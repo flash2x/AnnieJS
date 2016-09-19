@@ -12,27 +12,28 @@ namespace annieUI
             var s=this;
             s.photo=new Image();
             s.bitmap=new annie.Bitmap();
-            s.mask=new annie.Shape();
-            s.photo.onload=function (e){
+            s.maskObj=new annie.Shape();
+            s.photo.onload=function (e:any){
                s.bitmap.bitmapData=s.photo;
-                s.bitmap.scaleX=s.bitmap.scaleY=s.radio/s.photo.width*2;
-                s.mask.clear();
-                s.mask.beginFill("#000000");
+                s.maskObj.clear();
+                s.maskObj.beginFill("#000000");
                 if(s.maskType==0) {
-                    s.mask.circle(s.radio, s.radio, s.radio);
+                    s.bitmap.scaleX=s.bitmap.scaleY=s.radio*2/s.photo.width;
+                    s.maskObj.circle(s.radio, s.radio, s.radio);
                 }else{
-                    s.mask.rect(0,0,s.radio,s.radio);
+                    s.bitmap.scaleX=s.bitmap.scaleY=s.radio/s.photo.width;
+                    s.maskObj.rect(0,0,s.radio,s.radio);
                 }
-                s.mask.endFill();
+                s.maskObj.endFill();
             };
             s.addChild(s.bitmap);
-            s.bitmap.mask=s.mask;
+            s.bitmap.mask=s.maskObj;
         }
         private photo:any;
         private bitmap:Bitmap;
-        private mask:Shape;
         private maskType:number=0;
         private radio:number;
+        private maskObj:Shape;
         public init(src:string,radio:number=0,maskType:number=0):void{
             this.radio=radio;
             this.photo.src=src;

@@ -34,7 +34,8 @@ var jsList =[
     "annie/utils/Tween.ts",
     "annie/Annie.ts",
     "annie/GlobalFunction.ts",
-    "annie/ui/scrollPage.ts"
+    "annie/ui/scrollPage.ts",
+    "annie/ui/FacePhoto.ts"
 ];
 var onBuild = function(){
     var op = {

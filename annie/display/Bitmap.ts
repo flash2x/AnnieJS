@@ -15,15 +15,6 @@ namespace annie {
      */
     export class Bitmap extends DisplayObject {
         /**
-         * 画缓存位图的时候需要使用
-         * @property _bitmapCanvas
-         * @private
-         * @static
-         * @since 1.0.0
-         * @type {Canvas}
-         */
-        private static _bitmapCanvas:any = window.document.createElement("canvas");
-        /**
          * HTML的一个Image对象
          * @property bitmapData
          * @public
@@ -117,7 +108,7 @@ namespace annie {
             //滤镜
             if(s._isNeedUpdate){
                 if (s["cFilters"] && s["cFilters"].length > 0) {
-                    var _canvas = Bitmap._bitmapCanvas;
+                    var _canvas = annie.DisplayObject._canvas;
                     var tr = s.rect;
                     var w = tr ? tr.width : s.bitmapData.width;
                     var h = tr ? tr.height : s.bitmapData.height;
@@ -207,7 +198,7 @@ namespace annie {
             if(!bitmap.rect){
                 return bitmap.bitmapData;
             }else{
-                var _canvas = Bitmap._bitmapCanvas;
+                var _canvas = annie.DisplayObject._canvas;
                 var w:number=bitmap.rect.width;
                 var h:number=bitmap.rect.height;
                 _canvas.width=w;

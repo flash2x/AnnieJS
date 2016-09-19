@@ -278,9 +278,6 @@ namespace annieUI {
                     s.stopTimes = -1;
                 }
             }
-            if(annie.osType=="android"){
-                return;
-            }
             if (!s.isMaoPao) {
                 e.preventDefault();
             }

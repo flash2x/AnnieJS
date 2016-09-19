@@ -33,6 +33,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @default []
+         * @readonly
          */
         public children:DisplayObject[]=[];
 

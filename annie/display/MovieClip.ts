@@ -68,6 +68,7 @@ namespace annie {
          * @since 1.0.0
          * @type {number}
          * @default 1
+         * @readonly
          */
         public currentFrame:number=1;
 
@@ -79,6 +80,7 @@ namespace annie {
          * @since 1.0.0
          * @type {boolean}
          * @default true
+         * @readonly
          */
         public isPlaying:boolean=true;
 
@@ -89,6 +91,7 @@ namespace annie {
          * @since 1.0.0
          * @type {boolean}
          * @default true
+         * @readonly
          */
         public isFront:boolean=true;
         /**
@@ -98,6 +101,7 @@ namespace annie {
          * @since 1.0.0
          * @type {number}
          * @default 1
+         * @readonly
          */
         public totalFrames:number=1;
         private _scriptLayer:any=[];

@@ -39,6 +39,7 @@ namespace annie {
          * @since 1.0.0
          * @type {number}
          * @default 0
+         * @readonly
          */
         public renderType = 0;
         /**
@@ -60,6 +61,7 @@ namespace annie {
          * @since 1.0.0
          * @type {annie.Rectangle}
          * @default {x:0,y:0,width:0,height:0}
+         * @readonly
          */
         public viewRect:Rectangle = new Rectangle();
         /**
@@ -88,6 +90,7 @@ namespace annie {
          * @since 1.0.0
          * @default 320
          * @type {number}
+         * @readonly
          */
         public width:number = 320;
         /**
@@ -97,6 +100,7 @@ namespace annie {
          * @since 1.0.0
          * @default 240
          * @type {number}
+         * @readonly
          */
         public height:number = 240;
         /**
@@ -106,6 +110,7 @@ namespace annie {
          * @since 1.0.0
          * @default 320
          * @type {number}
+         * @readonly
          */
         public divHeight:number = 320;
         /**
@@ -114,6 +119,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @default 240
+         * @readonly
          * @type {number}
          */
         public divWidth:number = 240;

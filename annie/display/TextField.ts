@@ -13,7 +13,6 @@ namespace annie {
         public constructor() {
             super();
         }
-        public static _textCanvas:any = window.document.createElement("canvas");
         private _cacheImg:any=window.document.createElement("img");
         private _cacheX:number = 0;
         private _cacheY:number = 0;
@@ -126,7 +125,7 @@ namespace annie {
             ctx.fillStyle = this.color;
         }
         private _getMeasuredWidth(text:string):number {
-            var ctx = TextField._textCanvas.getContext("2d");
+            var ctx = annie.DisplayObject._canvas.getContext("2d");
             //ctx.save();
             var w = ctx.measureText(text).width;
             //ctx.restore();
@@ -156,7 +155,7 @@ namespace annie {
                     s._isNeedUpdate=false;
                     return;
                 }
-                var can=TextField._textCanvas;
+                var can=annie.DisplayObject._canvas;
                 var ctx = can.getContext("2d");
                 var hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines:any = [];
