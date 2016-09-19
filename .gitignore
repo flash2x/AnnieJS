@@ -40,7 +40,8 @@ jspm_packages
 docRes
 libs
 out
-test.fla
+*.fla
+*.swf
 test
 command.txt
 docConfig.json

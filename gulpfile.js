@@ -4,7 +4,8 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
 var merge = require('merge2');
-var jsList =[
+var del = require('del');
+var coreList =[
     "annie/events/EventDispatcher.ts",
     "annie/events/Event.ts",
     "annie/events/MouseEvent.ts",
@@ -33,34 +34,53 @@ var jsList =[
     "annie/utils/RESManager.ts",
     "annie/utils/Tween.ts",
     "annie/Annie.ts",
-    "annie/GlobalFunction.ts",
+    "annie/GlobalFunction.ts"
+];
+var uiList=[
+    "build/annieCore.d.ts",
     "annie/ui/scrollPage.ts",
     "annie/ui/FacePhoto.ts"
 ];
-var onBuild = function(){
+var onBuildCore = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
-        out: "annie.js"
+        out: "annieCore.js"
     };
-    var outDir = "test/libs";
-    var tsResult = gulp.src(jsList).pipe(ts(op));
+    var outDir = "build";
+    var tsResult = gulp.src(coreList).pipe(ts(op));
+    return merge([
+        tsResult.dts.pipe(gulp.dest(outDir)),
+        tsResult.js.pipe(gulp.dest(outDir))
+    ]);
+};
+var onBuildUI = function(){
+    var op = {
+        noImplicitAny: true,
+        declaration: true,
+        out: "annieUI.js"
+    };
+    var outDir = "build";
+    var tsResult = gulp.src(uiList).pipe(ts(op));
     return merge([
         tsResult.dts.pipe(gulp.dest(outDir)),
         tsResult.js.pipe(gulp.dest(outDir))
     ]);
 };
 var onBuildDoc = function () {
+    del([
+        'libs'
+    ]);
     var op = {
         noImplicitAny: true,
         declaration: true
     };
     var outDir = "libs";
-    var tsResult = gulp.src(jsList).pipe(ts(op));
+    var tsResult = gulp.src(coreList.concat(uiList.slice(1))).pipe(ts(op));
     return merge([
         tsResult.js.pipe(gulp.dest(outDir))
     ]);
 }
-gulp.task('default', onBuild);
+gulp.task('onBuildCore', onBuildCore);
+gulp.task('onBuildUI', onBuildUI);
 gulp.task("onBuildDoc", onBuildDoc);
-//gulp.task('createHelp', gulpSequence["onBuildDoc", "onCreateDoc"]);
