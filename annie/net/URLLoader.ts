@@ -165,11 +165,10 @@ namespace annie {
                         case "sound":
                         case "video":
                             if(s.responseType=="sound") {
-                                item = document.createElement("audio");
+                                item = document.createElement("AUDIO");
                             }else {
-                                item = document.createElement("video");
+                                item = document.createElement("VIDEO");
                             }
-                            item.autoplay = false;
                             item.preload = true;
                             item.src = s.url;
                             break;

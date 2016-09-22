@@ -65,6 +65,15 @@ namespace annie {
          */
         private static _count2:number=0;
         /**
+         * 主要为了记录项目中是否有添加onClick的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
+         * @property _count3
+         * @static
+         * @type {number}
+         * @since 1.0.0
+         * @private
+         */
+        private static _count3:number=0;
+        /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
          * @returns {number}
@@ -78,8 +87,10 @@ namespace annie {
                 id=EventDispatcher._count1;
             }else if(type=="onMouseUp"){
                 id=EventDispatcher._count2;
-            }else{
+            }else if(type=="onMouseMove"){
                 id=EventDispatcher._count0;
+            }else{
+                id=EventDispatcher._count3;
             }
             return id;
         }
@@ -132,6 +143,8 @@ namespace annie {
                 EventDispatcher._count2+=count;
             }else if(type=="onMouseMove"){
                 EventDispatcher._count0+=count;
+            }else{
+                EventDispatcher._count3+=count;
             }
         }
 

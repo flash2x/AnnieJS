@@ -57,6 +57,15 @@ declare namespace annie {
          */
         private static _count2;
         /**
+         * 主要为了记录项目中是否有添加onClick的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
+         * @property _count3
+         * @static
+         * @type {number}
+         * @since 1.0.0
+         * @private
+         */
+        private static _count3;
+        /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
          * @returns {number}
@@ -190,7 +199,7 @@ declare namespace annie {
          */
         static END_FRAME: string;
         /**
-         * MovieClip 帧事件
+         * MovieClip 帧标签事件
          * @Event
          * @property CALL_FRAME
          * @type {string}
@@ -240,6 +249,7 @@ declare namespace annie {
          */
         static ABORT: string;
         /**
+         * 开始事件
          * @Event
          * @property START
          * @type {string}
@@ -249,6 +259,7 @@ declare namespace annie {
          */
         static START: string;
         /**
+         * 事件类型名
          * @property type
          * @type {string}
          * @public
@@ -301,6 +312,7 @@ declare namespace annie {
      */
     class MouseEvent extends Event {
         /**
+         * 鼠标或者手指按下事件
          * @property MOUSE_DOWN
          * @static
          * @public
@@ -309,6 +321,7 @@ declare namespace annie {
          */
         static MOUSE_DOWN: string;
         /**
+         * 鼠标或者手指抬起事件
          * @property MOUSE_UP
          * @static
          * @public
@@ -317,6 +330,16 @@ declare namespace annie {
          */
         static MOUSE_UP: string;
         /**
+         * 鼠标或者手指单击
+         * @property CLICK
+         * @static
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         */
+        static CLICK: string;
+        /**
+         * 鼠标或者手指移动事件
          * @property MOUSE_MOVE
          * @static
          * @public
@@ -2627,6 +2650,7 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
+        private _mouseDownPoint;
         private _mt();
         /**
          * 循环刷新页面的函数
@@ -3136,6 +3160,86 @@ declare namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         draw(target: any, type: number): void;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        init(): void;
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        reSize(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.WGRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class WGRender extends AObject implements IRender {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        rootContainer: any;
+        private _gl;
+        private _stage;
+        private _shaderProgram;
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        constructor(stage: Stage);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        /**
+         *  调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
+         */
+        draw(target: any, type: number): void;
+        private _getShader(id);
         /**
          * 初始化渲染器
          * @public

@@ -198,10 +198,12 @@ namespace annie {
             var s = this;
             s.stage = this;
             if (annie.osType == "pc") {
-                s.autoSteering = false;
+                s.autoResize=true;
+            }else{
+                s.autoSteering = true;
             }
-            this._lastMousePoint = new Point();
-            this.name = "stageInstance_" + s.getInstanceId();
+            s._lastMousePoint = new Point();
+            s.name = "stageInstance_" + s.getInstanceId();
             var div:any = document.getElementById(rootDivId);
             s.renderType = renderType;
             s.width = desW;
@@ -285,6 +287,7 @@ namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
+        private _mouseDownPoint:Point=new Point(0,0);
         private _mt():void {
             var s = this;
             var mt:any = s._mouseEventInfo;
@@ -316,11 +319,37 @@ namespace annie {
                         event.type=item;
                     }
                     p=s.globalToLocal(s._lastMousePoint);
+                    event["_pd"]=false;
                     event.clientX = s._lastMousePoint.x;
                     event.clientY = s._lastMousePoint.y;
                     event.stageX = p.x;
                     event.stageY = p.y;
                     eLen++;
+                }
+                if(item=="onMouseDown"){
+                    s._mouseDownPoint.x=s._lastMousePoint.x;
+                    s._mouseDownPoint.y=s._lastMousePoint.y;
+                }else if(item=="onMouseUp"){
+                    if(Math.abs(s._mouseDownPoint.x-s._lastMousePoint.x)<=1&&Math.abs(s._mouseDownPoint.y-s._lastMousePoint.y)<=1){
+                        //click事件
+                        //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                        if (EventDispatcher.getMouseEventCount("onMouseClick")> 0){
+                            if(!s._ml[eLen]) {
+                                event = new MouseEvent("onMouseClick");
+                                events.push(event);
+                            }else{
+                                event=s._ml[eLen];
+                                event.type="onMouseClick";
+                            }
+                            p=s.globalToLocal(s._lastMousePoint);
+                            event["_pd"]=false;
+                            event.clientX = s._lastMousePoint.x;
+                            event.clientY = s._lastMousePoint.y;
+                            event.stageX = p.x;
+                            event.stageY = p.y;
+                            eLen++;
+                        }
+                    }
                 }
             }
             if (eLen > 0) {

@@ -61,7 +61,7 @@ namespace annie {
          */
         public static END_FRAME:string = "onEndFrame";
         /**
-         * MovieClip 帧事件
+         * MovieClip 帧标签事件
          * @Event
          * @property CALL_FRAME
          * @type {string}
@@ -111,6 +111,7 @@ namespace annie {
          */
         public static ABORT:string = "onAbort";
         /**
+         * 开始事件
          * @Event
          * @property START
          * @type {string}
@@ -120,6 +121,7 @@ namespace annie {
          */
         public static START:string = "onStart";
         /**
+         * 事件类型名
          * @property type
          * @type {string}
          * @public
