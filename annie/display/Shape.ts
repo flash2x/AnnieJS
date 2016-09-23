@@ -37,7 +37,7 @@ namespace annie {
          */
         public static getGradientColor(colors:Array<string>, ratios:Array<number>, points:Array<number>):any {
             var colorObj:any;
-            var ctx = Shape._cacheCanvas.getContext("2d");
+            var ctx = DisplayObject._canvas.getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }else{
@@ -59,7 +59,7 @@ namespace annie {
          * @since 1.0.0
          */
         public static getBitmapStyle(image:any):any{
-            var ctx = Shape._cacheCanvas.getContext("2d");
+            var ctx = DisplayObject._canvas.getContext("2d");
             return ctx.createPattern(image,"repeat");
         }
         /**
@@ -94,8 +94,7 @@ namespace annie {
          * @private
          * @type {Canvas}
          */
-        public static _cacheCanvas:any = window.document.createElement("canvas");
-        private _cacheImg:any=window.document.createElement("img");
+        private _cacheImg:any=window.document.createElement("canvas");
         private _cacheX:number = 0;
         private _cacheY:number = 0;
         private _isBitmapStroke:Matrix;
@@ -140,7 +139,7 @@ namespace annie {
          * @since 1.0.0
          */
         public roundRect(x:number,y:number,w:number,h:number,rTL:number=0,rTR:number=0,rBL:number=0,rBR:number=0):void{
-            //var ctx = Shape._cacheCanvas.getContext("2d");
+            //var ctx = DisplayObject._canvas.getContext("2d");
             var max = (w<h?w:h)/2;
             var mTL=0, mTR=0, mBR=0, mBL=0;
             if (rTL < 0) { rTL *= (mTL=-1); }
@@ -743,7 +742,7 @@ namespace annie {
                         s._cacheX = leftX;
                         s._cacheY = leftY;
                         ///////////////////////////
-                        var _canvas = Shape._cacheCanvas;
+                        var _canvas = s._cacheImg;
                         _canvas.width = w;
                         _canvas.height = h;
                         var ctx = _canvas["getContext"]('2d');
@@ -806,14 +805,15 @@ namespace annie {
                             ctx.putImageData(imageData,0,0);
                         }
                         //
-                        s._cacheImg.src = _canvas.toDataURL("image/png");
                     } else {
-                        s._cacheImg.src ="";
+                        s._cacheImg.width=0;
+                        s._cacheImg.height=0;
                         s._cacheX=0;
                         s._cacheY=0;
                     }
                 }else{
-                    s._cacheImg.src="";
+                    s._cacheImg.width=0;
+                    s._cacheImg.height=0;
                     s._cacheX=0;
                     s._cacheY=0;
                 }
@@ -823,7 +823,7 @@ namespace annie {
         /*private _drawPath(){
             var s=this;
             var leftX:number=s._cacheX,leftY:number=s._cacheY,w:number=s._cacheW,h:number=s._cacheH;
-            var _canvas = Shape._cacheCanvas;
+            var _canvas = DisplayObject._canvas;
             _canvas.width = w;
             _canvas.height = h;
             var ctx = _canvas["getContext"]('2d');
@@ -891,7 +891,7 @@ namespace annie {
                     return s;
                 }
             //继续检测
-                var _canvas = Shape._cacheCanvas;
+                var _canvas = DisplayObject._canvas;
                 _canvas.width = 1;
                 _canvas.height = 1;
                 var ctx = _canvas["getContext"]('2d');

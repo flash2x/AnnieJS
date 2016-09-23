@@ -218,7 +218,10 @@ namespace annie {
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                s.renderObj = new WGRender(s);
+                //s.renderObj = new WGRender(s);
+                s.renderObj = new CanvasRender(s);
+                trace("webgl目前来说商业应用不是很稳定,等成熟后将在高版本中支持!");
+                trace("目前还是会以Canvas来渲染!");
             }
             s.renderObj.init();
             var rc = s.renderObj.rootContainer;

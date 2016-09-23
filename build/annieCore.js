@@ -1550,7 +1550,7 @@ var annie;
             if (rect === void 0) { rect = null; }
             _super.call(this);
             /**
-             * HTML的一个Image对象
+             * HTML的一个Image对象或者是canvas对象或者是video对象
              * @property bitmapData
              * @public
              * @since 1.0.0
@@ -1569,7 +1569,7 @@ var annie;
              */
             this.rect = null;
             /**
-             * 缓存起来的位图对象。最后真正送到渲染器去渲染的对象
+             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
              * @property _cacheImg
              * @private
              * @since 1.0.0
@@ -1631,7 +1631,10 @@ var annie;
             //滤镜
             if (s._isNeedUpdate) {
                 if (s["cFilters"] && s["cFilters"].length > 0) {
-                    var _canvas = annie.DisplayObject._canvas;
+                    if (!s._realCacheImg) {
+                        s._realCacheImg = window.document.createElement("canvas");
+                    }
+                    var _canvas = s._realCacheImg;
                     var tr = s.rect;
                     var w = tr ? tr.width : s.bitmapData.width;
                     var h = tr ? tr.height : s.bitmapData.height;
@@ -1672,10 +1675,7 @@ var annie;
                         f.drawFilter(imageData);
                     }
                     ctx.putImageData(imageData, 0, 0);
-                    if (!s._realCacheImg) {
-                        s._realCacheImg = window.document.createElement("img");
-                    }
-                    s._realCacheImg.src = _canvas.toDataURL("image/png");
+                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
                     s._cacheImg = s._realCacheImg;
                     s._cacheX = -10;
                     s._cacheY = -10;
@@ -1767,7 +1767,13 @@ var annie;
              * @default []
              */
             this._command = [];
-            this._cacheImg = window.document.createElement("img");
+            /**
+             * @property _cacheCanvas
+             * @since 1.0.0
+             * @private
+             * @type {Canvas}
+             */
+            this._cacheImg = window.document.createElement("canvas");
             this._cacheX = 0;
             this._cacheY = 0;
             /**
@@ -1872,7 +1878,7 @@ var annie;
          */
         Shape.getGradientColor = function (colors, ratios, points) {
             var colorObj;
-            var ctx = Shape._cacheCanvas.getContext("2d");
+            var ctx = annie.DisplayObject._canvas.getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }
@@ -1894,7 +1900,7 @@ var annie;
          * @since 1.0.0
          */
         Shape.getBitmapStyle = function (image) {
-            var ctx = Shape._cacheCanvas.getContext("2d");
+            var ctx = annie.DisplayObject._canvas.getContext("2d");
             return ctx.createPattern(image, "repeat");
         };
         /**
@@ -1954,7 +1960,7 @@ var annie;
             if (rTR === void 0) { rTR = 0; }
             if (rBL === void 0) { rBL = 0; }
             if (rBR === void 0) { rBR = 0; }
-            //var ctx = Shape._cacheCanvas.getContext("2d");
+            //var ctx = DisplayObject._canvas.getContext("2d");
             var max = (w < h ? w : h) / 2;
             var mTL = 0, mTR = 0, mBR = 0, mBL = 0;
             if (rTL < 0) {
@@ -2414,7 +2420,7 @@ var annie;
                         s._cacheX = leftX;
                         s._cacheY = leftY;
                         ///////////////////////////
-                        var _canvas = Shape._cacheCanvas;
+                        var _canvas = s._cacheImg;
                         _canvas.width = w;
                         _canvas.height = h;
                         var ctx = _canvas["getContext"]('2d');
@@ -2482,17 +2488,17 @@ var annie;
                             }
                             ctx.putImageData(imageData, 0, 0);
                         }
-                        //
-                        s._cacheImg.src = _canvas.toDataURL("image/png");
                     }
                     else {
-                        s._cacheImg.src = "";
+                        s._cacheImg.width = 0;
+                        s._cacheImg.height = 0;
                         s._cacheX = 0;
                         s._cacheY = 0;
                     }
                 }
                 else {
-                    s._cacheImg.src = "";
+                    s._cacheImg.width = 0;
+                    s._cacheImg.height = 0;
                     s._cacheX = 0;
                     s._cacheY = 0;
                 }
@@ -2502,7 +2508,7 @@ var annie;
         /*private _drawPath(){
             var s=this;
             var leftX:number=s._cacheX,leftY:number=s._cacheY,w:number=s._cacheW,h:number=s._cacheH;
-            var _canvas = Shape._cacheCanvas;
+            var _canvas = DisplayObject._canvas;
             _canvas.width = w;
             _canvas.height = h;
             var ctx = _canvas["getContext"]('2d');
@@ -2572,7 +2578,7 @@ var annie;
                     return s;
                 }
                 //继续检测
-                var _canvas = Shape._cacheCanvas;
+                var _canvas = annie.DisplayObject._canvas;
                 _canvas.width = 1;
                 _canvas.height = 1;
                 var ctx = _canvas["getContext"]('2d');
@@ -2586,13 +2592,6 @@ var annie;
             }
             return null;
         };
-        /**
-         * @property _cacheCanvas
-         * @since 1.0.0
-         * @private
-         * @type {Canvas}
-         */
-        Shape._cacheCanvas = window.document.createElement("canvas");
         Shape.BASE_64 = {
             "A": 0,
             "B": 1,
@@ -4370,7 +4369,7 @@ var annie;
         __extends(TextField, _super);
         function TextField() {
             _super.call(this);
-            this._cacheImg = window.document.createElement("img");
+            this._cacheImg = window.document.createElement("canvas");
             this._cacheX = 0;
             this._cacheY = 0;
             this._cacheObject = { bold: false, italic: false, size: 12, lineType: "single", text: "", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
@@ -4513,7 +4512,7 @@ var annie;
                     s._isNeedUpdate = false;
                     return;
                 }
-                var can = annie.DisplayObject._canvas;
+                var can = s._cacheImg;
                 var ctx = can.getContext("2d");
                 var hardLines = s.text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
@@ -4625,7 +4624,6 @@ var annie;
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
-                s._cacheImg.src = can.toDataURL("image/png");
                 s._cacheX = -10;
                 s._cacheY = -10;
                 s._isNeedUpdate = false;
@@ -5151,7 +5149,10 @@ var annie;
             }
             else {
                 //webgl
-                s.renderObj = new annie.WGRender(s);
+                //s.renderObj = new WGRender(s);
+                s.renderObj = new annie.CanvasRender(s);
+                trace("webgl目前来说商业应用不是很稳定,等成熟后将在高版本中支持!");
+                trace("目前还是会以Canvas来渲染!");
             }
             s.renderObj.init();
             var rc = s.renderObj.rootContainer;
@@ -6342,217 +6343,6 @@ var annie;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * Canvas 渲染器
-     * @class annie.WGRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.0
-     */
-    var WGRender = (function (_super) {
-        __extends(WGRender, _super);
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.0
-         */
-        function WGRender(stage) {
-            _super.call(this);
-            /**
-             * 渲染器所在最上层的对象
-             * @property rootContainer
-             * @public
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            this.rootContainer = null;
-            this._stage = stage;
-        }
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.0
-         * @public
-         */
-        WGRender.prototype.begin = function () {
-            var s = this;
-            var gl = s._gl;
-            if (s._stage.bgColor != "") {
-                var color = s._stage.bgColor;
-                var r = parseInt("0x" + color.substr(1, 2));
-                var g = parseInt("0x" + color.substr(3, 2));
-                var b = parseInt("0x" + color.substr(5, 2));
-                gl.clearColor(r / 255, g / 255, b / 255, 1.0);
-            }
-            else {
-                gl.clearColor(0.0, 0.0, 0.0, 0.0);
-            }
-            // Enable depth tests
-            gl.enable(gl.DEPTH_TEST);
-            // Clear the depth buffer and color buffer
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        };
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.0
-         */
-        WGRender.prototype.beginMask = function (target) {
-        };
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.0
-         */
-        WGRender.prototype.endMask = function () {
-        };
-        /**
-         *  调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
-         */
-        WGRender.prototype.draw = function (target, type) {
-            /* var s = this;
-             // Define the vertices for a triangle
-             var vertices: any = [
-             0.0, 0.5, 0.0,
-             -0.5, -0.5, 0.0,
-             0.5, -0.5, 0.0
-             ];
-             // Create a buffer to use in the WebGL instance
-             var buffer = s._gl.createBuffer();
-             s._gl.bindBuffer(s._gl.ARRAY_BUFFER, buffer);
-             // Create and initialize the vertex buffer's data-store
-             s._gl.bufferData(s._gl.ARRAY_BUFFER, new Float32Array(vertices), s._gl.STATIC_DRAW);
-             // Enable the vertex attribute array
-             //开启对应程序接口的数组模式
-             s._gl.enableVertexAttribArray(0);
-             //把当前工作的数据缓冲区指定给0号位置的程序接口
-             s._gl.vertexAttribPointer(0, 3, s._gl.FLOAT, false, 0, 0);
-             s._gl.drawArrays(s._gl.TRIANGLES, 0, 3);
-             // Force all buffered GL commands to be executed as quickly as possible by the rendering engine
-             s._gl.flush();*/
-            var s = this;
-            var gl = s._gl;
-            ////////////////////////////////////////////
-            var vertices = [
-                1.0, 1.0,
-                1.0, -1.0,
-                -1.0, 1.0,
-                -1.0, -1.0
-            ];
-            // Create a buffer to use in the WebGL instance
-            var buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            // Create and initialize the vertex buffer's data-store
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
-            // Enable the vertex attribute array
-            //开启对应程序接口的数组模式
-            gl.enableVertexAttribArray(0);
-            //把当前工作的数据缓冲区指定给0号位置的程序接口
-            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-            //////////////////////////////////////////////////
-            //在这里把我们的纹理交给WebGL:
-            ////////////////////////////////////////
-            var textureObject = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, textureObject);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, target._cacheImg);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            //为了安全起见，在使用之前请绑定好纹理ID
-            gl.activeTexture(gl.TEXTURE0);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        };
-        WGRender.prototype._getShader = function (id) {
-            var s = this;
-            var gl = s._gl;
-            // Find the shader script element
-            var shaderText = "";
-            // Create the shader object instance
-            var shader = null;
-            if (id == 0) {
-                shaderText = 'precision mediump float;varying vec2 textureCoordinate;uniform sampler2D inputImageTexture;void main() {gl_FragColor = texture2D(inputImageTexture, textureCoordinate);}';
-                shader = gl.createShader(gl.FRAGMENT_SHADER);
-            }
-            else {
-                shaderText = 'precision mediump float;attribute vec4 position;attribute vec2 inputTextureCoordinate;varying vec2 textureCoordinate;void main() {gl_Position = position;textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);}';
-                shader = gl.createShader(gl.VERTEX_SHADER);
-            }
-            // Set the shader source code in the shader object instance and compile the shader
-            gl.shaderSource(shader, shaderText);
-            gl.compileShader(shader);
-            if (null == gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                throw Error("Shader compilation failed. Error: \"" + gl.getShaderInfoLog(shader) + "\"");
-            }
-            // Attach the shaders to the shader program
-            gl.attachShader(s._shaderProgram, shader);
-            return shader;
-        };
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.0
-         * @method init
-         */
-        WGRender.prototype.init = function () {
-            var s = this;
-            if (!s.rootContainer) {
-                s.rootContainer = document.createElement("canvas");
-                s._stage.rootDiv.appendChild(s.rootContainer);
-            }
-            var c = s.rootContainer;
-            s._gl = c["getContext"]('experimental-webgl') || c["getContext"]('webgl');
-            var gl = s._gl;
-            s._shaderProgram = gl.createProgram();
-            var _shaderProgram = s._shaderProgram;
-            gl.disable(gl.DEPTH_TEST);
-            gl.disable(gl.CULL_FACE);
-            gl.enable(gl.BLEND);
-            //初始化顶点着色器和片元着色器
-            s._getShader(0);
-            s._getShader(1);
-            gl.linkProgram(_shaderProgram);
-            if (null == gl.getProgramParameter(_shaderProgram, gl.LINK_STATUS)) {
-                throw Error("Error linking shader program: \"" + gl.getProgramInfoLog(_shaderProgram) + "\"");
-            }
-            gl.useProgram(_shaderProgram);
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-        };
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.0
-         * @method reSize
-         */
-        WGRender.prototype.reSize = function () {
-            var s = this;
-            var c = s.rootContainer;
-            c.width = s._stage.divWidth * annie.devicePixelRatio;
-            c.height = s._stage.divHeight * annie.devicePixelRatio;
-            c.style.width = s._stage.divWidth + "px";
-            c.style.height = s._stage.divHeight + "px";
-            s._gl.viewport(0, 0, c.width, c.height);
-        };
-        return WGRender;
-    }(annie.AObject));
-    annie.WGRender = WGRender;
 })(annie || (annie = {}));
 /**
  * @module annie

@@ -13,7 +13,7 @@ namespace annie {
         public constructor() {
             super();
         }
-        private _cacheImg:any=window.document.createElement("img");
+        private _cacheImg:any=window.document.createElement("canvas");
         private _cacheX:number = 0;
         private _cacheY:number = 0;
         private _cacheObject:any ={bold:false,italic:false,size:12,lineType:"single",text:"",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
@@ -155,7 +155,7 @@ namespace annie {
                     s._isNeedUpdate=false;
                     return;
                 }
-                var can=annie.DisplayObject._canvas;
+                var can=s._cacheImg;
                 var ctx = can.getContext("2d");
                 var hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines:any = [];
@@ -260,7 +260,6 @@ namespace annie {
                     }
                     ctx.putImageData(imageData,0,0);
                 }
-                s._cacheImg.src = can.toDataURL("image/png");
                 s._cacheX=-10;
                 s._cacheY=-10;
                 s._isNeedUpdate = false;

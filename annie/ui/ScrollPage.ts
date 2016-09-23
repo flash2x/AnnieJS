@@ -1,10 +1,20 @@
 /**
  * Created by anlun on 16/8/14.
  */
+/**
+ * @module annieUI
+ */
 namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     import osType = annie.osType;
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.ScrollPage
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
     export class ScrollPage extends Sprite {
         /**
          * 横向还是纵向 默认为纵向
@@ -121,7 +131,7 @@ namespace annieUI {
          * @default 20
          * @type {number}
          */
-        public fSpeed: number = 20;
+        public  fSpeed: number = 20;
         private isMaoPao: boolean = true;
         private paramXY: string = "y";
         private stopTimes: number = -1;

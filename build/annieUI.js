@@ -6,10 +6,20 @@ var __extends = (this && this.__extends) || function (d, b) {
 /**
  * Created by anlun on 16/8/14.
  */
+/**
+ * @module annieUI
+ */
 var annieUI;
 (function (annieUI) {
     var Sprite = annie.Sprite;
     var Shape = annie.Shape;
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.ScrollPage
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
     var ScrollPage = (function (_super) {
         __extends(ScrollPage, _super);
         /**
@@ -307,9 +317,20 @@ var annieUI;
 /**
  * Created by anlun on 16/8/14.
  */
+/**
+ * @module annieUI
+ */
 var annieUI;
 (function (annieUI) {
     var Sprite = annie.Sprite;
+    /**
+     * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
+     * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
+     * @class annieUI.FacePhoto
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+    */
     var FacePhoto = (function (_super) {
         __extends(FacePhoto, _super);
         function FacePhoto() {
@@ -336,6 +357,13 @@ var annieUI;
             s.addChild(s.bitmap);
             s.bitmap.mask = s.maskObj;
         }
+        /**
+         * 被始化头像
+         * @method init
+         * @param src 头像的地址
+         * @param radio 指定头像的长宽
+         * @param maskType 遮罩类型，是圆形遮罩还是方形遮罩
+         */
         FacePhoto.prototype.init = function (src, radio, maskType) {
             if (radio === void 0) { radio = 0; }
             if (maskType === void 0) { maskType = 0; }
