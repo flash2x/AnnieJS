@@ -117,7 +117,10 @@ namespace annie {
         }
         _dRender._stage=obj;
         _dRender.rootContainer=DisplayObject["_canvas"];
-        //设置宽高
+        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
+        if(!obj.stage){
+            obj.update();
+        }
         var whObj:any=obj.getBounds();
         var w:number=rect?rect.width:whObj.width;
         var h:number=rect?rect.height:whObj.height;
@@ -136,7 +139,9 @@ namespace annie {
         obj.y=rect?-rect.y:0;
         obj.scaleX=obj.scaleY=1;
         obj.rotation=obj.skewX=obj.skewY=0;
-        obj.update();
+        if(obj.stage) {
+            obj.update();
+        }
         obj.render(_dRender);
         obj.parent=objInfo.p;
         obj.x=objInfo.x;
