@@ -107,6 +107,13 @@ namespace annie {
          * @type {boolean}
          */
         public bold:boolean=false;
+
+        /**
+         * 设置文本在canvas里的渲染样式
+         * @param ctx
+         * @private
+         * @since 1.0.0
+         */
         private _prepContext(ctx:any):void {
             var s=this;
             var font:any=s.size || 12;
@@ -124,6 +131,15 @@ namespace annie {
             ctx.textBaseline = "top";
             ctx.fillStyle = this.color;
         }
+
+        /**
+         * 获取文本宽
+         * @method _getMeasuredWidth
+         * @param text
+         * @return {number}
+         * @private
+         * @since 1.0.0
+         */
         private _getMeasuredWidth(text:string):number {
             var ctx = annie.DisplayObject._canvas.getContext("2d");
             //ctx.save();
@@ -131,7 +147,13 @@ namespace annie {
             //ctx.restore();
             return w;
         }
-
+        /**
+         * 重写 render
+         * @method render
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         public render(renderObj:IRender):void {
             var s = this;
             if (s._cacheImg.src!="") {
@@ -139,6 +161,13 @@ namespace annie {
             }
             //super.render();
         }
+        /**
+         * 重写 update
+         * @method update
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         public update():void {
             var s:any = this;
             if(s.pauseUpdate)return;
@@ -265,6 +294,14 @@ namespace annie {
                 s._isNeedUpdate = false;
             }
         }
+
+        /**
+         * 重写 getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         public getBounds():Rectangle{
             var s=this;
             var r=new Rectangle();

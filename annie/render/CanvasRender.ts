@@ -112,7 +112,7 @@ namespace annie {
             this._ctx.restore();
         }
         /**
-         *  调用渲染
+         * 调用渲染
          * @public
          * @since 1.0.0
          * @method draw

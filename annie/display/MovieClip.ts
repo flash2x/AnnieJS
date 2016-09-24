@@ -460,7 +460,7 @@ namespace annie {
         }
 
         /**
-         * 更改mc中的一个孩子的显示属性
+         * 更改movieClip中的一个child的显示属性
          * @method setFrameChild
          * @public
          * @since 1.0.0
@@ -492,6 +492,7 @@ namespace annie {
         }
 
         /**
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0

@@ -36,7 +36,14 @@ namespace annie {
             super();
             this.eventTypes = {};
         }
-        //全局的鼠标事件的监听数
+
+        /**
+         * 全局的鼠标事件的监听数对象表
+         * @property _MECO
+         * @public
+         * @since 1.0.0
+         */
+
         private static _MECO:any={};
         /**
          * 看看有多少mouse或者touch侦听数
@@ -45,6 +52,7 @@ namespace annie {
          * @static
          * @private
          * @since 1.0.0
+         * @param {string} type 获取事件类型，默认是所有
          */
         public static getMouseEventCount(type:string=""):number{
             var count:number=0;

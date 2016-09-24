@@ -40,12 +40,15 @@ namespace annie {
         }
         /**
          * 视频的引用
+         * @property video
+         * @public
+         * @since 1.0.0
          */
-        private video:any;
+        public video:any;
         /**
          * 播放的视频类型 值为0是序列图,1是视频 只读
          * @property videoType
-         * @puboic
+         * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
@@ -53,7 +56,10 @@ namespace annie {
         public videoType:number=0;
 
         /**
-         * 继承刷新方法
+         * 重写update
+         * @method update
+         * @public
+         * @since 1.0.0
          */
         public update(){
             //刷新视频

@@ -29,6 +29,12 @@ declare namespace annie {
     class EventDispatcher extends AObject {
         private eventTypes;
         constructor();
+        /**
+         * 全局的鼠标事件的监听数对象表
+         * @property _MECO
+         * @public
+         * @since 1.0.0
+         */
         private static _MECO;
         /**
          * 看看有多少mouse或者touch侦听数
@@ -37,6 +43,7 @@ declare namespace annie {
          * @static
          * @private
          * @since 1.0.0
+         * @param {string} type 获取事件类型，默认是所有
          */
         static getMouseEventCount(type?: string): number;
         /**
@@ -271,6 +278,13 @@ declare namespace annie {
          * @since 1.0.0
          */
         preventDefault(): void;
+        /**
+         * 是否阻止事件向下冒泡
+         * @property _pd
+         * @type {boolean}
+         * @private
+         * @since 1.0.0
+         */
         private _pd;
     }
 }
@@ -499,6 +513,7 @@ declare namespace annie {
          */
         ty: number;
         /**
+         * 构造函数
          * @method Matrix
          * @param {number} a
          * @param {number} b
@@ -511,6 +526,7 @@ declare namespace annie {
          */
         constructor(a?: number, b?: number, c?: number, d?: number, tx?: number, ty?: number);
         /**
+         * 复制一个矩阵
          * @method clone
          * @since 1.0.0
          * @public
@@ -551,7 +567,7 @@ declare namespace annie {
          */
         invert(): Matrix;
         /**
-         * 设置一个矩阵通过普通的属性
+         * 设置一个矩阵通过普通的显示对象的相关九大属性
          * @method createBox
          * @param {number} x
          * @param {number} y
@@ -575,7 +591,7 @@ declare namespace annie {
          */
         prepend: (mtx: Matrix) => void;
         /**
-         * 判断
+         * 判断两个矩阵是否相等
          * @method isEqual
          * @static
          * @public
@@ -650,7 +666,7 @@ declare namespace annie {
          */
         isPointIn(point: Point): boolean;
         /**
-         * 将多个rect合成为一个大的rect
+         * 将多个矩形合成为一个大的矩形
          * 返回包含所有给定的矩阵拼合之后的一个最小矩形
          * @method createFromRects
          * @param {annie.Rectangle} rect
@@ -661,8 +677,8 @@ declare namespace annie {
          */
         static createFromRects(rect: Rectangle, ...arg: Rectangle[]): Rectangle;
         /**
-         * 通过一系列点来确定一个矩形
-         * 返回包含所有给定的点的一个最小矩形
+         * 通过一系列点来生成一个矩形
+         * 返回包含所有给定的点的最小矩形
          * @method createFromPoints
          * @static
          * @public
@@ -875,15 +891,6 @@ declare namespace annie {
          * @default 0
          */
         visible: boolean;
-        /**
-         * 显示对象的混合模式
-         * @property blendMode
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        blendMode: number;
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -1101,7 +1108,7 @@ declare namespace annie {
          */
         constructor(bitmapData?: any, rect?: Rectangle);
         /**
-         * 调用渲染
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -1109,13 +1116,14 @@ declare namespace annie {
          */
         render(renderObj: IRender): void;
         /**
-         * @调用更新
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
          */
         update(): void;
         /**
+         * 重写getBounds
          * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public
@@ -1203,7 +1211,7 @@ declare namespace annie {
         private _isBitmapStroke;
         private _isBitmapFill;
         /**
-         *碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
+         * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
          * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
          * @property hitPixel
          * @public
@@ -1451,7 +1459,7 @@ declare namespace annie {
          */
         decodePath: (data: string) => void;
         /**
-         *
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -1459,12 +1467,14 @@ declare namespace annie {
          */
         render(renderObj: IRender): void;
         /**
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
          */
         update(): void;
         /**
+         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -1472,6 +1482,7 @@ declare namespace annie {
          */
         getBounds(): Rectangle;
         /**
+         * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -1572,7 +1583,7 @@ declare namespace annie {
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
-         * 移动指定层级上的孩子
+         * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
          * @public
@@ -1587,14 +1598,14 @@ declare namespace annie {
          */
         removeAllChildren(): void;
         /**
-         * 刷新
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
          */
         update(): void;
         /**
-         * 碰撞测试
+         * 重写碰撞测试
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -1604,6 +1615,7 @@ declare namespace annie {
          */
         hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
         /**
+         * 重写getBounds
          * @method getBounds
          * @returns {any}
          * @since 1.0.0
@@ -1611,7 +1623,7 @@ declare namespace annie {
          */
         getBounds(): Rectangle;
         /**
-         * 渲染
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -1643,13 +1655,17 @@ declare namespace annie {
         /**
          * 媒体类型 VIDEO 或者 AUDIO
          * @type {string}
+         * @since 1.0.0
+         * @since 1.0.0
          */
         type: string;
         private _loop;
         /**
+         * 构造函数
          * @method Media
          * @param {string|HtmlElement} src
          * @param {string} type
+         * @since 1.0.0
          */
         constructor(src: any, type: string);
         /**
@@ -1808,8 +1824,15 @@ declare namespace annie {
          * @param src
          * @param width
          * @param height
+         * @since 1.0.0
          */
         constructor(src: string, width: number, height: number);
+        /**
+         * 资源加载成功
+         * @private
+         * @since 1.0.0
+         * @param e
+         */
         private success(e);
         /**
          * 如果需要单独使用ImageFrames的话,你需要时间调用update来刷新视频的播放进度,使用VideoPlayer的类将无需考虑
@@ -1823,6 +1846,8 @@ declare namespace annie {
         /**
          * 播放视频,如果autoplay为true则会加载好后自动播放
          * @method play
+         * @public
+         * @since 1.0.0
          */
         play(): void;
         /**
@@ -2077,7 +2102,7 @@ declare namespace annie {
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         /**
-         * 更改mc中的一个孩子的显示属性
+         * 更改movieClip中的一个child的显示属性
          * @method setFrameChild
          * @public
          * @since 1.0.0
@@ -2095,6 +2120,7 @@ declare namespace annie {
          */
         delFrameChild(child: any, attr: any): void;
         /**
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -2134,6 +2160,7 @@ declare namespace annie {
          */
         htmlElement: any;
         /**
+         * 上一交刷新时保留的数据
          * @property _oldProps
          * @private
          * @since 1.0.0
@@ -2141,6 +2168,7 @@ declare namespace annie {
          */
         private _oldProps;
         /**
+         * 是否已经添加了舞台事件
          * @property _isAdded
          * @since 1.0.0
          * @type {boolean}
@@ -2148,6 +2176,7 @@ declare namespace annie {
          */
         private _isAdded;
         /**
+         * 构造函数
          * @method FloatDisplay
          * @public
          * @param isOnCanvas 是否悬浮在canvas上面,否则会将元素放到canvas下面
@@ -2170,14 +2199,14 @@ declare namespace annie {
          */
         delElement(): void;
         /**
-         * 刷新现实对象
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
          */
         update(): void;
         /**
-         * 获取对象的bounds
+         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -2208,19 +2237,25 @@ declare namespace annie {
         constructor(src: any, type: number, width: number, height: number);
         /**
          * 视频的引用
+         * @property video
+         * @public
+         * @since 1.0.0
          */
-        private video;
+        video: any;
         /**
          * 播放的视频类型 值为0是序列图,1是视频 只读
          * @property videoType
-         * @puboic
+         * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
         videoType: number;
         /**
-         * 继承刷新方法
+         * 重写update
+         * @method update
+         * @public
+         * @since 1.0.0
          */
         update(): void;
     }
@@ -2332,10 +2367,45 @@ declare namespace annie {
          * @type {boolean}
          */
         bold: boolean;
+        /**
+         * 设置文本在canvas里的渲染样式
+         * @param ctx
+         * @private
+         * @since 1.0.0
+         */
         private _prepContext(ctx);
+        /**
+         * 获取文本宽
+         * @method _getMeasuredWidth
+         * @param text
+         * @return {number}
+         * @private
+         * @since 1.0.0
+         */
         private _getMeasuredWidth(text);
+        /**
+         * 重写 render
+         * @method render
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         render(renderObj: IRender): void;
+        /**
+         * 重写 update
+         * @method update
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         update(): void;
+        /**
+         * 重写 getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         getBounds(): Rectangle;
     }
 }
@@ -2388,7 +2458,7 @@ declare namespace annie {
          */
         initInfo(text: string, w: number, h: number, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
         /**
-         * 设置粗体
+         * 设置文本是否为粗体
          * @method setBold
          * @param {boolean} bold true或false
          * @public
@@ -2714,9 +2784,32 @@ declare namespace annie {
          */
         resize: () => void;
         getBounds(): Rectangle;
+        /**
+         * 要循环调用 flush 函数对象列表
+         * @type {Array}
+         */
         private static allUpdateObjList;
+        /**
+         *
+         */
         private static flushAll();
+        /**
+         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
+         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
+         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
+         * @method addUpdateObj
+         * @param target 要循化调用 flush 函数的对象
+         * @public
+         * @since
+         */
         private static addUpdateObj(target);
+        /**
+         * 移除掉已经添加的循环刷新对象
+         * @method removeUpdateObj
+         * @param target
+         * @private
+         * @since 1.0.0
+         */
         private static removeUpdateObj(target);
     }
 }
@@ -2725,7 +2818,7 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 投影或者发光.
+     * 投影或者发光滤镜
      * @class annie.ShadowFilter
      * @extends annie.AObject
      * @public
@@ -2917,7 +3010,7 @@ declare namespace annie {
         toString(): string;
     }
     /**
-     * 矩阵变色
+     * 矩阵变色滤镜
      * @class annie.ColorMatrixFilter
      * @extends annie.AObject
      * @public
@@ -2997,7 +3090,7 @@ declare namespace annie {
         toString(): string;
     }
     /**
-     * 模糊
+     * 模糊滤镜
      * @class annie.BlurFilter
      * @extends annie.AOjbect
      * @public
@@ -3159,7 +3252,7 @@ declare namespace annie {
          */
         endMask(): void;
         /**
-         *  调用渲染
+         * 调用渲染
          * @public
          * @since 1.0.0
          * @method draw
@@ -3251,7 +3344,24 @@ declare namespace annie {
          * @type {Object}
          */
         data: Object;
+        /**
+         * 格式化post请求参数
+         * @method _fqs
+         * @param data
+         * @param query
+         * @return {string}
+         * @private
+         * @since 1.0.0
+         */
         private _fqs;
+        /**
+         * 格式化get 请求参数
+         * @method _fus
+         * @param src
+         * @param data
+         * @return {any}
+         * @private
+         */
         private _fus;
     }
 }
@@ -3746,6 +3856,9 @@ declare namespace annie {
         static bounceInOut(k: number): number;
         /**
          * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
+         * @method flush
+         * @private
+         * @since 1.0.0
          */
         private static flush();
     }
@@ -3833,15 +3946,15 @@ declare namespace annie {
      */
     var canHTMLTouchMove: boolean;
     /**
-     * 启用调试模式
-     * @type {boolean}
+     * 将显示对象转成base64的图片数据
+     * @method toDisplayDataURL
      * @static
-     * @public
-     * @default
-     * @since 1.0.0
-     * @default false
+     * @param {annie.DisplayObject} obj 显示对象
+     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
+     * @param {string} type  jpeg或者png，默认为png
+     * @return {string} base64格式数据
      */
-    var isDebug: boolean;
+    var toDisplayDataURL: (obj: any, rect?: Rectangle, type?: string) => string;
 }
 /**
  * @class 全局

@@ -149,7 +149,6 @@ var annieUI;
              * @type {number}
              */
             this.fSpeed = 20;
-            this.isMaoPao = true;
             this.paramXY = "y";
             this.stopTimes = -1;
             var s = this;
@@ -221,6 +220,8 @@ var annieUI;
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
          * @param isVertical 是纵向还是横向,不传值则默认为纵向
+         * @since 1.0.0
+         * @public
          */
         ScrollPage.prototype.changeDirection = function (isVertical) {
             if (isVertical === void 0) { isVertical = true; }
@@ -235,6 +236,14 @@ var annieUI;
                 s.paramXY = "x";
             }
         };
+        /**
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setMask
+         * @param w 设置可见区域的宽
+         * @param h 设置可见区域的高
+         * @public
+         * @since 1.0.0
+         */
         ScrollPage.prototype.setMask = function (w, h) {
             var s = this;
             s.maskObj.clear();
@@ -261,11 +270,6 @@ var annieUI;
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {
                         s.isStop = true;
-                        //并且需要告诉对应的鼠标弹起事件时不要向下冒泡
-                        s.isMaoPao = false;
-                    }
-                    else {
-                        s.isMaoPao = true;
                     }
                     if (s.isVertical) {
                         s.lastValue = e.localY;
@@ -305,7 +309,6 @@ var annieUI;
                             speedPer = 0.2;
                         }
                         view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
-                        s.isMaoPao = false;
                     }
                     s.lastValue = currentValue;
                     s.stopTimes = 0;
@@ -314,8 +317,6 @@ var annieUI;
                     s.isStop = false;
                     s.stopTimes = -1;
                 }
-            }
-            if (!s.isMaoPao) {
             }
         };
         return ScrollPage;

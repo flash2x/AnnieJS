@@ -37,7 +37,7 @@ namespace annie {
          */
         public static getGradientColor(colors:Array<string>, ratios:Array<number>, points:Array<number>):any {
             var colorObj:any;
-            var ctx = DisplayObject._canvas.getContext("2d");
+            var ctx = DisplayObject["_canvas"].getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }else{
@@ -59,7 +59,7 @@ namespace annie {
          * @since 1.0.0
          */
         public static getBitmapStyle(image:any):any{
-            var ctx = DisplayObject._canvas.getContext("2d");
+            var ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image,"repeat");
         }
         /**
@@ -100,7 +100,7 @@ namespace annie {
         private _isBitmapStroke:Matrix;
         private _isBitmapFill:Matrix;
         /**
-         *碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
+         * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
          * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
          * @property hitPixel
          * @public
@@ -608,7 +608,7 @@ namespace annie {
         };
 
         /**
-         *
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -623,6 +623,7 @@ namespace annie {
         }
 
         /**
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -857,6 +858,7 @@ namespace annie {
             }
         }*/
         /**
+         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -874,6 +876,7 @@ namespace annie {
             return r;
         }
         /**
+         * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -891,7 +894,7 @@ namespace annie {
                     return s;
                 }
             //继续检测
-                var _canvas = DisplayObject._canvas;
+                var _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
                 var ctx = _canvas["getContext"]('2d');

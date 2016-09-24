@@ -209,6 +209,8 @@ namespace annieUI {
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
          * @param isVertical 是纵向还是横向,不传值则默认为纵向
+         * @since 1.0.0
+         * @public
          */
         public changeDirection(isVertical: boolean = true): void {
             var s = this;
@@ -221,6 +223,14 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
+        /**
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setMask
+         * @param w 设置可见区域的宽
+         * @param h 设置可见区域的高
+         * @public
+         * @since 1.0.0
+         */
         private setMask(w:number,h:number):void{
             var s:any=this;
             s.maskObj.clear();

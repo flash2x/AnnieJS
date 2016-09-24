@@ -3,6 +3,12 @@
  */
 namespace annie {
     var isUpdateTween:boolean=true;
+    /**
+     * 对外私有类
+     * @class TweenObj
+     * @private
+     * @since 1.0.0
+     */
     class TweenObj extends AObject {
         public constructor() {
             super();
@@ -19,6 +25,17 @@ namespace annie {
         public _completeFun:Function;
         public _ease:Function;
         private _isFront:boolean = true;
+
+        /**
+         * 初始化数据
+         * @method init
+         * @param target
+         * @param times
+         * @param data
+         * @param isTo
+         * @public
+         * @since 1.0.0
+         */
         public init(target:any, times:number, data:any, isTo:boolean = true):void {
             var s = this;
             s._currentFrame = 1;
@@ -74,6 +91,13 @@ namespace annie {
                 }
             }
         }
+
+        /**
+         * 更新数据
+         * @method update
+         * @since 1.0.0
+         * @public
+         */
         public update():void {
             var s = this;
             if (s._isFront && s._delay > 0) {
@@ -696,6 +720,9 @@ namespace annie {
         }
         /**
          * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
+         * @method flush
+         * @private
+         * @since 1.0.0
          */
         private static flush():void{
             if(isUpdateTween){

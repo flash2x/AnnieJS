@@ -99,16 +99,47 @@ namespace annie {
      * @default false
      */
     export var canHTMLTouchMove:boolean=false;
+    // 作为将显示对象导出成图片的render渲染器
+    var _dRender:any=null;
     /**
      * 将显示对象转成base64的图片数据
-     * @method drawToImage
+     * @method toDisplayDataURL
+     * @static
      * @param {annie.DisplayObject} obj 显示对象
      * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {string} type  jpg或者png，默认为jpg
+     * @param {string} type  jpeg或者png，默认为png
      * @return {string} base64格式数据
      */
-    export var drawToImage=function (obj:DisplayObject,rect:Rectangle=null,type="jpg"):string {
-
-        return "";
+    export var toDisplayDataURL=function(obj:any,rect:Rectangle=null,type="png"):string {
+        if(!_dRender){
+            _dRender=new CanvasRender(null);
+        }
+        _dRender._stage=obj;
+        _dRender.rootContainer=DisplayObject["_canvas"];
+        //设置宽高
+        var whObj:any=obj.getBounds();
+        _dRender.rootContainer.width=rect?rect.width:whObj.width;
+        _dRender.rootContainer.height=rect?rect.height:whObj.height;
+        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
+        _dRender.begin();
+        var objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
+        obj.stage.pause=true;
+        obj.parent=null;
+        obj.x=rect?-rect.x:0;
+        obj.y=rect?-rect.y:0;
+        obj.scaleX=obj.scaleY=1;
+        obj.rotation=obj.skewX=obj.skewY=0;
+        obj.update();
+        obj.render(_dRender);
+        obj.parent=objInfo.p;
+        obj.x=objInfo.x;
+        obj.y=objInfo.y;
+        obj.scaleX= objInfo.scX;
+        obj.scaleY=objInfo.scY;
+        obj.rotation=objInfo.r;
+        obj.skewX=objInfo.skX;
+        obj.skewY=objInfo.skY;
+        obj.stage.pause=false;
+        return _dRender.rootContainer.toDataURL("image/"+type);
     };
 }

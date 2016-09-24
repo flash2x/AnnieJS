@@ -21,14 +21,18 @@ namespace annie {
         /**
          * 媒体类型 VIDEO 或者 AUDIO
          * @type {string}
+         * @since 1.0.0
+         * @since 1.0.0
          */
         public type = "";
         private _loop: number = 0;
 
         /**
+         * 构造函数
          * @method Media
          * @param {string|HtmlElement} src
          * @param {string} type
+         * @since 1.0.0
          */
         public constructor(src: any, type: string) {
             super();

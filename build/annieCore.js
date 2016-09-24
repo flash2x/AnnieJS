@@ -52,6 +52,7 @@ var annie;
          * @static
          * @private
          * @since 1.0.0
+         * @param {string} type 获取事件类型，默认是所有
          */
         EventDispatcher.getMouseEventCount = function (type) {
             if (type === void 0) { type = ""; }
@@ -203,7 +204,12 @@ var annie;
             }
             s.eventTypes = {};
         };
-        //全局的鼠标事件的监听数
+        /**
+         * 全局的鼠标事件的监听数对象表
+         * @property _MECO
+         * @public
+         * @since 1.0.0
+         */
         EventDispatcher._MECO = {};
         return EventDispatcher;
     }(AObject));
@@ -255,6 +261,13 @@ var annie;
              * @default null
              */
             this.data = null;
+            /**
+             * 是否阻止事件向下冒泡
+             * @property _pd
+             * @type {boolean}
+             * @private
+             * @since 1.0.0
+             */
             this._pd = false;
             this.type = type;
         }
@@ -632,6 +645,7 @@ var annie;
     var Matrix = (function (_super) {
         __extends(Matrix, _super);
         /**
+         * 构造函数
          * @method Matrix
          * @param {number} a
          * @param {number} b
@@ -740,6 +754,7 @@ var annie;
             s.ty = ty;
         }
         /**
+         * 复制一个矩阵
          * @method clone
          * @since 1.0.0
          * @public
@@ -819,7 +834,7 @@ var annie;
             return target;
         };
         /**
-         * 设置一个矩阵通过普通的属性
+         * 设置一个矩阵通过普通的显示对象的相关九大属性
          * @method createBox
          * @param {number} x
          * @param {number} y
@@ -868,7 +883,7 @@ var annie;
             s.ty = y + ay - (ax * s.b + ay * s.d);
         };
         /**
-         * 判断
+         * 判断两个矩阵是否相等
          * @method isEqual
          * @static
          * @public
@@ -962,7 +977,7 @@ var annie;
             return point.x >= s.x && point.x <= (s.x + s.width) && point.y >= s.y && point.y <= (s.y + s.height);
         };
         /**
-         * 将多个rect合成为一个大的rect
+         * 将多个矩形合成为一个大的矩形
          * 返回包含所有给定的矩阵拼合之后的一个最小矩形
          * @method createFromRects
          * @param {annie.Rectangle} rect
@@ -1000,8 +1015,8 @@ var annie;
             return new Rectangle(x, y, wx1 - x, hy1 - y);
         };
         /**
-         * 通过一系列点来确定一个矩形
-         * 返回包含所有给定的点的一个最小矩形
+         * 通过一系列点来生成一个矩形
+         * 返回包含所有给定的点的最小矩形
          * @method createFromPoints
          * @static
          * @public
@@ -1242,15 +1257,15 @@ var annie;
              * @default 0
              */
             this.visible = true;
-            /**
-             * 显示对象的混合模式
-             * @property blendMode
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.blendMode = 0;
+            // /**
+            //  * 显示对象的混合模式
+            //  * @property blendMode
+            //  * @public
+            //  * @since 1.0.0
+            //  * @type {number}
+            //  * @default 0
+            //  */
+            // public blendMode:number = 0;
             /**
              * 显示对象的变形矩阵
              * @property matrix
@@ -1593,7 +1608,7 @@ var annie;
             s.rect = rect;
         }
         /**
-         * 调用渲染
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -1606,7 +1621,7 @@ var annie;
             //super.render();
         };
         /**
-         * @调用更新
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -1677,6 +1692,7 @@ var annie;
             }
         };
         /**
+         * 重写getBounds
          * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public
@@ -1763,7 +1779,7 @@ var annie;
             this._cacheX = 0;
             this._cacheY = 0;
             /**
-             *碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
+             * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
              * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
              * @property hitPixel
              * @public
@@ -1864,7 +1880,7 @@ var annie;
          */
         Shape.getGradientColor = function (colors, ratios, points) {
             var colorObj;
-            var ctx = annie.DisplayObject._canvas.getContext("2d");
+            var ctx = annie.DisplayObject["_canvas"].getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }
@@ -1886,7 +1902,7 @@ var annie;
          * @since 1.0.0
          */
         Shape.getBitmapStyle = function (image) {
-            var ctx = annie.DisplayObject._canvas.getContext("2d");
+            var ctx = annie.DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         };
         /**
@@ -2269,7 +2285,7 @@ var annie;
             }
         };
         /**
-         *
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -2283,6 +2299,7 @@ var annie;
             //super.render();
         };
         /**
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -2528,6 +2545,7 @@ var annie;
             }
         }*/
         /**
+         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -2545,6 +2563,7 @@ var annie;
             return r;
         };
         /**
+         * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -2564,7 +2583,7 @@ var annie;
                     return s;
                 }
                 //继续检测
-                var _canvas = annie.DisplayObject._canvas;
+                var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
                 var ctx = _canvas["getContext"]('2d');
@@ -2849,7 +2868,7 @@ var annie;
             _super.prototype._onDispatchBubbledEvent.call(this, type);
         };
         /**
-         * 移动指定层级上的孩子
+         * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
          * @public
@@ -2887,7 +2906,7 @@ var annie;
             }
         };
         /**
-         * 刷新
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -2904,7 +2923,7 @@ var annie;
             }
         };
         /**
-         * 碰撞测试
+         * 重写碰撞测试
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -2941,6 +2960,7 @@ var annie;
             return null;
         };
         /**
+         * 重写getBounds
          * @method getBounds
          * @returns {any}
          * @since 1.0.0
@@ -2959,7 +2979,7 @@ var annie;
             return rect;
         };
         /**
-         * 渲染
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -3039,9 +3059,11 @@ var annie;
     var Media = (function (_super) {
         __extends(Media, _super);
         /**
+         * 构造函数
          * @method Media
          * @param {string|HtmlElement} src
          * @param {string} type
+         * @since 1.0.0
          */
         function Media(src, type) {
             _super.call(this);
@@ -3056,6 +3078,8 @@ var annie;
             /**
              * 媒体类型 VIDEO 或者 AUDIO
              * @type {string}
+             * @since 1.0.0
+             * @since 1.0.0
              */
             this.type = "";
             this._loop = 0;
@@ -3195,6 +3219,7 @@ var annie;
          * @param src
          * @param width
          * @param height
+         * @since 1.0.0
          */
         function ImageFrames(src, width, height) {
             _super.call(this);
@@ -3279,6 +3304,12 @@ var annie;
             s._urlLoader = new annie.URLLoader();
             s._urlLoader.addEventListener(annie.Event.COMPLETE, s.success.bind(s));
         }
+        /**
+         * 资源加载成功
+         * @private
+         * @since 1.0.0
+         * @param e
+         */
         ImageFrames.prototype.success = function (e) {
             var s = this;
             if (e.data.type == "json") {
@@ -3408,6 +3439,8 @@ var annie;
         /**
          * 播放视频,如果autoplay为true则会加载好后自动播放
          * @method play
+         * @public
+         * @since 1.0.0
          */
         ImageFrames.prototype.play = function () {
             this.autoplay = true;
@@ -3888,7 +3921,7 @@ var annie;
             }
         };
         /**
-         * 更改mc中的一个孩子的显示属性
+         * 更改movieClip中的一个child的显示属性
          * @method setFrameChild
          * @public
          * @since 1.0.0
@@ -3918,6 +3951,7 @@ var annie;
             }
         };
         /**
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -4125,6 +4159,7 @@ var annie;
     var FloatDisplay = (function (_super) {
         __extends(FloatDisplay, _super);
         /**
+         * 构造函数
          * @method FloatDisplay
          * @public
          * @param isOnCanvas 是否悬浮在canvas上面,否则会将元素放到canvas下面
@@ -4141,6 +4176,7 @@ var annie;
              */
             this.htmlElement = null;
             /**
+             * 上一交刷新时保留的数据
              * @property _oldProps
              * @private
              * @since 1.0.0
@@ -4148,6 +4184,7 @@ var annie;
              */
             this._oldProps = { alpha: 1, matrix: { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 } };
             /**
+             * 是否已经添加了舞台事件
              * @property _isAdded
              * @since 1.0.0
              * @type {boolean}
@@ -4209,7 +4246,7 @@ var annie;
             }
         };
         /**
-         * 刷新现实对象
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -4250,7 +4287,7 @@ var annie;
             }
         };
         /**
-         * 获取对象的bounds
+         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -4297,7 +4334,7 @@ var annie;
             /**
              * 播放的视频类型 值为0是序列图,1是视频 只读
              * @property videoType
-             * @puboic
+             * @public
              * @since 1.0.0
              * @type {number}
              * @default 0
@@ -4326,7 +4363,10 @@ var annie;
             this.videoType = isUseVideo ? 1 : 0;
         }
         /**
-         * 继承刷新方法
+         * 重写update
+         * @method update
+         * @public
+         * @since 1.0.0
          */
         VideoPlayer.prototype.update = function () {
             //刷新视频
@@ -4455,6 +4495,12 @@ var annie;
              */
             this.bold = false;
         }
+        /**
+         * 设置文本在canvas里的渲染样式
+         * @param ctx
+         * @private
+         * @since 1.0.0
+         */
         TextField.prototype._prepContext = function (ctx) {
             var s = this;
             var font = s.size || 12;
@@ -4472,6 +4518,14 @@ var annie;
             ctx.textBaseline = "top";
             ctx.fillStyle = this.color;
         };
+        /**
+         * 获取文本宽
+         * @method _getMeasuredWidth
+         * @param text
+         * @return {number}
+         * @private
+         * @since 1.0.0
+         */
         TextField.prototype._getMeasuredWidth = function (text) {
             var ctx = annie.DisplayObject._canvas.getContext("2d");
             //ctx.save();
@@ -4479,6 +4533,13 @@ var annie;
             //ctx.restore();
             return w;
         };
+        /**
+         * 重写 render
+         * @method render
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         TextField.prototype.render = function (renderObj) {
             var s = this;
             if (s._cacheImg.src != "") {
@@ -4486,6 +4547,13 @@ var annie;
             }
             //super.render();
         };
+        /**
+         * 重写 update
+         * @method update
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         TextField.prototype.update = function () {
             var s = this;
             if (s.pauseUpdate)
@@ -4620,6 +4688,13 @@ var annie;
                 s._isNeedUpdate = false;
             }
         };
+        /**
+         * 重写 getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         TextField.prototype.getBounds = function () {
             var s = this;
             var r = new annie.Rectangle();
@@ -4728,7 +4803,7 @@ var annie;
             }
         };
         /**
-         * 设置粗体
+         * 设置文本是否为粗体
          * @method setBold
          * @param {boolean} bold true或false
          * @public
@@ -5493,6 +5568,9 @@ var annie;
         Stage.prototype.getBounds = function () {
             return this.viewRect;
         };
+        /**
+         *
+         */
         Stage.flushAll = function () {
             var len = Stage.allUpdateObjList.length;
             for (var i = 0; i < len; i++) {
@@ -5500,6 +5578,15 @@ var annie;
             }
             requestAnimationFrame(Stage.flushAll);
         };
+        /**
+         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
+         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
+         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
+         * @method addUpdateObj
+         * @param target 要循化调用 flush 函数的对象
+         * @public
+         * @since
+         */
         Stage.addUpdateObj = function (target) {
             var isHave = false;
             var len = Stage.allUpdateObjList.length;
@@ -5513,6 +5600,13 @@ var annie;
                 Stage.allUpdateObjList.push(target);
             }
         };
+        /**
+         * 移除掉已经添加的循环刷新对象
+         * @method removeUpdateObj
+         * @param target
+         * @private
+         * @since 1.0.0
+         */
         Stage.removeUpdateObj = function (target) {
             var len = Stage.allUpdateObjList.length;
             for (var i = 0; i < len; i++) {
@@ -5522,6 +5616,10 @@ var annie;
                 }
             }
         };
+        /**
+         * 要循环调用 flush 函数对象列表
+         * @type {Array}
+         */
         Stage.allUpdateObjList = [];
         return Stage;
     }(annie.Sprite));
@@ -5533,7 +5631,7 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * 投影或者发光.
+     * 投影或者发光滤镜
      * @class annie.ShadowFilter
      * @extends annie.AObject
      * @public
@@ -5783,7 +5881,7 @@ var annie;
     }(annie.AObject));
     annie.ColorFilter = ColorFilter;
     /**
-     * 矩阵变色
+     * 矩阵变色滤镜
      * @class annie.ColorMatrixFilter
      * @extends annie.AObject
      * @public
@@ -5999,7 +6097,7 @@ var annie;
     }(annie.AObject));
     annie.ColorMatrixFilter = ColorMatrixFilter;
     /**
-     * 模糊
+     * 模糊滤镜
      * @class annie.BlurFilter
      * @extends annie.AOjbect
      * @public
@@ -6358,7 +6456,7 @@ var annie;
             this._ctx.restore();
         };
         /**
-         *  调用渲染
+         * 调用渲染
          * @public
          * @since 1.0.0
          * @method draw
@@ -6482,6 +6580,15 @@ var annie;
              * @type {Object}
              */
             this.data = null;
+            /**
+             * 格式化post请求参数
+             * @method _fqs
+             * @param data
+             * @param query
+             * @return {string}
+             * @private
+             * @since 1.0.0
+             */
             this._fqs = function (data, query) {
                 var params = [];
                 if (data) {
@@ -6495,6 +6602,14 @@ var annie;
                 return params.join("&");
             };
             //formatURIString
+            /**
+             * 格式化get 请求参数
+             * @method _fus
+             * @param src
+             * @param data
+             * @return {any}
+             * @private
+             */
             this._fus = function (src, data) {
                 var s = this;
                 if (data == null || data == "") {
@@ -7245,6 +7360,12 @@ var annie;
 var annie;
 (function (annie) {
     var isUpdateTween = true;
+    /**
+     * 对外私有类
+     * @class TweenObj
+     * @private
+     * @since 1.0.0
+     */
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
@@ -7255,6 +7376,16 @@ var annie;
             this._delay = 0;
             this._isFront = true;
         }
+        /**
+         * 初始化数据
+         * @method init
+         * @param target
+         * @param times
+         * @param data
+         * @param isTo
+         * @public
+         * @since 1.0.0
+         */
         TweenObj.prototype.init = function (target, times, data, isTo) {
             if (isTo === void 0) { isTo = true; }
             var s = this;
@@ -7314,6 +7445,12 @@ var annie;
                 }
             }
         };
+        /**
+         * 更新数据
+         * @method update
+         * @since 1.0.0
+         * @public
+         */
         TweenObj.prototype.update = function () {
             var s = this;
             if (s._isFront && s._delay > 0) {
@@ -7901,6 +8038,9 @@ var annie;
         };
         /**
          * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
+         * @method flush
+         * @private
+         * @since 1.0.0
          */
         Tween.flush = function () {
             if (isUpdateTween) {
@@ -8021,16 +8161,51 @@ var annie;
      * @default false
      */
     annie.canHTMLTouchMove = false;
+    // 作为将显示对象导出成图片的render渲染器
+    var _dRender = null;
     /**
-     * 启用调试模式
-     * @type {boolean}
+     * 将显示对象转成base64的图片数据
+     * @method toDisplayDataURL
      * @static
-     * @public
-     * @default
-     * @since 1.0.0
-     * @default false
+     * @param {annie.DisplayObject} obj 显示对象
+     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
+     * @param {string} type  jpeg或者png，默认为png
+     * @return {string} base64格式数据
      */
-    annie.isDebug = false;
+    annie.toDisplayDataURL = function (obj, rect, type) {
+        if (rect === void 0) { rect = null; }
+        if (type === void 0) { type = "png"; }
+        if (!_dRender) {
+            _dRender = new annie.CanvasRender(null);
+        }
+        _dRender._stage = obj;
+        _dRender.rootContainer = annie.DisplayObject["_canvas"];
+        //设置宽高
+        var whObj = obj.getBounds();
+        _dRender.rootContainer.width = rect ? rect.width : whObj.width;
+        _dRender.rootContainer.height = rect ? rect.height : whObj.height;
+        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
+        _dRender.begin();
+        var objInfo = { p: obj.parent, x: obj.x, y: obj.y, scX: obj.scaleX, scY: obj.scaleY, r: obj.rotation, skX: obj.skewX, skY: obj.skewY };
+        obj.stage.pause = true;
+        obj.parent = null;
+        obj.x = rect ? -rect.x : 0;
+        obj.y = rect ? -rect.y : 0;
+        obj.scaleX = obj.scaleY = 1;
+        obj.rotation = obj.skewX = obj.skewY = 0;
+        obj.update();
+        obj.render(_dRender);
+        obj.parent = objInfo.p;
+        obj.x = objInfo.x;
+        obj.y = objInfo.y;
+        obj.scaleX = objInfo.scX;
+        obj.scaleY = objInfo.scY;
+        obj.rotation = objInfo.r;
+        obj.skewX = objInfo.skX;
+        obj.skewY = objInfo.skY;
+        obj.stage.pause = false;
+        return _dRender.rootContainer.toDataURL("image/" + type);
+    };
 })(annie || (annie = {}));
 /**
  * @class 全局

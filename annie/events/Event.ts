@@ -174,6 +174,14 @@ namespace annie {
         public preventDefault(){
             this._pd=true;
         }
+
+        /**
+         * 是否阻止事件向下冒泡
+         * @property _pd
+         * @type {boolean}
+         * @private
+         * @since 1.0.0
+         */
         private _pd:boolean=false;
     }
 }

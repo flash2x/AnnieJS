@@ -232,6 +232,15 @@ namespace annie {
          * @type {Object}
          */
         public data:Object = null;
+        /**
+         * 格式化post请求参数
+         * @method _fqs
+         * @param data
+         * @param query
+         * @return {string}
+         * @private
+         * @since 1.0.0
+         */
         private _fqs = function (data:any, query:any):string {
             var params:any = [];
             if (data) {
@@ -245,6 +254,14 @@ namespace annie {
             return params.join("&");
         };
         //formatURIString
+        /**
+         * 格式化get 请求参数
+         * @method _fus
+         * @param src
+         * @param data
+         * @return {any}
+         * @private
+         */
         private _fus = function (src:any, data:any):string {
             var s = this;
             if (data == null || data == "") {

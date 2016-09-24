@@ -83,7 +83,7 @@ namespace annie {
             s.rect = rect;
         }
         /**
-         * 调用渲染
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -97,7 +97,7 @@ namespace annie {
         }
 
         /**
-         * @调用更新
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -166,6 +166,7 @@ namespace annie {
             }
         }
         /**
+         * 重写getBounds
          * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public

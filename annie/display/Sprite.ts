@@ -191,7 +191,7 @@ namespace annie {
             super._onDispatchBubbledEvent(type);
         }
         /**
-         * 移动指定层级上的孩子
+         * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
          * @public
@@ -227,7 +227,7 @@ namespace annie {
         }
 
         /**
-         * 刷新
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -244,7 +244,7 @@ namespace annie {
             }
         }
         /**
-         * 碰撞测试
+         * 重写碰撞测试
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -278,6 +278,7 @@ namespace annie {
             return null;
         }
         /**
+         * 重写getBounds
          * @method getBounds
          * @returns {any}
          * @since 1.0.0
@@ -297,7 +298,7 @@ namespace annie {
         }
 
         /**
-         * 渲染
+         * 重写渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public

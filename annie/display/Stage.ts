@@ -670,7 +670,16 @@ namespace annie {
         public getBounds():Rectangle {
             return this.viewRect;
         }
+
+        /**
+         * 要循环调用 flush 函数对象列表
+         * @type {Array}
+         */
         private static allUpdateObjList:Array<any>=[];
+
+        /**
+         *
+         */
         private static flushAll():void{
             var len=Stage.allUpdateObjList.length;
             for(var i=0;i<len;i++){
@@ -678,6 +687,16 @@ namespace annie {
             }
             requestAnimationFrame(Stage.flushAll);
         }
+
+        /**
+         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
+         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
+         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
+         * @method addUpdateObj
+         * @param target 要循化调用 flush 函数的对象
+         * @public
+         * @since
+         */
         private static addUpdateObj(target:any):void{
             var isHave:boolean=false;
             var len=Stage.allUpdateObjList.length;
@@ -691,6 +710,13 @@ namespace annie {
                 Stage.allUpdateObjList.push(target);
             }
         }
+        /**
+         * 移除掉已经添加的循环刷新对象
+         * @method removeUpdateObj
+         * @param target
+         * @private
+         * @since 1.0.0
+         */
         private static removeUpdateObj(target:any):void{
             var len=Stage.allUpdateObjList.length;
             for(var i=0;i<len;i++){

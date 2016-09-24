@@ -99,6 +99,7 @@ namespace annie {
          * @param src
          * @param width
          * @param height
+         * @since 1.0.0
          */
         public constructor(src:string,width:number,height:number) {
             super();
@@ -109,6 +110,13 @@ namespace annie {
             s._urlLoader = new URLLoader();
             s._urlLoader.addEventListener(annie.Event.COMPLETE, s.success.bind(s));
         }
+
+        /**
+         * 资源加载成功
+         * @private
+         * @since 1.0.0
+         * @param e
+         */
         private success(e:annie.Event){
             var s = this;
             if (e.data.type == "json") {
@@ -229,6 +237,8 @@ namespace annie {
         /**
          * 播放视频,如果autoplay为true则会加载好后自动播放
          * @method play
+         * @public
+         * @since 1.0.0
          */
         public play() {
             this.autoplay = true;

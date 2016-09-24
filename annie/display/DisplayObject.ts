@@ -201,15 +201,15 @@ namespace annie{
          * @default 0
          */
         public visible:boolean = true;
-        /**
-         * 显示对象的混合模式
-         * @property blendMode
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        public blendMode:number = 0;
+        // /**
+        //  * 显示对象的混合模式
+        //  * @property blendMode
+        //  * @public
+        //  * @since 1.0.0
+        //  * @type {number}
+        //  * @default 0
+        //  */
+        // public blendMode:number = 0;
         /**
          * 显示对象的变形矩阵
          * @property matrix
