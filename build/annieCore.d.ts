@@ -3951,10 +3951,11 @@ declare namespace annie {
      * @static
      * @param {annie.DisplayObject} obj 显示对象
      * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {string} type  jpeg或者png，默认为png
+     * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
+     * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    var toDisplayDataURL: (obj: any, rect?: Rectangle, type?: string) => string;
+    var toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
 }
 /**
  * @class 全局

@@ -8169,12 +8169,14 @@ var annie;
      * @static
      * @param {annie.DisplayObject} obj 显示对象
      * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {string} type  jpeg或者png，默认为png
+     * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
+     * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    annie.toDisplayDataURL = function (obj, rect, type) {
+    annie.toDisplayDataURL = function (obj, rect, typeInfo, bgColor) {
         if (rect === void 0) { rect = null; }
-        if (type === void 0) { type = "png"; }
+        if (typeInfo === void 0) { typeInfo = null; }
+        if (bgColor === void 0) { bgColor = ""; }
         if (!_dRender) {
             _dRender = new annie.CanvasRender(null);
         }
@@ -8182,12 +8184,19 @@ var annie;
         _dRender.rootContainer = annie.DisplayObject["_canvas"];
         //设置宽高
         var whObj = obj.getBounds();
-        _dRender.rootContainer.width = rect ? rect.width : whObj.width;
-        _dRender.rootContainer.height = rect ? rect.height : whObj.height;
+        var w = rect ? rect.width : whObj.width;
+        var h = rect ? rect.height : whObj.height;
+        _dRender.rootContainer.width = w;
+        _dRender.rootContainer.height = h;
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        _dRender.begin();
+        if (bgColor == "") {
+            _dRender._ctx.clearRect(0, 0, w, h);
+        }
+        else {
+            _dRender._ctx.fillStyle = bgColor;
+            _dRender._ctx.fillRect(0, 0, w, h);
+        }
         var objInfo = { p: obj.parent, x: obj.x, y: obj.y, scX: obj.scaleX, scY: obj.scaleY, r: obj.rotation, skX: obj.skewX, skY: obj.skewY };
-        obj.stage.pause = true;
         obj.parent = null;
         obj.x = rect ? -rect.x : 0;
         obj.y = rect ? -rect.y : 0;
@@ -8203,8 +8212,10 @@ var annie;
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
-        obj.stage.pause = false;
-        return _dRender.rootContainer.toDataURL("image/" + type);
+        if (!typeInfo) {
+            typeInfo = { type: "png" };
+        }
+        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
 })(annie || (annie = {}));
 /**
