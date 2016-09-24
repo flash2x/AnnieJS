@@ -123,7 +123,6 @@ namespace annie {
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         _dRender.begin();
         var objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
-        obj.stage.pause=true;
         obj.parent=null;
         obj.x=rect?-rect.x:0;
         obj.y=rect?-rect.y:0;
@@ -139,7 +138,6 @@ namespace annie {
         obj.rotation=objInfo.r;
         obj.skewX=objInfo.skX;
         obj.skewY=objInfo.skY;
-        obj.stage.pause=false;
         return _dRender.rootContainer.toDataURL("image/"+type);
     };
 }
