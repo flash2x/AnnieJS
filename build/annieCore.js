@@ -8205,9 +8205,7 @@ var annie;
         obj.y = rect ? -rect.y : 0;
         obj.scaleX = obj.scaleY = 1;
         obj.rotation = obj.skewX = obj.skewY = 0;
-        if (obj.stage) {
-            obj.update();
-        }
+        obj.update();
         obj.render(_dRender);
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
