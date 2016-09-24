@@ -100,13 +100,15 @@ namespace annie {
      */
     export var canHTMLTouchMove:boolean=false;
     /**
-     * 启用调试模式
-     * @type {boolean}
-     * @static
-     * @public
-     * @default
-     * @since 1.0.0
-     * @default false
+     * 将显示对象转成base64的图片数据
+     * @method drawToImage
+     * @param {annie.DisplayObject} obj 显示对象
+     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
+     * @param {string} type  jpg或者png，默认为jpg
+     * @return {string} base64格式数据
      */
-    export var isDebug=false;
+    export var drawToImage=function (obj:DisplayObject,rect:Rectangle=null,type="jpg"):string {
+
+        return "";
+    };
 }

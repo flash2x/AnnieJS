@@ -262,15 +262,18 @@ namespace annie {
             //将mc设置成按钮形式
             if(s.totalFrames>1) {
                 s.gotoAndStop(1);
-                s.addEventListener("onMouseDown", function () {
-                    this.gotoAndStop(2);
-                }.bind(s));
-                s.addEventListener("onMouseUp", function () {
-                    this.gotoAndStop(1);
-                }.bind(s));
+                s.addEventListener("onMouseDown",this._mouseEvent.bind(this));
+                s.addEventListener("onMouseUp",this._mouseEvent.bind(this));
+                s.addEventListener("onMouseOut",this._mouseEvent.bind(this));
             }
         }
-
+        private _mouseEvent=function (e:MouseEvent):void {
+            if(e.type==annie.MouseEvent.MOUSE_DOWN){
+                this.gotoAndStop(2);
+            }else{
+                this.gotoAndStop(1);
+            }
+        };
         //setLabelFrame;
         /**
          * Flash2x工具调用的方法,用户一般不需要使用

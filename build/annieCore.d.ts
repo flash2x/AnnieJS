@@ -29,51 +29,16 @@ declare namespace annie {
     class EventDispatcher extends AObject {
         private eventTypes;
         constructor();
-        /**
-         * 主要为了记录项目中是否有添加onMouseMove的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
-         * @property _count0
-         * @static
-         * @type {number}
-         * @since 1.0.0
-         * @private
-         */
-        private static _count0;
-        /**
-         * 主要为了记录项目中是否有添加onMouseMown的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
-         * @property _count1
-         * @static
-         * @type {number}
-         * @since 1.0.0
-         * @private
-         */
-        private static _count1;
-        /**
-         * 主要为了记录项目中是否有添加onMouseUp的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
-         * @property _count2
-         * @static
-         * @type {number}
-         * @since 1.0.0
-         * @private
-         */
-        private static _count2;
-        /**
-         * 主要为了记录项目中是否有添加onClick的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
-         * @property _count3
-         * @static
-         * @type {number}
-         * @since 1.0.0
-         * @private
-         */
-        private static _count3;
+        private static _MECO;
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
          * @returns {number}
          * @static
-         * @public
+         * @private
          * @since 1.0.0
          */
-        static getMouseEventCount(type: string): number;
+        static getMouseEventCount(type?: string): number;
         /**
          * 给对象添加一个侦听
          * @method addEventListener
@@ -148,6 +113,16 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Event extends AObject {
+        /**
+         * 舞台尺寸发生变化时触发
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        static RESIZE: string;
         /**
          * 舞台初始化完成后会触发的事件
          * @Event
@@ -347,6 +322,24 @@ declare namespace annie {
          * @type {string}
          */
         static MOUSE_MOVE: string;
+        /**
+         * 鼠标或者手指移入到显示对象上里触发的事件
+         * @property MOUSE_OVER
+         * @static
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         */
+        static MOUSE_OVER: string;
+        /**
+         * 鼠标或者手指移出显示对象边界触发的事件
+         * @property MOUSE_OUT
+         * @static
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         */
+        static MOUSE_OUT: string;
         /**
          * mouse或touch事件时rootDiv坐标x点
          * @property clientX
@@ -2006,6 +1999,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         initButton(): void;
+        private _mouseEvent;
         /**
          * Flash2x工具调用的方法,用户一般不需要使用
          * @method d
@@ -2615,6 +2609,12 @@ declare namespace annie {
          */
         private _mouseEventInfo;
         /**
+         * 上一次鼠标或触碰经过的显示对象列表
+         * @type {Array}
+         * @private
+         */
+        private _lastDpList;
+        /**
          * 显示对象入口函数
          * @method Stage
          * @param {string} rootDivId
@@ -2650,6 +2650,7 @@ declare namespace annie {
          * @private
          */
         private _mouseDownPoint;
+        private _initMouseEvent(event, cp, sp);
         private _mt();
         /**
          * 循环刷新页面的函数
@@ -2702,9 +2703,16 @@ declare namespace annie {
          */
         private setAlign;
         /**
-         * 当舞台尺寸发生改变时调用
+         * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
+         * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
+         * 不管autoResize 的状态是什么，你只要侦听 了stage 的 annie.Event.RESIZE 事件
+         * 都可以接收到舞台变化的通知。
+         * @method resize
+         * @public
+         * @since 1.0.0
+         * @
          */
-        private resize;
+        resize: () => void;
         getBounds(): Rectangle;
         private static allUpdateObjList;
         private static flushAll();
@@ -3838,7 +3846,6 @@ declare namespace annie {
 /**
  * @class 全局
  */
-import Stage = annie.Stage;
 /**
  * 往控制台打印调试信息
  * @method trace

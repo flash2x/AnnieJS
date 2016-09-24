@@ -148,6 +148,7 @@ declare namespace annieUI {
          * @param isVertical 是纵向还是横向,不传值则默认为纵向
          */
         changeDirection(isVertical?: boolean): void;
+        private setMask(w, h);
         private onMouseEvent(e);
     }
 }

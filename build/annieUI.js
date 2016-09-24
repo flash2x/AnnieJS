@@ -153,25 +153,15 @@ var annieUI;
             this.paramXY = "y";
             this.stopTimes = -1;
             var s = this;
+            s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
-            s.addChild(s.view);
-            s.maskObj.beginFill("#000000");
-            s.maskObj.rect(0, 0, vW, vH);
-            s.viewWidth = vW;
-            s.viewHeight = vH;
-            s.maskObj.endFill();
             s.view.mask = s.maskObj;
+            s.setMask(vW, vH);
+            s.maskObj.alpha = 0;
+            s.addChild(s.maskObj);
+            s.addChild(s.view);
             s.maxDistance = maxDistance;
-            s.isVertical = isVertical;
-            if (s.isVertical) {
-                s.distance = s.viewHeight;
-                s.paramXY = "y";
-            }
-            else {
-                s.distance = s.viewWidth;
-                s.paramXY = "x";
-            }
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
@@ -245,6 +235,25 @@ var annieUI;
                 s.paramXY = "x";
             }
         };
+        ScrollPage.prototype.setMask = function (w, h) {
+            var s = this;
+            s.maskObj.clear();
+            s.maskObj.beginFill("#000000");
+            s.maskObj.rect(0, 0, w, h);
+            s.viewWidth = w;
+            s.viewHeight = h;
+            s.maskObj.endFill();
+            s.viewHeight = h;
+            s.viewWidth = w;
+            if (s.isVertical) {
+                s.distance = s.viewHeight;
+                s.paramXY = "y";
+            }
+            else {
+                s.distance = s.viewWidth;
+                s.paramXY = "x";
+            }
+        };
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
             var view = s.view;
@@ -307,7 +316,6 @@ var annieUI;
                 }
             }
             if (!s.isMaoPao) {
-                e.preventDefault();
             }
         };
         return ScrollPage;
@@ -349,7 +357,8 @@ var annieUI;
                     s.maskObj.circle(s.radio, s.radio, s.radio);
                 }
                 else {
-                    s.bitmap.scaleX = s.bitmap.scaleY = s.radio / s.photo.width;
+                    var w = s.photo.width > s.photo.height ? s.photo.width : s.photo.height;
+                    s.bitmap.scaleX = s.bitmap.scaleY = s.radio / w;
                     s.maskObj.rect(0, 0, s.radio, s.radio);
                 }
                 s.maskObj.endFill();

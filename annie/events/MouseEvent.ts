@@ -47,6 +47,24 @@ namespace annie {
          */
         public static MOUSE_MOVE:string = "onMouseMove";
         /**
+         * 鼠标或者手指移入到显示对象上里触发的事件
+         * @property MOUSE_OVER
+         * @static
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         */
+        public static MOUSE_OVER:string = "onMouseOver";
+        /**
+         * 鼠标或者手指移出显示对象边界触发的事件
+         * @property MOUSE_OUT
+         * @static
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         */
+        public static MOUSE_OUT:string = "onMouseOut";
+        /**
          * mouse或touch事件时rootDiv坐标x点
          * @property clientX
          * @public

@@ -277,7 +277,6 @@ namespace annie {
             }
             return null;
         }
-
         /**
          * @method getBounds
          * @returns {any}

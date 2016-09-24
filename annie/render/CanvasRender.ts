@@ -47,7 +47,7 @@ namespace annie {
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
                 s._ctx.fillRect(0, 0, c.width + 1, c.height + 1);
-            } else {
+            }else{
                 s._ctx.clearRect(0, 0, c.width + 1, c.height + 1);
             }
             s._ctx.restore();
@@ -127,7 +127,7 @@ namespace annie {
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (type == 0) {
                 //图片
-                if(target._cacheImg) {
+                if(target._cacheImg){
                     var tr = target.rect;
                     //因为如果有滤镜的话是重新画了图的,所以尺寸什么的跟SpriteSheet无关了
                     if (tr&&!target._isCache){

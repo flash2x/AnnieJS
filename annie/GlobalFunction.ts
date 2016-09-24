@@ -1,7 +1,6 @@
 /**
  * @class 全局
  */
-import Stage = annie.Stage;
 /**
  * 往控制台打印调试信息
  * @method trace
@@ -38,5 +37,5 @@ import F2xText=annie.TextField;
 import F2xInputText=annie.InputText;
 import F2xBitmap=annie.Bitmap;
 import F2xShape=annie.Shape;
-Stage["addUpdateObj"](annie.Tween);
-Stage["flushAll"]();
+annie.Stage["addUpdateObj"](annie.Tween);
+annie.Stage["flushAll"]();

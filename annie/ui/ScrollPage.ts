@@ -132,10 +132,8 @@ namespace annieUI {
          * @type {number}
          */
         public  fSpeed: number = 20;
-        private isMaoPao: boolean = true;
         private paramXY: string = "y";
         private stopTimes: number = -1;
-
         /**
          * 构造函数
          * @method  ScrollPage
@@ -147,31 +145,21 @@ namespace annieUI {
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             var s = this;
+            s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
-            s.addChild(s.view);
-            s.maskObj.beginFill("#000000");
-            s.maskObj.rect(0, 0, vW, vH);
-            s.viewWidth = vW;
-            s.viewHeight = vH;
-            s.maskObj.endFill();
             s.view.mask = s.maskObj;
+            s.setMask(vW,vH);
+            s.maskObj.alpha=0;
+            s.addChild(s.maskObj);
+            s.addChild(s.view);
             s.maxDistance = maxDistance;
-            s.isVertical = isVertical;
-
-            if (s.isVertical) {
-                s.distance = s.viewHeight;
-                s.paramXY = "y";
-            } else {
-                s.distance = s.viewWidth;
-                s.paramXY = "x";
-            }
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view: any = s.view;
-                if (!s.isStop) {
+                if (!s.isStop){
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
                         //是否超过了边界,如果超过了,则加快加速度,让其停止
@@ -233,7 +221,24 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
-
+        private setMask(w:number,h:number):void{
+            var s:any=this;
+            s.maskObj.clear();
+            s.maskObj.beginFill("#000000");
+            s.maskObj.rect(0, 0, w, h);
+            s.viewWidth = w;
+            s.viewHeight = h;
+            s.maskObj.endFill();
+            s.viewHeight=h;
+            s.viewWidth=w;
+            if (s.isVertical) {
+                s.distance = s.viewHeight;
+                s.paramXY = "y";
+            } else {
+                s.distance = s.viewWidth;
+                s.paramXY = "x";
+            }
+        }
         private onMouseEvent(e: annie.MouseEvent): void {
             var s = this;
             var view: any = s.view;
@@ -241,10 +246,6 @@ namespace annieUI {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {
                         s.isStop = true;
-                        //并且需要告诉对应的鼠标弹起事件时不要向下冒泡
-                        s.isMaoPao = false;
-                    } else {
-                        s.isMaoPao = true;
                     }
                     if (s.isVertical) {
                         s.lastValue = e.localY;
@@ -279,7 +280,6 @@ namespace annieUI {
                             speedPer = 0.2;
                         }
                         view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
-                        s.isMaoPao = false;
                     }
                     s.lastValue = currentValue;
                     s.stopTimes = 0;
@@ -287,9 +287,6 @@ namespace annieUI {
                     s.isStop = false;
                     s.stopTimes = -1;
                 }
-            }
-            if (!s.isMaoPao) {
-                e.preventDefault();
             }
         }
     }

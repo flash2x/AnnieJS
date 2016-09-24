@@ -11,6 +11,16 @@ namespace annie {
      */
     export class Event extends AObject {
         /**
+         * 舞台尺寸发生变化时触发
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        public static RESIZE:string = "onResize";
+        /**
          * 舞台初始化完成后会触发的事件
          * @Event
          * @property ON_STAGE_INIT

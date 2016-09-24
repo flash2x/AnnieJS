@@ -32,7 +32,8 @@ namespace annieUI
                     s.bitmap.scaleX=s.bitmap.scaleY=s.radio*2/s.photo.width;
                     s.maskObj.circle(s.radio, s.radio, s.radio);
                 }else{
-                    s.bitmap.scaleX=s.bitmap.scaleY=s.radio/s.photo.width;
+                    var w=s.photo.width>s.photo.height?s.photo.width:s.photo.height;
+                    s.bitmap.scaleX=s.bitmap.scaleY=s.radio/w;
                     s.maskObj.rect(0,0,s.radio,s.radio);
                 }
                 s.maskObj.endFill();
