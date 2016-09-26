@@ -83,7 +83,7 @@ namespace annie {
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 req.responseType = "blob";
             }
-            req.withCredentials = true;
+            req.withCredentials = false;
             if (!s.data) {
                 req.send();
             } else {
