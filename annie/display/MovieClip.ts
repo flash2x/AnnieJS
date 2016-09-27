@@ -460,7 +460,12 @@ namespace annie {
         }
 
         /**
-         * 更改movieClip中的一个child的显示属性
+         * 动画播放过程中更改movieClip中的一个child的显示属性，
+         * 如果是停止状态，可以直接设置子级显示属性
+         * 因为moveClip在播放的过程中是无法更新子级的显示属性的，
+         * 比如你要更新子级的坐标，透明度，旋转等等，这些更改都会无效
+         * 因为，moveClip自己记录了子级每一帧的这些属性，所有你需要通过
+         * 此方法告诉moveClip我要自己控制这些属性
          * @method setFrameChild
          * @public
          * @since 1.0.0

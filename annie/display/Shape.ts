@@ -755,10 +755,10 @@ namespace annie {
                             var cfLen = cf.length;
                             for (var i = 0; i < cfLen; i++) {
                                 if (s.cFilters[i].type == "Shadow") {
-                                    ctx.shadowBlur = cf[i].blur;
-                                    ctx.shadowColor = cf[i].color;
-                                    ctx.shadowOffsetX = cf[i].offsetX;
-                                    ctx.shadowOffsetY = cf[i].offsetY;
+                                    ctx.shadowBlur += cf[i].blur;
+                                    ctx.shadowColor += cf[i].color;
+                                    ctx.shadowOffsetX += cf[i].offsetX;
+                                    ctx.shadowOffsetY += cf[i].offsetY;
                                     break;
                                 }
                             }

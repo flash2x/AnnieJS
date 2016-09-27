@@ -192,7 +192,7 @@ namespace annie {
          * @static
          * @public
          * @since 1.0.0
-         * @param bitmap
+         * @param {annie.Bitmap} bitmap
          * @return {Image}
          */
         public static getBitmapData(bitmap:annie.Bitmap):any{

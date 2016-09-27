@@ -11,7 +11,7 @@ namespace annie{
      * @since 1.0.0
      * @extends annie.EventDispatcher
      */
-    export class DisplayObject extends EventDispatcher {
+    export class DisplayObject extends EventDispatcher{
         /**
          * @method DisplayObject
          * @since 1.0.0

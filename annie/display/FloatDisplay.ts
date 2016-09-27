@@ -38,13 +38,6 @@ namespace annie {
          * @private
          */
         private _isAdded:boolean=false;
-        /**
-         * 构造函数
-         * @method FloatDisplay
-         * @public
-         * @param isOnCanvas 是否悬浮在canvas上面,否则会将元素放到canvas下面
-         * @since 1.0.0
-         */
         public constructor() {
             super();
             var s = this;

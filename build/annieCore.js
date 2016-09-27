@@ -207,7 +207,7 @@ var annie;
         /**
          * 全局的鼠标事件的监听数对象表
          * @property _MECO
-         * @public
+         * @private
          * @since 1.0.0
          */
         EventDispatcher._MECO = {};
@@ -555,6 +555,14 @@ var annie;
      */
     var Point = (function (_super) {
         __extends(Point, _super);
+        /**
+         * 构造函数
+         * @method Point
+         * @public
+         * @since 1.0.0
+         * @param x
+         * @param y
+         */
         function Point(x, y) {
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
@@ -914,7 +922,7 @@ var annie;
     var Rectangle = (function (_super) {
         __extends(Rectangle, _super);
         /**
-         * 初始化一个矩形
+         * 构造函数
          * @method Rectangle
          * @param {number} x
          * @param {number} y
@@ -1718,7 +1726,7 @@ var annie;
          * @static
          * @public
          * @since 1.0.0
-         * @param bitmap
+         * @param {annie.Bitmap} bitmap
          * @return {Image}
          */
         Bitmap.getBitmapData = function (bitmap) {
@@ -2435,10 +2443,10 @@ var annie;
                             var cfLen = cf.length;
                             for (var i = 0; i < cfLen; i++) {
                                 if (s.cFilters[i].type == "Shadow") {
-                                    ctx.shadowBlur = cf[i].blur;
-                                    ctx.shadowColor = cf[i].color;
-                                    ctx.shadowOffsetX = cf[i].offsetX;
-                                    ctx.shadowOffsetY = cf[i].offsetY;
+                                    ctx.shadowBlur += cf[i].blur;
+                                    ctx.shadowColor += cf[i].color;
+                                    ctx.shadowOffsetX += cf[i].offsetX;
+                                    ctx.shadowOffsetY += cf[i].offsetY;
                                     break;
                                 }
                             }
@@ -3921,7 +3929,12 @@ var annie;
             }
         };
         /**
-         * 更改movieClip中的一个child的显示属性
+         * 动画播放过程中更改movieClip中的一个child的显示属性，
+         * 如果是停止状态，可以直接设置子级显示属性
+         * 因为moveClip在播放的过程中是无法更新子级的显示属性的，
+         * 比如你要更新子级的坐标，透明度，旋转等等，这些更改都会无效
+         * 因为，moveClip自己记录了子级每一帧的这些属性，所有你需要通过
+         * 此方法告诉moveClip我要自己控制这些属性
          * @method setFrameChild
          * @public
          * @since 1.0.0
@@ -4158,13 +4171,6 @@ var annie;
      */
     var FloatDisplay = (function (_super) {
         __extends(FloatDisplay, _super);
-        /**
-         * 构造函数
-         * @method FloatDisplay
-         * @public
-         * @param isOnCanvas 是否悬浮在canvas上面,否则会将元素放到canvas下面
-         * @since 1.0.0
-         */
         function FloatDisplay() {
             _super.call(this);
             /**
@@ -4591,7 +4597,7 @@ var annie;
                         s.lineWidth = lineH;
                     }
                 }
-                if (s.lineType == "single") {
+                if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines.push(hardLines[0]);
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
@@ -4680,6 +4686,7 @@ var annie;
                     for (var i = 0; i < len; i++) {
                         var f = s["cFilters"][i];
                         f.drawFilter(imageData);
+                        trace(s["cFilters"][i].type);
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
@@ -6701,7 +6708,7 @@ var annie;
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 req.responseType = "blob";
             }
-            req.withCredentials = true;
+            req.withCredentials = false;
             if (!s.data) {
                 req.send();
             }
@@ -7360,12 +7367,6 @@ var annie;
 var annie;
 (function (annie) {
     var isUpdateTween = true;
-    /**
-     * 对外私有类
-     * @class TweenObj
-     * @private
-     * @since 1.0.0
-     */
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
@@ -7611,15 +7612,15 @@ var annie;
             }
         };
         /**
-         * quadraticIN缓动类型
-         * @method quadraticIN
+         * quadraticIn缓动类型
+         * @method quadraticIn
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        Tween.quadraticIN = function (k) {
+        Tween.quadraticIn = function (k) {
             return k * k;
         };
         /**
@@ -7650,15 +7651,15 @@ var annie;
             return -0.5 * (--k * (k - 2) - 1);
         };
         /**
-         * cubicIN 缓动类型
-         * @method cubicIN
+         * cubicIn 缓动类型
+         * @method cubicIn
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        Tween.cubicIN = function (k) {
+        Tween.cubicIn = function (k) {
             return k * k * k;
         };
         /**

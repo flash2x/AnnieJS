@@ -11,7 +11,7 @@ namespace annie {
      */
     export class Rectangle extends AObject {
         /**
-         * 初始化一个矩形
+         * 构造函数
          * @method Rectangle
          * @param {number} x
          * @param {number} y

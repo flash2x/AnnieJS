@@ -202,7 +202,7 @@ namespace annie {
                         s.lineWidth=lineH;
                     }
                 }
-                if(s.lineType=="single"){
+                if(s.text.indexOf("\n")<0&&s.lineType=="single"){
                     realLines.push(hardLines[0]);
                     var str = hardLines[0];
                     var lineW=s._getMeasuredWidth(str);
@@ -286,8 +286,10 @@ namespace annie {
                     for(var i=0;i<len;i++) {
                         var f:any = s["cFilters"][i];
                         f.drawFilter(imageData);
+                        trace(s["cFilters"][i].type);
                     }
                     ctx.putImageData(imageData,0,0);
+
                 }
                 s._cacheX=-10;
                 s._cacheY=-10;

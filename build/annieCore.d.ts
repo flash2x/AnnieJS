@@ -32,7 +32,7 @@ declare namespace annie {
         /**
          * 全局的鼠标事件的监听数对象表
          * @property _MECO
-         * @public
+         * @private
          * @since 1.0.0
          */
         private static _MECO;
@@ -431,6 +431,14 @@ declare namespace annie {
      * @public
      */
     class Point extends annie.AObject {
+        /**
+         * 构造函数
+         * @method Point
+         * @public
+         * @since 1.0.0
+         * @param x
+         * @param y
+         */
         constructor(x?: number, y?: number);
         /**
          * @property x
@@ -616,7 +624,7 @@ declare namespace annie {
      */
     class Rectangle extends AObject {
         /**
-         * 初始化一个矩形
+         * 构造函数
          * @method Rectangle
          * @param {number} x
          * @param {number} y
@@ -1137,7 +1145,7 @@ declare namespace annie {
          * @static
          * @public
          * @since 1.0.0
-         * @param bitmap
+         * @param {annie.Bitmap} bitmap
          * @return {Image}
          */
         static getBitmapData(bitmap: annie.Bitmap): any;
@@ -2102,7 +2110,12 @@ declare namespace annie {
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         /**
-         * 更改movieClip中的一个child的显示属性
+         * 动画播放过程中更改movieClip中的一个child的显示属性，
+         * 如果是停止状态，可以直接设置子级显示属性
+         * 因为moveClip在播放的过程中是无法更新子级的显示属性的，
+         * 比如你要更新子级的坐标，透明度，旋转等等，这些更改都会无效
+         * 因为，moveClip自己记录了子级每一帧的这些属性，所有你需要通过
+         * 此方法告诉moveClip我要自己控制这些属性
          * @method setFrameChild
          * @public
          * @since 1.0.0
@@ -2175,13 +2188,6 @@ declare namespace annie {
          * @private
          */
         private _isAdded;
-        /**
-         * 构造函数
-         * @method FloatDisplay
-         * @public
-         * @param isOnCanvas 是否悬浮在canvas上面,否则会将元素放到canvas下面
-         * @since 1.0.0
-         */
         constructor();
         /**
          * 初始化方法
@@ -3555,15 +3561,15 @@ declare namespace annie {
         private static _tweenPool;
         private static _tweenList;
         /**
-         * quadraticIN缓动类型
-         * @method quadraticIN
+         * quadraticIn缓动类型
+         * @method quadraticIn
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        static quadraticIN(k: number): number;
+        static quadraticIn(k: number): number;
         /**
          * quadraticOut 缓动类型
          * @method quadraticOut
@@ -3585,15 +3591,15 @@ declare namespace annie {
          */
         static quadraticInOut(k: number): number;
         /**
-         * cubicIN 缓动类型
-         * @method cubicIN
+         * cubicIn 缓动类型
+         * @method cubicIn
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        static cubicIN(k: number): number;
+        static cubicIn(k: number): number;
         /**
          * cubicOut 缓动类型
          * @method cubicOut

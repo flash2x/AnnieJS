@@ -40,7 +40,7 @@ namespace annie {
         /**
          * 全局的鼠标事件的监听数对象表
          * @property _MECO
-         * @public
+         * @private
          * @since 1.0.0
          */
 

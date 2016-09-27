@@ -667,7 +667,7 @@ namespace annie {
             s.renderObj.reSize();
             s.setAlign();
         };
-        public getBounds():Rectangle {
+        public getBounds():Rectangle{
             return this.viewRect;
         }
 

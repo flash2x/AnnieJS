@@ -135,16 +135,16 @@ declare namespace annieUI {
         /**
          * 构造函数
          * @method  ScrollPage
-         * @param vW 可视区域宽
-         * @param vH 可视区域高
-         * @param maxDistance 最大滚动的长度
-         * @param isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @param {number}vW 可视区域宽
+         * @param {number}vH 可视区域高
+         * @param {number}maxDistance 最大滚动的长度
+         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          */
         constructor(vW: number, vH: number, maxDistance: number, isVertical?: boolean);
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
-         * @param isVertical 是纵向还是横向,不传值则默认为纵向
+         * @param {boolean}isVertical 是纵向还是横向,不传值则默认为纵向
          * @since 1.0.0
          * @public
          */
@@ -152,8 +152,8 @@ declare namespace annieUI {
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
          * @method setMask
-         * @param w 设置可见区域的宽
-         * @param h 设置可见区域的高
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
          * @public
          * @since 1.0.0
          */

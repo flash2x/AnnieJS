@@ -3,12 +3,6 @@
  */
 namespace annie {
     var isUpdateTween:boolean=true;
-    /**
-     * 对外私有类
-     * @class TweenObj
-     * @private
-     * @since 1.0.0
-     */
     class TweenObj extends AObject {
         public constructor() {
             super();
@@ -256,15 +250,15 @@ namespace annie {
         private static _tweenList:Array<TweenObj> = [];
 
         /**
-         * quadraticIN缓动类型
-         * @method quadraticIN
+         * quadraticIn缓动类型
+         * @method quadraticIn
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        public static quadraticIN(k:number):number {
+        public static quadraticIn(k:number):number {
             return k * k;
         }
         /**
@@ -295,15 +289,15 @@ namespace annie {
             return -0.5 * (--k * (k - 2) - 1);
         }
         /**
-         * cubicIN 缓动类型
-         * @method cubicIN
+         * cubicIn 缓动类型
+         * @method cubicIn
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        public static cubicIN(k:number):number {
+        public static cubicIn(k:number):number {
             return k * k * k;
 
         }
