@@ -2689,6 +2689,7 @@ declare namespace annie {
          * @type {Array}
          * @private
          */
+        private static _isLoadedVConsole;
         private _lastDpList;
         /**
          * 显示对象入口函数

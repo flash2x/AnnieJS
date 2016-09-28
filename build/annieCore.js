@@ -5084,11 +5084,6 @@ var annie;
              * @private
              */
             this._mouseEventInfo = {};
-            /**
-             * 上一次鼠标或触碰经过的显示对象列表
-             * @type {Array}
-             * @private
-             */
             this._lastDpList = [];
             /**
              * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
@@ -5269,7 +5264,21 @@ var annie;
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成
-                s.dispatchEvent(new annie.Event("onInitStage"));
+                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
+                if (annie.debug && !Stage._isLoadedVConsole) {
+                    var vLoad = new annie.URLLoader();
+                    vLoad.load("libs/vconsole.min.js");
+                    vLoad.addEventListener(annie.Event.COMPLETE, function (e) {
+                        Stage._isLoadedVConsole = true;
+                        document.querySelector('head').appendChild(e.data.response);
+                        e.data.response.onload = function () {
+                            s.dispatchEvent(new annie.Event("onInitStage"));
+                        };
+                    });
+                }
+                else {
+                    s.dispatchEvent(new annie.Event("onInitStage"));
+                }
             }, 100);
         }
         /**
@@ -5623,6 +5632,12 @@ var annie;
                 }
             }
         };
+        /**
+         * 上一次鼠标或触碰经过的显示对象列表
+         * @type {Array}
+         * @private
+         */
+        Stage._isLoadedVConsole = false;
         /**
          * 要循环调用 flush 函数对象列表
          * @type {Array}
@@ -6789,8 +6804,8 @@ var annie;
                                 if (isBlob) {
                                     URL.revokeObjectURL(item.src);
                                 }
-                                s.dispatchEvent(e);
                                 item.onload = null;
+                                s.dispatchEvent(e);
                             };
                             break;
                         case "sound":
@@ -6819,12 +6834,12 @@ var annie;
                     e.data["response"] = item;
                     s.data = null;
                     s.responseType = "";
-                    if (!isNeedLoad) {
-                        s.dispatchEvent(e);
-                    }
                     req.onerror = null;
                     //s._req.onreadystatechange=null;
                     req.onprogress = null;
+                    if (!isNeedLoad) {
+                        s.dispatchEvent(e);
+                    }
                 }
             };
             s._req = req;

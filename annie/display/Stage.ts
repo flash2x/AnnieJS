@@ -184,6 +184,7 @@ namespace annie {
          * @type {Array}
          * @private
          */
+        private static _isLoadedVConsole:boolean=false;
         private _lastDpList:any=[];
         /**
          * 显示对象入口函数
@@ -253,7 +254,20 @@ namespace annie {
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成
-                s.dispatchEvent(new annie.Event("onInitStage"));
+                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
+                if(debug&&!Stage._isLoadedVConsole){
+                    var vLoad:URLLoader=new URLLoader();
+                    vLoad.load("libs/vconsole.min.js");
+                    vLoad.addEventListener(annie.Event.COMPLETE,function (e:Event) {
+                        Stage._isLoadedVConsole=true;
+                        document.querySelector('head').appendChild(e.data.response);
+                        e.data.response.onload = function () {
+                            s.dispatchEvent(new annie.Event("onInitStage"));
+                        }
+                    });
+                }else{
+                    s.dispatchEvent(new annie.Event("onInitStage"));
+                }
             }, 100);
         }
         /**
@@ -670,13 +684,11 @@ namespace annie {
         public getBounds():Rectangle{
             return this.viewRect;
         }
-
         /**
          * 要循环调用 flush 函数对象列表
          * @type {Array}
          */
         private static allUpdateObjList:Array<any>=[];
-
         /**
          *
          */
