@@ -151,6 +151,7 @@ var annieUI;
             this.fSpeed = 20;
             this.paramXY = "y";
             this.stopTimes = -1;
+            this.isMouseDown = false;
             var s = this;
             s.isVertical = isVertical;
             s.view = new Sprite();
@@ -164,6 +165,7 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view = s.view;
                 if (!s.isStop) {
@@ -252,8 +254,6 @@ var annieUI;
             s.viewWidth = w;
             s.viewHeight = h;
             s.maskObj.endFill();
-            s.viewHeight = h;
-            s.viewWidth = w;
             if (s.isVertical) {
                 s.distance = s.viewHeight;
                 s.paramXY = "y";
@@ -278,8 +278,11 @@ var annieUI;
                         s.lastValue = e.localX;
                     }
                     s.speed = 0;
+                    s.isMouseDown = true;
                 }
                 else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                    if (!s.isMouseDown)
+                        return;
                     var currentValue;
                     if (s.isVertical) {
                         currentValue = e.localY;
@@ -314,6 +317,7 @@ var annieUI;
                     s.stopTimes = 0;
                 }
                 else {
+                    s.isMouseDown = false;
                     s.isStop = false;
                     s.stopTimes = -1;
                 }

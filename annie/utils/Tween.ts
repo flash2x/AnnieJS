@@ -111,10 +111,9 @@ namespace annie {
             }
             if (s._isFront) {
                 s._currentFrame++;
+
                 if (s._currentFrame > s._totalFrames) {
-                    if (s._completeFun) {
-                        s._completeFun();
-                    }
+                    var cf=s._completeFun;
                     if (s._isLoop>0) {
                         s._isFront = false;
                         s._currentFrame = s._totalFrames;
@@ -122,18 +121,22 @@ namespace annie {
                     } else {
                         Tween.kill(s.getInstanceId());
                     }
+                    if(cf){
+                        cf();
+                    }
                 }
             } else {
                 s._currentFrame--;
                 if (s._currentFrame <0) {
-                    if (s._completeFun) {
-                        s._completeFun();
-                    }
+                    var cf=s._completeFun;
                     if (s._isLoop>0) {
                         s._isFront = true;
                         s._currentFrame = 1;
                     }else{
                         Tween.kill(s.getInstanceId());
+                    }
+                    if(cf){
+                        cf();
                     }
                 }
             }

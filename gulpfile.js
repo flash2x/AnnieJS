@@ -3,8 +3,9 @@
  */
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
-var merge = require('merge2');
 var del = require('del');
+var uglify = require('gulp-uglify');
+var rename = require('gulp-rename');
 var coreList =[
     "annie/events/EventDispatcher.ts",
     "annie/events/Event.ts",
@@ -48,10 +49,8 @@ var onBuildCore = function(){
     };
     var outDir = "build";
     var tsResult = gulp.src(coreList).pipe(ts(op));
-    return merge([
-        tsResult.dts.pipe(gulp.dest(outDir)),
-        tsResult.js.pipe(gulp.dest(outDir))
-    ]);
+        tsResult.dts.pipe(gulp.dest(outDir));
+        tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 var onBuildUI = function(){
     var op = {
@@ -61,12 +60,10 @@ var onBuildUI = function(){
     };
     var outDir = "build";
     var tsResult = gulp.src(uiList).pipe(ts(op));
-    return merge([
-        tsResult.dts.pipe(gulp.dest(outDir)),
-        tsResult.js.pipe(gulp.dest(outDir))
-    ]);
+        tsResult.dts.pipe(gulp.dest(outDir));
+        tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
-var onBuildDoc = function () {
+var onBuildDoc = function (){
     del([
         'libs'
     ]);
@@ -76,10 +73,9 @@ var onBuildDoc = function () {
     };
     var outDir = "libs";
     var tsResult = gulp.src(coreList.concat(uiList.slice(1))).pipe(ts(op));
-    return merge([
-        tsResult.js.pipe(gulp.dest(outDir))
-    ]);
-}
+        tsResult.js.pipe(gulp.dest(outDir));
+};
 gulp.task('onBuildCore', onBuildCore);
 gulp.task('onBuildUI', onBuildUI);
 gulp.task("onBuildDoc", onBuildDoc);
+gulp.task('onBuildAll',['onBuildCore','onBuildUI']);

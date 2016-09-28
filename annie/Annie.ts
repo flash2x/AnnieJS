@@ -3,6 +3,23 @@
  */
 namespace annie {
     /**
+     * 是否开启调试模式
+     * @public
+     * @since 1.0.1
+     * @public
+     * @property debug
+     * @type {boolean}
+     */
+    export var debug:boolean=false;
+    /**
+     * annie引擎的版本号
+     * @public
+     * @since 1.0.1
+     * @property version
+     * @type {string}
+     */
+    export var version:string="1.0.1";
+    /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
      * @type {number}

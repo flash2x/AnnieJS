@@ -158,8 +158,8 @@ namespace annie {
                                 if(isBlob) {
                                     URL.revokeObjectURL(item.src);
                                 }
-                                s.dispatchEvent(e);
                                 item.onload = null;
+                                s.dispatchEvent(e);
                             };
                             break;
                         case "sound":
@@ -187,12 +187,12 @@ namespace annie {
                     e.data["response"] = item;
                     s.data = null;
                     s.responseType = "";
-                    if (!isNeedLoad) {
-                        s.dispatchEvent(e);
-                    }
                     req.onerror = null;
                     //s._req.onreadystatechange=null;
                     req.onprogress = null;
+                    if (!isNeedLoad) {
+                        s.dispatchEvent(e);
+                    }
                 }
             }
             s._req = req;

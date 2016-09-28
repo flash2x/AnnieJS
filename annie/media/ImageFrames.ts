@@ -13,7 +13,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class ImageFrames extends EventDispatcher{
-        private list: Array<any>;
+        private list: any;
         /**
          * img文件所在的文件夹路径
          * @property src

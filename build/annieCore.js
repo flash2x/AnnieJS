@@ -1104,7 +1104,7 @@ var annie;
              */
             this.cAlpha = 1;
             /**
-             * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的透明度依次相乘得到最终的值
+             * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
              * @private
              * @type {annie.Matrix}
@@ -4992,7 +4992,7 @@ var annie;
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @type false
+             * @default false
              */
             this.autoResize = false;
             /**
@@ -6919,7 +6919,7 @@ var annie;
          * @param {string} sceneName fla通过flash2x转换时设置的包名
          * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
          * @param {Function} completeFun 加载完成回高,无回调参数
-         * @param {string} domain 加载时要设置的url前缀,一般为默认。
+         * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
          */
         RESManager.loadScene = function (sceneName, progressFun, completeFun, domain) {
             if (domain === void 0) { domain = ""; }
@@ -7472,9 +7472,7 @@ var annie;
             if (s._isFront) {
                 s._currentFrame++;
                 if (s._currentFrame > s._totalFrames) {
-                    if (s._completeFun) {
-                        s._completeFun();
-                    }
+                    var cf = s._completeFun;
                     if (s._isLoop > 0) {
                         s._isFront = false;
                         s._currentFrame = s._totalFrames;
@@ -7483,20 +7481,24 @@ var annie;
                     else {
                         Tween.kill(s.getInstanceId());
                     }
+                    if (cf) {
+                        cf();
+                    }
                 }
             }
             else {
                 s._currentFrame--;
                 if (s._currentFrame < 0) {
-                    if (s._completeFun) {
-                        s._completeFun();
-                    }
+                    var cf = s._completeFun;
                     if (s._isLoop > 0) {
                         s._isFront = true;
                         s._currentFrame = 1;
                     }
                     else {
                         Tween.kill(s.getInstanceId());
+                    }
+                    if (cf) {
+                        cf();
                     }
                 }
             }
@@ -8063,6 +8065,23 @@ var annie;
  */
 var annie;
 (function (annie) {
+    /**
+     * 是否开启调试模式
+     * @public
+     * @since 1.0.1
+     * @public
+     * @property debug
+     * @type {boolean}
+     */
+    annie.debug = false;
+    /**
+     * annie引擎的版本号
+     * @public
+     * @since 1.0.1
+     * @property version
+     * @type {string}
+     */
+    annie.version = "1.0.1";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

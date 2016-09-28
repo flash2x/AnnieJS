@@ -132,6 +132,7 @@ declare namespace annieUI {
         fSpeed: number;
         private paramXY;
         private stopTimes;
+        private isMouseDown;
         /**
          * 构造函数
          * @method  ScrollPage

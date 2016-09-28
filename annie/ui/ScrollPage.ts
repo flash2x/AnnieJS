@@ -134,6 +134,7 @@ namespace annieUI {
         public  fSpeed: number = 20;
         private paramXY: string = "y";
         private stopTimes: number = -1;
+        private isMouseDown:boolean=false;
         /**
          * 构造函数
          * @method  ScrollPage
@@ -157,6 +158,7 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view: any = s.view;
                 if (!s.isStop){
@@ -239,8 +241,6 @@ namespace annieUI {
             s.viewWidth = w;
             s.viewHeight = h;
             s.maskObj.endFill();
-            s.viewHeight=h;
-            s.viewWidth=w;
             if (s.isVertical) {
                 s.distance = s.viewHeight;
                 s.paramXY = "y";
@@ -263,7 +263,9 @@ namespace annieUI {
                         s.lastValue = e.localX;
                     }
                     s.speed = 0;
+                    s.isMouseDown=true;
                 } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                    if(!s.isMouseDown)return;
                     var currentValue: number;
                     if (s.isVertical) {
                         currentValue = e.localY;
@@ -294,6 +296,7 @@ namespace annieUI {
                     s.lastValue = currentValue;
                     s.stopTimes = 0;
                 } else {
+                    s.isMouseDown=false;
                     s.isStop = false;
                     s.stopTimes = -1;
                 }

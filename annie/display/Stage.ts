@@ -80,7 +80,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @type false
+         * @default false
          */
         public autoResize:boolean = false;
         /**
