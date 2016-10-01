@@ -26,7 +26,7 @@ var trace = function (...arg:any[]) {
 var globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
 //禁止页面滑动
 document.ontouchmove = function(e){
-    if(!annie.canHTMLTouchMove) {
+    if(!annie.canHTMLTouchMove&&!annie.debug){
         e.preventDefault();
     }
 };

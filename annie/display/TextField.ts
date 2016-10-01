@@ -141,7 +141,7 @@ namespace annie {
          * @since 1.0.0
          */
         private _getMeasuredWidth(text:string):number {
-            var ctx = annie.DisplayObject._canvas.getContext("2d");
+            var ctx = this._cacheImg.getContext("2d");
             //ctx.save();
             var w = ctx.measureText(text).width;
             //ctx.restore();

@@ -3520,7 +3520,8 @@ declare namespace annie {
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 第二个参数是用时间值还是用帧数
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
          */
@@ -3536,7 +3537,8 @@ declare namespace annie {
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 第二个参数是用时间值还是用帧数
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
          */

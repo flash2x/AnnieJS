@@ -133,11 +133,12 @@ namespace annie {
                 s.list.push(e.data.response);
                 s._currentLoadIndex = s.list.length;
                 if (s._currentLoadIndex == s._configInfo.totalsPage) {
-                    //加载结束,跑出结束事件
+                    //加载结束,抛出结束事件
                     if (!s.canPlay) {
                         s.canPlay = true;
                     }
                     s._isLoaded=true;
+                    s.dispatchEvent("onload");
                 } else {
                     s.loadImage();
                     var bufferFrame = s._currentLoadIndex* s._configInfo.pageCount;
@@ -162,6 +163,7 @@ namespace annie {
                         }
                         if (bufferFrame >= s._needBufferFrame && !s.canPlay) {
                             s.canPlay = true;
+                            s.dispatchEvent("oncanplay");
                         }
                     }
                 }
@@ -179,12 +181,12 @@ namespace annie {
             if (s.canPlay && s.autoplay) {
                 if (s.currentFrame == s._configInfo.totalsFrame) {
                     //播放结束事件
-                    s.dispatchEvent("onPlayEnd");
                     s.currentFrame=0;
                     if(!s.loop){
                         s.autoplay=false;
                         s.isPlaying=false;
                     }
+                    s.dispatchEvent("onPlayEnd");
                 } else {
                     if(s.currentFrame<(s._currentLoadIndex * s._configInfo.pageCount-1)||s._isLoaded){
                         //////////////////////////////渲染//////////////////////////////////
@@ -194,7 +196,6 @@ namespace annie {
                         var y = rowIndex % s._configInfo.rowCount;
                         s.rect.x = y * (s._configInfo.dis + s._configInfo.width) + s._configInfo.dis;
                         s.rect.y = x * (s._configInfo.dis + s._configInfo.height) + s._configInfo.dis;
-                        trace( s.rect.x +":"+ s.rect.y);
                         s.rect.width = s._configInfo.width;
                         s.rect.height = s._configInfo.height;
                         s.currentBitmap= s.list[pageIndex];

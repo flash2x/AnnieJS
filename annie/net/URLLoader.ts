@@ -171,6 +171,7 @@ namespace annie {
                             }
                             item.preload = true;
                             item.src = s.url;
+                            item.load();
                             break;
                         case "json":
                             item = JSON.parse(result);

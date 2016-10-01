@@ -257,7 +257,7 @@ namespace annie {
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if(debug&&!Stage._isLoadedVConsole){
                     var vLoad:URLLoader=new URLLoader();
-                    vLoad.load("libs/vconsole.min.js");
+                    vLoad.load("libs/vConsole.min.js");
                     vLoad.addEventListener(annie.Event.COMPLETE,function (e:Event) {
                         Stage._isLoadedVConsole=true;
                         document.querySelector('head').appendChild(e.data.response);
@@ -279,10 +279,6 @@ namespace annie {
             if(!s.pause) {
                 super.update();
             }
-            //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-            if(EventDispatcher.getMouseEventCount()>0) {
-                s._mt();
-            }
         }
         /**
          * 渲染函数
@@ -293,6 +289,10 @@ namespace annie {
             if(!this.pause) {
                 renderObj.begin();
                 super.render(renderObj);
+            }
+            //检查mouse或touch事件是否有，如果有的话，就触发事件函数
+            if(EventDispatcher.getMouseEventCount()>0) {
+                this._mt();
             }
         }
 

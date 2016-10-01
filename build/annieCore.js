@@ -2110,7 +2110,7 @@ var annie;
          * @since 1.0.0
          */
         Shape.prototype.arc = function (x, y, radius, start, end) {
-            this._command.push([1, "arc", [x, y, radius, start, end]]);
+            this._command.push([1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]]);
         };
         /**
          * 画一个圆
@@ -3335,11 +3335,12 @@ var annie;
                 s.list.push(e.data.response);
                 s._currentLoadIndex = s.list.length;
                 if (s._currentLoadIndex == s._configInfo.totalsPage) {
-                    //加载结束,跑出结束事件
+                    //加载结束,抛出结束事件
                     if (!s.canPlay) {
                         s.canPlay = true;
                     }
                     s._isLoaded = true;
+                    s.dispatchEvent("onload");
                 }
                 else {
                     s.loadImage();
@@ -3370,6 +3371,7 @@ var annie;
                         }
                         if (bufferFrame >= s._needBufferFrame && !s.canPlay) {
                             s.canPlay = true;
+                            s.dispatchEvent("oncanplay");
                         }
                     }
                 }
@@ -3386,12 +3388,12 @@ var annie;
             if (s.canPlay && s.autoplay) {
                 if (s.currentFrame == s._configInfo.totalsFrame) {
                     //播放结束事件
-                    s.dispatchEvent("onPlayEnd");
                     s.currentFrame = 0;
                     if (!s.loop) {
                         s.autoplay = false;
                         s.isPlaying = false;
                     }
+                    s.dispatchEvent("onPlayEnd");
                 }
                 else {
                     if (s.currentFrame < (s._currentLoadIndex * s._configInfo.pageCount - 1) || s._isLoaded) {
@@ -3402,7 +3404,6 @@ var annie;
                         var y = rowIndex % s._configInfo.rowCount;
                         s.rect.x = y * (s._configInfo.dis + s._configInfo.width) + s._configInfo.dis;
                         s.rect.y = x * (s._configInfo.dis + s._configInfo.height) + s._configInfo.dis;
-                        trace(s.rect.x + ":" + s.rect.y);
                         s.rect.width = s._configInfo.width;
                         s.rect.height = s._configInfo.height;
                         s.currentBitmap = s.list[pageIndex];
@@ -4533,7 +4534,7 @@ var annie;
          * @since 1.0.0
          */
         TextField.prototype._getMeasuredWidth = function (text) {
-            var ctx = annie.DisplayObject._canvas.getContext("2d");
+            var ctx = this._cacheImg.getContext("2d");
             //ctx.save();
             var w = ctx.measureText(text).width;
             //ctx.restore();
@@ -5267,7 +5268,7 @@ var annie;
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if (annie.debug && !Stage._isLoadedVConsole) {
                     var vLoad = new annie.URLLoader();
-                    vLoad.load("libs/vconsole.min.js");
+                    vLoad.load("libs/vConsole.min.js");
                     vLoad.addEventListener(annie.Event.COMPLETE, function (e) {
                         Stage._isLoadedVConsole = true;
                         document.querySelector('head').appendChild(e.data.response);
@@ -5290,10 +5291,6 @@ var annie;
             if (!s.pause) {
                 _super.prototype.update.call(this);
             }
-            //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-            if (annie.EventDispatcher.getMouseEventCount() > 0) {
-                s._mt();
-            }
         };
         /**
          * 渲染函数
@@ -5304,6 +5301,10 @@ var annie;
             if (!this.pause) {
                 renderObj.begin();
                 _super.prototype.render.call(this, renderObj);
+            }
+            //检查mouse或touch事件是否有，如果有的话，就触发事件函数
+            if (annie.EventDispatcher.getMouseEventCount() > 0) {
+                this._mt();
             }
         };
         Stage.prototype._initMouseEvent = function (event, cp, sp) {
@@ -6818,6 +6819,7 @@ var annie;
                             }
                             item.preload = true;
                             item.src = s.url;
+                            item.load();
                             break;
                         case "json":
                             item = JSON.parse(result);
@@ -7540,7 +7542,8 @@ var annie;
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 第二个参数是用时间值还是用帧数
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
          */
@@ -7558,7 +7561,8 @@ var annie;
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 第二个参数是用时间值还是用帧数
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
          */
@@ -8288,7 +8292,7 @@ var trace = function () {
 var globalDispatcher = new annie.EventDispatcher();
 //禁止页面滑动
 document.ontouchmove = function (e) {
-    if (!annie.canHTMLTouchMove) {
+    if (!annie.canHTMLTouchMove && !annie.debug) {
         e.preventDefault();
     }
 };

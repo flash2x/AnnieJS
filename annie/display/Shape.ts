@@ -270,9 +270,8 @@ namespace annie {
          * @since 1.0.0
          */
         public arc(x:number, y:number,radius:number, start:number, end:number):void{
-            this._command.push([1,"arc",[x,y,radius,start,end]]);
+            this._command.push([1,"arc",[x,y,radius,start/180*Math.PI,end/180*Math.PI]]);
         }
-
         /**
          * 画一个圆
          * @method circle

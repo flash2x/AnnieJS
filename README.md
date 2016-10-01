@@ -1,9 +1,14 @@
 # AnnieJS(官方交流探讨QQ群:185090134)
-    AnnieJS 引擎是一款专注于Html5 互动交互的2d动画引擎。借助于Adobe Flash以及Flash2x工具将以前开发as3项目的工作流程完美复制到HTML5项目开发中来。
-    AnnieJS 引擎完全仿照as3的语法和架构，动画效果流畅,制作视觉震撼,但学习简单,安装方便！
-    AnnieJS 引擎支持ts和js两种开发语言环境，使用你熟悉的语言开发事半功倍。
-    AnnieJS 引擎最大的优势就是短小精悍。全部核心代码压缩后不到70k，该有的功能都有了。
-    AnnieJS 引擎需要结合Adobe 及 Flash2x工具使用才能发挥它最大的优势。
+## [AnnieJS 官网:http://www.annie2x.com](http://www.annie2x.com)
+## [Flash2x 官网:http://www.flash2x.org](http://www.flash2x.org)
+## [AnnieJS API文档:http://api.annie2x.com](http://api.annie2x.com) 
+## [AnnieJS demo演示:http://test.annie2x.com](http://test.annie2x.com)
+    AnnieJS 是一款专注于Html5 互动交互的2d动画引擎。
+    AnnieJS 借助于Adobe Flash以及Flash2x工具将以前开发as3项目的工作流程完美复制到HTML5项目开发中来。
+    AnnieJS 完全仿照as3的语法和架构，动画效果流畅,制作视觉震撼,但学习简单,安装方便！
+    AnnieJS 支持ts和js两种开发语言环境，使用你熟悉的语言开发事半功倍。
+    AnnieJS 最大的优势就是短小精悍。全部核心代码压缩后不到70k，该有的功能都有了。
+    AnnieJS 需要结合Adobe 及 Flash2x工具使用才能发挥它最大的优势。
     Flash2x 是一款优秀的Adobe Flash插件。
 # 相比Flash自带的CreateJS有什么区别和优势
     不得不承认CreateJS非常的优秀，但是它当初不是以移动优先的原则设计的，大量的逻辑和判断代码针对移动端没有任何意义。
@@ -11,10 +16,8 @@
     Createjs鼠标事件也是非常让人头疼，如果你的按钮是有透明的地方或者说接近透明的地方，那么这个地方根本无法获取到鼠标事件
     Createjs多fla项目制作打包，需要自己组织合成，资源压缩，打包还需要我们自己构建
     Createjs对于交互式项目，核心库越小越好，显然Createjs代码库有点过大
-    那么AnnieJS的作者经过了长期使用CreateJS经验之后，做了大量的优化和工作才做出了现在的这款AnnieJS引擎,重新定义了Flash开发H5的工作流程
-    具体优势各位看官接着往下看
-## [AnnieJS API文档:http://api.annie2x.com](http://api.annie2x.com) 
-## [AnnieJS demo演示:http://test.annie2x.com](http://test.annie2x.com)
+    那么AnnieJS的作者经过了长期使用CreateJS经验之后，做了大量的优化和工作才做出了现在的这款AnnieJS引擎
+    重新定义了Flash开发H5的工作流程,具体优势各位看官接着往下看
 #使用前准备工作
     1.安装 Ant 或者 Gulp 构建工具，选一种你熟悉的就行
     2.如果使用typeSript开发，则需要安装 node.js typeSrcipt 运行环境
@@ -22,7 +25,7 @@
     4.安装Adboe Flash CS6 及以上版本
     5.强烈推荐google Chrome浏览器，调试利器
     6.下载并安装Flash2xManager管理软件,用此软件一健配置工具和引擎(支持Mac和win)
-   [点击下载Flash2xManager工具](https://pan.baidu.com/s/1pKpMmUJ#path=%252FFlash2x%25E4%25B8%258B%25E8%25BD%25BD)
+##[点击下载Flash2xManager工具](https://pan.baidu.com/s/1pKpMmUJ#path=%252FFlash2x%25E4%25B8%258B%25E8%25BD%25BD)
 #小试牛刀
     1.安装好以上所说的相关工具后，打开Adobe Flash软件 随便新建一个Fla文件制作些东西保存(一定要保存)。
     2.打开Flash的菜单->窗口->扩展(cs6是[其他])->Flash2x，这时就启动了我们的Falsh2x工具。
@@ -72,10 +75,14 @@
     修复了Tween中的两个命名不规范的静态缓动方法名
     修复annieUI.ScrollPage 在pc端鼠标不按下就能滚动的bug
     修复annie.Tween 在动画完成回调函数里继续更改同一对象的动画效果时会无效的bug
-    支持vconsole调试，这样在手机上测试的时候就可以查看到调试信息(非常好用)
+    将annie.Shape.arc方法的参数由弧度更改成角度
+    支持vconsole调试，这样在手机上测试的时候就可以查看到调试信息(非常有用)
+    更改了鼠标事件执行顺序，以前是在渲染前,现在更改后渲染后,逻辑更合理
 ## Flash2x 3.0.1 版本更新列表
     修复导出矢量图时偶尔报错的bug
     修复多行静态文本导出后只显示一行的bug
+    修复了清除缓存模式下Main.js没有被清除缓存的bug
+    修复导出序列视频annie.ImageVideo会抖动的bug
 ## AnnieJS 1.0.0 版本诞生
     支持flash 剪辑,动画剪辑，按钮,文本，矢量，图形,SpriteSheet，声音等对象
     支持flash 遮罩，引导，传统补间，高级补间，骨骼动画
@@ -83,7 +90,7 @@
     支持Flash 显示对象的x,y,alpha,rotation,visible,scaleX,sclaeY,skewX,skewY,anchorX,anchorY
     支持Flash 时间轴嵌套时间轴动画，多层，多帧，多子级动画
     支持Flash 时间轴的正向播放，反向播放
-    支持Flash 时间轴跳转标签，
+    支持Flash 时间轴跳转标签
     支持Flash 时间轴EnterFrame事件，EndFrame事件，CallFrame事件
     支持Flash 时间轴上运行的脚本
     支持Flash 矢量的单色填充，渐变线性填充，渐变径向填充，位图填充
