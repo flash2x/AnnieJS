@@ -218,6 +218,7 @@ var annieUI;
                 }
             });
         }
+        ///dfgdfgdfgdfg
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
