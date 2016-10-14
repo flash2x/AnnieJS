@@ -13,8 +13,7 @@ namespace annie {
         public constructor() {
             super();
         }
-        public static _textCanvas:any = window.document.createElement("canvas");
-        private _cacheImg:any=window.document.createElement("img");
+        private _cacheImg:any=window.document.createElement("canvas");
         private _cacheX:number = 0;
         private _cacheY:number = 0;
         private _cacheObject:any ={bold:false,italic:false,size:12,lineType:"single",text:"",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
@@ -108,6 +107,13 @@ namespace annie {
          * @type {boolean}
          */
         public bold:boolean=false;
+
+        /**
+         * 设置文本在canvas里的渲染样式
+         * @param ctx
+         * @private
+         * @since 1.0.0
+         */
         private _prepContext(ctx:any):void {
             var s=this;
             var font:any=s.size || 12;
@@ -125,14 +131,29 @@ namespace annie {
             ctx.textBaseline = "top";
             ctx.fillStyle = this.color;
         }
+
+        /**
+         * 获取文本宽
+         * @method _getMeasuredWidth
+         * @param text
+         * @return {number}
+         * @private
+         * @since 1.0.0
+         */
         private _getMeasuredWidth(text:string):number {
-            var ctx = TextField._textCanvas.getContext("2d");
+            var ctx = this._cacheImg.getContext("2d");
             //ctx.save();
             var w = ctx.measureText(text).width;
             //ctx.restore();
             return w;
         }
-
+        /**
+         * 重写 render
+         * @method render
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         public render(renderObj:IRender):void {
             var s = this;
             if (s._cacheImg.src!="") {
@@ -140,6 +161,13 @@ namespace annie {
             }
             //super.render();
         }
+        /**
+         * 重写 update
+         * @method update
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         public update():void {
             var s:any = this;
             if(s.pauseUpdate)return;
@@ -156,7 +184,7 @@ namespace annie {
                     s._isNeedUpdate=false;
                     return;
                 }
-                var can=TextField._textCanvas;
+                var can=s._cacheImg;
                 var ctx = can.getContext("2d");
                 var hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines:any = [];
@@ -174,7 +202,7 @@ namespace annie {
                         s.lineWidth=lineH;
                     }
                 }
-                if(s.lineType=="single"){
+                if(s.text.indexOf("\n")<0&&s.lineType=="single"){
                     realLines.push(hardLines[0]);
                     var str = hardLines[0];
                     var lineW=s._getMeasuredWidth(str);
@@ -258,15 +286,24 @@ namespace annie {
                     for(var i=0;i<len;i++) {
                         var f:any = s["cFilters"][i];
                         f.drawFilter(imageData);
+                        trace(s["cFilters"][i].type);
                     }
                     ctx.putImageData(imageData,0,0);
+
                 }
-                s._cacheImg.src = can.toDataURL("image/png");
                 s._cacheX=-10;
                 s._cacheY=-10;
                 s._isNeedUpdate = false;
             }
         }
+
+        /**
+         * 重写 getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
         public getBounds():Rectangle{
             var s=this;
             var r=new Rectangle();

@@ -1,3 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Node template
 # Logs
 logs
 *.log
@@ -36,10 +38,10 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 .idea
-out
-test.fla
-test
-command.txt
 docRes
-docConfig.json
 libs
+out
+*.swf
+demo
+command.txt
+docConfig.json

@@ -23,6 +23,7 @@ namespace annie {
          */
         public htmlElement:any=null;
         /**
+         * 上一交刷新时保留的数据
          * @property _oldProps
          * @private
          * @since 1.0.0
@@ -30,18 +31,13 @@ namespace annie {
          */
         private _oldProps:Object={alpha:1,matrix:{a:1,b:0,c:0,d:1,tx:0,ty:0}};
         /**
+         * 是否已经添加了舞台事件
          * @property _isAdded
          * @since 1.0.0
          * @type {boolean}
          * @private
          */
         private _isAdded:boolean=false;
-        /**
-         * @method FloatDisplay
-         * @public
-         * @param isOnCanvas 是否悬浮在canvas上面,否则会将元素放到canvas下面
-         * @since 1.0.0
-         */
         public constructor() {
             super();
             var s = this;
@@ -100,7 +96,7 @@ namespace annie {
         }
 
         /**
-         * 刷新现实对象
+         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -141,7 +137,7 @@ namespace annie {
             }
         }
         /**
-         * 获取对象的bounds
+         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0

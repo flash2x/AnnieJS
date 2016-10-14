@@ -1,7 +1,7 @@
 /**
  * @module annie
  */
-namespace annie {
+namespace annie{
     /**
      * 显示对象抽奖类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
@@ -11,7 +11,7 @@ namespace annie {
      * @since 1.0.0
      * @extends annie.EventDispatcher
      */
-    export class DisplayObject extends EventDispatcher {
+    export class DisplayObject extends EventDispatcher{
         /**
          * @method DisplayObject
          * @since 1.0.0
@@ -27,7 +27,8 @@ namespace annie {
          * @since 1.0.0
          * @type {Stage}
          * @default null;
-         */
+         * @readonly
+         * */
         public stage:Stage=null;
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
@@ -39,7 +40,7 @@ namespace annie {
          */
         private cAlpha:number = 1;
         /**
-         * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的透明度依次相乘得到最终的值
+         * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
          * @private
          * @type {annie.Matrix}
@@ -200,15 +201,15 @@ namespace annie {
          * @default 0
          */
         public visible:boolean = true;
-        /**
-         * 显示对象的混合模式
-         * @property blendMode
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        public blendMode:number = 0;
+        // /**
+        //  * 显示对象的混合模式
+        //  * @property blendMode
+        //  * @public
+        //  * @since 1.0.0
+        //  * @type {number}
+        //  * @default 0
+        //  */
+        // public blendMode:number = 0;
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -226,7 +227,7 @@ namespace annie {
          * @type {annie.DisplayObject}
          * @default null
          */
-        public mask:DisplayObject = null;
+        public mask:any = null;
         /**
          * 显示对象的滤镜数组
          * @property filters
@@ -243,6 +244,7 @@ namespace annie {
          * @public
          * @type {annie.Sprite}
          * @default null
+         * @readonly
          */
         public parent:Sprite = null;
 
@@ -444,5 +446,14 @@ namespace annie {
                 s.scaleY *= sy;
             }
         }
+        /**
+         * 画缓存位图的时候需要使用
+         * @property _bitmapCanvas
+         * @private
+         * @static
+         * @since 1.0.0
+         * @type {Canvas}
+         */
+        public static _canvas:any = window.document.createElement("canvas");
     }
 }

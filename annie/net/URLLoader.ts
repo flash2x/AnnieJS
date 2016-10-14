@@ -83,7 +83,7 @@ namespace annie {
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 req.responseType = "blob";
             }
-            req.withCredentials = true;
+            req.withCredentials = false;
             if (!s.data) {
                 req.send();
             } else {
@@ -158,20 +158,20 @@ namespace annie {
                                 if(isBlob) {
                                     URL.revokeObjectURL(item.src);
                                 }
-                                s.dispatchEvent(e);
                                 item.onload = null;
+                                s.dispatchEvent(e);
                             };
                             break;
                         case "sound":
                         case "video":
                             if(s.responseType=="sound") {
-                                item = document.createElement("audio");
+                                item = document.createElement("AUDIO");
                             }else {
-                                item = document.createElement("video");
+                                item = document.createElement("VIDEO");
                             }
-                            item.autoplay = false;
                             item.preload = true;
                             item.src = s.url;
+                            item.load();
                             break;
                         case "json":
                             item = JSON.parse(result);
@@ -188,12 +188,12 @@ namespace annie {
                     e.data["response"] = item;
                     s.data = null;
                     s.responseType = "";
-                    if (!isNeedLoad) {
-                        s.dispatchEvent(e);
-                    }
                     req.onerror = null;
                     //s._req.onreadystatechange=null;
                     req.onprogress = null;
+                    if (!isNeedLoad) {
+                        s.dispatchEvent(e);
+                    }
                 }
             }
             s._req = req;
@@ -233,6 +233,15 @@ namespace annie {
          * @type {Object}
          */
         public data:Object = null;
+        /**
+         * 格式化post请求参数
+         * @method _fqs
+         * @param data
+         * @param query
+         * @return {string}
+         * @private
+         * @since 1.0.0
+         */
         private _fqs = function (data:any, query:any):string {
             var params:any = [];
             if (data) {
@@ -246,6 +255,14 @@ namespace annie {
             return params.join("&");
         };
         //formatURIString
+        /**
+         * 格式化get 请求参数
+         * @method _fus
+         * @param src
+         * @param data
+         * @return {any}
+         * @private
+         */
         private _fus = function (src:any, data:any):string {
             var s = this;
             if (data == null || data == "") {
