@@ -2,20 +2,14 @@
  * @class 全局
  */
 import Stage = annie.Stage;
+
 /**
  * 往控制台打印调试信息
- * @method trace
- * @param {Object} arg 任何个数,任意类型的参数
- * @since 1.0.0
- * @public
- * @static
+ * @type {any}
  * @example trace(1);trace(1,"hello");
  */
-var trace = function (...arg:any[]) {
-    for (var i in arguments) {
-        console.log(arguments[i]);
-    }
-};
+var trace=console.log.bind(console);
+
 /**
  * 全局事件触发器
  * @static
