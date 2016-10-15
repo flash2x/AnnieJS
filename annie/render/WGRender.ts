@@ -22,7 +22,10 @@ namespace annie {
         public rootContainer: any = null;
         private _gl: any;
         private _stage: Stage;
-        private _shaderProgram: any;
+        private _program: any;
+        private _texture:any;
+        private _buffer:any;
+
 
         /**
          * @CanvasRender
@@ -53,9 +56,6 @@ namespace annie {
             } else {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
-            // Enable depth tests
-            gl.enable(gl.DEPTH_TEST);
-            // Clear the depth buffer and color buffer
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         }
 
@@ -81,67 +81,19 @@ namespace annie {
         }
 
         /**
-         *  调用渲染
+         * 当舞台尺寸改变时会调用
          * @public
          * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
+         * @method reSize
          */
-        public draw(target: any, type: number): void {
-            /* var s = this;
-             // Define the vertices for a triangle
-             var vertices: any = [
-             0.0, 0.5, 0.0,
-             -0.5, -0.5, 0.0,
-             0.5, -0.5, 0.0
-             ];
-             // Create a buffer to use in the WebGL instance
-             var buffer = s._gl.createBuffer();
-             s._gl.bindBuffer(s._gl.ARRAY_BUFFER, buffer);
-             // Create and initialize the vertex buffer's data-store
-             s._gl.bufferData(s._gl.ARRAY_BUFFER, new Float32Array(vertices), s._gl.STATIC_DRAW);
-             // Enable the vertex attribute array
-             //开启对应程序接口的数组模式
-             s._gl.enableVertexAttribArray(0);
-             //把当前工作的数据缓冲区指定给0号位置的程序接口
-             s._gl.vertexAttribPointer(0, 3, s._gl.FLOAT, false, 0, 0);
-             s._gl.drawArrays(s._gl.TRIANGLES, 0, 3);
-             // Force all buffered GL commands to be executed as quickly as possible by the rendering engine
-             s._gl.flush();*/
+        public reSize(): void {
             var s = this;
-            var gl = s._gl;
-            ////////////////////////////////////////////
-            var vertices =
-                [
-                    1.0, 1.0,
-                    1.0, -1.0,
-                    -1.0, 1.0,
-                    -1.0, -1.0
-                ];
-            // Create a buffer to use in the WebGL instance
-            var buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            // Create and initialize the vertex buffer's data-store
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
-            // Enable the vertex attribute array
-            //开启对应程序接口的数组模式
-            gl.enableVertexAttribArray(0);
-            //把当前工作的数据缓冲区指定给0号位置的程序接口
-            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-            //////////////////////////////////////////////////
-            //在这里把我们的纹理交给WebGL:
-            ////////////////////////////////////////
-            var textureObject = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, textureObject);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, target._cacheImg);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            //为了安全起见，在使用之前请绑定好纹理ID
-            gl.activeTexture(gl.TEXTURE0);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            var c = s.rootContainer;
+            c.width = s._stage.divWidth * devicePixelRatio;
+            c.height = s._stage.divHeight * devicePixelRatio;
+            c.style.width = s._stage.divWidth + "px";
+            c.style.height = s._stage.divHeight + "px";
+            s._gl.viewport(0, 0, c.width, c.height);
         }
         private _getShader(id: number){
             var s = this;
@@ -151,11 +103,23 @@ namespace annie {
             // Create the shader object instance
             var shader: any = null;
             if (id == 0) {
-                shaderText = 'precision mediump float;varying vec2 textureCoordinate;uniform sampler2D inputImageTexture;void main() {gl_FragColor = texture2D(inputImageTexture, textureCoordinate);}';
+                shaderText = 'precision mediump float;' +
+                    'varying vec2 textureCoordinate;' +
+                    'uniform sampler2D inputImageTexture;' +
+                    'void main() {' +
+                    'gl_FragColor = texture2D(inputImageTexture, textureCoordinate);' +
+                    '}';
                 shader = gl.createShader(gl.FRAGMENT_SHADER);
             }
             else {
-                shaderText = 'precision mediump float;attribute vec4 position;attribute vec2 inputTextureCoordinate;varying vec2 textureCoordinate;void main() {gl_Position = position;textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);}';
+                shaderText = 'precision mediump float;' +
+                    'attribute vec4 position;' +
+                    'attribute vec2 inputTextureCoordinate;' +
+                    'varying vec2 textureCoordinate;' +
+                    'void main() {' +
+                    'gl_Position = position;' +
+                    'textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);' +
+                    '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
             }
             // Set the shader source code in the shader object instance and compile the shader
@@ -165,7 +129,7 @@ namespace annie {
                 throw Error("Shader compilation failed. Error: \"" + gl.getShaderInfoLog(shader) + "\"");
             }
             // Attach the shaders to the shader program
-            gl.attachShader(s._shaderProgram, shader);
+            gl.attachShader(s._program, shader);
             return shader;
         }
 
@@ -184,35 +148,58 @@ namespace annie {
             var c = s.rootContainer;
             s._gl = c["getContext"]('experimental-webgl')||c["getContext"]('webgl');
             var gl = s._gl;
-            s._shaderProgram = gl.createProgram();
-            var _shaderProgram=s._shaderProgram;
-            gl.disable(gl.DEPTH_TEST);
-            gl.disable(gl.CULL_FACE);
-            gl.enable(gl.BLEND);
+            s._program = gl.createProgram();
+            var _program=s._program;
             //初始化顶点着色器和片元着色器
             s._getShader(0);
             s._getShader(1);
-            gl.linkProgram(_shaderProgram);
-            if (null == gl.getProgramParameter(_shaderProgram, gl.LINK_STATUS)) {
-                throw Error("Error linking shader program: \"" + gl.getProgramInfoLog(_shaderProgram) + "\"");
+            gl.linkProgram(_program);
+            if (null == gl.getProgramParameter(_program, gl.LINK_STATUS)) {
+                throw Error("Error linking shader program: \"" + gl.getProgramInfoLog(_program) + "\"");
             }
-            gl.useProgram(_shaderProgram);
+            gl.useProgram(_program);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            s._texture=gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, s._texture);
+            s._buffer=gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, s._buffer);
+
         }
         /**
-         * 当舞台尺寸改变时会调用
+         *  调用渲染
          * @public
          * @since 1.0.0
-         * @method reSize
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
          */
-        public reSize(): void {
+        public draw(target: any, type: number): void {
             var s = this;
-            var c = s.rootContainer;
-            c.width = s._stage.divWidth * devicePixelRatio;
-            c.height = s._stage.divHeight * devicePixelRatio;
-            c.style.width = s._stage.divWidth + "px";
-            c.style.height = s._stage.divHeight + "px";
-            s._gl.viewport(0, 0, c.width, c.height);
+            var gl = s._gl;
+            ////////////////////////////////////////////
+            var vertices =
+                [
+                    1.0, 1.0,
+                    1.0, -1.0,
+                    -1.0, 1.0,
+                    -1.0, -1.0
+                ];
+            //绑定buffer
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            //绑定texture
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, target._cacheImg);
+            //设置贴图信息
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            //获取变量
+            var pos:number=gl.getAttribLocation(s._program,"position");
+            //以下两组成对出现，允许position变量从buffer数组里面取数据，并设置取数据规则
+            gl.enableVertexAttribArray(pos);
+            gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+            // 渲染
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
     }
 }

@@ -68,8 +68,8 @@
     在main.js或者main.ts中将'annie.debug=false;'设成 'annie.debug=true;'
 #如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
-#更新历史
-## AnnieJS 1.0.1 版本更新列表
+#AnnieJS 版本更新列表
+##AnnieJS 1.0.1 版本
     修复静态文本多行显示不正确bug
     URLLoader支持泛型跨域
     修复了Tween中的两个命名不规范的静态缓动方法名
@@ -78,12 +78,7 @@
     将annie.Shape.arc方法的参数由弧度更改成角度
     支持vconsole调试，这样在手机上测试的时候就可以查看到调试信息(非常有用)
     更改了鼠标事件执行顺序，以前是在渲染前,现在更改后渲染后,逻辑更合理
-## Flash2x 3.0.1 版本更新列表
-    修复导出矢量图时偶尔报错的bug
-    修复多行静态文本导出后只显示一行的bug
-    修复了清除缓存模式下Main.js没有被清除缓存的bug
-    修复导出序列视频annie.ImageVideo会抖动的bug
-## AnnieJS 1.0.0 版本诞生
+##AnnieJS 1.0.0 版本
     支持flash 剪辑,动画剪辑，按钮,文本，矢量，图形,SpriteSheet，声音等对象
     支持flash 遮罩，引导，传统补间，高级补间，骨骼动画
     支持Flash 模糊，发光，投影，高级色彩，变色滤镜
@@ -101,6 +96,14 @@
     支持tween 动画类
     支持urlLoader 加载类
     支持flash2x 管理类
-## Flash2x 3.0.0 版本诞生
+#Flash2x 版本更新列表
+## Flash2x 3.0.2
+    支持Flash Canvas 文档导出
+## Flash2x 3.0.1
+    修复导出矢量图时偶尔报错的bug
+    修复多行静态文本导出后只显示一行的bug
+    修复了清除缓存模式下Main.js没有被清除缓存的bug
+    修复导出序列视频annie.ImageVideo会抖动的bug
+## Flash2x 3.0.0
      支持将flash以上所提到的资源和功能导出，以提供给AnnieJS引擎使用。
      支持自定义开发功能，给需要想导出成其他引擎的开发者开发使用。
