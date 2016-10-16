@@ -6654,7 +6654,7 @@ var annie;
                     'varying vec2 textureCoordinate;' +
                     'void main() {' +
                     'gl_Position = position;' +
-                    'textureCoordinate = vec2(position.x, position.y);' +
+                    'textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
             }
@@ -6715,9 +6715,7 @@ var annie;
                 -1, -1,
                 -1, 1,
                 1, 1,
-                1, -1,
-                -1, -1
-            ];
+                1, -1];
             //绑定buffer
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             //绑定texture
@@ -6733,7 +6731,7 @@ var annie;
             gl.enableVertexAttribArray(pos);
             gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
             // 渲染
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
         return WGRender;
     }(annie.AObject));

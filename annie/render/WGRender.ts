@@ -118,7 +118,7 @@ namespace annie {
                     'varying vec2 textureCoordinate;' +
                     'void main() {' +
                     'gl_Position = position;' +
-                    'textureCoordinate = vec2(position.x, position.y);' +
+                    'textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
             }
