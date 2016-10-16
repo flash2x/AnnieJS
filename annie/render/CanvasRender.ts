@@ -42,7 +42,6 @@ namespace annie {
         public begin():void{
             var s=this;
             var c=s.rootContainer;
-            s._ctx.save();
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
@@ -50,7 +49,6 @@ namespace annie {
             }else{
                 s._ctx.clearRect(0, 0, c.width + 1, c.height + 1);
             }
-            s._ctx.restore();
         }
         /**
          * 开始有遮罩时调用

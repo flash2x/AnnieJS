@@ -6405,7 +6405,6 @@ var annie;
         CanvasRender.prototype.begin = function () {
             var s = this;
             var c = s.rootContainer;
-            s._ctx.save();
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
@@ -6414,7 +6413,6 @@ var annie;
             else {
                 s._ctx.clearRect(0, 0, c.width + 1, c.height + 1);
             }
-            s._ctx.restore();
         };
         /**
          * 开始有遮罩时调用
@@ -6589,6 +6587,7 @@ var annie;
         WGRender.prototype.begin = function () {
             var s = this;
             var gl = s._gl;
+            gl.clear(gl.COLOR_BUFFER_BIT);
             if (s._stage.bgColor != "") {
                 var color = s._stage.bgColor;
                 var r = parseInt("0x" + color.substr(1, 2));
@@ -6599,7 +6598,6 @@ var annie;
             else {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         };
         /**
          * 开始有遮罩时调用
@@ -6656,16 +6654,13 @@ var annie;
                     'varying vec2 textureCoordinate;' +
                     'void main() {' +
                     'gl_Position = position;' +
-                    'textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);' +
+                    'textureCoordinate = vec2(position.x, position.y);' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
             }
             // Set the shader source code in the shader object instance and compile the shader
             gl.shaderSource(shader, shaderText);
             gl.compileShader(shader);
-            if (null == gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                throw Error("Shader compilation failed. Error: \"" + gl.getShaderInfoLog(shader) + "\"");
-            }
             // Attach the shaders to the shader program
             gl.attachShader(s._program, shader);
             return shader;
@@ -6696,6 +6691,9 @@ var annie;
             }
             gl.useProgram(_program);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             s._texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, s._texture);
             s._buffer = gl.createBuffer();
@@ -6710,38 +6708,19 @@ var annie;
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         WGRender.prototype.draw = function (target, type) {
-            /* var s = this;
-             // Define the vertices for a triangle
-             var vertices: any = [
-             0.0, 0.5, 0.0,
-             -0.5, -0.5, 0.0,
-             0.5, -0.5, 0.0
-             ];
-             // Create a buffer to use in the WebGL instance
-             var buffer = s._gl.createBuffer();
-             s._gl.bindBuffer(s._gl.ARRAY_BUFFER, buffer);
-             // Create and initialize the vertex buffer's data-store
-             s._gl.bufferData(s._gl.ARRAY_BUFFER, new Float32Array(vertices), s._gl.STATIC_DRAW);
-             // Enable the vertex attribute array
-             //开启对应程序接口的数组模式
-             s._gl.enableVertexAttribArray(0);
-             //把当前工作的数据缓冲区指定给0号位置的程序接口
-             s._gl.vertexAttribPointer(0, 3, s._gl.FLOAT, false, 0, 0);
-             s._gl.drawArrays(s._gl.TRIANGLES, 0, 3);
-             // Force all buffered GL commands to be executed as quickly as possible by the rendering engine
-             s._gl.flush();*/
             var s = this;
             var gl = s._gl;
             ////////////////////////////////////////////
             var vertices = [
-                1.0, 1.0,
-                1.0, -1.0,
-                -1.0, 1.0,
-                -1.0, -1.0
+                -1, -1,
+                -1, 1,
+                1, 1,
+                1, -1,
+                -1, -1
             ];
-            //以下两个成对出现，绑定buffer,负值
+            //绑定buffer
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-            //以下两个成对出现绑定texture,负值
+            //绑定texture
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, target._cacheImg);
             //设置贴图信息
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -6754,7 +6733,7 @@ var annie;
             gl.enableVertexAttribArray(pos);
             gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
             // 渲染
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
         };
         return WGRender;
     }(annie.AObject));

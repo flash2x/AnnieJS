@@ -47,6 +47,7 @@ namespace annie {
         public begin(): void {
             var s = this;
             var gl = s._gl;
+            gl.clear(gl.COLOR_BUFFER_BIT);
             if (s._stage.bgColor != "") {
                 var color = s._stage.bgColor;
                 var r = parseInt("0x" + color.substr(1, 2));
@@ -56,7 +57,6 @@ namespace annie {
             } else {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         }
 
         /**
@@ -118,16 +118,13 @@ namespace annie {
                     'varying vec2 textureCoordinate;' +
                     'void main() {' +
                     'gl_Position = position;' +
-                    'textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);' +
+                    'textureCoordinate = vec2(position.x, position.y);' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
             }
             // Set the shader source code in the shader object instance and compile the shader
             gl.shaderSource(shader, shaderText);
             gl.compileShader(shader);
-            if (null == gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                throw Error("Shader compilation failed. Error: \"" + gl.getShaderInfoLog(shader) + "\"");
-            }
             // Attach the shaders to the shader program
             gl.attachShader(s._program, shader);
             return shader;
@@ -159,11 +156,13 @@ namespace annie {
             }
             gl.useProgram(_program);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             s._texture=gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, s._texture);
             s._buffer=gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, s._buffer);
-
         }
         /**
          *  调用渲染
@@ -179,10 +178,11 @@ namespace annie {
             ////////////////////////////////////////////
             var vertices =
                 [
-                    1.0, 1.0,
-                    1.0, -1.0,
-                    -1.0, 1.0,
-                    -1.0, -1.0
+                    -1, -1,
+                    -1, 1,
+                    1, 1,
+                    1, -1,
+                    -1,-1
                 ];
             //绑定buffer
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -199,7 +199,7 @@ namespace annie {
             gl.enableVertexAttribArray(pos);
             gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
             // 渲染
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 5);
         }
     }
 }
