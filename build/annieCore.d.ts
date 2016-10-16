@@ -3309,7 +3309,8 @@ declare namespace annie {
         private _stage;
         private _program;
         private _texture;
-        private _buffer;
+        private _vBuffer;
+        private _tBuffer;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -3354,6 +3355,8 @@ declare namespace annie {
          * @method init
          */
         init(): void;
+        private setBuffer(attr, buffer, data);
+        private setTexture(texture, img);
         /**
          *  调用渲染
          * @public

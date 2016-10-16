@@ -6587,7 +6587,7 @@ var annie;
         WGRender.prototype.begin = function () {
             var s = this;
             var gl = s._gl;
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
             if (s._stage.bgColor != "") {
                 var color = s._stage.bgColor;
                 var r = parseInt("0x" + color.substr(1, 2));
@@ -6640,21 +6640,21 @@ var annie;
             var shader = null;
             if (id == 0) {
                 shaderText = 'precision mediump float;' +
-                    'varying vec2 textureCoordinate;' +
-                    'uniform sampler2D inputImageTexture;' +
+                    'varying vec2 v_TC;' +
+                    'uniform sampler2D u_texture;' +
                     'void main() {' +
-                    'gl_FragColor = texture2D(inputImageTexture, textureCoordinate);' +
+                    'gl_FragColor = texture2D(u_texture, v_TC);' +
                     '}';
                 shader = gl.createShader(gl.FRAGMENT_SHADER);
             }
             else {
                 shaderText = 'precision mediump float;' +
-                    'attribute vec4 position;' +
-                    'attribute vec2 inputTextureCoordinate;' +
-                    'varying vec2 textureCoordinate;' +
+                    'attribute vec4 a_P;' +
+                    'attribute vec2 a_TC;' +
+                    'varying vec2 v_TC;' +
                     'void main() {' +
-                    'gl_Position = position;' +
-                    'textureCoordinate = vec2((position.x+1.0)/2.0, (position.y+1.0)/2.0);' +
+                    'gl_Position = a_P;' +
+                    'v_TC = a_TC;' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
             }
@@ -6685,19 +6685,49 @@ var annie;
             //初始化顶点着色器和片元着色器
             s._getShader(0);
             s._getShader(1);
+            //链接到gpu
             gl.linkProgram(_program);
-            if (null == gl.getProgramParameter(_program, gl.LINK_STATUS)) {
-                throw Error("Error linking shader program: \"" + gl.getProgramInfoLog(_program) + "\"");
-            }
+            //使用当前编译的程序
             gl.useProgram(_program);
+            //改变y轴方向,以对应纹理坐标
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            //设置支持有透明度纹理
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+            //取消深度检测
             gl.disable(gl.DEPTH_TEST);
+            //开启混合模式
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+            //新建贴图
             s._texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, s._texture);
-            s._buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, s._buffer);
+            //新建缓存
+            s._vBuffer = gl.createBuffer();
+            s._tBuffer = gl.createBuffer();
+        };
+        WGRender.prototype.setBuffer = function (attr, buffer, data) {
+            var s = this;
+            var gl = s._gl;
+            //绑定buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+            var pos = gl.getAttribLocation(s._program, attr);
+            //将buffer赋值给一变量
+            gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+            //以下两组成对出现，允许position变量从buffer数组里面取数据，并设置取数据规则
+            gl.enableVertexAttribArray(pos);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        };
+        WGRender.prototype.setTexture = function (texture, img) {
+            var s = this;
+            var gl = s._gl;
+            //绑定texture
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+            //设置贴图信息
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         };
         /**
          *  调用渲染
@@ -6712,24 +6742,22 @@ var annie;
             var gl = s._gl;
             ////////////////////////////////////////////
             var vertices = [
-                -1, -1,
-                -1, 1,
-                1, 1,
-                1, -1];
+                0.0, 0.0,
+                target._cacheImg.width / 640, 0.0,
+                0.0, target._cacheImg.height / 1136,
+                target._cacheImg.width / 640, target._cacheImg.height / 1136
+            ];
+            var textureCoord = [
+                0.0, 0.0,
+                1.0, 0.0,
+                0.0, 1.0,
+                1.0, 1.0
+            ];
             //绑定buffer
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-            //绑定texture
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, target._cacheImg);
-            //设置贴图信息
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            //获取变量
-            var pos = gl.getAttribLocation(s._program, "position");
-            //以下两组成对出现，允许position变量从buffer数组里面取数据，并设置取数据规则
-            gl.enableVertexAttribArray(pos);
-            gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+            s.setBuffer("a_P", s._vBuffer, new Float32Array(vertices));
+            s.setBuffer("a_TC", s._tBuffer, new Float32Array(textureCoord));
+            //TODO 需要检查是否需要重新绑定贴图
+            s.setTexture(s._texture, target._cacheImg);
             // 渲染
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
