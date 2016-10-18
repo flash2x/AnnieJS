@@ -818,6 +818,7 @@ namespace annie {
                     s._cacheY=0;
                 }
                 s._isNeedUpdate = false;
+                DisplayObject._setGlInfo(s);
             }
         }
         /*private _drawPath(){

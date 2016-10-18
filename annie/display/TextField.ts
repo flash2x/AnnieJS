@@ -294,6 +294,7 @@ namespace annie {
                 s._cacheX=-10;
                 s._cacheY=-10;
                 s._isNeedUpdate = false;
+                DisplayObject._setGlInfo(s);
             }
         }
 

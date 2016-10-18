@@ -1035,6 +1035,8 @@ declare namespace annie {
          * @type {Canvas}
          */
         static _canvas: any;
+        _glInfo: any;
+        static _setGlInfo(target: any): void;
     }
 }
 /**
@@ -3311,6 +3313,9 @@ declare namespace annie {
         private _texture;
         private _vBuffer;
         private _tBuffer;
+        private _dW;
+        private _dH;
+        private _rectObj;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -3357,6 +3362,7 @@ declare namespace annie {
         init(): void;
         private setBuffer(attr, buffer, data);
         private setTexture(texture, img);
+        private setMatrix2d(matrix);
         /**
          *  调用渲染
          * @public

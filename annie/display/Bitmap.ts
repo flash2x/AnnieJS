@@ -13,7 +13,7 @@ namespace annie {
      * @extends annie.DisplayObject
      * @since 1.0.0
      */
-    export class Bitmap extends DisplayObject {
+    export class Bitmap extends DisplayObject{
         /**
          * HTML的一个Image对象或者是canvas对象或者是video对象
          * @property bitmapData
@@ -163,6 +163,7 @@ namespace annie {
                     s._cacheImg = s.bitmapData;
                 }
                 s._isNeedUpdate = false;
+                DisplayObject._setGlInfo(s);
             }
         }
         /**

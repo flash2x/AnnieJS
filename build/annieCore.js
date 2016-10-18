@@ -1311,6 +1311,8 @@ var annie;
              * @readonly
              */
             this.parent = null;
+            //需要用webgl渲染的信息
+            this._glInfo = {};
         }
         /**
          *将全局坐标转换到本地坐标值
@@ -1515,6 +1517,32 @@ var annie;
                 s.scaleY *= sy;
             }
         };
+        DisplayObject._setGlInfo = function (target) {
+            //判断是不是webgl渲染模式
+            if (target.stage.renderType == 1) {
+                var gi = target._glInfo;
+                var tc = target.rect;
+                var img = target._cacheImg;
+                if (tc) {
+                    gi.x = tc.x / img.width;
+                    gi.y = tc.y / img.height;
+                    gi.w = (tc.x + tc.width) / img.width;
+                    gi.h = (tc.y + tc.height) / img.height;
+                    gi.pw = tc.width / (target.stage.divWidth * annie.devicePixelRatio) * 2;
+                    gi.ph = tc.height / (target.stage.divHeight * annie.devicePixelRatio) * 2;
+                }
+                else {
+                    var cX = target._cacheX;
+                    var cY = target._cacheY;
+                    gi.x = cX / img.width;
+                    gi.y = cY / img.height;
+                    gi.w = (img.width - cX) / img.width;
+                    gi.h = (img.height - cY) / img.height;
+                    gi.pw = (img.width - cX) / (target.stage.divWidth * annie.devicePixelRatio) * 2;
+                    gi.ph = (img.height - cY) / (target.stage.divHeight * annie.devicePixelRatio) * 2;
+                }
+            }
+        };
         /**
          * 画缓存位图的时候需要使用
          * @property _bitmapCanvas
@@ -1697,6 +1725,7 @@ var annie;
                     s._cacheImg = s.bitmapData;
                 }
                 s._isNeedUpdate = false;
+                annie.DisplayObject._setGlInfo(s);
             }
         };
         /**
@@ -2514,6 +2543,7 @@ var annie;
                     s._cacheY = 0;
                 }
                 s._isNeedUpdate = false;
+                annie.DisplayObject._setGlInfo(s);
             }
         };
         /*private _drawPath(){
@@ -4694,6 +4724,7 @@ var annie;
                 s._cacheX = -10;
                 s._cacheY = -10;
                 s._isNeedUpdate = false;
+                annie.DisplayObject._setGlInfo(s);
             }
         };
         /**
@@ -6577,6 +6608,7 @@ var annie;
              */
             this.rootContainer = null;
             this._stage = stage;
+            this._rectObj = new annie.Rectangle();
         }
         /**
          * 开始渲染时执行
@@ -6630,6 +6662,8 @@ var annie;
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
             s._gl.viewport(0, 0, c.width, c.height);
+            s._dW = c.width;
+            s._dH = c.height;
         };
         WGRender.prototype._getShader = function (id) {
             var s = this;
@@ -6652,8 +6686,9 @@ var annie;
                     'attribute vec4 a_P;' +
                     'attribute vec2 a_TC;' +
                     'varying vec2 v_TC;' +
+                    'uniform mat4 mvpMatrix;' +
                     'void main() {' +
-                    'gl_Position = a_P;' +
+                    'gl_Position =mvpMatrix*a_P;' +
                     'v_TC = a_TC;' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
@@ -6729,6 +6764,25 @@ var annie;
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         };
+        WGRender.prototype.setMatrix2d = function (matrix) {
+            var s = this;
+            var gl = s._gl;
+            /*   var mvpMatrix: any = new Float32Array(
+               [
+                   matrix.a, matrix.b, 0, 0,
+                   matrix.c, matrix.d, 0, 0,
+                   0, 0, 1, 0,
+                   matrix.tx/s._dW*2, matrix.ty/s._dH*2, 0, 1
+               ]);*/
+            var mvpMatrix = new Float32Array([
+                matrix.a, matrix.c, 0, 0,
+                matrix.b, matrix.d, 0, 0,
+                0, 0, 1, 0,
+                matrix.tx / s._dW * 2, matrix.ty / s._dH * 2, 0, 1
+            ]);
+            var u_mvp = gl.getUniformLocation(s._program, 'mvpMatrix');
+            gl.uniformMatrix4fv(u_mvp, false, mvpMatrix);
+        };
         /**
          *  调用渲染
          * @public
@@ -6740,18 +6794,19 @@ var annie;
         WGRender.prototype.draw = function (target, type) {
             var s = this;
             var gl = s._gl;
+            var gi = target._glInfo;
             ////////////////////////////////////////////
             var vertices = [
                 0.0, 0.0,
-                target._cacheImg.width / 640, 0.0,
-                0.0, target._cacheImg.height / 1136,
-                target._cacheImg.width / 640, target._cacheImg.height / 1136
+                gi.pw, 0.0,
+                0.0, gi.ph,
+                gi.pw, gi.ph
             ];
             var textureCoord = [
-                0.0, 0.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 1.0
+                gi.x, gi.y,
+                gi.w, gi.y,
+                gi.x, gi.h,
+                gi.w, gi.h
             ];
             //绑定buffer
             s.setBuffer("a_P", s._vBuffer, new Float32Array(vertices));
@@ -6759,6 +6814,7 @@ var annie;
             //TODO 需要检查是否需要重新绑定贴图
             s.setTexture(s._texture, target._cacheImg);
             // 渲染
+            s.setMatrix2d(target.cMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
         return WGRender;

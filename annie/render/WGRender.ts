@@ -23,9 +23,12 @@ namespace annie {
         private _gl: any;
         private _stage: Stage;
         private _program: any;
-        private _texture:any;
-        private _vBuffer:any;
-        private _tBuffer:any;
+        private _texture: any;
+        private _vBuffer: any;
+        private _tBuffer: any;
+        private _dW: number;
+        private _dH: number;
+        private _rectObj: annie.Rectangle;
 
 
         /**
@@ -37,6 +40,7 @@ namespace annie {
         public constructor(stage: Stage) {
             super();
             this._stage = stage;
+            this._rectObj = new annie.Rectangle();
         }
 
         /**
@@ -48,7 +52,7 @@ namespace annie {
         public begin(): void {
             var s = this;
             var gl = s._gl;
-            gl.clear(gl.COLOR_BUFFER_BIT|gl.STENCIL_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
             if (s._stage.bgColor != "") {
                 var color = s._stage.bgColor;
                 var r = parseInt("0x" + color.substr(1, 2));
@@ -95,10 +99,13 @@ namespace annie {
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
             s._gl.viewport(0, 0, c.width, c.height);
+            s._dW = c.width;
+            s._dH = c.height;
         }
-        private _getShader(id: number){
+
+        private _getShader(id: number) {
             var s = this;
-            var gl=s._gl;
+            var gl = s._gl;
             // Find the shader script element
             var shaderText = "";
             // Create the shader object instance
@@ -117,8 +124,9 @@ namespace annie {
                     'attribute vec4 a_P;' +
                     'attribute vec2 a_TC;' +
                     'varying vec2 v_TC;' +
+                    'uniform mat4 mvpMatrix;' +
                     'void main() {' +
-                    'gl_Position = a_P;' +
+                    'gl_Position =mvpMatrix*a_P;' +
                     'v_TC = a_TC;' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
@@ -130,7 +138,6 @@ namespace annie {
             gl.attachShader(s._program, shader);
             return shader;
         }
-
         /**
          * 初始化渲染器
          * @public
@@ -144,10 +151,10 @@ namespace annie {
                 s._stage.rootDiv.appendChild(s.rootContainer);
             }
             var c = s.rootContainer;
-            s._gl = c["getContext"]('experimental-webgl')||c["getContext"]('webgl');
+            s._gl = c["getContext"]('experimental-webgl') || c["getContext"]('webgl');
             var gl = s._gl;
             s._program = gl.createProgram();
-            var _program=s._program;
+            var _program = s._program;
             //初始化顶点着色器和片元着色器
             s._getShader(0);
             s._getShader(1);
@@ -163,28 +170,30 @@ namespace annie {
             gl.disable(gl.DEPTH_TEST);
             //开启混合模式
             gl.enable(gl.BLEND);
-            gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             //新建贴图
-            s._texture=gl.createTexture();
+            s._texture = gl.createTexture();
             //新建缓存
-            s._vBuffer=gl.createBuffer();
-            s._tBuffer=gl.createBuffer();
+            s._vBuffer = gl.createBuffer();
+            s._tBuffer = gl.createBuffer();
         }
-        private setBuffer(attr:string,buffer:any,data:any):void{
-            var s=this;
+
+        private setBuffer(attr: string, buffer: any, data: any): void {
+            var s = this;
             var gl = s._gl;
             //绑定buffer
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
-            var pos:number=gl.getAttribLocation(s._program,attr);
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+            var pos: number = gl.getAttribLocation(s._program, attr);
             //将buffer赋值给一变量
             gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
             //以下两组成对出现，允许position变量从buffer数组里面取数据，并设置取数据规则
             gl.enableVertexAttribArray(pos);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
-        private setTexture(texture:any,img:any):void{
-            var s=this;
+
+        private setTexture(texture: any, img: any): void {
+            var s = this;
             var gl = s._gl;
             //绑定texture
             gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -195,6 +204,28 @@ namespace annie {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
+
+        private setMatrix2d(matrix: annie.Matrix): void {
+            var s = this;
+            var gl = s._gl;
+             /*   var mvpMatrix: any = new Float32Array(
+                [
+                    matrix.a, matrix.b, 0, 0,
+                    matrix.c, matrix.d, 0, 0,
+                    0, 0, 1, 0,
+                    matrix.tx/s._dW*2, matrix.ty/s._dH*2, 0, 1
+                ]);*/
+            var mvpMatrix: any = new Float32Array(
+                [
+                    matrix.a, matrix.c, 0, 0,
+                    matrix.b, matrix.d, 0, 0,
+                    0, 0, 1, 0,
+                    matrix.tx/s._dW*2, matrix.ty/s._dH*2, 0, 1
+                ]);
+            var u_mvp = gl.getUniformLocation(s._program, 'mvpMatrix');
+            gl.uniformMatrix4fv(u_mvp, false, mvpMatrix);
+        }
+
         /**
          *  调用渲染
          * @public
@@ -206,26 +237,29 @@ namespace annie {
         public draw(target: any, type: number): void {
             var s = this;
             var gl = s._gl;
+            var gi: any = target._glInfo;
             ////////////////////////////////////////////
             var vertices =
                 [
                     0.0, 0.0,
-                    target._cacheImg.width/640, 0.0,
-                    0.0, target._cacheImg.height/1136,
-                    target._cacheImg.width/640, target._cacheImg.height/1136
+                    gi.pw, 0.0,
+                    0.0, gi.ph,
+                    gi.pw, gi.ph
                 ];
-            var textureCoord = [
-                0.0, 0.0,
-                1.0, 0.0,
-                0.0, 1.0,
-                1.0, 1.0
-            ];
+            var textureCoord =
+                [
+                    gi.x, gi.y,
+                    gi.w, gi.y,
+                    gi.x, gi.h,
+                    gi.w, gi.h
+                ];
             //绑定buffer
-            s.setBuffer("a_P",s._vBuffer,new Float32Array(vertices));
-            s.setBuffer("a_TC",s._tBuffer,new Float32Array(textureCoord));
+            s.setBuffer("a_P", s._vBuffer, new Float32Array(vertices));
+            s.setBuffer("a_TC", s._tBuffer, new Float32Array(textureCoord));
             //TODO 需要检查是否需要重新绑定贴图
-            s.setTexture(s._texture,target._cacheImg);
+            s.setTexture(s._texture, target._cacheImg);
             // 渲染
+            s.setMatrix2d(target.cMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
     }
