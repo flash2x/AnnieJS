@@ -20,9 +20,9 @@
     重新定义了Flash开发H5的工作流程,具体优势各位看官接着往下看
 #使用前准备工作
     1.安装 Ant 或者 Gulp 构建工具，选一种你熟悉的就行
-    2.如果使用typeSript开发，则需要安装 node.js typeSrcipt 运行环境
-    3.强烈推荐WebStrom，我们所有的源码和项目也是使用此工具制作
-    4.安装Adboe Flash CS6 及以上版本
+    2.如果使用typeScript开发，则需要安装 node.js typeScript 运行环境
+    3.强烈推荐WebStorm，我们所有的源码和项目也是使用此工具制作
+    4.安装Adobe Flash CS6 及以上版本
     5.强烈推荐google Chrome浏览器，调试利器
     6.下载并安装Flash2xManager管理软件,用此软件一健配置工具和引擎(支持Mac和win)
 ##[点击下载Flash2xManager工具](https://pan.baidu.com/s/1pKpMmUJ#path=%252FFlash2x%25E4%25B8%258B%25E8%25BD%25BD)
