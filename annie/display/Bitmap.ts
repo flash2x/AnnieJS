@@ -118,7 +118,9 @@ namespace annie {
                     var newW = w + 20;
                     var newH = h + 20;
                     _canvas.width = newW;
-                    _canvas.height = newW;
+                    _canvas.height = newH;
+                    _canvas.style.width=newW/devicePixelRatio+"px";
+                    _canvas.style.height=newH/devicePixelRatio+"px";
                     var ctx = _canvas.getContext("2d");
                     ctx.clearRect(0, 0, newW, newH);
                     ctx.translate(10, 10);
@@ -162,6 +164,7 @@ namespace annie {
                     s._cacheY = 0;
                     s._cacheImg = s.bitmapData;
                 }
+                //给webgl更新新
                 s._isNeedUpdate = false;
                 DisplayObject._setGlInfo(s);
             }
@@ -186,17 +189,16 @@ namespace annie {
             }
             return r;
         }
-
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
-         * @method getSingleBitmap
+         * @method convertToImage
          * @static
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
          * @return {Image}
          */
-        public static getBitmapData(bitmap:annie.Bitmap):any{
+        public static convertToImage(bitmap:annie.Bitmap):any{
             if(!bitmap.rect){
                 return bitmap.bitmapData;
             }else{

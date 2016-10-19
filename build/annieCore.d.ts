@@ -546,11 +546,12 @@ declare namespace annie {
          * @method transformPoint
          * @param {number} x
          * @param {number} y
+         * @param {annie.Point} 默认为空，如果不为null，则返回的是Point就是此对象，如果为null，则返回来的Point是新建的对象
          * @returns {annie.Point}
          * @public
          * @since 1.0.0
          */
-        transformPoint: (x: number, y: number) => Point;
+        transformPoint: (x: number, y: number, bp?: Point) => Point;
         /**
          * 从一个矩阵里赋值给这个矩阵
          * @method setFrom
@@ -944,7 +945,7 @@ declare namespace annie {
          * @param {annie.Point} point
          * @returns {annie.Point}
          */
-        globalToLocal(point: Point): Point;
+        globalToLocal(point: Point, bp?: Point): Point;
         /**
          *将本地坐标转换到全局坐标值
          * @method localToGlobal
@@ -953,7 +954,14 @@ declare namespace annie {
          * @param {annie.Point} point
          * @returns {annie.Point}
          */
-        localToGlobal(point: Point): Point;
+        localToGlobal(point: Point, bp?: Point): Point;
+        /**
+         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+         * @type {annie.Point}
+         * @private
+         * @static
+         */
+        static _bp: Point;
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -1143,14 +1151,14 @@ declare namespace annie {
         getBounds(): Rectangle;
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
-         * @method getSingleBitmap
+         * @method convertToImage
          * @static
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
          * @return {Image}
          */
-        static getBitmapData(bitmap: annie.Bitmap): any;
+        static convertToImage(bitmap: annie.Bitmap): any;
     }
 }
 /**
@@ -1241,7 +1249,7 @@ declare namespace annie {
         addDraw(commandName: string, params: Array<any>): void;
         /**
          * 画一个带圆角的矩形
-         * @method roundRect
+         * @method drawRoundRect
          * @param {number} x 点x值
          * @param {number} y 点y值
          * @param {number} w 宽
@@ -1253,7 +1261,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        roundRect(x: number, y: number, w: number, h: number, rTL?: number, rTR?: number, rBL?: number, rBR?: number): void;
+        drawRoundRect(x: number, y: number, w: number, h: number, rTL?: number, rTR?: number, rBL?: number, rBR?: number): void;
         /**
          * 绘画时移动到某一点
          * @method moveTo
@@ -1316,7 +1324,7 @@ declare namespace annie {
         closePath(): void;
         /**
          * 画一个矩形
-         * @method rect
+         * @method drawRect
          * @param {number} x
          * @param {number} y
          * @param {number} w
@@ -1324,10 +1332,10 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        rect(x: number, y: number, w: number, h: number): void;
+        drawRect(x: number, y: number, w: number, h: number): void;
         /**
          * 画一个弧形
-         * @method arc
+         * @method drawArc
          * @param {number} x 起始点x
          * @param {number} y 起始点y
          * @param {number} radius 半径
@@ -1336,20 +1344,20 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        arc(x: number, y: number, radius: number, start: number, end: number): void;
+        drawArc(x: number, y: number, radius: number, start: number, end: number): void;
         /**
          * 画一个圆
-         * @method circle
+         * @method drawCircle
          * @param {number} x 圆心x
          * @param {number} y 圆心y
          * @param {number} radius 半径
          * @public
          * @since 1.0.0
          */
-        circle(x: number, y: number, radius: number): void;
+        drawCircle(x: number, y: number, radius: number): void;
         /**
          * 画一个椭圆
-         * @method ellipse
+         * @method drawEllipse
          * @param {number} x
          * @param {number} y
          * @param {number} w
@@ -1357,7 +1365,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        ellipse(x: number, y: number, w: number, h: number): void;
+        drawEllipse(x: number, y: number, w: number, h: number): void;
         /**
          * 清除掉之前所有绘画的东西
          * @method clear
@@ -1501,6 +1509,17 @@ declare namespace annie {
          * @since 1.0.0
          */
         hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * 如果有的话,改变矢量对象的边框或者填充的颜色.
+         * @method changeColor
+         * @param {Object} infoObj
+         * @param {string} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {string} infoObj.strokeColor 线条颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
+         * @public
+         * @since 1.0.2
+         */
+        changeColor(infoObj: any): void;
     }
 }
 /**
@@ -3310,12 +3329,20 @@ declare namespace annie {
         private _gl;
         private _stage;
         private _program;
-        private _texture;
         private _vBuffer;
         private _tBuffer;
         private _dW;
         private _dH;
-        private _rectObj;
+        private _pMatrix;
+        private _pMI;
+        private _vMI;
+        private _uA;
+        private _cM;
+        private _currentTextureId;
+        private _textures;
+        private _images;
+        private _maxTextureCount;
+        private _uniformTexture;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -3361,8 +3388,7 @@ declare namespace annie {
          */
         init(): void;
         private setBuffer(attr, buffer, data);
-        private setTexture(texture, img);
-        private setMatrix2d(matrix);
+        private setTexture(img);
         /**
          *  调用渲染
          * @public

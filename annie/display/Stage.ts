@@ -342,7 +342,7 @@ namespace annie {
                 }
                 //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                 cp=s._lastMousePoint;
-                sp=s.globalToLocal(cp);
+                sp=s.globalToLocal(cp,DisplayObject._bp);
                 if (EventDispatcher.getMouseEventCount(item)> 0){
                     if(!s._ml[eLen]) {
                         event = new MouseEvent(item);

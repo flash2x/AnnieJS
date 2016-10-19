@@ -134,13 +134,19 @@ namespace annie {
          * @method transformPoint
          * @param {number} x
          * @param {number} y
+         * @param {annie.Point} 默认为空，如果不为null，则返回的是Point就是此对象，如果为null，则返回来的Point是新建的对象
          * @returns {annie.Point}
          * @public
          * @since 1.0.0
          */
-        public transformPoint = function (x:number, y:number):Point {
+        public transformPoint = function (x:number, y:number,bp:Point=null):Point {
             var s = this;
-            return new Point(x * s.a + y * s.c + s.tx, x * s.b + y * s.d + s.ty);
+            if(!bp){
+                bp=new Point();
+            }
+            bp.x=x * s.a + y * s.c + s.tx;
+            bp.y=x * s.b + y * s.d + s.ty;
+            return bp
         };
 
         /**

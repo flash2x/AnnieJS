@@ -416,7 +416,7 @@ namespace annie {
                 bitmap=b(sceneName,bitmapName);
                 if(bitmap&&bitmap.rect) {
                     //从SpriteSheet中取出Image单独存放
-                    res[sceneName][sbName]=bitmap=annie.Bitmap.getBitmapData(bitmap);
+                    res[sceneName][sbName]=bitmap=annie.Bitmap.convertToImage(bitmap);
                 }
             }
             return bitmap;
@@ -459,7 +459,7 @@ namespace annie {
             if (pathObj.type == 0) {
                 shape.decodePath(pathObj.data);
             } else {
-                shape.roundRect(pathObj.data.x, pathObj.data.y, pathObj.data.w, pathObj.data.h, pathObj.data.topLeftRadius, pathObj.data.topRightRadius, pathObj.data.bottomLeftRadius, pathObj.data.bottomRightRadius);
+                shape.drawRoundRect(pathObj.data.x, pathObj.data.y, pathObj.data.w, pathObj.data.h, pathObj.data.topLeftRadius, pathObj.data.topRightRadius, pathObj.data.bottomLeftRadius, pathObj.data.bottomRightRadius);
             }
             if (fillObj) {
                 shape.endFill();

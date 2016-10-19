@@ -23,13 +23,20 @@ namespace annie {
         private _gl: any;
         private _stage: Stage;
         private _program: any;
-        private _texture: any;
         private _vBuffer: any;
         private _tBuffer: any;
         private _dW: number;
         private _dH: number;
-        private _rectObj: annie.Rectangle;
-
+        private _pMatrix: any;
+        private _pMI: number;
+        private _vMI: number;
+        private _uA: number;
+        private _cM: annie.Matrix;
+        private _currentTextureId: number = 0;
+        private _textures: any = [];
+        private _images: any = [];
+        private _maxTextureCount: number = 32;
+        private _uniformTexture: number = 32;
 
         /**
          * @CanvasRender
@@ -40,7 +47,6 @@ namespace annie {
         public constructor(stage: Stage) {
             super();
             this._stage = stage;
-            this._rectObj = new annie.Rectangle();
         }
 
         /**
@@ -52,7 +58,6 @@ namespace annie {
         public begin(): void {
             var s = this;
             var gl = s._gl;
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
             if (s._stage.bgColor != "") {
                 var color = s._stage.bgColor;
                 var r = parseInt("0x" + color.substr(1, 2));
@@ -101,6 +106,13 @@ namespace annie {
             s._gl.viewport(0, 0, c.width, c.height);
             s._dW = c.width;
             s._dH = c.height;
+            s._pMatrix = new Float32Array(
+                [
+                    1 / s._dW * 2, 0.0, 0.0,
+                    0.0, -1 / s._dH * 2, 0.0,
+                    -1.0, 1.0, 1.0
+                ]
+            );
         }
 
         private _getShader(id: number) {
@@ -111,22 +123,25 @@ namespace annie {
             // Create the shader object instance
             var shader: any = null;
             if (id == 0) {
-                shaderText = 'precision mediump float;' +
+                shaderText = 'precision highp float;' +
                     'varying vec2 v_TC;' +
                     'uniform sampler2D u_texture;' +
+                    'uniform float u_A;' +
+                    'varying float v_A;'+
                     'void main() {' +
-                    'gl_FragColor = texture2D(u_texture, v_TC);' +
+                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
                     '}';
                 shader = gl.createShader(gl.FRAGMENT_SHADER);
             }
             else {
-                shaderText = 'precision mediump float;' +
-                    'attribute vec4 a_P;' +
+                shaderText = 'precision highp float;' +
+                    'attribute vec2 a_P;' +
                     'attribute vec2 a_TC;' +
                     'varying vec2 v_TC;' +
-                    'uniform mat4 mvpMatrix;' +
+                    'uniform mat3 vMatrix;' +
+                    'uniform mat3 pMatrix;' +
                     'void main() {' +
-                    'gl_Position =mvpMatrix*a_P;' +
+                    'gl_Position =vec4((pMatrix*vMatrix*vec3(a_P, 1.0)).xy, 1.0, 1.0);' +
                     'v_TC = a_TC;' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
@@ -138,6 +153,7 @@ namespace annie {
             gl.attachShader(s._program, shader);
             return shader;
         }
+
         /**
          * 初始化渲染器
          * @public
@@ -150,9 +166,9 @@ namespace annie {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
             }
-            var c = s.rootContainer;
-            s._gl = c["getContext"]('experimental-webgl') || c["getContext"]('webgl');
-            var gl = s._gl;
+            var c: any = s.rootContainer;
+            var gl = c.getContext("webgl") || c.getContext('experimental-webgl');
+            s._gl = gl;
             s._program = gl.createProgram();
             var _program = s._program;
             //初始化顶点着色器和片元着色器
@@ -163,19 +179,27 @@ namespace annie {
             //使用当前编译的程序
             gl.useProgram(_program);
             //改变y轴方向,以对应纹理坐标
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
             //设置支持有透明度纹理
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
             //取消深度检测
             gl.disable(gl.DEPTH_TEST);
             //开启混合模式
             gl.enable(gl.BLEND);
+            gl.disable(gl.CULL_FACE);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-            //新建贴图
-            s._texture = gl.createTexture();
             //新建缓存
             s._vBuffer = gl.createBuffer();
             s._tBuffer = gl.createBuffer();
+            //
+            s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
+            s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
+            s._uA=gl.getUniformLocation(s._program, 'u_A');
+            //
+            s._cM = new annie.Matrix();
+            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            gl.activeTexture(gl.TEXTURE0);
+            s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
         }
 
         private setBuffer(attr: string, buffer: any, data: any): void {
@@ -187,43 +211,62 @@ namespace annie {
             var pos: number = gl.getAttribLocation(s._program, attr);
             //将buffer赋值给一变量
             gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-            //以下两组成对出现，允许position变量从buffer数组里面取数据，并设置取数据规则
             gl.enableVertexAttribArray(pos);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
 
-        private setTexture(texture: any, img: any): void {
+        private setTexture(img: any): void {
             var s = this;
+            var images = s._images;
             var gl = s._gl;
-            //绑定texture
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-            //设置贴图信息
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        }
-
-        private setMatrix2d(matrix: annie.Matrix): void {
-            var s = this;
-            var gl = s._gl;
-             /*   var mvpMatrix: any = new Float32Array(
-                [
-                    matrix.a, matrix.b, 0, 0,
-                    matrix.c, matrix.d, 0, 0,
-                    0, 0, 1, 0,
-                    matrix.tx/s._dW*2, matrix.ty/s._dH*2, 0, 1
-                ]);*/
-            var mvpMatrix: any = new Float32Array(
-                [
-                    matrix.a, matrix.c, 0, 0,
-                    matrix.b, matrix.d, 0, 0,
-                    0, 0, 1, 0,
-                    matrix.tx/s._dW*2, matrix.ty/s._dH*2, 0, 1
-                ]);
-            var u_mvp = gl.getUniformLocation(s._program, 'mvpMatrix');
-            gl.uniformMatrix4fv(u_mvp, false, mvpMatrix);
+            //一般打上这种标签的都不是雪碧图，强行在第一通道上更新
+            var imagesCount: number = images.length;
+            var updateTexture: boolean = true;
+            if(img["glUpdate"]!=undefined|| imagesCount == 0) {
+                //需要强制更新纹理
+                if (img["glUpdate"]) {
+                    img["glUpdate"] = false;
+                    s._currentTextureId = 0;
+                }else{
+                    s._currentTextureId =1;
+                }
+            }else {
+                for (var i = 0; i < imagesCount; i++) {
+                    if (img == images[i]) {
+                        s._currentTextureId = i;
+                        //不需要更新纹理
+                        updateTexture = false;
+                        break;
+                    }
+                }
+                if (updateTexture) {
+                    if (s._currentTextureId < s._maxTextureCount - 1) {
+                        s._currentTextureId++;
+                    } else {
+                        s._currentTextureId = 1;
+                    }
+                }
+            }
+            gl.activeTexture(gl["TEXTURE" + s._currentTextureId]);
+            if (updateTexture) {
+                var t: any;
+                if (!s._textures[s._currentTextureId]) {
+                    //如果不存在就建
+                    t = gl.createTexture();
+                    s._textures[s._currentTextureId] = t;
+                } else {
+                    //如果存在就换
+                    t = s._textures[s._currentTextureId];
+                }
+                gl.bindTexture(gl.TEXTURE_2D, t);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                //设置贴图信息
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                images[s._currentTextureId] = img;
+            }
+            gl.uniform1i(s._uniformTexture, s._currentTextureId);
         }
 
         /**
@@ -256,10 +299,27 @@ namespace annie {
             //绑定buffer
             s.setBuffer("a_P", s._vBuffer, new Float32Array(vertices));
             s.setBuffer("a_TC", s._tBuffer, new Float32Array(textureCoord));
-            //TODO 需要检查是否需要重新绑定贴图
-            s.setTexture(s._texture, target._cacheImg);
-            // 渲染
-            s.setMatrix2d(target.cMatrix);
+            var img = target._cacheImg;
+            s.setTexture(img);
+            var m: any;
+            if (img.nodeName == "CANVAS") {
+                m = s._cM;
+                m.identity();
+                m.tx = -img.width;
+                m.ty = -img.height;
+                m.prepend(target.cMatrix);
+            } else {
+                m = target.cMatrix;
+            }
+            var vMatrix: any = new Float32Array(
+                [
+                    m.a, m.b, 0,
+                    m.c, m.d, 0,
+                    m.tx, m.ty, 1
+                ]);
+            gl.uniform1f(s._uA,target.cAlpha);
+            gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
+            gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
     }

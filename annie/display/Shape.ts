@@ -109,7 +109,6 @@ namespace annie {
          * @default true
          */
         public hitPixel:boolean=true;
-
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
          * @method addDraw
@@ -126,7 +125,7 @@ namespace annie {
 
         /**
          * 画一个带圆角的矩形
-         * @method roundRect
+         * @method drawRoundRect
          * @param {number} x 点x值
          * @param {number} y 点y值
          * @param {number} w 宽
@@ -138,7 +137,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public roundRect(x:number,y:number,w:number,h:number,rTL:number=0,rTR:number=0,rBL:number=0,rBR:number=0):void{
+        public drawRoundRect(x:number,y:number,w:number,h:number,rTL:number=0,rTR:number=0,rBL:number=0,rBR:number=0):void{
             //var ctx = DisplayObject._canvas.getContext("2d");
             var max = (w<h?w:h)/2;
             var mTL=0, mTR=0, mBR=0, mBL=0;
@@ -241,7 +240,7 @@ namespace annie {
         }
         /**
          * 画一个矩形
-         * @method rect
+         * @method drawRect
          * @param {number} x
          * @param {number} y
          * @param {number} w
@@ -249,7 +248,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public rect(x:number,y:number,w:number,h:number):void{
+        public drawRect(x:number,y:number,w:number,h:number):void{
             var c = this._command;
             c.push([1,"moveTo",[x,y]]);
             c.push([1,"lineTo",[x+w,y]]);
@@ -260,7 +259,7 @@ namespace annie {
 
         /**
          * 画一个弧形
-         * @method arc
+         * @method drawArc
          * @param {number} x 起始点x
          * @param {number} y 起始点y
          * @param {number} radius 半径
@@ -269,25 +268,25 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public arc(x:number, y:number,radius:number, start:number, end:number):void{
+        public drawArc(x:number, y:number,radius:number, start:number, end:number):void{
             this._command.push([1,"arc",[x,y,radius,start/180*Math.PI,end/180*Math.PI]]);
         }
         /**
          * 画一个圆
-         * @method circle
+         * @method drawCircle
          * @param {number} x 圆心x
          * @param {number} y 圆心y
          * @param {number} radius 半径
          * @public
          * @since 1.0.0
          */
-        public circle(x:number,y:number,radius:number):void{
+        public drawCircle(x:number,y:number,radius:number):void{
             this._command.push([1,"arc",[x,y,radius,0,2*Math.PI]]);
         }
 
         /**
          * 画一个椭圆
-         * @method ellipse
+         * @method drawEllipse
          * @param {number} x
          * @param {number} y
          * @param {number} w
@@ -295,7 +294,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public ellipse(x:number,y:number,w:number,h:number):void{
+        public drawEllipse(x:number,y:number,w:number,h:number):void{
             var k = 0.5522848;
             var ox = (w / 2) * k;
             var oy = (h / 2) * k;
@@ -745,6 +744,8 @@ namespace annie {
                         var _canvas = s._cacheImg;
                         _canvas.width = w;
                         _canvas.height = h;
+                        _canvas.style.width=w/devicePixelRatio+"px";
+                        _canvas.style.height=h/devicePixelRatio+"px";
                         var ctx = _canvas["getContext"]('2d');
                         ctx.clearRect(0, 0, w, h);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
@@ -888,7 +889,7 @@ namespace annie {
             var s=this;
             if(isMouseEvent&&!s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p=s.globalToLocal(globalPoint);
+            var p=s.globalToLocal(globalPoint,DisplayObject._bp);
             if(s.getBounds().isPointIn(p)){
                 if(!s.hitPixel){
                     return s;
@@ -906,6 +907,37 @@ namespace annie {
                 };
             }
             return null;
+        }
+        /**
+         * 如果有的话,改变矢量对象的边框或者填充的颜色.
+         * @method changeColor
+         * @param {Object} infoObj
+         * @param {string} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {string} infoObj.strokeColor 线条颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
+         * @public
+         * @since 1.0.2
+         */
+        public changeColor(infoObj:any):void{
+            var s=this;
+            var cLen:number = s._command.length;
+            var c=s._command;
+            for(var i=0;i<cLen;i++){
+                if(c[i][0]==0){
+                    if(c[i][1]=="fillStyle"&&infoObj.fillColor&&c[i][2]!=infoObj.fillColor){
+                        c[i][2]=infoObj.fillColor;
+                        s._isNeedUpdate=true;
+                    }
+                    if(c[i][1]=="strokeStyle"&&infoObj.strokeColor&&c[i][2]!=infoObj.strokeColor){
+                        c[i][2]=infoObj.strokeColor;
+                        s._isNeedUpdate=true;
+                    }
+                    if(c[i][1]=="lineWidth"&&infoObj.lineWidth&&c[i][2]!=infoObj.lineWidth){
+                        c[i][2]=infoObj.lineWidth;
+                        s._isNeedUpdate=true;
+                    }
+                }
+            }
         }
     }
 }

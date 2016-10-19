@@ -251,8 +251,10 @@ namespace annie {
                 } else if (s.textAlign == "right") {
                     tx = maxW;
                 }
-                can.height = maxH+20;
                 can.width = maxW+20;
+                can.height = maxH+20;
+                can.style.width=can.width/devicePixelRatio+"px";
+                can.style.height=can.height/devicePixelRatio+"px";
                 ctx.clearRect(0, 0, maxW, maxH);
                 ctx.setTransform(1, 0, 0, 1, tx+10, 10);
                 /////////////////////

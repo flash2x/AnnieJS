@@ -256,8 +256,8 @@ namespace annie{
          * @param {annie.Point} point
          * @returns {annie.Point}
          */
-        public globalToLocal(point:Point):Point {
-            return this.cMatrix.invert().transformPoint(point.x, point.y);
+        public globalToLocal(point:Point,bp:Point=null):Point {
+            return this.cMatrix.invert().transformPoint(point.x, point.y,bp);
         }
         /**
          *将本地坐标转换到全局坐标值
@@ -267,9 +267,17 @@ namespace annie{
          * @param {annie.Point} point
          * @returns {annie.Point}
          */
-        public localToGlobal(point:Point):Point {
-            return this.cMatrix.transformPoint(point.x, point.y);
+        public localToGlobal(point:Point,bp:Point=null):Point {
+            return this.cMatrix.transformPoint(point.x, point.y,bp);
         }
+
+        /**
+         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+         * @type {annie.Point}
+         * @private
+         * @static
+         */
+        public static _bp:Point=new Point();
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -283,7 +291,7 @@ namespace annie{
             var s = this;
             if(!s.visible)return null;
             if (isMouseEvent && !s.mouseEnable)return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint))) {
+            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint,DisplayObject._bp))) {
                 return s;
             }
             return null;
@@ -468,8 +476,8 @@ namespace annie{
                     gi.y = tc.y / img.height;
                     gi.w = (tc.x + tc.width) / img.width;
                     gi.h = (tc.y + tc.height) / img.height;
-                    gi.pw = tc.width / (target.stage.divWidth*devicePixelRatio)*2;
-                    gi.ph = tc.height / (target.stage.divHeight*devicePixelRatio)*2;
+                    gi.pw = tc.width;
+                    gi.ph = tc.height;
                 } else {
                     var cX: number = target._cacheX;
                     var cY: number = target._cacheY;
@@ -477,8 +485,10 @@ namespace annie{
                     gi.y = cY / img.height;
                     gi.w = (img.width - cX) / img.width;
                     gi.h = (img.height - cY) / img.height;
-                    gi.pw = (img.width - cX) / (target.stage.divWidth*devicePixelRatio)*2;
-                    gi.ph = (img.height - cY) / (target.stage.divHeight*devicePixelRatio)*2;
+                    gi.pw = (img.width - cX*2);
+                    gi.ph = (img.height - cY*2);
+                    //因为不是雪碧图有可能中途更新了效果，但引用没变，所以需要标记告诉webgl需要更新纹理
+                    img["glUpdate"]=true;
                 }
             }
         }
