@@ -134,5 +134,24 @@ namespace annie {
             }
             return new Rectangle(x,y,w,h);
         }
+
+        /**
+         * 判读两个矩形是否相交
+         * @method testRectCross
+         * @public
+         * @since 1.0.2
+         * @param r1
+         * @param r2
+         * @return {boolean}
+         */
+        public static testRectCross(ra:Rectangle,rb:Rectangle):boolean{
+            var a_cx:number,a_cy:number; /* 第一个中心点*/
+            var b_cx:number,b_cy:number; /* 第二个中心点*/
+            a_cx = ra.x + (ra.width/2);
+            a_cy = ra.y + (ra.height/2);
+            b_cx = rb.x + (rb.width/2);
+            b_cy = rb.y + (rb.height/2);
+            return ((Math.abs(a_cx - b_cx) <= (ra.width/2 + rb.width/2))&&(Math.abs(a_cy - b_cy) <= (ra.height/2 + rb.height/2)));
+        }
     }
 }

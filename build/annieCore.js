@@ -1068,6 +1068,24 @@ var annie;
             }
             return new Rectangle(x, y, w, h);
         };
+        /**
+         * 判读两个矩形是否相交
+         * @method testRectCross
+         * @public
+         * @since 1.0.2
+         * @param r1
+         * @param r2
+         * @return {boolean}
+         */
+        Rectangle.testRectCross = function (ra, rb) {
+            var a_cx, a_cy; /* 第一个中心点*/
+            var b_cx, b_cy; /* 第二个中心点*/
+            a_cx = ra.x + (ra.width / 2);
+            a_cy = ra.y + (ra.height / 2);
+            b_cx = rb.x + (rb.width / 2);
+            b_cy = rb.y + (rb.height / 2);
+            return ((Math.abs(a_cx - b_cx) <= (ra.width / 2 + rb.width / 2)) && (Math.abs(a_cy - b_cy) <= (ra.height / 2 + rb.height / 2)));
+        };
         return Rectangle;
     }(annie.AObject));
     annie.Rectangle = Rectangle;
@@ -3208,6 +3226,7 @@ var annie;
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
             }, false);
+            s._SBWeixin = s._weixinSB.bind(s);
         }
         /**
          * 开始播放媒体
@@ -3227,7 +3246,16 @@ var annie;
             catch (e) {
                 trace(e);
             }
-            s.media.play();
+            //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
+            try {
+                WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+            }
+            catch (e) {
+                s.media.play();
+            }
+        };
+        Media.prototype._weixinSB = function () {
+            this.media.play();
         };
         /**
          * 停止播放
@@ -6963,6 +6991,7 @@ var annie;
  */
 var annie;
 (function (annie) {
+    var Eval = eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -7161,11 +7190,9 @@ var annie;
                         var item;
                         switch (s.responseType) {
                             case "css":
-                                // <link href="img/divcss5.css" rel="stylesheet"/>
                                 item = document.createElement("link");
                                 item.rel = "stylesheet";
                                 item.href = s.url;
-                                //document.querySelector('head').appendChild(item);
                                 break;
                             case "image":
                             case "sound":
@@ -7211,6 +7238,8 @@ var annie;
                                 item = t["responseXML"];
                                 break;
                             case "js":
+                                Eval(result);
+                                break;
                             case "text":
                             case "unKnow":
                             default:
@@ -7277,7 +7306,6 @@ var annie;
      */
     var RESManager;
     (function (RESManager) {
-        var Eval = eval.bind(window);
         /**
          * 存储加载资源的总对象
          * @type {Object}
@@ -7430,17 +7458,7 @@ var annie;
             }
         }
         function _onRESComplete(e) {
-            if (e.data.type == "js") {
-                //资源加载完成
-                /*var script = e.data.response;
-                 document.querySelector('head').appendChild(script);
-                 script.onload = function () {
-                 _checkComplete();
-                 }*/
-                Eval(e.data.response);
-                _checkComplete();
-            }
-            else {
+            if (e.data.type != "js" && e.data.type != "css") {
                 var id = _currentConfig[_loadIndex][0].id;
                 var scene = _loadSceneNames[_loadIndex];
                 if (e.data.type == "sound") {
@@ -7449,8 +7467,8 @@ var annie;
                 else {
                     res[scene][id] = e.data.response;
                 }
-                _checkComplete();
             }
+            _checkComplete();
         }
         function _checkComplete() {
             _loadedLoadRes++;

@@ -698,6 +698,16 @@ declare namespace annie {
          * @returns {annie.Rectangle}
          */
         static createFromPoints(p1: Point, ...arg: Point[]): Rectangle;
+        /**
+         * 判读两个矩形是否相交
+         * @method testRectCross
+         * @public
+         * @since 1.0.2
+         * @param r1
+         * @param r2
+         * @return {boolean}
+         */
+        static testRectCross(ra: Rectangle, rb: Rectangle): boolean;
     }
 }
 /**
@@ -1714,6 +1724,8 @@ declare namespace annie {
          * @since 1.0.0
          */
         play(start: number, loop: number): void;
+        private _SBWeixin;
+        private _weixinSB();
         /**
          * 停止播放
          * @method stop

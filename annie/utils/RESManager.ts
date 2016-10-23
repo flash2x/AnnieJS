@@ -8,7 +8,6 @@ namespace annie {
      * @class annie.RESManager
      */
     export namespace RESManager{
-        var Eval:any=eval.bind(window);
         /**
          * 存储加载资源的总对象
          * @type {Object}
@@ -160,16 +159,7 @@ namespace annie {
             }
         }
         function _onRESComplete(e:Event):void{
-            if (e.data.type == "js") {
-                //资源加载完成
-                /*var script = e.data.response;
-                 document.querySelector('head').appendChild(script);
-                 script.onload = function () {
-                 _checkComplete();
-                 }*/
-                Eval(e.data.response);
-                _checkComplete();
-            } else {
+            if (e.data.type != "js"&&e.data.type!="css") {
                 var id = _currentConfig[_loadIndex][0].id;
                 var scene = _loadSceneNames[_loadIndex];
                 if(e.data.type=="sound"){
@@ -177,8 +167,9 @@ namespace annie {
                 }else {
                     res[scene][id] = e.data.response;
                 }
-                _checkComplete();
             }
+            _checkComplete();
+
         }
         function _checkComplete() {
             _loadedLoadRes++;

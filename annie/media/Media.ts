@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+    declare var WeixinJSBridge:any;
     /**
      * 抽象类 一般不直接使用
      * @class annie.Media
@@ -46,7 +47,7 @@ namespace annie {
             s.media.addEventListener('ended', function () {
                 s._loop--;
                 if (s._loop > 0) {
-                    s.media.play();
+                    s.play(0,s._loop);
                 } else {
                     s.media.pause();
                 }
@@ -56,8 +57,8 @@ namespace annie {
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", {currentTime: s.media.currentTime});
             }, false);
+            s._SBWeixin=s._weixinSB.bind(s);
         }
-
         /**
          * 开始播放媒体
          * @method play
@@ -75,9 +76,17 @@ namespace annie {
             } catch (e) {
                 trace(e);
             }
-            s.media.play();
+            //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
+            try{
+                WeixinJSBridge.invoke("getNetworkType",{},s._SBWeixin);
+            }catch(e){
+                s.media.play();
+            }
         }
-
+        private _SBWeixin:any;
+        private _weixinSB(){
+            this.media.play();
+        }
         /**
          * 停止播放
          * @method stop
