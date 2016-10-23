@@ -16,7 +16,6 @@ namespace annie {
         public constructor() {
             super();
         }
-
         /**
          * 取消加载
          * @method loadCancel
@@ -27,10 +26,9 @@ namespace annie {
             var s = this;
             if (s._req) {
                 s._req.abort();
-                s._req = null;
+                //s._req = null;
             }
         }
-
         private _req:XMLHttpRequest;
 
         /**
@@ -71,19 +69,121 @@ namespace annie {
                     s.responseType = "unKnow";
                 }
             }
-            var req = new XMLHttpRequest();
+            var req:any=null;
+            if(!s._req){
+                s._req=new XMLHttpRequest();
+                req=s._req;
+                req.timeout = 5000;
+                req.withCredentials = false;
+                req.onprogress = function (event:any):void {
+                    if (!event || event.loaded > 0 && event.total == 0) {
+                        return; // Sometimes we get no "total", so just ignore the progress event.
+                    }
+                    s.dispatchEvent("onProgress",{loadedBytes:event.loaded,totalBytes:event.total});
+                };
+                req.onerror = function (event:any):void {
+                    reSendTimes++;
+                    if(reSendTimes>3){
+                        s.dispatchEvent("onError", event["message"]);
+                    }else {
+                        //断线重连
+                        req.abort();
+                        if (!s.data) {
+                            req.send();
+                        } else {
+                            if (isBinaryData) {
+                                req.send(s.data);
+                            } else {
+                                req.send(s._fqs(s.data, null));
+                            }
+                        }
+                    }
+                };
+                req.onreadystatechange = function (event:any):void {
+                    var t = event.target;
+                    if (t["readyState"] == 4) {
+                        var e:Event = new Event("onComplete");
+                        var result = t["response"];
+                        e.data = {type: s.responseType, response: null};
+                        var item:any;
+                        switch (s.responseType) {
+                            case "css":
+                                item = document.createElement("link");
+                                item.rel = "stylesheet";
+                                item.href = s.url;
+                                break;
+                            case "image":
+                            case "sound":
+                            case "video":
+                                var isBlob:boolean=true;
+                                if(s.responseType=="image"){
+                                    item = document.createElement("img");
+                                    item.onload = function () {
+                                        if(isBlob) {
+                                            URL.revokeObjectURL(item.src);
+                                        }
+                                        item.onload = null;
+                                    };
+                                }else{
+                                    if(s.responseType=="sound") {
+                                        item = document.createElement("AUDIO");
+                                    }else if(s.responseType=="video") {
+                                        item = document.createElement("VIDEO");
+                                    }
+                                    item.preload = true;
+                                    item.load();
+                                    item.onloadeddata = function (){
+                                        if(isBlob) {
+                                            URL.revokeObjectURL(item.src);
+                                        }
+                                        item.onloadeddata = null;
+                                    };
+                                }
+                                try{
+                                    item.src = URL.createObjectURL(result);
+                                }catch(err){
+                                    item.src = s.url;
+                                    isBlob=false;
+                                }
+                                break;
+                            case "json":
+                                item = JSON.parse(result);
+                                break;
+                            case "xml":
+                                item = t["responseXML"];
+                                break;
+                            case "js":
+                            case "text":
+                            case "unKnow":
+                            default:
+                                item = result;
+                                break;
+                        }
+                        e.data["response"] = item;
+                        s.data = null;
+                        s.responseType = "";
+                        //req.onerror = null;
+                        //s._req.onreadystatechange=null;
+                        //req.onprogress = null;
+                        s.dispatchEvent(e);
+                    }
+                };
+            }else {
+                req = s._req;
+            }
+            var reSendTimes=0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
             } else {
                 s.url = url;
             }
-            req.open(s.method, s.url, true);
-            req.timeout = 5000;
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 req.responseType = "blob";
+            }else{
+                req.responseType ="text";
             }
-            req.withCredentials = false;
+            req.open(s.method, s.url, true);
             if (!s.data) {
                 req.send();
             } else {
@@ -97,106 +197,8 @@ namespace annie {
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
-            var reSendTimes=0;
-            req.onprogress = function (event:any):void {
-                if (!event || event.loaded > 0 && event.total == 0) {
-                    return; // Sometimes we get no "total", so just ignore the progress event.
-                }
-                s.dispatchEvent("onProgress",{loadedBytes:event.loaded,totalBytes:event.total});
-            };
-            req.onerror = function (event:any):void {
-                reSendTimes++;
-                if(reSendTimes>3){
-                    s.dispatchEvent("onError", event["message"]);
-                }else {
-                    //断线重连
-                    req.abort();
-                    if (!s.data) {
-                        req.send();
-                    } else {
-                        if (isBinaryData) {
-                            req.send(s.data);
-                        } else {
-                            req.send(s._fqs(s.data, null));
-                        }
-                    }
-                }
-            };
-            req.onreadystatechange = function (event:any):void {
-                var t = event.target;
-                if (t["readyState"] == 4) {
-                    var e:Event = new Event("onComplete");
-                    var result = t["response"];
-                    e.data = {type: s.responseType, response: null};
-                    var item:any;
-                    var isNeedLoad:boolean = false;
-                    switch (s.responseType) {
-                        case "js":
-                            item = document.createElement("script");
-                            item.src = s.url;
-                            //item.type = "text/javascript";
-                            //document.querySelector('head').appendChild(script);
-                            break;
-                        case "css":
-                            // <link href="img/divcss5.css" rel="stylesheet"/>
-                            item = document.createElement("link");
-                            item.rel = "stylesheet";
-                            item.href = s.url;
-                            //document.querySelector('head').appendChild(item);
-                            break;
-                        case "image":
-                            item = document.createElement("img");
-                            var isBlob:boolean=true;
-                            try{
-                                item.src = URL.createObjectURL(result);
-                            }catch(err){
-                                item.src = s.url;
-                                isBlob=false;
-                            }
-                            isNeedLoad = true;
-                            item.onload = function () {
-                                if(isBlob) {
-                                    URL.revokeObjectURL(item.src);
-                                }
-                                item.onload = null;
-                                s.dispatchEvent(e);
-                            };
-                            break;
-                        case "sound":
-                        case "video":
-                            if(s.responseType=="sound") {
-                                item = document.createElement("AUDIO");
-                            }else {
-                                item = document.createElement("VIDEO");
-                            }
-                            item.preload = true;
-                            item.src = s.url;
-                            item.load();
-                            break;
-                        case "json":
-                            item = JSON.parse(result);
-                            break;
-                        case "xml":
-                            item = t["responseXML"];
-                            break;
-                        case "unKnow":
-                        case "text":
-                        default:
-                            item = result;
-                            break;
-                    }
-                    e.data["response"] = item;
-                    s.data = null;
-                    s.responseType = "";
-                    req.onerror = null;
-                    //s._req.onreadystatechange=null;
-                    req.onprogress = null;
-                    if (!isNeedLoad) {
-                        s.dispatchEvent(e);
-                    }
-                }
-            }
-            s._req = req;
+
+
         }
         /**
          * 后台返回来的数据类弄

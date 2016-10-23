@@ -38,15 +38,15 @@ namespace annie {
          * @private
          */
         private _isAdded:boolean=false;
-        public constructor() {
+        public constructor(){
             super();
             var s = this;
-            s.addEventListener(Event.REMOVE_TO_STAGE, function (e: Event) {
+            s.addEventListener(Event.REMOVE_TO_STAGE, function (e:Event) {
                 if (s.htmlElement) {
                     s.htmlElement.style.display = "none";
                 }
             })
-            s.addEventListener(Event.ADD_TO_STAGE, function (e: Event) {
+            s.addEventListener(Event.ADD_TO_STAGE, function (e:Event) {
                 if (!s._isAdded) {
                     s._isAdded = true;
                     s.stage.rootDiv.insertBefore(s.htmlElement,s.stage.rootDiv.childNodes[0]);
@@ -72,11 +72,9 @@ namespace annie {
             var style = htmlElement.style;
             style.position = "absolute";
             style.display="none";
-            //style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-            style.transformOrigin=style.webkitTransformOrigin="0 0 0";
+            style.transformOrigin = style.WebkitTransformOrigin= "0 0 0";
             s.htmlElement = htmlElement;
         }
-
         /**
          * 删除html元素,这样就等于解了封装
          * @method delElement

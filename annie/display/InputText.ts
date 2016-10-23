@@ -150,7 +150,6 @@ namespace annie {
                 return s.htmlElement.value;
             }
         }
-
         /**
          * 设置输入文本的值,因为输入文本调用了html的input标签,所以不能直接像动态文本那样用textObj.text获取值或者设置值
          * @method setText

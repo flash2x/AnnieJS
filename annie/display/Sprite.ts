@@ -225,7 +225,6 @@ namespace annie {
                 s.removeChildAt(i);
             }
         }
-
         /**
          * 重写刷新
          * @method update
@@ -355,7 +354,6 @@ namespace annie {
             if (maskObj) {
                 renderObj.endMask();
             }
-            //super.render();
         }
     }
 }

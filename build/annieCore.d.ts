@@ -36,6 +36,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         private static _MECO;
+        static _totalMEC: number;
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
@@ -1044,7 +1045,14 @@ declare namespace annie {
          */
         static _canvas: any;
         _glInfo: any;
-        static _setGlInfo(target: any): void;
+        /**
+         * 设置webgl要渲染的东西
+         * @method _setGlInfo
+         * @param target
+         * @param type
+         * @private
+         */
+        static _setGlInfo(target: any, type: number): void;
     }
 }
 /**
@@ -2770,14 +2778,17 @@ declare namespace annie {
          */
         getFrameRate(): number;
         /**
-         * 获取设备或最上层的div宽高
-         * @method getScreenWH
+         * 获取引擎所在的div宽高
+         * @method getRootDivWH
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
          * @returns {{w: number, h: number}}
          */
-        private getScreenWH(div);
+        getRootDivWH(div: HTMLDivElement): {
+            w: number;
+            h: number;
+        };
         /**
          * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
          * @method kill
@@ -3309,19 +3320,19 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * Canvas 渲染器
+     * WebGl 渲染器
      * @class annie.WGRender
      * @extends annie.AObject
      * @implements IRender
      * @public
-     * @since 1.0.0
+     * @since 1.0.2
      */
     class WGRender extends AObject implements IRender {
         /**
          * 渲染器所在最上层的对象
          * @property rootContainer
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @type {any}
          * @default null
          */
@@ -3329,8 +3340,7 @@ declare namespace annie {
         private _gl;
         private _stage;
         private _program;
-        private _vBuffer;
-        private _tBuffer;
+        private _buffer;
         private _dW;
         private _dH;
         private _pMatrix;
@@ -3343,17 +3353,19 @@ declare namespace annie {
         private _images;
         private _maxTextureCount;
         private _uniformTexture;
+        private _posAttr;
+        private _textAttr;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         constructor(stage: Stage);
         /**
          * 开始渲染时执行
          * @method begin
-         * @since 1.0.0
+         * @since 1.0.2
          * @public
          */
         begin(): void;
@@ -3362,20 +3374,20 @@ declare namespace annie {
          * @method beginMask
          * @param {annie.DisplayObject} target
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         beginMask(target: any): void;
         /**
          * 结束遮罩时调用
          * @method endMask
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         endMask(): void;
         /**
          * 当舞台尺寸改变时会调用
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method reSize
          */
         reSize(): void;
@@ -3383,16 +3395,16 @@ declare namespace annie {
         /**
          * 初始化渲染器
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method init
          */
         init(): void;
-        private setBuffer(attr, buffer, data);
+        private setBuffer(buffer, data);
         private setTexture(img);
         /**
          *  调用渲染
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          * @param {number} type 0图片 1矢量 2文字 3容器
@@ -4112,7 +4124,7 @@ declare namespace annie {
  * @static
  * @example trace(1);trace(1,"hello");
  */
-declare var trace: (...arg: any[]) => void;
+declare var trace: any;
 /**
  * 全局事件触发器
  * @static

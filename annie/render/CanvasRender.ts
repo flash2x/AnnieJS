@@ -119,7 +119,7 @@ namespace annie {
          */
         public draw(target:any, type:number):void {
             var s = this;
-            s._ctx.save();
+            //s._ctx.save();
             s._ctx.globalAlpha = target.cAlpha;
             var tm=target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
@@ -143,7 +143,7 @@ namespace annie {
                     s._ctx.drawImage(target._cacheImg, 0, 0);
                 }
             }
-            s._ctx.restore();
+            //s._ctx.restore();
         }
 
         /**

@@ -45,6 +45,7 @@ namespace annie {
          */
 
         private static _MECO:any={};
+        public static _totalMEC:number=0;
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
@@ -59,7 +60,9 @@ namespace annie {
             if(type==""){
                 //返回所有鼠标事件数
                 for(var item in EventDispatcher._MECO){
-                    count+=EventDispatcher._MECO[item];
+                    if(item.indexOf("onMouse")==0) {
+                        count += EventDispatcher._MECO[item];
+                    }
                 }
             }else {
                 if (EventDispatcher._MECO[type]){
@@ -106,14 +109,15 @@ namespace annie {
          * @param {boolean} isAdd
          */
         private _changeMouseCount(type:string,isAdd:boolean):void{
-            var count=-1;
-            if(isAdd){
-                count=1;
-            }
+            var count=isAdd?1:-1;
             if(!EventDispatcher._MECO[type]){
                 EventDispatcher._MECO[type]=0;
             }
             EventDispatcher._MECO[type]+=count;
+            if(EventDispatcher._MECO[type]<0){
+                EventDispatcher._MECO[type]=0;
+            }
+            EventDispatcher._totalMEC+=count;
         }
         /**
          * 广播侦听

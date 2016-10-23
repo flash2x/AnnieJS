@@ -166,7 +166,7 @@ namespace annie {
                 }
                 //给webgl更新新
                 s._isNeedUpdate = false;
-                DisplayObject._setGlInfo(s);
+                DisplayObject._setGlInfo(s,0);
             }
         }
         /**

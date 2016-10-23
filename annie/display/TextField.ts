@@ -9,7 +9,7 @@ namespace annie {
      * @since 1.0.0
      * @public
      */
-    export class TextField extends DisplayObject {
+    export class TextField extends DisplayObject{
         public constructor() {
             super();
         }
@@ -179,6 +179,7 @@ namespace annie {
                 }
             }
             if (s._isNeedUpdate){
+                s.text+="";
                 if(s.text==undefined||s.text.length==0){
                     s._cacheImg.src="";
                     s._isNeedUpdate=false;
@@ -296,7 +297,7 @@ namespace annie {
                 s._cacheX=-10;
                 s._cacheY=-10;
                 s._isNeedUpdate = false;
-                DisplayObject._setGlInfo(s);
+                DisplayObject._setGlInfo(s,2);
             }
         }
 

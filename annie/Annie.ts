@@ -18,7 +18,7 @@ namespace annie {
      * @property version
      * @type {string}
      */
-    export var version:string="1.0.1";
+    export var version:string="1.0.2";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

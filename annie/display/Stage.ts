@@ -203,7 +203,7 @@ namespace annie {
             super();
             var s = this;
             s.stage = this;
-            if (annie.osType == "pc") {
+            if (annie.osType == "pc"){
                 s.autoResize=true;
             }else{
                 s.autoSteering = true;
@@ -231,16 +231,6 @@ namespace annie {
                 //trace("目前还是会以Canvas来渲染!");
             }
             s.renderObj.init();
-            var rc = s.renderObj.rootContainer;
-            if (osType != "pc") {
-                rc.addEventListener("touchstart", s.onMouseEvent.bind(s), false);
-                rc.addEventListener('touchmove', s.onMouseEvent.bind(s), false);
-                rc.addEventListener('touchend', s.onMouseEvent.bind(s), false);
-            } else {
-                rc.addEventListener("mousedown", s.onMouseEvent.bind(s), false);
-                rc.addEventListener('mousemove', s.onMouseEvent.bind(s), false);
-                rc.addEventListener('mouseup', s.onMouseEvent.bind(s), false);
-            }
             window.addEventListener("resize", function (e:any) {
                 if (s.autoResize) {
                     s.resize();
@@ -260,13 +250,25 @@ namespace annie {
                     vLoad.load("libs/vConsole.min.js");
                     vLoad.addEventListener(annie.Event.COMPLETE,function (e:Event) {
                         Stage._isLoadedVConsole=true;
-                        document.querySelector('head').appendChild(e.data.response);
+                        /*document.querySelector('head').appendChild(e.data.response);
                         e.data.response.onload = function () {
                             s.dispatchEvent(new annie.Event("onInitStage"));
-                        }
+                        }*/
+                        s.dispatchEvent(new annie.Event("onInitStage"));
                     });
                 }else{
                     s.dispatchEvent(new annie.Event("onInitStage"));
+                }
+                var rc = s.renderObj.rootContainer;
+                var mouseEvent=s.onMouseEvent.bind(s);
+                if (osType != "pc") {
+                    rc.addEventListener("touchstart", mouseEvent);
+                    rc.addEventListener('touchmove', mouseEvent);
+                    rc.addEventListener('touchend', mouseEvent);
+                } else {
+                    rc.addEventListener("mousedown", mouseEvent);
+                    rc.addEventListener('mousemove',mouseEvent);
+                    rc.addEventListener('mouseup', mouseEvent);
                 }
             }, 100);
         }
@@ -291,11 +293,10 @@ namespace annie {
                 super.render(renderObj);
             }
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-            if(EventDispatcher.getMouseEventCount()>0) {
+            if(EventDispatcher._totalMEC>0) {
                 this._mt();
             }
         }
-
         /**
          * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
          * @type {Array}
@@ -373,7 +374,6 @@ namespace annie {
                                 event.type="onMouseClick";
                             }
                             events.push(event);
-                            event["_pd"]=false;
                             s._initMouseEvent(event,cp,sp);
                             eLen++;
                         }
@@ -387,7 +387,7 @@ namespace annie {
                 if (d){
                     //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
                     //找出真正的target,因为有些父级可能会mouseChildren=false;
-                    while (d) {
+                    while(d) {
                         if (d["mouseChildren"]===false) {
                             //丢掉之前的层级,因为根本没用了
                             displayList.length=0;
@@ -530,14 +530,14 @@ namespace annie {
             return 60 / (this._flush + 1);
         }
         /**
-         * 获取设备或最上层的div宽高
-         * @method getScreenWH
+         * 获取引擎所在的div宽高
+         * @method getRootDivWH
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
          * @returns {{w: number, h: number}}
          */
-        private getScreenWH(div:HTMLDivElement) {
+        public getRootDivWH(div:HTMLDivElement){
             var sw = div.style.width;
             var sh = div.style.height;
             var iw = window.innerWidth
@@ -595,12 +595,11 @@ namespace annie {
             var s:any = this;
             s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
             //阻止向下冒泡
-            e.preventDefault();
         };
         /**
          * 设置舞台的对齐模式
          */
-        private setAlign = function() {
+        private setAlign = function(){
             var s=this;
             var divH = s.divHeight * devicePixelRatio;
             var divW = s.divWidth * devicePixelRatio;
@@ -675,7 +674,7 @@ namespace annie {
          */
         public resize = function () {
             var s=this;
-            var whObj = s.getScreenWH(s.rootDiv);
+            var whObj = s.getRootDivWH(s.rootDiv);
             s.divHeight = whObj.h;
             s.divWidth = whObj.w;
             s.renderObj.reSize();

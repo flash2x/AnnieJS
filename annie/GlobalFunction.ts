@@ -10,11 +10,7 @@
  * @static
  * @example trace(1);trace(1,"hello");
  */
-var trace = function (...arg:any[]) {
-    for (var i in arguments) {
-        console.log(arguments[i]);
-    }
-};
+var trace =console.log.bind(console);
 /**
  * 全局事件触发器
  * @static

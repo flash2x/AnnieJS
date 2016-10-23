@@ -60,7 +60,9 @@ var annie;
             if (type == "") {
                 //返回所有鼠标事件数
                 for (var item in EventDispatcher._MECO) {
-                    count += EventDispatcher._MECO[item];
+                    if (item.indexOf("onMouse") == 0) {
+                        count += EventDispatcher._MECO[item];
+                    }
                 }
             }
             else {
@@ -108,14 +110,15 @@ var annie;
          * @param {boolean} isAdd
          */
         EventDispatcher.prototype._changeMouseCount = function (type, isAdd) {
-            var count = -1;
-            if (isAdd) {
-                count = 1;
-            }
+            var count = isAdd ? 1 : -1;
             if (!EventDispatcher._MECO[type]) {
                 EventDispatcher._MECO[type] = 0;
             }
             EventDispatcher._MECO[type] += count;
+            if (EventDispatcher._MECO[type] < 0) {
+                EventDispatcher._MECO[type] = 0;
+            }
+            EventDispatcher._totalMEC += count;
         };
         /**
          * 广播侦听
@@ -211,6 +214,7 @@ var annie;
          * @since 1.0.0
          */
         EventDispatcher._MECO = {};
+        EventDispatcher._totalMEC = 0;
         return EventDispatcher;
     }(AObject));
     annie.EventDispatcher = EventDispatcher;
@@ -1526,9 +1530,16 @@ var annie;
                 s.scaleY *= sy;
             }
         };
-        DisplayObject._setGlInfo = function (target) {
+        /**
+         * 设置webgl要渲染的东西
+         * @method _setGlInfo
+         * @param target
+         * @param type
+         * @private
+         */
+        DisplayObject._setGlInfo = function (target, type) {
             //判断是不是webgl渲染模式
-            if (target.stage.renderType == 1) {
+            if (target.stage && target.stage.renderType == 1) {
                 var gi = target._glInfo;
                 var tc = target.rect;
                 var img = target._cacheImg;
@@ -1550,7 +1561,8 @@ var annie;
                     gi.pw = (img.width - cX * 2);
                     gi.ph = (img.height - cY * 2);
                     //因为不是雪碧图有可能中途更新了效果，但引用没变，所以需要标记告诉webgl需要更新纹理
-                    img["glUpdate"] = true;
+                    img.glUpdate = true;
+                    img._annieType = type;
                 }
             }
         };
@@ -1746,7 +1758,7 @@ var annie;
                 }
                 //给webgl更新新
                 s._isNeedUpdate = false;
-                annie.DisplayObject._setGlInfo(s);
+                annie.DisplayObject._setGlInfo(s, 0);
             }
         };
         /**
@@ -2566,7 +2578,7 @@ var annie;
                     s._cacheY = 0;
                 }
                 s._isNeedUpdate = false;
-                annie.DisplayObject._setGlInfo(s);
+                annie.DisplayObject._setGlInfo(s, 1);
             }
         };
         /*private _drawPath(){
@@ -3130,7 +3142,6 @@ var annie;
             if (maskObj) {
                 renderObj.endMask();
             }
-            //super.render();
         };
         return Sprite;
     }(annie.DisplayObject));
@@ -4315,8 +4326,7 @@ var annie;
             var style = htmlElement.style;
             style.position = "absolute";
             style.display = "none";
-            //style.transformOrigin = style.WebkitTransformOrigin = style.msTransformOrigin = style.MozTransformOrigin = style.OTransformOrigin = "0% 0%";
-            style.transformOrigin = style.webkitTransformOrigin = "0 0 0";
+            style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
             s.htmlElement = htmlElement;
         };
         /**
@@ -4657,6 +4667,7 @@ var annie;
                 }
             }
             if (s._isNeedUpdate) {
+                s.text += "";
                 if (s.text == undefined || s.text.length == 0) {
                     s._cacheImg.src = "";
                     s._isNeedUpdate = false;
@@ -4780,7 +4791,7 @@ var annie;
                 s._cacheX = -10;
                 s._cacheY = -10;
                 s._isNeedUpdate = false;
-                annie.DisplayObject._setGlInfo(s);
+                annie.DisplayObject._setGlInfo(s, 2);
             }
         };
         /**
@@ -5206,7 +5217,6 @@ var annie;
                 var s = this;
                 s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
                 //阻止向下冒泡
-                e.preventDefault();
             };
             /**
              * 设置舞台的对齐模式
@@ -5290,7 +5300,7 @@ var annie;
              */
             this.resize = function () {
                 var s = this;
-                var whObj = s.getScreenWH(s.rootDiv);
+                var whObj = s.getRootDivWH(s.rootDiv);
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
@@ -5325,17 +5335,6 @@ var annie;
                 s.renderObj = new annie.WGRender(s);
             }
             s.renderObj.init();
-            var rc = s.renderObj.rootContainer;
-            if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", s.onMouseEvent.bind(s), false);
-                rc.addEventListener('touchmove', s.onMouseEvent.bind(s), false);
-                rc.addEventListener('touchend', s.onMouseEvent.bind(s), false);
-            }
-            else {
-                rc.addEventListener("mousedown", s.onMouseEvent.bind(s), false);
-                rc.addEventListener('mousemove', s.onMouseEvent.bind(s), false);
-                rc.addEventListener('mouseup', s.onMouseEvent.bind(s), false);
-            }
             window.addEventListener("resize", function (e) {
                 if (s.autoResize) {
                     s.resize();
@@ -5355,14 +5354,27 @@ var annie;
                     vLoad.load("libs/vConsole.min.js");
                     vLoad.addEventListener(annie.Event.COMPLETE, function (e) {
                         Stage._isLoadedVConsole = true;
-                        document.querySelector('head').appendChild(e.data.response);
+                        /*document.querySelector('head').appendChild(e.data.response);
                         e.data.response.onload = function () {
                             s.dispatchEvent(new annie.Event("onInitStage"));
-                        };
+                        }*/
+                        s.dispatchEvent(new annie.Event("onInitStage"));
                     });
                 }
                 else {
                     s.dispatchEvent(new annie.Event("onInitStage"));
+                }
+                var rc = s.renderObj.rootContainer;
+                var mouseEvent = s.onMouseEvent.bind(s);
+                if (annie.osType != "pc") {
+                    rc.addEventListener("touchstart", mouseEvent);
+                    rc.addEventListener('touchmove', mouseEvent);
+                    rc.addEventListener('touchend', mouseEvent);
+                }
+                else {
+                    rc.addEventListener("mousedown", mouseEvent);
+                    rc.addEventListener('mousemove', mouseEvent);
+                    rc.addEventListener('mouseup', mouseEvent);
                 }
             }, 100);
         }
@@ -5387,7 +5399,7 @@ var annie;
                 _super.prototype.render.call(this, renderObj);
             }
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-            if (annie.EventDispatcher.getMouseEventCount() > 0) {
+            if (annie.EventDispatcher._totalMEC > 0) {
                 this._mt();
             }
         };
@@ -5461,7 +5473,6 @@ var annie;
                                 event.type = "onMouseClick";
                             }
                             events.push(event);
-                            event["_pd"] = false;
                             s._initMouseEvent(event, cp, sp);
                             eLen++;
                         }
@@ -5622,14 +5633,14 @@ var annie;
             return 60 / (this._flush + 1);
         };
         /**
-         * 获取设备或最上层的div宽高
-         * @method getScreenWH
+         * 获取引擎所在的div宽高
+         * @method getRootDivWH
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
          * @returns {{w: number, h: number}}
          */
-        Stage.prototype.getScreenWH = function (div) {
+        Stage.prototype.getRootDivWH = function (div) {
             var sw = div.style.width;
             var sh = div.style.height;
             var iw = window.innerWidth
@@ -6570,7 +6581,7 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target, type) {
             var s = this;
-            s._ctx.save();
+            //s._ctx.save();
             s._ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
@@ -6596,7 +6607,7 @@ var annie;
                     s._ctx.drawImage(target._cacheImg, 0, 0);
                 }
             }
-            s._ctx.restore();
+            //s._ctx.restore();
         };
         /**
          * 初始化渲染器
@@ -6637,12 +6648,12 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * Canvas 渲染器
+     * WebGl 渲染器
      * @class annie.WGRender
      * @extends annie.AObject
      * @implements IRender
      * @public
-     * @since 1.0.0
+     * @since 1.0.2
      */
     var WGRender = (function (_super) {
         __extends(WGRender, _super);
@@ -6650,7 +6661,7 @@ var annie;
          * @CanvasRender
          * @param {annie.Stage} stage
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         function WGRender(stage) {
             _super.call(this);
@@ -6658,7 +6669,7 @@ var annie;
              * 渲染器所在最上层的对象
              * @property rootContainer
              * @public
-             * @since 1.0.0
+             * @since 1.0.2
              * @type {any}
              * @default null
              */
@@ -6668,12 +6679,14 @@ var annie;
             this._images = [];
             this._maxTextureCount = 32;
             this._uniformTexture = 32;
+            this._posAttr = 0;
+            this._textAttr = 0;
             this._stage = stage;
         }
         /**
          * 开始渲染时执行
          * @method begin
-         * @since 1.0.0
+         * @since 1.0.2
          * @public
          */
         WGRender.prototype.begin = function () {
@@ -6689,13 +6702,14 @@ var annie;
             else {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
+            gl.clear(gl.COLOR_BUFFER_BIT);
         };
         /**
          * 开始有遮罩时调用
          * @method beginMask
          * @param {annie.DisplayObject} target
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         WGRender.prototype.beginMask = function (target) {
         };
@@ -6703,14 +6717,14 @@ var annie;
          * 结束遮罩时调用
          * @method endMask
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         WGRender.prototype.endMask = function () {
         };
         /**
          * 当舞台尺寸改变时会调用
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method reSize
          */
         WGRender.prototype.reSize = function () {
@@ -6770,7 +6784,7 @@ var annie;
         /**
          * 初始化渲染器
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method init
          */
         WGRender.prototype.init = function () {
@@ -6802,8 +6816,7 @@ var annie;
             gl.disable(gl.CULL_FACE);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             //新建缓存
-            s._vBuffer = gl.createBuffer();
-            s._tBuffer = gl.createBuffer();
+            s._buffer = gl.createBuffer();
             //
             s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
             s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
@@ -6811,19 +6824,22 @@ var annie;
             //
             s._cM = new annie.Matrix();
             s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-            gl.activeTexture(gl.TEXTURE0);
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
+            s._posAttr = gl.getAttribLocation(s._program, "a_P");
+            s._textAttr = gl.getAttribLocation(s._program, "a_TC");
+            gl.enableVertexAttribArray(s._posAttr);
+            gl.enableVertexAttribArray(s._textAttr);
         };
-        WGRender.prototype.setBuffer = function (attr, buffer, data) {
+        WGRender.prototype.setBuffer = function (buffer, data) {
             var s = this;
             var gl = s._gl;
             //绑定buffer
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-            var pos = gl.getAttribLocation(s._program, attr);
             //将buffer赋值给一变量
-            gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(pos);
+            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
+            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
         };
         WGRender.prototype.setTexture = function (img) {
             var s = this;
@@ -6832,22 +6848,17 @@ var annie;
             //一般打上这种标签的都不是雪碧图，强行在第一通道上更新
             var imagesCount = images.length;
             var updateTexture = true;
-            if (img["glUpdate"] != undefined || imagesCount == 0) {
-                //需要强制更新纹理
-                if (img["glUpdate"]) {
-                    img["glUpdate"] = false;
-                    s._currentTextureId = 0;
-                }
-                else {
-                    s._currentTextureId = 1;
-                }
+            if (imagesCount == 0) {
+                s._currentTextureId = 0;
             }
             else {
                 for (var i = 0; i < imagesCount; i++) {
                     if (img == images[i]) {
+                        if (!img.glUpdate) {
+                            //不需要更新纹理
+                            updateTexture = false;
+                        }
                         s._currentTextureId = i;
-                        //不需要更新纹理
-                        updateTexture = false;
                         break;
                     }
                 }
@@ -6860,6 +6871,13 @@ var annie;
                     }
                 }
             }
+            //这里一定要再判断一次
+            if (img.glUpdate) {
+                //需要更新纹理
+                img.glUpdate = false;
+                s._currentTextureId = 0;
+                updateTexture = true;
+            }
             gl.activeTexture(gl["TEXTURE" + s._currentTextureId]);
             if (updateTexture) {
                 var t;
@@ -6867,26 +6885,28 @@ var annie;
                     //如果不存在就建
                     t = gl.createTexture();
                     s._textures[s._currentTextureId] = t;
+                    gl.bindTexture(gl.TEXTURE_2D, t);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                    //设置贴图信息
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                    images[s._currentTextureId] = img;
                 }
                 else {
                     //如果存在就换
                     t = s._textures[s._currentTextureId];
+                    gl.bindTexture(gl.TEXTURE_2D, t);
                 }
-                gl.bindTexture(gl.TEXTURE_2D, t);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-                //设置贴图信息
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                images[s._currentTextureId] = img;
             }
             gl.uniform1i(s._uniformTexture, s._currentTextureId);
+            gl.bindTexture(gl.TEXTURE_2D, null);
         };
         /**
          *  调用渲染
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          * @param {number} type 0图片 1矢量 2文字 3容器
@@ -6897,28 +6917,28 @@ var annie;
             var gi = target._glInfo;
             ////////////////////////////////////////////
             var vertices = [
-                0.0, 0.0,
-                gi.pw, 0.0,
-                0.0, gi.ph,
-                gi.pw, gi.ph
-            ];
-            var textureCoord = [
-                gi.x, gi.y,
-                gi.w, gi.y,
-                gi.x, gi.h,
-                gi.w, gi.h
+                //x,y,textureX,textureY
+                0.0, 0.0, gi.x, gi.y,
+                gi.pw, 0.0, gi.w, gi.y,
+                0.0, gi.ph, gi.x, gi.h,
+                gi.pw, gi.ph, gi.w, gi.h
             ];
             //绑定buffer
-            s.setBuffer("a_P", s._vBuffer, new Float32Array(vertices));
-            s.setBuffer("a_TC", s._tBuffer, new Float32Array(textureCoord));
+            s.setBuffer(s._buffer, new Float32Array(vertices));
             var img = target._cacheImg;
             s.setTexture(img);
             var m;
-            if (img.nodeName == "CANVAS") {
+            if (img._annieType > 0) {
                 m = s._cM;
                 m.identity();
-                m.tx = -img.width;
-                m.ty = -img.height;
+                if (img._annieType == 2) {
+                    m.tx = target._cacheX * 2;
+                    m.ty = target._cacheY * 2;
+                }
+                else {
+                    m.tx = -img.width;
+                    m.ty = -img.height;
+                }
                 m.prepend(target.cMatrix);
             }
             else {
@@ -7049,7 +7069,6 @@ var annie;
             var s = this;
             if (s._req) {
                 s._req.abort();
-                s._req = null;
             }
         };
         /**
@@ -7100,7 +7119,118 @@ var annie;
                     s.responseType = "unKnow";
                 }
             }
-            var req = new XMLHttpRequest();
+            var req = null;
+            if (!s._req) {
+                s._req = new XMLHttpRequest();
+                req = s._req;
+                req.timeout = 5000;
+                req.withCredentials = false;
+                req.onprogress = function (event) {
+                    if (!event || event.loaded > 0 && event.total == 0) {
+                        return; // Sometimes we get no "total", so just ignore the progress event.
+                    }
+                    s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
+                };
+                req.onerror = function (event) {
+                    reSendTimes++;
+                    if (reSendTimes > 3) {
+                        s.dispatchEvent("onError", event["message"]);
+                    }
+                    else {
+                        //断线重连
+                        req.abort();
+                        if (!s.data) {
+                            req.send();
+                        }
+                        else {
+                            if (isBinaryData) {
+                                req.send(s.data);
+                            }
+                            else {
+                                req.send(s._fqs(s.data, null));
+                            }
+                        }
+                    }
+                };
+                req.onreadystatechange = function (event) {
+                    var t = event.target;
+                    if (t["readyState"] == 4) {
+                        var e = new annie.Event("onComplete");
+                        var result = t["response"];
+                        e.data = { type: s.responseType, response: null };
+                        var item;
+                        switch (s.responseType) {
+                            case "css":
+                                // <link href="img/divcss5.css" rel="stylesheet"/>
+                                item = document.createElement("link");
+                                item.rel = "stylesheet";
+                                item.href = s.url;
+                                //document.querySelector('head').appendChild(item);
+                                break;
+                            case "image":
+                            case "sound":
+                            case "video":
+                                var isBlob = true;
+                                if (s.responseType == "image") {
+                                    item = document.createElement("img");
+                                    item.onload = function () {
+                                        if (isBlob) {
+                                            URL.revokeObjectURL(item.src);
+                                        }
+                                        item.onload = null;
+                                    };
+                                }
+                                else {
+                                    if (s.responseType == "sound") {
+                                        item = document.createElement("AUDIO");
+                                    }
+                                    else if (s.responseType == "video") {
+                                        item = document.createElement("VIDEO");
+                                    }
+                                    item.preload = true;
+                                    item.load();
+                                    item.onloadeddata = function () {
+                                        if (isBlob) {
+                                            URL.revokeObjectURL(item.src);
+                                        }
+                                        item.onloadeddata = null;
+                                    };
+                                }
+                                try {
+                                    item.src = URL.createObjectURL(result);
+                                }
+                                catch (err) {
+                                    item.src = s.url;
+                                    isBlob = false;
+                                }
+                                break;
+                            case "json":
+                                item = JSON.parse(result);
+                                break;
+                            case "xml":
+                                item = t["responseXML"];
+                                break;
+                            case "js":
+                            case "text":
+                            case "unKnow":
+                            default:
+                                item = result;
+                                break;
+                        }
+                        e.data["response"] = item;
+                        s.data = null;
+                        s.responseType = "";
+                        //req.onerror = null;
+                        //s._req.onreadystatechange=null;
+                        //req.onprogress = null;
+                        s.dispatchEvent(e);
+                    }
+                };
+            }
+            else {
+                req = s._req;
+            }
+            var reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
@@ -7108,12 +7238,13 @@ var annie;
             else {
                 s.url = url;
             }
-            req.open(s.method, s.url, true);
-            req.timeout = 5000;
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 req.responseType = "blob";
             }
-            req.withCredentials = false;
+            else {
+                req.responseType = "text";
+            }
+            req.open(s.method, s.url, true);
             if (!s.data) {
                 req.send();
             }
@@ -7129,111 +7260,6 @@ var annie;
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
-            var reSendTimes = 0;
-            req.onprogress = function (event) {
-                if (!event || event.loaded > 0 && event.total == 0) {
-                    return; // Sometimes we get no "total", so just ignore the progress event.
-                }
-                s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
-            };
-            req.onerror = function (event) {
-                reSendTimes++;
-                if (reSendTimes > 3) {
-                    s.dispatchEvent("onError", event["message"]);
-                }
-                else {
-                    //断线重连
-                    req.abort();
-                    if (!s.data) {
-                        req.send();
-                    }
-                    else {
-                        if (isBinaryData) {
-                            req.send(s.data);
-                        }
-                        else {
-                            req.send(s._fqs(s.data, null));
-                        }
-                    }
-                }
-            };
-            req.onreadystatechange = function (event) {
-                var t = event.target;
-                if (t["readyState"] == 4) {
-                    var e = new annie.Event("onComplete");
-                    var result = t["response"];
-                    e.data = { type: s.responseType, response: null };
-                    var item;
-                    var isNeedLoad = false;
-                    switch (s.responseType) {
-                        case "js":
-                            item = document.createElement("script");
-                            item.src = s.url;
-                            //item.type = "text/javascript";
-                            //document.querySelector('head').appendChild(script);
-                            break;
-                        case "css":
-                            // <link href="img/divcss5.css" rel="stylesheet"/>
-                            item = document.createElement("link");
-                            item.rel = "stylesheet";
-                            item.href = s.url;
-                            //document.querySelector('head').appendChild(item);
-                            break;
-                        case "image":
-                            item = document.createElement("img");
-                            var isBlob = true;
-                            try {
-                                item.src = URL.createObjectURL(result);
-                            }
-                            catch (err) {
-                                item.src = s.url;
-                                isBlob = false;
-                            }
-                            isNeedLoad = true;
-                            item.onload = function () {
-                                if (isBlob) {
-                                    URL.revokeObjectURL(item.src);
-                                }
-                                item.onload = null;
-                                s.dispatchEvent(e);
-                            };
-                            break;
-                        case "sound":
-                        case "video":
-                            if (s.responseType == "sound") {
-                                item = document.createElement("AUDIO");
-                            }
-                            else {
-                                item = document.createElement("VIDEO");
-                            }
-                            item.preload = true;
-                            item.src = s.url;
-                            item.load();
-                            break;
-                        case "json":
-                            item = JSON.parse(result);
-                            break;
-                        case "xml":
-                            item = t["responseXML"];
-                            break;
-                        case "unKnow":
-                        case "text":
-                        default:
-                            item = result;
-                            break;
-                    }
-                    e.data["response"] = item;
-                    s.data = null;
-                    s.responseType = "";
-                    req.onerror = null;
-                    //s._req.onreadystatechange=null;
-                    req.onprogress = null;
-                    if (!isNeedLoad) {
-                        s.dispatchEvent(e);
-                    }
-                }
-            };
-            s._req = req;
         };
         return URLLoader;
     }(annie.EventDispatcher));
@@ -7251,6 +7277,7 @@ var annie;
      */
     var RESManager;
     (function (RESManager) {
+        var Eval = eval.bind(window);
         /**
          * 存储加载资源的总对象
          * @type {Object}
@@ -7405,11 +7432,13 @@ var annie;
         function _onRESComplete(e) {
             if (e.data.type == "js") {
                 //资源加载完成
-                var script = e.data.response;
-                document.querySelector('head').appendChild(script);
-                script.onload = function () {
-                    _checkComplete();
-                };
+                /*var script = e.data.response;
+                 document.querySelector('head').appendChild(script);
+                 script.onload = function () {
+                 _checkComplete();
+                 }*/
+                Eval(e.data.response);
+                _checkComplete();
             }
             else {
                 var id = _currentConfig[_loadIndex][0].id;
@@ -8489,7 +8518,7 @@ var annie;
      * @property version
      * @type {string}
      */
-    annie.version = "1.0.1";
+    annie.version = "1.0.2";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -8661,15 +8690,7 @@ var annie;
  * @static
  * @example trace(1);trace(1,"hello");
  */
-var trace = function () {
-    var arg = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        arg[_i - 0] = arguments[_i];
-    }
-    for (var i in arguments) {
-        console.log(arguments[i]);
-    }
-};
+var trace = console.log.bind(console);
 /**
  * 全局事件触发器
  * @static

@@ -3,19 +3,19 @@
  */
 namespace annie {
     /**
-     * Canvas 渲染器
+     * WebGl 渲染器
      * @class annie.WGRender
      * @extends annie.AObject
      * @implements IRender
      * @public
-     * @since 1.0.0
+     * @since 1.0.2
      */
     export class WGRender extends AObject implements IRender {
         /**
          * 渲染器所在最上层的对象
          * @property rootContainer
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @type {any}
          * @default null
          */
@@ -23,8 +23,7 @@ namespace annie {
         private _gl: any;
         private _stage: Stage;
         private _program: any;
-        private _vBuffer: any;
-        private _tBuffer: any;
+        private _buffer: any;
         private _dW: number;
         private _dH: number;
         private _pMatrix: any;
@@ -37,12 +36,14 @@ namespace annie {
         private _images: any = [];
         private _maxTextureCount: number = 32;
         private _uniformTexture: number = 32;
+        private _posAttr: number = 0;
+        private _textAttr: number = 0;
 
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         public constructor(stage: Stage) {
             super();
@@ -52,7 +53,7 @@ namespace annie {
         /**
          * 开始渲染时执行
          * @method begin
-         * @since 1.0.0
+         * @since 1.0.2
          * @public
          */
         public begin(): void {
@@ -67,6 +68,7 @@ namespace annie {
             } else {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
+            gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
         /**
@@ -74,17 +76,16 @@ namespace annie {
          * @method beginMask
          * @param {annie.DisplayObject} target
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
-        public beginMask(target: any): void {
+        public beginMask(target: any):void {
 
         }
-
         /**
          * 结束遮罩时调用
          * @method endMask
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          */
         public endMask(): void {
 
@@ -93,7 +94,7 @@ namespace annie {
         /**
          * 当舞台尺寸改变时会调用
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method reSize
          */
         public reSize(): void {
@@ -114,8 +115,7 @@ namespace annie {
                 ]
             );
         }
-
-        private _getShader(id: number) {
+        private _getShader(id: number){
             var s = this;
             var gl = s._gl;
             // Find the shader script element
@@ -157,7 +157,7 @@ namespace annie {
         /**
          * 初始化渲染器
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method init
          */
         public init(): void {
@@ -189,8 +189,7 @@ namespace annie {
             gl.disable(gl.CULL_FACE);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             //新建缓存
-            s._vBuffer = gl.createBuffer();
-            s._tBuffer = gl.createBuffer();
+            s._buffer = gl.createBuffer();
             //
             s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
             s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
@@ -198,22 +197,23 @@ namespace annie {
             //
             s._cM = new annie.Matrix();
             s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-            gl.activeTexture(gl.TEXTURE0);
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
+            s._posAttr = gl.getAttribLocation(s._program, "a_P");
+            s._textAttr = gl.getAttribLocation(s._program, "a_TC");
+            gl.enableVertexAttribArray(s._posAttr);
+            gl.enableVertexAttribArray(s._textAttr);
         }
-
-        private setBuffer(attr: string, buffer: any, data: any): void {
+        private setBuffer(buffer: any, data: any): void {
             var s = this;
             var gl = s._gl;
             //绑定buffer
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-            var pos: number = gl.getAttribLocation(s._program, attr);
             //将buffer赋值给一变量
-            gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(pos);
+            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4*4, 0);
+            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4*4, 4*2);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
-
         private setTexture(img: any): void {
             var s = this;
             var images = s._images;
@@ -221,20 +221,16 @@ namespace annie {
             //一般打上这种标签的都不是雪碧图，强行在第一通道上更新
             var imagesCount: number = images.length;
             var updateTexture: boolean = true;
-            if(img["glUpdate"]!=undefined|| imagesCount == 0) {
-                //需要强制更新纹理
-                if (img["glUpdate"]) {
-                    img["glUpdate"] = false;
-                    s._currentTextureId = 0;
-                }else{
-                    s._currentTextureId =1;
-                }
+            if(imagesCount == 0) {
+                s._currentTextureId = 0;
             }else {
                 for (var i = 0; i < imagesCount; i++) {
                     if (img == images[i]) {
-                        s._currentTextureId = i;
-                        //不需要更新纹理
-                        updateTexture = false;
+                        if (!img.glUpdate) {
+                            //不需要更新纹理
+                            updateTexture = false;
+                        }
+                        s._currentTextureId=i;
                         break;
                     }
                 }
@@ -246,33 +242,41 @@ namespace annie {
                     }
                 }
             }
+            //这里一定要再判断一次
+            if(img.glUpdate){
+                //需要更新纹理
+                img.glUpdate=false;
+                s._currentTextureId=0;
+                updateTexture = true;
+            }
             gl.activeTexture(gl["TEXTURE" + s._currentTextureId]);
             if (updateTexture) {
                 var t: any;
-                if (!s._textures[s._currentTextureId]) {
+                if (!s._textures[s._currentTextureId]){
                     //如果不存在就建
                     t = gl.createTexture();
                     s._textures[s._currentTextureId] = t;
+                    gl.bindTexture(gl.TEXTURE_2D, t);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                    //设置贴图信息
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                    images[s._currentTextureId] = img;
                 } else {
                     //如果存在就换
                     t = s._textures[s._currentTextureId];
+                    gl.bindTexture(gl.TEXTURE_2D, t);
                 }
-                gl.bindTexture(gl.TEXTURE_2D, t);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-                //设置贴图信息
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                images[s._currentTextureId] = img;
             }
             gl.uniform1i(s._uniformTexture, s._currentTextureId);
+            gl.bindTexture(gl.TEXTURE_2D, null);
         }
-
         /**
          *  调用渲染
          * @public
-         * @since 1.0.0
+         * @since 1.0.2
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          * @param {number} type 0图片 1矢量 2文字 3容器
@@ -284,31 +288,29 @@ namespace annie {
             ////////////////////////////////////////////
             var vertices =
                 [
-                    0.0, 0.0,
-                    gi.pw, 0.0,
-                    0.0, gi.ph,
-                    gi.pw, gi.ph
-                ];
-            var textureCoord =
-                [
-                    gi.x, gi.y,
-                    gi.w, gi.y,
-                    gi.x, gi.h,
-                    gi.w, gi.h
+                    //x,y,textureX,textureY
+                    0.0, 0.0,gi.x, gi.y,
+                    gi.pw, 0.0,gi.w, gi.y,
+                    0.0, gi.ph,gi.x, gi.h,
+                    gi.pw, gi.ph,gi.w, gi.h
                 ];
             //绑定buffer
-            s.setBuffer("a_P", s._vBuffer, new Float32Array(vertices));
-            s.setBuffer("a_TC", s._tBuffer, new Float32Array(textureCoord));
+            s.setBuffer(s._buffer, new Float32Array(vertices));
             var img = target._cacheImg;
             s.setTexture(img);
             var m: any;
-            if (img.nodeName == "CANVAS") {
+            if (img._annieType>0) {
                 m = s._cM;
                 m.identity();
-                m.tx = -img.width;
-                m.ty = -img.height;
+                if(img._annieType==2){
+                    m.tx = target._cacheX*2;
+                    m.ty = target._cacheY*2;
+                }else{
+                    m.tx = -img.width;
+                    m.ty = -img.height;
+                }
                 m.prepend(target.cMatrix);
-            } else {
+            }else {
                 m = target.cMatrix;
             }
             var vMatrix: any = new Float32Array(
