@@ -465,41 +465,5 @@ namespace annie{
         public static _canvas:any = window.document.createElement("canvas");
         //需要用webgl渲染的信息
         public _glInfo:any={};
-
-        /**
-         * 设置webgl要渲染的东西
-         * @method _setGlInfo
-         * @param target
-         * @param type
-         * @private
-         */
-        public static _setGlInfo(target:any,type:number):void{
-            //判断是不是webgl渲染模式
-            if(target.stage&&target.stage.renderType==1) {
-                var gi: any = target._glInfo;
-                var tc: Rectangle = target.rect;
-                var img: any = target._cacheImg;
-                if (tc) {
-                    gi.x = tc.x / img.width;
-                    gi.y = tc.y / img.height;
-                    gi.w = (tc.x + tc.width) / img.width;
-                    gi.h = (tc.y + tc.height) / img.height;
-                    gi.pw = tc.width;
-                    gi.ph = tc.height;
-                } else {
-                    var cX: number = target._cacheX;
-                    var cY: number = target._cacheY;
-                    gi.x = cX / img.width;
-                    gi.y = cY / img.height;
-                    gi.w = (img.width - cX) / img.width;
-                    gi.h = (img.height - cY) / img.height;
-                    gi.pw = (img.width - cX*2);
-                    gi.ph = (img.height - cY*2);
-                    //因为不是雪碧图有可能中途更新了效果，但引用没变，所以需要标记告诉webgl需要更新纹理
-                    img.glUpdate=true;
-                    img._annieType=type;
-                }
-            }
-        }
     }
 }

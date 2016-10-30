@@ -30,15 +30,17 @@ namespace annie {
         private _pMI: number;
         private _vMI: number;
         private _uA: number;
+        private _uMask: number;
         private _cM: annie.Matrix;
-        private _currentTextureId: number = 0;
-        private _textures: any = [];
-        private _images: any = [];
         private _maxTextureCount: number = 32;
-        private _uniformTexture: number = 32;
+        private _uniformTexture: number = 0;
+        private _uniformMaskTexture: number = 0;
         private _posAttr: number = 0;
         private _textAttr: number = 0;
-
+        private _maskFbo: any;
+        private _maskObjList: any = [];
+        private _maskTexture: any = null;
+        private _maskSrcTexture: any = null;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -49,7 +51,6 @@ namespace annie {
             super();
             this._stage = stage;
         }
-
         /**
          * 开始渲染时执行
          * @method begin
@@ -69,8 +70,8 @@ namespace annie {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
             gl.clear(gl.COLOR_BUFFER_BIT);
+            s._maskObjList = [];
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -78,7 +79,28 @@ namespace annie {
          * @public
          * @since 1.0.2
          */
-        public beginMask(target: any):void {
+        public beginMask(target: any): void {
+            //更新缓冲模板
+            var s = this;
+            var gl = s._gl;
+            gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
+            gl.viewport(0,0,1024,1024);
+            gl.disable(gl.BLEND);
+            if (s._maskObjList.length == 0) {
+                gl.clearColor(0.0, 1.0, 1.0, 0.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
+                gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
+            }
+            //告诉shader这个时候是画遮罩本身的帧缓冲
+            gl.uniform1i(s._uMask, 1000);
+            s.draw(target, 1);
+            gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            s._maskObjList.push(target);
+            gl.uniform1i(s._uMask, s._maskObjList.length);
+            gl.viewport(0,0,s._dW,s._dH);
+            gl.enable(gl.BLEND);
 
         }
         /**
@@ -88,6 +110,25 @@ namespace annie {
          * @since 1.0.2
          */
         public endMask(): void {
+            var s = this;
+            var len = s._maskObjList.length;
+            var gl = s._gl;
+            if (len > 0) {
+                //更新缓冲模板
+                gl.disable(gl.BLEND);
+                gl.viewport(0,0,1024,1024);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
+                gl.uniform1i(s._uMask, -1000);
+                s.draw(s._maskObjList[len - 1], 1);
+                gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
+                gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                s._maskObjList.pop();
+                gl.viewport(0,0,s._dW,s._dH);
+                gl.enable(gl.BLEND);
+
+            }
+            gl.uniform1i(s._uMask, s._maskObjList.length);
 
         }
 
@@ -115,7 +156,7 @@ namespace annie {
                 ]
             );
         }
-        private _getShader(id: number){
+        private _getShader(id: number) {
             var s = this;
             var gl = s._gl;
             // Find the shader script element
@@ -123,13 +164,32 @@ namespace annie {
             // Create the shader object instance
             var shader: any = null;
             if (id == 0) {
-                shaderText = 'precision highp float;' +
+                 shaderText = 'precision highp float;' +
                     'varying vec2 v_TC;' +
+                    'varying vec2 v_MP;' +
                     'uniform sampler2D u_texture;' +
+                    'uniform sampler2D u_maskTexture;' +
                     'uniform float u_A;' +
-                    'varying float v_A;'+
+                    'uniform int u_Mask;' +
                     'void main() {' +
-                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
+                        'if(u_Mask==0){' +
+                            'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
+                        '}else if(u_Mask==1000){' +
+                             'vec4 textColor = texture2D(u_texture, v_TC);' +
+                             'gl_FragColor = texture2D(u_maskTexture, v_MP);' +
+                             'if(textColor.a==1.0){gl_FragColor.r+=0.05;gl_FragColor.a=1.0;}' +
+                        '}else if(u_Mask==-1000){' +
+                             'vec4 textColor = texture2D(u_texture, v_TC);' +
+                             'gl_FragColor = texture2D(u_maskTexture, v_MP);' +
+                             'if(textColor.a==1.0){gl_FragColor.r-=0.05;if(gl_FragColor.r==0.0){gl_FragColor.a=0.0;}}' +
+                        '}else{' +
+                            'vec4 textColor=texture2D(u_maskTexture, v_MP);' +
+                            'float maskStep=0.0;' +
+                            'if(int(textColor.r*20.0)==u_Mask){' +
+                                'maskStep=textColor.a;'+
+                             '}' +
+                            'gl_FragColor = texture2D(u_texture, v_TC)*u_A*maskStep;' +
+                        '}' +
                     '}';
                 shader = gl.createShader(gl.FRAGMENT_SHADER);
             }
@@ -138,10 +198,12 @@ namespace annie {
                     'attribute vec2 a_P;' +
                     'attribute vec2 a_TC;' +
                     'varying vec2 v_TC;' +
+                    'varying vec2 v_MP;' +
                     'uniform mat3 vMatrix;' +
                     'uniform mat3 pMatrix;' +
                     'void main() {' +
                     'gl_Position =vec4((pMatrix*vMatrix*vec3(a_P, 1.0)).xy, 1.0, 1.0);' +
+                    'v_MP=(gl_Position.xy+vec2(1.0,1.0))*0.5;' +
                     'v_TC = a_TC;' +
                     '}';
                 shader = gl.createShader(gl.VERTEX_SHADER);
@@ -153,7 +215,6 @@ namespace annie {
             gl.attachShader(s._program, shader);
             return shader;
         }
-
         /**
          * 初始化渲染器
          * @public
@@ -181,28 +242,32 @@ namespace annie {
             //改变y轴方向,以对应纹理坐标
             //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
             //设置支持有透明度纹理
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
             //取消深度检测
             gl.disable(gl.DEPTH_TEST);
             //开启混合模式
             gl.enable(gl.BLEND);
             gl.disable(gl.CULL_FACE);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-            //新建缓存
+            // 新建缓存
             s._buffer = gl.createBuffer();
             //
             s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
             s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
-            s._uA=gl.getUniformLocation(s._program, 'u_A');
+            s._uA = gl.getUniformLocation(s._program, 'u_A');
+            s._uMask = gl.getUniformLocation(s._program, 'u_Mask');
             //
             s._cM = new annie.Matrix();
             s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
+            s._uniformMaskTexture = gl.getUniformLocation(s._program, "u_maskTexture");
             s._posAttr = gl.getAttribLocation(s._program, "a_P");
             s._textAttr = gl.getAttribLocation(s._program, "a_TC");
             gl.enableVertexAttribArray(s._posAttr);
             gl.enableVertexAttribArray(s._textAttr);
+            s.initMaskBuffer();
         }
+
         private setBuffer(buffer: any, data: any): void {
             var s = this;
             var gl = s._gl;
@@ -210,68 +275,8 @@ namespace annie {
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
             //将buffer赋值给一变量
-            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4*4, 0);
-            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4*4, 4*2);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        }
-        private setTexture(img: any): void {
-            var s = this;
-            var images = s._images;
-            var gl = s._gl;
-            //一般打上这种标签的都不是雪碧图，强行在第一通道上更新
-            var imagesCount: number = images.length;
-            var updateTexture: boolean = true;
-            if(imagesCount == 0) {
-                s._currentTextureId = 0;
-            }else {
-                for (var i = 0; i < imagesCount; i++) {
-                    if (img == images[i]) {
-                        if (!img.glUpdate) {
-                            //不需要更新纹理
-                            updateTexture = false;
-                        }
-                        s._currentTextureId=i;
-                        break;
-                    }
-                }
-                if (updateTexture) {
-                    if (s._currentTextureId < s._maxTextureCount - 1) {
-                        s._currentTextureId++;
-                    } else {
-                        s._currentTextureId = 1;
-                    }
-                }
-            }
-            //这里一定要再判断一次
-            if(img.glUpdate){
-                //需要更新纹理
-                img.glUpdate=false;
-                s._currentTextureId=0;
-                updateTexture = true;
-            }
-            gl.activeTexture(gl["TEXTURE" + s._currentTextureId]);
-            if (updateTexture) {
-                var t: any;
-                if (!s._textures[s._currentTextureId]){
-                    //如果不存在就建
-                    t = gl.createTexture();
-                    s._textures[s._currentTextureId] = t;
-                    gl.bindTexture(gl.TEXTURE_2D, t);
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-                    //设置贴图信息
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                    images[s._currentTextureId] = img;
-                } else {
-                    //如果存在就换
-                    t = s._textures[s._currentTextureId];
-                    gl.bindTexture(gl.TEXTURE_2D, t);
-                }
-            }
-            gl.uniform1i(s._uniformTexture, s._currentTextureId);
-            gl.bindTexture(gl.TEXTURE_2D, null);
+            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
+            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
         }
         /**
          *  调用渲染
@@ -283,34 +288,32 @@ namespace annie {
          */
         public draw(target: any, type: number): void {
             var s = this;
+            if (!target._cacheImg || (target._cacheImg.nodeName == "IMG" && !target._cacheImg.complete))return;
             var gl = s._gl;
             var gi: any = target._glInfo;
             ////////////////////////////////////////////
             var vertices =
                 [
                     //x,y,textureX,textureY
-                    0.0, 0.0,gi.x, gi.y,
-                    gi.pw, 0.0,gi.w, gi.y,
-                    0.0, gi.ph,gi.x, gi.h,
-                    gi.pw, gi.ph,gi.w, gi.h
+                    0.0, 0.0, gi.x, gi.y,
+                    gi.pw, 0.0, gi.w, gi.y,
+                    0.0, gi.ph, gi.x, gi.h,
+                    gi.pw, gi.ph, gi.w, gi.h
                 ];
-            //绑定buffer
-            s.setBuffer(s._buffer, new Float32Array(vertices));
             var img = target._cacheImg;
-            s.setTexture(img);
             var m: any;
-            if (img._annieType>0) {
+            if (img._annieType > 0) {
                 m = s._cM;
                 m.identity();
-                if(img._annieType==2){
-                    m.tx = target._cacheX*2;
-                    m.ty = target._cacheY*2;
-                }else{
+                if (img._annieType == 2) {
+                    m.tx = target._cacheX * 2;
+                    m.ty = target._cacheY * 2;
+                } else {
                     m.tx = -img.width;
                     m.ty = -img.height;
                 }
                 m.prepend(target.cMatrix);
-            }else {
+            } else {
                 m = target.cMatrix;
             }
             var vMatrix: any = new Float32Array(
@@ -319,10 +322,115 @@ namespace annie {
                     m.c, m.d, 0,
                     m.tx, m.ty, 1
                 ]);
-            gl.uniform1f(s._uA,target.cAlpha);
+            s.activeTexture(img.texture,0);
+            gl.uniform1i(s._uniformTexture, 0);
+            s.activeTexture(s._maskTexture,1);
+            gl.uniform1i(s._uniformMaskTexture, 1);
+            s.setBuffer(s._buffer, new Float32Array(vertices));
+            gl.uniform1f(s._uA, target.cAlpha);
             gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            gl.flush();
+        }
+        private initMaskBuffer(): void {
+            var s = this;
+            s._maskFbo = s.createFramebuffer(1024,1024);
+            s._maskSrcTexture=s._maskFbo.texture;
+            s._maskTexture=s.createTexture(null,1024,1024);
+        }
+        public createTexture(bitmapData:any=null,width:number=1,height:number=1):WebGLTexture{
+            var gl = this._gl;
+            var texture:any = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            var b:any=bitmapData;
+            var h:number,w:number;
+            if(bitmapData) {
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+                w=bitmapData.width;
+                h=bitmapData.height;
+            }else{
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                w=width;
+                h=height;
+            }
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            texture.bitmapData=b;
+            texture.width=w;
+            texture.height=h;
+            gl.bindTexture(gl.TEXTURE_2D, null);
+            return texture;
+        }
+        public updateTexture(texture:WebGLTexture,bitmapData:any):void{
+            var s=this;
+            var gl=s._gl;
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+            gl.bindTexture(gl.TEXTURE_2D, null);
+        }
+        public createFramebuffer(width:number,height:number):WebGLFramebuffer{
+            var s=this;
+            var gl=s._gl;
+            var fb:any = gl.createFramebuffer();
+            fb.width=width;
+            fb.height=height;
+            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+            var texture = s.createTexture(null,width,height);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+            fb.texture=texture;
+            gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+            return fb;
+        }
+        public activeTexture(texture:WebGLTexture,id:number=0):void{
+            var s=this;
+            var gl=s._gl;
+            gl.activeTexture(gl["TEXTURE"+id]);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+        }
+        /**
+         * 设置webgl要渲染的东西
+         * @method _setGlInfo
+         * @param target
+         * @param type
+         * @private
+         */
+        public static setDisplayInfo(target:any,type:number):void{
+            //判断是不是webgl渲染模式
+            if(!target.stage||target.stage.renderType!=1)return;
+            if(target.stage) {
+                var gi: any = target._glInfo;
+                var renderObj:any=target.stage.renderObj;
+                var tc: Rectangle = target.rect;
+                var img: any = target._cacheImg;
+                if (tc) {
+                    gi.x = tc.x / img.width;
+                    gi.y = tc.y / img.height;
+                    gi.w = (tc.x + tc.width) / img.width;
+                    gi.h = (tc.y + tc.height) / img.height;
+                    gi.pw = tc.width;
+                    gi.ph = tc.height;
+                } else {
+                    var cX: number = target._cacheX;
+                    var cY: number = target._cacheY;
+                    gi.x = cX / img.width;
+                    gi.y = cY / img.height;
+                    gi.w = (img.width - cX) / img.width;
+                    gi.h = (img.height - cY) / img.height;
+                    gi.pw = (img.width - cX*2);
+                    gi.ph = (img.height - cY*2);
+                    //因为不是雪碧图有可能中途更新了效果，但引用没变，所以需要标记告诉webgl需要更新纹理
+                    img._annieType=type;
+                    if(img.texture){
+                        renderObj.updateTexture(img.texture,img);
+                    }
+                }
+            }
+            if(!img.texture){
+                img.texture=renderObj.createTexture(img);
+            }
         }
     }
 }

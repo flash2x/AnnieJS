@@ -357,8 +357,7 @@ namespace annie {
          */
         public beginRadialGradientFill = function(colors:Array<string>, ratios:Array<number>, points:Array<number>){
             this._fill(Shape.getGradientColor(colors,ratios,points));
-        }
-
+        };
         /**
          * 位图填充 一般给Flash2x用
          * @method beginBitmapFill
@@ -420,7 +419,6 @@ namespace annie {
         public beginRadialGradientStroke = function(colors:Array<string>, ratios:Array<number>,points:Array<number>,lineWidth:number=1) {
             this._stroke(Shape.getGradientColor(colors,ratios,points),lineWidth);
         }
-
         /**
          * 线条位图填充 一般给Flash2x用
          * @method beginBitmapStroke
@@ -452,10 +450,10 @@ namespace annie {
          * @since 1.0.0
          */
         public endFill():void {
-            var s=this;
-            var c=s._command;
-            var m=s._isBitmapFill;
-            if(m){
+                var s=this;
+                var c=s._command;
+                var m=s._isBitmapFill;
+                if(m){
                 //c.push([1, "save", []]);
                 c.push([2, "setTransform", [m.a,m.b,m.c,m.d,m.tx,m.ty]]);
             }
@@ -819,7 +817,7 @@ namespace annie {
                     s._cacheY=0;
                 }
                 s._isNeedUpdate = false;
-                DisplayObject._setGlInfo(s,1);
+                WGRender.setDisplayInfo(s,1);
             }
         }
         /*private _drawPath(){

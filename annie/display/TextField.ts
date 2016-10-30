@@ -16,7 +16,7 @@ namespace annie {
         private _cacheImg:any=window.document.createElement("canvas");
         private _cacheX:number = 0;
         private _cacheY:number = 0;
-        private _cacheObject:any ={bold:false,italic:false,size:12,lineType:"single",text:"",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
+        private _cacheObject:any ={bold:false,italic:false,size:12,lineType:"single",text:"ILoveAnnie",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
         /**
          * 文本的对齐方式
          * @property textAlign
@@ -178,13 +178,8 @@ namespace annie {
                     s._isNeedUpdate=true;
                 }
             }
-            if (s._isNeedUpdate){
+            if(s._isNeedUpdate){
                 s.text+="";
-                if(s.text==undefined||s.text.length==0){
-                    s._cacheImg.src="";
-                    s._isNeedUpdate=false;
-                    return;
-                }
                 var can=s._cacheImg;
                 var ctx = can.getContext("2d");
                 var hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
@@ -292,15 +287,13 @@ namespace annie {
                         trace(s["cFilters"][i].type);
                     }
                     ctx.putImageData(imageData,0,0);
-
                 }
                 s._cacheX=-10;
                 s._cacheY=-10;
                 s._isNeedUpdate = false;
-                DisplayObject._setGlInfo(s,2);
+                WGRender.setDisplayInfo(s,2);
             }
         }
-
         /**
          * 重写 getBounds
          * @method getBounds

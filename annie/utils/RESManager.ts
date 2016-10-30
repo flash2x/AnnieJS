@@ -402,18 +402,26 @@ namespace annie {
          * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
          */
         function sb(sceneName:string,bitmapName:string):annie.Bitmap{
-            var bitmap:annie.Bitmap=null;
             var sbName:string="_f2x_s"+bitmapName;
             if(res[sceneName][sbName]){
-                bitmap=res[sceneName][sbName];
+                return res[sceneName][sbName];
             }else{
-                bitmap=b(sceneName,bitmapName);
-                if(bitmap&&bitmap.rect) {
-                    //从SpriteSheet中取出Image单独存放
-                    res[sceneName][sbName]=bitmap=annie.Bitmap.convertToImage(bitmap);
+                var bitmapData:any=null;
+                var bitmap=b(sceneName,bitmapName);
+                if(bitmap) {
+                    if(bitmap.rect){
+                        //从SpriteSheet中取出Image单独存放
+                        bitmapData=annie.Bitmap.convertToImage(bitmap);
+                    }else{
+                        bitmapData=bitmap.bitmapData;
+                    }
+                    res[sceneName][sbName]=bitmapData;
+                    return bitmapData;
+                }else{
+                    trace("error:矢量位图填充时,未找到位图资源!");
+                    return null;
                 }
             }
-            return bitmap;
         }
         /**
          * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用

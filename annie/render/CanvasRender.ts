@@ -117,8 +117,9 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
-        public draw(target:any, type:number):void {
+        public draw(target:any, type:number):void{
             var s = this;
+            if(!target._cacheImg||(target._cacheImg.nodeName=="IMG"&&!target._cacheImg.complete))return;
             //s._ctx.save();
             s._ctx.globalAlpha = target.cAlpha;
             var tm=target.cMatrix;

@@ -259,18 +259,18 @@ namespace annie {
                 }else{
                     s.dispatchEvent(new annie.Event("onInitStage"));
                 }
-                var rc = s.renderObj.rootContainer;
-                var mouseEvent=s.onMouseEvent.bind(s);
-                if (osType != "pc") {
-                    rc.addEventListener("touchstart", mouseEvent);
-                    rc.addEventListener('touchmove', mouseEvent);
-                    rc.addEventListener('touchend', mouseEvent);
-                } else {
-                    rc.addEventListener("mousedown", mouseEvent);
-                    rc.addEventListener('mousemove',mouseEvent);
-                    rc.addEventListener('mouseup', mouseEvent);
-                }
             }, 100);
+            var rc = s.renderObj.rootContainer;
+            var mouseEvent=s.onMouseEvent.bind(s);
+            if (osType != "pc") {
+                rc.addEventListener("touchstart", mouseEvent);
+                rc.addEventListener('touchmove', mouseEvent);
+                rc.addEventListener('touchend', mouseEvent);
+            } else {
+                rc.addEventListener("mousedown", mouseEvent);
+                rc.addEventListener('mousemove',mouseEvent);
+                rc.addEventListener('mouseup', mouseEvent);
+            }
         }
         /**
          * 刷新函数

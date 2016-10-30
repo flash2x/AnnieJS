@@ -107,6 +107,7 @@ namespace annie {
             super.update();
             //滤镜
             if(s._isNeedUpdate){
+                if(!s.bitmapData||(s.bitmapData.nodeName=="IMG"&&!s.bitmapData.complete))return;
                 if (s["cFilters"] && s["cFilters"].length > 0) {
                     if(!s._realCacheImg){
                         s._realCacheImg=window.document.createElement("canvas");
@@ -166,7 +167,7 @@ namespace annie {
                 }
                 //给webgl更新新
                 s._isNeedUpdate = false;
-                DisplayObject._setGlInfo(s,0);
+                WGRender.setDisplayInfo(s,0);
             }
         }
         /**
@@ -199,6 +200,7 @@ namespace annie {
          * @return {Image}
          */
         public static convertToImage(bitmap:annie.Bitmap):any{
+            if(!bitmap.bitmapData||(bitmap.bitmapData.nodeName=="IMG"&&!bitmap.bitmapData.complete))return;
             if(!bitmap.rect){
                 return bitmap.bitmapData;
             }else{

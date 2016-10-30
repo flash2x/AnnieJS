@@ -14,7 +14,7 @@ namespace annie {
         /**
          * @param type text json js xml image sound css svg video unKnow
          */
-        public constructor() {
+        public constructor(){
             super();
         }
         /**
@@ -135,7 +135,8 @@ namespace annie {
                                     item.load();
                                     item.onloadeddata = function (){
                                         if(isBlob) {
-                                            URL.revokeObjectURL(item.src);
+                                            //执行下面的代码android有问题，会闪退
+                                            //URL.revokeObjectURL(item.src);
                                         }
                                         item.onloadeddata = null;
                                     };
@@ -143,8 +144,8 @@ namespace annie {
                                 try{
                                     item.src = URL.createObjectURL(result);
                                 }catch(err){
-                                    item.src = s.url;
                                     isBlob=false;
+                                    item.src = s.url;
                                 }
                                 break;
                             case "json":
@@ -200,8 +201,6 @@ namespace annie {
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
-
-
         }
         /**
          * 后台返回来的数据类弄

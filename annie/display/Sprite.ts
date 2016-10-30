@@ -321,6 +321,7 @@ namespace annie {
                                 //就是检测遮罩是否被更新过。因为动画遮罩反复更新的话他会播放同一次渲染要确定只能更新一回。
                                 if (maskObjIds.indexOf(mId) < 0) {
                                     maskObj.parent=s;
+                                    maskObj.stage=s.stage;
                                     if(s.totalFrames&&maskObj.totalFrames) {
                                         maskObj.gotoAndStop(s.currentFrame);
                                     }
@@ -339,6 +340,7 @@ namespace annie {
                             var mId:number = maskObj.getInstanceId();
                             if (maskObjIds.indexOf(mId) < 0) {
                                 maskObj.parent=s;
+                                maskObj.stage=s.stage;
                                 if(s.totalFrames&&maskObj.totalFrames) {
                                     maskObj.gotoAndStop(s.currentFrame);
                                 }

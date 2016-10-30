@@ -1055,14 +1055,6 @@ declare namespace annie {
          */
         static _canvas: any;
         _glInfo: any;
-        /**
-         * 设置webgl要渲染的东西
-         * @method _setGlInfo
-         * @param target
-         * @param type
-         * @private
-         */
-        static _setGlInfo(target: any, type: number): void;
     }
 }
 /**
@@ -2164,15 +2156,6 @@ declare namespace annie {
          * @param {Object} attr
          */
         setFrameChild(child: any, attr: any): void;
-        /**
-         * 如果你需要动态改变一个子对象的动画属性后又想恢复其他原有的导出动画,调用此方法也可以只恢复部分属性动画
-         * @method delFrameChild
-         * @public
-         * @since 1.0.0
-         * @param {annie.DisplayObject}  child 要恢复其动画属性的子对象
-         * @param {Object} attr 对象的相关属性的对象
-         */
-        delFrameChild(child: any, attr: any): void;
         /**
          * 重写刷新
          * @method update
@@ -3359,14 +3342,17 @@ declare namespace annie {
         private _pMI;
         private _vMI;
         private _uA;
+        private _uMask;
         private _cM;
-        private _currentTextureId;
-        private _textures;
-        private _images;
         private _maxTextureCount;
         private _uniformTexture;
+        private _uniformMaskTexture;
         private _posAttr;
         private _textAttr;
+        private _maskFbo;
+        private _maskObjList;
+        private _maskTexture;
+        private _maskSrcTexture;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -3412,7 +3398,6 @@ declare namespace annie {
          */
         init(): void;
         private setBuffer(buffer, data);
-        private setTexture(img);
         /**
          *  调用渲染
          * @public
@@ -3422,6 +3407,19 @@ declare namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         draw(target: any, type: number): void;
+        private initMaskBuffer();
+        createTexture(bitmapData?: any, width?: number, height?: number): WebGLTexture;
+        updateTexture(texture: WebGLTexture, bitmapData: any): void;
+        createFramebuffer(width: number, height: number): WebGLFramebuffer;
+        activeTexture(texture: WebGLTexture, id?: number): void;
+        /**
+         * 设置webgl要渲染的东西
+         * @method _setGlInfo
+         * @param target
+         * @param type
+         * @private
+         */
+        static setDisplayInfo(target: any, type: number): void;
     }
 }
 /**
@@ -4136,7 +4134,7 @@ declare namespace annie {
  * @static
  * @example trace(1);trace(1,"hello");
  */
-declare var trace: any;
+declare var trace: (...arg: any[]) => void;
 /**
  * 全局事件触发器
  * @static

@@ -30,11 +30,11 @@ namespace annieUI
                 s.maskObj.beginFill("#000000");
                 if(s.maskType==0) {
                     s.bitmap.scaleX=s.bitmap.scaleY=s.radio*2/s.photo.width;
-                    s.maskObj.circle(s.radio, s.radio, s.radio);
+                    s.maskObj.drawCircle(s.radio, s.radio, s.radio);
                 }else{
                     var w=s.photo.width>s.photo.height?s.photo.width:s.photo.height;
                     s.bitmap.scaleX=s.bitmap.scaleY=s.radio/w;
-                    s.maskObj.rect(0,0,s.radio,s.radio);
+                    s.maskObj.drawRect(0,0,s.radio,s.radio);
                 }
                 s.maskObj.endFill();
             };
@@ -46,7 +46,6 @@ namespace annieUI
         private maskType:number=0;
         private radio:number;
         private maskObj:Shape;
-
         /**
          * 被始化头像
          * @method init

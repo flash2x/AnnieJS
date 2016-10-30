@@ -44,7 +44,8 @@ namespace annie {
             } else {
                 s.media = src;
             }
-            s.media.addEventListener('ended', function () {
+            s._SBWeixin=s._weixinSB.bind(s);
+            s.media.addEventListener('ended', function(){
                 s._loop--;
                 if (s._loop > 0) {
                     s.play(0,s._loop);
@@ -52,12 +53,11 @@ namespace annie {
                     s.media.pause();
                 }
                 s.dispatchEvent("onPlayEnd");
-            }, false);
-            this.type = type.toLocaleUpperCase();
+            }.bind(s), false);
+            s.type = type.toLocaleUpperCase();
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", {currentTime: s.media.currentTime});
             }, false);
-            s._SBWeixin=s._weixinSB.bind(s);
         }
         /**
          * 开始播放媒体

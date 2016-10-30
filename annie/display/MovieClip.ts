@@ -419,7 +419,6 @@ namespace annie {
             }
             s._isUpdateFrame = true;
         }
-
         /**
          * 将播放头跳转到指定帧并从那一帧开始继续播放
          * @method gotoAndPlay
@@ -475,22 +474,9 @@ namespace annie {
         public setFrameChild(child:any, attr:any):void {
             child._donotUpdateinMC = child._donotUpdateinMC || {};
             for (var i in attr) {
-                child._donotUpdateinMC[i] = attr[i];
-            }
-        }
-
-        /**
-         * 如果你需要动态改变一个子对象的动画属性后又想恢复其他原有的导出动画,调用此方法也可以只恢复部分属性动画
-         * @method delFrameChild
-         * @public
-         * @since 1.0.0
-         * @param {annie.DisplayObject}  child 要恢复其动画属性的子对象
-         * @param {Object} attr 对象的相关属性的对象
-         */
-        public delFrameChild(child:any, attr:any):void {
-            child._donotUpdateinMC = child._donotUpdateinMC || {};
-            for (var i = 0; i < attr.length; i++) {
-                if (child._donotUpdateinMC[attr[i]] != undefined) {
+                if(attr[i]!=null) {
+                    child._donotUpdateinMC[i] = attr[i];
+                }else{
                     delete child._donotUpdateinMC[attr[i]];
                 }
             }

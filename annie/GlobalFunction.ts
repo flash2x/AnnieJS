@@ -10,7 +10,11 @@
  * @static
  * @example trace(1);trace(1,"hello");
  */
-var trace =console.log.bind(console);
+var trace = function (...arg:any[]) {
+    for (var i in arguments) {
+        console.log(arguments[i]);
+    }
+};
 /**
  * 全局事件触发器
  * @static
@@ -22,7 +26,7 @@ var trace =console.log.bind(console);
 var globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
 //禁止页面滑动
 document.ontouchmove = function(e){
-    if(!annie.canHTMLTouchMove&&!annie.debug){
+    if(!annie.canHTMLTouchMove||!annie.debug){
         e.preventDefault();
     }
 };
