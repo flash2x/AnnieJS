@@ -175,6 +175,23 @@ namespace annie {
            }
         }
         /**
+         * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
+         * @method getChildIndex
+         * @param {annie.DisplayObject} child 子对象
+         * @pubic
+         * @since 1.0.2
+         * @return {number}
+         */
+        public getChildIndex(child:DisplayObject):number {
+           var len=this.children.length;
+            for(var i:number=0;i<len;i++){
+                if(this.children[i]==child){
+                    return i;
+                }
+            }
+            return -1;
+        }
+        /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
          * @private

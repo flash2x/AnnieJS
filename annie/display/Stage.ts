@@ -92,7 +92,7 @@ namespace annie {
          * @type {number}
          * @readonly
          */
-        public width:number = 320;
+        public width:number = 0;
         /**
          * 舞台的尺寸高,也就是我们常说的设计尺寸
          * @property height
@@ -102,7 +102,7 @@ namespace annie {
          * @type {number}
          * @readonly
          */
-        public height:number = 240;
+        public height:number = 0;
         /**
          * 舞台在当前设备中的真实高
          * @property divHeight
@@ -112,7 +112,7 @@ namespace annie {
          * @type {number}
          * @readonly
          */
-        public divHeight:number = 320;
+        public divHeight:number = 0;
         /**
          * 舞台在当前设备中的真实宽
          * @property divWidth
@@ -122,7 +122,7 @@ namespace annie {
          * @readonly
          * @type {number}
          */
-        public divWidth:number = 240;
+        public divWidth:number = 0;
         /**
          * 舞台的背景色
          * 默认就是透明背景
@@ -246,16 +246,13 @@ namespace annie {
                 //告诉大家我初始化完成
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if(debug&&!Stage._isLoadedVConsole){
-                    var vLoad:URLLoader=new URLLoader();
-                    vLoad.load("libs/vConsole.min.js");
-                    vLoad.addEventListener(annie.Event.COMPLETE,function (e:Event) {
-                        Stage._isLoadedVConsole=true;
-                        /*document.querySelector('head').appendChild(e.data.response);
-                        e.data.response.onload = function () {
-                            s.dispatchEvent(new annie.Event("onInitStage"));
-                        }*/
+                    var script:HTMLScriptElement=document.createElement("script");
+                    script.onload=function () {
                         s.dispatchEvent(new annie.Event("onInitStage"));
-                    });
+                        script.onload=null;
+                    };
+                    document.head.appendChild(script);
+                    script.src="libs/vConsole.min.js";
                 }else{
                     s.dispatchEvent(new annie.Event("onInitStage"));
                 }
@@ -675,10 +672,13 @@ namespace annie {
         public resize = function () {
             var s=this;
             var whObj = s.getRootDivWH(s.rootDiv);
-            s.divHeight = whObj.h;
-            s.divWidth = whObj.w;
-            s.renderObj.reSize();
-            s.setAlign();
+            //这里判断
+            if((s.divWidth+s.divHeight)==0||Math.abs((whObj.h+whObj.w)-(s.divWidth+s.divHeight))<100){
+                s.divHeight = whObj.h;
+                s.divWidth = whObj.w;
+                s.renderObj.reSize();
+                s.setAlign();
+            }
         };
         public getBounds():Rectangle{
             return this.viewRect;

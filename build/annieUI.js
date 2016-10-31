@@ -152,6 +152,15 @@ var annieUI;
             this.paramXY = "y";
             this.stopTimes = -1;
             this.isMouseDown = false;
+            /**
+             * 是否是通过scrollTo方法在滑动中
+             * @property autoScroll
+             * @since 1.0.2
+             * @type {boolean}
+             * @private
+             * @default false;
+             */
+            this.autoScroll = false;
             var s = this;
             s.isVertical = isVertical;
             s.view = new Sprite();
@@ -168,6 +177,8 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view = s.view;
+                if (s.autoScroll)
+                    return;
                 if (!s.isStop) {
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
@@ -250,7 +261,7 @@ var annieUI;
             var s = this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
-            s.maskObj.rect(0, 0, w, h);
+            s.maskObj.drawRect(0, 0, w, h);
             s.viewWidth = w;
             s.viewHeight = h;
             s.maskObj.endFill();
@@ -265,6 +276,8 @@ var annieUI;
         };
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
+            if (s.autoScroll)
+                return;
             var view = s.view;
             if (s.distance < s.maxDistance) {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
@@ -322,6 +335,27 @@ var annieUI;
                     s.stopTimes = -1;
                 }
             }
+        };
+        /**
+         * 滚到指定的坐标位置
+         * @method
+         * @param dis 坐标位置
+         * @param time 滚动需要的时间
+         * @since 1.0.2
+         * @public
+         */
+        ScrollPage.prototype.scrollTo = function (dis, time) {
+            if (time === void 0) { time = 0; }
+            var s = this;
+            s.autoScroll = true;
+            s.isStop = true;
+            s.isMouseDown = false;
+            var obj = {};
+            obj.onComplete = function () {
+                s.autoScroll = false;
+            };
+            obj[s.paramXY] = dis;
+            annie.Tween.to(s.view, time, obj);
         };
         return ScrollPage;
     }(Sprite));

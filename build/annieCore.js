@@ -2942,6 +2942,23 @@ var annie;
             }
         };
         /**
+         * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
+         * @method getChildIndex
+         * @param {annie.DisplayObject} child 子对象
+         * @pubic
+         * @since 1.0.2
+         * @return {number}
+         */
+        Sprite.prototype.getChildIndex = function (child) {
+            var len = this.children.length;
+            for (var i = 0; i < len; i++) {
+                if (this.children[i] == child) {
+                    return i;
+                }
+            }
+            return -1;
+        };
+        /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
          * @private
@@ -3639,6 +3656,20 @@ var annie;
              */
             this._timeline = [];
             /**
+             * 有些时候我们需要在一个时间轴动画类中添加子元素
+             * 在默认情况下，MovieClip只有在停止播放的情况下
+             * 使用addChild等方法添加到mc中的子级对象是可见的
+             * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
+             * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
+             * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
+             * 此container容器会一直在mc的最上层
+             * @since 1.0.2
+             * @public
+             * @property container
+             * @type {annie.Sprite}
+             */
+            this.container = new annie.Sprite();
+            /**
              * mc的当前帧
              * @property currentFrame
              * @public
@@ -4179,6 +4210,7 @@ var annie;
                         }
                     }
                 }
+                s.children.push(s.container);
                 s._isNeedUpdateChildren = false;
                 //update一定要放在事件处理之前
                 var len = lastFrameChildren.length;
@@ -5085,7 +5117,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            this.width = 320;
+            this.width = 0;
             /**
              * 舞台的尺寸高,也就是我们常说的设计尺寸
              * @property height
@@ -5095,7 +5127,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            this.height = 240;
+            this.height = 0;
             /**
              * 舞台在当前设备中的真实高
              * @property divHeight
@@ -5105,7 +5137,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            this.divHeight = 320;
+            this.divHeight = 0;
             /**
              * 舞台在当前设备中的真实宽
              * @property divWidth
@@ -5115,7 +5147,7 @@ var annie;
              * @readonly
              * @type {number}
              */
-            this.divWidth = 240;
+            this.divWidth = 0;
             /**
              * 舞台的背景色
              * 默认就是透明背景
@@ -5283,10 +5315,13 @@ var annie;
             this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize();
-                s.setAlign();
+                //这里判断
+                if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
+                    s.divHeight = whObj.h;
+                    s.divWidth = whObj.w;
+                    s.renderObj.reSize();
+                    s.setAlign();
+                }
             };
             var s = this;
             s.stage = this;
@@ -5332,16 +5367,13 @@ var annie;
                 //告诉大家我初始化完成
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if (annie.debug && !Stage._isLoadedVConsole) {
-                    var vLoad = new annie.URLLoader();
-                    vLoad.load("libs/vConsole.min.js");
-                    vLoad.addEventListener(annie.Event.COMPLETE, function (e) {
-                        Stage._isLoadedVConsole = true;
-                        /*document.querySelector('head').appendChild(e.data.response);
-                        e.data.response.onload = function () {
-                            s.dispatchEvent(new annie.Event("onInitStage"));
-                        }*/
+                    var script = document.createElement("script");
+                    script.onload = function () {
                         s.dispatchEvent(new annie.Event("onInitStage"));
-                    });
+                        script.onload = null;
+                    };
+                    document.head.appendChild(script);
+                    script.src = "libs/vConsole.min.js";
                 }
                 else {
                     s.dispatchEvent(new annie.Event("onInitStage"));
@@ -6705,17 +6737,17 @@ var annie;
             gl.viewport(0, 0, 1024, 1024);
             gl.disable(gl.BLEND);
             if (s._maskObjList.length == 0) {
-                gl.clearColor(0.0, 1.0, 1.0, 0.0);
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
                 gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
                 gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
             }
+            s._maskObjList.push(target);
             //告诉shader这个时候是画遮罩本身的帧缓冲
-            gl.uniform1i(s._uMask, 1000);
+            gl.uniform1i(s._uMask, s._maskObjList.length * 100);
             s.draw(target, 1);
             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            s._maskObjList.push(target);
             gl.uniform1i(s._uMask, s._maskObjList.length);
             gl.viewport(0, 0, s._dW, s._dH);
             gl.enable(gl.BLEND);
@@ -6728,23 +6760,20 @@ var annie;
          */
         WGRender.prototype.endMask = function () {
             var s = this;
-            var len = s._maskObjList.length;
             var gl = s._gl;
-            if (len > 0) {
-                //更新缓冲模板
-                gl.disable(gl.BLEND);
-                gl.viewport(0, 0, 1024, 1024);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
-                gl.uniform1i(s._uMask, -1000);
-                s.draw(s._maskObjList[len - 1], 1);
-                gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
-                gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            var len = s._maskObjList.length;
+            if (len > 1) {
                 s._maskObjList.pop();
-                gl.viewport(0, 0, s._dW, s._dH);
-                gl.enable(gl.BLEND);
+                var mlCopy = s._maskObjList.concat();
+                s._maskObjList.length = 0;
+                for (var i = 0; i < mlCopy.length; i++) {
+                    s.beginMask(mlCopy[i]);
+                }
             }
-            gl.uniform1i(s._uMask, s._maskObjList.length);
+            else {
+                gl.uniform1i(s._uMask, 0);
+                s._maskObjList.length = 0;
+            }
         };
         /**
          * 当舞台尺寸改变时会调用
@@ -6786,18 +6815,20 @@ var annie;
                     'void main() {' +
                     'if(u_Mask==0){' +
                     'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
-                    '}else if(u_Mask==1000){' +
+                    '}else if(u_Mask>=100){' +
                     'vec4 textColor = texture2D(u_texture, v_TC);' +
                     'gl_FragColor = texture2D(u_maskTexture, v_MP);' +
-                    'if(textColor.a==1.0){gl_FragColor.r+=0.05;gl_FragColor.a=1.0;}' +
-                    '}else if(u_Mask==-1000){' +
-                    'vec4 textColor = texture2D(u_texture, v_TC);' +
-                    'gl_FragColor = texture2D(u_maskTexture, v_MP);' +
-                    'if(textColor.a==1.0){gl_FragColor.r-=0.05;if(gl_FragColor.r==0.0){gl_FragColor.a=0.0;}}' +
+                    'if(textColor.a>0.0){if(u_Mask==100){gl_FragColor.r=textColor.a;}else if(u_Mask==200&&gl_FragColor.r>0.0){gl_FragColor.g=textColor.a;}else if(u_Mask==300&&gl_FragColor.r>0.0&&gl_FragColor.g>0.0){gl_FragColor.b=textColor.a;}else if(u_Mask==400&&gl_FragColor.r>0.0&&gl_FragColor.g>0.0&&gl_FragColor.b>0.0){gl_FragColor.a=textColor.a;}}' +
                     '}else{' +
                     'vec4 textColor=texture2D(u_maskTexture, v_MP);' +
                     'float maskStep=0.0;' +
-                    'if(int(textColor.r*20.0)==u_Mask){' +
+                    'if(u_Mask==1){' +
+                    'maskStep=textColor.r;' +
+                    '}else if(u_Mask==2){' +
+                    'maskStep=textColor.g;' +
+                    '}else if(u_Mask==3){' +
+                    'maskStep=textColor.b;' +
+                    '}else if(u_Mask==4){' +
                     'maskStep=textColor.a;' +
                     '}' +
                     'gl_FragColor = texture2D(u_texture, v_TC)*u_A*maskStep;' +
@@ -7013,6 +7044,7 @@ var annie;
          * @param target
          * @param type
          * @private
+         * @since 1.0.2
          */
         WGRender.setDisplayInfo = function (target, type) {
             //判断是不是webgl渲染模式
@@ -7585,10 +7617,20 @@ var annie;
          * @method unLoadScene
          * @public
          * @static
-         * @since 1.0.0
+         * @since 1.0.2
          * @param {string} sceneName
+         * @param {WebGLRenderingContext} 如果是webgl渲染模式，请设置渲染的webgl对象，以方便删除不再需要使用的texture对象
          */
-        function unLoadScene(sceneName) {
+        function unLoadScene(sceneName, gl) {
+            if (gl === void 0) { gl = null; }
+            //删除webgl贴图资源
+            if (gl) {
+                for (var item in res[sceneName]) {
+                    if (res[sceneName][item].nodeName && res[sceneName][item].nodeName == "IMG" && res[sceneName][item].texture) {
+                        gl.deleteTexture(res[sceneName][item].texture);
+                    }
+                }
+            }
             delete res[sceneName];
             var scene = eval(sceneName);
             for (var i in scene) {

@@ -134,6 +134,15 @@ declare namespace annieUI {
         private stopTimes;
         private isMouseDown;
         /**
+         * 是否是通过scrollTo方法在滑动中
+         * @property autoScroll
+         * @since 1.0.2
+         * @type {boolean}
+         * @private
+         * @default false;
+         */
+        private autoScroll;
+        /**
          * 构造函数
          * @method  ScrollPage
          * @param {number}vW 可视区域宽
@@ -160,6 +169,15 @@ declare namespace annieUI {
          */
         private setMask(w, h);
         private onMouseEvent(e);
+        /**
+         * 滚到指定的坐标位置
+         * @method
+         * @param dis 坐标位置
+         * @param time 滚动需要的时间
+         * @since 1.0.2
+         * @public
+         */
+        scrollTo(dis: number, time?: number): void;
     }
 }
 /**

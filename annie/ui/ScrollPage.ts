@@ -136,6 +136,15 @@ namespace annieUI {
         private stopTimes: number = -1;
         private isMouseDown:boolean=false;
         /**
+         * 是否是通过scrollTo方法在滑动中
+         * @property autoScroll
+         * @since 1.0.2
+         * @type {boolean}
+         * @private
+         * @default false;
+         */
+        private autoScroll:boolean=false;
+        /**
          * 构造函数
          * @method  ScrollPage
          * @param {number}vW 可视区域宽
@@ -161,6 +170,7 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view: any = s.view;
+                if(s.autoScroll)return;
                 if (!s.isStop){
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
@@ -206,7 +216,6 @@ namespace annieUI {
                 }
             })
         }
-
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
@@ -237,7 +246,7 @@ namespace annieUI {
             var s:any=this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
-            s.maskObj.rect(0, 0, w, h);
+            s.maskObj.drawRect(0, 0, w, h);
             s.viewWidth = w;
             s.viewHeight = h;
             s.maskObj.endFill();
@@ -249,8 +258,9 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
-        private onMouseEvent(e: annie.MouseEvent): void {
+        private onMouseEvent(e: annie.MouseEvent): void{
             var s = this;
+            if(s.autoScroll)return;
             var view: any = s.view;
             if (s.distance < s.maxDistance) {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
@@ -301,6 +311,27 @@ namespace annieUI {
                     s.stopTimes = -1;
                 }
             }
+        }
+
+        /**
+         * 滚到指定的坐标位置
+         * @method
+         * @param dis 坐标位置
+         * @param time 滚动需要的时间
+         * @since 1.0.2
+         * @public
+         */
+        public scrollTo(dis:number,time:number=0):void{
+            var s=this;
+            s.autoScroll=true;
+            s.isStop=true;
+            s.isMouseDown=false;
+            var obj:any={};
+            obj.onComplete=function () {
+                s.autoScroll=false;
+            };
+            obj[s.paramXY]=dis;
+            annie.Tween.to(s.view,time,obj);
         }
     }
 }

@@ -1614,6 +1614,15 @@ declare namespace annie {
          */
         getChildAt(index: number): annie.DisplayObject;
         /**
+         * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
+         * @method getChildIndex
+         * @param {annie.DisplayObject} child 子对象
+         * @pubic
+         * @since 1.0.2
+         * @return {number}
+         */
+        getChildIndex(child: DisplayObject): number;
+        /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
          * @private
@@ -1928,6 +1937,20 @@ declare namespace annie {
          * @type {Array}
          */
         private _timeline;
+        /**
+         * 有些时候我们需要在一个时间轴动画类中添加子元素
+         * 在默认情况下，MovieClip只有在停止播放的情况下
+         * 使用addChild等方法添加到mc中的子级对象是可见的
+         * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
+         * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
+         * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
+         * 此container容器会一直在mc的最上层
+         * @since 1.0.2
+         * @public
+         * @property container
+         * @type {annie.Sprite}
+         */
+        container: Sprite;
         /**
          * mc的当前帧
          * @property currentFrame
@@ -3418,6 +3441,7 @@ declare namespace annie {
          * @param target
          * @param type
          * @private
+         * @since 1.0.2
          */
         static setDisplayInfo(target: any, type: number): void;
     }
@@ -3548,10 +3572,11 @@ declare namespace annie {
          * @method unLoadScene
          * @public
          * @static
-         * @since 1.0.0
+         * @since 1.0.2
          * @param {string} sceneName
+         * @param {WebGLRenderingContext} 如果是webgl渲染模式，请设置渲染的webgl对象，以方便删除不再需要使用的texture对象
          */
-        function unLoadScene(sceneName: string): void;
+        function unLoadScene(sceneName: string, gl?: WebGLRenderingContext): void;
         /**
          * 获取已经加载场景中的声音或视频资源
          * @method getMediaByName

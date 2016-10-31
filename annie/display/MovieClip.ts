@@ -9,7 +9,7 @@ namespace annie {
         public soundName:string;
         public soundScene:string;
         public soundTimes:number;
-        public constructor() {
+        public constructor(){
             var s = this;
             s.frameChildList = new Array();
             s.keyIndex = 0;
@@ -60,7 +60,20 @@ namespace annie {
          * @type {Array}
          */
         private _timeline:any=[];
-
+        /**
+         * 有些时候我们需要在一个时间轴动画类中添加子元素
+         * 在默认情况下，MovieClip只有在停止播放的情况下
+         * 使用addChild等方法添加到mc中的子级对象是可见的
+         * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
+         * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
+         * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
+         * 此container容器会一直在mc的最上层
+         * @since 1.0.2
+         * @public
+         * @property container
+         * @type {annie.Sprite}
+         */
+        public container:Sprite=new Sprite();
         /**
          * mc的当前帧
          * @property currentFrame
@@ -607,6 +620,7 @@ namespace annie {
                         }
                     }
                 }
+                s.children.push(s.container);
                 s._isNeedUpdateChildren = false;
                 //update一定要放在事件处理之前
                 var len = lastFrameChildren.length;

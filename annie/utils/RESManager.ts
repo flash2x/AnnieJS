@@ -217,10 +217,19 @@ namespace annie {
          * @method unLoadScene
          * @public
          * @static
-         * @since 1.0.0
+         * @since 1.0.2
          * @param {string} sceneName
+         * @param {WebGLRenderingContext} 如果是webgl渲染模式，请设置渲染的webgl对象，以方便删除不再需要使用的texture对象
          */
-        export function unLoadScene(sceneName:string):void{
+        export function unLoadScene(sceneName:string,gl:WebGLRenderingContext=null):void{
+            //删除webgl贴图资源
+            if(gl) {
+                for (var item in res[sceneName]) {
+                    if (res[sceneName][item].nodeName && res[sceneName][item].nodeName == "IMG" && res[sceneName][item].texture) {
+                        gl.deleteTexture(res[sceneName][item].texture);
+                    }
+                }
+            }
             delete res[sceneName];
             var scene:any = eval(sceneName);
             for (var i in scene) {
