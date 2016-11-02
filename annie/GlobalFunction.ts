@@ -8,7 +8,9 @@
  * @since 1.0.0
  * @public
  * @static
- * @example trace(1);trace(1,"hello");
+ * @example
+ *      trace(1);
+ *      trace(1,"hello");
  */
 var trace = function (...arg:any[]) {
     for (var i in arguments) {
@@ -22,6 +24,17 @@ var trace = function (...arg:any[]) {
  * @type {annie.EventDispatcher}
  * @public
  * @since 1.0.0
+ * @example
+ *      //A代码放到任何合适的地方
+ *      globalDispatcher.addEventListener("myTest",function(e){
+ *          trace("收到了其他地方发来的消息:"+e.data);
+ *      });
+ *
+ *      //B代码放到任何一个可以点击的对象的构造函数中
+ *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
+ *          globalDispatcher.dispatchEvent("myTest","我是小可");
+ *      });
+ *
  */
 var globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
 //禁止页面滑动

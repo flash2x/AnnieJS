@@ -62,6 +62,8 @@ namespace annie {
          * @type {annie.Rectangle}
          * @default {x:0,y:0,width:0,height:0}
          * @readonly
+         * @example
+         *      //始终让一个对象顶对齐，或者
          */
         public viewRect:Rectangle = new Rectangle();
         /**
@@ -146,6 +148,21 @@ namespace annie {
          * @since 1.0.0
          * @default "onScale"
          * @type {string}
+         * @example
+         *      //动态更改stage的对齐方式示例
+         *      //以下代码放到一个舞台的显示对象的构造函数中
+         *      var s=this;
+         *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+         *          var i=0;
+         *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+         *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+         *              var state=e.currentTarget;
+         *              state.scaleMode=aList[i];
+         *              state.resize();
+         *              if(i>5){i=0;}
+         *          }
+         *      }
+         *
          */
         public scaleMode:string = "onScale";
         /**

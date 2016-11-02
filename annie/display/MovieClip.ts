@@ -128,6 +128,8 @@ namespace annie {
         //private _isOnStage:boolean=false;
         public constructor() {
             super();
+            var s=this;
+            s.addChild(s.container);
         }
         /**
          * 调用止方法将停止当前帧
@@ -562,7 +564,7 @@ namespace annie {
                 var lastFrameChildren = s.children;
                 var i:number;
                 var frameEvents:any = [];
-                for (i = 0; i < s.children.length; i++) {
+                for (i = 0; i < s.children.length-1; i++) {
                     lastFrameChildren[i].parent = null;
                 }
                 s.children = [];
@@ -620,7 +622,6 @@ namespace annie {
                         }
                     }
                 }
-                s.children.push(s.container);
                 s._isNeedUpdateChildren = false;
                 //update一定要放在事件处理之前
                 var len = lastFrameChildren.length;
@@ -631,6 +632,7 @@ namespace annie {
                         lastFrameChildren[i].parent=null;
                     }
                 }
+                s.children.push(s.container);
                 super.update();
                 //看看是否到了第一帧，或是最后一帧,如果是准备事件
                 if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {

@@ -9,6 +9,9 @@ namespace annie {
      * @public
      * @property debug
      * @type {boolean}
+     * @example
+     *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
+     *      annie.debug=true;
      */
     export var debug:boolean=false;
     /**
@@ -17,6 +20,9 @@ namespace annie {
      * @since 1.0.1
      * @property version
      * @type {string}
+     * @example
+     *      //打印当前引擎的版本号
+     *      trace(annie.version);
      */
     export var version:string="1.0.2";
     /**
@@ -26,6 +32,9 @@ namespace annie {
      * @since 1.0.0
      * @public
      * @static
+     * @example
+     *      //打印当前设备的retina值
+     *      trace(annie.devicePixelRatio);
      */
     export var devicePixelRatio:number = window.devicePixelRatio ? window.devicePixelRatio : 1;
     /**
@@ -35,6 +44,9 @@ namespace annie {
      * @public
      * @type {string|string}
      * @static
+     * @example
+     *      //获取当前设备类型
+     *      trace(annie.osType);
      */
     export var osType:string = (function (){
         var n = navigator.userAgent.toLocaleLowerCase();
@@ -61,6 +73,21 @@ namespace annie {
      * @public
      * @since 1.0.0
      * @static
+     * @example
+     *      //动态更改stage的对齐方式示例
+     *      //以下代码放到一个舞台的显示对象的构造函数中
+     *      var s=this;
+     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+     *          var i=0;
+     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              var state=e.currentTarget;
+     *              state.scaleMode=aList[i];
+     *              state.resize();
+     *              if(i>5){i=0;}
+     *          }
+     *      }
+     *
      */
     export var StageScaleMode:{EXACT_FIT:string,NO_BORDER:string,NO_SCALE:string,SHOW_ALL:string,FIXED_WIDTH:string,FIXED_HEIGHT:string} = {
         EXACT_FIT: "exactFit",
@@ -71,25 +98,18 @@ namespace annie {
         FIXED_HEIGHT:"fixedHeight"
     }
     /**
-     * @property annie.version
-     * @public
-     * @static
-     * @since 1.0.0
-     * @type {string}
-     */
-    export var version:string="1.0.0";
-    /**
      * 跳转到指定网址
      * @method navigateToURL
      * @public
      * @since 1.0.0
      * @param {string} url
      * @static
+     * @example
+     *      annie.navigateToURL("http://www.annie2x.com");
      */
     export function navigateToURL(url:string):void {
         window.location.href = url;
     }
-
     /**
      * 向后台发送数据,但不会理会任何的后台反馈
      * @method sendToURL
@@ -97,6 +117,8 @@ namespace annie {
      * @since 1.0.0
      * @param {string} url
      * @static
+     * @example
+     *      annie.sendToURL("http://www.annie2x.com");
      */
     export function sendToURL(url:string):void {
         var req = new XMLHttpRequest();

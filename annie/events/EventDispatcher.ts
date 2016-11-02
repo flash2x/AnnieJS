@@ -5,6 +5,7 @@ namespace annie {
     /**
      * annie引擎类的基类
      * @class annie.AObject
+     * @since 1.0.0
      */
     export class AObject {
         private _id:number = 0;
@@ -18,13 +19,16 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @returns {number}
+         * @example
+         *      //获取 annie引擎类对象唯一码
+         *      trace(this.getInstanceId());
          */
         public getInstanceId():number {
             return this._id;
         }
     }
     /**
-     * 事件触发类
+     * 事件触发基类
      * @class annie.EventDispatcher
      * @extends annie.AObject
      * @public
@@ -79,12 +83,7 @@ namespace annie {
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @example
-         *      //1.使用类实例方法作为侦听函数:
-         *       this.addEventListener(annie.MouseEvent.MOUSE_UP,this.onMouseUp.bind(this));
-         *      //2.使用匿名方法作为侦听函数:
-         *      this.addEventListener(annie.MouseEvent.MOUSE_UP,function(e){...};
-         *      //2.使用有名方法作为侦听函数:t
-         *      his.addEventListener(annie.MouseEvent.MOUSE_UP,funName);
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
         public addEventListener(type:string,listener:Function):void {
             if(!type){

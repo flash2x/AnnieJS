@@ -54,7 +54,6 @@ namespace annie {
          * @default 0
          */
         public videoType:number=0;
-
         /**
          * 重写update
          * @method update

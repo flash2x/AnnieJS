@@ -40,7 +40,8 @@ var coreList =[
 var uiList=[
     "build/annieCore.d.ts",
     "annie/ui/scrollPage.ts",
-    "annie/ui/FacePhoto.ts"
+    "annie/ui/FacePhoto.ts",
+    "annie/ui/SlidePage.ts"
 ];
 var onBuildCore = function(){
     var op = {

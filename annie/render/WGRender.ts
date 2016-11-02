@@ -170,25 +170,25 @@ namespace annie {
                     'uniform int u_Mask;' +
                     'void main() {' +
                     'if(u_Mask==0){' +
-                        'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
+                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
                     '}else if(u_Mask>=100){' +
-                        'vec4 textColor = texture2D(u_texture, v_TC);' +
-                        'gl_FragColor = texture2D(u_maskTexture, v_MP);' +
-                        'if(textColor.a>0.0){if(u_Mask==100){gl_FragColor.r=textColor.a;}else if(u_Mask==200&&gl_FragColor.r>0.0){gl_FragColor.g=textColor.a;}else if(u_Mask==300&&gl_FragColor.r>0.0&&gl_FragColor.g>0.0){gl_FragColor.b=textColor.a;}else if(u_Mask==400&&gl_FragColor.r>0.0&&gl_FragColor.g>0.0&&gl_FragColor.b>0.0){gl_FragColor.a=textColor.a;}}' +
+                    'vec4 textColor = texture2D(u_texture, v_TC);' +
+                    'gl_FragColor = texture2D(u_maskTexture, v_MP);' +
+                    'if(textColor.a>0.0){if(u_Mask==100){gl_FragColor.r=textColor.a;}else if(u_Mask==200&&gl_FragColor.r>0.0){gl_FragColor.g=textColor.a;}else if(u_Mask==300&&gl_FragColor.r>0.0&&gl_FragColor.g>0.0){gl_FragColor.b=textColor.a;}else if(u_Mask==400&&gl_FragColor.r>0.0&&gl_FragColor.g>0.0&&gl_FragColor.b>0.0){gl_FragColor.a=textColor.a;}}' +
                     '}else{' +
-                        'vec4 textColor=texture2D(u_maskTexture, v_MP);' +
-                        'float maskStep=0.0;' +
-                        'if(u_Mask==1){' +
-                        'maskStep=textColor.r;' +
-                        '}else if(u_Mask==2){' +
-                        'maskStep=textColor.g;' +
-                        '}else if(u_Mask==3){' +
-                        'maskStep=textColor.b;' +
-                        '}else if(u_Mask==4){' +
-                        'maskStep=textColor.a;' +
-                        '}' +
-                        'gl_FragColor = texture2D(u_texture, v_TC)*u_A*maskStep;' +
-                        '}' +
+                    'vec4 textColor=texture2D(u_maskTexture, v_MP);' +
+                    'float maskStep=0.0;' +
+                    'if(u_Mask==1){' +
+                    'maskStep=textColor.r;' +
+                    '}else if(u_Mask==2){' +
+                    'maskStep=textColor.g;' +
+                    '}else if(u_Mask==3){' +
+                    'maskStep=textColor.b;' +
+                    '}else if(u_Mask==4){' +
+                    'maskStep=textColor.a;' +
+                    '}' +
+                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A*maskStep;' +
+                    '}' +
                     '}';
                 shader = gl.createShader(gl.FRAGMENT_SHADER);
             }

@@ -5,6 +5,7 @@ declare namespace annie {
     /**
      * annie引擎类的基类
      * @class annie.AObject
+     * @since 1.0.0
      */
     class AObject {
         private _id;
@@ -16,11 +17,14 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @returns {number}
+         * @example
+         *      //获取 annie引擎类对象唯一码
+         *      trace(this.getInstanceId());
          */
         getInstanceId(): number;
     }
     /**
-     * 事件触发类
+     * 事件触发基类
      * @class annie.EventDispatcher
      * @extends annie.AObject
      * @public
@@ -55,12 +59,7 @@ declare namespace annie {
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @example
-         *      //1.使用类实例方法作为侦听函数:
-         *       this.addEventListener(annie.MouseEvent.MOUSE_UP,this.onMouseUp.bind(this));
-         *      //2.使用匿名方法作为侦听函数:
-         *      this.addEventListener(annie.MouseEvent.MOUSE_UP,function(e){...};
-         *      //2.使用有名方法作为侦听函数:t
-         *      his.addEventListener(annie.MouseEvent.MOUSE_UP,funName);
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
         addEventListener(type: string, listener: Function): void;
         /**
@@ -2614,6 +2613,8 @@ declare namespace annie {
          * @type {annie.Rectangle}
          * @default {x:0,y:0,width:0,height:0}
          * @readonly
+         * @example
+         *      //始终让一个对象顶对齐，或者
          */
         viewRect: Rectangle;
         /**
@@ -2698,6 +2699,21 @@ declare namespace annie {
          * @since 1.0.0
          * @default "onScale"
          * @type {string}
+         * @example
+         *      //动态更改stage的对齐方式示例
+         *      //以下代码放到一个舞台的显示对象的构造函数中
+         *      var s=this;
+         *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+         *          var i=0;
+         *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+         *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+         *              var state=e.currentTarget;
+         *              state.scaleMode=aList[i];
+         *              state.resize();
+         *              if(i>5){i=0;}
+         *          }
+         *      }
+         *
          */
         scaleMode: string;
         /**
@@ -4047,6 +4063,9 @@ declare namespace annie {
      * @public
      * @property debug
      * @type {boolean}
+     * @example
+     *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
+     *      annie.debug=true;
      */
     var debug: boolean;
     /**
@@ -4055,6 +4074,9 @@ declare namespace annie {
      * @since 1.0.1
      * @property version
      * @type {string}
+     * @example
+     *      //打印当前引擎的版本号
+     *      trace(annie.version);
      */
     var version: string;
     /**
@@ -4064,6 +4086,9 @@ declare namespace annie {
      * @since 1.0.0
      * @public
      * @static
+     * @example
+     *      //打印当前设备的retina值
+     *      trace(annie.devicePixelRatio);
      */
     var devicePixelRatio: number;
     /**
@@ -4073,6 +4098,9 @@ declare namespace annie {
      * @public
      * @type {string|string}
      * @static
+     * @example
+     *      //获取当前设备类型
+     *      trace(annie.osType);
      */
     var osType: string;
     /**
@@ -4088,6 +4116,21 @@ declare namespace annie {
      * @public
      * @since 1.0.0
      * @static
+     * @example
+     *      //动态更改stage的对齐方式示例
+     *      //以下代码放到一个舞台的显示对象的构造函数中
+     *      var s=this;
+     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+     *          var i=0;
+     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              var state=e.currentTarget;
+     *              state.scaleMode=aList[i];
+     *              state.resize();
+     *              if(i>5){i=0;}
+     *          }
+     *      }
+     *
      */
     var StageScaleMode: {
         EXACT_FIT: string;
@@ -4098,20 +4141,14 @@ declare namespace annie {
         FIXED_HEIGHT: string;
     };
     /**
-     * @property annie.version
-     * @public
-     * @static
-     * @since 1.0.0
-     * @type {string}
-     */
-    var version: string;
-    /**
      * 跳转到指定网址
      * @method navigateToURL
      * @public
      * @since 1.0.0
      * @param {string} url
      * @static
+     * @example
+     *      annie.navigateToURL("http://www.annie2x.com");
      */
     function navigateToURL(url: string): void;
     /**
@@ -4121,6 +4158,8 @@ declare namespace annie {
      * @since 1.0.0
      * @param {string} url
      * @static
+     * @example
+     *      annie.sendToURL("http://www.annie2x.com");
      */
     function sendToURL(url: string): void;
     /**
@@ -4157,7 +4196,9 @@ declare namespace annie {
  * @since 1.0.0
  * @public
  * @static
- * @example trace(1);trace(1,"hello");
+ * @example
+ *      trace(1);
+ *      trace(1,"hello");
  */
 declare var trace: (...arg: any[]) => void;
 /**
@@ -4167,6 +4208,17 @@ declare var trace: (...arg: any[]) => void;
  * @type {annie.EventDispatcher}
  * @public
  * @since 1.0.0
+ * @example
+ *      //A代码放到任何合适的地方
+ *      globalDispatcher.addEventListener("myTest",function(e){
+ *          trace("收到了其他地方发来的消息:"+e.data);
+ *      });
+ *
+ *      //B代码放到任何一个可以点击的对象的构造函数中
+ *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
+ *          globalDispatcher.dispatchEvent("myTest","我是小可");
+ *      });
+ *
  */
 declare var globalDispatcher: annie.EventDispatcher;
 import Flash2x = annie.RESManager;
