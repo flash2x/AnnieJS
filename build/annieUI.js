@@ -453,10 +453,10 @@ var annieUI;
          * @param{number}slideSpeed  页面滑动速度
          * @example
          *      var slideBox = new annieUI.SlidePage({
-         *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *      isVertical: true,//默认值为true,ture为纵向,falas为横向
-         *      slideSpeed: .32,//默认值为.4，滑动速度
-         *      callback:callback//滑动完成回调函数
+         *          pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
+         *          isVertical: true,//默认值为true,ture为纵向,falas为横向
+         *          slideSpeed: .32,//默认值为.4，滑动速度
+         *          callback:callback//滑动完成回调函数
          *       });
          */
         function SlidePage(option) {
@@ -510,13 +510,15 @@ var annieUI;
              * 当前页面索引ID
              * @property currentPageIndex
              * @type {number}
+             * @since 1.0.2
              * @public
              */
             this.currentPageIndex = 0;
             /**
              * 页面是否移动
-             * @property currentPageIndex
+             * @property isMoving
              * @type {boolean}
+             * @since 1.0.2
              * @public
              */
             this.isMoving = false;
@@ -557,18 +559,27 @@ var annieUI;
             this.isMouseDown = false;
             /**
              * 是否可以下一页
+             * @property canSlideNext
              * @type {boolean}
-             * @type {boolean}
+             * @since 1.0.2
              * @public
              */
             this.canSlideNext = true;
             /**
              * 是否可以上一页
+             * @property canSlidePrev
              * @type {boolean}
-             * @type {boolean}
+             * @since 1.0.2
              * @public
              */
             this.canSlidePrev = true;
+            /**
+             * 手指滑动方向
+             * @property slideDirection
+             * @type {string}
+             * @public
+             * @since 1.0.2
+             */
             this.slideDirection = 'next';
             /**
              * 是否为数组
@@ -706,7 +717,7 @@ var annieUI;
                             }
                             // s.pageList[s.currentPageIndex + 1].visible = true;
                             s.currentPageIndex++;
-                            s.slideToIndex(s.currentPageIndex);
+                            s.slideTo(s.currentPageIndex);
                         }
                         else {
                             s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
@@ -726,7 +737,7 @@ var annieUI;
                             }
                             // s.pageList[s.currentPageIndex - 1].visible = true;
                             s.currentPageIndex--;
-                            s.slideToIndex(s.currentPageIndex);
+                            s.slideTo(s.currentPageIndex);
                         }
                         else {
                             s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
@@ -740,12 +751,12 @@ var annieUI;
         };
         /**
          * 滑动到指定页
-         * @method slideToIndex
+         * @method slideTo
          * @param index 页面索引
          * @public
          * @since 1.0.2
          */
-        SlidePage.prototype.slideToIndex = function (index) {
+        SlidePage.prototype.slideTo = function (index) {
             var s = this;
             if (s.isMoving) {
                 return;

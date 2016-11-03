@@ -319,7 +319,7 @@ namespace annieUI {
                             }
                             // s.pageList[s.currentPageIndex + 1].visible = true;
                             s.currentPageIndex++;
-                            s.slideToIndex(s.currentPageIndex);
+                            s.slideTo(s.currentPageIndex);
                         } else {
                             s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
                                 y: -s.stageH * (s.listLen - 1),
@@ -337,7 +337,7 @@ namespace annieUI {
                             }
                             // s.pageList[s.currentPageIndex - 1].visible = true;
                             s.currentPageIndex--;
-                            s.slideToIndex(s.currentPageIndex);
+                            s.slideTo(s.currentPageIndex);
                         } else {
                             s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
                                 y: 0,
