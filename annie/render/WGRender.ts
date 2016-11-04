@@ -41,6 +41,8 @@ namespace annie {
         private _maskObjList: any = [];
         private _maskTexture: any = null;
         private _maskSrcTexture: any = null;
+        private _textures: any = [];
+        private _curTextureId: number = -1;
 
         /**
          * @CanvasRender
@@ -99,6 +101,7 @@ namespace annie {
             //告诉shader这个时候是画遮罩本身的帧缓冲
             gl.uniform1i(s._uMask, s._maskObjList.length*100);
             s.draw(target, 1);
+            gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.uniform1i(s._uMask, s._maskObjList.length);
@@ -258,7 +261,7 @@ namespace annie {
             s._uMask = gl.getUniformLocation(s._program, 'u_Mask');
             //
             s._cM = new annie.Matrix();
-            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            s._maxTextureCount =3;// gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
             s._uniformMaskTexture = gl.getUniformLocation(s._program, "u_maskTexture");
             s._posAttr = gl.getAttribLocation(s._program, "a_P");
@@ -323,18 +326,54 @@ namespace annie {
                     m.c, m.d, 0,
                     m.tx, m.ty, 1
                 ]);
-            s.activeTexture(img.texture, 0);
-            gl.uniform1i(s._uniformTexture, 0);
-            s.activeTexture(s._maskTexture, 1);
-            gl.uniform1i(s._uniformMaskTexture, 1);
+            //if(s._maskObjList.length>0) {
+            gl.uniform1i(s._uniformMaskTexture, s.activeTexture(s._maskTexture, true));
+            //}
+            gl.uniform1i(s._uniformTexture, s.activeTexture(img.texture));
             s.setBuffer(s._buffer, new Float32Array(vertices));
             gl.uniform1f(s._uA, target.cAlpha);
             gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            gl.flush();
         }
-
+        private activeTexture(texture:any,isMaskTexture:boolean=false):number{
+            var s=this;
+            var gl=s._gl;
+            var newId:number=-1;
+            var isHave:boolean=false;
+            if(isMaskTexture){
+                newId=0;
+                if(s._textures[0]==texture){
+                    isHave=true;
+                }
+            }else {
+                for (var i = 1; i < s._maxTextureCount; i++) {
+                    if (s._textures[i] == null) {
+                        newId = i;
+                        break;
+                    }
+                    if (s._textures[i] == texture) {
+                        newId = i;
+                        isHave = true;
+                        break;
+                    }
+                }
+                if (newId < 0) {
+                    if (s._curTextureId < s._maxTextureCount - 1) {
+                        s._curTextureId++;
+                    } else {
+                        s._curTextureId = 1;
+                    }
+                    newId = s._curTextureId;
+                }
+            }
+            gl.activeTexture(gl["TEXTURE" + newId]);
+            //if(!isHave||newId ==0) {
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+            //}
+            s._textures[newId]=texture;
+            return newId;
+        }
         private initMaskBuffer(): void {
             var s = this;
             s._maskFbo = s.createFramebuffer(1024, 1024);
@@ -364,7 +403,7 @@ namespace annie {
             texture.bitmapData = b;
             texture.width = w;
             texture.height = h;
-            gl.bindTexture(gl.TEXTURE_2D, null);
+            gl.bindTexture(gl.TEXTURE_2D,null);
             return texture;
         }
 
@@ -389,14 +428,6 @@ namespace annie {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             return fb;
         }
-
-        public activeTexture(texture: WebGLTexture, id: number = 0): void {
-            var s = this;
-            var gl = s._gl;
-            gl.activeTexture(gl["TEXTURE" + id]);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-        }
-
         /**
          * 设置webgl要渲染的东西
          * @method _setGlInfo

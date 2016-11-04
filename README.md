@@ -77,6 +77,9 @@
     优化加载模块，提高加载速度
     修复在微信环境里某些手机音乐不能自动播放的问题
     修复矢量位图填充在不使用spriteSheet的情况下时无法找到位置资源的bug
+    增加annie.Tween 中的完成回调参数
+    增加annie.Tween 中的loop循环参数
+    增加annie.Rectangle 中testRectCross方法 检测矩形相交
     进一步优化引擎内核
 ## AnnieJS 1.0.1 版本更新列表
     修复静态文本多行显示不正确bug

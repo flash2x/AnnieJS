@@ -19,6 +19,8 @@ namespace annie {
         public _completeFun:Function;
         public _ease:Function;
         private _isFront:boolean = true;
+        private _cParams:Array=null;
+        private _loop:boolean=false;
 
         /**
          * 初始化数据
@@ -43,6 +45,8 @@ namespace annie {
             s._isFront=true;
             s._ease = null;
             s._update = null;
+            s._cParams=null;
+            s._loop = false;
             s._completeFun = null;
             for (var item in data) {
                 switch (item) {
@@ -71,6 +75,12 @@ namespace annie {
                         break;
                     case "onComplete":
                         s._completeFun = data[item];
+                        break;
+                    case "completeParams":
+                        s._cParams=data[item];
+                        break;
+                    case "loop":
+                        s._loop=data[item];
                         break;
                     default :
                         if(typeof(data[item])=="number") {
@@ -109,26 +119,29 @@ namespace annie {
             if (s._update) {
                 s._update();
             }
+            var cf=s._completeFun;
+            var pm=s._cParams;
             if (s._isFront) {
                 s._currentFrame++;
-
                 if (s._currentFrame > s._totalFrames) {
-                    var cf=s._completeFun;
-                    if (s._isLoop>0) {
-                        s._isFront = false;
-                        s._currentFrame = s._totalFrames;
-                        s._isLoop--;
-                    } else {
-                        Tween.kill(s.getInstanceId());
+                    if(s._loop){
+                        s._currentFrame=1;
+                    }else {
+                        if (s._isLoop > 0) {
+                            s._isFront = false;
+                            s._currentFrame = s._totalFrames;
+                            s._isLoop--;
+                        } else {
+                            Tween.kill(s.getInstanceId());
+                        }
                     }
                     if(cf){
-                        cf();
+                        cf.apply(null,pm);
                     }
                 }
             } else {
                 s._currentFrame--;
                 if (s._currentFrame <0) {
-                    var cf=s._completeFun;
                     if (s._isLoop>0) {
                         s._isFront = true;
                         s._currentFrame = 1;
@@ -136,7 +149,7 @@ namespace annie {
                         Tween.kill(s.getInstanceId());
                     }
                     if(cf){
-                        cf();
+                        cf.apply(null,pm);
                     }
                 }
             }
@@ -157,7 +170,9 @@ namespace annie {
          * @param {number} totalFrame 总时间长度 用帧数来表示时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {number:boolean} data.loop 是否循环播放。
+         * @param {Function} data.onComplete 完成函数. 默认为null
+         * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
@@ -177,7 +192,9 @@ namespace annie {
          * @param {number} totalFrame 总时间长度 用帧数来表示时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
@@ -222,8 +239,10 @@ namespace annie {
             for (var i = 0; i < len; i++) {
                 Tween._tweenList[i].target = null;
                 Tween._tweenList[i]._completeFun = null;
+                Tween._tweenList[i]._cParams = null;
                 Tween._tweenList[i]._update = null;
                 Tween._tweenList[i]._ease = null;
+                Tween._tweenList[i]._loop = false;
                 Tween._tweenPool.push(Tween._tweenList[i]);
             }
             Tween._tweenList.length = 0;
@@ -243,8 +262,10 @@ namespace annie {
                 if (Tween._tweenList[i].getInstanceId() == tweenId) {
                     Tween._tweenList[i].target = null;
                     Tween._tweenList[i]._completeFun = null;
+                    Tween._tweenList[i]._cParams = null;
                     Tween._tweenList[i]._update = null;
                     Tween._tweenList[i]._ease = null;
+                    Tween._tweenList[i]._loop = null;
                     Tween._tweenPool.push(Tween._tweenList[i]);
                     Tween._tweenList.splice(i, 1);
                     break;

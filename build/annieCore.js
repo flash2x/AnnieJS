@@ -6716,6 +6716,8 @@ var annie;
             this._maskObjList = [];
             this._maskTexture = null;
             this._maskSrcTexture = null;
+            this._textures = [];
+            this._curTextureId = -1;
             this._stage = stage;
         }
         /**
@@ -6764,6 +6766,7 @@ var annie;
             //告诉shader这个时候是画遮罩本身的帧缓冲
             gl.uniform1i(s._uMask, s._maskObjList.length * 100);
             s.draw(target, 1);
+            gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.uniform1i(s._uMask, s._maskObjList.length);
@@ -6919,7 +6922,7 @@ var annie;
             s._uMask = gl.getUniformLocation(s._program, 'u_Mask');
             //
             s._cM = new annie.Matrix();
-            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            s._maxTextureCount = 3; // gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
             s._uniformMaskTexture = gl.getUniformLocation(s._program, "u_maskTexture");
             s._posAttr = gl.getAttribLocation(s._program, "a_P");
@@ -6983,16 +6986,56 @@ var annie;
                 m.c, m.d, 0,
                 m.tx, m.ty, 1
             ]);
-            s.activeTexture(img.texture, 0);
-            gl.uniform1i(s._uniformTexture, 0);
-            s.activeTexture(s._maskTexture, 1);
-            gl.uniform1i(s._uniformMaskTexture, 1);
+            //if(s._maskObjList.length>0) {
+            gl.uniform1i(s._uniformMaskTexture, s.activeTexture(s._maskTexture, true));
+            //}
+            gl.uniform1i(s._uniformTexture, s.activeTexture(img.texture));
             s.setBuffer(s._buffer, new Float32Array(vertices));
             gl.uniform1f(s._uA, target.cAlpha);
             gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            gl.flush();
+        };
+        WGRender.prototype.activeTexture = function (texture, isMaskTexture) {
+            if (isMaskTexture === void 0) { isMaskTexture = false; }
+            var s = this;
+            var gl = s._gl;
+            var newId = -1;
+            var isHave = false;
+            if (isMaskTexture) {
+                newId = 0;
+                if (s._textures[0] == texture) {
+                    isHave = true;
+                }
+            }
+            else {
+                for (var i = 1; i < s._maxTextureCount; i++) {
+                    if (s._textures[i] == null) {
+                        newId = i;
+                        break;
+                    }
+                    if (s._textures[i] == texture) {
+                        newId = i;
+                        isHave = true;
+                        break;
+                    }
+                }
+                if (newId < 0) {
+                    if (s._curTextureId < s._maxTextureCount - 1) {
+                        s._curTextureId++;
+                    }
+                    else {
+                        s._curTextureId = 1;
+                    }
+                    newId = s._curTextureId;
+                }
+            }
+            gl.activeTexture(gl["TEXTURE" + newId]);
+            //if(!isHave||newId ==0) {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            //}
+            s._textures[newId] = texture;
+            return newId;
         };
         WGRender.prototype.initMaskBuffer = function () {
             var s = this;
@@ -7048,13 +7091,6 @@ var annie;
             fb.texture = texture;
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             return fb;
-        };
-        WGRender.prototype.activeTexture = function (texture, id) {
-            if (id === void 0) { id = 0; }
-            var s = this;
-            var gl = s._gl;
-            gl.activeTexture(gl["TEXTURE" + id]);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
         };
         /**
          * 设置webgl要渲染的东西
@@ -7967,6 +8003,8 @@ var annie;
             this._isLoop = 0;
             this._delay = 0;
             this._isFront = true;
+            this._cParams = null;
+            this._loop = false;
         }
         /**
          * 初始化数据
@@ -7992,6 +8030,8 @@ var annie;
             s._isFront = true;
             s._ease = null;
             s._update = null;
+            s._cParams = null;
+            s._loop = false;
             s._completeFun = null;
             for (var item in data) {
                 switch (item) {
@@ -8022,6 +8062,12 @@ var annie;
                         break;
                     case "onComplete":
                         s._completeFun = data[item];
+                        break;
+                    case "completeParams":
+                        s._cParams = data[item];
+                        break;
+                    case "loop":
+                        s._loop = data[item];
                         break;
                     default:
                         if (typeof (data[item]) == "number") {
@@ -8060,27 +8106,32 @@ var annie;
             if (s._update) {
                 s._update();
             }
+            var cf = s._completeFun;
+            var pm = s._cParams;
             if (s._isFront) {
                 s._currentFrame++;
                 if (s._currentFrame > s._totalFrames) {
-                    var cf = s._completeFun;
-                    if (s._isLoop > 0) {
-                        s._isFront = false;
-                        s._currentFrame = s._totalFrames;
-                        s._isLoop--;
+                    if (s._loop) {
+                        s._currentFrame = 1;
                     }
                     else {
-                        Tween.kill(s.getInstanceId());
+                        if (s._isLoop > 0) {
+                            s._isFront = false;
+                            s._currentFrame = s._totalFrames;
+                            s._isLoop--;
+                        }
+                        else {
+                            Tween.kill(s.getInstanceId());
+                        }
                     }
                     if (cf) {
-                        cf();
+                        cf.apply(null, pm);
                     }
                 }
             }
             else {
                 s._currentFrame--;
                 if (s._currentFrame < 0) {
-                    var cf = s._completeFun;
                     if (s._isLoop > 0) {
                         s._isFront = true;
                         s._currentFrame = 1;
@@ -8089,7 +8140,7 @@ var annie;
                         Tween.kill(s.getInstanceId());
                     }
                     if (cf) {
-                        cf();
+                        cf.apply(null, pm);
                     }
                 }
             }
@@ -8113,7 +8164,9 @@ var annie;
          * @param {number} totalFrame 总时间长度 用帧数来表示时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {number:boolean} data.loop 是否循环播放。
+         * @param {Function} data.onComplete 完成函数. 默认为null
+         * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
@@ -8132,7 +8185,9 @@ var annie;
          * @param {number} totalFrame 总时间长度 用帧数来表示时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
@@ -8178,8 +8233,10 @@ var annie;
             for (var i = 0; i < len; i++) {
                 Tween._tweenList[i].target = null;
                 Tween._tweenList[i]._completeFun = null;
+                Tween._tweenList[i]._cParams = null;
                 Tween._tweenList[i]._update = null;
                 Tween._tweenList[i]._ease = null;
+                Tween._tweenList[i]._loop = false;
                 Tween._tweenPool.push(Tween._tweenList[i]);
             }
             Tween._tweenList.length = 0;
@@ -8198,8 +8255,10 @@ var annie;
                 if (Tween._tweenList[i].getInstanceId() == tweenId) {
                     Tween._tweenList[i].target = null;
                     Tween._tweenList[i]._completeFun = null;
+                    Tween._tweenList[i]._cParams = null;
                     Tween._tweenList[i]._update = null;
                     Tween._tweenList[i]._ease = null;
+                    Tween._tweenList[i]._loop = null;
                     Tween._tweenPool.push(Tween._tweenList[i]);
                     Tween._tweenList.splice(i, 1);
                     break;

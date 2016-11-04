@@ -3392,6 +3392,8 @@ declare namespace annie {
         private _maskObjList;
         private _maskTexture;
         private _maskSrcTexture;
+        private _textures;
+        private _curTextureId;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -3446,11 +3448,11 @@ declare namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         draw(target: any, type: number): void;
+        private activeTexture(texture, isMaskTexture?);
         private initMaskBuffer();
         createTexture(bitmapData?: any, width?: number, height?: number): WebGLTexture;
         updateTexture(texture: WebGLTexture, bitmapData: any): void;
         createFramebuffer(width: number, height: number): WebGLFramebuffer;
-        activeTexture(texture: WebGLTexture, id?: number): void;
         /**
          * 设置webgl要渲染的东西
          * @method _setGlInfo
@@ -3697,7 +3699,9 @@ declare namespace annie {
          * @param {number} totalFrame 总时间长度 用帧数来表示时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {number:boolean} data.loop 是否循环播放。
+         * @param {Function} data.onComplete 完成函数. 默认为null
+         * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
@@ -3714,7 +3718,9 @@ declare namespace annie {
          * @param {number} totalFrame 总时间长度 用帧数来表示时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
