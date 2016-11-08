@@ -97,7 +97,9 @@ var annie;
             }
             if (s.eventTypes[type].indexOf(listener) < 0) {
                 s.eventTypes[type].push(listener);
-                s._changeMouseCount(type, true);
+                if (type.indexOf("onMouse") == 0) {
+                    s._changeMouseCount(type, true);
+                }
             }
         };
         /**
@@ -1155,7 +1157,7 @@ var annie;
              * @type {boolean}
              * @public
              * @since 1.0.0
-             * @default true
+             * @default false
              */
             this.mouseEnable = true;
             /**
@@ -4799,7 +4801,6 @@ var annie;
                     for (var i = 0; i < len; i++) {
                         var f = s["cFilters"][i];
                         f.drawFilter(imageData);
-                        trace(s["cFilters"][i].type);
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
@@ -8230,14 +8231,16 @@ var annie;
          */
         Tween.killAll = function () {
             var len = Tween._tweenList.length;
+            var tweenObj;
             for (var i = 0; i < len; i++) {
-                Tween._tweenList[i].target = null;
-                Tween._tweenList[i]._completeFun = null;
-                Tween._tweenList[i]._cParams = null;
-                Tween._tweenList[i]._update = null;
-                Tween._tweenList[i]._ease = null;
-                Tween._tweenList[i]._loop = false;
-                Tween._tweenPool.push(Tween._tweenList[i]);
+                tweenObj = Tween._tweenList[i];
+                tweenObj.target = null;
+                tweenObj._completeFun = null;
+                tweenObj._cParams = null;
+                tweenObj._update = null;
+                tweenObj._ease = null;
+                tweenObj._loop = false;
+                Tween._tweenPool.push(tweenObj);
             }
             Tween._tweenList.length = 0;
         };
@@ -8251,15 +8254,17 @@ var annie;
          */
         Tween.kill = function (tweenId) {
             var len = Tween._tweenList.length;
+            var tweenObj;
             for (var i = 0; i < len; i++) {
-                if (Tween._tweenList[i].getInstanceId() == tweenId) {
-                    Tween._tweenList[i].target = null;
-                    Tween._tweenList[i]._completeFun = null;
-                    Tween._tweenList[i]._cParams = null;
-                    Tween._tweenList[i]._update = null;
-                    Tween._tweenList[i]._ease = null;
-                    Tween._tweenList[i]._loop = null;
-                    Tween._tweenPool.push(Tween._tweenList[i]);
+                tweenObj = Tween._tweenList[i];
+                if (tweenObj.getInstanceId() == tweenId) {
+                    tweenObj.target = null;
+                    tweenObj._completeFun = null;
+                    tweenObj._cParams = null;
+                    tweenObj._update = null;
+                    tweenObj._ease = null;
+                    tweenObj._loop = null;
+                    Tween._tweenPool.push(tweenObj);
                     Tween._tweenList.splice(i, 1);
                     break;
                 }

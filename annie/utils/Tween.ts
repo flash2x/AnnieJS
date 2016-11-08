@@ -19,7 +19,7 @@ namespace annie {
         public _completeFun:Function;
         public _ease:Function;
         private _isFront:boolean = true;
-        private _cParams:Array=null;
+        private _cParams:any=null;
         private _loop:boolean=false;
 
         /**
@@ -236,14 +236,16 @@ namespace annie {
          */
         public static killAll():void {
             var len:number = Tween._tweenList.length;
+            var tweenObj:any;
             for (var i = 0; i < len; i++) {
-                Tween._tweenList[i].target = null;
-                Tween._tweenList[i]._completeFun = null;
-                Tween._tweenList[i]._cParams = null;
-                Tween._tweenList[i]._update = null;
-                Tween._tweenList[i]._ease = null;
-                Tween._tweenList[i]._loop = false;
-                Tween._tweenPool.push(Tween._tweenList[i]);
+                tweenObj=Tween._tweenList[i];
+                tweenObj.target = null;
+                tweenObj._completeFun = null;
+                tweenObj._cParams = null;
+                tweenObj._update = null;
+                tweenObj._ease = null;
+                tweenObj._loop = false;
+                Tween._tweenPool.push(tweenObj);
             }
             Tween._tweenList.length = 0;
         }
@@ -258,15 +260,17 @@ namespace annie {
          */
         public static kill(tweenId:number):void {
             var len:number = Tween._tweenList.length;
+            var tweenObj:any;
             for (var i = 0; i < len; i++) {
-                if (Tween._tweenList[i].getInstanceId() == tweenId) {
-                    Tween._tweenList[i].target = null;
-                    Tween._tweenList[i]._completeFun = null;
-                    Tween._tweenList[i]._cParams = null;
-                    Tween._tweenList[i]._update = null;
-                    Tween._tweenList[i]._ease = null;
-                    Tween._tweenList[i]._loop = null;
-                    Tween._tweenPool.push(Tween._tweenList[i]);
+                tweenObj=Tween._tweenList[i];
+                if (tweenObj.getInstanceId() == tweenId) {
+                    tweenObj.target = null;
+                    tweenObj._completeFun = null;
+                    tweenObj._cParams = null;
+                    tweenObj._update = null;
+                    tweenObj._ease = null;
+                    tweenObj._loop = null;
+                    Tween._tweenPool.push(tweenObj);
                     Tween._tweenList.splice(i, 1);
                     break;
                 }

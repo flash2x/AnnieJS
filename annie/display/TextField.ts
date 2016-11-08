@@ -284,7 +284,6 @@ namespace annie {
                     for(var i=0;i<len;i++) {
                         var f:any = s["cFilters"][i];
                         f.drawFilter(imageData);
-                        trace(s["cFilters"][i].type);
                     }
                     ctx.putImageData(imageData,0,0);
                 }

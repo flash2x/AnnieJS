@@ -243,9 +243,6 @@ namespace annie {
             } else {
                 //webgl
                 s.renderObj = new WGRender(s);
-                //s.renderObj = new CanvasRender(s);
-                //trace("webgl目前来说商业应用不是很稳定,等成熟后将在高版本中支持!");
-                //trace("目前还是会以Canvas来渲染!");
             }
             s.renderObj.init();
             window.addEventListener("resize", function (e:any) {
@@ -358,7 +355,7 @@ namespace annie {
                 //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                 cp=s._lastMousePoint;
                 sp=s.globalToLocal(cp,DisplayObject._bp);
-                if (EventDispatcher.getMouseEventCount(item)> 0){
+                if (EventDispatcher.getMouseEventCount(item)>0){
                     if(!s._ml[eLen]) {
                         event = new MouseEvent(item);
                         s._ml[eLen]=event;
@@ -369,7 +366,7 @@ namespace annie {
                     events.push(event);
                     s._initMouseEvent(event,cp,sp);
                     eLen++;
-                }
+               }
                 if(item=="onMouseDown"){
                     s._mouseDownPoint.x=cp.x;
                     s._mouseDownPoint.y=cp.y;

@@ -96,7 +96,9 @@ namespace annie {
             }
             if(s.eventTypes[type].indexOf(listener)<0){
                 s.eventTypes[type].push(listener);
-                s._changeMouseCount(type,true);
+                if(type.indexOf("onMouse")==0) {
+                    s._changeMouseCount(type, true);
+                }
             }
         }
         /**

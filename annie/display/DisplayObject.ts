@@ -63,7 +63,7 @@ namespace annie{
          * @type {boolean}
          * @public
          * @since 1.0.0
-         * @default true
+         * @default false
          */
         public mouseEnable:boolean = true;
         /**

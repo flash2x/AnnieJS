@@ -312,7 +312,7 @@ namespace annieUI {
                         s.slideDirection = s.touchStartX > s.touchEndX ? 'next' : 'prev';
                     }
                     if (s.slideDirection == 'next') {
-                        globalDispatcher.dispatchEvent(new annie.Event('onSlideNextEvent'));
+                        globalDispatcher.dispatchEvent('onSlideNextEvent');
                         if (s.currentPageIndex < s.listLen - 1) {
                             if (!s.canSlideNext || !s.pageList[s.currentPageIndex].canSlideNext) {
                                 return;
@@ -330,7 +330,7 @@ namespace annieUI {
                             });
                         }
                     } else {
-                        globalDispatcher.dispatchEvent(new annie.Event('onSlidePrevEvent'));
+                        globalDispatcher.dispatchEvent('onSlidePrevEvent');
                         if (s.currentPageIndex > 0) {
                             if (!s.canSlidePrev || !s.pageList[s.currentPageIndex].canSlidePrev) {
                                 return;
