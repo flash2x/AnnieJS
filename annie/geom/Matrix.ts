@@ -2,11 +2,11 @@
  * @module annie
  */
 namespace annie {
-    var PI:number = Math.PI;
-    var HalfPI:number = PI>>1;
-    var PacPI:number = PI + HalfPI;
-    var TwoPI:number = PI<<1;
-    var DEG_TO_RAD:number = Math.PI / 180;
+    let PI:number = Math.PI;
+    let HalfPI:number = PI>>1;
+    let PacPI:number = PI + HalfPI;
+    let TwoPI:number = PI<<1;
+    let DEG_TO_RAD:number = Math.PI / 180;
     function cos(angle:number):number {
         switch (angle) {
             case HalfPI:
@@ -108,7 +108,8 @@ namespace annie {
          */
         public constructor(a:number = 1, b:number = 0, c:number = 0, d:number = 1, tx:number = 0, ty:number = 0) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annie.Matrix";
             s.a = a;
             s.b = b;
             s.c = c;
@@ -125,7 +126,7 @@ namespace annie {
          * @returns {annie.Matrix}
          */
         public clone():Matrix {
-            var s = this;
+            let s = this;
             return new Matrix(s.a, s.b, s.c, s.d, s.tx, s.ty);
         }
 
@@ -140,7 +141,7 @@ namespace annie {
          * @since 1.0.0
          */
         public transformPoint = function (x:number, y:number,bp:Point=null):Point {
-            var s = this;
+            let s = this;
             if(!bp){
                 bp=new Point();
             }
@@ -157,7 +158,7 @@ namespace annie {
          * @since 1.0.0
          */
         public setFrom(mtx:Matrix):void {
-            var s = this;
+            let s = this;
             s.a = mtx.a;
             s.b = mtx.b;
             s.c = mtx.c;
@@ -173,7 +174,7 @@ namespace annie {
          * @since 1.0.0
          */
         public identity():void {
-            var s = this;
+            let s = this;
             s.a = s.d = 1;
             s.b = s.c = s.tx = s.ty = 0;
         }
@@ -186,14 +187,14 @@ namespace annie {
          * @public
          */
         public invert():Matrix {
-            var s = this;
-            var target:Matrix = new Matrix(s.a, s.b, s.c, s.d, s.tx, s.ty);
-            var a = s.a;
-            var b = s.b;
-            var c = s.c;
-            var d = s.d;
-            var tx = s.tx;
-            var ty = s.ty;
+            let s = this;
+            let target:Matrix = new Matrix(s.a, s.b, s.c, s.d, s.tx, s.ty);
+            let a = s.a;
+            let b = s.b;
+            let c = s.c;
+            let d = s.d;
+            let tx = s.tx;
+            let ty = s.ty;
             if (b == 0 && c == 0) {
                 if (a == 0 || d == 0) {
                     target.a = target.d = target.tx = target.ty = 0;
@@ -206,13 +207,13 @@ namespace annie {
                 }
                 return target;
             }
-            var determinant = a * d - b * c;
+            let determinant = a * d - b * c;
             if (determinant == 0) {
                 target.identity();
                 return target;
             }
             determinant = 1 / determinant;
-            var k = target.a = d * determinant;
+            let k = target.a = d * determinant;
             b = target.b = -b * determinant;
             c = target.c = -c * determinant;
             d = target.d = a * determinant;
@@ -237,7 +238,7 @@ namespace annie {
          * @public
          */
         public createBox(x:number,y:number,scaleX:number, scaleY:number, rotation:number,skewX:number, skewY:number, ax:number, ay:number):void {
-            var s = this;
+            let s = this;
             if(rotation!=0){
                 skewX =skewY=rotation%360;
             }else {
@@ -251,8 +252,8 @@ namespace annie {
             } else {
                 skewX *= DEG_TO_RAD;
                 skewY *= DEG_TO_RAD;
-                var u = cos(skewX);
-                var v = sin(skewX);
+                let u = cos(skewX);
+                let v = sin(skewX);
                 if (skewX == skewY) {
                     s.a = u * scaleX;
                     s.b = v * scaleX;
@@ -276,16 +277,16 @@ namespace annie {
          * @param {annie.Matrix} mtx
          */
         public prepend = function (mtx:Matrix):void {
-            var s = this;
-            var a = mtx.a;
-            var b = mtx.b;
-            var c = mtx.c;
-            var d = mtx.d;
-            var tx = mtx.tx;
-            var ty = mtx.ty;
-            var a1 = s.a;
-            var c1 = s.c;
-            var tx1 = s.tx;
+            let s = this;
+            let a = mtx.a;
+            let b = mtx.b;
+            let c = mtx.c;
+            let d = mtx.d;
+            let tx = mtx.tx;
+            let ty = mtx.ty;
+            let a1 = s.a;
+            let c1 = s.c;
+            let tx1 = s.tx;
             s.a = a * a1 + c * s.b;
             s.b = b * a1 + d * s.b;
             s.c = a * c1 + c * s.d;
@@ -306,6 +307,69 @@ namespace annie {
          */
         public static isEqual(m1:Matrix, m2:Matrix):boolean {
             return m1.tx == m2.tx && m1.ty == m2.ty && m1.a == m2.a && m1.b == m2.b && m1.c == m2.c && m1.d == m2.d;
+        }
+        public concat(mtx:annie.Matrix):void{
+            let s=this;
+            let a = s.a, b = s.b, c = s.c, d = s.d,
+                tx = s.tx, ty = s.ty;
+            let ma = mtx.a, mb = mtx.b, mc = mtx.c, md = mtx.d,
+                mx = mtx.tx, my = mtx.ty;
+            s.a = a * ma + b * mc;
+            s.b = a * mb + b * md;
+            s.c = c * ma + d * mc;
+            s.d = c * mb + d * md;
+            s.tx = tx * ma + ty * mc + mx;
+            s.ty = tx * mb + ty * md + my;
+        }
+        /**
+         * 对矩阵应用旋转转换。
+         * @method rotate
+         * @param angle
+         * @since 1.0.3
+         * @public
+         */
+        public rotate(angle:number):void{
+            let s=this;
+            let sin = Math.sin(angle), cos = Math.cos(angle),
+            a = s.a, b = s.b, c = s.c, d = s.d,
+            tx = s.tx, ty = s.ty;
+            s.a = a * cos - b * sin;
+            s.b = a * sin + b * cos;
+            s.c = c * cos - d * sin;
+            s.d = c * sin + d * cos;
+            s.tx = tx * cos - ty * sin;
+            s.ty = tx * sin + ty * cos;
+        }
+
+        /**
+         * 对矩阵应用缩放转换。
+         * @method scale
+         * @param {Number} sx 用于沿 x 轴缩放对象的乘数。
+         * @param {Number} sy 用于沿 y 轴缩放对象的乘数。
+         * @since 1.0.3
+         * @public
+         */
+        public scale(sx:number, sy:number):void{
+            let s=this;
+            s.a *= sx;
+            s.d *= sy;
+            s.c *= sx;
+            s.b *= sy;
+            s.tx *= sx;
+            s.ty *= sy;
+        }
+        /**
+         * 沿 x 和 y 轴平移矩阵，由 dx 和 dy 参数指定。
+         * @method translate
+         * @public
+         * @since 1.0.3
+         * @param {Number} dx 沿 x 轴向右移动的量（以像素为单位
+         * @param {Number} dy 沿 y 轴向右移动的量（以像素为单位
+         */
+        public translate(dx:number, dy:number){
+            let s=this;
+            s.tx += dx;
+            s.ty += dy;
         }
     }
 }

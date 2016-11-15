@@ -19,7 +19,8 @@ namespace annie {
          */
         constructor(x:number=0, y:number=0) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annie.Point";
             s.x = x;
             s.y = y;
         }

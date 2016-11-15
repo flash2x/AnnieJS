@@ -2,7 +2,7 @@
  * @module annie
  */
 namespace annie {
-    var Eval:any=eval.bind(window);
+    let Eval:any=eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -16,6 +16,7 @@ namespace annie {
          */
         public constructor(){
             super();
+            this._instanceType="annie.URLLoader";
         }
         /**
          * 取消加载
@@ -24,7 +25,7 @@ namespace annie {
          * @since 1.0.0
          */
         public loadCancel():void {
-            var s = this;
+            let s = this;
             if (s._req) {
                 s._req.abort();
                 //s._req = null;
@@ -41,13 +42,13 @@ namespace annie {
          * @param {boolean} isBinaryData 是否向后台发送二进制数据包手blob byteArray等
          */
         public load(url:string, isBinaryData:boolean = false):void {
-            var s = this;
+            let s = this;
             s.loadCancel();
             if (s.responseType == null || s.responseType == "") {
                 //看看是什么后缀
-                var urlSplit = url.split(".");
-                var extStr = urlSplit[urlSplit.length - 1];
-                var ext = extStr.split("?")[0].toLocaleLowerCase();
+                let urlSplit = url.split(".");
+                let extStr = urlSplit[urlSplit.length - 1];
+                let ext = extStr.split("?")[0].toLocaleLowerCase();
                 if (ext == "mp3" || ext == "ogg" || ext == "wav") {
                     s.responseType = "sound";
                 } else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
@@ -70,7 +71,7 @@ namespace annie {
                     s.responseType = "unKnow";
                 }
             }
-            var req:any=null;
+            let req:any=null;
             if(!s._req){
                 s._req=new XMLHttpRequest();
                 req=s._req;
@@ -101,12 +102,12 @@ namespace annie {
                     }
                 };
                 req.onreadystatechange = function (event:any):void {
-                    var t = event.target;
+                    let t = event.target;
                     if (t["readyState"] == 4) {
-                        var e:Event = new Event("onComplete");
-                        var result = t["response"];
+                        let e:Event = new Event("onComplete");
+                        let result = t["response"];
                         e.data = {type: s.responseType, response: null};
-                        var item:any;
+                        let item:any;
                         switch (s.responseType) {
                             case "css":
                                 item = document.createElement("link");
@@ -116,7 +117,7 @@ namespace annie {
                             case "image":
                             case "sound":
                             case "video":
-                                var isBlob:boolean=true;
+                                let isBlob:boolean=true;
                                 if(s.responseType=="image"){
                                     item = document.createElement("img");
                                     item.onload = function () {
@@ -175,7 +176,7 @@ namespace annie {
             }else {
                 req = s._req;
             }
-            var reSendTimes=0;
+            let reSendTimes=0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
@@ -247,9 +248,9 @@ namespace annie {
          * @since 1.0.0
          */
         private _fqs = function (data:any, query:any):string {
-            var params:any = [];
+            let params:any = [];
             if (data) {
-                for (var n in data) {
+                for (let n in data) {
                     params.push(encodeURIComponent(n) + "=" + encodeURIComponent(data[n]));
                 }
             }
@@ -268,14 +269,14 @@ namespace annie {
          * @private
          */
         private _fus = function (src:any, data:any):string {
-            var s = this;
+            let s = this;
             if (data == null || data == "") {
                 return src;
             }
-            var query:any = [];
-            var idx = src.indexOf("?");
+            let query:any = [];
+            let idx = src.indexOf("?");
             if (idx != -1) {
-                var q = src.slice(idx + 1);
+                let q = src.slice(idx + 1);
                 query = query.concat(q.split("&"));
                 return src.slice(0, idx) + "?" + s._fqs(data, query);
             } else {

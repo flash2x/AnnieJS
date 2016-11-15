@@ -2,7 +2,7 @@
  * @module annie
  */
 namespace annie {
-    declare var WeixinJSBridge:any;
+    declare let WeixinJSBridge:any;
     /**
      * 抽象类 一般不直接使用
      * @class annie.Media
@@ -37,7 +37,8 @@ namespace annie {
          */
         public constructor(src: any, type: string) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annie.Media";
             if (typeof(src) == "string") {
                 s.media = document.createElement(type);
                 s.media.src = src;
@@ -68,7 +69,7 @@ namespace annie {
          * @since 1.0.0
          */
         public play(start: number, loop: number): void {
-            var s = this;
+            let s = this;
             s._loop = loop;
             //TODO 好像设置了也没什么用，后期再看看
             try {

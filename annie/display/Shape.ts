@@ -12,6 +12,7 @@ namespace annie {
     export class Shape extends DisplayObject {
         public constructor() {
             super();
+            this._instanceType="annie.Shape";
         }
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -36,14 +37,14 @@ namespace annie {
          * @pubic
          */
         public static getGradientColor(colors:Array<string>, ratios:Array<number>, points:Array<number>):any {
-            var colorObj:any;
-            var ctx = DisplayObject["_canvas"].getContext("2d");
+            let colorObj:any;
+            let ctx = DisplayObject["_canvas"].getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }else{
                 colorObj=ctx.createRadialGradient(points[0], points[1], points[2], points[3],points[4],points[5]);
             }
-            for (var i = 0, l = colors.length; i < l; i++) {
+            for (let i = 0, l = colors.length; i < l; i++) {
                 colorObj.addColorStop(ratios[i], colors[i]);
             }
             return colorObj;
@@ -59,7 +60,7 @@ namespace annie {
          * @since 1.0.0
          */
         public static getBitmapStyle(image:any):any{
-            var ctx = DisplayObject["_canvas"].getContext("2d");
+            let ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image,"repeat");
         }
         /**
@@ -80,9 +81,9 @@ namespace annie {
                 color = "#000000";
             }
             if (alpha != 1) {
-                var r = parseInt("0x" + color.substr(1, 2));
-                var g = parseInt("0x" + color.substr(3, 2));
-                var b = parseInt("0x" + color.substr(5, 2));
+                let r = parseInt("0x" + color.substr(1, 2));
+                let g = parseInt("0x" + color.substr(3, 2));
+                let b = parseInt("0x" + color.substr(5, 2));
                 color = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
             }
             return color;
@@ -118,7 +119,7 @@ namespace annie {
          * @since 1.0.0
          */
         public addDraw(commandName:string, params:Array<any>):void {
-            var s = this;
+            let s = this;
             s._isNeedUpdate = true;
             s._command.push([1, commandName, params]);
         }
@@ -138,9 +139,9 @@ namespace annie {
          * @since 1.0.0
          */
         public drawRoundRect(x:number,y:number,w:number,h:number,rTL:number=0,rTR:number=0,rBL:number=0,rBR:number=0):void{
-            //var ctx = DisplayObject._canvas.getContext("2d");
-            var max = (w<h?w:h)/2;
-            var mTL=0, mTR=0, mBR=0, mBL=0;
+            //let ctx = DisplayObject._canvas.getContext("2d");
+            let max = (w<h?w:h)/2;
+            let mTL=0, mTR=0, mBR=0, mBL=0;
             if (rTL < 0) { rTL *= (mTL=-1); }
             if (rTL > max) { rTL = max; }
             if (rTR < 0) { rTR *= (mTR=-1); }
@@ -149,7 +150,7 @@ namespace annie {
             if (rBR > max) { rBR = max; }
             if (rBL < 0) { rBL *= (mBL=-1); }
             if (rBL > max) { rBL = max; }
-            var c = this._command;
+            let c = this._command;
             c.push([1,"moveTo",[x+w-rTR, y]]);
             c.push([1,"arcTo",[x+w+rTR*mTR, y-rTR*mTR, x+w, y+rTR, rTR]]);
             c.push([1,"lineTo",[x+w, y+h-rBR]]);
@@ -249,7 +250,7 @@ namespace annie {
          * @since 1.0.0
          */
         public drawRect(x:number,y:number,w:number,h:number):void{
-            var c = this._command;
+            let c = this._command;
             c.push([1,"moveTo",[x,y]]);
             c.push([1,"lineTo",[x+w,y]]);
             c.push([1,"lineTo",[x+w, y+h]]);
@@ -295,14 +296,14 @@ namespace annie {
          * @since 1.0.0
          */
         public drawEllipse(x:number,y:number,w:number,h:number):void{
-            var k = 0.5522848;
-            var ox = (w / 2) * k;
-            var oy = (h / 2) * k;
-            var xe = x + w;
-            var ye = y + h;
-            var xm = x + w / 2;
-            var ym = y + h / 2;
-            var c = this._command;
+            let k = 0.5522848;
+            let ox = (w / 2) * k;
+            let oy = (h / 2) * k;
+            let xe = x + w;
+            let ye = y + h;
+            let xm = x + w / 2;
+            let ym = y + h / 2;
+            let c = this._command;
             c.push([1,"moveTo",[x, ym]]);
             c.push([1,"bezierCurveTo",[x, ym-oy, xm-ox, y, xm, y]]);
             c.push([1,"bezierCurveTo",[xm+ox, y, xe, ym-oy, xe, ym]]);
@@ -317,7 +318,7 @@ namespace annie {
          * @since 1.0.0
          */
         public clear():void {
-            var s = this;
+            let s = this;
             s._command = [];
             s._isNeedUpdate = true;
         }
@@ -367,14 +368,14 @@ namespace annie {
          * @since 1.0.0
          */
         public beginBitmapFill(image:any,matrix:Matrix):void{
-            var s=this;
+            let s=this;
             if(matrix){
                 s._isBitmapFill=matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
         }
         private _fill(fillStyle:any):void {
-            var c = this._command;
+            let c = this._command;
             c.push([0, "fillStyle", fillStyle]);
             c.push([1, "beginPath", []]);
             this._isNeedUpdate=true;
@@ -429,14 +430,14 @@ namespace annie {
          * @since 1.0.0
          */
         public beginBitmapStroke(image:any,matrix:Matrix,lineWidth:number=1):void{
-            var s=this;
+            let s=this;
             if(matrix){
                 s._isBitmapStroke=matrix;
             }
             s._stroke(Shape.getBitmapStyle(image),lineWidth);
         }
         private _stroke(strokeStyle:any, width:number):void {
-            var c = this._command;
+            let c = this._command;
             c.push([0, "lineWidth", width]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
@@ -450,9 +451,9 @@ namespace annie {
          * @since 1.0.0
          */
         public endFill():void {
-                var s=this;
-                var c=s._command;
-                var m=s._isBitmapFill;
+                let s=this;
+                let c=s._command;
+                let m=s._isBitmapFill;
                 if(m){
                 //c.push([1, "save", []]);
                 c.push([2, "setTransform", [m.a,m.b,m.c,m.d,m.tx,m.ty]]);
@@ -471,9 +472,9 @@ namespace annie {
          * @since 1.0.0
          */
         public endStroke():void{
-            var s=this;
-            var c=s._command;
-            var m=s._isBitmapStroke;
+            let s=this;
+            let c=s._command;
+            let m=s._isBitmapStroke;
             if(m){
                 //c.push([1, "save", []]);
                 //如果为2则还需要特别处理
@@ -559,32 +560,32 @@ namespace annie {
          * @since 1.0.0
          */
         public decodePath = function (data:string):void {
-            var s = this;
-            var instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
-            var paramCount = [2, 2, 4, 6, 0];
-            var i = 0, l = data.length;
-            var params:any;
-            var x = 0, y = 0;
-            var base64:any = Shape.BASE_64;
+            let s = this;
+            let instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
+            let paramCount = [2, 2, 4, 6, 0];
+            let i = 0, l = data.length;
+            let params:any;
+            let x = 0, y = 0;
+            let base64:any = Shape.BASE_64;
             while (i < l) {
-                var c = data.charAt(i);
-                var n:any = base64[c];
-                var fi = n >> 3; // highest order bits 1-3 code for operation.
-                var f = instructions[fi];
+                let c = data.charAt(i);
+                let n:any = base64[c];
+                let fi = n >> 3; // highest order bits 1-3 code for operation.
+                let f = instructions[fi];
                 // check that we have a valid instruction & that the unused bits are empty:
                 if (!f || (n & 3)) {
                     throw("bad path data (@" + i + "): " + c);
                 }
-                var pl = paramCount[fi];
+                let pl = paramCount[fi];
                 if (!fi) {
                     x = y = 0;
                 } // move operations reset the position.
                 params=[];
                 i++;
-                var charCount = (n >> 2 & 1) + 2;  // 4th header bit indicates number size for this operation.
-                for (var p = 0; p < pl; p++) {
-                    var num:any = base64[data.charAt(i)];
-                    var sign = (num >> 5) ? -1 : 1;
+                let charCount = (n >> 2 & 1) + 2;  // 4th header bit indicates number size for this operation.
+                for (let p = 0; p < pl; p++) {
+                    let num:any = base64[data.charAt(i)];
+                    let sign = (num >> 5) ? -1 : 1;
                     num = ((num & 31) << 6) | (base64[data.charAt(i + 1)]);
                     if (charCount == 3) {
                         num = (num << 6) | (base64[data.charAt(i + 2)]);
@@ -611,7 +612,7 @@ namespace annie {
          * @since 1.0.0
          */
         public render(renderObj:IRender):void {
-            var s = this;
+            let s = this;
             if (s._cacheImg.src!="") {
                 renderObj.draw(s, 1);
             }
@@ -625,22 +626,22 @@ namespace annie {
          * @since 1.0.0
          */
         public update():void {
-            var s = this;
+            let s = this;
             super.update();
             if (s._isNeedUpdate) {
                 //更新缓存
-                var cLen:number = s._command.length;
-                var leftX:number;
-                var leftY:number;
-                var buttonRightX:number;
-                var buttonRightY:number;
-                var i:number;
+                let cLen:number = s._command.length;
+                let leftX:number;
+                let leftY:number;
+                let buttonRightX:number;
+                let buttonRightY:number;
+                let i:number;
                 if (cLen > 0) {
                     //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
-                    var data:any;
-                    var lastX=0;
-                    var lastY=0;
-                    var lineWidth = 0;
+                    let data:any;
+                    let lastX=0;
+                    let lastY=0;
+                    let lineWidth = 0;
                     for (i = 0; i < cLen; i++) {
                         data = s._command[i];
                         if (data[0] == 1) {
@@ -674,10 +675,10 @@ namespace annie {
                                 }
                             } else if (data[1] == "quadraticCurveTo") {
                                 //求中点
-                                var mid1X = (lastX + data[2][0]) * 0.5;
-                                var mid1Y = (lastX + data[2][1]) * 0.5;
-                                var mid2X = (data[2][0] + data[2][2]) * 0.5;
-                                var mid2Y = (data[2][1] + data[2][3]) * 0.5;
+                                let mid1X = (lastX + data[2][0]) * 0.5;
+                                let mid1Y = (lastX + data[2][1]) * 0.5;
+                                let mid2X = (data[2][0] + data[2][2]) * 0.5;
+                                let mid2Y = (data[2][1] + data[2][3]) * 0.5;
                                 if (leftX == undefined) {
                                     leftX = mid1X;
                                 }
@@ -697,13 +698,13 @@ namespace annie {
                                 lastX = data[2][2];
                                 lastY = data[2][3];
                             }else if(data[1]=="arc"){
-                                var yuanPointX=data[2][0];
-                                var yuanPointY=data[2][1];
-                                var radio=data[2][2];
-                                var yuanLeftX=yuanPointX-radio;
-                                var yuanLeftY=yuanPointY-radio;
-                                var yuanBRX=yuanPointX+radio;
-                                var yuanBRY=yuanPointY+radio;
+                                let yuanPointX=data[2][0];
+                                let yuanPointY=data[2][1];
+                                let radio=data[2][2];
+                                let yuanLeftX=yuanPointX-radio;
+                                let yuanLeftY=yuanPointY-radio;
+                                let yuanBRX=yuanPointX+radio;
+                                let yuanBRY=yuanPointY+radio;
                                 if (leftX == undefined) {
                                     leftX = yuanLeftX;
                                 }
@@ -734,24 +735,24 @@ namespace annie {
                         leftY -= 20+lineWidth>>1;
                         buttonRightX +=20+lineWidth>>1;
                         buttonRightY +=20+lineWidth>>1;
-                        var w = buttonRightX - leftX;
-                        var h = buttonRightY - leftY;
+                        let w = buttonRightX - leftX;
+                        let h = buttonRightY - leftY;
                         s._cacheX = leftX;
                         s._cacheY = leftY;
                         ///////////////////////////
-                        var _canvas = s._cacheImg;
+                        let _canvas = s._cacheImg;
                         _canvas.width = w;
                         _canvas.height = h;
                         _canvas.style.width=w/devicePixelRatio+"px";
                         _canvas.style.height=h/devicePixelRatio+"px";
-                        var ctx = _canvas["getContext"]('2d');
+                        let ctx = _canvas["getContext"]('2d');
                         ctx.clearRect(0, 0, w, h);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         /////////////////////
                         if(s["cFilters"]&&s["cFilters"].length>0) {
-                            var cf = s.cFilters;
-                            var cfLen = cf.length;
-                            for (var i = 0; i < cfLen; i++) {
+                            let cf = s.cFilters;
+                            let cfLen = cf.length;
+                            for (let i = 0; i < cfLen; i++) {
                                 if (s.cFilters[i].type == "Shadow") {
                                     ctx.shadowBlur += cf[i].blur;
                                     ctx.shadowColor += cf[i].color;
@@ -767,11 +768,11 @@ namespace annie {
                             ctx.shadowOffsetY =0;
                         }
                         ////////////////////
-                        var data;
+                        let data:any;
                         for (i = 0; i < cLen; i++) {
                             data = s._command[i];
                             if (data[0]>0) {
-                                var paramsLen = data[2].length;
+                                let paramsLen = data[2].length;
                                 if (paramsLen == 0) {
                                     ctx[data[1]]();
                                 } else if (paramsLen == 2) {
@@ -795,10 +796,10 @@ namespace annie {
                         ///////////////////////////
                         //滤镜
                         if(s["cFilters"]&&s["cFilters"].length>0) {
-                            var len=s["cFilters"].length;
-                            var imageData = ctx.getImageData(0, 0, w, h);
-                            for(var i=0;i<len;i++) {
-                                var f:any = s["cFilters"][i];
+                            let len=s["cFilters"].length;
+                            let imageData = ctx.getImageData(0, 0, w, h);
+                            for(let i=0;i<len;i++) {
+                                let f:any = s["cFilters"][i];
                                 f.drawFilter(imageData);
                             }
                             ctx.putImageData(imageData,0,0);
@@ -821,20 +822,20 @@ namespace annie {
             }
         }
         /*private _drawPath(){
-            var s=this;
-            var leftX:number=s._cacheX,leftY:number=s._cacheY,w:number=s._cacheW,h:number=s._cacheH;
-            var _canvas = DisplayObject._canvas;
+            let s=this;
+            let leftX:number=s._cacheX,leftY:number=s._cacheY,w:number=s._cacheW,h:number=s._cacheH;
+            let _canvas = DisplayObject._canvas;
             _canvas.width = w;
             _canvas.height = h;
-            var ctx = _canvas["getContext"]('2d');
+            let ctx = _canvas["getContext"]('2d');
             ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
             ctx.clearRect(leftX, leftY, w + 1, h + 1);
-            var data;
-            var cLen:number=s._command.length;
-            for (var i = 0; i < cLen; i++) {
+            let data;
+            let cLen:number=s._command.length;
+            for (let i = 0; i < cLen; i++) {
                 data = s._command[i];
                 if (data[0]>0) {
-                    var paramsLen = data[2].length;
+                    let paramsLen = data[2].length;
                     if (paramsLen == 0) {
                         ctx[data[1]]();
                     } else if (paramsLen == 2) {
@@ -864,8 +865,8 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds():Rectangle{
-            var s=this;
-            var r=new Rectangle();
+            let s=this;
+            let r=new Rectangle();
             if(s._cacheImg){
                 r.x=s._cacheX+20;
                 r.y=s._cacheY+20;
@@ -884,19 +885,19 @@ namespace annie {
          * @since 1.0.0
          */
         public hitTestPoint(globalPoint:Point,isMouseEvent:boolean=false):DisplayObject{
-            var s=this;
+            let s=this;
             if(isMouseEvent&&!s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p=s.globalToLocal(globalPoint,DisplayObject._bp);
+            let p=s.globalToLocal(globalPoint,DisplayObject._bp);
             if(s.getBounds().isPointIn(p)){
                 if(!s.hitPixel){
                     return s;
                 }
             //继续检测
-                var _canvas = DisplayObject["_canvas"];
+                let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
-                var ctx = _canvas["getContext"]('2d');
+                let ctx = _canvas["getContext"]('2d');
                 ctx.clearRect(0,0,1,1);
                 ctx.setTransform(1,0,0,1,s._cacheX-p.x,s._cacheY-p.y);
                 ctx.drawImage(s._cacheImg,0,0);
@@ -917,10 +918,10 @@ namespace annie {
          * @since 1.0.2
          */
         public changeColor(infoObj:any):void{
-            var s=this;
-            var cLen:number = s._command.length;
-            var c=s._command;
-            for(var i=0;i<cLen;i++){
+            let s=this;
+            let cLen:number = s._command.length;
+            let c=s._command;
+            for(let i=0;i<cLen;i++){
                 if(c[i][0]==0){
                     if(c[i][1]=="fillStyle"&&infoObj.fillColor&&c[i][2]!=infoObj.fillColor){
                         c[i][2]=infoObj.fillColor;

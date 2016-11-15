@@ -52,6 +52,7 @@ namespace annie {
          */
         public constructor(stage: Stage) {
             super();
+            this._instanceType="annie.WGRender";
             this._stage = stage;
         }
 
@@ -62,13 +63,13 @@ namespace annie {
          * @public
          */
         public begin(): void {
-            var s = this;
-            var gl = s._gl;
+            let s = this;
+            let gl = s._gl;
             if (s._stage.bgColor != "") {
-                var color = s._stage.bgColor;
-                var r = parseInt("0x" + color.substr(1, 2));
-                var g = parseInt("0x" + color.substr(3, 2));
-                var b = parseInt("0x" + color.substr(5, 2));
+                let color = s._stage.bgColor;
+                let r = parseInt("0x" + color.substr(1, 2));
+                let g = parseInt("0x" + color.substr(3, 2));
+                let b = parseInt("0x" + color.substr(5, 2));
                 gl.clearColor(r / 255, g / 255, b / 255, 1.0);
             } else {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -86,8 +87,8 @@ namespace annie {
          */
         public beginMask(target: any): void {
             //更新缓冲模板
-            var s = this;
-            var gl = s._gl;
+            let s = this;
+            let gl = s._gl;
             gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
             gl.viewport(0, 0, 1024, 1024);
             gl.disable(gl.BLEND);
@@ -115,14 +116,14 @@ namespace annie {
          * @since 1.0.2
          */
         public endMask(): void {
-            var s = this;
-            var gl=s._gl;
-            var len = s._maskObjList.length;
+            let s = this;
+            let gl=s._gl;
+            let len = s._maskObjList.length;
             if(len>1){
                 s._maskObjList.pop();
-                var mlCopy:any=s._maskObjList.concat();
+                let mlCopy:any=s._maskObjList.concat();
                 s._maskObjList.length=0;
-                for(var i:number=0;i<mlCopy.length;i++){
+                for(let i:number=0;i<mlCopy.length;i++){
                     s.beginMask(mlCopy[i]);
                 }
             }else{
@@ -138,8 +139,8 @@ namespace annie {
          * @method reSize
          */
         public reSize(): void {
-            var s = this;
-            var c = s.rootContainer;
+            let s = this;
+            let c = s.rootContainer;
             c.width = s._stage.divWidth * devicePixelRatio;
             c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";
@@ -157,12 +158,12 @@ namespace annie {
         }
 
         private _getShader(id: number) {
-            var s = this;
-            var gl = s._gl;
+            let s = this;
+            let gl = s._gl;
             // Find the shader script element
-            var shaderText = "";
+            let shaderText = "";
             // Create the shader object instance
-            var shader: any = null;
+            let shader: any = null;
             if (id == 0) {
                 shaderText = 'precision highp float;' +
                     'varying vec2 v_TC;' +
@@ -225,16 +226,16 @@ namespace annie {
          * @method init
          */
         public init(): void {
-            var s = this;
+            let s = this;
             if (!s.rootContainer) {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
             }
-            var c: any = s.rootContainer;
-            var gl = c.getContext("webgl") || c.getContext('experimental-webgl');
+            let c: any = s.rootContainer;
+            let gl = c.getContext("webgl") || c.getContext('experimental-webgl');
             s._gl = gl;
             s._program = gl.createProgram();
-            var _program = s._program;
+            let _program = s._program;
             //初始化顶点着色器和片元着色器
             s._getShader(0);
             s._getShader(1);
@@ -272,8 +273,8 @@ namespace annie {
         }
 
         private setBuffer(buffer: any, data: any): void {
-            var s = this;
-            var gl = s._gl;
+            let s = this;
+            let gl = s._gl;
             //绑定buffer
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
@@ -291,12 +292,12 @@ namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         public draw(target: any, type: number): void {
-            var s = this;
+            let s = this;
             if (!target._cacheImg || (target._cacheImg.nodeName == "IMG" && !target._cacheImg.complete))return;
-            var gl = s._gl;
-            var gi: any = target._glInfo;
+            let gl = s._gl;
+            let gi: any = target._glInfo;
             ////////////////////////////////////////////
-            var vertices =
+            let vertices =
                 [
                     //x,y,textureX,textureY
                     0.0, 0.0, gi.x, gi.y,
@@ -304,8 +305,8 @@ namespace annie {
                     0.0, gi.ph, gi.x, gi.h,
                     gi.pw, gi.ph, gi.w, gi.h
                 ];
-            var img = target._cacheImg;
-            var m: any;
+            let img = target._cacheImg;
+            let m: any;
             if (img._annieType > 0) {
                 m = s._cM;
                 m.identity();
@@ -320,7 +321,7 @@ namespace annie {
             } else {
                 m = target.cMatrix;
             }
-            var vMatrix: any = new Float32Array(
+            let vMatrix: any = new Float32Array(
                 [
                     m.a, m.b, 0,
                     m.c, m.d, 0,
@@ -337,17 +338,17 @@ namespace annie {
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
         private activeTexture(texture:any,isMaskTexture:boolean=false):number{
-            var s=this;
-            var gl=s._gl;
-            var newId:number=-1;
-            var isHave:boolean=false;
+            let s=this;
+            let gl=s._gl;
+            let newId:number=-1;
+            let isHave:boolean=false;
             if(isMaskTexture){
                 newId=0;
                 if(s._textures[0]==texture){
                     isHave=true;
                 }
             }else {
-                for (var i = 1; i < s._maxTextureCount; i++) {
+                for (let i = 1; i < s._maxTextureCount; i++) {
                     if (s._textures[i] == null) {
                         newId = i;
                         break;
@@ -375,18 +376,18 @@ namespace annie {
             return newId;
         }
         private initMaskBuffer(): void {
-            var s = this;
+            let s = this;
             s._maskFbo = s.createFramebuffer(1024, 1024);
             s._maskSrcTexture = s._maskFbo.texture;
             s._maskTexture = s.createTexture(null, 1024, 1024);
         }
 
         public createTexture(bitmapData: any = null, width: number = 1, height: number = 1): WebGLTexture {
-            var gl = this._gl;
-            var texture: any = gl.createTexture();
+            let gl = this._gl;
+            let texture: any = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            var b: any = bitmapData;
-            var h: number, w: number;
+            let b: any = bitmapData;
+            let h: number, w: number;
             if (bitmapData) {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
                 w = bitmapData.width;
@@ -408,21 +409,21 @@ namespace annie {
         }
 
         public updateTexture(texture: WebGLTexture, bitmapData: any): void {
-            var s = this;
-            var gl = s._gl;
+            let s = this;
+            let gl = s._gl;
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
             gl.bindTexture(gl.TEXTURE_2D, null);
         }
 
         public createFramebuffer(width: number, height: number): WebGLFramebuffer {
-            var s = this;
-            var gl = s._gl;
-            var fb: any = gl.createFramebuffer();
+            let s = this;
+            let gl = s._gl;
+            let fb: any = gl.createFramebuffer();
             fb.width = width;
             fb.height = height;
             gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-            var texture = s.createTexture(null, width, height);
+            let texture = s.createTexture(null, width, height);
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
             fb.texture = texture;
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -439,11 +440,11 @@ namespace annie {
         public static setDisplayInfo(target: any, type: number): void {
             //判断是不是webgl渲染模式
             if (!target.stage || target.stage.renderType != 1)return;
+            let img: any = target._cacheImg;
+            let renderObj: any = target.stage.renderObj;
             if (target.stage) {
-                var gi: any = target._glInfo;
-                var renderObj: any = target.stage.renderObj;
-                var tc: Rectangle = target.rect;
-                var img: any = target._cacheImg;
+                let gi: any = target._glInfo;
+                let tc: Rectangle = target.rect;
                 if (tc) {
                     gi.x = tc.x / img.width;
                     gi.y = tc.y / img.height;
@@ -452,8 +453,8 @@ namespace annie {
                     gi.pw = tc.width;
                     gi.ph = tc.height;
                 } else {
-                    var cX: number = target._cacheX;
-                    var cY: number = target._cacheY;
+                    let cX: number = target._cacheX;
+                    let cY: number = target._cacheY;
                     gi.x = cX / img.width;
                     gi.y = cY / img.height;
                     gi.w = (img.width - cX) / img.width;

@@ -154,7 +154,8 @@ namespace annieUI {
          */
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annieUI.ScrollPage";
             s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
@@ -169,7 +170,7 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
-                var view: any = s.view;
+                let view: any = s.view;
                 if(s.autoScroll)return;
                 if (!s.isStop){
                     if (Math.abs(s.speed) > 0) {
@@ -224,7 +225,7 @@ namespace annieUI {
          * @public
          */
         public changeDirection(isVertical: boolean = true): void {
-            var s = this;
+            let s = this;
             s.isVertical = isVertical;
             if (isVertical) {
                 s.distance = s.viewHeight;
@@ -243,7 +244,7 @@ namespace annieUI {
          * @since 1.0.0
          */
         private setMask(w:number,h:number):void{
-            var s:any=this;
+            let s:any=this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
             s.maskObj.drawRect(0, 0, w, h);
@@ -259,9 +260,9 @@ namespace annieUI {
             }
         }
         private onMouseEvent(e: annie.MouseEvent): void{
-            var s = this;
+            let s = this;
             if(s.autoScroll)return;
-            var view: any = s.view;
+            let view: any = s.view;
             if (s.distance < s.maxDistance) {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {
@@ -276,7 +277,7 @@ namespace annieUI {
                     s.isMouseDown=true;
                 } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
                     if(!s.isMouseDown)return;
-                    var currentValue: number;
+                    let currentValue: number;
                     if (s.isVertical) {
                         currentValue = e.localY;
                     } else {
@@ -297,7 +298,7 @@ namespace annieUI {
                         s.speed = 0;
                     }
                     if (s.speed != 0) {
-                        var speedPer: number = 1;
+                        let speedPer: number = 1;
                         if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
                             speedPer = 0.2;
                         }
@@ -322,11 +323,11 @@ namespace annieUI {
          * @public
          */
         public scrollTo(dis:number,time:number=0):void{
-            var s=this;
+            let s=this;
             s.autoScroll=true;
             s.isStop=true;
             s.isMouseDown=false;
-            var obj:any={};
+            let obj:any={};
             obj.onComplete=function () {
                 s.autoScroll=false;
             };

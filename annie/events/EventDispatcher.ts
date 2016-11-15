@@ -9,13 +9,14 @@ namespace annie {
      */
     export class AObject {
         private _id:number = 0;
+        protected _instanceType:string="AObject";
         private static _object_id = 0;
         public constructor(){
             this._id = AObject._object_id++;
         }
         /**
          * 每一个annie引擎对象都会有一个唯一的id码。
-         * @method getInstanceId
+         * @property instanceId
          * @public
          * @since 1.0.0
          * @returns {number}
@@ -23,8 +24,11 @@ namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.getInstanceId());
          */
-        public getInstanceId():number {
+        public get instanceId():number {
             return this._id;
+        }
+        public get instanceType():string{
+            return this._instanceType;
         }
     }
     /**
@@ -38,7 +42,9 @@ namespace annie {
         private eventTypes:any = null;
         public constructor() {
             super();
+            this._instanceType="annie.EventDispatcher";
             this.eventTypes = {};
+
         }
 
         /**
@@ -60,10 +66,10 @@ namespace annie {
          * @param {string} type 获取事件类型，默认是所有
          */
         public static getMouseEventCount(type:string=""):number{
-            var count:number=0;
+            let count:number=0;
             if(type==""){
                 //返回所有鼠标事件数
-                for(var item in EventDispatcher._MECO){
+                for(let item in EventDispatcher._MECO){
                     if(item.indexOf("onMouse")==0) {
                         count += EventDispatcher._MECO[item];
                     }
@@ -90,7 +96,7 @@ namespace annie {
                 trace("添加侦听的type值为undefined");
                 return;
             }
-            var s=this;
+            let s=this;
             if (!s.eventTypes[type]) {
                 s.eventTypes[type] = [];
             }
@@ -110,7 +116,7 @@ namespace annie {
          * @param {boolean} isAdd
          */
         private _changeMouseCount(type:string,isAdd:boolean):void{
-            var count=isAdd?1:-1;
+            let count=isAdd?1:-1;
             if(!EventDispatcher._MECO[type]){
                 EventDispatcher._MECO[type]=0;
             }
@@ -130,20 +136,20 @@ namespace annie {
          * @returns {boolean} 如果有收听者则返回true
          */
         public dispatchEvent(event:any,data:any=null):boolean {
-            var s = this;
+            let s = this;
             if(typeof(event)=="string"){
                 event=new annie.Event(event);
             }
-            var listeners = s.eventTypes[event.type];
+            let listeners = s.eventTypes[event.type];
             if (listeners) {
-                var len = listeners.length;
+                let len = listeners.length;
                 if(event.target==null) {
                     event.target = s;
                 }
                 if(data!=null){
                     event.data=data;
                 }
-                for (var i = 0; i < len; i++) {
+                for (let i = 0; i < len; i++) {
                     listeners[i](event);
                 }
                 return true;
@@ -174,11 +180,11 @@ namespace annie {
          * @param {Function} listener 及侦听时绑定的回调方法
          */
         public removeEventListener(type:string,listener:Function):void{
-            var s=this;
-            var listeners = s.eventTypes[type];
+            let s=this;
+            let listeners = s.eventTypes[type];
             if (listeners) {
-                var len = listeners.length;
-                for (var i = len - 1; i >= 0; i--) {
+                let len = listeners.length;
+                for (let i = len - 1; i >= 0; i--) {
                     if(listeners[i] === listener){
                         listeners.splice(i, 1);
                         if(type.indexOf("onMouse")==0) {
@@ -195,10 +201,10 @@ namespace annie {
          * @since 1.0.0
          */
         public removeAllEventListener() {
-            var s=this;
-            for(var type in s.eventTypes){
+            let s=this;
+            for(let type in s.eventTypes){
                 if(type.indexOf("onMouse")==0) {
-                    for(var j=0;j<s.eventTypes[type].length;j++){
+                    for(let j=0;j<s.eventTypes[type].length;j++){
                         s._changeMouseCount(type,false);
                     }
                 }

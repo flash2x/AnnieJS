@@ -30,7 +30,9 @@ namespace annie {
          */
         public constructor(stage:Stage){
             super();
+            this._instanceType="annie.CanvasRender";
             this._stage=stage;
+
         }
 
         /**
@@ -40,8 +42,8 @@ namespace annie {
          * @public
          */
         public begin():void{
-            var s=this;
-            var c=s.rootContainer;
+            let s=this;
+            let c=s.rootContainer;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
@@ -58,23 +60,23 @@ namespace annie {
          * @since 1.0.0
          */
         public beginMask(target:any):void{
-            var s:CanvasRender=this;
-            var isHadPath = false;
+            let s:CanvasRender=this;
+            let isHadPath = false;
             if(target.children&&target.children.length>0){
                 target=target.children[0];
             }
             if(target._command){
                 s._ctx.save();
                 s._ctx.globalAlpha=0;
-                var tm=target.cMatrix;
+                let tm=target.cMatrix;
                 s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                var data:any;
-                var cLen:number = target._command.length;
-                for (var i = 0; i < cLen; i++) {
+                let data:any;
+                let cLen:number = target._command.length;
+                for (let i = 0; i < cLen; i++) {
                     data = target._command[i];
                     if (data[0] == 1) {
                         isHadPath = true;
-                        var paramsLen = data[2].length;
+                        let paramsLen = data[2].length;
                         if (paramsLen == 0) {
                             s._ctx[data[1]]();
                         } else if (paramsLen == 2) {
@@ -118,16 +120,16 @@ namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         public draw(target:any, type:number):void{
-            var s = this;
+            let s = this;
             if(!target._cacheImg||(target._cacheImg.nodeName=="IMG"&&!target._cacheImg.complete))return;
             //s._ctx.save();
             s._ctx.globalAlpha = target.cAlpha;
-            var tm=target.cMatrix;
+            let tm=target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (type == 0) {
                 //图片
                 if(target._cacheImg){
-                    var tr = target.rect;
+                    let tr = target.rect;
                     //因为如果有滤镜的话是重新画了图的,所以尺寸什么的跟SpriteSheet无关了
                     if (tr&&!target._isCache){
                         s._ctx.drawImage(target._cacheImg, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
@@ -154,12 +156,12 @@ namespace annie {
          * @method init
          */
         public init():void {
-            var s = this;
+            let s = this;
             if(!s.rootContainer) {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
             }
-            var c=s.rootContainer;
+            let c=s.rootContainer;
             s._ctx = c["getContext"]('2d');
         }
 
@@ -170,8 +172,8 @@ namespace annie {
          * @method reSize
          */
         public reSize():void{
-            var s=this;
-            var c=s.rootContainer;
+            let s=this;
+            let c=s.rootContainer;
             c.width = s._stage.divWidth *devicePixelRatio;
             c.height = s._stage.divHeight *devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";

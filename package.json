@@ -1,6 +1,6 @@
 {
   "name": "annie",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "annie is powerful js Engine!",
   "main": "gulpfile.js",
   "directories": {

@@ -11,7 +11,7 @@ namespace annie{
      * @since 1.0.0
      * @extends annie.EventDispatcher
      */
-    export class DisplayObject extends EventDispatcher{
+    export abstract class DisplayObject extends EventDispatcher{
         /**
          * @method DisplayObject
          * @since 1.0.0
@@ -19,6 +19,7 @@ namespace annie{
          */
         public constructor(){
             super();
+            this._instanceType="annie.DisplayObject";
         }
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
@@ -288,7 +289,7 @@ namespace annie{
          * @returns {annie.DisplayObject}
          */
         public hitTestPoint(globalPoint:Point, isMouseEvent:boolean = false):DisplayObject {
-            var s = this;
+            let s = this;
             if(!s.visible)return null;
             if (isMouseEvent && !s.mouseEnable)return null;
             if (s.getBounds().isPointIn(s.globalToLocal(globalPoint,DisplayObject._bp))) {
@@ -303,9 +304,7 @@ namespace annie{
          * @since 1.0.0
          * @returns {annie.Rectangle}
          */
-        public getBounds():Rectangle {
-            return null;
-        }
+        public abstract getBounds():Rectangle;
 
         /**
          * 获取对象形变后外切矩形。
@@ -316,12 +315,12 @@ namespace annie{
          * @returns {annie.Rectangle}
          */
         public getDrawRect():Rectangle{
-            var s = this;
-            var rect:Rectangle;
-            var bounds = s.getBounds();
+            let s = this;
+            let rect:Rectangle;
+            let bounds = s.getBounds();
             if (bounds){
-                var p1:Point = s.matrix.transformPoint(bounds.x, bounds.y);
-                var p2:Point = s.matrix.transformPoint(bounds.x + bounds.width, bounds.y + bounds.height);
+                let p1:Point = s.matrix.transformPoint(bounds.x, bounds.y);
+                let p2:Point = s.matrix.transformPoint(bounds.x + bounds.width, bounds.y + bounds.height);
                 rect = Rectangle.createFromPoints(p1, p2);
                 rect.width -= rect.x;
                 rect.height -= rect.y;
@@ -334,8 +333,8 @@ namespace annie{
          * @public
          * @since 1.0.0
          */
-        public update():void {
-            var s = this;
+        public update():void{
+            let s = this;
             s.matrix.createBox(s.x, s.y, s.scaleX, s.scaleY, s.rotation, s.skewX, s.skewY, s.anchorX, s.anchorY);
             s.cFilters.length=0;
             s.cMatrix.setFrom(s.matrix);
@@ -343,9 +342,9 @@ namespace annie{
                 s.cMatrix.prepend(s.parent.cMatrix);
                 s.cAlpha = s.alpha * s.parent.cAlpha;
                 if (s.parent.cFilters && s.parent.cFilters.length > 0) {
-                    var len=s.parent.cFilters.length;
-                    var pf=s.parent.cFilters;
-                    for(var i=0;i<len;i++) {
+                    let len=s.parent.cFilters.length;
+                    let pf=s.parent.cFilters;
+                    for(let i=0;i<len;i++) {
                         s.cFilters[i]=pf[i];
                     }
                 }
@@ -355,20 +354,20 @@ namespace annie{
             if(s.visible) {
                 //如果visible为true更新他们的显示列表信息
                 if (s.filters && s.filters.length > 0) {
-                    var len = s.filters.length;
-                    var sf = s.filters;
-                    for (var i = 0; i < len; i++) {
+                    let len = s.filters.length;
+                    let sf = s.filters;
+                    for (let i = 0; i < len; i++) {
                         s.cFilters.push(sf[i]);
                     }
                 }
                 //判读是否显示对象链上是否有滤镜更新
                 if (s.cFilters.length > 0) {
-                    var cLen = s.cFilters.length;
-                    var isNeedUpdateFilters = false;
+                    let cLen = s.cFilters.length;
+                    let isNeedUpdateFilters = false;
                     if (s.cCacheFilters.length != cLen) {
                         isNeedUpdateFilters = true;
                     } else {
-                        for (var i = 0; i < cLen; i++) {
+                        for (let i = 0; i < cLen; i++) {
                             if (s.cFilters[i].toString() != s.cCacheFilters[i]) {
                                 isNeedUpdateFilters = true;
                                 break;
@@ -378,7 +377,7 @@ namespace annie{
                     if (isNeedUpdateFilters) {
                         s._isNeedUpdate = true;
                         s.cCacheFilters.length = 0;
-                        for (var i = 0; i < cLen; i++) {
+                        for (let i = 0; i < cLen; i++) {
                             s.cCacheFilters[i] = s.cFilters[i].toString();
                         }
                     }
@@ -403,9 +402,7 @@ namespace annie{
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          */
-        public render(renderObj:IRender):void {
-            //this.isNeedUpdate =false;
-        }
+        public abstract render(renderObj:IRender):void;
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递
          * @method _onDispatchBubbledEvent
@@ -415,43 +412,54 @@ namespace annie{
          * @private
          */
         public _onDispatchBubbledEvent(type:string):void {
-            var s = this;
+            let s = this;
             s.stage=s.parent.stage;
             s.dispatchEvent(type);
             if(type=="onRemoveToStage"){
                 s.stage=null;
             }
         }
+
         /**
-         * 返回显示对象的宽和高
-         * @method getWH
+         * 获取或者设置显示对象在父级里的x方向的宽
+         * 之前需要使用getWH或者setWH 现已废弃
+         * @property  width
          * @public
-         * @since 1.0.0
-         * @returns {width: number, height: number}
+         * @since 1.0.3
+         * @return {number}
          */
-        public getWH():{width:number,height:number} {
-            var s = this;
-            var dr = s.getDrawRect();
-            return {width: dr.width, height: dr.height};
+        get width():number{
+            let s = this;
+            let dr = s.getDrawRect();
+            return  dr.width;
         }
-        /**
-         * 设置显示对象的宽和高
-         * @method setWH
-         * @public
-         * @since 1.0.0
-         * @param {number} w
-         * @param {number} h
-         */
-        public setWH(w:number, h:number):void {
-            var s = this;
-            var wh = s.getWH();
-            if (w != 0) {
-                var sx = w / wh.width;
+        set width(value:number){
+            let s = this;
+            let w = s.width;
+            if (value != 0) {
+                let sx = value /w;
                 s.scaleX *= sx;
             }
-            if (h != 0) {
-                var sy = h / wh.height;
-                s.scaleY *= sy;
+        }
+        /**
+         * 获取或者设置显示对象在父级里的y方向的高
+         * 之前需要使用getWH或者setWH 现已废弃
+         * @property  height
+         * @public
+         * @since 1.0.3
+         * @return {number}
+         */
+        get height():number{
+            let s = this;
+            let dr = s.getDrawRect();
+            return  dr.height;
+        }
+        set height(value:number){
+            let s = this;
+            let h = s.height;
+            if (value != 0) {
+                let sy = value /h;
+                s.scaleX *= sy;
             }
         }
         /**

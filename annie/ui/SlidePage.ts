@@ -195,7 +195,7 @@ namespace annieUI {
          * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @param{number}slideSpeed  页面滑动速度
          * @example
-         *      var slideBox = new annieUI.SlidePage({
+         *      let slideBox = new annieUI.SlidePage({
          *          pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
          *          isVertical: true,//默认值为true,ture为纵向,falas为横向
          *          slideSpeed: .32,//默认值为.4，滑动速度
@@ -204,7 +204,8 @@ namespace annieUI {
          */
         constructor(option: any) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annieUI.SlidePages";
             if (!s.isArray(option['pageList'])) {
                 throw 'pageList参数数据格式不对！pageList应为页面对象列表数组';
             }
@@ -226,12 +227,12 @@ namespace annieUI {
          * @param e
          */
         private onAddToStage(e: annie.Event): void {
-            var s = this;
-            s.stageW = s.stage.width;
-            s.stageH = s.stage.height;
+            let s = this;
+            s.stageW = s.stage.desWidth;
+            s.stageH = s.stage.desHeight;
             s.listLen = s.pageList.length;//页面个数
             s.slideCon = new annie.Sprite();
-            for (var i = 0; i < s.listLen; i++) {
+            for (let i = 0; i < s.listLen; i++) {
                 s.pageList[i].pageId = i;
                 s.pageList[i].visible = true;
                 s.pageList[i].canSlidePrev = true;
@@ -259,7 +260,7 @@ namespace annieUI {
          * @param e
          */
         private onMouseEventHandler(e: annie.MouseEvent): void {
-            var s = this;
+            let s = this;
             if (s.isMoving) {
                 return;
             }
@@ -357,16 +358,16 @@ namespace annieUI {
          * @since 1.0.2
          */
         public slideTo(index: any): void {
-            var s = this;
+            let s = this;
             if (s.isMoving) {
                 return;
             }
             if (s.isVertical) {
                 annie.Tween.to(s.slideCon, s.slideSpeed, {
-                    y: -index * s.stage.height, onComplete: function () {
+                    y: -index * s.stage.desHeight, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
-                        //     for (var i = 0; i < s.listLen; i++) {
+                        //     for (let i = 0; i < s.listLen; i++) {
                         //         if (s.currentPageIndex != s.pageList[i].pageId)
                         //             s.pageList[i].visible = false;
                         //     }
@@ -379,10 +380,10 @@ namespace annieUI {
                 s.isMoving = true;
             } else {
                 annie.Tween.to(s.slideCon, s.slideSpeed, {
-                    x: -index * s.stage.width, onComplete: function () {
+                    x: -index * s.stage.desWidth, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
-                        //     for (var i = 0; i < s.listLen; i++) {
+                        //     for (let i = 0; i < s.listLen; i++) {
                         //         if (s.currentPageIndex != s.pageList[i].pageId)
                         //             s.pageList[i].visible = false;
                         //     }
@@ -405,13 +406,13 @@ namespace annieUI {
          * @param list 页面数组对象
          */
         public addPageList(list: any): void {
-            var s = this;
+            let s = this;
             if (!s.isArray(list)) {
                 throw 'list应为页面对象列表数组';
             }
-            var addListLen = list.length;
+            let addListLen = list.length;
             // console.log('addLisLen:'+addListLen);
-            for (var i = 0; i < addListLen; i++) {
+            for (let i = 0; i < addListLen; i++) {
                 list[i].pageId = s.listLen;
                 list[i].visible = true;
                 list[i].canSlidePrev = true;
@@ -427,7 +428,6 @@ namespace annieUI {
                 s.slideCon.addChildAt(list[i], s.listLen);
             }
         }
-
         /**
          * 平面中两点距离公式
          * @param x1
@@ -437,13 +437,9 @@ namespace annieUI {
          * @returns {number}
          */
         private getDistance(x1: number, y1: number, x2: number, y2: number): number {
-            var x1 = x1;
-            var y1 = y1;
-            var x2 = x2;
-            var y2 = y2;
-            var xdiff = x2 - x1;
-            var ydiff = y2 - y1;
-            var dis = Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);
+            let xdiff = x2 - x1;
+            let ydiff = y2 - y1;
+            let dis = Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);
             return dis;
         }
     }

@@ -20,7 +20,8 @@ namespace annieUI
     export class FacePhoto extends Sprite{
         constructor(){
             super();
-            var s=this;
+            let s=this;
+            s._instanceType="annieUI.FacePhoto";
             s.photo=new Image();
             s.bitmap=new annie.Bitmap();
             s.maskObj=new annie.Shape();
@@ -32,7 +33,7 @@ namespace annieUI
                     s.bitmap.scaleX=s.bitmap.scaleY=s.radio*2/s.photo.width;
                     s.maskObj.drawCircle(s.radio, s.radio, s.radio);
                 }else{
-                    var w=s.photo.width>s.photo.height?s.photo.width:s.photo.height;
+                    let w=s.photo.width>s.photo.height?s.photo.width:s.photo.height;
                     s.bitmap.scaleX=s.bitmap.scaleY=s.radio/w;
                     s.maskObj.drawRect(0,0,s.radio,s.radio);
                 }

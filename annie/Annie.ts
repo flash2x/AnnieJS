@@ -13,7 +13,7 @@ namespace annie {
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    export var debug:boolean=false;
+    export let debug:boolean=false;
     /**
      * annie引擎的版本号
      * @public
@@ -24,7 +24,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    export var version:string="1.0.2";
+    export let version:string="1.0.2";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -36,7 +36,7 @@ namespace annie {
      *      //打印当前设备的retina值
      *      trace(annie.devicePixelRatio);
      */
-    export var devicePixelRatio:number = window.devicePixelRatio ? window.devicePixelRatio : 1;
+    export let devicePixelRatio:number = window.devicePixelRatio ? window.devicePixelRatio : 1;
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
@@ -48,10 +48,10 @@ namespace annie {
      *      //获取当前设备类型
      *      trace(annie.osType);
      */
-    export var osType:string = (function (){
-        var n = navigator.userAgent.toLocaleLowerCase();
-        var reg1 = /android/;
-        var reg2 = /iphone|ipod|ipad/;
+    export let osType:string = (function (){
+        let n = navigator.userAgent.toLocaleLowerCase();
+        let reg1 = /android/;
+        let reg2 = /iphone|ipod|ipad/;
         if (reg1.test(n)){
             return "android";
         }else if(reg2.test(n)){
@@ -76,12 +76,12 @@ namespace annie {
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      var s=this;
+     *      let s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          var i=0;
+     *          let i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              var state=e.currentTarget;
+     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              let state=e.currentTarget;
      *              state.scaleMode=aList[i];
      *              state.resize();
      *              if(i>5){i=0;}
@@ -89,7 +89,7 @@ namespace annie {
      *      }
      *
      */
-    export var StageScaleMode:{EXACT_FIT:string,NO_BORDER:string,NO_SCALE:string,SHOW_ALL:string,FIXED_WIDTH:string,FIXED_HEIGHT:string} = {
+    export let StageScaleMode:{EXACT_FIT:string,NO_BORDER:string,NO_SCALE:string,SHOW_ALL:string,FIXED_WIDTH:string,FIXED_HEIGHT:string} = {
         EXACT_FIT: "exactFit",
         NO_BORDER: "noBorder",
         NO_SCALE: "noScale",
@@ -121,7 +121,7 @@ namespace annie {
      *      annie.sendToURL("http://www.annie2x.com");
      */
     export function sendToURL(url:string):void {
-        var req = new XMLHttpRequest();
+        let req = new XMLHttpRequest();
         req.open("get", url, true);
         req.send();
     }
@@ -137,9 +137,9 @@ namespace annie {
      * @type{boolean}
      * @default false
      */
-    export var canHTMLTouchMove:boolean=false;
+    export let canHTMLTouchMove:boolean=false;
     // 作为将显示对象导出成图片的render渲染器
-    var _dRender:any=null;
+    let _dRender:any=null;
     /**
      * 将显示对象转成base64的图片数据
      * @method toDisplayDataURL
@@ -150,7 +150,7 @@ namespace annie {
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    export var toDisplayDataURL=function(obj:any,rect:Rectangle=null,typeInfo:any=null,bgColor:string=""):string {
+    export let toDisplayDataURL=function(obj:any,rect:Rectangle=null,typeInfo:any=null,bgColor:string=""):string {
         if(!_dRender){
             _dRender=new CanvasRender(null);
         }
@@ -160,9 +160,9 @@ namespace annie {
         if(!obj.stage){
             obj.update();
         }
-        var whObj:any=obj.getBounds();
-        var w:number=rect?rect.width:whObj.width;
-        var h:number=rect?rect.height:whObj.height;
+        let whObj:any=obj.getBounds();
+        let w:number=rect?rect.width:whObj.width;
+        let h:number=rect?rect.height:whObj.height;
         _dRender.rootContainer.width=w;
         _dRender.rootContainer.height=h;
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
@@ -172,7 +172,7 @@ namespace annie {
             _dRender._ctx.fillStyle=bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
-        var objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
+        let objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
         obj.parent=null;
         obj.x=rect?-rect.x:0;
         obj.y=rect?-rect.y:0;

@@ -20,10 +20,12 @@ namespace annie {
          */
         public constructor(x:number=0, y:number=0, width:number=0, height:number=0) {
             super();
-            this.x = x;
-            this.y = y;
-            this.height = height;
-            this.width = width;
+            var s=this;
+            s._instanceType="annie.Rectangle";
+            s.x = x;
+            s.y = y;
+            s.height = height;
+            s.width = width;
         }
 
         /**
@@ -68,7 +70,7 @@ namespace annie {
          * @since 1.0.0
          */
         public isPointIn(point:Point):boolean{
-            var s=this;
+            let s=this;
             return point.x>=s.x&&point.x<=(s.x+s.width)&&point.y>=s.y&&point.y<=(s.y+s.height);
         }
         /**
@@ -82,8 +84,8 @@ namespace annie {
          * @static
          */
         public static createFromRects(rect:Rectangle,...arg:Rectangle[]):Rectangle{
-            var x=rect.x,y=rect.y,w=rect.width,h=rect.height,wx1:number,wx2:number,hy1:number,hy2:number
-            for(var i:number=0;i<arg.length;i++){
+            let x=rect.x,y=rect.y,w=rect.width,h=rect.height,wx1:number,wx2:number,hy1:number,hy2:number
+            for(let i:number=0;i<arg.length;i++){
                 if(arg[i]==null)continue;
                 wx1=x+w;
                 hy1=y+h;
@@ -116,8 +118,8 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public static createFromPoints(p1:Point,...arg:Point[]):Rectangle{
-           var x=p1.x,y=p1.y,w=p1.x,h=p1.y;
-            for(var i:number=0;i<arg.length;i++){
+           let x=p1.x,y=p1.y,w=p1.x,h=p1.y;
+            for(let i:number=0;i<arg.length;i++){
                 if(arg[i]==null)continue;
                 if(x>arg[i].x){
                     x=arg[i].x;
@@ -145,8 +147,8 @@ namespace annie {
          * @return {boolean}
          */
         public static testRectCross(ra:Rectangle,rb:Rectangle):boolean{
-            var a_cx:number,a_cy:number; /* 第一个中心点*/
-            var b_cx:number,b_cy:number; /* 第二个中心点*/
+            let a_cx:number,a_cy:number; /* 第一个中心点*/
+            let b_cx:number,b_cy:number; /* 第二个中心点*/
             a_cx = ra.x + (ra.width/2);
             a_cy = ra.y + (ra.height/2);
             b_cx = rb.x + (rb.width/2);

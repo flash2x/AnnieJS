@@ -15,8 +15,8 @@ namespace annie {
     export class Sprite extends DisplayObject {
         public constructor() {
             super();
+            this._instanceType="annie.Sprite";
         }
-
         /**
          * 是否可以让children接收鼠标事件
          * @property mouseChildren
@@ -56,9 +56,9 @@ namespace annie {
          * @param {annie.DisplayObject} child
          */
         public removeChild(child:DisplayObject):void {
-            var s = this;
-            var len=s.children.length;
-            for (var i = 0; i < len; i++) {
+            let s = this;
+            let len=s.children.length;
+            for (let i = 0; i < len; i++) {
                 if (s.children[i] == child) {
                     s.removeChildAt(i);
                     break;
@@ -67,11 +67,11 @@ namespace annie {
         }
         //全局遍历
         private static _getElementsByName(rex:RegExp,root:annie.Sprite,isOnlyOne:boolean,isRecursive:boolean,resultList:Array<annie.DisplayObject>):void{
-            var len=root.children.length;
+            let len=root.children.length;
             if(len>0){
-                var name:string;
-                var child:any;
-                for(var i=0;i<len;i++){
+                let name:string;
+                let child:any;
+                for(let i=0;i<len;i++){
                     child=root.children[i];
                     name=child.name;
                     if(name&&name!=""){
@@ -102,16 +102,16 @@ namespace annie {
          */
         public getChildByName(name:string|RegExp,isOnlyOne:boolean=true,isRecursive:boolean=false):any {
             if(!name)return null;
-            var s = this;
-            var rex:any;
+            let s = this;
+            let rex:any;
             if (typeof(name) == "string"){
                 rex=new RegExp("^"+name+"$");
             }else{
                 rex=name;
             }
-            var  elements:Array<annie.DisplayObject>=[];
+            let  elements:Array<annie.DisplayObject>=[];
             Sprite._getElementsByName(rex,s,isOnlyOne,isRecursive,elements);
-            var len=elements.length;
+            let len=elements.length;
             if(len==0){
                 return null;
             }else if(len==1){
@@ -130,15 +130,15 @@ namespace annie {
          * @since 1.0.0
          */
         public addChildAt(child:DisplayObject, index:number):void {
-            var s = this;
-            var sameParent=s==child.parent;
-            var len:number;
+            let s = this;
+            let sameParent=s==child.parent;
+            let len:number;
             if (child.parent) {
                 if(!sameParent) {
                     child.parent.removeChild(child);
                 }else{
                      len=s.children.length;
-                    for (var i = 0; i < len; i++) {
+                    for (let i = 0; i < len; i++) {
                         if (s.children[i] == child) {
                             s.children.splice(i,1);
                             break;
@@ -183,8 +183,8 @@ namespace annie {
          * @return {number}
          */
         public getChildIndex(child:DisplayObject):number {
-           var len=this.children.length;
-            for(var i:number=0;i<len;i++){
+           let len=this.children.length;
+            for(let i:number=0;i<len;i++){
                 if(this.children[i]==child){
                     return i;
                 }
@@ -199,10 +199,10 @@ namespace annie {
          * @since 1.0.0
          */
         public _onDispatchBubbledEvent(type:string):void {
-            var s = this;
-            var len=s.children.length;
+            let s = this;
+            let len=s.children.length;
             s.stage=s.parent.stage;
-            for (var i = 0; i < len; i++){
+            for (let i = 0; i < len; i++){
                 s.children[i]._onDispatchBubbledEvent(type);
             }
             super._onDispatchBubbledEvent(type);
@@ -215,9 +215,9 @@ namespace annie {
          * @since 1.0.0
          */
         public removeChildAt(index:number):void {
-            var s = this;
-            var child:any;
-            var len=s.children.length;
+            let s = this;
+            let child:any;
+            let len=s.children.length;
             if(len==0)return;
             if (index == len) {
                 child = s.children.pop();
@@ -236,9 +236,9 @@ namespace annie {
          * @since 1.0.0
          */
         public removeAllChildren():void {
-            var s = this;
-            var len=s.children.length;
-            for (var i = len- 1; i >= 0; i--) {
+            let s = this;
+            let len=s.children.length;
+            for (let i = len- 1; i >= 0; i--) {
                 s.removeChildAt(i);
             }
         }
@@ -249,11 +249,11 @@ namespace annie {
          * @since 1.0.0
          */
         public update():void {
-            var s = this;
+            let s = this;
             super.update();
-            var len=s.children.length;
-            var child:any;
-            for (var i = len-1; i>=0; i--) {
+            let len=s.children.length;
+            let child:any;
+            for (let i = len-1; i>=0; i--) {
                 child=s.children[i];
                 //因为悬浮的html元素要时时更新来检查他的visible属性
                 child.update();
@@ -269,14 +269,14 @@ namespace annie {
          * @since 1.0.0
          */
         public hitTestPoint(globalPoint:Point,isMouseEvent:boolean=false):DisplayObject{
-            var s=this;
+            let s=this;
             if(!s.visible)return null;
             if(isMouseEvent&&!s.mouseEnable)return null;
-            var len=s.children.length;
-            var hitDisplayObject:DisplayObject;
-            var child:any;
+            let len=s.children.length;
+            let hitDisplayObject:DisplayObject;
+            let child:any;
             //这里特别注意是从上往下遍历
-            for(var i=len-1;i>=0;i--){
+            for(let i=len-1;i>=0;i--){
                 //TODO 这里要考虑遮罩
                 child=s.children[i];
                 if(child.mask){
@@ -301,13 +301,13 @@ namespace annie {
          * @public
          */
         public getBounds():Rectangle{
-            var s=this;
-            var len:number= s.children.length;
+            let s=this;
+            let len:number= s.children.length;
             if(len==0){
                 return null;
             }
-            var rect=s.children[0].getDrawRect();
-            for (var i = 1; i < len; i++) {
+            let rect=s.children[0].getDrawRect();
+            for (let i = 1; i < len; i++) {
                 rect=Rectangle.createFromRects(rect,s.children[i].getDrawRect());
             }
           return rect;
@@ -321,12 +321,12 @@ namespace annie {
          * @since 1.0.0
          */
         public render(renderObj:IRender):void {
-            var s:any = this;
-            var maskObj:any;
-            var maskObjIds:any = [];
-            var child:any;
-            var len:number= s.children.length;
-            for (var i = 0; i < len; i++) {
+            let s:any = this;
+            let maskObj:any;
+            let maskObjIds:any = [];
+            let child:any;
+            let len:number= s.children.length;
+            for (let i = 0; i < len; i++) {
                 child = s.children[i];
                 if (child.cAlpha > 0 && child.visible) {
                     if (maskObj) {
@@ -334,7 +334,7 @@ namespace annie {
                             if (child.mask != maskObj) {
                                 renderObj.endMask();
                                 maskObj = child.mask;
-                                var mId:number = maskObj.getInstanceId();
+                                let mId:number = maskObj.getInstanceId();
                                 //就是检测遮罩是否被更新过。因为动画遮罩反复更新的话他会播放同一次渲染要确定只能更新一回。
                                 if (maskObjIds.indexOf(mId) < 0) {
                                     maskObj.parent=s;
@@ -354,7 +354,7 @@ namespace annie {
                     } else {
                         if (child.mask) {
                             maskObj = child.mask;
-                            var mId:number = maskObj.getInstanceId();
+                            let mId:number = maskObj.getInstanceId();
                             if (maskObjIds.indexOf(mId) < 0) {
                                 maskObj.parent=s;
                                 maskObj.stage=s.stage;

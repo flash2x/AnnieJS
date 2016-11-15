@@ -12,6 +12,7 @@ namespace annie {
     export class Sound extends Media {
         public constructor(src:any) {
             super(src,"Audio");
+            this._instanceType="annie.Sound";
         }
     }
 }

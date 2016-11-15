@@ -41,13 +41,15 @@ var uiList=[
     "build/annieCore.d.ts",
     "annie/ui/scrollPage.ts",
     "annie/ui/FacePhoto.ts",
-    "annie/ui/SlidePage.ts"
+    "annie/ui/SlidePage.ts",
+    "annie/ui/FlipBook.ts"
 ];
 var onBuildCore = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
-        out: "annieCore.js"
+        out: "annieCore.js",
+        target: "ES5"
     };
     var outDir = "build";
     var tsResult = gulp.src(coreList).pipe(ts(op));
@@ -58,6 +60,7 @@ var onBuildUI = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
+        target: "ES5",
         out: "annieUI.js"
     };
     var outDir = "build";
@@ -71,7 +74,8 @@ var onBuildDoc = function (){
     ]);
     var op = {
         noImplicitAny: true,
-        declaration: true
+        declaration: true,
+        target: "ES5"
     };
     var outDir = "libs";
     var tsResult = gulp.src(coreList.concat(uiList.slice(1))).pipe(ts(op));

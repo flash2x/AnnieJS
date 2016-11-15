@@ -2,7 +2,7 @@
  * @module annie
  */
 namespace annie {
-    var isUpdateTween:boolean=true;
+    let isUpdateTween:boolean=true;
     class TweenObj extends AObject {
         public constructor() {
             super();
@@ -33,7 +33,7 @@ namespace annie {
          * @since 1.0.0
          */
         public init(target:any, times:number, data:any, isTo:boolean = true):void {
-            var s = this;
+            let s = this;
             s._currentFrame = 1;
             s._totalFrames = times*30>>0;
             s.target = target;
@@ -48,7 +48,7 @@ namespace annie {
             s._cParams=null;
             s._loop = false;
             s._completeFun = null;
-            for (var item in data) {
+            for (let item in data) {
                 switch (item) {
                     case "useFrame":
                         if(data[item]==true){
@@ -103,24 +103,24 @@ namespace annie {
          * @public
          */
         public update():void {
-            var s = this;
+            let s = this;
             if (s._isFront && s._delay > 0) {
                 s._delay--;
                 return;
             }
             //更新数据
-            var per = s._currentFrame / s._totalFrames;
+            let per = s._currentFrame / s._totalFrames;
             if (s._ease) {
                 per = s._ease(per);
             }
-            for (var item in s._disData) {
+            for (let item in s._disData) {
                 s.target[item] = s._startData[item] + s._disData[item] * per;
             }
             if (s._update) {
                 s._update();
             }
-            var cf=s._completeFun;
-            var pm=s._cParams;
+            let cf=s._completeFun;
+            let pm=s._cParams;
             if (s._isFront) {
                 s._currentFrame++;
                 if (s._currentFrame > s._totalFrames) {
@@ -132,7 +132,7 @@ namespace annie {
                             s._currentFrame = s._totalFrames;
                             s._isLoop--;
                         } else {
-                            Tween.kill(s.getInstanceId());
+                            Tween.kill(s.instanceId);
                         }
                     }
                     if(cf){
@@ -146,7 +146,7 @@ namespace annie {
                         s._isFront = true;
                         s._currentFrame = 1;
                     }else{
-                        Tween.kill(s.getInstanceId());
+                        Tween.kill(s.instanceId);
                     }
                     if(cf){
                         cf.apply(null,pm);
@@ -206,9 +206,9 @@ namespace annie {
             return Tween.createTween(target, totalFrame, data, false);
         }
         private static createTween(target:any, totalFrame:number, data:any, isTo:boolean):number{
-            var tweenOjb:TweenObj;
-            var len=Tween._tweenList.length;
-            for(var i=0;i<len;i++){
+            let tweenOjb:TweenObj;
+            let len=Tween._tweenList.length;
+            for(let i=0;i<len;i++){
                 if (target == Tween._tweenList[i].target) {
                     tweenOjb = Tween._tweenList[i];
                     break;
@@ -225,7 +225,7 @@ namespace annie {
                 Tween._tweenList.push(tweenOjb);
             }
             tweenOjb.init(target, totalFrame, data, isTo);
-            return tweenOjb.getInstanceId();
+            return tweenOjb.instanceId;
         }
         /**
          * 销毁所有正在运行的Tween对象
@@ -235,9 +235,9 @@ namespace annie {
          * @since 1.0.0
          */
         public static killAll():void {
-            var len:number = Tween._tweenList.length;
-            var tweenObj:any;
-            for (var i = 0; i < len; i++) {
+            let len:number = Tween._tweenList.length;
+            let tweenObj:any;
+            for (let i = 0; i < len; i++) {
                 tweenObj=Tween._tweenList[i];
                 tweenObj.target = null;
                 tweenObj._completeFun = null;
@@ -259,9 +259,9 @@ namespace annie {
          * @since 1.0.0
          */
         public static kill(tweenId:number):void {
-            var len:number = Tween._tweenList.length;
-            var tweenObj:any;
-            for (var i = 0; i < len; i++) {
+            let len:number = Tween._tweenList.length;
+            let tweenObj:any;
+            for (let i = 0; i < len; i++) {
                 tweenObj=Tween._tweenList[i];
                 if (tweenObj.getInstanceId() == tweenId) {
                     tweenObj.target = null;
@@ -662,7 +662,7 @@ namespace annie {
          * @returns {number}
          */
         public static backIn(k:number):number {
-            var s = 1.70158;
+            let s = 1.70158;
             return k * k * ((s + 1) * k - s);
         }
         /**
@@ -675,7 +675,7 @@ namespace annie {
          * @returns {number}
          */
         public static backOut(k:number):number {
-            var s = 1.70158;
+            let s = 1.70158;
             return --k * k * ((s + 1) * k + s) + 1;
         }
         /**
@@ -688,7 +688,7 @@ namespace annie {
          * @returns {number}
          */
         public static backInOut(k:number):number {
-            var s = 1.70158 * 1.525;
+            let s = 1.70158 * 1.525;
             if ((k *= 2) < 1) {
                 return 0.5 * (k * k * ((s + 1) * k - s));
             }
@@ -750,8 +750,8 @@ namespace annie {
          */
         private static flush():void{
             if(isUpdateTween){
-                var len:number = Tween._tweenList.length;
-                for (var i = len-1; i>=0; i--) {
+                let len:number = Tween._tweenList.length;
+                for (let i = len-1; i>=0; i--) {
                     Tween._tweenList[i].update();
                 }
             }

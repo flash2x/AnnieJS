@@ -69,6 +69,16 @@
 #如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
+##AnnieJS 1.0.3 版本
+    废弃annie.AObject.getInstanceId()方法，直接使用annie.AObject.instanceId属性获取或则设置
+    废弃annie.DisplayObject.getWH()和annie.DisplayObject.setWH()方法，直接使用annie.DisplayObject.width和annie.DisplayObject.height属性进行获取和设置
+    废弃annie.InputText.getText()和annie.DisplayObject.setText()方法，直接使用annie.InputText.text属性进行获取和设置
+    废弃annie.InputText.setBorder()，直接使用annie.InputText.border 属性进行获取和设置
+    废弃annie.InputText.setBold()，直接使用annie.InputText.bold 属性进行获取和设置
+    废弃annie.InputText.setItalic()，直接使用annie.InputText.italic 属性进行获取和设置
+    增加annie.InputText.color 属性进行字体颜色的获取和设置
+    增加annie.AObject.instanceType 属性进行获取对象类型
+    进一步优化引擎内核
 ##AnnieJS 1.0.2 版本
     新增annie.MoveClip类中的container属性，方便对MovieClip中添加不是用fla生成的子级对象
     支持WEBGL渲染，提高渲染性能。

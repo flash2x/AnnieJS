@@ -87,24 +87,24 @@ namespace annie {
         public autoResize:boolean = false;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
-         * @property width
+         * @property desWidth
          * @public
          * @since 1.0.0
          * @default 320
          * @type {number}
          * @readonly
          */
-        public width:number = 0;
+        public desWidth:number = 0;
         /**
          * 舞台的尺寸高,也就是我们常说的设计尺寸
-         * @property height
+         * @property desHeight
          * @public
          * @since 1.0.0
          * @default 240
          * @type {number}
          * @readonly
          */
-        public height:number = 0;
+        public desHeight:number = 0;
         /**
          * 舞台在当前设备中的真实高
          * @property divHeight
@@ -151,12 +151,12 @@ namespace annie {
          * @example
          *      //动态更改stage的对齐方式示例
          *      //以下代码放到一个舞台的显示对象的构造函数中
-         *      var s=this;
+         *      let s=this;
          *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-         *          var i=0;
+         *          let i=0;
          *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-         *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-         *              var state=e.currentTarget;
+         *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+         *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
          *              state.resize();
          *              if(i>5){i=0;}
@@ -218,7 +218,8 @@ namespace annie {
          */
         public constructor(rootDivId:string = "annieEngine", desW:number = 640, desH:number = 1040, frameRate:number = 30, scaleMode:string = "fixedHeight", renderType:number = 0) {
             super();
-            var s = this;
+            let s = this;
+            this._instanceType="annie.Stage";
             s.stage = this;
             if (annie.osType == "pc"){
                 s.autoResize=true;
@@ -227,11 +228,11 @@ namespace annie {
                 s.autoResize=true;
             }
             s._lastMousePoint = new Point();
-            s.name = "stageInstance_" + s.getInstanceId();
-            var div:any = document.getElementById(rootDivId);
+            s.name = "stageInstance_" + s.instanceId;
+            let div:any = document.getElementById(rootDivId);
             s.renderType = renderType;
-            s.width = desW;
-            s.height = desH;
+            s.desWidth = desW;
+            s.desHeight = desH;
             s.rootDiv = div;
             s.setFrameRate(frameRate);
             s.scaleMode = scaleMode;
@@ -249,7 +250,7 @@ namespace annie {
                 if (s.autoResize) {
                     s.resize();
                 }
-                var event = new Event("onResize");
+                let event = new Event("onResize");
                 s.dispatchEvent(event);
             });
             setTimeout(function () {
@@ -260,7 +261,7 @@ namespace annie {
                 //告诉大家我初始化完成
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if(debug&&!Stage._isLoadedVConsole){
-                    var script:HTMLScriptElement=document.createElement("script");
+                    let script:HTMLScriptElement=document.createElement("script");
                     script.onload=function () {
                         s.dispatchEvent(new annie.Event("onInitStage"));
                         script.onload=null;
@@ -271,8 +272,8 @@ namespace annie {
                     s.dispatchEvent(new annie.Event("onInitStage"));
                 }
             }, 100);
-            var rc = s.renderObj.rootContainer;
-            var mouseEvent=s.onMouseEvent.bind(s);
+            let rc = s.renderObj.rootContainer;
+            let mouseEvent=s.onMouseEvent.bind(s);
             if (osType != "pc") {
                 rc.addEventListener("touchstart", mouseEvent);
                 rc.addEventListener('touchmove', mouseEvent);
@@ -288,7 +289,7 @@ namespace annie {
          * @method update
          */
         public update():void {
-            var s=this;
+            let s=this;
             if(!s.pause) {
                 super.update();
             }
@@ -327,20 +328,20 @@ namespace annie {
             event.stageY = sp.y;
         }
         private _mt():void {
-            var s = this;
-            var mt:any = s._mouseEventInfo;
-            var points:any;
-            var events:any = [];
-            var event:any;
+            let s = this;
+            let mt:any = s._mouseEventInfo;
+            let points:any;
+            let events:any = [];
+            let event:any;
             //stageMousePoint
-            var sp:Point;
+            let sp:Point;
             //localPoint;
-            var lp:Point;
+            let lp:Point;
             //clientPoint
-            var cp:Point;
+            let cp:Point;
             //事件个数
-            var eLen:number = 0;
-            for (var item in mt) {
+            let eLen:number = 0;
+            for (let item in mt) {
                 if (osType == "pc"){
                     points = [mt[item]];
                 } else {
@@ -393,8 +394,8 @@ namespace annie {
             }
             if (eLen > 0){
                 //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                var d:any = s.hitTestPoint(cp, true);
-                var displayList:Array<DisplayObject> = [];
+                let d:any = s.hitTestPoint(cp, true);
+                let displayList:Array<DisplayObject> = [];
                 if (d){
                     //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
                     //找出真正的target,因为有些父级可能会mouseChildren=false;
@@ -409,11 +410,11 @@ namespace annie {
                 }else{
                     displayList.push(s);
                 }
-                var len:number = displayList.length;
+                let len:number = displayList.length;
                 displayList.reverse();
-                for (var i = 0; i<len; i++) {
+                for (let i = 0; i<len; i++) {
                     d = displayList[i];
-                    for (var j = 0; j < eLen; j++) {
+                    for (let j = 0; j < eLen; j++) {
                         if (events[j]["_pd"]===false) {
                             if(d.hasEventListener(events[j].type)) {
                                 events[j].currentTarget = d;
@@ -429,13 +430,13 @@ namespace annie {
                 //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                 if(s._lastDpList){
                     //从第二个开始，因为第一个对象始终是stage顶级对象
-                    var len1=s._lastDpList.length;
-                    var len2=displayList.length;
+                    let len1=s._lastDpList.length;
+                    let len2=displayList.length;
                     len=len1>len2?len1:len2;
-                    var isDiff=false;
-                    var overEvent:annie.MouseEvent;
-                    var outEvent:annie.MouseEvent;
-                    for(var i=1;i<len;i++){
+                    let isDiff=false;
+                    let overEvent:annie.MouseEvent;
+                    let outEvent:annie.MouseEvent;
+                    for(let i=1;i<len;i++){
                         if(!isDiff) {
                             if(s._lastDpList[i]!=displayList[i]){
                             //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
@@ -499,7 +500,7 @@ namespace annie {
          * 循环刷新页面的函数
          */
         private flush():void {
-            var s = this;
+            let s = this;
             if (s._flush == 0) {
                 s.update();
                 s.render(s.renderObj);
@@ -525,7 +526,7 @@ namespace annie {
          * @public
          */
         public setFrameRate(fps:number):void {
-            var s = this;
+            let s = this;
             s._flush = 60 / fps - 1 >> 0;
             if (s._flush < 0) {
                 s._flush = 0;
@@ -549,15 +550,15 @@ namespace annie {
          * @returns {{w: number, h: number}}
          */
         public getRootDivWH(div:HTMLDivElement){
-            var sw = div.style.width;
-            var sh = div.style.height;
-            var iw = window.innerWidth
+            let sw = div.style.width;
+            let sh = div.style.height;
+            let iw = window.innerWidth
                 || document.documentElement.clientWidth
                 || document.body.clientWidth;
-            var ih = window.innerHeight || document.documentElement.clientHeight
+            let ih = window.innerHeight || document.documentElement.clientHeight
                 || document.body.clientHeight;
-            var vW = parseInt(sw);
-            var vH = parseInt(sh);
+            let vW = parseInt(sw);
+            let vH = parseInt(sh);
             if (vW.toString() == "NaN"){
                 vW = iw;
             } else {
@@ -603,7 +604,7 @@ namespace annie {
          */
         private onMouseEvent = function (e:any):void{
             //检查是否有
-            var s:any = this;
+            let s:any = this;
             s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
             //阻止向下冒泡
         };
@@ -611,22 +612,22 @@ namespace annie {
          * 设置舞台的对齐模式
          */
         private setAlign = function(){
-            var s=this;
-            var divH = s.divHeight * devicePixelRatio;
-            var divW = s.divWidth * devicePixelRatio;
-            var desH = s.height;
-            var desW = s.width;
+            let s=this;
+            let divH = s.divHeight * devicePixelRatio;
+            let divW = s.divWidth * devicePixelRatio;
+            let desH = s.desHeight;
+            let desW = s.desWidth;
             //设备是否为竖屏
-            var isDivH = divH > divW;
+            let isDivH = divH > divW;
             //内容是否为竖屏内容
-            var isDesH = desH > desW;
-            var scaleY = 1;
-            var scaleX = 1;
+            let isDesH = desH > desW;
+            let scaleY = 1;
+            let scaleX = 1;
             s.x = (divW - desW) / 2;
             s.y = (divH - desH) / 2;
             if(s.autoSteering) {
                 if (isDesH != isDivH) {
-                    var d = divH;
+                    let d = divH;
                     divH = divW;
                     divW = d;
                 }
@@ -684,8 +685,8 @@ namespace annie {
          * @
          */
         public resize = function () {
-            var s=this;
-            var whObj = s.getRootDivWH(s.rootDiv);
+            let s=this;
+            let whObj = s.getRootDivWH(s.rootDiv);
             //这里判断
             if((s.divWidth+s.divHeight)==0||Math.abs((whObj.h+whObj.w)-(s.divWidth+s.divHeight))<100){
                 s.divHeight = whObj.h;
@@ -706,8 +707,8 @@ namespace annie {
          *
          */
         private static flushAll():void{
-            var len=Stage.allUpdateObjList.length;
-            for(var i=0;i<len;i++){
+            let len=Stage.allUpdateObjList.length;
+            for(let i=0;i<len;i++){
                 Stage.allUpdateObjList[i]&&Stage.allUpdateObjList[i].flush();
             }
             requestAnimationFrame(Stage.flushAll);
@@ -723,9 +724,9 @@ namespace annie {
          * @since
          */
         private static addUpdateObj(target:any):void{
-            var isHave:boolean=false;
-            var len=Stage.allUpdateObjList.length;
-            for(var i=0;i<len;i++){
+            let isHave:boolean=false;
+            let len=Stage.allUpdateObjList.length;
+            for(let i=0;i<len;i++){
                 if(Stage.allUpdateObjList[i]===target){
                     isHave=true;
                     break;
@@ -743,8 +744,8 @@ namespace annie {
          * @since 1.0.0
          */
         private static removeUpdateObj(target:any):void{
-            var len=Stage.allUpdateObjList.length;
-            for(var i=0;i<len;i++){
+            let len=Stage.allUpdateObjList.length;
+            for(let i=0;i<len;i++){
                 if(Stage.allUpdateObjList[i]===target){
                     Stage.allUpdateObjList.splice(i,1);
                     break;

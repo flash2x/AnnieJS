@@ -12,8 +12,8 @@
  *      trace(1);
  *      trace(1,"hello");
  */
-var trace = function (...arg:any[]) {
-    for (var i in arguments) {
+let trace = function (...arg:any[]) {
+    for (let i in arguments) {
         console.log(arguments[i]);
     }
 };
@@ -36,7 +36,7 @@ var trace = function (...arg:any[]) {
  *      });
  *
  */
-var globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
+let globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
 //禁止页面滑动
 document.ontouchmove = function(e){
     if(!annie.canHTMLTouchMove||!annie.debug){

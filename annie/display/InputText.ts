@@ -32,7 +32,8 @@ namespace annie {
         public constructor(inputType:string) {
             super();
             var input:any = null;
-            var s:InputText = this;
+            let s:InputText = this;
+            s._instanceType="annie.InputText";
             if (inputType != "multiline") {
                 input = document.createElement("input");
                 if (inputType == "password") {
@@ -51,7 +52,7 @@ namespace annie {
         public init(htmlElement:any):void{
             super.init(htmlElement);
             //默认设置
-            var s=this;
+            let s=this;
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
@@ -72,7 +73,7 @@ namespace annie {
          * @param {number}lineSpacing 如果是多行,请设置行高
          */
         public initInfo(text:string, w:number, h:number, color:string, align:string,size:number,font:string, showBorder:boolean, lineSpacing:number):void {
-            var s:InputText = this;
+            let s:InputText = this;
             s.htmlElement.placeholder = text;
             s.htmlElement.style.width = w + "px";
             s.htmlElement.style.height = h + "px";
@@ -81,53 +82,72 @@ namespace annie {
             s.htmlElement.style.color = color;
             s.htmlElement.style.textAlign = align;
             /////////////////////设置边框//////////////
-            s.setBorder(showBorder);
+            s.border=showBorder;
             //color:blue; text-align:center"
             if (s.inputType == "multiLine") {
                 s.htmlElement.style.lineHeight = lineSpacing+"px";
             }
         }
-
         /**
          * 设置文本是否为粗体
-         * @method setBold
+         * @property bold
          * @param {boolean} bold true或false
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          */
-        public setBold(bold:boolean):void{
-            var s=this.htmlElement.style;
+        public set bold(bold:boolean){
+            let ss=this.htmlElement.style;
             if(bold){
-                s.fontWeight="bold";
+                ss.fontWeight="bold";
             }else{
-                s.fontWeight="normal";
+                ss.fontWeight="normal";
             }
+        }
+        public get bold():boolean{
+            return this.htmlElement.style.fontWeight=="bold";
         }
 
         /**
          * 设置文本是否倾斜
-         * @method setItalic
+         * @property italic
          * @param {boolean} italic true或false
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          */
-        public setItalic(italic:boolean):void{
-            var s=this.htmlElement.style;
+        public set italic(italic:boolean){
+            let s=this.htmlElement.style;
             if(italic){
                 s.fontStyle="italic";
             }else{
                 s.fontStyle="normal";
             }
         }
+        public get italic():boolean{
+            return this.htmlElement.style.fontStyle=="italic"
+        }
         /**
-         * 设置是否有边框
-         * @method setBorder
+         * 设置文本颜色
+         * @property color
+         * @param {boolean} italic true或false
+         * @public
+         * @since 1.0.3
+         */
+        public set color(value:string){
+            var ss=this.htmlElement.style;
+            ss.color = value;
+        }
+        public get color():string{
+            return this.htmlElement.style.color;
+        }
+        /**
+         * 设置或获取是否有边框
+         * @property property
          * @param {boolean} show true或false
          * @public
-         * @sinc 1.0.0
+         * @since 1.0.3
          */
-        public setBorder(show:boolean):void {
-            var s = this;
+        public set border(show:boolean) {
+            let s = this;
             if (show) {
                 s.htmlElement.style.borderStyle = "inset";
                 s.htmlElement.style.backgroundColor = "#fff";
@@ -136,29 +156,28 @@ namespace annie {
                 s.htmlElement.style.backgroundColor = "transparent";
             }
         }
-
+        public get border():boolean {
+            return this.htmlElement.style.borderStyle != "none";
+        }
         /**
-         * 获取输入文本的值,因为输入文本调用了html的input标签,所以不能直接像动态文本那样用textObj.text获取值或者设置值
-         * @method getText
+         * 获取或设置输入文本的值
+         * 之前的getText 和setText 已废弃
+         * @property text
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          * @returns {string}
          */
-        public getText():string{
-            var s=this;
+        public get text():string{
+            let s=this;
             if(s.htmlElement){
                 return s.htmlElement.value;
             }
         }
-        /**
-         * 设置输入文本的值,因为输入文本调用了html的input标签,所以不能直接像动态文本那样用textObj.text获取值或者设置值
-         * @method setText
-         * @param {string} text
-         */
-        public setText(text:string):void{
-            var s=this;
+
+        public set text(value:string){
+            let s=this;
             if(s.htmlElement) {
-                s.htmlElement.value = text;
+                s.htmlElement.value = value;
             }
         }
     }

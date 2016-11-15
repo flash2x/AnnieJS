@@ -9,11 +9,12 @@ declare namespace annie {
      */
     class AObject {
         private _id;
+        protected _instanceType: string;
         private static _object_id;
         constructor();
         /**
          * 每一个annie引擎对象都会有一个唯一的id码。
-         * @method getInstanceId
+         * @property instanceId
          * @public
          * @since 1.0.0
          * @returns {number}
@@ -21,7 +22,8 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.getInstanceId());
          */
-        getInstanceId(): number;
+        instanceId: number;
+        instanceType: string;
     }
     /**
      * 事件触发基类
@@ -610,6 +612,33 @@ declare namespace annie {
          * @returns {boolean}
          */
         static isEqual(m1: Matrix, m2: Matrix): boolean;
+        concat(mtx: annie.Matrix): void;
+        /**
+         * 对矩阵应用旋转转换。
+         * @method rotate
+         * @param angle
+         * @since 1.0.3
+         * @public
+         */
+        rotate(angle: number): void;
+        /**
+         * 对矩阵应用缩放转换。
+         * @method scale
+         * @param {Number} sx 用于沿 x 轴缩放对象的乘数。
+         * @param {Number} sy 用于沿 y 轴缩放对象的乘数。
+         * @since 1.0.3
+         * @public
+         */
+        scale(sx: number, sy: number): void;
+        /**
+         * 沿 x 和 y 轴平移矩阵，由 dx 和 dy 参数指定。
+         * @method translate
+         * @public
+         * @since 1.0.3
+         * @param {Number} dx 沿 x 轴向右移动的量（以像素为单位
+         * @param {Number} dy 沿 y 轴向右移动的量（以像素为单位
+         */
+        translate(dx: number, dy: number): void;
     }
 }
 /**
@@ -722,7 +751,7 @@ declare namespace annie {
      * @since 1.0.0
      * @extends annie.EventDispatcher
      */
-    class DisplayObject extends EventDispatcher {
+    abstract class DisplayObject extends EventDispatcher {
         /**
          * @method DisplayObject
          * @since 1.0.0
@@ -989,7 +1018,7 @@ declare namespace annie {
          * @since 1.0.0
          * @returns {annie.Rectangle}
          */
-        getBounds(): Rectangle;
+        abstract getBounds(): Rectangle;
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽主y方向上的高
@@ -1014,7 +1043,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          */
-        render(renderObj: IRender): void;
+        abstract render(renderObj: IRender): void;
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递
          * @method _onDispatchBubbledEvent
@@ -1025,25 +1054,23 @@ declare namespace annie {
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
-         * 返回显示对象的宽和高
-         * @method getWH
+         * 获取或者设置显示对象在父级里的x方向的宽
+         * 之前需要使用getWH或者setWH 现已废弃
+         * @property  width
          * @public
-         * @since 1.0.0
-         * @returns {width: number, height: number}
+         * @since 1.0.3
+         * @return {number}
          */
-        getWH(): {
-            width: number;
-            height: number;
-        };
+        width: number;
         /**
-         * 设置显示对象的宽和高
-         * @method setWH
+         * 获取或者设置显示对象在父级里的y方向的高
+         * 之前需要使用getWH或者setWH 现已废弃
+         * @property  height
          * @public
-         * @since 1.0.0
-         * @param {number} w
-         * @param {number} h
+         * @since 1.0.3
+         * @return {number}
          */
-        setWH(w: number, h: number): void;
+        height: number;
         /**
          * 画缓存位图的时候需要使用
          * @property _bitmapCanvas
@@ -2265,6 +2292,7 @@ declare namespace annie {
          * @returns {annie.Rectangle}
          */
         getBounds(): Rectangle;
+        render(renderObj: IRender): void;
     }
 }
 /**
@@ -2511,42 +2539,45 @@ declare namespace annie {
         initInfo(text: string, w: number, h: number, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
         /**
          * 设置文本是否为粗体
-         * @method setBold
+         * @property bold
          * @param {boolean} bold true或false
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          */
-        setBold(bold: boolean): void;
+        bold: boolean;
         /**
          * 设置文本是否倾斜
-         * @method setItalic
+         * @property italic
          * @param {boolean} italic true或false
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          */
-        setItalic(italic: boolean): void;
+        italic: boolean;
         /**
-         * 设置是否有边框
-         * @method setBorder
+         * 设置文本颜色
+         * @property color
+         * @param {boolean} italic true或false
+         * @public
+         * @since 1.0.3
+         */
+        color: string;
+        /**
+         * 设置或获取是否有边框
+         * @property property
          * @param {boolean} show true或false
          * @public
-         * @sinc 1.0.0
+         * @since 1.0.3
          */
-        setBorder(show: boolean): void;
+        border: boolean;
         /**
-         * 获取输入文本的值,因为输入文本调用了html的input标签,所以不能直接像动态文本那样用textObj.text获取值或者设置值
-         * @method getText
+         * 获取或设置输入文本的值
+         * 之前的getText 和setText 已废弃
+         * @property text
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          * @returns {string}
          */
-        getText(): string;
-        /**
-         * 设置输入文本的值,因为输入文本调用了html的input标签,所以不能直接像动态文本那样用textObj.text获取值或者设置值
-         * @method setText
-         * @param {string} text
-         */
-        setText(text: string): void;
+        text: string;
     }
 }
 /**
@@ -2638,24 +2669,24 @@ declare namespace annie {
         autoResize: boolean;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
-         * @property width
+         * @property desWidth
          * @public
          * @since 1.0.0
          * @default 320
          * @type {number}
          * @readonly
          */
-        width: number;
+        desWidth: number;
         /**
          * 舞台的尺寸高,也就是我们常说的设计尺寸
-         * @property height
+         * @property desHeight
          * @public
          * @since 1.0.0
          * @default 240
          * @type {number}
          * @readonly
          */
-        height: number;
+        desHeight: number;
         /**
          * 舞台在当前设备中的真实高
          * @property divHeight
@@ -2702,12 +2733,12 @@ declare namespace annie {
          * @example
          *      //动态更改stage的对齐方式示例
          *      //以下代码放到一个舞台的显示对象的构造函数中
-         *      var s=this;
+         *      let s=this;
          *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-         *          var i=0;
+         *          let i=0;
          *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-         *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-         *              var state=e.currentTarget;
+         *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+         *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
          *              state.resize();
          *              if(i>5){i=0;}
@@ -3574,7 +3605,7 @@ declare namespace annie {
          * @param {Function} completeFun 加载完成回高,无回调参数
          * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
          */
-        var loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
+        let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
         /**
          * 判断一个场景是否已经被加载
          * @method isLoadedScene
@@ -4073,7 +4104,7 @@ declare namespace annie {
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    var debug: boolean;
+    let debug: boolean;
     /**
      * annie引擎的版本号
      * @public
@@ -4084,7 +4115,7 @@ declare namespace annie {
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    var version: string;
+    let version: string;
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -4096,7 +4127,7 @@ declare namespace annie {
      *      //打印当前设备的retina值
      *      trace(annie.devicePixelRatio);
      */
-    var devicePixelRatio: number;
+    let devicePixelRatio: number;
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
@@ -4108,7 +4139,7 @@ declare namespace annie {
      *      //获取当前设备类型
      *      trace(annie.osType);
      */
-    var osType: string;
+    let osType: string;
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -4125,12 +4156,12 @@ declare namespace annie {
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      var s=this;
+     *      let s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          var i=0;
+     *          let i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              var state=e.currentTarget;
+     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              let state=e.currentTarget;
      *              state.scaleMode=aList[i];
      *              state.resize();
      *              if(i>5){i=0;}
@@ -4138,7 +4169,7 @@ declare namespace annie {
      *      }
      *
      */
-    var StageScaleMode: {
+    let StageScaleMode: {
         EXACT_FIT: string;
         NO_BORDER: string;
         NO_SCALE: string;
@@ -4179,7 +4210,7 @@ declare namespace annie {
      * @type{boolean}
      * @default false
      */
-    var canHTMLTouchMove: boolean;
+    let canHTMLTouchMove: boolean;
     /**
      * 将显示对象转成base64的图片数据
      * @method toDisplayDataURL
@@ -4190,7 +4221,7 @@ declare namespace annie {
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    var toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
+    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
 }
 /**
  * @class 全局
@@ -4206,7 +4237,7 @@ declare namespace annie {
  *      trace(1);
  *      trace(1,"hello");
  */
-declare var trace: (...arg: any[]) => void;
+declare let trace: (...arg: any[]) => void;
 /**
  * 全局事件触发器
  * @static
@@ -4226,7 +4257,7 @@ declare var trace: (...arg: any[]) => void;
  *      });
  *
  */
-declare var globalDispatcher: annie.EventDispatcher;
+declare let globalDispatcher: annie.EventDispatcher;
 import Flash2x = annie.RESManager;
 import F2xContainer = annie.Sprite;
 import F2xMovieClip = annie.MovieClip;

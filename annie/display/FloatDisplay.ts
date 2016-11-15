@@ -40,12 +40,13 @@ namespace annie {
         private _isAdded:boolean=false;
         public constructor(){
             super();
-            var s = this;
+            this._instanceType="annie.FloatDisplay";
+            let s = this;
             s.addEventListener(Event.REMOVE_TO_STAGE, function (e:Event) {
                 if (s.htmlElement) {
                     s.htmlElement.style.display = "none";
                 }
-            })
+            });
             s.addEventListener(Event.ADD_TO_STAGE, function (e:Event) {
                 if (!s._isAdded) {
                     s._isAdded = true;
@@ -65,11 +66,11 @@ namespace annie {
          * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
          */
         public init(htmlElement:any):void{
-            var s =this;
+            let s =this;
             if (typeof(htmlElement) == "string") {
                 htmlElement = document.getElementById(htmlElement);
             }
-            var style = htmlElement.style;
+            let style = htmlElement.style;
             style.position = "absolute";
             style.display="none";
             style.transformOrigin = style.WebkitTransformOrigin= "0 0 0";
@@ -82,7 +83,7 @@ namespace annie {
          * @public
          */
         public delElement():void{
-            var elem=this.htmlElement;
+            let elem=this.htmlElement;
             if(elem){
                 elem.style.display="none";
                 if(elem.parentNode) {
@@ -101,30 +102,30 @@ namespace annie {
          */
         public update():void{
             super.update();
-            var s=this;
-            var o = s.htmlElement;
+            let s=this;
+            let o = s.htmlElement;
             if (!o) {
                 return;
             }
-            var style = o.style;
-            var visible=s.visible;
-            var parent=s.parent;
+            let style = o.style;
+            let visible=s.visible;
+            let parent=s.parent;
             while(visible&&parent){
                 visible=parent.visible;
                 parent=parent.parent;
             }
-            var show = visible ? "inline" : "none";
+            let show = visible ? "inline" : "none";
             if(show!=style.display){
                 style.display = show;
             }
             if (!s.visible) {
                 return;
             }
-            var props:any=new Object;
+            let props:any=new Object;
             props.alpha= s["cAlpha"];
-            var mtx = s["cMatrix"];
-            var oldProps:any = s._oldProps;
-            var d=annie.devicePixelRatio;
+            let mtx = s["cMatrix"];
+            let oldProps:any = s._oldProps;
+            let d=annie.devicePixelRatio;
             if (!Matrix.isEqual(oldProps.matrix,mtx)){
                 style.transform = style.webkitTransform="matrix(" + (mtx.a/d) + "," + (mtx.b/d) + "," + (mtx.c/d) + "," + (mtx.d/d) + "," + (mtx.tx/d)+"," + (mtx.ty/d)+")";
                 oldProps.matrix={tx:mtx.tx,ty:mtx.ty,a:mtx.a,b:mtx.b,c:mtx.c,d:mtx.d};
@@ -142,14 +143,17 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds():Rectangle{
-            var s=this;
-            var r=new Rectangle();
+            let s=this;
+            let r=new Rectangle();
             if(s.htmlElement){
-                var hs=s.htmlElement.style;
+                let hs=s.htmlElement.style;
                 r.width=parseInt(hs.width);
                 r.height=parseInt(hs.height);
             }
             return r;
+        }
+        public render(renderObj:IRender):void{
+
         }
     }
 }

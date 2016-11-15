@@ -162,6 +162,7 @@ var annieUI;
              */
             this.autoScroll = false;
             var s = this;
+            s._instanceType = "annieUI.ScrollPage";
             s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
@@ -296,7 +297,7 @@ var annieUI;
                 else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
                     if (!s.isMouseDown)
                         return;
-                    var currentValue;
+                    var currentValue = void 0;
                     if (s.isVertical) {
                         currentValue = e.localY;
                     }
@@ -384,6 +385,7 @@ var annieUI;
             _super.call(this);
             this.maskType = 0;
             var s = this;
+            s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
             s.bitmap = new annie.Bitmap();
             s.maskObj = new annie.Shape();
@@ -452,7 +454,7 @@ var annieUI;
          * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @param{number}slideSpeed  页面滑动速度
          * @example
-         *      var slideBox = new annieUI.SlidePage({
+         *      let slideBox = new annieUI.SlidePage({
          *          pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
          *          isVertical: true,//默认值为true,ture为纵向,falas为横向
          *          slideSpeed: .32,//默认值为.4，滑动速度
@@ -591,6 +593,7 @@ var annieUI;
                 return Object.prototype.toString.call(obj) === '[object Array]';
             };
             var s = this;
+            s._instanceType = "annieUI.SlidePages";
             if (!s.isArray(option['pageList'])) {
                 throw 'pageList参数数据格式不对！pageList应为页面对象列表数组';
             }
@@ -621,8 +624,8 @@ var annieUI;
          */
         SlidePage.prototype.onAddToStage = function (e) {
             var s = this;
-            s.stageW = s.stage.width;
-            s.stageH = s.stage.height;
+            s.stageW = s.stage.desWidth;
+            s.stageH = s.stage.desHeight;
             s.listLen = s.pageList.length; //页面个数
             s.slideCon = new annie.Sprite();
             for (var i = 0; i < s.listLen; i++) {
@@ -763,10 +766,10 @@ var annieUI;
             }
             if (s.isVertical) {
                 annie.Tween.to(s.slideCon, s.slideSpeed, {
-                    y: -index * s.stage.height, onComplete: function () {
+                    y: -index * s.stage.desHeight, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
-                        //     for (var i = 0; i < s.listLen; i++) {
+                        //     for (let i = 0; i < s.listLen; i++) {
                         //         if (s.currentPageIndex != s.pageList[i].pageId)
                         //             s.pageList[i].visible = false;
                         //     }
@@ -780,10 +783,10 @@ var annieUI;
             }
             else {
                 annie.Tween.to(s.slideCon, s.slideSpeed, {
-                    x: -index * s.stage.width, onComplete: function () {
+                    x: -index * s.stage.desWidth, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
-                        //     for (var i = 0; i < s.listLen; i++) {
+                        //     for (let i = 0; i < s.listLen; i++) {
                         //         if (s.currentPageIndex != s.pageList[i].pageId)
                         //             s.pageList[i].visible = false;
                         //     }
@@ -837,10 +840,6 @@ var annieUI;
          * @returns {number}
          */
         SlidePage.prototype.getDistance = function (x1, y1, x2, y2) {
-            var x1 = x1;
-            var y1 = y1;
-            var x2 = x2;
-            var y2 = y2;
             var xdiff = x2 - x1;
             var ydiff = y2 - y1;
             var dis = Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);

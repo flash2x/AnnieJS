@@ -48,6 +48,7 @@ namespace annie {
          */
         public constructor(type:string) {
             super(type);
+            this._instanceType="annie.TouchEvent";
         }
     }
 }

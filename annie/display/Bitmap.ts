@@ -78,7 +78,8 @@ namespace annie {
          */
         public constructor(bitmapData:any=null, rect:Rectangle = null) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annie.Bitmap";
             s.bitmapData = bitmapData;
             s.rect = rect;
         }
@@ -103,7 +104,7 @@ namespace annie {
          * @since 1.0.0
          */
         public update():void{
-            var s = this;
+            let s = this;
             super.update();
             //滤镜
             if(s._isNeedUpdate){
@@ -112,17 +113,17 @@ namespace annie {
                     if(!s._realCacheImg){
                         s._realCacheImg=window.document.createElement("canvas");
                     }
-                    var _canvas = s._realCacheImg;
-                    var tr = s.rect;
-                    var w = tr ? tr.width : s.bitmapData.width;
-                    var h = tr ? tr.height : s.bitmapData.height;
-                    var newW = w + 20;
-                    var newH = h + 20;
+                    let _canvas = s._realCacheImg;
+                    let tr = s.rect;
+                    let w = tr ? tr.width : s.bitmapData.width;
+                    let h = tr ? tr.height : s.bitmapData.height;
+                    let newW = w + 20;
+                    let newH = h + 20;
                     _canvas.width = newW;
                     _canvas.height = newH;
                     _canvas.style.width=newW/devicePixelRatio+"px";
                     _canvas.style.height=newH/devicePixelRatio+"px";
-                    var ctx = _canvas.getContext("2d");
+                    let ctx = _canvas.getContext("2d");
                     ctx.clearRect(0, 0, newW, newH);
                     ctx.translate(10, 10);
                     ctx.shadowBlur = 0;
@@ -130,9 +131,9 @@ namespace annie {
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
                     /////////////////////
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    for (var i = 0; i < cfLen; i++) {
+                    let cf = s.cFilters;
+                    let cfLen = cf.length;
+                    for (let i = 0; i < cfLen; i++) {
                         if (s.cFilters[i].type == "Shadow") {
                             ctx.shadowBlur = cf[i].blur;
                             ctx.shadowColor = cf[i].color;
@@ -147,10 +148,10 @@ namespace annie {
                     } else {
                         ctx.drawImage(s.bitmapData, 0, 0);
                     }
-                    var len = s["cFilters"].length;
-                    var imageData = ctx.getImageData(0, 0, newW, newH);
-                    for (var i = 0; i < len; i++) {
-                        var f:any = s["cFilters"][i];
+                    let len = s["cFilters"].length;
+                    let imageData = ctx.getImageData(0, 0, newW, newH);
+                    for (let i = 0; i < len; i++) {
+                        let f:any = s["cFilters"][i];
                         f.drawFilter(imageData);
                     }
                     ctx.putImageData(imageData, 0, 0);
@@ -179,8 +180,8 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds():Rectangle {
-            var s = this;
-            var r = new Rectangle();
+            let s = this;
+            let r = new Rectangle();
             if (s.rect) {
                 r.width = s.rect.width;
                 r.height = s.rect.height;
@@ -204,16 +205,16 @@ namespace annie {
             if(!bitmap.rect){
                 return bitmap.bitmapData;
             }else{
-                var _canvas = annie.DisplayObject._canvas;
-                var w:number=bitmap.rect.width;
-                var h:number=bitmap.rect.height;
+                let _canvas = annie.DisplayObject._canvas;
+                let w:number=bitmap.rect.width;
+                let h:number=bitmap.rect.height;
                 _canvas.width=w;
                 _canvas.height=h;
-                var ctx = _canvas.getContext("2d");
-                var tr=bitmap.rect;
+                let ctx = _canvas.getContext("2d");
+                let tr=bitmap.rect;
                 ctx.clearRect(0, 0, w,h);
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                var _realCacheImg=window.document.createElement("img");
+                let _realCacheImg=window.document.createElement("img");
                 _realCacheImg.src = _canvas.toDataURL("image/png");
                 return _realCacheImg;
             }

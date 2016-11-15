@@ -163,6 +163,7 @@ namespace annie {
          */
         public constructor(type:string) {
             super();
+            this._instanceType="annie.Event";
             this.type = type;
         }
         /**

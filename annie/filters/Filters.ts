@@ -69,7 +69,8 @@ namespace annie{
          */
         public  constructor(color:string="black",offsetX:number=2,offsetY:number=2,blur:number=2){
             super();
-            var s=this;
+            let s=this;
+            s._instanceType="annie.ShadowFilter";
             s.offsetX=offsetX;
             s.offsetY=offsetY;
             s.blur=blur;
@@ -83,7 +84,7 @@ namespace annie{
          * @return {string}
          */
         public toString():string{
-            var s=this;
+            let s=this;
             return s.type+s.offsetX+s.offsetY+s.blur+s.color;
         }
         /**
@@ -190,7 +191,8 @@ namespace annie{
          */
         public constructor(redMultiplier:number=1, greenMultiplier:number=1, blueMultiplier:number=1, alphaMultiplier:number=1, redOffset:number=0, greenOffset:number=0, blueOffset:number=0, alphaOffset:number=0){
             super();
-            var s=this;
+            let s=this;
+            s._instanceType="annie.ColorFilter";
             s.redMultiplier=redMultiplier;
             s.greenMultiplier=greenMultiplier;
             s.blueMultiplier=blueMultiplier;
@@ -209,10 +211,10 @@ namespace annie{
          */
         public drawFilter(imageData:ImageData=null){
             if(!imageData)return;
-            var s=this;
-            var data = imageData.data;
-            var l = data.length;
-            for (var i=0; i<l; i+=4) {
+            let s=this;
+            let data = imageData.data;
+            let l = data.length;
+            for (let i=0; i<l; i+=4) {
                 data[i] = data[i]*s.redMultiplier+s.redOffset;
                 data[i+1] = data[i+1]*s.greenMultiplier+s.greenOffset;
                 data[i+2] = data[i+2]*s.blueMultiplier+s.blueOffset;
@@ -228,7 +230,7 @@ namespace annie{
          * @return {string}
          */
         public toString():string{
-            var s=this;
+            let s=this;
             return s.type+s.redMultiplier+s.greenMultiplier+s.blueMultiplier+s.alphaMultiplier+s.redOffset+s.greenOffset+s.blueOffset+s.alphaOffset;
         }
     }
@@ -293,7 +295,8 @@ namespace annie{
          */
         public constructor(brightness:number, contrast:number, saturation:number, hue:number){
             super();
-            var s=this;
+            let s=this;
+            s._instanceType="annie.ColorMatrixFilter";
             s.brightness=brightness;
             s.contrast=contrast;
             s.saturation=saturation;
@@ -318,7 +321,7 @@ namespace annie{
             }
             //contrast
             contrast = this._cleanValue(contrast,100);
-            var x:number;
+            let x:number;
             if(contrast!=0) {
                 if (contrast < 0) {
                     x = 127 + contrast / 100 * 127;
@@ -343,9 +346,9 @@ namespace annie{
             saturation = this._cleanValue(saturation,100);
             if(saturation!=0) {
                 x = 1 + ((saturation > 0) ? 3 * saturation / 100 : saturation / 100);
-                var lumR = 0.3086;
-                var lumG = 0.6094;
-                var lumB = 0.0820;
+                let lumR = 0.3086;
+                let lumG = 0.6094;
+                let lumB = 0.0820;
                 s._multiplyMatrix([
                     lumR * (1 - x) + x, lumG * (1 - x), lumB * (1 - x), 0, 0,
                     lumR * (1 - x), lumG * (1 - x) + x, lumB * (1 - x), 0, 0,
@@ -357,11 +360,11 @@ namespace annie{
             //hue
             hue = this._cleanValue(hue,180)/180*Math.PI;
             if(hue!=0) {
-                var cosVal = Math.cos(hue);
-                var sinVal = Math.sin(hue);
-                var lumR = 0.213;
-                var lumG = 0.715;
-                var lumB = 0.072;
+                let cosVal = Math.cos(hue);
+                let sinVal = Math.sin(hue);
+                let lumR = 0.213;
+                let lumG = 0.715;
+                let lumB = 0.072;
                 s._multiplyMatrix([
                     lumR + cosVal * (1 - lumR) + sinVal * (-lumR), lumG + cosVal * (-lumG) + sinVal * (-lumG), lumB + cosVal * (-lumB) + sinVal * (1 - lumB), 0, 0,
                     lumR + cosVal * (-lumR) + sinVal * (0.143), lumG + cosVal * (1 - lumG) + sinVal * (0.140), lumB + cosVal * (-lumB) + sinVal * (-0.283), 0, 0,
@@ -380,15 +383,15 @@ namespace annie{
          */
         public drawFilter(imageData:ImageData=null):void{
             if(!imageData) return;
-                var data:any = imageData.data;
-                var l = data.length;
-                var r:number,g:number,b:number,a:number;
-                var mtx = this.colorMatrix;
-                var m0 =  mtx[0],  m1 =  mtx[1],  m2 =  mtx[2],  m3 =  mtx[3],  m4 =  mtx[4];
-                var m5 =  mtx[5],  m6 =  mtx[6],  m7 =  mtx[7],  m8 =  mtx[8],  m9 =  mtx[9];
-                var m10 = mtx[10], m11 = mtx[11], m12 = mtx[12], m13 = mtx[13], m14 = mtx[14];
-                var m15 = mtx[15], m16 = mtx[16], m17 = mtx[17], m18 = mtx[18], m19 = mtx[19];
-                for (var i=0; i<l; i+=4) {
+                let data:any = imageData.data;
+                let l = data.length;
+                let r:number,g:number,b:number,a:number;
+                let mtx = this.colorMatrix;
+                let m0 =  mtx[0],  m1 =  mtx[1],  m2 =  mtx[2],  m3 =  mtx[3],  m4 =  mtx[4];
+                let m5 =  mtx[5],  m6 =  mtx[6],  m7 =  mtx[7],  m8 =  mtx[8],  m9 =  mtx[9];
+                let m10 = mtx[10], m11 = mtx[11], m12 = mtx[12], m13 = mtx[13], m14 = mtx[14];
+                let m15 = mtx[15], m16 = mtx[16], m17 = mtx[17], m18 = mtx[18], m19 = mtx[19];
+                for (let i=0; i<l; i+=4) {
                     r = data[i];
                     g = data[i+1];
                     b = data[i+2];
@@ -413,13 +416,13 @@ namespace annie{
             10.0
         ];
         private _multiplyMatrix(colorMat:any){
-            var i:number, j:number, k:number, col:any = [];
+            let i:number, j:number, k:number, col:any = [];
             for (i=0;i<5;i++) {
                 for (j=0;j<5;j++) {
                     col[j] = this.colorMatrix[j+i*5];
                 }
                 for (j=0;j<5;j++) {
-                    var val=0;
+                    let val=0;
                     for (k=0;k<5;k++) {
                         val += colorMat[j+k*5]*col[k];
                     }
@@ -438,7 +441,7 @@ namespace annie{
          * @return {string}
          */
         public toString():string{
-            var s=this;
+            let s=this;
             return s.type+s.brightness+s.hue+s.saturation+s.contrast;
         }
     }
@@ -493,7 +496,8 @@ namespace annie{
          */
         public constructor(blurX:number=2, blurY:number=2, quality:number=1){
             super();
-            var s=this;
+            let s=this;
+            s._instanceType="annie.BlurFilter";
             s.blurX=blurX>8?8:blurX;
             s.blurY=blurY>8?8:blurY;
             s.quality=quality>3?3:quality;
@@ -506,7 +510,7 @@ namespace annie{
          * @return {string}
          */
         public toString():string{
-            var s=this;
+            let s=this;
             return s.type+s.blurX+s.blurY+s.quality;
         }
         private static SHG_TABLE:any = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
@@ -519,50 +523,50 @@ namespace annie{
          * @public
          */
         public drawFilter(imageData:ImageData=null){
-            var s=this;
-            var radiusX = s.blurX >> 1;
+            let s=this;
+            let radiusX = s.blurX >> 1;
             if (isNaN(radiusX) || radiusX < 0) return false;
-            var radiusY = s.blurY >> 1;
+            let radiusY = s.blurY >> 1;
             if (isNaN(radiusY) || radiusY < 0) return false;
             if (radiusX == 0 && radiusY == 0) return false;
-            var iterations = s.quality;
+            let iterations = s.quality;
             if (isNaN(iterations) || iterations < 1) iterations = 1;
             iterations |= 0;
             if (iterations > 3) iterations = 3;
             if (iterations < 1) iterations = 1;
-            var px:any = imageData.data;
-            var x=0, y=0, i=0, p=0, yp=0, yi=0, yw=0, r=0, g=0, b=0, a=0, pr=0, pg=0, pb=0, pa=0;
-            var divx = (radiusX + radiusX + 1) | 0;
-            var divy = (radiusY + radiusY + 1) | 0;
-            var w = imageData.width | 0;
-            var h = imageData.height | 0;
-            var w1 = (w - 1) | 0;
-            var h1 = (h - 1) | 0;
-            var rxp1 = (radiusX + 1) | 0;
-            var ryp1 = (radiusY + 1) | 0;
-            var ssx = {r:0,b:0,g:0,a:0};
-            var sx:any = ssx;
+            let px:any = imageData.data;
+            let x=0, y=0, i=0, p=0, yp=0, yi=0, yw=0, r=0, g=0, b=0, a=0, pr=0, pg=0, pb=0, pa=0;
+            let divx = (radiusX + radiusX + 1) | 0;
+            let divy = (radiusY + radiusY + 1) | 0;
+            let w = imageData.width | 0;
+            let h = imageData.height | 0;
+            let w1 = (w - 1) | 0;
+            let h1 = (h - 1) | 0;
+            let rxp1 = (radiusX + 1) | 0;
+            let ryp1 = (radiusY + 1) | 0;
+            let ssx = {r:0,b:0,g:0,a:0};
+            let sx:any = ssx;
             for ( i = 1; i < divx; i++ )
             {
                 sx = sx.n = {r:0,b:0,g:0,a:0};
             }
             sx.n = ssx;
-            var ssy = {r:0,b:0,g:0,a:0};
-            var sy:any = ssy;
+            let ssy = {r:0,b:0,g:0,a:0};
+            let sy:any = ssy;
             for ( i = 1; i < divy; i++ )
             {
                 sy = sy.n = {r:0,b:0,g:0,a:0};
             }
             sy.n = ssy;
-            var si:any = null;
-            var mtx = BlurFilter.MUL_TABLE[radiusX] | 0;
-            var stx = BlurFilter.SHG_TABLE[radiusX] | 0;
-            var mty = BlurFilter.MUL_TABLE[radiusY] | 0;
-            var sty = BlurFilter.SHG_TABLE[radiusY] | 0;
+            let si:any = null;
+            let mtx = BlurFilter.MUL_TABLE[radiusX] | 0;
+            let stx = BlurFilter.SHG_TABLE[radiusX] | 0;
+            let mty = BlurFilter.MUL_TABLE[radiusY] | 0;
+            let sty = BlurFilter.SHG_TABLE[radiusY] | 0;
             while (iterations-- > 0) {
                 yw = yi = 0;
-                var ms = mtx;
-                var ss = stx;
+                let ms = mtx;
+                let ss = stx;
                 for (y = h; --y > -1;) {
                     r = rxp1 * (pr = px[(yi) | 0]);
                     g = rxp1 * (pg = px[(yi + 1) | 0]);

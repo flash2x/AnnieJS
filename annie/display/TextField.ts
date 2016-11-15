@@ -12,6 +12,7 @@ namespace annie {
     export class TextField extends DisplayObject{
         public constructor() {
             super();
+            this._instanceType="annie.TextField";
         }
         private _cacheImg:any=window.document.createElement("canvas");
         private _cacheX:number = 0;
@@ -115,8 +116,8 @@ namespace annie {
          * @since 1.0.0
          */
         private _prepContext(ctx:any):void {
-            var s=this;
-            var font:any=s.size || 12;
+            let s=this;
+            let font:any=s.size || 12;
             font+="px ";
             font+=s.font;
             //font-weight:bold;font-style:italic;
@@ -141,9 +142,9 @@ namespace annie {
          * @since 1.0.0
          */
         private _getMeasuredWidth(text:string):number {
-            var ctx = this._cacheImg.getContext("2d");
+            let ctx = this._cacheImg.getContext("2d");
             //ctx.save();
-            var w = ctx.measureText(text).width;
+            let w = ctx.measureText(text).width;
             //ctx.restore();
             return w;
         }
@@ -155,7 +156,7 @@ namespace annie {
          * @since 1.0.0
          */
         public render(renderObj:IRender):void {
-            var s = this;
+            let s = this;
             if (s._cacheImg.src!="") {
                 renderObj.draw(s, 2);
             }
@@ -169,10 +170,10 @@ namespace annie {
          * @since 1.0.0
          */
         public update():void {
-            var s:any = this;
+            let s:any = this;
             if(s.pauseUpdate)return;
             super.update();
-            for(var item in s._cacheObject){
+            for(let item in s._cacheObject){
                 if(s._cacheObject[item]!=s[item]){
                     s._cacheObject[item]=s[item];
                     s._isNeedUpdate=true;
@@ -180,12 +181,12 @@ namespace annie {
             }
             if(s._isNeedUpdate){
                 s.text+="";
-                var can=s._cacheImg;
-                var ctx = can.getContext("2d");
-                var hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
-                var realLines:any = [];
+                let can=s._cacheImg;
+                let ctx = can.getContext("2d");
+                let hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
+                let realLines:any = [];
                 s._prepContext(ctx);
-                var lineH:number;
+                let lineH:number;
                 if (s.lineHeight) {
                     lineH = s.lineHeight;
                 } else {
@@ -200,14 +201,14 @@ namespace annie {
                 }
                 if(s.text.indexOf("\n")<0&&s.lineType=="single"){
                     realLines.push(hardLines[0]);
-                    var str = hardLines[0];
-                    var lineW=s._getMeasuredWidth(str);
+                    let str = hardLines[0];
+                    let lineW=s._getMeasuredWidth(str);
                     if(lineW>s.lineWidth) {
-                        var w=s._getMeasuredWidth(str[0]);
-                        var lineStr = str[0];
-                        var wordW = 0;
-                        var strLen=str.length;
-                        for (var j = 1; j < strLen; j++) {
+                        let w=s._getMeasuredWidth(str[0]);
+                        let lineStr = str[0];
+                        let wordW = 0;
+                        let strLen=str.length;
+                        for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s.lineWidth) {
@@ -219,13 +220,13 @@ namespace annie {
                         }
                     }
                 }else{
-                    for (var i = 0, l = hardLines.length; i < l; i++) {
-                        var str = hardLines[i];
-                        var w=s._getMeasuredWidth(str[0]);
-                        var lineStr=str[0];
-                        var wordW=0;
-                        var strLen=str.length;
-                        for (var j = 1;j<strLen;j++) {
+                    for (let i = 0, l = hardLines.length; i < l; i++) {
+                        let str = hardLines[i];
+                        let w=s._getMeasuredWidth(str[0]);
+                        let lineStr=str[0];
+                        let wordW=0;
+                        let strLen=str.length;
+                        for (let j = 1;j<strLen;j++) {
                             wordW= ctx.measureText(str[j]).width;
                             w+=wordW;
                             if (w>this.lineWidth){
@@ -239,9 +240,9 @@ namespace annie {
                         realLines.push(lineStr);
                     }
                 }
-                var maxH=lineH * realLines.length;
-                var maxW=s.lineWidth;
-                var tx = 0;
+                let maxH=lineH * realLines.length;
+                let maxW=s.lineWidth;
+                let tx = 0;
                 if (s.textAlign == "center") {
                     tx = maxW * 0.5;
                 } else if (s.textAlign == "right") {
@@ -255,9 +256,9 @@ namespace annie {
                 ctx.setTransform(1, 0, 0, 1, tx+10, 10);
                 /////////////////////
                 if(s["cFilters"]&&s["cFilters"].length>0) {
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    for (var i = 0; i < cfLen; i++) {
+                    let cf = s.cFilters;
+                    let cfLen = cf.length;
+                    for (let i = 0; i < cfLen; i++) {
                         if (s.cFilters[i].type == "Shadow") {
                             ctx.shadowBlur = cf[i].blur;
                             ctx.shadowColor = cf[i].color;
@@ -274,15 +275,15 @@ namespace annie {
                 }
                 ////////////////////
                 s._prepContext(ctx);
-                for (var i = 0; i<realLines.length; i++) {
+                for (let i = 0; i<realLines.length; i++) {
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
                 //滤镜
                 if(s["cFilters"]&&s["cFilters"].length>0) {
-                    var len=s["cFilters"].length;
-                    var imageData = ctx.getImageData(0, 0, maxW+20, maxH+20);
-                    for(var i=0;i<len;i++) {
-                        var f:any = s["cFilters"][i];
+                    let len=s["cFilters"].length;
+                    let imageData = ctx.getImageData(0, 0, maxW+20, maxH+20);
+                    for(let i=0;i<len;i++) {
+                        let f:any = s["cFilters"][i];
                         f.drawFilter(imageData);
                     }
                     ctx.putImageData(imageData,0,0);
@@ -301,8 +302,8 @@ namespace annie {
          * @since 1.0.0
          */
         public getBounds():Rectangle{
-            var s=this;
-            var r=new Rectangle();
+            let s=this;
+            let r=new Rectangle();
             if(s._cacheImg){
                 r.x=0;
                 r.y=0;

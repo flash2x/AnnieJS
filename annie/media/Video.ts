@@ -12,7 +12,8 @@ namespace annie {
     export class Video extends Media {
         public constructor(src:any,width:number,height:number) {
             super(src, "Video");
-            var s=this;
+            let s=this;
+            s._instanceType="annie.Video";
             s.media.setAttribute("webkit-playsinline", "true");
             s.media.setAttribute("x-webkit-airplay", "true");
             s.media.width=width;

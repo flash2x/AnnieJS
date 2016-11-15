@@ -10,7 +10,7 @@ namespace annie {
         public soundScene:string;
         public soundTimes:number;
         public constructor(){
-            var s = this;
+            let s = this;
             s.frameChildList = new Array();
             s.keyIndex = 0;
             s.eventName = "";
@@ -19,8 +19,8 @@ namespace annie {
             s.soundTimes = 1;
         }
         public setDisplayInfo(display:DisplayObject, displayBaseInfo:Object=null, displayExtendInfo:Object = null):void {
-            var s = this;
-            var info:Object = {
+            let s = this;
+            let info:Object = {
                 display: display,
                 x: 0,
                 y: 0,
@@ -35,8 +35,8 @@ namespace annie {
             s.frameChildList.push(info);
         }
         public setGraphicInfo(loopType:string, firstFrame:number, parentFrameIndex:number):void {
-            var s = this;
-            var lastIndex = s.frameChildList.length - 1;
+            let s = this;
+            let lastIndex = s.frameChildList.length - 1;
             s.frameChildList[lastIndex].graphicInfo = {
                 loopType: loopType,
                 firstFrame: firstFrame,
@@ -128,7 +128,8 @@ namespace annie {
         //private _isOnStage:boolean=false;
         public constructor() {
             super();
-            var s=this;
+            let s=this;
+            s._instanceType="annie.MovieClip";
             s.addChild(s.container);
         }
         /**
@@ -138,7 +139,7 @@ namespace annie {
          * @since 1.0.0
          */
         public stop():void {
-            var s = this;
+            let s = this;
             //s._isNeedUpdateChildren = true;
             s.isPlaying = false;
         }
@@ -152,7 +153,7 @@ namespace annie {
          * @param {number} frameIndex
          */
         public as(frameScript:Function, frameIndex:number):void {
-            var s = this;
+            let s = this;
             s._scriptLayer[frameIndex] = frameScript;
         }
 
@@ -165,7 +166,7 @@ namespace annie {
          * @param {Function}frameScript {Function} 时间轴播放到当前帧时要执行回调方法
          */
         public addFrameScript(frameIndex:number, frameScript:Function):void {
-            var s = this;
+            let s = this;
             s.as(frameScript, frameIndex);
         }
 
@@ -177,7 +178,7 @@ namespace annie {
          * @param {number} frameIndex
          */
         public removeFrameScript(frameIndex:number):void{
-            var s = this;
+            let s = this;
             if(s._scriptLayer[frameIndex]){
                 s._scriptLayer[frameIndex]=null;
             }
@@ -191,7 +192,7 @@ namespace annie {
          * @returns {annie.MovieClip}
          */
         public a():MovieClip {
-            var s = this;
+            let s = this;
             s._currentLayer = [];
             s._timeline.unshift(s._currentLayer);
             return s;
@@ -207,10 +208,10 @@ namespace annie {
          * @param {number} count
          */
         public b(count:number):MovieClip {
-            var s = this;
+            let s = this;
             s._currentLayerFrame = new McFrame();
             s._currentLayerFrame.keyIndex = s._currentLayer.length;
-            for (var i = 0; i < count; i++) {
+            for (let i = 0; i < count; i++) {
                 s._currentLayer.push(s._currentLayerFrame);
             }
             if (s.totalFrames < s._currentLayer.length) {
@@ -231,7 +232,7 @@ namespace annie {
          * @returns {annie.MovieClip}
          */
         public c(display:any, displayBaseInfo:any=null, displayExtendInfo:any=null):MovieClip {
-            var s = this;
+            let s = this;
             s._currentLayerFrame.setDisplayInfo(display, displayBaseInfo, displayExtendInfo);
             return s;
         }
@@ -248,7 +249,7 @@ namespace annie {
          * @returns {annie.MovieClip}
          */
         public g(loopType:string, firstFrame:number, parentFrameIndex:number):MovieClip {
-            var s = this;
+            let s = this;
             s._currentLayerFrame.setGraphicInfo(loopType, firstFrame, parentFrameIndex);
             return s;
         }
@@ -261,7 +262,7 @@ namespace annie {
          * @param{Object} graphicInfo
          */
         public setGraphicInfo(graphicInfo:any):void {
-            var s = this;
+            let s = this;
             s._graphicInfo = graphicInfo;
         }
 
@@ -272,7 +273,7 @@ namespace annie {
          * @since 1.0.0
          */
         public initButton():void {
-            var s = this;
+            let s = this;
             s.mouseChildren=false;
             //将mc设置成按钮形式
             if(s.totalFrames>1) {
@@ -300,7 +301,7 @@ namespace annie {
          * @returns {annie.MovieClip}
          */
          public d(name:string, index:number):MovieClip {
-            var s = this;
+            let s = this;
             s._labelFrame[name] = index + 1;
             s._frameLabel[index + 1] = name;
             return s;
@@ -315,7 +316,7 @@ namespace annie {
          * @returns {string}
          * */
         public getCurrentLabel():string {
-            var s = this;
+            let s = this;
             return s._frameLabel[s.currentFrame] ? s._frameLabel[s.currentFrame] : "";
         }
 
@@ -329,7 +330,7 @@ namespace annie {
          * @returns {annie.MovieClip}
          */
          public e(eventName:string):MovieClip {
-            var s = this;
+            let s = this;
             s._currentLayerFrame.eventName = eventName;
             return s;
         }
@@ -346,7 +347,7 @@ namespace annie {
          * @returns {annie.MovieClip}
          */
         public f(sceneName:string, soundName:string, times:number):MovieClip {
-            var s = this;
+            let s = this;
             s._currentLayerFrame.soundName = soundName;
             s._currentLayerFrame.soundScene = sceneName;
             s._currentLayerFrame.soundTimes = times;
@@ -360,7 +361,7 @@ namespace annie {
          * @public
          */
         public nextFrame():void {
-            var s = this;
+            let s = this;
             if (s.currentFrame < s.totalFrames) {
                 s.currentFrame++;
                 s._isNeedUpdateChildren = true;
@@ -376,7 +377,7 @@ namespace annie {
          * @public
          */
         public prevFrame():void {
-            var s = this;
+            let s = this;
             if (s.currentFrame > 1) {
                 s.currentFrame--;
                 s._isNeedUpdateChildren = true;
@@ -393,9 +394,9 @@ namespace annie {
          * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
          */
         public gotoAndStop(frameIndex:number|string):void {
-            var s = this;
+            let s = this;
             s.isPlaying = false;
-            var tempFrame:any;
+            let tempFrame:any;
             if (typeof(frameIndex) == "string") {
                 if (s._labelFrame[frameIndex] != undefined) {
                     tempFrame = s._labelFrame[frameIndex];
@@ -425,7 +426,7 @@ namespace annie {
          * @since 1.0.0
          */
         public play(isFront:boolean=true):void {
-            var s = this;
+            let s = this;
             s.isPlaying = true;
             if (isFront == undefined) {
                 s.isFront = true;
@@ -443,14 +444,14 @@ namespace annie {
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
          */
         public gotoAndPlay(frameIndex:number|string, isFront:boolean=true):void {
-            var s = this;
+            let s = this;
             if (isFront == undefined) {
                 s.isFront = true;
             } else {
                 s.isFront = isFront;
             }
             s.isPlaying = true;
-            var tempFrame:any;
+            let tempFrame:any;
             if (typeof(frameIndex) == "string") {
                 if (s._labelFrame[frameIndex] != undefined) {
                     tempFrame = s._labelFrame[frameIndex];
@@ -488,7 +489,7 @@ namespace annie {
          */
         public setFrameChild(child:any, attr:any):void {
             child._donotUpdateinMC = child._donotUpdateinMC || {};
-            for (var i in attr) {
+            for (let i in attr) {
                 if(attr[i]!=null) {
                     child._donotUpdateinMC[i] = attr[i];
                 }else{
@@ -505,15 +506,15 @@ namespace annie {
          */
         public update():void {
             //super.update();
-            var s:any = this;
+            let s:any = this;
             if (s.pauseUpdate)return;
             if (s._graphicInfo) {
                 //核心代码
                 //loopType,firstFrame,parentFrameIndex
-                var curParentFrameIndex:number = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
-                var tempCurrentFrame = 1;
-                var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
-                var cStartFrame = s._graphicInfo.firstFrame + 1;
+                let curParentFrameIndex:number = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
+                let tempCurrentFrame = 1;
+                let pStartFrame = s._graphicInfo.parentFrameIndex + 1;
+                let cStartFrame = s._graphicInfo.firstFrame + 1;
                 if (s._graphicInfo.loopType == "play once") {
                     if (curParentFrameIndex - pStartFrame >= 0) {
                         tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
@@ -555,15 +556,15 @@ namespace annie {
             }
             s._isUpdateFrame = true;
             if (s._isNeedUpdateChildren) {
-                var layerCount = s._timeline.length;
-                var frameCount = 0;
-                var frame:McFrame = null;
-                var displayObject:any = null;
-                var infoObject:any = null;
-                var frameChildrenCount = 0;
-                var lastFrameChildren = s.children;
-                var i:number;
-                var frameEvents:any = [];
+                let layerCount = s._timeline.length;
+                let frameCount = 0;
+                let frame:McFrame = null;
+                let displayObject:any = null;
+                let infoObject:any = null;
+                let frameChildrenCount = 0;
+                let lastFrameChildren = s.children;
+                let i:number;
+                let frameEvents:any = [];
                 for (i = 0; i < s.children.length-1; i++) {
                     lastFrameChildren[i].parent = null;
                 }
@@ -578,13 +579,13 @@ namespace annie {
                                 annie.RESManager.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
                             }
                             if (frame.eventName != "" && s.hasEventListener(Event.CALL_FRAME)) {
-                                var event = new Event(Event.CALL_FRAME);
+                                let event = new Event(Event.CALL_FRAME);
                                 event.data = {frameIndex: s.currentFrame, frameName: frame.eventName};
                                 frameEvents.push(event);
                             }
                         }
                         frameChildrenCount = frame.frameChildList.length;
-                        for (var j = 0; j < frameChildrenCount; j++) {
+                        for (let j = 0; j < frameChildrenCount; j++) {
                             infoObject = frame.frameChildList[j];
                             displayObject = infoObject.display;
                             displayObject.x = infoObject.x;
@@ -608,7 +609,7 @@ namespace annie {
                                 }
                             }
                             if (displayObject["_donotUpdateinMC"] != undefined) {
-                                for (var o in displayObject["_donotUpdateinMC"]) {
+                                for (let o in displayObject["_donotUpdateinMC"]) {
                                     if (displayObject["_donotUpdateinMC"][o] != undefined) {
                                         displayObject[o] = displayObject["_donotUpdateinMC"][o];
                                     }
@@ -624,7 +625,7 @@ namespace annie {
                 }
                 s._isNeedUpdateChildren = false;
                 //update一定要放在事件处理之前
-                var len = lastFrameChildren.length;
+                let len = lastFrameChildren.length;
                 for (i = 0; i < len; i++) {
                     if (!lastFrameChildren[i].parent){
                         lastFrameChildren[i].parent=s;
@@ -637,7 +638,7 @@ namespace annie {
                 //看看是否到了第一帧，或是最后一帧,如果是准备事件
                 if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
                     if (s.hasEventListener(Event.END_FRAME)) {
-                        var event = new Event(Event.END_FRAME);
+                        let event = new Event(Event.END_FRAME);
                         event.data = {
                             frameIndex: s.currentFrame,
                             frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
@@ -646,7 +647,7 @@ namespace annie {
                     }
                 }
                 //看看是否有帧事件,有则派发
-                var len = frameEvents.length;
+                len = frameEvents.length;
                 for (i = 0; i < len; i++) {
                     s.dispatchEvent(frameEvents[i]);
                 }
@@ -667,7 +668,7 @@ namespace annie {
         public _onDispatchBubbledEvent(type:string):void {
             super._onDispatchBubbledEvent(type);
             if (type == "onRemoveToStage") {
-                var s = this;
+                let s = this;
                 s.currentFrame = 1;
                 s.isPlaying = true;
                 s.isFront = true;

@@ -19,13 +19,14 @@ namespace annie {
          */
         public constructor(src:any,type:number=0,width:number,height:number){
             super();
-            var isUseVideo:any=true;
+            this._instanceType="annie.VideoPlayer";
+            let isUseVideo:any=true;
             if(type==0){
                 if(annie.osType=="android"){
                     isUseVideo=false;
                 }else{
                     //检测是否支持mp4,如果不支持,也将用序列
-                    var testVideo=document.createElement("video");
+                    let testVideo=document.createElement("video");
                     isUseVideo=testVideo.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')=="probably";
                 }
             }else if(type==1){

@@ -404,7 +404,7 @@ declare namespace annieUI {
          * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @param{number}slideSpeed  页面滑动速度
          * @example
-         *      var slideBox = new annieUI.SlidePage({
+         *      let slideBox = new annieUI.SlidePage({
          *          pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
          *          isVertical: true,//默认值为true,ture为纵向,falas为横向
          *          slideSpeed: .32,//默认值为.4，滑动速度

@@ -103,7 +103,8 @@ namespace annie {
          */
         public constructor(src:string,width:number,height:number) {
             super();
-            var s = this;
+            let s = this;
+            s._instanceType="annie.ImageFrames";
             s.src=src;
             s.rect = new Rectangle(0,0,width,height);
             s.list = [];
@@ -118,11 +119,11 @@ namespace annie {
          * @param e
          */
         private success(e:annie.Event){
-            var s = this;
+            let s = this;
             if (e.data.type == "json") {
                 //加载到了配置文件
                 s._configInfo = {};
-                for (var item in e.data.response) {
+                for (let item in e.data.response) {
                     s._configInfo[item] = e.data.response[item];
                 }
                 s._startTime = Date.now();
@@ -141,12 +142,12 @@ namespace annie {
                     s.dispatchEvent("onload");
                 } else {
                     s.loadImage();
-                    var bufferFrame = s._currentLoadIndex* s._configInfo.pageCount;
+                    let bufferFrame = s._currentLoadIndex* s._configInfo.pageCount;
                     if (bufferFrame >= 30) {
                         if (bufferFrame == 30) {
                             //判断网速
-                            var _endTime = Date.now();
-                            var time = _endTime - s._startTime;
+                            let _endTime = Date.now();
+                            let time = _endTime - s._startTime;
                             if (time < 500) {
                                 s._needBufferFrame = 30;
                             } else if (time < 1000) {
@@ -177,7 +178,7 @@ namespace annie {
          * @public
          */
         public update() {
-            var s = this;
+            let s = this;
             if (s.canPlay && s.autoplay) {
                 if (s.currentFrame == s._configInfo.totalsFrame) {
                     //播放结束事件
@@ -190,10 +191,10 @@ namespace annie {
                 } else {
                     if(s.currentFrame<(s._currentLoadIndex * s._configInfo.pageCount-1)||s._isLoaded){
                         //////////////////////////////渲染//////////////////////////////////
-                        var pageIndex = Math.floor(s.currentFrame / s._configInfo.pageCount);
-                        var rowIndex = s.currentFrame % s._configInfo.pageCount;
-                        var x = Math.floor(rowIndex / s._configInfo.rowCount);
-                        var y = rowIndex % s._configInfo.rowCount;
+                        let pageIndex = Math.floor(s.currentFrame / s._configInfo.pageCount);
+                        let rowIndex = s.currentFrame % s._configInfo.pageCount;
+                        let x = Math.floor(rowIndex / s._configInfo.rowCount);
+                        let y = rowIndex % s._configInfo.rowCount;
                         s.rect.x = y * (s._configInfo.dis + s._configInfo.width) + s._configInfo.dis;
                         s.rect.y = x * (s._configInfo.dis + s._configInfo.height) + s._configInfo.dis;
                         s.rect.width = s._configInfo.width;
@@ -213,7 +214,7 @@ namespace annie {
             s.checkChange();
         }
         private checkChange(){
-            var s=this;
+            let s=this;
             if (s._lastSrc != s.src) {
                 //开始初始化
                 if (s.src != "") {
@@ -232,7 +233,7 @@ namespace annie {
             }
         }
         private loadImage(){
-            var s = this;
+            let s = this;
             s._urlLoader.load(s.src + "/" + s._configInfo.name + s._currentLoadIndex + s._configInfo.type);
         }
         /**
@@ -261,7 +262,7 @@ namespace annie {
          * @since 1.0.0
          */
         public clear():void{
-            var s=this;
+            let s=this;
             s._urlLoader.loadCancel();
             s.list = [];
             s.src="";

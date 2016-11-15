@@ -12,67 +12,67 @@ namespace annie {
          * 存储加载资源的总对象
          * @type {Object}
          */
-        var res:any ={};
+        let res:any ={};
         /**
          * 加载器是否正在加载中
          */
-        var _isLoading:boolean;
+        let _isLoading:boolean;
         /**
          * 加载中的场景名列表
          */
-        var _loadSceneNames:any;
+        let _loadSceneNames:any;
         /**
          * 加载地址的域名地址或前缀
          */
-        var _domain:string;
+        let _domain:string;
         /**
          * 当前加载到哪一个资源
          */
-        var _loadIndex:number;
+        let _loadIndex:number;
         /**
          * 当前加载的总资源数
          */
-        var _totalLoadRes:number;
+        let _totalLoadRes:number;
         /**
          * 当前已经加载的资源数
          */
-        var _loadedLoadRes:number;
+        let _loadedLoadRes:number;
         /**
          * 加载资源的完成回调
          */
-        var _completeCallback:Function;
+        let _completeCallback:Function;
         /**
          * 加载资源时的进度回调
          */
-        var _progressCallback:Function;
+        let _progressCallback:Function;
         /**
          * 加载配置文件的加载器
          */
-        var _JSONQueue:URLLoader;
+        let _JSONQueue:URLLoader;
         /**
          * 加载资源文件的加载器
          */
-        var _loaderQueue:URLLoader;
+        let _loaderQueue:URLLoader;
         /**
          * 加载器是否初始化过
          */
-        var _isInited:Boolean;
+        let _isInited:Boolean;
         /**
          * 当前加载的资源配置文件内容
          */
-        var _currentConfig:any;
+        let _currentConfig:any;
         /**
          * 获取当前加载的时间当作随机数用
          */
-        var _time:number;
+        let _time:number;
         /**
          * 加载资源数和总资源数的比
          */
-        var _loadPer:number;
+        let _loadPer:number;
         /**
          * 单个资源占总资源数的比
          */
-        var _loadSinglePer:number
+        let _loadSinglePer:number
         /**
          * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
          * @method loadScene
@@ -84,7 +84,7 @@ namespace annie {
          * @param {Function} completeFun 加载完成回高,无回调参数
          * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
          */
-        export var loadScene = function(sceneName:any, progressFun:Function, completeFun:Function,domain:string = ""):void {
+        export let loadScene = function(sceneName:any, progressFun:Function, completeFun:Function,domain:string = ""):void {
             //加载资源配置文件
             if (_isLoading) {
                 _JSONQueue.loadCancel();
@@ -102,8 +102,8 @@ namespace annie {
                 }
             }
             else {
-                var len = sceneName.length;
-                for (var i = 0; i < len; i++) {
+                let len = sceneName.length;
+                for (let i = 0; i < len; i++) {
                     if (!isLoadedScene(sceneName[i])) {
                         res[sceneName[i]] = new Object();
                         _loadSceneNames.push(sceneName[i]);
@@ -139,7 +139,7 @@ namespace annie {
         }
         function onCFGComplete(e:Event):void {
             //配置文件加载完成
-            var resList:any = e.data.response;
+            let resList:any = e.data.response;
             _currentConfig.push(resList);
             _totalLoadRes += resList.length;
             _loadIndex++;
@@ -160,8 +160,8 @@ namespace annie {
         }
         function _onRESComplete(e:Event):void{
             if (e.data.type != "js"&&e.data.type!="css") {
-                var id = _currentConfig[_loadIndex][0].id;
-                var scene = _loadSceneNames[_loadIndex];
+                let id = _currentConfig[_loadIndex][0].id;
+                let scene = _loadSceneNames[_loadIndex];
                 if(e.data.type=="sound"){
                     res[scene][id] = new annie.Sound(e.data.response);
                 }else {
@@ -192,7 +192,7 @@ namespace annie {
         }
 
         function _loadRes():void {
-            var url = _domain + _currentConfig[_loadIndex][0].src;
+            let url = _domain + _currentConfig[_loadIndex][0].src;
             _loaderQueue.load(url);
         }
 
@@ -224,15 +224,15 @@ namespace annie {
         export function unLoadScene(sceneName:string,gl:WebGLRenderingContext=null):void{
             //删除webgl贴图资源
             if(gl) {
-                for (var item in res[sceneName]) {
+                for (let item in res[sceneName]) {
                     if (res[sceneName][item].nodeName && res[sceneName][item].nodeName == "IMG" && res[sceneName][item].texture) {
                         gl.deleteTexture(res[sceneName][item].texture);
                     }
                 }
             }
             delete res[sceneName];
-            var scene:any = eval(sceneName);
-            for (var i in scene) {
+            let scene:any = eval(sceneName);
+            for (let i in scene) {
                 delete scene[i];
             }
             eval(sceneName + "=null;");
@@ -248,7 +248,7 @@ namespace annie {
          * @returns {any}
          */
         export function getMediaByName(sceneName:string, mediaName:string):any {
-            var s = res;
+            let s = res;
             if (s[sceneName][mediaName]) {
                 return s[sceneName][mediaName];
             }
@@ -266,18 +266,18 @@ namespace annie {
          * @returns {any}
          */
         export function b(sceneName:string, imageName:string):Bitmap {
-            var s = res;
-            var isFind = false;
+            let s = res;
+            let isFind = false;
             if (s[sceneName][imageName]) {
                 return new annie.Bitmap(s[sceneName][imageName]);
             } else {
-                var m = 0;
+                let m = 0;
                 while (s[sceneName]["F2xSSIMG" + m]) {
-                    var data = s[sceneName]["F2xSSIMGData" + m];
+                    let data = s[sceneName]["F2xSSIMGData" + m];
                     if (data[imageName] != undefined) {
                         isFind = true;
-                        var imgData = data[imageName];
-                        var spriteSheet = s[sceneName]["F2xSSIMG" + m];
+                        let imgData = data[imageName];
+                        let spriteSheet = s[sceneName]["F2xSSIMG" + m];
                         //return {image: spriteSheet, rect: imgData};
                         return new annie.Bitmap(spriteSheet, imgData);
                     }
@@ -328,7 +328,7 @@ namespace annie {
                 }
             }
             if(extendInfo&&extendInfo.length>0){
-                var index=0;
+                let index=0;
                 display.filters=[];
                 while(extendInfo[index]!=undefined){
                     if(extendInfo[index]==0){
@@ -338,15 +338,15 @@ namespace annie {
                         display.filters.push(new BlurFilter(extendInfo[index+1],extendInfo[index+2],extendInfo[index+3]));
                         index+=4;
                     }else if(extendInfo[index]==2){
-                        var blur=(extendInfo[index+1]+extendInfo[index+2])*0.5;
-                        var color=Shape.getRGBA(extendInfo[index+4],extendInfo[index+5]);
-                        var offsetX=extendInfo[index+7]*Math.cos(extendInfo[index+6]/180*Math.PI);
-                        var offsetY=extendInfo[index+7]*Math.sin(extendInfo[index+6]/180*Math.PI);
+                        let blur=(extendInfo[index+1]+extendInfo[index+2])*0.5;
+                        let color=Shape.getRGBA(extendInfo[index+4],extendInfo[index+5]);
+                        let offsetX=extendInfo[index+7]*Math.cos(extendInfo[index+6]/180*Math.PI);
+                        let offsetY=extendInfo[index+7]*Math.sin(extendInfo[index+6]/180*Math.PI);
                         display.filters.push(new ShadowFilter(color,offsetX,offsetY,blur));
                         index+=8;
                     }else if(extendInfo[index]==3){
-                        var blur=(extendInfo[index+1]+extendInfo[index+2])*0.5;
-                        var color=Shape.getRGBA(extendInfo[index+4],extendInfo[index+5]);
+                        let blur=(extendInfo[index+1]+extendInfo[index+2])*0.5;
+                        let color=Shape.getRGBA(extendInfo[index+4],extendInfo[index+5]);
                         display.filters.push(new ShadowFilter(color,0,0,blur));
                         index+=6;
                     }else if(extendInfo[index]==4){
@@ -380,7 +380,7 @@ namespace annie {
          * @returns {annie.TextFiled|annie.InputText}
          */
         export function t(type:number, text:string, size:number, color:string, face:string, top:number, left:number, width:number, height:number, lineSpacing:number, align:string, italic:boolean = false, bold:boolean = false, lineType:string = "single", showBorder:boolean = false):any {
-            var textObj:any;
+            let textObj:any;
             if (type == 0 || type == 1) {
                 textObj = new annie.TextField();
                 textObj.text = text;
@@ -411,12 +411,12 @@ namespace annie {
          * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
          */
         function sb(sceneName:string,bitmapName:string):annie.Bitmap{
-            var sbName:string="_f2x_s"+bitmapName;
+            let sbName:string="_f2x_s"+bitmapName;
             if(res[sceneName][sbName]){
                 return res[sceneName][sbName];
             }else{
-                var bitmapData:any=null;
-                var bitmap=b(sceneName,bitmapName);
+                let bitmapData:any=null;
+                let bitmap=b(sceneName,bitmapName);
                 if(bitmap) {
                     if(bitmap.rect){
                         //从SpriteSheet中取出Image单独存放
@@ -444,7 +444,7 @@ namespace annie {
          * @returns {annie.Shape}
          */
         export function s(pathObj:any, fillObj:any, strokeObj:any):Shape {
-            var shape = new annie.Shape();
+            let shape = new annie.Shape();
             if (fillObj) {
                 if (fillObj.type == 0) {
                     shape.beginFill(fillObj.color);
@@ -495,7 +495,7 @@ namespace annie {
          * @param {string} info.responseType 后台返回数据的类型,默认为"json"
          */
         export function ajax(info:any):void{
-            var urlLoader=new URLLoader();
+            let urlLoader=new URLLoader();
             urlLoader.method=info.type==undefined?"get":info.type;
             urlLoader.data=info.data==undefined?null:info.data;
             urlLoader.responseType=info.responseType==undefined?"text":info.responseType;
