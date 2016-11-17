@@ -157,7 +157,7 @@ namespace annie {
          */
         public render(renderObj:IRender):void {
             let s = this;
-            if (s._cacheImg.src!="") {
+            if(s._cacheImg.width>0){
                 renderObj.draw(s, 2);
             }
             //super.render();
@@ -304,11 +304,11 @@ namespace annie {
         public getBounds():Rectangle{
             let s=this;
             let r=new Rectangle();
-            if(s._cacheImg){
-                r.x=0;
-                r.y=0;
-                r.width=s._cacheImg.width-20;
-                r.height=s._cacheImg.height-20;
+            if(s._cacheImg.width>0){
+                r.x = 0;
+                r.y = 0;
+                r.width = s._cacheImg.width - 20;
+                r.height = s._cacheImg.height - 20;
             }
             return r;
         }

@@ -449,3 +449,64 @@ declare namespace annieUI {
         private getDistance(x1, y1, x2, y2);
     }
 }
+declare namespace annieUI {
+    import Sprite = annie.Sprite;
+    class FlipBook extends Sprite {
+        totalPage: number;
+        currPage: number;
+        private bW;
+        private bH;
+        private toPage;
+        private crossGap;
+        private layer1Arr;
+        private layer0Arr;
+        private state;
+        private timerArg0;
+        private timerArg1;
+        private px;
+        private py;
+        private toPosArr;
+        private myPosArr;
+        private rPage0;
+        private rPage1;
+        private pageMC;
+        private leftPage;
+        private rightPage;
+        private rMask0;
+        private rMask1;
+        private shadow0;
+        private shadow1;
+        private sMask0;
+        private sMask1;
+        private p1;
+        private p2;
+        private p3;
+        private p4;
+        private limitP1;
+        private limitP2;
+        private pages;
+        private stageMP;
+        private getPageCallback;
+        constructor();
+        init(width: number, height: number, pageCount: any, getPageCallBack: Function): void;
+        private drawPage(num, movePoint);
+        private checkLimit(point, limitPoint, limitGap);
+        private getPage(index);
+        private getBookArr(point, actionPoint1, actionPoint2);
+        private getLayerArr(point1, point2, actionPoint1, actionPoint2, limitPoint1, limitPoint2);
+        private getShape(shape, pointArr);
+        private setShadowMask(shape, maskShape, g_width, g_height);
+        private getShadow(shape, maskShape, point1, point2, maskArray, arg);
+        private setPage(pageNum);
+        private onMouseDown(e);
+        private onMouseUp(e);
+        private onMouseMove(e);
+        private checkArea(point);
+        flipTo(index: number): void;
+        private flushPage();
+        private onEnterFrame(e);
+        private arc(argR, argN1, argN2);
+        private angle(target1, target2);
+        private pos(target1, target2);
+    }
+}

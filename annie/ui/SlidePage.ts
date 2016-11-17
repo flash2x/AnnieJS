@@ -349,7 +349,6 @@ namespace annieUI {
                 }
             }
         }
-
         /**
          * 滑动到指定页
          * @method slideTo
@@ -424,7 +423,6 @@ namespace annieUI {
                 }
                 s.pageList.push(list[i]);
                 s.listLen = s.pageList.length;
-                // console.log('加长度后：'+s.listLen);
                 s.slideCon.addChildAt(list[i], s.listLen);
             }
         }
@@ -437,10 +435,9 @@ namespace annieUI {
          * @returns {number}
          */
         private getDistance(x1: number, y1: number, x2: number, y2: number): number {
-            let xdiff = x2 - x1;
-            let ydiff = y2 - y1;
-            let dis = Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);
-            return dis;
+            let xd = x2 - x1;
+            let yd = y2 - y1;
+            return Math.pow((xd * xd + yd * yd), 0.5);
         }
     }
 }

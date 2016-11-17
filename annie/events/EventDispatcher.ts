@@ -22,7 +22,7 @@ namespace annie {
          * @returns {number}
          * @example
          *      //获取 annie引擎类对象唯一码
-         *      trace(this.getInstanceId());
+         *      trace(this.instanceId);
          */
         public get instanceId():number {
             return this._id;

@@ -133,7 +133,7 @@ namespace annie {
             _progressCallback = progressFun;
             _currentConfig = [];
             _loadConfig();
-        }
+        };
         function _loadConfig():void {
             _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
         }
@@ -169,7 +169,6 @@ namespace annie {
                 }
             }
             _checkComplete();
-
         }
         function _checkComplete() {
             _loadedLoadRes++;
@@ -178,19 +177,23 @@ namespace annie {
             if (_currentConfig[_loadIndex].length > 0) {
                 _loadRes();
             }else {
+                var info:any={};
+                info.sceneName = _loadSceneNames[_loadIndex];
                 _loadIndex++;
+                info.sceneId=_loadIndex;
+                info.sceneTotal=_loadSceneNames.length;
                 if (_loadIndex == _loadSceneNames.length) {
                     //全部资源加载完成
                     _isLoading = false;
                     //_progressCallback(100);
-                    _completeCallback();
+                    _completeCallback(info);
                 }
                 else {
+                    _completeCallback(info);
                     _loadRes();
                 }
             }
         }
-
         function _loadRes():void {
             let url = _domain + _currentConfig[_loadIndex][0].src;
             _loaderQueue.load(url);

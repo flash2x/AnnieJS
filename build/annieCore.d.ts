@@ -20,7 +20,7 @@ declare namespace annie {
          * @returns {number}
          * @example
          *      //获取 annie引擎类对象唯一码
-         *      trace(this.getInstanceId());
+         *      trace(this.instanceId);
          */
         instanceId: number;
         instanceType: string;
@@ -1575,7 +1575,8 @@ declare namespace annie {
     class Sprite extends DisplayObject {
         constructor();
         /**
-         * 是否可以让children接收鼠标事件
+         * 是否可以让children接收鼠标事件,如果为false
+         * 鼠标事件将不会往下冒泡
          * @property mouseChildren
          * @type {boolean}
          * @default true

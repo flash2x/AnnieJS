@@ -263,7 +263,7 @@ namespace annie {
             let tweenObj:any;
             for (let i = 0; i < len; i++) {
                 tweenObj=Tween._tweenList[i];
-                if (tweenObj.getInstanceId() == tweenId) {
+                if (tweenObj.instanceId == tweenId) {
                     tweenObj.target = null;
                     tweenObj._completeFun = null;
                     tweenObj._cParams = null;

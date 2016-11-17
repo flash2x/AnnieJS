@@ -28,7 +28,7 @@ var annie;
              * @returns {number}
              * @example
              *      //获取 annie引擎类对象唯一码
-             *      trace(this.getInstanceId());
+             *      trace(this.instanceId);
              */
             get: function () {
                 return this._id;
@@ -2427,7 +2427,7 @@ var annie;
          */
         Shape.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cacheImg.src != "") {
+            if (s._cacheImg.width > 0) {
                 renderObj.draw(s, 1);
             }
             //super.render();
@@ -2645,42 +2645,6 @@ var annie;
                 annie.WGRender.setDisplayInfo(s, 1);
             }
         };
-        /*private _drawPath(){
-            let s=this;
-            let leftX:number=s._cacheX,leftY:number=s._cacheY,w:number=s._cacheW,h:number=s._cacheH;
-            let _canvas = DisplayObject._canvas;
-            _canvas.width = w;
-            _canvas.height = h;
-            let ctx = _canvas["getContext"]('2d');
-            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-            ctx.clearRect(leftX, leftY, w + 1, h + 1);
-            let data;
-            let cLen:number=s._command.length;
-            for (let i = 0; i < cLen; i++) {
-                data = s._command[i];
-                if (data[0]>0) {
-                    let paramsLen = data[2].length;
-                    if (paramsLen == 0) {
-                        ctx[data[1]]();
-                    } else if (paramsLen == 2) {
-                        ctx[data[1]](data[2][0], data[2][1]);
-                    } else if (paramsLen == 4) {
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
-                    }else if(paramsLen==5){
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
-                    }else if(paramsLen==6){
-                        if(data[0]==2){
-                            //位图填充
-                            data[2][4]-=leftX;
-                            data[2][5]-=leftY;
-                        }
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
-                    }
-                }else {
-                    ctx[data[1]] = data[2];
-                }
-            }
-        }*/
         /**
          * 重写getBounds
          * @method getBounds
@@ -2691,7 +2655,7 @@ var annie;
         Shape.prototype.getBounds = function () {
             var s = this;
             var r = new annie.Rectangle();
-            if (s._cacheImg) {
+            if (s._cacheImg.width > 0) {
                 r.x = s._cacheX + 20;
                 r.y = s._cacheY + 20;
                 r.width = s._cacheImg.width - 20;
@@ -2719,7 +2683,6 @@ var annie;
                 if (!s.hitPixel) {
                     return s;
                 }
-                //继续检测
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -2730,7 +2693,6 @@ var annie;
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                     return s;
                 }
-                ;
             }
             return null;
         };
@@ -2855,7 +2817,8 @@ var annie;
         function Sprite() {
             _super.call(this);
             /**
-             * 是否可以让children接收鼠标事件
+             * 是否可以让children接收鼠标事件,如果为false
+             * 鼠标事件将不会往下冒泡
              * @property mouseChildren
              * @type {boolean}
              * @default true
@@ -3185,7 +3148,7 @@ var annie;
                             if (child.mask != maskObj) {
                                 renderObj.endMask();
                                 maskObj = child.mask;
-                                var mId = maskObj.getInstanceId();
+                                var mId = maskObj.instanceId;
                                 //就是检测遮罩是否被更新过。因为动画遮罩反复更新的话他会播放同一次渲染要确定只能更新一回。
                                 if (maskObjIds.indexOf(mId) < 0) {
                                     maskObj.parent = s;
@@ -3207,7 +3170,7 @@ var annie;
                     else {
                         if (child.mask) {
                             maskObj = child.mask;
-                            var mId = maskObj.getInstanceId();
+                            var mId = maskObj.instanceId;
                             if (maskObjIds.indexOf(mId) < 0) {
                                 maskObj.parent = s;
                                 maskObj.stage = s.stage;
@@ -4753,7 +4716,7 @@ var annie;
          */
         TextField.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cacheImg.src != "") {
+            if (s._cacheImg.width > 0) {
                 renderObj.draw(s, 2);
             }
             //super.render();
@@ -4908,7 +4871,7 @@ var annie;
         TextField.prototype.getBounds = function () {
             var s = this;
             var r = new annie.Rectangle();
-            if (s._cacheImg) {
+            if (s._cacheImg.width > 0) {
                 r.x = 0;
                 r.y = 0;
                 r.width = s._cacheImg.width - 20;
@@ -7769,14 +7732,19 @@ var annie;
                 _loadRes();
             }
             else {
+                var info = {};
+                info.sceneName = _loadSceneNames[_loadIndex];
                 _loadIndex++;
+                info.sceneId = _loadIndex;
+                info.sceneTotal = _loadSceneNames.length;
                 if (_loadIndex == _loadSceneNames.length) {
                     //全部资源加载完成
                     _isLoading = false;
                     //_progressCallback(100);
-                    _completeCallback();
+                    _completeCallback(info);
                 }
                 else {
+                    _completeCallback(info);
                     _loadRes();
                 }
             }
@@ -8393,7 +8361,7 @@ var annie;
             var tweenObj;
             for (var i = 0; i < len; i++) {
                 tweenObj = Tween._tweenList[i];
-                if (tweenObj.getInstanceId() == tweenId) {
+                if (tweenObj.instanceId == tweenId) {
                     tweenObj.target = null;
                     tweenObj._completeFun = null;
                     tweenObj._cParams = null;
@@ -9102,7 +9070,7 @@ var trace = function () {
 var globalDispatcher = new annie.EventDispatcher();
 //禁止页面滑动
 document.ontouchmove = function (e) {
-    if (!annie.canHTMLTouchMove || !annie.debug) {
+    if (!annie.canHTMLTouchMove) {
         e.preventDefault();
     }
 };

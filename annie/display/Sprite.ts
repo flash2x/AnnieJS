@@ -18,7 +18,8 @@ namespace annie {
             this._instanceType="annie.Sprite";
         }
         /**
-         * 是否可以让children接收鼠标事件
+         * 是否可以让children接收鼠标事件,如果为false
+         * 鼠标事件将不会往下冒泡
          * @property mouseChildren
          * @type {boolean}
          * @default true
@@ -334,7 +335,7 @@ namespace annie {
                             if (child.mask != maskObj) {
                                 renderObj.endMask();
                                 maskObj = child.mask;
-                                let mId:number = maskObj.getInstanceId();
+                                let mId:number = maskObj.instanceId;
                                 //就是检测遮罩是否被更新过。因为动画遮罩反复更新的话他会播放同一次渲染要确定只能更新一回。
                                 if (maskObjIds.indexOf(mId) < 0) {
                                     maskObj.parent=s;
@@ -354,7 +355,7 @@ namespace annie {
                     } else {
                         if (child.mask) {
                             maskObj = child.mask;
-                            let mId:number = maskObj.getInstanceId();
+                            let mId:number = maskObj.instanceId;
                             if (maskObjIds.indexOf(mId) < 0) {
                                 maskObj.parent=s;
                                 maskObj.stage=s.stage;

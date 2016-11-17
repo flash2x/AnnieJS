@@ -96,7 +96,6 @@ namespace annie {
             }
             //super.render();
         }
-
         /**
          * 重写刷新
          * @method update

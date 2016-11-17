@@ -78,6 +78,7 @@
     废弃annie.InputText.setItalic()，直接使用annie.InputText.italic 属性进行获取和设置
     增加annie.InputText.color 属性进行字体颜色的获取和设置
     增加annie.AObject.instanceType 属性进行获取对象类型
+    增加Flash2x.loadScene()的完成时回调参数。在加载多场景的时候很有用，比如有些时候，我不想等所有的场景加载完才运行，这样我可以通过完成时回调参数来判断加载到哪里了。
     进一步优化引擎内核
 ##AnnieJS 1.0.2 版本
     新增annie.MoveClip类中的container属性，方便对MovieClip中添加不是用fla生成的子级对象
