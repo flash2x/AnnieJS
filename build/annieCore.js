@@ -8856,7 +8856,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.2";
+    annie.version = "1.0.3";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
