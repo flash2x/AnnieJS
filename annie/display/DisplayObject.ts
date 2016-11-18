@@ -409,9 +409,10 @@ namespace annie{
          * @private
          * @since 1.0.0
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        public _onDispatchBubbledEvent(type:string):void {
+        public _onDispatchBubbledEvent(type:string,updateMc:boolean=false):void {
             let s = this;
             s.stage=s.parent.stage;
             s.dispatchEvent(type);

@@ -615,7 +615,7 @@ var annie;
          * @returns {number}
          */
         Point.distance = function (p1, p2) {
-            return Math.sqrt(p1.x * p1.x * +p1.y * p2.y);
+            return Math.sqrt(p1.x * p1.x + p1.y * p2.y);
         };
         return Point;
     }(annie.AObject));
@@ -1564,9 +1564,11 @@ var annie;
          * @private
          * @since 1.0.0
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        DisplayObject.prototype._onDispatchBubbledEvent = function (type) {
+        DisplayObject.prototype._onDispatchBubbledEvent = function (type, updateMc) {
+            if (updateMc === void 0) { updateMc = false; }
             var s = this;
             s.stage = s.parent.stage;
             s.dispatchEvent(type);
@@ -1902,6 +1904,7 @@ var annie;
              * @default []
              */
             this._command = [];
+            this.useMask = false;
             /**
              * @property _cacheCanvas
              * @since 1.0.0
@@ -1921,6 +1924,7 @@ var annie;
              * @default true
              */
             this.hitPixel = true;
+            this.rect = new annie.Rectangle();
             /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
@@ -2554,78 +2558,84 @@ var annie;
                         buttonRightY += 20 + lineWidth >> 1;
                         var w = buttonRightX - leftX;
                         var h = buttonRightY - leftY;
-                        s._cacheX = leftX;
-                        s._cacheY = leftY;
-                        ///////////////////////////
-                        var _canvas = s._cacheImg;
-                        _canvas.width = w;
-                        _canvas.height = h;
-                        _canvas.style.width = w / annie.devicePixelRatio + "px";
-                        _canvas.style.height = h / annie.devicePixelRatio + "px";
-                        var ctx = _canvas["getContext"]('2d');
-                        ctx.clearRect(0, 0, w, h);
-                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        /////////////////////
-                        if (s["cFilters"] && s["cFilters"].length > 0) {
-                            var cf = s.cFilters;
-                            var cfLen = cf.length;
-                            for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                if (s.cFilters[i_1].type == "Shadow") {
-                                    ctx.shadowBlur += cf[i_1].blur;
-                                    ctx.shadowColor += cf[i_1].color;
-                                    ctx.shadowOffsetX += cf[i_1].offsetX;
-                                    ctx.shadowOffsetY += cf[i_1].offsetY;
-                                    break;
-                                }
-                            }
-                        }
-                        else {
-                            ctx.shadowBlur = 0;
-                            ctx.shadowColor = "#0";
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                        ////////////////////
-                        var data_1;
-                        for (i = 0; i < cLen; i++) {
-                            data_1 = s._command[i];
-                            if (data_1[0] > 0) {
-                                var paramsLen = data_1[2].length;
-                                if (paramsLen == 0) {
-                                    ctx[data_1[1]]();
-                                }
-                                else if (paramsLen == 2) {
-                                    ctx[data_1[1]](data_1[2][0], data_1[2][1]);
-                                }
-                                else if (paramsLen == 4) {
-                                    ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3]);
-                                }
-                                else if (paramsLen == 5) {
-                                    ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4]);
-                                }
-                                else if (paramsLen == 6) {
-                                    if (data_1[0] == 2) {
-                                        //位图填充
-                                        data_1[2][4] -= leftX;
-                                        data_1[2][5] -= leftY;
+                        s.rect.x = leftX + 20;
+                        s.rect.y = leftY + 20;
+                        s.rect.width = w - 20;
+                        s.rect.height = h - 20;
+                        if (!s.useMask) {
+                            ///////////////////////////
+                            s._cacheX = leftX;
+                            s._cacheY = leftY;
+                            var _canvas = s._cacheImg;
+                            _canvas.width = w;
+                            _canvas.height = h;
+                            _canvas.style.width = w / annie.devicePixelRatio + "px";
+                            _canvas.style.height = h / annie.devicePixelRatio + "px";
+                            var ctx = _canvas["getContext"]('2d');
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                            /////////////////////
+                            if (s["cFilters"] && s["cFilters"].length > 0) {
+                                var cf = s.cFilters;
+                                var cfLen = cf.length;
+                                for (var i_1 = 0; i_1 < cfLen; i_1++) {
+                                    if (s.cFilters[i_1].type == "Shadow") {
+                                        ctx.shadowBlur += cf[i_1].blur;
+                                        ctx.shadowColor += cf[i_1].color;
+                                        ctx.shadowOffsetX += cf[i_1].offsetX;
+                                        ctx.shadowOffsetY += cf[i_1].offsetY;
+                                        break;
                                     }
-                                    ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4], data_1[2][5]);
                                 }
                             }
                             else {
-                                ctx[data_1[1]] = data_1[2];
+                                ctx.shadowBlur = 0;
+                                ctx.shadowColor = "#0";
+                                ctx.shadowOffsetX = 0;
+                                ctx.shadowOffsetY = 0;
                             }
-                        }
-                        ///////////////////////////
-                        //滤镜
-                        if (s["cFilters"] && s["cFilters"].length > 0) {
-                            var len = s["cFilters"].length;
-                            var imageData = ctx.getImageData(0, 0, w, h);
-                            for (var i_2 = 0; i_2 < len; i_2++) {
-                                var f = s["cFilters"][i_2];
-                                f.drawFilter(imageData);
+                            ////////////////////
+                            var data_1;
+                            for (i = 0; i < cLen; i++) {
+                                data_1 = s._command[i];
+                                if (data_1[0] > 0) {
+                                    var paramsLen = data_1[2].length;
+                                    if (paramsLen == 0) {
+                                        ctx[data_1[1]]();
+                                    }
+                                    else if (paramsLen == 2) {
+                                        ctx[data_1[1]](data_1[2][0], data_1[2][1]);
+                                    }
+                                    else if (paramsLen == 4) {
+                                        ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3]);
+                                    }
+                                    else if (paramsLen == 5) {
+                                        ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4]);
+                                    }
+                                    else if (paramsLen == 6) {
+                                        if (data_1[0] == 2) {
+                                            //位图填充
+                                            data_1[2][4] -= leftX;
+                                            data_1[2][5] -= leftY;
+                                        }
+                                        ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4], data_1[2][5]);
+                                    }
+                                }
+                                else {
+                                    ctx[data_1[1]] = data_1[2];
+                                }
                             }
-                            ctx.putImageData(imageData, 0, 0);
+                            ///////////////////////////
+                            //滤镜
+                            if (s["cFilters"] && s["cFilters"].length > 0) {
+                                var len = s["cFilters"].length;
+                                var imageData = ctx.getImageData(0, 0, w, h);
+                                for (var i_2 = 0; i_2 < len; i_2++) {
+                                    var f = s["cFilters"][i_2];
+                                    f.drawFilter(imageData);
+                                }
+                                ctx.putImageData(imageData, 0, 0);
+                            }
                         }
                     }
                     else {
@@ -2653,15 +2663,7 @@ var annie;
          * @returns {annie.Rectangle}
          */
         Shape.prototype.getBounds = function () {
-            var s = this;
-            var r = new annie.Rectangle();
-            if (s._cacheImg.width > 0) {
-                r.x = s._cacheX + 20;
-                r.y = s._cacheY + 20;
-                r.width = s._cacheImg.width - 20;
-                r.height = s._cacheImg.height - 20;
-            }
-            return r;
+            return this.rect;
         };
         /**
          * 重写hitTestPoint
@@ -2679,10 +2681,7 @@ var annie;
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
-            if (s.getBounds().isPointIn(p)) {
-                if (!s.hitPixel) {
-                    return s;
-                }
+            if (s.hitPixel) {
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -2691,6 +2690,11 @@ var annie;
                 ctx.setTransform(1, 0, 0, 1, s._cacheX - p.x, s._cacheY - p.y);
                 ctx.drawImage(s._cacheImg, 0, 0);
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                    return s;
+                }
+            }
+            else {
+                if (s.getBounds().isPointIn(p)) {
                     return s;
                 }
             }
@@ -3005,16 +3009,18 @@ var annie;
          * @method _onDispatchBubbledEvent
          * @private
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
          */
-        Sprite.prototype._onDispatchBubbledEvent = function (type) {
+        Sprite.prototype._onDispatchBubbledEvent = function (type, updateMc) {
+            if (updateMc === void 0) { updateMc = false; }
             var s = this;
             var len = s.children.length;
             s.stage = s.parent.stage;
             for (var i = 0; i < len; i++) {
-                s.children[i]._onDispatchBubbledEvent(type);
+                s.children[i]._onDispatchBubbledEvent(type, updateMc);
             }
-            _super.prototype._onDispatchBubbledEvent.call(this, type);
+            _super.prototype._onDispatchBubbledEvent.call(this, type, updateMc);
         };
         /**
          * 移除指定层级上的孩子
@@ -4265,7 +4271,7 @@ var annie;
                 for (i = 0; i < len; i++) {
                     if (!lastFrameChildren[i].parent) {
                         lastFrameChildren[i].parent = s;
-                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage");
+                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
                         lastFrameChildren[i].parent = null;
                     }
                 }
@@ -4300,11 +4306,13 @@ var annie;
          * 触发显示列表上相关的事件
          * @method _onDispatchBubbledEvent
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        MovieClip.prototype._onDispatchBubbledEvent = function (type) {
+        MovieClip.prototype._onDispatchBubbledEvent = function (type, updateMc) {
+            if (updateMc === void 0) { updateMc = false; }
             _super.prototype._onDispatchBubbledEvent.call(this, type);
-            if (type == "onRemoveToStage") {
+            if (updateMc) {
                 var s = this;
                 s.currentFrame = 1;
                 s.isPlaying = true;
@@ -9069,7 +9077,7 @@ var trace = function () {
  */
 var globalDispatcher = new annie.EventDispatcher();
 //禁止页面滑动
-document.ontouchmove = function (e) {
+document.ontouchmove = document.ontouchstart = document.ontouchend = function (e) {
     if (!annie.canHTMLTouchMove) {
         e.preventDefault();
     }

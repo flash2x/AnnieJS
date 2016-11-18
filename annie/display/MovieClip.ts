@@ -629,7 +629,7 @@ namespace annie {
                 for (i = 0; i < len; i++) {
                     if (!lastFrameChildren[i].parent){
                         lastFrameChildren[i].parent=s;
-                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage");
+                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage",true);
                         lastFrameChildren[i].parent=null;
                     }
                 }
@@ -655,7 +655,7 @@ namespace annie {
                 if (s._scriptLayer[s.currentFrame - 1] != undefined) {
                     s._scriptLayer[s.currentFrame - 1]();
                 }
-            } else {
+            }else{
                 super.update();
             }
         }
@@ -663,11 +663,12 @@ namespace annie {
          * 触发显示列表上相关的事件
          * @method _onDispatchBubbledEvent
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        public _onDispatchBubbledEvent(type:string):void {
+        public _onDispatchBubbledEvent(type:string,updateMc:boolean=false):void {
             super._onDispatchBubbledEvent(type);
-            if (type == "onRemoveToStage") {
+            if (updateMc){
                 let s = this;
                 s.currentFrame = 1;
                 s.isPlaying = true;

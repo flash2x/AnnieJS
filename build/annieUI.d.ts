@@ -487,6 +487,7 @@ declare namespace annieUI {
         private pages;
         private stageMP;
         private getPageCallback;
+        canFlip: boolean;
         constructor();
         init(width: number, height: number, pageCount: any, getPageCallBack: Function): void;
         private drawPage(num, movePoint);

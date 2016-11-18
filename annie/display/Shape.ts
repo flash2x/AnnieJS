@@ -14,7 +14,6 @@ namespace annie {
             super();
             this._instanceType = "annie.Shape";
         }
-
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
          * @property _command
@@ -24,7 +23,6 @@ namespace annie {
          * @default []
          */
         private _command: any = [];
-
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
          * 一般给用户使用较少,Flash2x工具自动使用
@@ -64,6 +62,8 @@ namespace annie {
             let ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         }
+
+        public useMask: boolean = false;
 
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
@@ -231,6 +231,8 @@ namespace annie {
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
             this._command.push([1, "quadraticCurveTo", [cpX, cpY, x, y]]);
         }
+
+        private rect: Rectangle = new Rectangle();
 
         /**
          * 三次贝赛尔曲线
@@ -763,72 +765,78 @@ namespace annie {
                         buttonRightY += 20 + lineWidth >> 1;
                         let w = buttonRightX - leftX;
                         let h = buttonRightY - leftY;
-                        s._cacheX = leftX;
-                        s._cacheY = leftY;
-                        ///////////////////////////
-                        let _canvas = s._cacheImg;
-                        _canvas.width = w;
-                        _canvas.height = h;
-                        _canvas.style.width = w / devicePixelRatio + "px";
-                        _canvas.style.height = h / devicePixelRatio + "px";
-                        let ctx = _canvas["getContext"]('2d');
-                        ctx.clearRect(0, 0, w, h);
-                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        /////////////////////
-                        if (s["cFilters"] && s["cFilters"].length > 0) {
-                            let cf = s.cFilters;
-                            let cfLen = cf.length;
-                            for (let i = 0; i < cfLen; i++) {
-                                if (s.cFilters[i].type == "Shadow") {
-                                    ctx.shadowBlur += cf[i].blur;
-                                    ctx.shadowColor += cf[i].color;
-                                    ctx.shadowOffsetX += cf[i].offsetX;
-                                    ctx.shadowOffsetY += cf[i].offsetY;
-                                    break;
-                                }
-                            }
-                        } else {
-                            ctx.shadowBlur = 0;
-                            ctx.shadowColor = "#0";
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                        ////////////////////
-                        let data: any;
-                        for (i = 0; i < cLen; i++) {
-                            data = s._command[i];
-                            if (data[0] > 0) {
-                                let paramsLen = data[2].length;
-                                if (paramsLen == 0) {
-                                    ctx[data[1]]();
-                                } else if (paramsLen == 2) {
-                                    ctx[data[1]](data[2][0], data[2][1]);
-                                } else if (paramsLen == 4) {
-                                    ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
-                                } else if (paramsLen == 5) {
-                                    ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
-                                } else if (paramsLen == 6) {
-                                    if (data[0] == 2) {
-                                        //位图填充
-                                        data[2][4] -= leftX;
-                                        data[2][5] -= leftY;
+                        s.rect.x = leftX + 20;
+                        s.rect.y = leftY + 20;
+                        s.rect.width = w - 20;
+                        s.rect.height = h - 20;
+                        if (!s.useMask) {
+                            ///////////////////////////
+                            s._cacheX = leftX;
+                            s._cacheY = leftY;
+                            let _canvas = s._cacheImg;
+                            _canvas.width = w;
+                            _canvas.height = h;
+                            _canvas.style.width = w / devicePixelRatio + "px";
+                            _canvas.style.height = h / devicePixelRatio + "px";
+                            let ctx = _canvas["getContext"]('2d');
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                            /////////////////////
+                            if (s["cFilters"] && s["cFilters"].length > 0) {
+                                let cf = s.cFilters;
+                                let cfLen = cf.length;
+                                for (let i = 0; i < cfLen; i++) {
+                                    if (s.cFilters[i].type == "Shadow") {
+                                        ctx.shadowBlur += cf[i].blur;
+                                        ctx.shadowColor += cf[i].color;
+                                        ctx.shadowOffsetX += cf[i].offsetX;
+                                        ctx.shadowOffsetY += cf[i].offsetY;
+                                        break;
                                     }
-                                    ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
                                 }
                             } else {
-                                ctx[data[1]] = data[2];
+                                ctx.shadowBlur = 0;
+                                ctx.shadowColor = "#0";
+                                ctx.shadowOffsetX = 0;
+                                ctx.shadowOffsetY = 0;
                             }
-                        }
-                        ///////////////////////////
-                        //滤镜
-                        if (s["cFilters"] && s["cFilters"].length > 0) {
-                            let len = s["cFilters"].length;
-                            let imageData = ctx.getImageData(0, 0, w, h);
-                            for (let i = 0; i < len; i++) {
-                                let f: any = s["cFilters"][i];
-                                f.drawFilter(imageData);
+                            ////////////////////
+                            let data: any;
+                            for (i = 0; i < cLen; i++) {
+                                data = s._command[i];
+                                if (data[0] > 0) {
+                                    let paramsLen = data[2].length;
+                                    if (paramsLen == 0) {
+                                        ctx[data[1]]();
+                                    } else if (paramsLen == 2) {
+                                        ctx[data[1]](data[2][0], data[2][1]);
+                                    } else if (paramsLen == 4) {
+                                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
+                                    } else if (paramsLen == 5) {
+                                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
+                                    } else if (paramsLen == 6) {
+                                        if (data[0] == 2) {
+                                            //位图填充
+                                            data[2][4] -= leftX;
+                                            data[2][5] -= leftY;
+                                        }
+                                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                                    }
+                                } else {
+                                    ctx[data[1]] = data[2];
+                                }
                             }
-                            ctx.putImageData(imageData, 0, 0);
+                            ///////////////////////////
+                            //滤镜
+                            if (s["cFilters"] && s["cFilters"].length > 0) {
+                                let len = s["cFilters"].length;
+                                let imageData = ctx.getImageData(0, 0, w, h);
+                                for (let i = 0; i < len; i++) {
+                                    let f: any = s["cFilters"][i];
+                                    f.drawFilter(imageData);
+                                }
+                                ctx.putImageData(imageData, 0, 0);
+                            }
                         }
                         //
                     } else {
@@ -837,6 +845,7 @@ namespace annie {
                         s._cacheX = 0;
                         s._cacheY = 0;
                     }
+
                 } else {
                     s._cacheImg.width = 0;
                     s._cacheImg.height = 0;
@@ -856,15 +865,7 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds(): Rectangle {
-            let s = this;
-            let r = new Rectangle();
-            if (s._cacheImg.width > 0) {
-                r.x = s._cacheX + 20;
-                r.y = s._cacheY + 20;
-                r.width = s._cacheImg.width - 20;
-                r.height = s._cacheImg.height - 20;
-            }
-            return r;
+            return this.rect;
         }
 
         /**
@@ -881,10 +882,7 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
-            if (s.getBounds().isPointIn(p)) {
-                if (!s.hitPixel) {
-                    return s;
-                }
+            if (s.hitPixel) {
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -893,6 +891,10 @@ namespace annie {
                 ctx.setTransform(1, 0, 0, 1, s._cacheX - p.x, s._cacheY - p.y);
                 ctx.drawImage(s._cacheImg, 0, 0);
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                    return s;
+                }
+            }else{
+                if (s.getBounds().isPointIn(p)) {
                     return s;
                 }
             }

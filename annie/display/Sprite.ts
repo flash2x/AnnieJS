@@ -197,16 +197,17 @@ namespace annie {
          * @method _onDispatchBubbledEvent
          * @private
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
          */
-        public _onDispatchBubbledEvent(type:string):void {
+        public _onDispatchBubbledEvent(type:string,updateMc:boolean=false):void {
             let s = this;
             let len=s.children.length;
             s.stage=s.parent.stage;
             for (let i = 0; i < len; i++){
-                s.children[i]._onDispatchBubbledEvent(type);
+                s.children[i]._onDispatchBubbledEvent(type,updateMc);
             }
-            super._onDispatchBubbledEvent(type);
+            super._onDispatchBubbledEvent(type,updateMc);
         }
         /**
          * 移除指定层级上的孩子

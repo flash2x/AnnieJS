@@ -1050,9 +1050,10 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        _onDispatchBubbledEvent(type: string): void;
+        _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
         /**
          * 获取或者设置显示对象在父级里的x方向的宽
          * 之前需要使用getWH或者setWH 现已废弃
@@ -1242,6 +1243,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         static getBitmapStyle(image: any): any;
+        useMask: boolean;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -1337,6 +1339,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void;
+        private rect;
         /**
          * 三次贝赛尔曲线
          * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
@@ -1654,9 +1657,10 @@ declare namespace annie {
          * @method _onDispatchBubbledEvent
          * @private
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
          */
-        _onDispatchBubbledEvent(type: string): void;
+        _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
         /**
          * 移除指定层级上的孩子
          * @method removeChildAt
@@ -2217,9 +2221,10 @@ declare namespace annie {
          * 触发显示列表上相关的事件
          * @method _onDispatchBubbledEvent
          * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        _onDispatchBubbledEvent(type: string): void;
+        _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
     }
 }
 /**

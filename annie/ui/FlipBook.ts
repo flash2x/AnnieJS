@@ -43,6 +43,7 @@
         private pages: any = [];
         private stageMP: Point = new Point();
         private getPageCallback:Function;
+        public canFlip:boolean=true;
         public constructor() {
             super();
             this._instanceType = "annieUI.FlipBook";
@@ -74,6 +75,8 @@
             s.shadow1.visible = false;
             s.rPage1.mask=s.rMask1;
             s.rPage0.mask=s.rMask0;
+            s.rMask0.useMask=true;
+            s.rMask1.useMask=true;
             s.setPage(s.currPage);
             s.stage.addEventListener(MouseEvent.MOUSE_DOWN, s.onMouseDown.bind(s));
             s.stage.addEventListener(MouseEvent.MOUSE_UP, s.onMouseUp.bind(s));
@@ -229,6 +232,7 @@
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.mask = maskShape;
+            maskShape.useMask=true;
         }
         private getShadow(shape: Shape, maskShape: Shape, point1: Point, point2: Point, maskArray: any, arg: number): void {
             let myScale: number;
@@ -260,29 +264,32 @@
         }
         private onMouseDown(e: MouseEvent): void {
             let s = this;
-            if (s.state != "stop") {
+            if (!s.canFlip||s.state != "stop") {
                 return;
             }
             s.stageMP.x = e.clientX;
             s.stageMP.y = e.clientY;
             var p: Point = s.globalToLocal(s.stageMP);
+            s.stageMP=p;
             s.timerArg0 = s.checkArea(p);
             s.timerArg0 = s.timerArg0 < 0 ? -s.timerArg0 : s.timerArg0;
             if (s.timerArg0 > 0) {
                 if((s.timerArg0<3&&s.currPage>0)||(s.timerArg0>2&&s.currPage<=s.totalPage-2)){
                     s.state = "start";
                     s.flushPage();
+                    s.dispatchEvent("onFlipStart")
                 }
             }
         }
         private onMouseUp(e: MouseEvent): void {
             let s = this;
-            s.stageMP.x = e.clientX;
-            s.stageMP.y = e.clientY;
             if (s.state == "start") {
+                s.stageMP.x = e.clientX;
+                s.stageMP.y = e.clientY;
                 var p: Point = s.globalToLocal(s.stageMP);
                 s.timerArg1 = s.checkArea(p);
                 s.state = "auto";
+                s.stageMP=p;
             }
         }
 
@@ -291,6 +298,8 @@
             if (s.state == "start") {
                 s.stageMP.x = e.clientX;
                 s.stageMP.y = e.clientY;
+                var p: Point = s.globalToLocal(s.stageMP);
+                s.stageMP=p;
             }
         }
 
@@ -387,10 +396,11 @@
             let u: number;
             if (s.state == "start") {
                 u = 0.4;
-                var p = s.globalToLocal(s.stageMP);
+                var p:Point =s.stageMP;
                 s.px += (p.x - s.px) * u >> 0;
                 s.py += (p.y - s.py) * u >> 0;
-                s.drawPage(s.timerArg0, new Point(s.px, s.py));
+                var np=new Point(s.px,s.py);
+                s.drawPage(s.timerArg0,np);
             } else if (s.state == "auto") {
                 if (Math.abs(toPos.x - s.px) > s.bW * 1.5 && s.timerArg1 > 0) {
                     //不处于点翻区域并且翻页不过中线时
@@ -423,6 +433,7 @@
                     s.pageMC.removeAllChildren();
                     s.setPage(s.currPage);
                     s.state = "stop";
+                    s.dispatchEvent("onFlipStop");
                 }
             }
         }
