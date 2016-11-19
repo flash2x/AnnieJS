@@ -8,7 +8,18 @@
     import Point=annie.Point;
     export class FlipBook extends Sprite {
         //可设置或可调用接口,页数以单页数计算~
+        /**
+         * 总页数
+         * @property totalPage
+         * @type {number}
+         */
         public totalPage: number = 0;
+        /**
+         * 当前页数
+         * @property
+         * @type {number}
+         * @since 1.0.3
+         */
         public currPage: number = 0;
         private bW: number;
         private bH: number;
@@ -43,11 +54,27 @@
         private pages: any = [];
         private stageMP: Point = new Point();
         private getPageCallback:Function;
+        /**
+         * 指定是否能够翻页动作
+         * @property canFlip
+         * @since 1.0.3
+         * @type {boolean}
+         */
         public canFlip:boolean=true;
         public constructor() {
             super();
             this._instanceType = "annieUI.FlipBook";
         }
+
+        /**
+         * 初始化电子杂志
+         * @method init
+         * @param width 单页宽
+         * @param height 单页高
+         * @param pageCount 总页数，一般为偶数
+         * @param getPageCallBack，通过此回调获取指定页的内容的显示对象
+         * @since 1.0.3
+         */
         public init(width: number, height: number, pageCount: any,getPageCallBack:Function): void {
             let s = this;
             s.getPageCallback=getPageCallBack;
@@ -327,6 +354,12 @@
             return 0;
         }
 
+        /**
+         * 跳到指定的页数
+         * @method flipTo
+         * @param index
+         * @since 1.0.3
+         */
         public flipTo(index: number): void {
             let n: number;
             let s = this;
