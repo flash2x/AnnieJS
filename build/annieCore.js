@@ -568,6 +568,72 @@ var annie;
 var annie;
 (function (annie) {
     /**
+     * 多点触碰事件。单点事件请使用mouseEvent,pc和mobile通用
+     * @class annie.TouchEvent
+     * @extends annie.Event
+     */
+    var TouchEvent = (function (_super) {
+        __extends(TouchEvent, _super);
+        /**
+         * @method TouchEvent
+         * @public
+         * @since 1.0.3
+         * @param {string} type
+         */
+        function TouchEvent(type) {
+            _super.call(this, type);
+            /**
+             * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第1个点。
+             * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
+             * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
+             * @property clientPoint1
+             * @public
+             * @since 1.0.3
+             * @type {annie.Point}
+             */
+            this.clientPoint1 = new annie.Point();
+            /**
+             * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第2个点。
+             * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
+             * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
+             * @property clientPoint2
+             * @public
+             * @since 1.0.3
+             * @type {annie.Point}
+             */
+            this.clientPoint2 = new annie.Point();
+            /**
+             * 相对于上一次的缩放值
+             * @property scale
+             * @since 1.0.3
+             */
+            this.scale = 0;
+            /**
+             * 相对于上一次的旋转值
+             * @property rotate
+             * @since 1.0.3
+             */
+            this.rotate = 0;
+            this._instanceType = "annie.TouchEvent";
+        }
+        /**
+         * @property TOUCH_BEGIN
+         * @static
+         * @public
+         * @since 1.0.3
+         * @type {string}
+         */
+        TouchEvent.ON_MULTI_TOUCH = "onMultiTouch";
+        return TouchEvent;
+    }(annie.Event));
+    annie.TouchEvent = TouchEvent;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
      * @class annie.Point
      * @extends annie.AObject
      * @since 1.0.0
@@ -615,7 +681,7 @@ var annie;
          * @returns {number}
          */
         Point.distance = function (p1, p2) {
-            return Math.sqrt(p1.x * p1.x + p1.y * p2.y);
+            return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
         };
         return Point;
     }(annie.AObject));
@@ -2681,7 +2747,7 @@ var annie;
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
-            if (s.hitPixel) {
+            if (s.hitPixel && !s.useMask) {
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -5193,6 +5259,13 @@ var annie;
              */
             this.viewRect = new annie.Rectangle();
             /**
+             * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+             * @property isMultiTouch
+             * @since 1.0.3
+             * @type {boolean}
+             */
+            this.isMultiTouch = false;
+            /**
              * 当设备尺寸更新，或者旋转后是否自动更新方向
              * 端默认不开启
              * @property autoSteering
@@ -5340,6 +5413,7 @@ var annie;
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp"
             };
+            this.muliPoints = [];
             /**
              * 当document有鼠标或触摸事件时调用
              * @param e
@@ -5347,8 +5421,20 @@ var annie;
             this.onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
-                s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
-                //阻止向下冒泡
+                if (annie.osType == "pc" || e.targetTouches.length < 2) {
+                    s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
+                    if (s.muliPoints.length > 0) {
+                        s.muliPoints = [];
+                    }
+                }
+                else if (s.isMultiTouch && e.targetTouches.length == 2) {
+                    //求角度和距离
+                    var p1 = new annie.Point(e.targetTouches[0].clientX - e.target.offsetLeft, e.targetTouches[0].clientY - e.target.offsetTop);
+                    var p2 = new annie.Point(e.targetTouches[1].clientX - e.target.offsetLeft, e.targetTouches[1].clientY - e.target.offsetTop);
+                    var angle = Math.atan2(p1.y - p2.y, p1.x - p2.x) / Math.PI * 180;
+                    var dis = annie.Point.distance(p1, p2);
+                    s.muliPoints.push({ p1: p1, p2: p2, angle: angle, dis: dis });
+                }
             };
             /**
              * 设置舞台的对齐模式
@@ -5527,13 +5613,30 @@ var annie;
          * @param renderObj
          */
         Stage.prototype.render = function (renderObj) {
-            if (!this.pause) {
+            var s = this;
+            if (!s.pause) {
                 renderObj.begin();
                 _super.prototype.render.call(this, renderObj);
             }
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
             if (annie.EventDispatcher._totalMEC > 0) {
-                this._mt();
+                s._mt();
+            }
+            if (s.isMultiTouch && s.muliPoints.length >= 2) {
+                //如果有事件，抛事件
+                if (!s._touchEvent) {
+                    s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
+                    s._touchEvent.target = s;
+                }
+                var len = s.muliPoints.length;
+                s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
+                s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
+                s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
+                s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
+                s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
+                s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
+                s.dispatchEvent(s._touchEvent);
+                s.muliPoints = [];
             }
         };
         Stage.prototype._initMouseEvent = function (event, cp, sp) {

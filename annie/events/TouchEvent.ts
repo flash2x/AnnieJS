@@ -12,38 +12,46 @@ namespace annie {
          * @property TOUCH_BEGIN
          * @static
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          * @type {string}
          */
-        public static TOUCH_BEGIN:string = "onTouchBegin";
+        public static ON_MULTI_TOUCH:string = "onMultiTouch";
         /**
-         * @property TOUCH_END
-         * @static
+         * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第1个点。
+         * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
+         * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
+         * @property clientPoint1
          * @public
-         * @since 1.0.0
-         * @type {string}
+         * @since 1.0.3
+         * @type {annie.Point}
          */
-        public static TOUCH_END:string = "onTouchEnd";
+        public clientPoint1:Point=new Point();
         /**
-         * @property TOUCH_MOVE
-         * @static
+         * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第2个点。
+         * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
+         * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
+         * @property clientPoint2
          * @public
-         * @since 1.0.0
-         * @type {string}
+         * @since 1.0.3
+         * @type {annie.Point}
          */
-        public static TOUCH_MOVE:string = "onTouchMove";
+        public clientPoint2:Point=new Point();
         /**
-         * 多点事件中点的信息
-         * @property points
-         * @public
-         * @since 1.0.0
-         * @type {Array<Point>}
+         * 相对于上一次的缩放值
+         * @property scale
+         * @since 1.0.3
          */
-        public points:Array<Point>=null;
+        public scale:number=0;
+        /**
+         * 相对于上一次的旋转值
+         * @property rotate
+         * @since 1.0.3
+         */
+        public rotate:number=0;
         /**
          * @method TouchEvent
          * @public
-         * @since 1.0.0
+         * @since 1.0.3
          * @param {string} type
          */
         public constructor(type:string) {

@@ -427,6 +427,65 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
+     * 多点触碰事件。单点事件请使用mouseEvent,pc和mobile通用
+     * @class annie.TouchEvent
+     * @extends annie.Event
+     */
+    class TouchEvent extends Event {
+        /**
+         * @property TOUCH_BEGIN
+         * @static
+         * @public
+         * @since 1.0.3
+         * @type {string}
+         */
+        static ON_MULTI_TOUCH: string;
+        /**
+         * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第1个点。
+         * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
+         * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
+         * @property clientPoint1
+         * @public
+         * @since 1.0.3
+         * @type {annie.Point}
+         */
+        clientPoint1: Point;
+        /**
+         * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第2个点。
+         * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
+         * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
+         * @property clientPoint2
+         * @public
+         * @since 1.0.3
+         * @type {annie.Point}
+         */
+        clientPoint2: Point;
+        /**
+         * 相对于上一次的缩放值
+         * @property scale
+         * @since 1.0.3
+         */
+        scale: number;
+        /**
+         * 相对于上一次的旋转值
+         * @property rotate
+         * @since 1.0.3
+         */
+        rotate: number;
+        /**
+         * @method TouchEvent
+         * @public
+         * @since 1.0.3
+         * @param {string} type
+         */
+        constructor(type: string);
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
      * @class annie.Point
      * @extends annie.AObject
      * @since 1.0.0
@@ -2655,6 +2714,13 @@ declare namespace annie {
          */
         viewRect: Rectangle;
         /**
+         * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+         * @property isMultiTouch
+         * @since 1.0.3
+         * @type {boolean}
+         */
+        isMultiTouch: boolean;
+        /**
          * 当设备尺寸更新，或者旋转后是否自动更新方向
          * 端默认不开启
          * @property autoSteering
@@ -2810,6 +2876,7 @@ declare namespace annie {
          * @method update
          */
         update(): void;
+        private _touchEvent;
         /**
          * 渲染函数
          * @method render
@@ -2873,6 +2940,7 @@ declare namespace annie {
          * @private
          */
         private _mouseEventTypes;
+        private muliPoints;
         /**
          * 当document有鼠标或触摸事件时调用
          * @param e

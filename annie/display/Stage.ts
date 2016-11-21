@@ -67,6 +67,13 @@ namespace annie {
          */
         public viewRect:Rectangle = new Rectangle();
         /**
+         * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+         * @property isMultiTouch
+         * @since 1.0.3
+         * @type {boolean}
+         */
+        public isMultiTouch:boolean=false;
+        /**
          * 当设备尺寸更新，或者旋转后是否自动更新方向
          * 端默认不开启
          * @property autoSteering
@@ -294,19 +301,37 @@ namespace annie {
                 super.update();
             }
         }
+        private _touchEvent:annie.TouchEvent;
         /**
          * 渲染函数
          * @method render
          * @param renderObj
          */
         public render(renderObj:IRender):void {
-            if(!this.pause) {
+            let s=this;
+            if(!s.pause) {
                 renderObj.begin();
                 super.render(renderObj);
             }
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
             if(EventDispatcher._totalMEC>0) {
-                this._mt();
+                s._mt();
+            }
+            if(s.isMultiTouch&&s.muliPoints.length>=2){
+                //如果有事件，抛事件
+                if(!s._touchEvent) {
+                    s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
+                    s._touchEvent.target=s;
+                }
+                var len=s.muliPoints.length;
+                s._touchEvent.rotate=(s.muliPoints[len-1].angle-s.muliPoints[len-2].angle)*2;
+                s._touchEvent.scale=(s.muliPoints[len-1].dis-s.muliPoints[len-2].dis)/(s.divHeight>s.divWidth?s.desWidth:s.desHeight)*4;
+                s._touchEvent.clientPoint1.x=s.muliPoints[len-1].p1.x*annie.devicePixelRatio;
+                s._touchEvent.clientPoint2.x=s.muliPoints[len-1].p2.x*annie.devicePixelRatio;
+                s._touchEvent.clientPoint1.y=s.muliPoints[len-1].p1.y*annie.devicePixelRatio;
+                s._touchEvent.clientPoint2.y=s.muliPoints[len-1].p2.y*annie.devicePixelRatio;
+                s.dispatchEvent(s._touchEvent);
+                s.muliPoints=[];
             }
         }
         /**
@@ -598,6 +623,7 @@ namespace annie {
             touchmove: "onMouseMove",
             touchend: "onMouseUp"
         };
+        private muliPoints:Array<any>=[];
         /**
          * 当document有鼠标或触摸事件时调用
          * @param e
@@ -605,8 +631,19 @@ namespace annie {
         private onMouseEvent = function (e:any):void{
             //检查是否有
             let s:any = this;
-            s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
-            //阻止向下冒泡
+            if(annie.osType=="pc"||e.targetTouches.length<2) {
+                s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
+                if(s.muliPoints.length>0) {
+                    s.muliPoints = [];
+                }
+            }else if(s.isMultiTouch&&e.targetTouches.length==2){
+                //求角度和距离
+                var p1=new Point(e.targetTouches[0].clientX-e.target.offsetLeft,e.targetTouches[0].clientY-e.target.offsetTop);
+                var p2=new Point(e.targetTouches[1].clientX-e.target.offsetLeft,e.targetTouches[1].clientY-e.target.offsetTop);
+                var angle=Math.atan2(p1.y-p2.y,p1.x-p2.x)/Math.PI*180;
+                var dis=annie.Point.distance(p1,p2);
+                s.muliPoints.push({p1:p1,p2:p2,angle:angle,dis:dis});
+            }
         };
         /**
          * 设置舞台的对齐模式

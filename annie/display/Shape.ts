@@ -882,7 +882,7 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
-            if (s.hitPixel) {
+            if (s.hitPixel&&!s.useMask) {
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;

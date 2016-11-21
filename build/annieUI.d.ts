@@ -452,7 +452,18 @@ declare namespace annieUI {
 declare namespace annieUI {
     import Sprite = annie.Sprite;
     class FlipBook extends Sprite {
+        /**
+         * 总页数
+         * @property totalPage
+         * @type {number}
+         */
         totalPage: number;
+        /**
+         * 当前页数
+         * @property
+         * @type {number}
+         * @since 1.0.3
+         */
         currPage: number;
         private bW;
         private bH;
@@ -487,8 +498,23 @@ declare namespace annieUI {
         private pages;
         private stageMP;
         private getPageCallback;
+        /**
+         * 指定是否能够翻页动作
+         * @property canFlip
+         * @since 1.0.3
+         * @type {boolean}
+         */
         canFlip: boolean;
         constructor();
+        /**
+         * 初始化电子杂志
+         * @method init
+         * @param width 单页宽
+         * @param height 单页高
+         * @param pageCount 总页数，一般为偶数
+         * @param getPageCallBack，通过此回调获取指定页的内容的显示对象
+         * @since 1.0.3
+         */
         init(width: number, height: number, pageCount: any, getPageCallBack: Function): void;
         private drawPage(num, movePoint);
         private checkLimit(point, limitPoint, limitGap);
@@ -503,6 +529,12 @@ declare namespace annieUI {
         private onMouseUp(e);
         private onMouseMove(e);
         private checkArea(point);
+        /**
+         * 跳到指定的页数
+         * @method flipTo
+         * @param index
+         * @since 1.0.3
+         */
         flipTo(index: number): void;
         private flushPage();
         private onEnterFrame(e);

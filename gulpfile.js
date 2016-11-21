@@ -10,6 +10,7 @@ var coreList =[
     "annie/events/EventDispatcher.ts",
     "annie/events/Event.ts",
     "annie/events/MouseEvent.ts",
+    "annie/events/TouchEvent.ts",
     "annie/geom/Point.ts",
     "annie/geom/Matrix.ts",
     "annie/geom/Rectangle.ts",

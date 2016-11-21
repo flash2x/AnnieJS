@@ -859,7 +859,18 @@ var annieUI;
         function FlipBook() {
             _super.call(this);
             //可设置或可调用接口,页数以单页数计算~
+            /**
+             * 总页数
+             * @property totalPage
+             * @type {number}
+             */
             this.totalPage = 0;
+            /**
+             * 当前页数
+             * @property
+             * @type {number}
+             * @since 1.0.3
+             */
             this.currPage = 0;
             this.state = "stop";
             this.timerArg0 = 0;
@@ -879,9 +890,24 @@ var annieUI;
             this.sMask1 = new Shape();
             this.pages = [];
             this.stageMP = new Point();
+            /**
+             * 指定是否能够翻页动作
+             * @property canFlip
+             * @since 1.0.3
+             * @type {boolean}
+             */
             this.canFlip = true;
             this._instanceType = "annieUI.FlipBook";
         }
+        /**
+         * 初始化电子杂志
+         * @method init
+         * @param width 单页宽
+         * @param height 单页高
+         * @param pageCount 总页数，一般为偶数
+         * @param getPageCallBack，通过此回调获取指定页的内容的显示对象
+         * @since 1.0.3
+         */
         FlipBook.prototype.init = function (width, height, pageCount, getPageCallBack) {
             var s = this;
             s.getPageCallback = getPageCallBack;
@@ -1163,6 +1189,12 @@ var annieUI;
             }
             return 0;
         };
+        /**
+         * 跳到指定的页数
+         * @method flipTo
+         * @param index
+         * @since 1.0.3
+         */
         FlipBook.prototype.flipTo = function (index) {
             var n;
             var s = this;
