@@ -999,6 +999,16 @@ declare namespace annie {
          */
         visible: boolean;
         /**
+         * 显示对象的混合模式
+         * 支持的混合模式大概有
+         * @property blendMode
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         * @default 0
+         */
+        blendMode: string;
+        /**
          * 显示对象的变形矩阵
          * @property matrix
          * @public
@@ -2034,13 +2044,13 @@ declare namespace annie {
          * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
          * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
          * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
-         * 此container容器会一直在mc的最上层
+         * 此 floatView 容器会一直在mc的最上层
          * @since 1.0.2
          * @public
-         * @property container
+         * @property floatView
          * @type {annie.Sprite}
          */
-        container: Sprite;
+        floatView: Sprite;
         /**
          * mc的当前帧
          * @property currentFrame
@@ -3593,15 +3603,16 @@ declare namespace annie {
          */
         loadCancel(): void;
         private _req;
+        private headers;
         /**
          * 加载或请求数据
          * @method load
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {boolean} isBinaryData 是否向后台发送二进制数据包手blob byteArray等
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary等，请设置 默认为form
          */
-        load(url: string, isBinaryData?: boolean): void;
+        load(url: string, contentType?: string): void;
         /**
          * 后台返回来的数据类弄
          * @property responseType
@@ -3656,6 +3667,13 @@ declare namespace annie {
          * @private
          */
         private _fus;
+        /**
+         * 添加自定义头
+         * @addHeader
+         * @param name
+         * @param value
+         */
+        addHeader(name: string, value: string): void;
     }
 }
 /**

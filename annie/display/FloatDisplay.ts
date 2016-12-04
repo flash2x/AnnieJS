@@ -53,7 +53,7 @@ namespace annie {
                     s.stage.rootDiv.insertBefore(s.htmlElement,s.stage.rootDiv.childNodes[0]);
                 } else {
                     if (s.htmlElement && s.visible) {
-                        s.htmlElement.style.display = "inline";
+                        s.htmlElement.style.display = "block";
                     }
                 }
             })
@@ -114,7 +114,7 @@ namespace annie {
                 visible=parent.visible;
                 parent=parent.parent;
             }
-            let show = visible ? "inline" : "none";
+            let show = visible ? "block" : "none";
             if(show!=style.display){
                 style.display = show;
             }

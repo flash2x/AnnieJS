@@ -67,13 +67,13 @@ namespace annie {
          * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
          * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
          * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
-         * 此container容器会一直在mc的最上层
+         * 此 floatView 容器会一直在mc的最上层
          * @since 1.0.2
          * @public
-         * @property container
+         * @property floatView
          * @type {annie.Sprite}
          */
-        public container:Sprite=new Sprite();
+        public floatView:Sprite=new Sprite();
         /**
          * mc的当前帧
          * @property currentFrame
@@ -130,7 +130,7 @@ namespace annie {
             super();
             let s=this;
             s._instanceType="annie.MovieClip";
-            s.addChild(s.container);
+            s.addChild(s.floatView);
         }
         /**
          * 调用止方法将停止当前帧
@@ -633,7 +633,7 @@ namespace annie {
                         lastFrameChildren[i].parent=null;
                     }
                 }
-                s.children.push(s.container);
+                s.children.push(s.floatView);
                 super.update();
                 //看看是否到了第一帧，或是最后一帧,如果是准备事件
                 if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {

@@ -32,16 +32,16 @@ namespace annie {
             }
         }
         private _req:XMLHttpRequest;
-
+        private headers:Array<string>=[];
         /**
          * 加载或请求数据
          * @method load
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {boolean} isBinaryData 是否向后台发送二进制数据包手blob byteArray等
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary等，请设置 默认为form
          */
-        public load(url:string, isBinaryData:boolean = false):void {
+        public load(url:string, contentType:string = "form"):void {
             let s = this;
             s.loadCancel();
             if (s.responseType == null || s.responseType == "") {
@@ -75,7 +75,6 @@ namespace annie {
             if(!s._req){
                 s._req=new XMLHttpRequest();
                 req=s._req;
-                req.timeout = 5000;
                 req.withCredentials = false;
                 req.onprogress = function (event:any):void {
                     if (!event || event.loaded > 0 && event.total == 0) {
@@ -93,10 +92,16 @@ namespace annie {
                         if (!s.data) {
                             req.send();
                         } else {
-                            if (isBinaryData) {
-                                req.send(s.data);
-                            } else {
+                            if (contentType=="form") {
+                                req.setRequestHeader("Content-type","application/x-www-form-urlencoded;charset=UTF-8");
                                 req.send(s._fqs(s.data, null));
+                            } else {
+                                var type="application/json";
+                                if(contentType!="json") {
+                                    type="multipart/form-data";
+                                }
+                                req.setRequestHeader("Content-type", type+";charset=UTF-8");
+                                req.send(s.data);
                             }
                         }
                     }
@@ -150,7 +155,12 @@ namespace annie {
                                 }
                                 break;
                             case "json":
-                                item = JSON.parse(result);
+                                try {
+                                    item = JSON.parse(result);
+                                }catch(e){
+                                    s.dispatchEvent("onError", "服务器返回错误!");
+                                    return;
+                                }
                                 break;
                             case "xml":
                                 item = t["responseXML"];
@@ -167,9 +177,6 @@ namespace annie {
                         e.data["response"] = item;
                         s.data = null;
                         s.responseType = "";
-                        //req.onerror = null;
-                        //s._req.onreadystatechange=null;
-                        //req.onprogress = null;
                         s.dispatchEvent(e);
                     }
                 };
@@ -189,14 +196,25 @@ namespace annie {
                 req.responseType ="text";
             }
             req.open(s.method, s.url, true);
+            if(s.headers.length>0){
+                for(let h=0;h<s.headers.length;h+=2){
+                    req.setRequestHeader(s.headers[h],s.headers[h+1]);
+                }
+                s.headers.length=0;
+            }
             if (!s.data) {
                 req.send();
             } else {
-                req.setRequestHeader("Content-type","application/x-www-form-urlencoded;charset=UTF-8");
-                if (isBinaryData) {
-                    req.send(s.data);
-                } else {
+                if (contentType=="form") {
+                    req.setRequestHeader("Content-type","application/x-www-form-urlencoded;charset=UTF-8");
                     req.send(s._fqs(s.data, null));
+                } else {
+                    var type="application/json";
+                    if(contentType!="json") {
+                        type="multipart/form-data";
+                    }
+                    req.setRequestHeader("Content-type", type+";charset=UTF-8");
+                    req.send(s.data);
                 }
             }
             /*req.onloadstart = function (e) {
@@ -283,5 +301,15 @@ namespace annie {
                 return src + "?" + s._fqs(data, query);
             }
         };
+
+        /**
+         * 添加自定义头
+         * @addHeader
+         * @param name
+         * @param value
+         */
+        public addHeader(name:string,value:string):void{
+            this.headers.push(name,value);
+        }
     }
 }

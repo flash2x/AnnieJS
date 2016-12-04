@@ -461,7 +461,7 @@ namespace annie{
             let h = s.height;
             if (value != 0) {
                 let sy = value /h;
-                s.scaleX *= sy;
+                s.scaleY *= sy;
             }
         }
         /**

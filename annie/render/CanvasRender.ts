@@ -32,7 +32,6 @@ namespace annie {
             super();
             this._instanceType="annie.CanvasRender";
             this._stage=stage;
-
         }
 
         /**

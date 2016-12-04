@@ -26,8 +26,8 @@ namespace annie {
         private _urlLoader: URLLoader;
         private _configInfo: any;
         private _startTime: number;
-        private _needBufferFrame: number;
-        private _currentLoadIndex: number;
+        private _needBufferFrame: number=0;
+        private _currentLoadIndex: number=0;
         /**
          * 当前播放到序列的哪一帧
          * @property currentFrame
@@ -143,14 +143,12 @@ namespace annie {
                 } else {
                     s.loadImage();
                     let bufferFrame = s._currentLoadIndex* s._configInfo.pageCount;
-                    if (bufferFrame >= 30) {
-                        if (bufferFrame == 30) {
+                    if (bufferFrame > 30) {
+                        if (s._needBufferFrame == 0) {
                             //判断网速
                             let _endTime = Date.now();
                             let time = _endTime - s._startTime;
-                            if (time < 500) {
-                                s._needBufferFrame = 30;
-                            } else if (time < 1000) {
+                            if (time < 1000) {
                                 s._needBufferFrame = 60;
                             } else if (time < 1500) {
                                 s._needBufferFrame = 90;
@@ -224,7 +222,7 @@ namespace annie {
                     s.canPlay = false;
                     s._currentLoadIndex = 0;
                     s.currentFrame = 0;
-                    s._needBufferFrame = 1000;
+                    s._needBufferFrame = 0;
                     s._isLoaded=false;
                     s._lastSrc = s.src;
                 } else {

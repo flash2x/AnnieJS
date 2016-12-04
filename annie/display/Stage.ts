@@ -644,6 +644,14 @@ namespace annie {
                 var dis=annie.Point.distance(p1,p2);
                 s.muliPoints.push({p1:p1,p2:p2,angle:angle,dis:dis});
             }
+            if(!annie.canHTMLTouchMove) {
+                e.preventDefault();
+            }
+            if(e.type=="touchstart"){
+                if(globalDispatcher.hasEventListener("onInputBlur")) {
+                    globalDispatcher.dispatchEvent("onInputBlur");
+                }
+            }
         };
         /**
          * 设置舞台的对齐模式

@@ -37,12 +37,6 @@ let trace = function (...arg:any[]) {
  *
  */
 let globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
-//禁止页面滑动
-document.ontouchmove=document.ontouchstart=document.ontouchend = function(e){
-    if(!annie.canHTMLTouchMove){
-        e.preventDefault();
-    }
-};
 import Flash2x=annie.RESManager;
 import F2xContainer=annie.Sprite;
 import F2xMovieClip=annie.MovieClip;

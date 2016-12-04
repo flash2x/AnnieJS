@@ -70,8 +70,10 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
 ##AnnieJS 1.0.3 版本
+    修复annie.URLLoader上传超时没反应的bug
     修复annie.canTouchMove不起作用的bug
     修复annie.Point.distance()计算错误bug
+    修复android机annie.MouseEvent.CLICK事件不灵敏的bug
     修复将一个子对象添加到另一个子对象时，子对象里所有动画信息会被裙始化的bug
     阻止手机双击屏幕时,界面会往上弹起效果
     废弃annie.AObject.getInstanceId()方法，直接使用annie.AObject.instanceId属性获取或则设置

@@ -56,6 +56,15 @@ namespace annie {
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
+            var remove=function () {
+                s.htmlElement.blur();
+            }.bind(s);
+            s.addEventListener(annie.Event.ADD_TO_STAGE,function () {
+                globalDispatcher.addEventListener("onInputBlur",remove);
+            });
+            s.addEventListener(annie.Event.REMOVE_TO_STAGE,function () {
+                globalDispatcher.removeEventListener("onInputBlur",remove);
+            })
         }
         /**
          * 被始化输入文件的一些属性

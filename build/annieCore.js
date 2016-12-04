@@ -1438,15 +1438,16 @@ var annie;
              * @default 0
              */
             this.visible = true;
-            // /**
-            //  * 显示对象的混合模式
-            //  * @property blendMode
-            //  * @public
-            //  * @since 1.0.0
-            //  * @type {number}
-            //  * @default 0
-            //  */
-            // public blendMode:number = 0;
+            /**
+             * 显示对象的混合模式
+             * 支持的混合模式大概有
+             * @property blendMode
+             * @public
+             * @since 1.0.0
+             * @type {string}
+             * @default 0
+             */
+            this.blendMode = "normal";
             /**
              * 显示对象的变形矩阵
              * @property matrix
@@ -1686,7 +1687,7 @@ var annie;
                 var h = s.height;
                 if (value != 0) {
                     var sy = value / h;
-                    s.scaleX *= sy;
+                    s.scaleY *= sy;
                 }
             },
             enumerable: true,
@@ -3467,6 +3468,8 @@ var annie;
              */
             this.src = "";
             this._lastSrc = "";
+            this._needBufferFrame = 0;
+            this._currentLoadIndex = 0;
             /**
              * 当前播放到序列的哪一帧
              * @property currentFrame
@@ -3573,15 +3576,12 @@ var annie;
                 else {
                     s.loadImage();
                     var bufferFrame = s._currentLoadIndex * s._configInfo.pageCount;
-                    if (bufferFrame >= 30) {
-                        if (bufferFrame == 30) {
+                    if (bufferFrame > 30) {
+                        if (s._needBufferFrame == 0) {
                             //判断网速
                             var _endTime = Date.now();
                             var time = _endTime - s._startTime;
-                            if (time < 500) {
-                                s._needBufferFrame = 30;
-                            }
-                            else if (time < 1000) {
+                            if (time < 1000) {
                                 s._needBufferFrame = 60;
                             }
                             else if (time < 1500) {
@@ -3660,7 +3660,7 @@ var annie;
                     s.canPlay = false;
                     s._currentLoadIndex = 0;
                     s.currentFrame = 0;
-                    s._needBufferFrame = 1000;
+                    s._needBufferFrame = 0;
                     s._isLoaded = false;
                     s._lastSrc = s.src;
                 }
@@ -3780,13 +3780,13 @@ var annie;
              * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
              * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
              * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
-             * 此container容器会一直在mc的最上层
+             * 此 floatView 容器会一直在mc的最上层
              * @since 1.0.2
              * @public
-             * @property container
+             * @property floatView
              * @type {annie.Sprite}
              */
-            this.container = new annie.Sprite();
+            this.floatView = new annie.Sprite();
             /**
              * mc的当前帧
              * @property currentFrame
@@ -3843,7 +3843,7 @@ var annie;
             };
             var s = this;
             s._instanceType = "annie.MovieClip";
-            s.addChild(s.container);
+            s.addChild(s.floatView);
         }
         /**
          * 调用止方法将停止当前帧
@@ -4341,7 +4341,7 @@ var annie;
                         lastFrameChildren[i].parent = null;
                     }
                 }
-                s.children.push(s.container);
+                s.children.push(s.floatView);
                 _super.prototype.update.call(this);
                 //看看是否到了第一帧，或是最后一帧,如果是准备事件
                 if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
@@ -4449,7 +4449,7 @@ var annie;
                 }
                 else {
                     if (s.htmlElement && s.visible) {
-                        s.htmlElement.style.display = "inline";
+                        s.htmlElement.style.display = "block";
                     }
                 }
             });
@@ -4509,7 +4509,7 @@ var annie;
                 visible = parent.visible;
                 parent = parent.parent;
             }
-            var show = visible ? "inline" : "none";
+            var show = visible ? "block" : "none";
             if (show != style.display) {
                 style.display = show;
             }
@@ -5018,6 +5018,15 @@ var annie;
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
+            var remove = function () {
+                s.htmlElement.blur();
+            }.bind(s);
+            s.addEventListener(annie.Event.ADD_TO_STAGE, function () {
+                globalDispatcher.addEventListener("onInputBlur", remove);
+            });
+            s.addEventListener(annie.Event.REMOVE_TO_STAGE, function () {
+                globalDispatcher.removeEventListener("onInputBlur", remove);
+            });
         };
         /**
          * 被始化输入文件的一些属性
@@ -5434,6 +5443,14 @@ var annie;
                     var angle = Math.atan2(p1.y - p2.y, p1.x - p2.x) / Math.PI * 180;
                     var dis = annie.Point.distance(p1, p2);
                     s.muliPoints.push({ p1: p1, p2: p2, angle: angle, dis: dis });
+                }
+                if (!annie.canHTMLTouchMove) {
+                    e.preventDefault();
+                }
+                if (e.type == "touchstart") {
+                    if (globalDispatcher.hasEventListener("onInputBlur")) {
+                        globalDispatcher.dispatchEvent("onInputBlur");
+                    }
                 }
             };
             /**
@@ -7371,6 +7388,7 @@ var annie;
          */
         function URLLoader() {
             _super.call(this);
+            this.headers = [];
             /**
              * 后台返回来的数据类弄
              * @property responseType
@@ -7472,10 +7490,10 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {boolean} isBinaryData 是否向后台发送二进制数据包手blob byteArray等
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary等，请设置 默认为form
          */
-        URLLoader.prototype.load = function (url, isBinaryData) {
-            if (isBinaryData === void 0) { isBinaryData = false; }
+        URLLoader.prototype.load = function (url, contentType) {
+            if (contentType === void 0) { contentType = "form"; }
             var s = this;
             s.loadCancel();
             if (s.responseType == null || s.responseType == "") {
@@ -7518,7 +7536,6 @@ var annie;
             if (!s._req) {
                 s._req = new XMLHttpRequest();
                 req = s._req;
-                req.timeout = 5000;
                 req.withCredentials = false;
                 req.onprogress = function (event) {
                     if (!event || event.loaded > 0 && event.total == 0) {
@@ -7538,11 +7555,17 @@ var annie;
                             req.send();
                         }
                         else {
-                            if (isBinaryData) {
-                                req.send(s.data);
+                            if (contentType == "form") {
+                                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                                req.send(s._fqs(s.data, null));
                             }
                             else {
-                                req.send(s._fqs(s.data, null));
+                                var type = "application/json";
+                                if (contentType != "json") {
+                                    type = "multipart/form-data";
+                                }
+                                req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                                req.send(s.data);
                             }
                         }
                     }
@@ -7597,7 +7620,13 @@ var annie;
                                 }
                                 break;
                             case "json":
-                                item_1 = JSON.parse(result);
+                                try {
+                                    item_1 = JSON.parse(result);
+                                }
+                                catch (e) {
+                                    s.dispatchEvent("onError", "服务器返回错误!");
+                                    return;
+                                }
                                 break;
                             case "xml":
                                 item_1 = t["responseXML"];
@@ -7614,9 +7643,6 @@ var annie;
                         e.data["response"] = item_1;
                         s.data = null;
                         s.responseType = "";
-                        //req.onerror = null;
-                        //s._req.onreadystatechange=null;
-                        //req.onprogress = null;
                         s.dispatchEvent(e);
                     }
                 };
@@ -7639,21 +7665,41 @@ var annie;
                 req.responseType = "text";
             }
             req.open(s.method, s.url, true);
+            if (s.headers.length > 0) {
+                for (var h = 0; h < s.headers.length; h += 2) {
+                    req.setRequestHeader(s.headers[h], s.headers[h + 1]);
+                }
+                s.headers.length = 0;
+            }
             if (!s.data) {
                 req.send();
             }
             else {
-                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                if (isBinaryData) {
-                    req.send(s.data);
+                if (contentType == "form") {
+                    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                    req.send(s._fqs(s.data, null));
                 }
                 else {
-                    req.send(s._fqs(s.data, null));
+                    var type = "application/json";
+                    if (contentType != "json") {
+                        type = "multipart/form-data";
+                    }
+                    req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                    req.send(s.data);
                 }
             }
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
+        };
+        /**
+         * 添加自定义头
+         * @addHeader
+         * @param name
+         * @param value
+         */
+        URLLoader.prototype.addHeader = function (name, value) {
+            this.headers.push(name, value);
         };
         return URLLoader;
     }(annie.EventDispatcher));
@@ -9179,12 +9225,6 @@ var trace = function () {
  *
  */
 var globalDispatcher = new annie.EventDispatcher();
-//禁止页面滑动
-document.ontouchmove = document.ontouchstart = document.ontouchend = function (e) {
-    if (!annie.canHTMLTouchMove) {
-        e.preventDefault();
-    }
-};
 var Flash2x = annie.RESManager;
 var F2xContainer = annie.Sprite;
 var F2xMovieClip = annie.MovieClip;
