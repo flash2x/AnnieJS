@@ -37,7 +37,6 @@ let trace = function (...arg:any[]) {
  *
  */
 let globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
-import Flash2x=annie.RESManager;
 import F2xContainer=annie.Sprite;
 import F2xMovieClip=annie.MovieClip;
 import F2xText=annie.TextField;

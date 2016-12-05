@@ -33,7 +33,7 @@ var coreList =[
     "annie/render/CanvasRender.ts",
     "annie/render/WGRender.ts",
     "annie/net/URLLoader.ts",
-    "annie/utils/RESManager.ts",
+    "annie/utils/Flash2x.ts",
     "annie/utils/Tween.ts",
     "annie/Annie.ts",
     "annie/GlobalFunction.ts"

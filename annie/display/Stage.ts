@@ -644,13 +644,8 @@ namespace annie {
                 var dis=annie.Point.distance(p1,p2);
                 s.muliPoints.push({p1:p1,p2:p2,angle:angle,dis:dis});
             }
-            if(!annie.canHTMLTouchMove) {
+            if((annie.osType=="ios"&&e.type=="touchend")||(e.type=="touchmove")){
                 e.preventDefault();
-            }
-            if(e.type=="touchstart"){
-                if(globalDispatcher.hasEventListener("onInputBlur")) {
-                    globalDispatcher.dispatchEvent("onInputBlur");
-                }
             }
         };
         /**

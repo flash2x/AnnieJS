@@ -125,19 +125,6 @@ namespace annie {
         req.open("get", url, true);
         req.send();
     }
-
-    /**
-     * 是否允许html页面接受滑动事件。如:有些时候需要叠加一些很长的div元素在canvas上面。
-     * 这个时候如果不开启这个允许滑动属性，则无法下拉div显示超出屏幕外的内容
-     * @property canTouchMove
-     * @type {boolean}
-     * @static
-     * @since 1.0.0
-     * @public
-     * @type{boolean}
-     * @default false
-     */
-    export let canHTMLTouchMove:boolean=false;
     // 作为将显示对象导出成图片的render渲染器
     let _dRender:any=null;
     /**

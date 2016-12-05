@@ -22,6 +22,14 @@ namespace annie {
          * @default "singleline"
          */
         public inputType:string="singleline";
+        /**
+         * 在手机端是否需要自动收回软键盘，在pc端此参数无效
+         * @property isAutoDownKeyBoard
+         * @type {boolean}
+         * @since 1.0.3
+         * @default true
+         */
+        public isAutoDownKeyBoard:boolean=true;
 
         /**
          * @method InputText
@@ -57,13 +65,15 @@ namespace annie {
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
             var remove=function () {
-                s.htmlElement.blur();
+                if(s.isAutoDownKeyBoard) {
+                    s.htmlElement.blur();
+                }
             }.bind(s);
             s.addEventListener(annie.Event.ADD_TO_STAGE,function () {
-                globalDispatcher.addEventListener("onInputBlur",remove);
+                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP,remove);
             });
             s.addEventListener(annie.Event.REMOVE_TO_STAGE,function () {
-                globalDispatcher.removeEventListener("onInputBlur",remove);
+                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP,remove);
             })
         }
         /**

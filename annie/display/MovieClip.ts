@@ -31,7 +31,7 @@ namespace annie {
                 skewY: 0,
                 alpha: 1
             };
-            annie.RESManager.d(info, displayBaseInfo, displayExtendInfo);
+            Flash2x.d(info, displayBaseInfo, displayExtendInfo);
             s.frameChildList.push(info);
         }
         public setGraphicInfo(loopType:string, firstFrame:number, parentFrameIndex:number):void {
@@ -576,7 +576,7 @@ namespace annie {
                         if (frame == undefined)continue;
                         if (frame.keyIndex == (s.currentFrame - 1)) {
                             if (frame.soundName != "") {
-                                annie.RESManager.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
+                                Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
                             }
                             if (frame.eventName != "" && s.hasEventListener(Event.CALL_FRAME)) {
                                 let event = new Event(Event.CALL_FRAME);

@@ -2589,6 +2589,14 @@ declare namespace annie {
          */
         inputType: string;
         /**
+         * 在手机端是否需要自动收回软键盘，在pc端此参数无效
+         * @property isAutoDownKeyBoard
+         * @type {boolean}
+         * @since 1.0.3
+         * @default true
+         */
+        isAutoDownKeyBoard: boolean;
+        /**
          * @method InputText
          * @public
          * @since 1.0.0
@@ -3677,131 +3685,127 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * 资源加载管理模块
+ * @class Flash2x
  */
-declare namespace annie {
+declare namespace Flash2x {
+    import Shape = annie.Shape;
+    import Bitmap = annie.Bitmap;
     /**
-     * 资源加载管理模块
-     * @module annie.RESManager
-     * @class annie.RESManager
+     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
+     * @method loadScene
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {string} sceneName fla通过flash2x转换时设置的包名
+     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
+     * @param {Function} completeFun 加载完成回高,无回调参数
+     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
      */
-    namespace RESManager {
-        /**
-         * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
-         * @method loadScene
-         * @public
-         * @static
-         * @since 1.0.0
-         * @param {string} sceneName fla通过flash2x转换时设置的包名
-         * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
-         * @param {Function} completeFun 加载完成回高,无回调参数
-         * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
-         */
-        let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
-        /**
-         * 判断一个场景是否已经被加载
-         * @method isLoadedScene
-         * @public
-         * @static
-         * @since 1.0.0
-         * @param {string} sceneName
-         * @returns {boolean}
-         */
-        function isLoadedScene(sceneName: string): Boolean;
-        /**
-         * 删除一个场景资源,以方便系统垃圾回收
-         * @method unLoadScene
-         * @public
-         * @static
-         * @since 1.0.2
-         * @param {string} sceneName
-         * @param {WebGLRenderingContext} 如果是webgl渲染模式，请设置渲染的webgl对象，以方便删除不再需要使用的texture对象
-         */
-        function unLoadScene(sceneName: string, gl?: WebGLRenderingContext): void;
-        /**
-         * 获取已经加载场景中的声音或视频资源
-         * @method getMediaByName
-         * @public
-         * @static
-         * @since 1.0.0
-         * @param {string} sceneName
-         * @param {string} mediaName
-         * @returns {any}
-         */
-        function getMediaByName(sceneName: string, mediaName: string): any;
-        /**
-         * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-         * @method b
-         * @public
-         * @since 1.0.0
-         * @static
-         * @param {string} sceneName
-         * @param {string} imageName
-         * @returns {any}
-         */
-        function b(sceneName: string, imageName: string): Bitmap;
-        /**
-         * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-         * @method d
-         * @public
-         * @static
-         * @since 1.0.0
-         * @param {Object} display
-         * @param {Object} baseInfo
-         * @param {Object} extendInfo
-         */
-        function d(display: any, baseInfo?: any, extendInfo?: any): void;
-        /**
-         * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-         * @method t
-         * @public
-         * @static
-         * @since 1.0.0
-         * @param {number} type
-         * @param {string} text
-         * @param {number} size
-         * @param {string} color
-         * @param {string} face
-         * @param {number} top
-         * @param {number} left
-         * @param {number} width
-         * @param {number} height
-         * @param {number} lineSpacing
-         * @param {string} align
-         * @param {boolean} italic
-         * @param {boolean} bold
-         * @param {string} lineType
-         * @param {boolean} showBorder
-         * @returns {annie.TextFiled|annie.InputText}
-         */
-        function t(type: number, text: string, size: number, color: string, face: string, top: number, left: number, width: number, height: number, lineSpacing: number, align: string, italic?: boolean, bold?: boolean, lineType?: string, showBorder?: boolean): any;
-        /**
-         * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-         * @method s
-         * @public
-         * @static
-         * @since 1.0.0
-         * @param {Object} pathObj
-         * @param {Object} fillObj
-         * @param {Object} strokeObj
-         * @returns {annie.Shape}
-         */
-        function s(pathObj: any, fillObj: any, strokeObj: any): Shape;
-        /**
-         * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-         * @method ajax
-         * @public
-         * @since 1.0.0
-         * @param info 向后台传送数据所需要设置的信息
-         * @param {url} info.url 向后台请求的地址
-         * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
-         * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
-         * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
-         * @param {Object} info.data 向后台发送的信息对象,默认为null
-         * @param {string} info.responseType 后台返回数据的类型,默认为"json"
-         */
-        function ajax(info: any): void;
-    }
+    let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
+    /**
+     * 判断一个场景是否已经被加载
+     * @method isLoadedScene
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {string} sceneName
+     * @returns {boolean}
+     */
+    function isLoadedScene(sceneName: string): Boolean;
+    /**
+     * 删除一个场景资源,以方便系统垃圾回收
+     * @method unLoadScene
+     * @public
+     * @static
+     * @since 1.0.2
+     * @param {string} sceneName
+     * @param {WebGLRenderingContext} gl 如果是webgl渲染模式，请设置渲染的webgl对象，以方便删除不再需要使用的texture对象
+     */
+    function unLoadScene(sceneName: string, gl?: WebGLRenderingContext): void;
+    /**
+     * 获取已经加载场景中的声音或视频资源
+     * @method getMediaByName
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {string} sceneName
+     * @param {string} mediaName
+     * @returns {any}
+     */
+    function getMediaByName(sceneName: string, mediaName: string): any;
+    /**
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+     * @method b
+     * @public
+     * @since 1.0.0
+     * @static
+     * @param {string} sceneName
+     * @param {string} imageName
+     * @returns {any}
+     */
+    function b(sceneName: string, imageName: string): Bitmap;
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} display
+     * @param {Object} baseInfo
+     * @param {Object} extendInfo
+     */
+    function d(display: any, baseInfo?: any, extendInfo?: any): void;
+    /**
+     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+     * @method t
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {number} type
+     * @param {string} text
+     * @param {number} size
+     * @param {string} color
+     * @param {string} face
+     * @param {number} top
+     * @param {number} left
+     * @param {number} width
+     * @param {number} height
+     * @param {number} lineSpacing
+     * @param {string} align
+     * @param {boolean} italic
+     * @param {boolean} bold
+     * @param {string} lineType
+     * @param {boolean} showBorder
+     * @returns {annie.TextFiled|annie.InputText}
+     */
+    function t(type: number, text: string, size: number, color: string, face: string, top: number, left: number, width: number, height: number, lineSpacing: number, align: string, italic?: boolean, bold?: boolean, lineType?: string, showBorder?: boolean): any;
+    /**
+     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+     * @method s
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} pathObj
+     * @param {Object} fillObj
+     * @param {Object} strokeObj
+     * @returns {annie.Shape}
+     */
+    function s(pathObj: any, fillObj: any, strokeObj: any): Shape;
+    /**
+     * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
+     * @method ajax
+     * @public
+     * @since 1.0.0
+     * @param info 向后台传送数据所需要设置的信息
+     * @param {url} info.url 向后台请求的地址
+     * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
+     * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
+     * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
+     * @param {Object} info.data 向后台发送的信息对象,默认为null
+     * @param {string} info.responseType 后台返回数据的类型,默认为"json"
+     */
+    function ajax(info: any): void;
 }
 /**
  * @module annie
@@ -4292,18 +4296,6 @@ declare namespace annie {
      */
     function sendToURL(url: string): void;
     /**
-     * 是否允许html页面接受滑动事件。如:有些时候需要叠加一些很长的div元素在canvas上面。
-     * 这个时候如果不开启这个允许滑动属性，则无法下拉div显示超出屏幕外的内容
-     * @property canTouchMove
-     * @type {boolean}
-     * @static
-     * @since 1.0.0
-     * @public
-     * @type{boolean}
-     * @default false
-     */
-    let canHTMLTouchMove: boolean;
-    /**
      * 将显示对象转成base64的图片数据
      * @method toDisplayDataURL
      * @static
@@ -4350,7 +4342,6 @@ declare let trace: (...arg: any[]) => void;
  *
  */
 declare let globalDispatcher: annie.EventDispatcher;
-import Flash2x = annie.RESManager;
 import F2xContainer = annie.Sprite;
 import F2xMovieClip = annie.MovieClip;
 import F2xText = annie.TextField;
