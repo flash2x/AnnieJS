@@ -5718,7 +5718,8 @@ var annie;
                     s._lastDpList = null;
                 }
                 else if (item == "onMouseUp") {
-                    if (Math.abs(s._mouseDownPoint.x - cp.x) <= 1 && Math.abs(s._mouseDownPoint.y - cp.y) <= 1) {
+                    // if(Math.abs(s._mouseDownPoint.x-cp.x)<=1&&Math.abs(s._mouseDownPoint.y-cp.y)<=1){
+                    if (annie.Point.distance(s._mouseDownPoint, cp) < 10) {
                         //click事件
                         //这个地方检查是所有显示对象列表里是否有添加对应的事件
                         if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
