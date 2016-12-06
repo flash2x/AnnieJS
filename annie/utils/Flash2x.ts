@@ -1,5 +1,6 @@
 /**
- * 资源加载管理模块
+ * Flash资源加载或者管理类，静态类，不可实例化
+ * 一般都是初始化或者设置从Flash里导出的资源
  * @class Flash2x
  */
 namespace Flash2x {
