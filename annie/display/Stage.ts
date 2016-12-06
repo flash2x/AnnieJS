@@ -633,9 +633,7 @@ namespace annie {
             let s:any = this;
             if(annie.osType=="pc"||e.targetTouches.length<2) {
                 s._mouseEventInfo[s._mouseEventTypes[e.type]] = e;
-                if(s.muliPoints.length>0) {
-                    s.muliPoints = [];
-                }
+                s.muliPoints = [];
             }else if(s.isMultiTouch&&e.targetTouches.length==2){
                 //求角度和距离
                 var p1=new Point(e.targetTouches[0].clientX-e.target.offsetLeft,e.targetTouches[0].clientY-e.target.offsetTop);
