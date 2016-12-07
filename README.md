@@ -129,6 +129,8 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
+## Flash2x 3.0.3
+   更新AnnieJS引擎及相应的模板包
 ## Flash2x 3.0.2
     支持Flash Canvas 文档导出
     增加对单帧的动画剪辑的时间轴上的代码脚本导出
