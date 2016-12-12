@@ -22,6 +22,7 @@ namespace annie {
          * @default "singleline"
          */
         public inputType:string="singleline";
+
         /**
          * 在手机端是否需要自动收回软键盘，在pc端此参数无效
          * @property isAutoDownKeyBoard
@@ -30,12 +31,11 @@ namespace annie {
          * @default true
          */
         public isAutoDownKeyBoard:boolean=true;
-
         /**
          * @method InputText
          * @public
          * @since 1.0.0
-         * @param {string} inputType multiline 多行 password 密码 singleline 单行
+         * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
          */
         public constructor(inputType:string) {
             super();
@@ -44,17 +44,24 @@ namespace annie {
             s._instanceType="annie.InputText";
             if (inputType != "multiline") {
                 input = document.createElement("input");
-                if (inputType == "password") {
-                    input.type = "password";
-                } else {
-                    input.type = "text";
-                }
+                input.type = inputType;
             } else {
                 input = document.createElement("textarea");
                 input.style.resize = "none";
                 input.style.overflow = "hidden";
             }
             s.inputType = inputType;
+            var remove=function () {
+                if(s.isAutoDownKeyBoard) {
+                    s.htmlElement&&s.htmlElement.blur();
+                }
+            }.bind(s);
+            s.addEventListener(Event.REMOVE_TO_STAGE, function (e:Event) {
+                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP,remove);
+            });
+            s.addEventListener(Event.ADD_TO_STAGE, function (e:Event) {
+                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP,remove);
+            });
             s.init(input);
         }
         public init(htmlElement:any):void{
@@ -64,17 +71,6 @@ namespace annie {
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
-            var remove=function () {
-                if(s.isAutoDownKeyBoard) {
-                    s.htmlElement.blur();
-                }
-            }.bind(s);
-            s.addEventListener(annie.Event.ADD_TO_STAGE,function () {
-                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP,remove);
-            });
-            s.addEventListener(annie.Event.REMOVE_TO_STAGE,function () {
-                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP,remove);
-            })
         }
         /**
          * 被始化输入文件的一些属性

@@ -2600,7 +2600,7 @@ declare namespace annie {
          * @method InputText
          * @public
          * @since 1.0.0
-         * @param {string} inputType multiline 多行 password 密码 singleline 单行
+         * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
          */
         constructor(inputType: string);
         init(htmlElement: any): void;
@@ -2676,6 +2676,16 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Stage extends Sprite {
+        /**
+         * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
+         * 所以需要自己灵活设置,默认阻止
+         * @property iosTouchendPreventDefault
+         * @type {boolean}
+         * @default true
+         * @since 1.0.4
+         * @public
+         */
+        iosTouchendPreventDefault: boolean;
         /**
          * 整个引擎的最上层的div元素,
          * 承载canvas的那个div html元素

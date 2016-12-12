@@ -847,6 +847,9 @@ var annieUI;
     }(Sprite));
     annieUI.SlidePage = SlidePage;
 })(annieUI || (annieUI = {}));
+/**
+ * @module annieUI
+ */
 var annieUI;
 (function (annieUI) {
     var Sprite = annie.Sprite;
@@ -854,6 +857,13 @@ var annieUI;
     var Event = annie.Event;
     var MouseEvent = annie.MouseEvent;
     var Point = annie.Point;
+    /**
+     * 电子杂志组件类
+     * @class annieUI.FlipBook
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.3
+     */
     var FlipBook = (function (_super) {
         __extends(FlipBook, _super);
         function FlipBook() {

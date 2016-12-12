@@ -449,8 +449,18 @@ declare namespace annieUI {
         private getDistance(x1, y1, x2, y2);
     }
 }
+/**
+ * @module annieUI
+ */
 declare namespace annieUI {
     import Sprite = annie.Sprite;
+    /**
+     * 电子杂志组件类
+     * @class annieUI.FlipBook
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.3
+     */
     class FlipBook extends Sprite {
         /**
          * 总页数

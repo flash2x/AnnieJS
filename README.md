@@ -69,6 +69,9 @@
 #如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
+##AnnieJS 1.0.4 版本
+    优化annie.URLLoader 错误事件提示
+    增加annie.URLLoader 加载完整事件里返回加载数据类型参数
 ##AnnieJS 1.0.3 版本
     删除annie.canTouchMove,不再控制html的可移动所有浮在AnnieJS上的Html元素自己管自己,现在canvas本身是不会上下滑动的了
     增加支持输入文本在手机端自动回收软键盘

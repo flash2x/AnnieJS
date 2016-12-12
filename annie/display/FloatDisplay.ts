@@ -22,6 +22,7 @@ namespace annie {
          * @type{HtmlElement}
          */
         public htmlElement:any=null;
+
         /**
          * 上一交刷新时保留的数据
          * @property _oldProps
@@ -56,7 +57,7 @@ namespace annie {
                         s.htmlElement.style.display = "block";
                     }
                 }
-            })
+            });
         }
         /**
          * 初始化方法

@@ -4975,7 +4975,7 @@ var annie;
          * @method InputText
          * @public
          * @since 1.0.0
-         * @param {string} inputType multiline 多行 password 密码 singleline 单行
+         * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
          */
         function InputText(inputType) {
             _super.call(this);
@@ -5004,12 +5004,7 @@ var annie;
             s._instanceType = "annie.InputText";
             if (inputType != "multiline") {
                 input = document.createElement("input");
-                if (inputType == "password") {
-                    input.type = "password";
-                }
-                else {
-                    input.type = "text";
-                }
+                input.type = inputType;
             }
             else {
                 input = document.createElement("textarea");
@@ -5017,6 +5012,17 @@ var annie;
                 input.style.overflow = "hidden";
             }
             s.inputType = inputType;
+            var remove = function () {
+                if (s.isAutoDownKeyBoard) {
+                    s.htmlElement && s.htmlElement.blur();
+                }
+            }.bind(s);
+            s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
+                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP, remove);
+            });
+            s.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
+                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
+            });
             s.init(input);
         }
         InputText.prototype.init = function (htmlElement) {
@@ -5026,17 +5032,6 @@ var annie;
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
-            var remove = function () {
-                if (s.isAutoDownKeyBoard) {
-                    s.htmlElement.blur();
-                }
-            }.bind(s);
-            s.addEventListener(annie.Event.ADD_TO_STAGE, function () {
-                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
-            });
-            s.addEventListener(annie.Event.REMOVE_TO_STAGE, function () {
-                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP, remove);
-            });
         };
         /**
          * 被始化输入文件的一些属性
@@ -5222,6 +5217,16 @@ var annie;
             if (scaleMode === void 0) { scaleMode = "fixedHeight"; }
             if (renderType === void 0) { renderType = 0; }
             _super.call(this);
+            /**
+             * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
+             * 所以需要自己灵活设置,默认阻止
+             * @property iosTouchendPreventDefault
+             * @type {boolean}
+             * @default true
+             * @since 1.0.4
+             * @public
+             */
+            this.iosTouchendPreventDefault = true;
             /**
              * 整个引擎的最上层的div元素,
              * 承载canvas的那个div html元素
@@ -5452,7 +5457,10 @@ var annie;
                     var dis = annie.Point.distance(p1, p2);
                     s.muliPoints.push({ p1: p1, p2: p2, angle: angle, dis: dis });
                 }
-                if ((annie.osType == "ios" && e.type == "touchend") || (e.type == "touchmove")) {
+                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                    e.preventDefault();
+                }
+                if (e.type == "touchmove") {
                     e.preventDefault();
                 }
             };
@@ -7549,7 +7557,7 @@ var annie;
                 req.onerror = function (event) {
                     reSendTimes++;
                     if (reSendTimes > 3) {
-                        s.dispatchEvent("onError", event["message"]);
+                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
                     }
                     else {
                         //断线重连
@@ -7576,77 +7584,81 @@ var annie;
                 req.onreadystatechange = function (event) {
                     var t = event.target;
                     if (t["readyState"] == 4) {
-                        var e = new annie.Event("onComplete");
-                        var result = t["response"];
-                        e.data = { type: s.responseType, response: null };
-                        var item_1;
-                        switch (s.responseType) {
-                            case "css":
-                                item_1 = document.createElement("link");
-                                item_1.rel = "stylesheet";
-                                item_1.href = s.url;
-                                break;
-                            case "image":
-                            case "sound":
-                            case "video":
-                                var isBlob_1 = true;
-                                if (s.responseType == "image") {
-                                    item_1 = document.createElement("img");
-                                    item_1.onload = function () {
-                                        if (isBlob_1) {
-                                            URL.revokeObjectURL(item_1.src);
+                        if (req.status == 200) {
+                            var e = new annie.Event("onComplete");
+                            try {
+                                var result = t["response"];
+                                e.data = { type: s.responseType, response: null };
+                                var item_1;
+                                switch (s.responseType) {
+                                    case "css":
+                                        item_1 = document.createElement("link");
+                                        item_1.rel = "stylesheet";
+                                        item_1.href = s.url;
+                                        break;
+                                    case "image":
+                                    case "sound":
+                                    case "video":
+                                        var isBlob_1 = true;
+                                        if (s.responseType == "image") {
+                                            item_1 = document.createElement("img");
+                                            item_1.onload = function () {
+                                                if (isBlob_1) {
+                                                    URL.revokeObjectURL(item_1.src);
+                                                }
+                                                item_1.onload = null;
+                                            };
                                         }
-                                        item_1.onload = null;
-                                    };
-                                }
-                                else {
-                                    if (s.responseType == "sound") {
-                                        item_1 = document.createElement("AUDIO");
-                                    }
-                                    else if (s.responseType == "video") {
-                                        item_1 = document.createElement("VIDEO");
-                                    }
-                                    item_1.preload = true;
-                                    item_1.load();
-                                    item_1.onloadeddata = function () {
-                                        if (isBlob_1) {
+                                        else {
+                                            if (s.responseType == "sound") {
+                                                item_1 = document.createElement("AUDIO");
+                                            }
+                                            else if (s.responseType == "video") {
+                                                item_1 = document.createElement("VIDEO");
+                                            }
+                                            item_1.preload = true;
+                                            item_1.load();
+                                            item_1.onloadeddata = function () {
+                                                if (isBlob_1) {
+                                                }
+                                                item_1.onloadeddata = null;
+                                            };
                                         }
-                                        item_1.onloadeddata = null;
-                                    };
+                                        try {
+                                            item_1.src = URL.createObjectURL(result);
+                                        }
+                                        catch (err) {
+                                            isBlob_1 = false;
+                                            item_1.src = s.url;
+                                        }
+                                        break;
+                                    case "json":
+                                        item_1 = JSON.parse(result);
+                                        break;
+                                    case "js":
+                                        item_1 = "JS_CODE";
+                                        Eval(result);
+                                        break;
+                                    case "text":
+                                    case "unKnow":
+                                    case "xml":
+                                    default:
+                                        item_1 = result;
+                                        break;
                                 }
-                                try {
-                                    item_1.src = URL.createObjectURL(result);
-                                }
-                                catch (err) {
-                                    isBlob_1 = false;
-                                    item_1.src = s.url;
-                                }
-                                break;
-                            case "json":
-                                try {
-                                    item_1 = JSON.parse(result);
-                                }
-                                catch (e) {
-                                    s.dispatchEvent("onError", "服务器返回错误!");
-                                    return;
-                                }
-                                break;
-                            case "xml":
-                                item_1 = t["responseXML"];
-                                break;
-                            case "js":
-                                Eval(result);
-                                break;
-                            case "text":
-                            case "unKnow":
-                            default:
-                                item_1 = result;
-                                break;
+                                e.data["response"] = item_1;
+                                s.data = null;
+                                s.responseType = "";
+                            }
+                            catch (e) {
+                                s.dispatchEvent("onError", { id: 1, msg: "服务器返回信息有误" });
+                            }
+                            s.dispatchEvent(e);
                         }
-                        e.data["response"] = item_1;
-                        s.data = null;
-                        s.responseType = "";
-                        s.dispatchEvent(e);
+                        else {
+                            //服务器返回报错
+                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
+                        }
                     }
                 };
             }

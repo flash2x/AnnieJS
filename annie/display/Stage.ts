@@ -12,6 +12,16 @@ namespace annie {
      */
     export class Stage extends Sprite{
         /**
+         * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
+         * 所以需要自己灵活设置,默认阻止.
+         * @property iosTouchendPreventDefault
+         * @type {boolean}
+         * @default true
+         * @since 1.0.4
+         * @public
+         */
+        public iosTouchendPreventDefault:boolean=true;
+        /**
          * 整个引擎的最上层的div元素,
          * 承载canvas的那个div html元素
          * @property rootDiv
@@ -642,7 +652,10 @@ namespace annie {
                 var dis=annie.Point.distance(p1,p2);
                 s.muliPoints.push({p1:p1,p2:p2,angle:angle,dis:dis});
             }
-            if((annie.osType=="ios"&&e.type=="touchend")||(e.type=="touchmove")){
+            if((e.type=="touchend")&&(annie.osType=="ios")&&(s.iosTouchendPreventDefault)){
+                e.preventDefault();
+            }
+            if(e.type=="touchmove"){
                 e.preventDefault();
             }
         };

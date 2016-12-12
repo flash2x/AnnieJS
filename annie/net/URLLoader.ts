@@ -85,7 +85,7 @@ namespace annie {
                 req.onerror = function (event:any):void {
                     reSendTimes++;
                     if(reSendTimes>3){
-                        s.dispatchEvent("onError", event["message"]);
+                        s.dispatchEvent("onError", {id:2,msg:event["message"]});
                     }else {
                         //断线重连
                         req.abort();
@@ -109,75 +109,78 @@ namespace annie {
                 req.onreadystatechange = function (event:any):void {
                     let t = event.target;
                     if (t["readyState"] == 4) {
-                        let e:Event = new Event("onComplete");
-                        let result = t["response"];
-                        e.data = {type: s.responseType, response: null};
-                        let item:any;
-                        switch (s.responseType) {
-                            case "css":
-                                item = document.createElement("link");
-                                item.rel = "stylesheet";
-                                item.href = s.url;
-                                break;
-                            case "image":
-                            case "sound":
-                            case "video":
-                                let isBlob:boolean=true;
-                                if(s.responseType=="image"){
-                                    item = document.createElement("img");
-                                    item.onload = function () {
-                                        if(isBlob) {
-                                            URL.revokeObjectURL(item.src);
+                        if(req.status==200) {
+                            let e: Event = new Event("onComplete");
+                            try {
+                                let result = t["response"];
+                                e.data = {type: s.responseType, response: null};
+                                let item: any;
+                                switch (s.responseType) {
+                                    case "css":
+                                        item = document.createElement("link");
+                                        item.rel = "stylesheet";
+                                        item.href = s.url;
+                                        break;
+                                    case "image":
+                                    case "sound":
+                                    case "video":
+                                        let isBlob: boolean = true;
+                                        if (s.responseType == "image") {
+                                            item = document.createElement("img");
+                                            item.onload = function () {
+                                                if (isBlob) {
+                                                    URL.revokeObjectURL(item.src);
+                                                }
+                                                item.onload = null;
+                                            };
+                                        } else {
+                                            if (s.responseType == "sound") {
+                                                item = document.createElement("AUDIO");
+                                            } else if (s.responseType == "video") {
+                                                item = document.createElement("VIDEO");
+                                            }
+                                            item.preload = true;
+                                            item.load();
+                                            item.onloadeddata = function () {
+                                                if (isBlob) {
+                                                    //执行下面的代码android有问题，会闪退
+                                                    //URL.revokeObjectURL(item.src);
+                                                }
+                                                item.onloadeddata = null;
+                                            };
                                         }
-                                        item.onload = null;
-                                    };
-                                }else{
-                                    if(s.responseType=="sound") {
-                                        item = document.createElement("AUDIO");
-                                    }else if(s.responseType=="video") {
-                                        item = document.createElement("VIDEO");
-                                    }
-                                    item.preload = true;
-                                    item.load();
-                                    item.onloadeddata = function (){
-                                        if(isBlob) {
-                                            //执行下面的代码android有问题，会闪退
-                                            //URL.revokeObjectURL(item.src);
+                                        try {
+                                            item.src = URL.createObjectURL(result);
+                                        } catch (err) {
+                                            isBlob = false;
+                                            item.src = s.url;
                                         }
-                                        item.onloadeddata = null;
-                                    };
+                                        break;
+                                    case "json":
+                                        item = JSON.parse(result);
+                                        break;
+                                    case "js":
+                                        item="JS_CODE";
+                                        Eval(result);
+                                        break;
+                                    case "text":
+                                    case "unKnow":
+                                    case "xml":
+                                    default:
+                                        item = result;
+                                        break;
                                 }
-                                try{
-                                    item.src = URL.createObjectURL(result);
-                                }catch(err){
-                                    isBlob=false;
-                                    item.src = s.url;
-                                }
-                                break;
-                            case "json":
-                                try {
-                                    item = JSON.parse(result);
-                                }catch(e){
-                                    s.dispatchEvent("onError", "服务器返回错误!");
-                                    return;
-                                }
-                                break;
-                            case "xml":
-                                item = t["responseXML"];
-                                break;
-                            case "js":
-                                Eval(result);
-                                break;
-                            case "text":
-                            case "unKnow":
-                            default:
-                                item = result;
-                                break;
+                                e.data["response"] = item;
+                                s.data = null;
+                                s.responseType = "";
+                           }catch (e) {
+                                s.dispatchEvent("onError", {id: 1, msg: "服务器返回信息有误"});
+                            }
+                            s.dispatchEvent(e);
+                        }else{
+                            //服务器返回报错
+                            s.dispatchEvent("onError", {id:0,msg:"访问地址不存在"});
                         }
-                        e.data["response"] = item;
-                        s.data = null;
-                        s.responseType = "";
-                        s.dispatchEvent(e);
                     }
                 };
             }else {

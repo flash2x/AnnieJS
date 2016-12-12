@@ -1,4 +1,7 @@
-﻿namespace annieUI {
+﻿/**
+ * @module annieUI
+ */
+namespace annieUI {
     import Bitmap=annie.Bitmap;
     import Sprite=annie.Sprite;
     import Shape=annie.Shape;
@@ -6,6 +9,13 @@
     import MouseEvent=annie.MouseEvent;
     import Matrix=annie.Matrix;
     import Point=annie.Point;
+    /**
+     * 电子杂志组件类
+     * @class annieUI.FlipBook
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.3
+     */
     export class FlipBook extends Sprite {
         //可设置或可调用接口,页数以单页数计算~
         /**
