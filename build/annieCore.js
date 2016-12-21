@@ -3425,6 +3425,10 @@ var annie;
             s._instanceType = "annie.Video";
             s.media.setAttribute("webkit-playsinline", "true");
             s.media.setAttribute("x-webkit-airplay", "true");
+            s.media.setAttribute("playsinline", "true");
+            s.media.setAttribute("x5-video-player-type", "h5");
+            s.media.setAttribute("poster", "");
+            s.media.setAttribute("controls", "false");
             s.media.width = width;
             s.media.height = height;
         }
@@ -4570,9 +4574,9 @@ var annie;
         /**
          * @method VideoPlayer
          * @param {string} src
+         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
          * @param {number} width
          * @param {number} height
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
          */
         function VideoPlayer(src, type, width, height) {
             if (type === void 0) { type = 0; }
@@ -5219,7 +5223,7 @@ var annie;
             _super.call(this);
             /**
              * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
-             * 所以需要自己灵活设置,默认阻止
+             * 所以需要自己灵活设置,默认阻止.
              * @property iosTouchendPreventDefault
              * @type {boolean}
              * @default true

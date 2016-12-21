@@ -16,6 +16,10 @@ namespace annie {
             s._instanceType="annie.Video";
             s.media.setAttribute("webkit-playsinline", "true");
             s.media.setAttribute("x-webkit-airplay", "true");
+            s.media.setAttribute("playsinline", "true");
+            s.media.setAttribute("x5-video-player-type", "h5");
+            s.media.setAttribute("poster", "");
+            s.media.setAttribute("controls", "false");
             s.media.width=width;
             s.media.height=height;
         }

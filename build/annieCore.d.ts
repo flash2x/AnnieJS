@@ -2385,9 +2385,9 @@ declare namespace annie {
         /**
          * @method VideoPlayer
          * @param {string} src
+         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
          * @param {number} width
          * @param {number} height
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
          */
         constructor(src: any, type: number, width: number, height: number);
         /**
@@ -2678,7 +2678,7 @@ declare namespace annie {
     class Stage extends Sprite {
         /**
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
-         * 所以需要自己灵活设置,默认阻止
+         * 所以需要自己灵活设置,默认阻止.
          * @property iosTouchendPreventDefault
          * @type {boolean}
          * @default true

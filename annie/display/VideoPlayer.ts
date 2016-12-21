@@ -13,9 +13,9 @@ namespace annie {
         /**
          * @method VideoPlayer
          * @param {string} src
+         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
          * @param {number} width
          * @param {number} height
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
          */
         public constructor(src:any,type:number=0,width:number,height:number){
             super();
