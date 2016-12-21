@@ -19,7 +19,8 @@ namespace annie {
          */
         public constructor(src:any,type:number=0,width:number,height:number){
             super();
-            this._instanceType="annie.VideoPlayer";
+            let s=this;
+            s._instanceType="annie.VideoPlayer";
             let isUseVideo:any=true;
             if(type==0){
                 if(annie.osType=="android"){
@@ -33,11 +34,11 @@ namespace annie {
                 isUseVideo=false;
             }
             if(isUseVideo){
-                this.video=new Video(src+".mp4",width,height);
+                s.video=new Video(src+".mp4",width,height);
             }else{
-                this.video=new ImageFrames(src,width,height);
+                s.video=new ImageFrames(src,width,height);
             }
-            this.videoType=isUseVideo?1:0;
+            s.videoType=isUseVideo?1:0;
         }
         /**
          * 视频的引用
@@ -62,13 +63,14 @@ namespace annie {
          * @since 1.0.0
          */
         public update(){
+            let  s=this;
             //刷新视频
-            if(this.videoType==0){
-                this.video.update();
-                this.rect=this.video.rect;
-                this["_cacheImg"]=this.bitmapData=this.video.currentBitmap;
+            if(s.videoType==0){
+                s.video.update();
+                s.rect=this.video.rect;
+                s["_cacheImg"]=s.bitmapData=s.video.currentBitmap;
             }else{
-                this["_cacheImg"]=this.bitmapData=this.video;
+                s["_cacheImg"]=s.bitmapData=s.video.media;
             }
             super.update();
         }

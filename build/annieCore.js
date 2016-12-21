@@ -4590,7 +4590,8 @@ var annie;
              * @default 0
              */
             this.videoType = 0;
-            this._instanceType = "annie.VideoPlayer";
+            var s = this;
+            s._instanceType = "annie.VideoPlayer";
             var isUseVideo = true;
             if (type == 0) {
                 if (annie.osType == "android") {
@@ -4606,12 +4607,12 @@ var annie;
                 isUseVideo = false;
             }
             if (isUseVideo) {
-                this.video = new annie.Video(src + ".mp4", width, height);
+                s.video = new annie.Video(src + ".mp4", width, height);
             }
             else {
-                this.video = new annie.ImageFrames(src, width, height);
+                s.video = new annie.ImageFrames(src, width, height);
             }
-            this.videoType = isUseVideo ? 1 : 0;
+            s.videoType = isUseVideo ? 1 : 0;
         }
         /**
          * 重写update
@@ -4620,14 +4621,15 @@ var annie;
          * @since 1.0.0
          */
         VideoPlayer.prototype.update = function () {
+            var s = this;
             //刷新视频
-            if (this.videoType == 0) {
-                this.video.update();
-                this.rect = this.video.rect;
-                this["_cacheImg"] = this.bitmapData = this.video.currentBitmap;
+            if (s.videoType == 0) {
+                s.video.update();
+                s.rect = this.video.rect;
+                s["_cacheImg"] = s.bitmapData = s.video.currentBitmap;
             }
             else {
-                this["_cacheImg"] = this.bitmapData = this.video;
+                s["_cacheImg"] = s.bitmapData = s.video.media;
             }
             _super.prototype.update.call(this);
         };
