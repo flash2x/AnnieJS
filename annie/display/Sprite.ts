@@ -305,12 +305,14 @@ namespace annie {
         public getBounds():Rectangle{
             let s=this;
             let len:number= s.children.length;
+            let rect:Rectangle;
             if(len==0){
-                return null;
-            }
-            let rect=s.children[0].getDrawRect();
-            for (let i = 1; i < len; i++) {
-                rect=Rectangle.createFromRects(rect,s.children[i].getDrawRect());
+                rect=new Rectangle();
+            }else {
+                rect = s.children[0].getDrawRect();
+                for (let i = 1; i < len; i++) {
+                    rect = Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+                }
             }
           return rect;
         }
