@@ -2,7 +2,7 @@
  * @module annie
  */
 namespace annie {
-    let Eval:any=eval.bind(window);
+    export let Eval:any=eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -39,7 +39,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary等，请设置 默认为form
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
         public load(url:string, contentType:string = "form"):void {
             let s = this;

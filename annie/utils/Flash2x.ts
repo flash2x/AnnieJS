@@ -524,4 +524,40 @@ namespace Flash2x {
         }
         urlLoader.load(info.url);
     }
+    let jsonpScript:any=null;
+    /**
+     * jsonp调用方法
+     * @method jsonp
+     * @param url
+     * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
+     * @param callbackName
+     * @param callbackFun
+     * @static
+     * @since 1.0.4
+     */
+    export function jsonp(url:string,type:number,callbackName:string,callbackFun:any){
+        let w:any=window;
+        if(type==1){
+            w[callbackName]=callbackFun;
+        }
+        if(!jsonpScript){
+            jsonpScript=document.createElement('script');
+            jsonpScript.onload=function (){
+                if(type==0) {
+                    callbackFun(w[callbackName]);
+                }
+                jsonpScript.src="";
+                w[callbackName]=null;
+                delete w[callbackName];
+            };
+            document.getElementsByTagName('head')[0].appendChild(jsonpScript);
+        }
+        let param:string;
+        if(url.indexOf("?")>0) {
+            param="&";
+        }else{
+            param="?";
+        }
+        jsonpScript.src = url + param+"_a_n_n_i_e_="+Math.random()+"&callback="+callbackName;
+    }
 }

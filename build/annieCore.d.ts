@@ -3601,6 +3601,7 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
+    let Eval: any;
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -3628,7 +3629,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary等，请设置 默认为form
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
         load(url: string, contentType?: string): void;
         /**
@@ -3817,6 +3818,17 @@ declare namespace Flash2x {
      * @param {string} info.responseType 后台返回数据的类型,默认为"json"
      */
     function ajax(info: any): void;
+    /**
+     * jsonp调用方法
+     * @method jsonp
+     * @param url
+     * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
+     * @param callbackName
+     * @param callbackFun
+     * @static
+     * @since 1.0.4
+     */
+    function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
 }
 /**
  * @module annie

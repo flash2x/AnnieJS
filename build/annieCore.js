@@ -1544,15 +1544,12 @@ var annie;
          */
         DisplayObject.prototype.getDrawRect = function () {
             var s = this;
-            var rect;
-            var bounds = s.getBounds();
-            if (bounds) {
-                var p1 = s.matrix.transformPoint(bounds.x, bounds.y);
-                var p2 = s.matrix.transformPoint(bounds.x + bounds.width, bounds.y + bounds.height);
-                rect = annie.Rectangle.createFromPoints(p1, p2);
-                rect.width -= rect.x;
-                rect.height -= rect.y;
-            }
+            var rect = s.getBounds();
+            var p1 = s.matrix.transformPoint(rect.x, rect.y);
+            var p2 = s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height);
+            rect = annie.Rectangle.createFromPoints(p1, p2);
+            rect.width -= rect.x;
+            rect.height -= rect.y;
             return rect;
         };
         /**
@@ -3191,12 +3188,15 @@ var annie;
         Sprite.prototype.getBounds = function () {
             var s = this;
             var len = s.children.length;
+            var rect;
             if (len == 0) {
-                return null;
+                rect = new annie.Rectangle();
             }
-            var rect = s.children[0].getDrawRect();
-            for (var i = 1; i < len; i++) {
-                rect = annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+            else {
+                rect = s.children[0].getDrawRect();
+                for (var i = 1; i < len; i++) {
+                    rect = annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+                }
             }
             return rect;
         };
@@ -7390,7 +7390,7 @@ var annie;
  */
 var annie;
 (function (annie) {
-    var Eval = eval.bind(window);
+    annie.Eval = eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -7507,7 +7507,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary等，请设置 默认为form
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
         URLLoader.prototype.load = function (url, contentType) {
             if (contentType === void 0) { contentType = "form"; }
@@ -7643,7 +7643,7 @@ var annie;
                                         break;
                                     case "js":
                                         item_1 = "JS_CODE";
-                                        Eval(result);
+                                        annie.Eval(result);
                                         break;
                                     case "text":
                                     case "unKnow":
@@ -8271,6 +8271,44 @@ var Flash2x;
         urlLoader.load(info.url);
     }
     Flash2x.ajax = ajax;
+    var jsonpScript = null;
+    /**
+     * jsonp调用方法
+     * @method jsonp
+     * @param url
+     * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
+     * @param callbackName
+     * @param callbackFun
+     * @static
+     * @since 1.0.4
+     */
+    function jsonp(url, type, callbackName, callbackFun) {
+        var w = window;
+        if (type == 1) {
+            w[callbackName] = callbackFun;
+        }
+        if (!jsonpScript) {
+            jsonpScript = document.createElement('script');
+            jsonpScript.onload = function () {
+                if (type == 0) {
+                    callbackFun(w[callbackName]);
+                }
+                jsonpScript.src = "";
+                w[callbackName] = null;
+                delete w[callbackName];
+            };
+            document.getElementsByTagName('head')[0].appendChild(jsonpScript);
+        }
+        var param;
+        if (url.indexOf("?") > 0) {
+            param = "&";
+        }
+        else {
+            param = "?";
+        }
+        jsonpScript.src = url + param + "_a_n_n_i_e_=" + Math.random() + "&callback=" + callbackName;
+    }
+    Flash2x.jsonp = jsonp;
 })(Flash2x || (Flash2x = {}));
 /**
  * @module annie

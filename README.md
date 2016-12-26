@@ -73,7 +73,9 @@
     优化annie.URLLoader 错误事件提示
     增加annie.URLLoader 加载完整事件里返回加载数据类型参数
     修复annie.VideoPlayer 播放mp4报错问题
-    优化mp4在ios播放效果
+    优化video在微信的播放效果
+    修复annie.DisplayObject.getDrawRect在没有子集的情况下返回null
+    新增Flash2x.jsonp()方法
 ##AnnieJS 1.0.3 版本
     删除annie.canTouchMove,不再控制html的可移动所有浮在AnnieJS上的Html元素自己管自己,现在canvas本身是不会上下滑动的了
     增加支持输入文本在手机端自动回收软键盘
