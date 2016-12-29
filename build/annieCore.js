@@ -3423,12 +3423,13 @@ var annie;
             _super.call(this, src, "Video");
             var s = this;
             s._instanceType = "annie.Video";
+            s.media.setAttribute("playsinline", "true");
             s.media.setAttribute("webkit-playsinline", "true");
             s.media.setAttribute("x-webkit-airplay", "true");
-            s.media.setAttribute("playsinline", "true");
             s.media.setAttribute("x5-video-player-type", "h5");
-            s.media.setAttribute("poster", "");
-            s.media.setAttribute("controls", "false");
+            s.media.poster = "";
+            s.media.preload = "auto";
+            s.media.controls = false;
             s.media.width = width;
             s.media.height = height;
         }
@@ -4469,6 +4470,9 @@ var annie;
             var s = this;
             if (typeof (htmlElement) == "string") {
                 htmlElement = document.getElementById(htmlElement);
+            }
+            else if (htmlElement._instanceType == "annie.Video") {
+                htmlElement = htmlElement.media;
             }
             var style = htmlElement.style;
             style.position = "absolute";

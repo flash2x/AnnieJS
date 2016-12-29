@@ -70,6 +70,8 @@ namespace annie {
             let s =this;
             if (typeof(htmlElement) == "string") {
                 htmlElement = document.getElementById(htmlElement);
+            }else if(htmlElement._instanceType=="annie.Video"){
+                htmlElement=htmlElement.media;
             }
             let style = htmlElement.style;
             style.position = "absolute";
@@ -119,7 +121,7 @@ namespace annie {
             if(show!=style.display){
                 style.display = show;
             }
-            if (!s.visible) {
+            if (!s.visible){
                 return;
             }
             let props:any=new Object;
