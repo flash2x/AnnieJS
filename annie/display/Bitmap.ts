@@ -104,10 +104,10 @@ namespace annie {
          */
         public update():void{
             let s = this;
+            if(!s.bitmapData||(s.bitmapData.nodeName=="IMG"&&!s.bitmapData.complete))return;
             super.update();
             //滤镜
             if(s._isNeedUpdate){
-                if(!s.bitmapData||(s.bitmapData.nodeName=="IMG"&&!s.bitmapData.complete))return;
                 if (s["cFilters"] && s["cFilters"].length > 0) {
                     if(!s._realCacheImg){
                         s._realCacheImg=window.document.createElement("canvas");

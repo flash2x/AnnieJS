@@ -27,6 +27,14 @@ namespace annie {
         public get instanceId():number {
             return this._id;
         }
+
+        /**
+         * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
+         * @property instanceType
+         * @since 1.0.3
+         * @public
+         * @return {string}
+         */
         public get instanceType():string{
             return this._instanceType;
         }

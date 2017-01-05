@@ -226,7 +226,7 @@ declare namespace annieUI {
      * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
-     * @since 1.0.2
+     * @since 1.0.0
      */
     class SlidePage extends Sprite {
         /**
@@ -235,7 +235,6 @@ declare namespace annieUI {
          * @type {number}
          * @private
          * @default 0
-         * @since 1.0.2
          */
         private listLen;
         /**
@@ -243,17 +242,21 @@ declare namespace annieUI {
          * @property slideCon
          * @type {annie.Sprite}
          * @private
-         * @since 1.0.2
          */
         private slideCon;
         /**
          * 滑动完成回调函数
-         * @property callback
+         * @method callback
          * @type {function}
-         * @since 1.0.2
          * @private
          */
         private callback;
+        /**
+         * @method onMoveStart
+         * @type {function}
+         * @private
+         */
+        private onMoveStart;
         /**
          * 滑动方向
          * @property isVertical
@@ -295,21 +298,26 @@ declare namespace annieUI {
          * @property touchEndY
          * @type {number}
          * @private
+         * @since
+         * @public
+         * @default 0
          */
         private touchEndY;
         /**
          * 当前页面索引ID
          * @property currentPageIndex
          * @type {number}
-         * @since 1.0.2
          * @public
+         * @since 1.0.3
+         * @default 0
          */
         currentPageIndex: number;
         /**
          * 页面是否移动
-         * @property isMoving
+         * @property currentPageIndex
          * @type {boolean}
-         * @since 1.0.2
+         * @public
+         * @default false
          * @public
          */
         isMoving: boolean;
@@ -358,8 +366,9 @@ declare namespace annieUI {
         /**
          * 是否可以下一页
          * @property canSlideNext
+         * @since 1.0.3
+         * @default true
          * @type {boolean}
-         * @since 1.0.2
          * @public
          */
         canSlideNext: boolean;
@@ -367,16 +376,16 @@ declare namespace annieUI {
          * 是否可以上一页
          * @property canSlidePrev
          * @type {boolean}
-         * @since 1.0.2
          * @public
+         * @default true
          */
         canSlidePrev: boolean;
         /**
-         * 手指滑动方向
          * @property slideDirection
          * @type {string}
+         * @since 1.0.3
          * @public
-         * @since 1.0.2
+         * @default "next"
          */
         slideDirection: string;
         /**
@@ -404,11 +413,11 @@ declare namespace annieUI {
          * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @param{number}slideSpeed  页面滑动速度
          * @example
-         *      let slideBox = new annieUI.SlidePage({
-         *          pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *          isVertical: true,//默认值为true,ture为纵向,falas为横向
-         *          slideSpeed: .32,//默认值为.4，滑动速度
-         *          callback:callback//滑动完成回调函数
+         *      var slideBox = new annieUI.SlidePage({
+         *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
+         *      isVertical: true,//默认值为true,ture为纵向,falas为横向
+         *      slideSpeed: .32,//默认值为.4，滑动速度
+         *      callback:callback//滑动完成回调函数
          *       });
          */
         constructor(option: any);
@@ -424,18 +433,18 @@ declare namespace annieUI {
         private onMouseEventHandler(e);
         /**
          * 滑动到指定页
-         * @method slideTo
-         * @param index 页面索引
+         * @method slideToIndex
          * @public
-         * @since 1.0.2
+         * @since 1.0.3
+         * @param index 页面索引
          */
-        slideTo(index: any): void;
+        slideToIndex(index: any): void;
         /**
          * 用于插入分页
          * @method addPageList
-         * @public
-         * @since 1.0.2
          * @param list 页面数组对象
+         * @since 1.0.3
+         * @public
          */
         addPageList(list: any): void;
         /**

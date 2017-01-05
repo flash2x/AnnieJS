@@ -37,6 +37,13 @@ var annie;
             configurable: true
         });
         Object.defineProperty(AObject.prototype, "instanceType", {
+            /**
+             * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
+             * @property instanceType
+             * @since 1.0.3
+             * @public
+             * @return {string}
+             */
             get: function () {
                 return this._instanceType;
             },
@@ -1819,11 +1826,11 @@ var annie;
          */
         Bitmap.prototype.update = function () {
             var s = this;
+            if (!s.bitmapData || (s.bitmapData.nodeName == "IMG" && !s.bitmapData.complete))
+                return;
             _super.prototype.update.call(this);
             //滤镜
             if (s._isNeedUpdate) {
-                if (!s.bitmapData || (s.bitmapData.nodeName == "IMG" && !s.bitmapData.complete))
-                    return;
                 if (s["cFilters"] && s["cFilters"].length > 0) {
                     if (!s._realCacheImg) {
                         s._realCacheImg = window.document.createElement("canvas");
@@ -7546,7 +7553,7 @@ var annie;
                 else if (ext == "txt") {
                     s.responseType = "text";
                 }
-                else if (ext == "js") {
+                else if (ext == "js" || ext == "swf") {
                     s.responseType = "js";
                 }
                 else {
@@ -7744,6 +7751,7 @@ var Flash2x;
     var BlurFilter = annie.BlurFilter;
     var ShadowFilter = annie.ShadowFilter;
     var ColorMatrixFilter = annie.ColorMatrixFilter;
+    Flash2x._isReleased = false;
     /**
      * 存储加载资源的总对象
      * @type {Object}
@@ -7860,6 +7868,7 @@ var Flash2x;
             _loaderQueue = new URLLoader();
             _loaderQueue.addEventListener(Event.COMPLETE, _onRESComplete);
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
+            _isInited = true;
         }
         _loadPer = 0;
         _loadIndex = 0;
@@ -7869,7 +7878,19 @@ var Flash2x;
         _completeCallback = completeFun;
         _progressCallback = progressFun;
         _currentConfig = [];
-        _loadConfig();
+        if (!Flash2x._isReleased) {
+            _loadConfig();
+        }
+        else {
+            //加载正式的单个文件
+            _loadIndex = 0;
+            _totalLoadRes = _loadSceneNames.length;
+            _loadSinglePer = 1 / _totalLoadRes;
+            for (var i = 0; i < _totalLoadRes; i++) {
+                _currentConfig.push([{ src: _domain + "src/" + _loadSceneNames[i] + ".swf" }]);
+            }
+            _loadRes();
+        }
     };
     function _loadConfig() {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
@@ -7896,15 +7917,36 @@ var Flash2x;
         }
     }
     function _onRESComplete(e) {
-        if (e.data.type != "js" && e.data.type != "css") {
-            var id = _currentConfig[_loadIndex][0].id;
-            var scene = _loadSceneNames[_loadIndex];
-            if (e.data.type == "sound") {
-                res[scene][id] = new annie.Sound(e.data.response);
+        var scene = _loadSceneNames[_loadIndex];
+        if (!Flash2x._isReleased) {
+            if (e.data.type != "js" && e.data.type != "css") {
+                var id = _currentConfig[_loadIndex][0].id;
+                if (e.data.type == "sound") {
+                    res[scene][id] = new annie.Sound(e.data.response);
+                }
+                else {
+                    res[scene][id] = e.data.response;
+                }
             }
-            else {
-                res[scene][id] = e.data.response;
+        }
+        else {
+            var F2x = Flash2x;
+            var JSResItem = F2x[scene + "Res"];
+            for (var item in JSResItem) {
+                var resItem;
+                if (JSResItem[item].indexOf("audio/") > 0) {
+                    resItem = new annie.Sound(JSResItem[item]);
+                }
+                else if (JSResItem[item].indexOf("image/") > 0) {
+                    resItem = new Image();
+                    resItem.src = JSResItem[item];
+                }
+                else {
+                    resItem = JSON.parse(JSResItem[item]);
+                }
+                res[scene][item] = resItem;
             }
+            delete F2x[scene + "Res"];
         }
         _checkComplete();
     }
@@ -7935,6 +7977,10 @@ var Flash2x;
     }
     function _loadRes() {
         var url = _domain + _currentConfig[_loadIndex][0].src;
+        if (Flash2x._isReleased) {
+            _loaderQueue.responseType = "js";
+            url += "?v=" + Flash2x._isReleased;
+        }
         _loaderQueue.load(url);
     }
     /**

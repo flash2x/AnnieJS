@@ -13,6 +13,7 @@ namespace Flash2x {
     import BlurFilter=annie.BlurFilter;
     import ShadowFilter=annie.ShadowFilter;
     import ColorMatrixFilter=annie.ColorMatrixFilter;
+    export let _isReleased=false;
     /**
      * 存储加载资源的总对象
      * @type {Object}
@@ -77,7 +78,7 @@ namespace Flash2x {
     /**
      * 单个资源占总资源数的比
      */
-    let _loadSinglePer: number
+    let _loadSinglePer: number;
     /**
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
      * @method loadScene
@@ -128,6 +129,7 @@ namespace Flash2x {
             _loaderQueue = new URLLoader();
             _loaderQueue.addEventListener(Event.COMPLETE, _onRESComplete);
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
+            _isInited=true;
         }
         _loadPer = 0;
         _loadIndex = 0;
@@ -137,14 +139,23 @@ namespace Flash2x {
         _completeCallback = completeFun;
         _progressCallback = progressFun;
         _currentConfig = [];
-        _loadConfig();
+        if(!_isReleased) {
+            _loadConfig();
+        }else{
+            //加载正式的单个文件
+            _loadIndex = 0;
+            _totalLoadRes=_loadSceneNames.length;
+            _loadSinglePer = 1 / _totalLoadRes;
+            for(let i=0;i<_totalLoadRes;i++) {
+                _currentConfig.push([{src:_domain+"src/"+_loadSceneNames[i]+".swf"}]);
+            }
+            _loadRes();
+        }
     };
-
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
-
-    function onCFGComplete(e: Event): void {
+    function onCFGComplete(e: Event): void{
         //配置文件加载完成
         let resList: any = e.data.response;
         _currentConfig.push(resList);
@@ -160,22 +171,38 @@ namespace Flash2x {
             _loadRes();
         }
     }
-
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
-
     function _onRESComplete(e: Event): void {
-        if (e.data.type != "js" && e.data.type != "css") {
-            let id = _currentConfig[_loadIndex][0].id;
-            let scene = _loadSceneNames[_loadIndex];
-            if (e.data.type == "sound") {
-                res[scene][id] = new annie.Sound(e.data.response);
-            } else {
-                res[scene][id] = e.data.response;
+        let scene = _loadSceneNames[_loadIndex];
+        if(!_isReleased){
+            if (e.data.type != "js" && e.data.type != "css") {
+                let id = _currentConfig[_loadIndex][0].id;
+                if (e.data.type == "sound") {
+                    res[scene][id] = new annie.Sound(e.data.response);
+                } else {
+                    res[scene][id] = e.data.response;
+                }
             }
+        }else{
+            var F2x:any=Flash2x;
+            var JSResItem:any=F2x[scene+"Res"];
+            for(var item in JSResItem){
+                var resItem:any;
+                if(JSResItem[item].indexOf("audio/")>0){
+                    resItem=new annie.Sound(JSResItem[item]);
+                }else if(JSResItem[item].indexOf("image/")>0){
+                    resItem=new Image();
+                    resItem.src=JSResItem[item];
+                }else{
+                    resItem=JSON.parse(JSResItem[item]);
+                }
+                res[scene][item]=resItem;
+            }
+            delete F2x[scene+"Res"];
         }
         _checkComplete();
     }
@@ -205,7 +232,11 @@ namespace Flash2x {
     }
 
     function _loadRes(): void {
-        let url = _domain + _currentConfig[_loadIndex][0].src;
+        let url=_domain + _currentConfig[_loadIndex][0].src;
+        if(_isReleased){
+            _loaderQueue.responseType="js";
+            url+="?v="+_isReleased;
+        }
         _loaderQueue.load(url);
     }
 

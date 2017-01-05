@@ -11,7 +11,7 @@ namespace annieUI {
      * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
-     * @since 1.0.2
+     * @since 1.0.0
      */
     export class SlidePage extends Sprite {
         /**
@@ -20,7 +20,6 @@ namespace annieUI {
          * @type {number}
          * @private
          * @default 0
-         * @since 1.0.2
          */
         private listLen: number = 0;
         /**
@@ -28,17 +27,21 @@ namespace annieUI {
          * @property slideCon
          * @type {annie.Sprite}
          * @private
-         * @since 1.0.2
          */
         private slideCon: any;
         /**
          * 滑动完成回调函数
-         * @property callback
+         * @method callback
          * @type {function}
-         * @since 1.0.2
          * @private
          */
         private callback: any;
+        /**
+         * @method onMoveStart
+         * @type {function}
+         * @private
+         */
+        private onMoveStart: any;
         /**
          * 滑动方向
          * @property isVertical
@@ -80,21 +83,26 @@ namespace annieUI {
          * @property touchEndY
          * @type {number}
          * @private
+         * @since
+         * @public
+         * @default 0
          */
         private touchEndY: number = 0;
         /**
          * 当前页面索引ID
          * @property currentPageIndex
          * @type {number}
-         * @since 1.0.2
          * @public
+         * @since 1.0.3
+         * @default 0
          */
         public currentPageIndex = 0;
         /**
          * 页面是否移动
-         * @property isMoving
+         * @property currentPageIndex
          * @type {boolean}
-         * @since 1.0.2
+         * @public
+         * @default false
          * @public
          */
         public isMoving = false;
@@ -143,8 +151,9 @@ namespace annieUI {
         /**
          * 是否可以下一页
          * @property canSlideNext
+         * @since 1.0.3
+         * @default true
          * @type {boolean}
-         * @since 1.0.2
          * @public
          */
         public canSlideNext: boolean = true;
@@ -152,16 +161,17 @@ namespace annieUI {
          * 是否可以上一页
          * @property canSlidePrev
          * @type {boolean}
-         * @since 1.0.2
          * @public
+         * @default true
          */
         public canSlidePrev: boolean = true;
+
         /**
-         * 手指滑动方向
          * @property slideDirection
          * @type {string}
+         * @since 1.0.3
          * @public
-         * @since 1.0.2
+         * @default "next"
          */
         public slideDirection: string = 'next';
         /**
@@ -195,17 +205,16 @@ namespace annieUI {
          * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @param{number}slideSpeed  页面滑动速度
          * @example
-         *      let slideBox = new annieUI.SlidePage({
-         *          pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *          isVertical: true,//默认值为true,ture为纵向,falas为横向
-         *          slideSpeed: .32,//默认值为.4，滑动速度
-         *          callback:callback//滑动完成回调函数
+         *      var slideBox = new annieUI.SlidePage({
+         *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
+         *      isVertical: true,//默认值为true,ture为纵向,falas为横向
+         *      slideSpeed: .32,//默认值为.4，滑动速度
+         *      callback:callback//滑动完成回调函数
          *       });
          */
         constructor(option: any) {
             super();
-            let s = this;
-            s._instanceType="annieUI.SlidePages";
+            var s = this;
             if (!s.isArray(option['pageList'])) {
                 throw 'pageList参数数据格式不对！pageList应为页面对象列表数组';
             }
@@ -213,6 +222,7 @@ namespace annieUI {
                 throw 'callback参数数据格式不对！callback应为函数';
             }
             s.pageList = option['pageList'];
+            s.onMoveStart = option['onMoveStart'];
             s.callback = option['callback'];
             s.isVertical = option['isVertical'] ? option['isVertical'] : true;
             s.canSlidePrev = option['canSlidePrev'] ? option['canSlidePrev'] : true;
@@ -227,12 +237,12 @@ namespace annieUI {
          * @param e
          */
         private onAddToStage(e: annie.Event): void {
-            let s = this;
+            var s = this;
             s.stageW = s.stage.desWidth;
             s.stageH = s.stage.desHeight;
             s.listLen = s.pageList.length;//页面个数
             s.slideCon = new annie.Sprite();
-            for (let i = 0; i < s.listLen; i++) {
+            for (var i = 0; i < s.listLen; i++) {
                 s.pageList[i].pageId = i;
                 s.pageList[i].visible = true;
                 s.pageList[i].canSlidePrev = true;
@@ -260,7 +270,7 @@ namespace annieUI {
          * @param e
          */
         private onMouseEventHandler(e: annie.MouseEvent): void {
-            let s = this;
+            var s = this;
             if (s.isMoving) {
                 return;
             }
@@ -313,60 +323,61 @@ namespace annieUI {
                         s.slideDirection = s.touchStartX > s.touchEndX ? 'next' : 'prev';
                     }
                     if (s.slideDirection == 'next') {
-                        globalDispatcher.dispatchEvent('onSlideNextEvent');
+                        globalDispatcher.dispatchEvent(new annie.Event('onSlideNextEvent'));
                         if (s.currentPageIndex < s.listLen - 1) {
                             if (!s.canSlideNext || !s.pageList[s.currentPageIndex].canSlideNext) {
                                 return;
                             }
                             // s.pageList[s.currentPageIndex + 1].visible = true;
                             s.currentPageIndex++;
-                            s.slideTo(s.currentPageIndex);
+                            s.slideToIndex(s.currentPageIndex);
                         } else {
                             s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
-                                y: -s.stageH * (s.listLen - 1),
-                                ease: annie.Tween.backOut
-                            }) : annie.Tween.to(s.slideCon, .2, {
-                                x: -s.stageW * (s.listLen - 1),
-                                ease: annie.Tween.backOut
-                            });
+                                    y: -s.stageH * (s.listLen - 1),
+                                    ease: annie.Tween.backOut
+                                }) : annie.Tween.to(s.slideCon, .2, {
+                                    x: -s.stageW * (s.listLen - 1),
+                                    ease: annie.Tween.backOut
+                                });
                         }
                     } else {
-                        globalDispatcher.dispatchEvent('onSlidePrevEvent');
+                        globalDispatcher.dispatchEvent(new annie.Event('onSlidePrevEvent'));
                         if (s.currentPageIndex > 0) {
                             if (!s.canSlidePrev || !s.pageList[s.currentPageIndex].canSlidePrev) {
                                 return;
                             }
                             // s.pageList[s.currentPageIndex - 1].visible = true;
                             s.currentPageIndex--;
-                            s.slideTo(s.currentPageIndex);
+                            s.slideToIndex(s.currentPageIndex);
                         } else {
                             s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
-                                y: 0,
-                                ease: annie.Tween.backOut
-                            }) : annie.Tween.to(s.slideCon, .2, {x: 0, ease: annie.Tween.backOut});
+                                    y: 0,
+                                    ease: annie.Tween.backOut
+                                }) : annie.Tween.to(s.slideCon, .2, {x: 0, ease: annie.Tween.backOut});
                         }
                     }
                 }
             }
         }
+
         /**
          * 滑动到指定页
-         * @method slideTo
-         * @param index 页面索引
+         * @method slideToIndex
          * @public
-         * @since 1.0.2
+         * @since 1.0.3
+         * @param index 页面索引
          */
-        public slideTo(index: any): void {
-            let s = this;
+        public slideToIndex(index: any): void {
+            var s = this;
             if (s.isMoving) {
                 return;
             }
             if (s.isVertical) {
                 annie.Tween.to(s.slideCon, s.slideSpeed, {
-                    y: -index * s.stage.desHeight, onComplete: function () {
+                    y: -index * s.stageH, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
-                        //     for (let i = 0; i < s.listLen; i++) {
+                        //     for (var i = 0; i < s.listLen; i++) {
                         //         if (s.currentPageIndex != s.pageList[i].pageId)
                         //             s.pageList[i].visible = false;
                         //     }
@@ -379,10 +390,10 @@ namespace annieUI {
                 s.isMoving = true;
             } else {
                 annie.Tween.to(s.slideCon, s.slideSpeed, {
-                    x: -index * s.stage.desWidth, onComplete: function () {
+                    x: -index * s.stageW, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
-                        //     for (let i = 0; i < s.listLen; i++) {
+                        //     for (var i = 0; i < s.listLen; i++) {
                         //         if (s.currentPageIndex != s.pageList[i].pageId)
                         //             s.pageList[i].visible = false;
                         //     }
@@ -395,23 +406,24 @@ namespace annieUI {
                 s.isMoving = true;
             }
             s.currentPageIndex = index;
+            s.isFunction(s.onMoveStart) && s.onMoveStart(index);//开始滑动动画
         }
 
         /**
          * 用于插入分页
          * @method addPageList
-         * @public
-         * @since 1.0.2
          * @param list 页面数组对象
+         * @since 1.0.3
+         * @public
          */
         public addPageList(list: any): void {
-            let s = this;
+            var s = this;
             if (!s.isArray(list)) {
                 throw 'list应为页面对象列表数组';
             }
-            let addListLen = list.length;
+            var addListLen = list.length;
             // console.log('addLisLen:'+addListLen);
-            for (let i = 0; i < addListLen; i++) {
+            for (var i = 0; i < addListLen; i++) {
                 list[i].pageId = s.listLen;
                 list[i].visible = true;
                 list[i].canSlidePrev = true;
@@ -423,9 +435,11 @@ namespace annieUI {
                 }
                 s.pageList.push(list[i]);
                 s.listLen = s.pageList.length;
+                // console.log('加长度后：'+s.listLen);
                 s.slideCon.addChildAt(list[i], s.listLen);
             }
         }
+
         /**
          * 平面中两点距离公式
          * @param x1
@@ -435,9 +449,15 @@ namespace annieUI {
          * @returns {number}
          */
         private getDistance(x1: number, y1: number, x2: number, y2: number): number {
-            let xd = x2 - x1;
-            let yd = y2 - y1;
-            return Math.pow((xd * xd + yd * yd), 0.5);
+            var x1 = x1;
+            var y1 = y1;
+            var x2 = x2;
+            var y2 = y2;
+            var xdiff = x2 - x1;
+            var ydiff = y2 - y1;
+            var dis = Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);
+            return dis;
         }
+
     }
 }

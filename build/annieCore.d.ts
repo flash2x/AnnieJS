@@ -23,6 +23,13 @@ declare namespace annie {
          *      trace(this.instanceId);
          */
         instanceId: number;
+        /**
+         * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
+         * @property instanceType
+         * @since 1.0.3
+         * @public
+         * @return {string}
+         */
         instanceType: string;
     }
     /**
@@ -3703,6 +3710,7 @@ declare namespace annie {
 declare namespace Flash2x {
     import Shape = annie.Shape;
     import Bitmap = annie.Bitmap;
+    let _isReleased: boolean;
     /**
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
      * @method loadScene

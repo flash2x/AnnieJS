@@ -65,7 +65,7 @@ namespace annie {
                     s.responseType = "json";
                 } else if (ext == "txt") {
                     s.responseType = "text";
-                } else if (ext == "js") {
+                } else if (ext == "js"||ext=="swf") {
                     s.responseType = "js";
                 } else {
                     s.responseType = "unKnow";
