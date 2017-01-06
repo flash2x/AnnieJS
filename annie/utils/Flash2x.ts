@@ -230,7 +230,6 @@ namespace Flash2x {
             }
         }
     }
-
     function _loadRes(): void {
         let url=_domain + _currentConfig[_loadIndex][0].src;
         if(_isReleased){
@@ -589,6 +588,6 @@ namespace Flash2x {
         }else{
             param="?";
         }
-        jsonpScript.src = url + param+"_a_n_n_i_e_="+Math.random()+"&callback="+callbackName;
+        jsonpScript.src = url + param+"a_n_n_i_e="+Math.random()+"&callback="+callbackName;
     }
 }
