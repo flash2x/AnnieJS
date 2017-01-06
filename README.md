@@ -136,6 +136,8 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
+## Flash2x 3.0.4
+   更新gulp构建模式下支持将fla打包成一个单独的swf资源文件供html5调用，实现一个fla生成一个swf文件别无其他资源文件的完美解决方案
 ## Flash2x 3.0.3
    更新AnnieJS引擎及相应的模板包
 ## Flash2x 3.0.2
