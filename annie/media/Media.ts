@@ -98,15 +98,19 @@ namespace annie {
             this.media.pause();
             this.media.currentTime = 0;
         }
-
         /**
          * 暂停播放
          * @method pause
          * @public
-         * @since 1.0.0
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
+         * @since 1.0.4
          */
-        public pause(): void {
-            this.media.pause();
+        public pause(isPause:boolean=true): void {
+            if(isPause){
+                this.media.pause();
+            }else{
+                this.media.play();
+            }
         }
     }
 }
