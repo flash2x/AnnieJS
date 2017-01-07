@@ -17,11 +17,17 @@ namespace annie {
          * @since 1.0.0
          * @public
          */
-        public constructor() {
+        public constructor(){
             super();
             this._instanceType = "annie.DisplayObject";
         }
 
+        /**
+         * 更新信息
+         * @property _updateInfo
+         * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+         */
+        protected _updateInfo: {UM: boolean, UA: boolean, UF: boolean} = {UM: true, UA: false, UF: false};
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
@@ -40,7 +46,7 @@ namespace annie {
          * @since 1.0.0
          * @default 1
          */
-        private cAlpha: number = 1;
+        protected cAlpha: number = 1;
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
@@ -49,7 +55,7 @@ namespace annie {
          * @default null
          * @since 1.0.0
          */
-        private cMatrix: Matrix = new Matrix();
+        protected cMatrix: Matrix = new Matrix();
         /**
          * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
          * @property _enterFrameEvent
@@ -76,25 +82,7 @@ namespace annie {
          * @since 1.0.0
          * @type {Array}
          */
-        public cFilters: any[] = [];
-        /**
-         * 缓存着的滤镜组信息，通过此信息来判断滤镜是否有更新以此来告诉对象是否需要更新缓存视觉
-         * @property cCacheFilters
-         * @private
-         * @default []
-         * @since 1.0.0
-         * @type {Array}
-         */
-        private cCacheFilters: any[] = [];
-        /**
-         * 是否需要更新缓存的开关
-         * @property _isNeedUpdate
-         * @private
-         * @type {boolean}
-         * @since 1.0.0
-         * @default true
-         */
-        public _isNeedUpdate: boolean = true;
+        protected cFilters: any[] = [];
         /**
          * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -104,6 +92,7 @@ namespace annie {
          * @default ""
          */
         public name: string = "";
+
         /**
          * 显示对象位置x
          * @property x
@@ -112,7 +101,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public x: number = 0;
+        public get x(): number {
+            return this._x;
+        }
+
+        public set x(value: number) {
+            let s=this;
+            if(s._x!=value) {
+                s._x = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _x: number = 0;
+
         /**
          * 显示对象位置y
          * @property y
@@ -121,7 +123,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public y: number = 0;
+        public get y(): number {
+            return this._y;
+        }
+
+        public set y(value: number) {
+            let s=this;
+            if(s._y!=value) {
+                s._y = value;
+                s._updateInfo.UM = true;
+            }
+        };
+
+        private _y: number = 0;
+
         /**
          * 显示对象x方向的缩放值
          * @property scaleX
@@ -130,7 +145,20 @@ namespace annie {
          * @type {number}
          * @default 1
          */
-        public scaleX: number = 1;
+        public get scaleX(): number {
+            return this._scaleX;
+        }
+
+        public set scaleX(value: number) {
+            let s=this;
+            if(s._scaleX!=value) {
+                s._scaleX = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _scaleX: number = 1;
+
         /**
          * 显示对象y方向的缩放值
          * @property scaleY
@@ -139,7 +167,20 @@ namespace annie {
          * @type {number}
          * @default 1
          */
-        public scaleY: number = 1;
+        public get scaleY(): number {
+            return this._scaleY;
+        }
+
+        public set scaleY(value: number) {
+            let s=this;
+            if(s._scaleY) {
+                s._scaleY = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _scaleY: number = 1;
+
         /**
          * 显示对象旋转角度
          * @property rotation
@@ -148,7 +189,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public rotation: number = 0;
+        public get rotation(): number {
+            return this._rotation;
+        }
+
+        public set rotation(value: number) {
+            let s=this;
+            if(s._rotation!=value) {
+                s._rotation = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _rotation: number = 0;
+
         /**
          * 显示对象透明度
          * @property alpha
@@ -157,7 +211,20 @@ namespace annie {
          * @type {number}
          * @default 1
          */
-        public alpha: number = 1;
+        public get alpha(): number {
+            return this._alpha;
+        }
+
+        public set alpha(value: number) {
+            let s=this;
+            if(s._alpha!=value) {
+                s._alpha = value;
+                s._updateInfo.UA = true
+            }
+        }
+
+        private _alpha: number = 1;
+
         /**
          * 显示对象x方向的斜切值
          * @property skewX
@@ -166,7 +233,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public skewX: number = 0;
+        public get skewX(): number {
+            return this._skewX;
+        }
+
+        public set skewX(value: number) {
+            var s=this;
+            if(s._skewX!=value) {
+                s._skewX = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _skewX: number = 0;
+
         /**
          * 显示对象y方向的斜切值
          * @property skewY
@@ -175,7 +255,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public skewY: number = 0;
+        public get skewY(): number {
+            return this._skewY;
+        }
+
+        public set skewY(value: number) {
+            let s=this;
+            if(s._scaleY!=value) {
+                s._skewY = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _skewY: number = 0;
+
         /**
          * 显示对象上x方向的缩放或旋转点
          * @property anchorX
@@ -184,7 +277,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public anchorX: number = 0;
+        public get anchorX(): number {
+            return this._anchorX;
+        }
+
+        public set anchorX(value: number) {
+            let s=this;
+            if(s._anchorX!=value) {
+                s._anchorX = value;
+                s._updateInfo.UM = true;
+            }
+        }
+
+        private _anchorX: number = 0;
+
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
@@ -193,7 +299,20 @@ namespace annie {
          * @type {number}
          * @default 0
          */
-        public anchorY: number = 0;
+        public get anchorY(): number {
+            return this._anchorY;
+        }
+
+        public set anchorY(value: number) {
+            let s=this;
+            if(s._anchorY!=value){
+                s._anchorY = value;
+                s._updateInfo.UM = true;
+            }
+
+        }
+
+        private _anchorY: number = 0;
         /**
          * 显未对象是否可见
          * @property visible
@@ -213,6 +332,7 @@ namespace annie {
          * @default 0
          */
         public blendMode: string = "normal";
+
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -221,7 +341,11 @@ namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        public matrix: Matrix = new Matrix();
+        public get matrix(): Matrix {
+            return this._matrix
+        };
+
+        private _matrix: Matrix = new Matrix();
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
          * @property mask
@@ -231,6 +355,7 @@ namespace annie {
          * @default null
          */
         public mask: any = null;
+
         /**
          * 显示对象的滤镜数组
          * @property filters
@@ -239,7 +364,19 @@ namespace annie {
          * @type {Array}
          * @default null
          */
-        public filters: any[] = null;
+        public get filters(): any[] {
+            return this._filters;
+        }
+
+        public set filters(value: any[]){
+            if(value) {
+                this._filters = value;
+            }else{
+                this._filters.length=0;
+            }
+            this._updateInfo.UF = true;
+        }
+        private _filters: any[] = [];
         /**
          * 显示对象的父级
          * @property parent
@@ -250,7 +387,12 @@ namespace annie {
          * @readonly
          */
         public parent: Sprite = null;
-
+        /**
+         * 是否自己的父级发生的改变
+         * @type {boolean}
+         * @private
+         */
+        protected _cp:boolean=false;
         /**
          *将全局坐标转换到本地坐标值
          * @method globalToLocal
@@ -260,6 +402,9 @@ namespace annie {
          * @returns {annie.Point}
          */
         public globalToLocal(point: Point, bp: Point = null): Point {
+            if (!bp) {
+                bp = annie.DisplayObject._bp;
+            }
             return this.cMatrix.invert().transformPoint(point.x, point.y, bp);
         }
 
@@ -272,6 +417,9 @@ namespace annie {
          * @returns {annie.Point}
          */
         public localToGlobal(point: Point, bp: Point = null): Point {
+            if (!bp) {
+                bp = annie.DisplayObject._bp;
+            }
             return this.cMatrix.transformPoint(point.x, point.y, bp);
         }
 
@@ -308,6 +456,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @returns {annie.Rectangle}
+         * @abstract
          */
         public abstract getBounds(): Rectangle;
 
@@ -329,64 +478,48 @@ namespace annie {
             rect.height -= rect.y;
             return rect;
         }
-
         /**
          * 更新函数
          * @method update
          * @public
          * @since 1.0.0
          */
-        public update(): void {
+        public update(um: boolean, ua: boolean, uf: boolean): void{
             let s = this;
-            s.matrix.createBox(s.x, s.y, s.scaleX, s.scaleY, s.rotation, s.skewX, s.skewY, s.anchorX, s.anchorY);
-            s.cFilters.length = 0;
-            s.cMatrix.setFrom(s.matrix);
-            if (s.parent) {
-                s.cMatrix.prepend(s.parent.cMatrix);
-                s.cAlpha = s.alpha * s.parent.cAlpha;
-                if (s.parent.cFilters && s.parent.cFilters.length > 0) {
-                    let len = s.parent.cFilters.length;
-                    let pf = s.parent.cFilters;
-                    for (let i = 0; i < len; i++) {
-                        s.cFilters[i] = pf[i];
-                    }
-                }
-            } else {
-                s.cAlpha = s.alpha;
+            if(s._cp){
+                um=ua=uf=true;
+                s._cp=false;
             }
-            if (s.visible) {
-                //如果visible为true更新他们的显示列表信息
-                if (s.filters && s.filters.length > 0) {
-                    let len = s.filters.length;
-                    let sf = s.filters;
-                    for (let i = 0; i < len; i++) {
-                        s.cFilters.push(sf[i]);
-                    }
+            if (s._updateInfo.UM) {
+                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+            }
+            if (um || s._updateInfo.UM) {
+                s.cMatrix.setFrom(s._matrix);
+                if (s.parent) {
+                    s.cMatrix.prepend(s.parent.cMatrix);
                 }
-                //判读是否显示对象链上是否有滤镜更新
-                if (s.cFilters.length > 0) {
-                    let cLen = s.cFilters.length;
-                    let isNeedUpdateFilters = false;
-                    if (s.cCacheFilters.length != cLen) {
-                        isNeedUpdateFilters = true;
-                    } else {
-                        for (let i = 0; i < cLen; i++) {
-                            if (s.cFilters[i].toString() != s.cCacheFilters[i]) {
-                                isNeedUpdateFilters = true;
-                                break;
-                            }
+            }
+            if (ua || s._updateInfo.UA){
+                s.cAlpha = s._alpha;
+                if (s.parent) {
+                    s.cAlpha *= s.parent.cAlpha;
+                }
+            }
+            if (uf || s._updateInfo.UF) {
+                s.cFilters.length = 0;
+                let sf = s._filters;
+                let len = sf.length;
+                for (let i = 0; i < len; i++) {
+                    s.cFilters.push(sf[i]);
+                }
+                if (s.parent) {
+                    if (s.parent.cFilters.length > 0) {
+                        let len = s.parent.cFilters.length;
+                        let pf = s.parent.cFilters;
+                        for (let i = len - 1; i >= 0; i--) {
+                            s.cFilters.unshift(pf[i]);
                         }
                     }
-                    if (isNeedUpdateFilters) {
-                        s._isNeedUpdate = true;
-                        s.cCacheFilters.length = 0;
-                        for (let i = 0; i < cLen; i++) {
-                            s.cCacheFilters[i] = s.cFilters[i].toString();
-                        }
-                    }
-                } else if (s.cCacheFilters.length > 0) {
-                    s.cCacheFilters.length = 0;
-                    s._isNeedUpdate = true;
                 }
             }
             //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
@@ -397,7 +530,6 @@ namespace annie {
                 s.dispatchEvent(s._enterFrameEvent);
             }
         }
-
         /**
          * 抽象方法
          * 调用此方法将显示对象渲染到屏幕
@@ -405,6 +537,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
+         * @abstract
          */
         public abstract render(renderObj: IRender): void;
 
@@ -434,13 +567,13 @@ namespace annie {
          * @since 1.0.3
          * @return {number}
          */
-        get width(): number {
+        public get width(): number {
             let s = this;
             let dr = s.getDrawRect();
             return dr.width;
         }
 
-        set width(value: number) {
+        public set width(value: number) {
             let s = this;
             let w = s.width;
             if (value != 0) {
@@ -457,13 +590,13 @@ namespace annie {
          * @since 1.0.3
          * @return {number}
          */
-        get height(): number {
+        public get height(): number {
             let s = this;
             let dr = s.getDrawRect();
             return dr.height;
         }
 
-        set height(value: number) {
+        public set height(value: number) {
             let s = this;
             let h = s.height;
             if (value != 0) {

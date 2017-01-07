@@ -825,6 +825,16 @@ declare namespace annie {
          */
         constructor();
         /**
+         * 更新信息
+         * @property _updateInfo
+         * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+         */
+        protected _updateInfo: {
+            UM: boolean;
+            UA: boolean;
+            UF: boolean;
+        };
+        /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
          * @public
@@ -842,7 +852,7 @@ declare namespace annie {
          * @since 1.0.0
          * @default 1
          */
-        private cAlpha;
+        protected cAlpha: number;
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
@@ -851,7 +861,7 @@ declare namespace annie {
          * @default null
          * @since 1.0.0
          */
-        private cMatrix;
+        protected cMatrix: Matrix;
         /**
          * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
          * @property _enterFrameEvent
@@ -878,25 +888,7 @@ declare namespace annie {
          * @since 1.0.0
          * @type {Array}
          */
-        cFilters: any[];
-        /**
-         * 缓存着的滤镜组信息，通过此信息来判断滤镜是否有更新以此来告诉对象是否需要更新缓存视觉
-         * @property cCacheFilters
-         * @private
-         * @default []
-         * @since 1.0.0
-         * @type {Array}
-         */
-        private cCacheFilters;
-        /**
-         * 是否需要更新缓存的开关
-         * @property _isNeedUpdate
-         * @private
-         * @type {boolean}
-         * @since 1.0.0
-         * @default true
-         */
-        _isNeedUpdate: boolean;
+        protected cFilters: any[];
         /**
          * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -915,6 +907,7 @@ declare namespace annie {
          * @default 0
          */
         x: number;
+        private _x;
         /**
          * 显示对象位置y
          * @property y
@@ -924,6 +917,7 @@ declare namespace annie {
          * @default 0
          */
         y: number;
+        private _y;
         /**
          * 显示对象x方向的缩放值
          * @property scaleX
@@ -933,6 +927,7 @@ declare namespace annie {
          * @default 1
          */
         scaleX: number;
+        private _scaleX;
         /**
          * 显示对象y方向的缩放值
          * @property scaleY
@@ -942,6 +937,7 @@ declare namespace annie {
          * @default 1
          */
         scaleY: number;
+        private _scaleY;
         /**
          * 显示对象旋转角度
          * @property rotation
@@ -951,6 +947,7 @@ declare namespace annie {
          * @default 0
          */
         rotation: number;
+        private _rotation;
         /**
          * 显示对象透明度
          * @property alpha
@@ -960,6 +957,7 @@ declare namespace annie {
          * @default 1
          */
         alpha: number;
+        private _alpha;
         /**
          * 显示对象x方向的斜切值
          * @property skewX
@@ -969,6 +967,7 @@ declare namespace annie {
          * @default 0
          */
         skewX: number;
+        private _skewX;
         /**
          * 显示对象y方向的斜切值
          * @property skewY
@@ -978,6 +977,7 @@ declare namespace annie {
          * @default 0
          */
         skewY: number;
+        private _skewY;
         /**
          * 显示对象上x方向的缩放或旋转点
          * @property anchorX
@@ -987,6 +987,7 @@ declare namespace annie {
          * @default 0
          */
         anchorX: number;
+        private _anchorX;
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
@@ -996,6 +997,7 @@ declare namespace annie {
          * @default 0
          */
         anchorY: number;
+        private _anchorY;
         /**
          * 显未对象是否可见
          * @property visible
@@ -1024,6 +1026,7 @@ declare namespace annie {
          * @default null
          */
         matrix: Matrix;
+        private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
          * @property mask
@@ -1042,6 +1045,7 @@ declare namespace annie {
          * @default null
          */
         filters: any[];
+        private _filters;
         /**
          * 显示对象的父级
          * @property parent
@@ -1052,6 +1056,12 @@ declare namespace annie {
          * @readonly
          */
         parent: Sprite;
+        /**
+         * 是否自己的父级发生的改变
+         * @type {boolean}
+         * @private
+         */
+        protected _cp: boolean;
         /**
          *将全局坐标转换到本地坐标值
          * @method globalToLocal
@@ -1093,6 +1103,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @returns {annie.Rectangle}
+         * @abstract
          */
         abstract getBounds(): Rectangle;
         /**
@@ -1110,7 +1121,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 抽象方法
          * 调用此方法将显示对象渲染到屏幕
@@ -1118,6 +1129,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
+         * @abstract
          */
         abstract render(renderObj: IRender): void;
         /**
@@ -1185,6 +1197,7 @@ declare namespace annie {
          * @default null
          */
         bitmapData: any;
+        private _bitmapData;
         /**
          * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
          * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
@@ -1205,6 +1218,7 @@ declare namespace annie {
          */
         private _cacheImg;
         private _realCacheImg;
+        private _isNeedUpdate;
         /**
          * @property _cacheX
          * @private
@@ -1252,7 +1266,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 重写getBounds
          * 获取Bitmap对象的Bounds
@@ -1309,6 +1323,7 @@ declare namespace annie {
          * @pubic
          */
         static getGradientColor(colors: Array<string>, ratios: Array<number>, points: Array<number>): any;
+        private _isNeedUpdate;
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -1605,7 +1620,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 重写getBounds
          * @method getBounds
@@ -1758,7 +1773,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 重写碰撞测试
          * @method hitTestPoint
@@ -1845,9 +1860,10 @@ declare namespace annie {
          * 暂停播放
          * @method pause
          * @public
-         * @since 1.0.0
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
+         * @since 1.0.4
          */
-        pause(): void;
+        pause(isPause?: boolean): void;
     }
 }
 /**
@@ -2292,7 +2308,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 触发显示列表上相关的事件
          * @method _onDispatchBubbledEvent
@@ -2365,7 +2381,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 重写getBounds
          * @method getBounds
@@ -2419,7 +2435,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
     }
 }
 /**
@@ -2560,7 +2576,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 重写 getBounds
          * @method getBounds
@@ -2910,7 +2926,7 @@ declare namespace annie {
          * 刷新函数
          * @method update
          */
-        update(): void;
+        update(um: boolean, ua: boolean, uf: boolean): void;
         private _touchEvent;
         /**
          * 渲染函数

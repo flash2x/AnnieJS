@@ -1265,6 +1265,12 @@ var annie;
         function DisplayObject() {
             _super.call(this);
             /**
+             * 更新信息
+             * @property _updateInfo
+             * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+             */
+            this._updateInfo = { UM: true, UA: false, UF: false };
+            /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
              * @public
@@ -1320,24 +1326,6 @@ var annie;
              */
             this.cFilters = [];
             /**
-             * 缓存着的滤镜组信息，通过此信息来判断滤镜是否有更新以此来告诉对象是否需要更新缓存视觉
-             * @property cCacheFilters
-             * @private
-             * @default []
-             * @since 1.0.0
-             * @type {Array}
-             */
-            this.cCacheFilters = [];
-            /**
-             * 是否需要更新缓存的开关
-             * @property _isNeedUpdate
-             * @private
-             * @type {boolean}
-             * @since 1.0.0
-             * @default true
-             */
-            this._isNeedUpdate = true;
-            /**
              * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
              * @property name
              * @since 1.0.0
@@ -1346,96 +1334,16 @@ var annie;
              * @default ""
              */
             this.name = "";
-            /**
-             * 显示对象位置x
-             * @property x
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.x = 0;
-            /**
-             * 显示对象位置y
-             * @property y
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.y = 0;
-            /**
-             * 显示对象x方向的缩放值
-             * @property scaleX
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 1
-             */
-            this.scaleX = 1;
-            /**
-             * 显示对象y方向的缩放值
-             * @property scaleY
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 1
-             */
-            this.scaleY = 1;
-            /**
-             * 显示对象旋转角度
-             * @property rotation
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.rotation = 0;
-            /**
-             * 显示对象透明度
-             * @property alpha
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 1
-             */
-            this.alpha = 1;
-            /**
-             * 显示对象x方向的斜切值
-             * @property skewX
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.skewX = 0;
-            /**
-             * 显示对象y方向的斜切值
-             * @property skewY
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.skewY = 0;
-            /**
-             * 显示对象上x方向的缩放或旋转点
-             * @property anchorX
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.anchorX = 0;
-            /**
-             * 显示对象上y方向的缩放或旋转点
-             * @property anchorY
-             * @pubic
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this.anchorY = 0;
+            this._x = 0;
+            this._y = 0;
+            this._scaleX = 1;
+            this._scaleY = 1;
+            this._rotation = 0;
+            this._alpha = 1;
+            this._skewX = 0;
+            this._skewY = 0;
+            this._anchorX = 0;
+            this._anchorY = 0;
             /**
              * 显未对象是否可见
              * @property visible
@@ -1455,15 +1363,7 @@ var annie;
              * @default 0
              */
             this.blendMode = "normal";
-            /**
-             * 显示对象的变形矩阵
-             * @property matrix
-             * @public
-             * @since 1.0.0
-             * @type {annie.Matrix}
-             * @default null
-             */
-            this.matrix = new annie.Matrix();
+            this._matrix = new annie.Matrix();
             /**
              * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
              * @property mask
@@ -1473,15 +1373,7 @@ var annie;
              * @default null
              */
             this.mask = null;
-            /**
-             * 显示对象的滤镜数组
-             * @property filters
-             * @since 1.0.0
-             * @public
-             * @type {Array}
-             * @default null
-             */
-            this.filters = null;
+            this._filters = [];
             /**
              * 显示对象的父级
              * @property parent
@@ -1492,10 +1384,277 @@ var annie;
              * @readonly
              */
             this.parent = null;
+            /**
+             * 是否自己的父级发生的改变
+             * @type {boolean}
+             * @private
+             */
+            this._cp = false;
             //需要用webgl渲染的信息
             this._glInfo = {};
             this._instanceType = "annie.DisplayObject";
         }
+        Object.defineProperty(DisplayObject.prototype, "x", {
+            /**
+             * 显示对象位置x
+             * @property x
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._x;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._x != value) {
+                    s._x = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "y", {
+            /**
+             * 显示对象位置y
+             * @property y
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._y;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._y != value) {
+                    s._y = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        Object.defineProperty(DisplayObject.prototype, "scaleX", {
+            /**
+             * 显示对象x方向的缩放值
+             * @property scaleX
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 1
+             */
+            get: function () {
+                return this._scaleX;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._scaleX != value) {
+                    s._scaleX = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "scaleY", {
+            /**
+             * 显示对象y方向的缩放值
+             * @property scaleY
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 1
+             */
+            get: function () {
+                return this._scaleY;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._scaleY) {
+                    s._scaleY = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "rotation", {
+            /**
+             * 显示对象旋转角度
+             * @property rotation
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._rotation;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._rotation != value) {
+                    s._rotation = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "alpha", {
+            /**
+             * 显示对象透明度
+             * @property alpha
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 1
+             */
+            get: function () {
+                return this._alpha;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._alpha != value) {
+                    s._alpha = value;
+                    s._updateInfo.UA = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "skewX", {
+            /**
+             * 显示对象x方向的斜切值
+             * @property skewX
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._skewX;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._skewX != value) {
+                    s._skewX = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "skewY", {
+            /**
+             * 显示对象y方向的斜切值
+             * @property skewY
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._skewY;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._scaleY != value) {
+                    s._skewY = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "anchorX", {
+            /**
+             * 显示对象上x方向的缩放或旋转点
+             * @property anchorX
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._anchorX;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._anchorX != value) {
+                    s._anchorX = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "anchorY", {
+            /**
+             * 显示对象上y方向的缩放或旋转点
+             * @property anchorY
+             * @pubic
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            get: function () {
+                return this._anchorY;
+            },
+            set: function (value) {
+                var s = this;
+                if (s._anchorY != value) {
+                    s._anchorY = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "matrix", {
+            /**
+             * 显示对象的变形矩阵
+             * @property matrix
+             * @public
+             * @since 1.0.0
+             * @type {annie.Matrix}
+             * @default null
+             */
+            get: function () {
+                return this._matrix;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        Object.defineProperty(DisplayObject.prototype, "filters", {
+            /**
+             * 显示对象的滤镜数组
+             * @property filters
+             * @since 1.0.0
+             * @public
+             * @type {Array}
+             * @default null
+             */
+            get: function () {
+                return this._filters;
+            },
+            set: function (value) {
+                if (value) {
+                    this._filters = value;
+                }
+                else {
+                    this._filters.length = 0;
+                }
+                this._updateInfo.UF = true;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          *将全局坐标转换到本地坐标值
          * @method globalToLocal
@@ -1506,6 +1665,9 @@ var annie;
          */
         DisplayObject.prototype.globalToLocal = function (point, bp) {
             if (bp === void 0) { bp = null; }
+            if (!bp) {
+                bp = annie.DisplayObject._bp;
+            }
             return this.cMatrix.invert().transformPoint(point.x, point.y, bp);
         };
         /**
@@ -1518,6 +1680,9 @@ var annie;
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
+            if (!bp) {
+                bp = annie.DisplayObject._bp;
+            }
             return this.cMatrix.transformPoint(point.x, point.y, bp);
         };
         /**
@@ -1565,60 +1730,42 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        DisplayObject.prototype.update = function () {
+        DisplayObject.prototype.update = function (um, ua, uf) {
             var s = this;
-            s.matrix.createBox(s.x, s.y, s.scaleX, s.scaleY, s.rotation, s.skewX, s.skewY, s.anchorX, s.anchorY);
-            s.cFilters.length = 0;
-            s.cMatrix.setFrom(s.matrix);
-            if (s.parent) {
-                s.cMatrix.prepend(s.parent.cMatrix);
-                s.cAlpha = s.alpha * s.parent.cAlpha;
-                if (s.parent.cFilters && s.parent.cFilters.length > 0) {
-                    var len = s.parent.cFilters.length;
-                    var pf = s.parent.cFilters;
-                    for (var i = 0; i < len; i++) {
-                        s.cFilters[i] = pf[i];
-                    }
+            if (s._cp) {
+                um = ua = uf = true;
+                s._cp = false;
+            }
+            if (s._updateInfo.UM) {
+                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+            }
+            if (um || s._updateInfo.UM) {
+                s.cMatrix.setFrom(s._matrix);
+                if (s.parent) {
+                    s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            else {
-                s.cAlpha = s.alpha;
+            if (ua || s._updateInfo.UA) {
+                s.cAlpha = s._alpha;
+                if (s.parent) {
+                    s.cAlpha *= s.parent.cAlpha;
+                }
             }
-            if (s.visible) {
-                //如果visible为true更新他们的显示列表信息
-                if (s.filters && s.filters.length > 0) {
-                    var len = s.filters.length;
-                    var sf = s.filters;
-                    for (var i = 0; i < len; i++) {
-                        s.cFilters.push(sf[i]);
-                    }
+            if (uf || s._updateInfo.UF) {
+                s.cFilters.length = 0;
+                var sf = s._filters;
+                var len = sf.length;
+                for (var i = 0; i < len; i++) {
+                    s.cFilters.push(sf[i]);
                 }
-                //判读是否显示对象链上是否有滤镜更新
-                if (s.cFilters.length > 0) {
-                    var cLen = s.cFilters.length;
-                    var isNeedUpdateFilters = false;
-                    if (s.cCacheFilters.length != cLen) {
-                        isNeedUpdateFilters = true;
-                    }
-                    else {
-                        for (var i = 0; i < cLen; i++) {
-                            if (s.cFilters[i].toString() != s.cCacheFilters[i]) {
-                                isNeedUpdateFilters = true;
-                                break;
-                            }
+                if (s.parent) {
+                    if (s.parent.cFilters.length > 0) {
+                        var len_1 = s.parent.cFilters.length;
+                        var pf = s.parent.cFilters;
+                        for (var i = len_1 - 1; i >= 0; i--) {
+                            s.cFilters.unshift(pf[i]);
                         }
                     }
-                    if (isNeedUpdateFilters) {
-                        s._isNeedUpdate = true;
-                        s.cCacheFilters.length = 0;
-                        for (var i = 0; i < cLen; i++) {
-                            s.cCacheFilters[i] = s.cFilters[i].toString();
-                        }
-                    }
-                }
-                else if (s.cCacheFilters.length > 0) {
-                    s.cCacheFilters.length = 0;
-                    s._isNeedUpdate = true;
                 }
             }
             //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
@@ -1747,15 +1894,7 @@ var annie;
             if (bitmapData === void 0) { bitmapData = null; }
             if (rect === void 0) { rect = null; }
             _super.call(this);
-            /**
-             * HTML的一个Image对象或者是canvas对象或者是video对象
-             * @property bitmapData
-             * @public
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            this.bitmapData = null;
+            this._bitmapData = null;
             /**
              * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
              * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
@@ -1776,6 +1915,7 @@ var annie;
              */
             this._cacheImg = null;
             this._realCacheImg = null;
+            this._isNeedUpdate = true;
             /**
              * @property _cacheX
              * @private
@@ -1805,6 +1945,21 @@ var annie;
             s.bitmapData = bitmapData;
             s.rect = rect;
         }
+        Object.defineProperty(Bitmap.prototype, "bitmapData", {
+            /**
+             * HTML的一个Image对象或者是canvas对象或者是video对象
+             * @property bitmapData
+             * @public
+             * @since 1.0.0
+             * @type {any}
+             * @default null
+             */
+            get: function () { return this._bitmapData; },
+            set: function (value) { this._bitmapData = value; this._isNeedUpdate = true; },
+            enumerable: true,
+            configurable: true
+        });
+        ;
         /**
          * 重写渲染
          * @method render
@@ -1813,8 +1968,11 @@ var annie;
          * @since 1.0.0
          */
         Bitmap.prototype.render = function (renderObj) {
-            if (this._cacheImg) {
-                renderObj.draw(this, 0);
+            var s = this;
+            if (s.visible && s.cAlpha > 0) {
+                if (s._cacheImg) {
+                    renderObj.draw(s, 0);
+                }
             }
             //super.render();
         };
@@ -1824,75 +1982,80 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        Bitmap.prototype.update = function () {
+        Bitmap.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (!s.bitmapData || (s.bitmapData.nodeName == "IMG" && !s.bitmapData.complete))
-                return;
-            _super.prototype.update.call(this);
-            //滤镜
-            if (s._isNeedUpdate) {
-                if (s["cFilters"] && s["cFilters"].length > 0) {
-                    if (!s._realCacheImg) {
-                        s._realCacheImg = window.document.createElement("canvas");
-                    }
-                    var _canvas = s._realCacheImg;
-                    var tr = s.rect;
-                    var w = tr ? tr.width : s.bitmapData.width;
-                    var h = tr ? tr.height : s.bitmapData.height;
-                    var newW = w + 20;
-                    var newH = h + 20;
-                    _canvas.width = newW;
-                    _canvas.height = newH;
-                    _canvas.style.width = newW / annie.devicePixelRatio + "px";
-                    _canvas.style.height = newH / annie.devicePixelRatio + "px";
-                    var ctx = _canvas.getContext("2d");
-                    ctx.clearRect(0, 0, newW, newH);
-                    ctx.translate(10, 10);
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = "#0";
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                    /////////////////////
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    for (var i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
+            if (s.visible) {
+                if (!s.bitmapData || (s.bitmapData.nodeName == "IMG" && !s.bitmapData.complete))
+                    return;
+                _super.prototype.update.call(this, um, ua, uf);
+                //滤镜
+                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                    s._isNeedUpdate = false;
+                    if (s.cFilters.length > 0) {
+                        if (!s._realCacheImg) {
+                            s._realCacheImg = window.document.createElement("canvas");
                         }
-                    }
-                    ////////////////////
-                    if (tr) {
-                        ctx.drawImage(s.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
+                        var _canvas = s._realCacheImg;
+                        var tr = s.rect;
+                        var w = tr ? tr.width : s.bitmapData.width;
+                        var h = tr ? tr.height : s.bitmapData.height;
+                        var newW = w + 20;
+                        var newH = h + 20;
+                        _canvas.width = newW;
+                        _canvas.height = newH;
+                        _canvas.style.width = newW / annie.devicePixelRatio + "px";
+                        _canvas.style.height = newH / annie.devicePixelRatio + "px";
+                        var ctx = _canvas.getContext("2d");
+                        ctx.clearRect(0, 0, newW, newH);
+                        ctx.translate(10, 10);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowColor = "#0";
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                        /////////////////////
+                        var cf = s.cFilters;
+                        var cfLen = cf.length;
+                        for (var i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                ctx.shadowBlur = cf[i].blur;
+                                ctx.shadowColor = cf[i].color;
+                                ctx.shadowOffsetX = cf[i].offsetX;
+                                ctx.shadowOffsetY = cf[i].offsetY;
+                                break;
+                            }
+                        }
+                        ////////////////////
+                        if (tr) {
+                            ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
+                        }
+                        else {
+                            ctx.drawImage(s._bitmapData, 0, 0);
+                        }
+                        var len = s["cFilters"].length;
+                        var imageData = ctx.getImageData(0, 0, newW, newH);
+                        for (var i = 0; i < len; i++) {
+                            var f = s["cFilters"][i];
+                            f.drawFilter(imageData);
+                        }
+                        ctx.putImageData(imageData, 0, 0);
+                        //s._realCacheImg.src = _canvas.toDataURL("image/png");
+                        s._cacheImg = s._realCacheImg;
+                        s._cacheX = -10;
+                        s._cacheY = -10;
+                        s._isCache = true;
                     }
                     else {
-                        ctx.drawImage(s.bitmapData, 0, 0);
+                        s._isCache = false;
+                        s._cacheX = 0;
+                        s._cacheY = 0;
+                        s._cacheImg = s._bitmapData;
                     }
-                    var len = s["cFilters"].length;
-                    var imageData = ctx.getImageData(0, 0, newW, newH);
-                    for (var i = 0; i < len; i++) {
-                        var f = s["cFilters"][i];
-                        f.drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                    s._cacheImg = s._realCacheImg;
-                    s._cacheX = -10;
-                    s._cacheY = -10;
-                    s._isCache = true;
+                    //给webgl更新新
+                    annie.WGRender.setDisplayInfo(s, 0);
                 }
-                else {
-                    s._isCache = false;
-                    s._cacheX = 0;
-                    s._cacheY = 0;
-                    s._cacheImg = s.bitmapData;
-                }
-                //给webgl更新新
-                s._isNeedUpdate = false;
-                annie.WGRender.setDisplayInfo(s, 0);
+                s._updateInfo.UF = false;
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
             }
         };
         /**
@@ -1975,6 +2138,7 @@ var annie;
              * @default []
              */
             this._command = [];
+            this._isNeedUpdate = true;
             this.useMask = false;
             /**
              * @property _cacheCanvas
@@ -2513,200 +2677,208 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.update = function () {
+        Shape.prototype.update = function (um, ua, uf) {
             var s = this;
-            _super.prototype.update.call(this);
-            if (s._isNeedUpdate) {
-                //更新缓存
-                var cLen = s._command.length;
-                var leftX = void 0;
-                var leftY = void 0;
-                var buttonRightX = void 0;
-                var buttonRightY = void 0;
-                var i = void 0;
-                if (cLen > 0) {
-                    //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
-                    var data = void 0;
-                    var lastX = 0;
-                    var lastY = 0;
-                    var lineWidth = 0;
-                    for (i = 0; i < cLen; i++) {
-                        data = s._command[i];
-                        if (data[0] == 1) {
-                            if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
-                                if (leftX == undefined) {
-                                    leftX = data[2][0];
-                                }
-                                if (leftY == undefined) {
-                                    leftY = data[2][1];
-                                }
-                                if (buttonRightX == undefined) {
-                                    buttonRightX = data[2][0];
-                                }
-                                if (buttonRightY == undefined) {
-                                    buttonRightY = data[2][1];
-                                }
-                                if (data[1] == "bezierCurveTo") {
-                                    leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
-                                    leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
-                                    buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
-                                    buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
-                                    lastX = data[2][4];
-                                    lastY = data[2][5];
-                                }
-                                else {
-                                    leftX = Math.min(leftX, data[2][0]);
-                                    leftY = Math.min(leftY, data[2][1]);
-                                    buttonRightX = Math.max(buttonRightX, data[2][0]);
-                                    buttonRightY = Math.max(buttonRightY, data[2][1]);
-                                    lastX = data[2][0];
-                                    lastY = data[2][1];
-                                }
-                            }
-                            else if (data[1] == "quadraticCurveTo") {
-                                //求中点
-                                var mid1X = (lastX + data[2][0]) * 0.5;
-                                var mid1Y = (lastX + data[2][1]) * 0.5;
-                                var mid2X = (data[2][0] + data[2][2]) * 0.5;
-                                var mid2Y = (data[2][1] + data[2][3]) * 0.5;
-                                if (leftX == undefined) {
-                                    leftX = mid1X;
-                                }
-                                if (leftY == undefined) {
-                                    leftY = mid1Y;
-                                }
-                                if (buttonRightX == undefined) {
-                                    buttonRightX = mid1X;
-                                }
-                                if (buttonRightY == undefined) {
-                                    buttonRightY = mid1Y;
-                                }
-                                leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
-                                leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
-                                buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
-                                buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
-                                lastX = data[2][2];
-                                lastY = data[2][3];
-                            }
-                            else if (data[1] == "arc") {
-                                var yuanPointX = data[2][0];
-                                var yuanPointY = data[2][1];
-                                var radio = data[2][2];
-                                var yuanLeftX = yuanPointX - radio;
-                                var yuanLeftY = yuanPointY - radio;
-                                var yuanBRX = yuanPointX + radio;
-                                var yuanBRY = yuanPointY + radio;
-                                if (leftX == undefined) {
-                                    leftX = yuanLeftX;
-                                }
-                                if (leftY == undefined) {
-                                    leftY = yuanLeftY;
-                                }
-                                if (buttonRightX == undefined) {
-                                    buttonRightX = yuanBRX;
-                                }
-                                if (buttonRightY == undefined) {
-                                    buttonRightY = yuanBRY;
-                                }
-                                leftX = Math.min(leftX, yuanLeftX);
-                                leftY = Math.min(leftY, yuanLeftY);
-                                buttonRightX = Math.max(buttonRightX, yuanBRX);
-                                buttonRightY = Math.max(buttonRightY, yuanBRY);
-                            }
-                        }
-                        else {
-                            if (data[1] == "lineWidth") {
-                                if (lineWidth < data[2]) {
-                                    lineWidth = data[2];
-                                }
-                            }
-                        }
-                    }
-                    if (leftX != undefined) {
-                        leftX -= 20 + lineWidth >> 1;
-                        leftY -= 20 + lineWidth >> 1;
-                        buttonRightX += 20 + lineWidth >> 1;
-                        buttonRightY += 20 + lineWidth >> 1;
-                        var w = buttonRightX - leftX;
-                        var h = buttonRightY - leftY;
-                        s.rect.x = leftX + 20;
-                        s.rect.y = leftY + 20;
-                        s.rect.width = w - 20;
-                        s.rect.height = h - 20;
-                        if (!s.useMask) {
-                            ///////////////////////////
-                            s._cacheX = leftX;
-                            s._cacheY = leftY;
-                            var _canvas = s._cacheImg;
-                            _canvas.width = w;
-                            _canvas.height = h;
-                            _canvas.style.width = w / annie.devicePixelRatio + "px";
-                            _canvas.style.height = h / annie.devicePixelRatio + "px";
-                            var ctx = _canvas["getContext"]('2d');
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                            /////////////////////
-                            if (s["cFilters"] && s["cFilters"].length > 0) {
-                                var cf = s.cFilters;
-                                var cfLen = cf.length;
-                                for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                    if (s.cFilters[i_1].type == "Shadow") {
-                                        ctx.shadowBlur += cf[i_1].blur;
-                                        ctx.shadowColor += cf[i_1].color;
-                                        ctx.shadowOffsetX += cf[i_1].offsetX;
-                                        ctx.shadowOffsetY += cf[i_1].offsetY;
-                                        break;
+            if (s.visible) {
+                _super.prototype.update.call(this, um, ua, uf);
+                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                    //更新缓存
+                    var cLen = s._command.length;
+                    var leftX = void 0;
+                    var leftY = void 0;
+                    var buttonRightX = void 0;
+                    var buttonRightY = void 0;
+                    var i = void 0;
+                    if (cLen > 0) {
+                        //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
+                        var data = void 0;
+                        var lastX = 0;
+                        var lastY = 0;
+                        var lineWidth = 0;
+                        for (i = 0; i < cLen; i++) {
+                            data = s._command[i];
+                            if (data[0] == 1) {
+                                if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
+                                    if (leftX == undefined) {
+                                        leftX = data[2][0];
                                     }
+                                    if (leftY == undefined) {
+                                        leftY = data[2][1];
+                                    }
+                                    if (buttonRightX == undefined) {
+                                        buttonRightX = data[2][0];
+                                    }
+                                    if (buttonRightY == undefined) {
+                                        buttonRightY = data[2][1];
+                                    }
+                                    if (data[1] == "bezierCurveTo") {
+                                        leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
+                                        leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
+                                        buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
+                                        buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
+                                        lastX = data[2][4];
+                                        lastY = data[2][5];
+                                    }
+                                    else {
+                                        leftX = Math.min(leftX, data[2][0]);
+                                        leftY = Math.min(leftY, data[2][1]);
+                                        buttonRightX = Math.max(buttonRightX, data[2][0]);
+                                        buttonRightY = Math.max(buttonRightY, data[2][1]);
+                                        lastX = data[2][0];
+                                        lastY = data[2][1];
+                                    }
+                                }
+                                else if (data[1] == "quadraticCurveTo") {
+                                    //求中点
+                                    var mid1X = (lastX + data[2][0]) * 0.5;
+                                    var mid1Y = (lastX + data[2][1]) * 0.5;
+                                    var mid2X = (data[2][0] + data[2][2]) * 0.5;
+                                    var mid2Y = (data[2][1] + data[2][3]) * 0.5;
+                                    if (leftX == undefined) {
+                                        leftX = mid1X;
+                                    }
+                                    if (leftY == undefined) {
+                                        leftY = mid1Y;
+                                    }
+                                    if (buttonRightX == undefined) {
+                                        buttonRightX = mid1X;
+                                    }
+                                    if (buttonRightY == undefined) {
+                                        buttonRightY = mid1Y;
+                                    }
+                                    leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
+                                    leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
+                                    buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
+                                    buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
+                                    lastX = data[2][2];
+                                    lastY = data[2][3];
+                                }
+                                else if (data[1] == "arc") {
+                                    var yuanPointX = data[2][0];
+                                    var yuanPointY = data[2][1];
+                                    var radio = data[2][2];
+                                    var yuanLeftX = yuanPointX - radio;
+                                    var yuanLeftY = yuanPointY - radio;
+                                    var yuanBRX = yuanPointX + radio;
+                                    var yuanBRY = yuanPointY + radio;
+                                    if (leftX == undefined) {
+                                        leftX = yuanLeftX;
+                                    }
+                                    if (leftY == undefined) {
+                                        leftY = yuanLeftY;
+                                    }
+                                    if (buttonRightX == undefined) {
+                                        buttonRightX = yuanBRX;
+                                    }
+                                    if (buttonRightY == undefined) {
+                                        buttonRightY = yuanBRY;
+                                    }
+                                    leftX = Math.min(leftX, yuanLeftX);
+                                    leftY = Math.min(leftY, yuanLeftY);
+                                    buttonRightX = Math.max(buttonRightX, yuanBRX);
+                                    buttonRightY = Math.max(buttonRightY, yuanBRY);
                                 }
                             }
                             else {
-                                ctx.shadowBlur = 0;
-                                ctx.shadowColor = "#0";
-                                ctx.shadowOffsetX = 0;
-                                ctx.shadowOffsetY = 0;
+                                if (data[1] == "lineWidth") {
+                                    if (lineWidth < data[2]) {
+                                        lineWidth = data[2];
+                                    }
+                                }
                             }
-                            ////////////////////
-                            var data_1;
-                            for (i = 0; i < cLen; i++) {
-                                data_1 = s._command[i];
-                                if (data_1[0] > 0) {
-                                    var paramsLen = data_1[2].length;
-                                    if (paramsLen == 0) {
-                                        ctx[data_1[1]]();
-                                    }
-                                    else if (paramsLen == 2) {
-                                        ctx[data_1[1]](data_1[2][0], data_1[2][1]);
-                                    }
-                                    else if (paramsLen == 4) {
-                                        ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3]);
-                                    }
-                                    else if (paramsLen == 5) {
-                                        ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4]);
-                                    }
-                                    else if (paramsLen == 6) {
-                                        if (data_1[0] == 2) {
-                                            //位图填充
-                                            data_1[2][4] -= leftX;
-                                            data_1[2][5] -= leftY;
+                        }
+                        if (leftX != undefined) {
+                            leftX -= 20 + lineWidth >> 1;
+                            leftY -= 20 + lineWidth >> 1;
+                            buttonRightX += 20 + lineWidth >> 1;
+                            buttonRightY += 20 + lineWidth >> 1;
+                            var w = buttonRightX - leftX;
+                            var h = buttonRightY - leftY;
+                            s.rect.x = leftX + 20;
+                            s.rect.y = leftY + 20;
+                            s.rect.width = w - 20;
+                            s.rect.height = h - 20;
+                            if (!s.useMask) {
+                                ///////////////////////////
+                                s._cacheX = leftX;
+                                s._cacheY = leftY;
+                                var _canvas = s._cacheImg;
+                                _canvas.width = w;
+                                _canvas.height = h;
+                                _canvas.style.width = w / annie.devicePixelRatio + "px";
+                                _canvas.style.height = h / annie.devicePixelRatio + "px";
+                                var ctx = _canvas["getContext"]('2d');
+                                ctx.clearRect(0, 0, w, h);
+                                ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                                /////////////////////
+                                if (s["cFilters"] && s["cFilters"].length > 0) {
+                                    var cf = s.cFilters;
+                                    var cfLen = cf.length;
+                                    for (var i_1 = 0; i_1 < cfLen; i_1++) {
+                                        if (s.cFilters[i_1].type == "Shadow") {
+                                            ctx.shadowBlur += cf[i_1].blur;
+                                            ctx.shadowColor += cf[i_1].color;
+                                            ctx.shadowOffsetX += cf[i_1].offsetX;
+                                            ctx.shadowOffsetY += cf[i_1].offsetY;
+                                            break;
                                         }
-                                        ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4], data_1[2][5]);
                                     }
                                 }
                                 else {
-                                    ctx[data_1[1]] = data_1[2];
+                                    ctx.shadowBlur = 0;
+                                    ctx.shadowColor = "#0";
+                                    ctx.shadowOffsetX = 0;
+                                    ctx.shadowOffsetY = 0;
+                                }
+                                ////////////////////
+                                var data_1;
+                                for (i = 0; i < cLen; i++) {
+                                    data_1 = s._command[i];
+                                    if (data_1[0] > 0) {
+                                        var paramsLen = data_1[2].length;
+                                        if (paramsLen == 0) {
+                                            ctx[data_1[1]]();
+                                        }
+                                        else if (paramsLen == 2) {
+                                            ctx[data_1[1]](data_1[2][0], data_1[2][1]);
+                                        }
+                                        else if (paramsLen == 4) {
+                                            ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3]);
+                                        }
+                                        else if (paramsLen == 5) {
+                                            ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4]);
+                                        }
+                                        else if (paramsLen == 6) {
+                                            if (data_1[0] == 2) {
+                                                //位图填充
+                                                data_1[2][4] -= leftX;
+                                                data_1[2][5] -= leftY;
+                                            }
+                                            ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4], data_1[2][5]);
+                                        }
+                                    }
+                                    else {
+                                        ctx[data_1[1]] = data_1[2];
+                                    }
+                                }
+                                ///////////////////////////
+                                //滤镜
+                                if (s["cFilters"] && s["cFilters"].length > 0) {
+                                    var len = s["cFilters"].length;
+                                    var imageData = ctx.getImageData(0, 0, w, h);
+                                    for (var i_2 = 0; i_2 < len; i_2++) {
+                                        var f = s["cFilters"][i_2];
+                                        f.drawFilter(imageData);
+                                    }
+                                    ctx.putImageData(imageData, 0, 0);
                                 }
                             }
-                            ///////////////////////////
-                            //滤镜
-                            if (s["cFilters"] && s["cFilters"].length > 0) {
-                                var len = s["cFilters"].length;
-                                var imageData = ctx.getImageData(0, 0, w, h);
-                                for (var i_2 = 0; i_2 < len; i_2++) {
-                                    var f = s["cFilters"][i_2];
-                                    f.drawFilter(imageData);
-                                }
-                                ctx.putImageData(imageData, 0, 0);
-                            }
+                        }
+                        else {
+                            s._cacheImg.width = 0;
+                            s._cacheImg.height = 0;
+                            s._cacheX = 0;
+                            s._cacheY = 0;
                         }
                     }
                     else {
@@ -2715,15 +2887,12 @@ var annie;
                         s._cacheX = 0;
                         s._cacheY = 0;
                     }
+                    s._isNeedUpdate = false;
+                    annie.WGRender.setDisplayInfo(s, 1);
                 }
-                else {
-                    s._cacheImg.width = 0;
-                    s._cacheImg.height = 0;
-                    s._cacheX = 0;
-                    s._cacheY = 0;
-                }
-                s._isNeedUpdate = false;
-                annie.WGRender.setDisplayInfo(s, 1);
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
         };
         /**
@@ -3016,6 +3185,7 @@ var annie;
             if (child.parent) {
                 if (!sameParent) {
                     child.parent.removeChild(child);
+                    child["_cp"] = false;
                 }
                 else {
                     len = s.children.length;
@@ -3137,15 +3307,30 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        Sprite.prototype.update = function () {
+        Sprite.prototype.update = function (um, ua, uf) {
             var s = this;
-            _super.prototype.update.call(this);
-            var len = s.children.length;
-            var child;
-            for (var i = len - 1; i >= 0; i--) {
-                child = s.children[i];
-                //因为悬浮的html元素要时时更新来检查他的visible属性
-                child.update();
+            if (s.visible) {
+                _super.prototype.update.call(this, um, ua, uf);
+                if (s._updateInfo.UM) {
+                    um = true;
+                }
+                if (s._updateInfo.UA) {
+                    ua = true;
+                }
+                if (s._updateInfo.UF) {
+                    uf = true;
+                }
+                var len = s.children.length;
+                var child = void 0;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = s.children[i];
+                    //因为悬浮的html元素要时时更新来检查他的visible属性
+                    child.update(um, ua, uf);
+                }
+                //为什么放到这里才设置呢，因为有遮罩可能也要用到这个参数
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
         };
         /**
@@ -3236,7 +3421,7 @@ var annie;
                                     if (s.totalFrames && maskObj.totalFrames) {
                                         maskObj.gotoAndStop(s.currentFrame);
                                     }
-                                    maskObj.update();
+                                    maskObj.update(true);
                                     maskObjIds.push(mId);
                                 }
                                 renderObj.beginMask(maskObj);
@@ -3257,7 +3442,7 @@ var annie;
                                 if (s.totalFrames && maskObj.totalFrames) {
                                     maskObj.gotoAndStop(s.currentFrame);
                                 }
-                                maskObj.update();
+                                maskObj.update(true);
                                 maskObjIds.push(mId);
                             }
                             renderObj.beginMask(maskObj);
@@ -3381,10 +3566,17 @@ var annie;
          * 暂停播放
          * @method pause
          * @public
-         * @since 1.0.0
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
+         * @since 1.0.4
          */
-        Media.prototype.pause = function () {
-            this.media.pause();
+        Media.prototype.pause = function (isPause) {
+            if (isPause === void 0) { isPause = true; }
+            if (isPause) {
+                this.media.pause();
+            }
+            else {
+                this.media.play();
+            }
         };
         return Media;
     }(annie.EventDispatcher));
@@ -4216,168 +4408,167 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        MovieClip.prototype.update = function () {
-            //super.update();
+        MovieClip.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.pauseUpdate)
-                return;
-            if (s._graphicInfo) {
-                //核心代码
-                //loopType,firstFrame,parentFrameIndex
-                var curParentFrameIndex = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
-                var tempCurrentFrame = 1;
-                var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
-                var cStartFrame = s._graphicInfo.firstFrame + 1;
-                if (s._graphicInfo.loopType == "play once") {
-                    if (curParentFrameIndex - pStartFrame >= 0) {
-                        tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
-                        if (tempCurrentFrame > s.totalFrames) {
+            if (s.visible && !s.pauseUpdate) {
+                if (s._graphicInfo) {
+                    //核心代码
+                    //loopType,firstFrame,parentFrameIndex
+                    var curParentFrameIndex = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
+                    var tempCurrentFrame = 1;
+                    var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
+                    var cStartFrame = s._graphicInfo.firstFrame + 1;
+                    if (s._graphicInfo.loopType == "play once") {
+                        if (curParentFrameIndex - pStartFrame >= 0) {
+                            tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
+                            if (tempCurrentFrame > s.totalFrames) {
+                                tempCurrentFrame = s.totalFrames;
+                            }
+                        }
+                    }
+                    else if (s._graphicInfo.loopType == "loop") {
+                        if (curParentFrameIndex - pStartFrame >= 0) {
+                            tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
+                        }
+                        if (tempCurrentFrame == 0) {
                             tempCurrentFrame = s.totalFrames;
                         }
                     }
-                }
-                else if (s._graphicInfo.loopType == "loop") {
-                    if (curParentFrameIndex - pStartFrame >= 0) {
-                        tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
+                    else {
+                        tempCurrentFrame = cStartFrame;
                     }
-                    if (tempCurrentFrame == 0) {
-                        tempCurrentFrame = s.totalFrames;
+                    if (s.currentFrame != tempCurrentFrame) {
+                        s.currentFrame = tempCurrentFrame;
+                        s._isNeedUpdateChildren = true;
+                    }
+                    s.isPlaying = false;
+                }
+                else {
+                    if (s.isPlaying && s._isUpdateFrame) {
+                        //核心代码
+                        if (s.isFront) {
+                            s.currentFrame++;
+                            if (s.currentFrame > s.totalFrames) {
+                                s.currentFrame = 1;
+                            }
+                        }
+                        else {
+                            s.currentFrame--;
+                            if (s.currentFrame < 1) {
+                                s.currentFrame = s.totalFrames;
+                            }
+                        }
+                        s._isNeedUpdateChildren = true;
+                    }
+                }
+                s._isUpdateFrame = true;
+                if (s._isNeedUpdateChildren) {
+                    var layerCount = s._timeline.length;
+                    var frameCount = 0;
+                    var frame = null;
+                    var displayObject = null;
+                    var infoObject = null;
+                    var frameChildrenCount = 0;
+                    var lastFrameChildren = s.children;
+                    var i = void 0;
+                    var frameEvents = [];
+                    for (i = 0; i < s.children.length - 1; i++) {
+                        lastFrameChildren[i].parent = null;
+                    }
+                    s.children = [];
+                    for (i = 0; i < layerCount; i++) {
+                        frameCount = s._timeline[i].length;
+                        if (s.currentFrame <= frameCount) {
+                            frame = s._timeline[i][s.currentFrame - 1];
+                            if (frame == undefined)
+                                continue;
+                            if (frame.keyIndex == (s.currentFrame - 1)) {
+                                if (frame.soundName != "") {
+                                    Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
+                                }
+                                if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
+                                    var event_1 = new annie.Event(annie.Event.CALL_FRAME);
+                                    event_1.data = { frameIndex: s.currentFrame, frameName: frame.eventName };
+                                    frameEvents.push(event_1);
+                                }
+                            }
+                            frameChildrenCount = frame.frameChildList.length;
+                            for (var j = 0; j < frameChildrenCount; j++) {
+                                infoObject = frame.frameChildList[j];
+                                displayObject = infoObject.display;
+                                displayObject.x = infoObject.x;
+                                displayObject.y = infoObject.y;
+                                displayObject.scaleX = infoObject.scaleX;
+                                displayObject.scaleY = infoObject.scaleY;
+                                displayObject.rotation = infoObject.rotation;
+                                displayObject.skewX = infoObject.skewX;
+                                displayObject.skewY = infoObject.skewY;
+                                displayObject.alpha = infoObject.alpha;
+                                if (infoObject.filters) {
+                                    displayObject.filters = infoObject.filters;
+                                }
+                                else {
+                                    displayObject.filters = null;
+                                }
+                                if (infoObject.graphicInfo) {
+                                    displayObject["_graphicInfo"] = infoObject.graphicInfo;
+                                }
+                                else {
+                                    if (displayObject["_graphicInfo"]) {
+                                        displayObject["_graphicInfo"] = null;
+                                    }
+                                }
+                                if (displayObject["_donotUpdateinMC"] != undefined) {
+                                    for (var o in displayObject["_donotUpdateinMC"]) {
+                                        if (displayObject["_donotUpdateinMC"][o] != undefined) {
+                                            displayObject[o] = displayObject["_donotUpdateinMC"][o];
+                                        }
+                                    }
+                                }
+                                displayObject.parent = s;
+                                s.children.push(displayObject);
+                                if (lastFrameChildren.indexOf(displayObject) < 0) {
+                                    displayObject._onDispatchBubbledEvent("onAddToStage");
+                                }
+                            }
+                        }
+                    }
+                    s._isNeedUpdateChildren = false;
+                    //update一定要放在事件处理之前
+                    var len = lastFrameChildren.length;
+                    for (i = 0; i < len; i++) {
+                        if (!lastFrameChildren[i].parent) {
+                            lastFrameChildren[i].parent = s;
+                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                            lastFrameChildren[i].parent = null;
+                        }
+                    }
+                    s.children.push(s.floatView);
+                    _super.prototype.update.call(this, um, ua, uf);
+                    //看看是否到了第一帧，或是最后一帧,如果是准备事件
+                    if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
+                        if (s.hasEventListener(annie.Event.END_FRAME)) {
+                            var event_2 = new annie.Event(annie.Event.END_FRAME);
+                            event_2.data = {
+                                frameIndex: s.currentFrame,
+                                frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
+                            };
+                            frameEvents.push(event_2);
+                        }
+                    }
+                    //看看是否有帧事件,有则派发
+                    len = frameEvents.length;
+                    for (i = 0; i < len; i++) {
+                        s.dispatchEvent(frameEvents[i]);
+                    }
+                    //看看是否有回调,有则调用
+                    if (s._scriptLayer[s.currentFrame - 1] != undefined) {
+                        s._scriptLayer[s.currentFrame - 1]();
                     }
                 }
                 else {
-                    tempCurrentFrame = cStartFrame;
+                    _super.prototype.update.call(this, um, ua, uf);
                 }
-                if (s.currentFrame != tempCurrentFrame) {
-                    s.currentFrame = tempCurrentFrame;
-                    s._isNeedUpdateChildren = true;
-                }
-                s.isPlaying = false;
-            }
-            else {
-                if (s.isPlaying && s._isUpdateFrame) {
-                    //核心代码
-                    if (s.isFront) {
-                        s.currentFrame++;
-                        if (s.currentFrame > s.totalFrames) {
-                            s.currentFrame = 1;
-                        }
-                    }
-                    else {
-                        s.currentFrame--;
-                        if (s.currentFrame < 1) {
-                            s.currentFrame = s.totalFrames;
-                        }
-                    }
-                    s._isNeedUpdateChildren = true;
-                }
-            }
-            s._isUpdateFrame = true;
-            if (s._isNeedUpdateChildren) {
-                var layerCount = s._timeline.length;
-                var frameCount = 0;
-                var frame = null;
-                var displayObject = null;
-                var infoObject = null;
-                var frameChildrenCount = 0;
-                var lastFrameChildren = s.children;
-                var i = void 0;
-                var frameEvents = [];
-                for (i = 0; i < s.children.length - 1; i++) {
-                    lastFrameChildren[i].parent = null;
-                }
-                s.children = [];
-                for (i = 0; i < layerCount; i++) {
-                    frameCount = s._timeline[i].length;
-                    if (s.currentFrame <= frameCount) {
-                        frame = s._timeline[i][s.currentFrame - 1];
-                        if (frame == undefined)
-                            continue;
-                        if (frame.keyIndex == (s.currentFrame - 1)) {
-                            if (frame.soundName != "") {
-                                Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
-                            }
-                            if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
-                                var event_1 = new annie.Event(annie.Event.CALL_FRAME);
-                                event_1.data = { frameIndex: s.currentFrame, frameName: frame.eventName };
-                                frameEvents.push(event_1);
-                            }
-                        }
-                        frameChildrenCount = frame.frameChildList.length;
-                        for (var j = 0; j < frameChildrenCount; j++) {
-                            infoObject = frame.frameChildList[j];
-                            displayObject = infoObject.display;
-                            displayObject.x = infoObject.x;
-                            displayObject.y = infoObject.y;
-                            displayObject.scaleX = infoObject.scaleX;
-                            displayObject.scaleY = infoObject.scaleY;
-                            displayObject.rotation = infoObject.rotation;
-                            displayObject.skewX = infoObject.skewX;
-                            displayObject.skewY = infoObject.skewY;
-                            displayObject.alpha = infoObject.alpha;
-                            if (infoObject.filters) {
-                                displayObject.filters = infoObject.filters;
-                            }
-                            else {
-                                displayObject.filters = null;
-                            }
-                            if (infoObject.graphicInfo) {
-                                displayObject["_graphicInfo"] = infoObject.graphicInfo;
-                            }
-                            else {
-                                if (displayObject["_graphicInfo"]) {
-                                    displayObject["_graphicInfo"] = null;
-                                }
-                            }
-                            if (displayObject["_donotUpdateinMC"] != undefined) {
-                                for (var o in displayObject["_donotUpdateinMC"]) {
-                                    if (displayObject["_donotUpdateinMC"][o] != undefined) {
-                                        displayObject[o] = displayObject["_donotUpdateinMC"][o];
-                                    }
-                                }
-                            }
-                            displayObject.parent = s;
-                            s.children.push(displayObject);
-                            if (lastFrameChildren.indexOf(displayObject) < 0) {
-                                displayObject._onDispatchBubbledEvent("onAddToStage");
-                            }
-                        }
-                    }
-                }
-                s._isNeedUpdateChildren = false;
-                //update一定要放在事件处理之前
-                var len = lastFrameChildren.length;
-                for (i = 0; i < len; i++) {
-                    if (!lastFrameChildren[i].parent) {
-                        lastFrameChildren[i].parent = s;
-                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
-                        lastFrameChildren[i].parent = null;
-                    }
-                }
-                s.children.push(s.floatView);
-                _super.prototype.update.call(this);
-                //看看是否到了第一帧，或是最后一帧,如果是准备事件
-                if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
-                    if (s.hasEventListener(annie.Event.END_FRAME)) {
-                        var event_2 = new annie.Event(annie.Event.END_FRAME);
-                        event_2.data = {
-                            frameIndex: s.currentFrame,
-                            frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
-                        };
-                        frameEvents.push(event_2);
-                    }
-                }
-                //看看是否有帧事件,有则派发
-                len = frameEvents.length;
-                for (i = 0; i < len; i++) {
-                    s.dispatchEvent(frameEvents[i]);
-                }
-                //看看是否有回调,有则调用
-                if (s._scriptLayer[s.currentFrame - 1] != undefined) {
-                    s._scriptLayer[s.currentFrame - 1]();
-                }
-            }
-            else {
-                _super.prototype.update.call(this);
             }
         };
         /**
@@ -4510,39 +4701,40 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        FloatDisplay.prototype.update = function () {
-            _super.prototype.update.call(this);
+        FloatDisplay.prototype.update = function (um, ua, uf) {
+            _super.prototype.update.call(this, um, ua, uf);
             var s = this;
             var o = s.htmlElement;
-            if (!o) {
-                return;
-            }
-            var style = o.style;
-            var visible = s.visible;
-            var parent = s.parent;
-            while (visible && parent) {
-                visible = parent.visible;
-                parent = parent.parent;
-            }
-            var show = visible ? "block" : "none";
-            if (show != style.display) {
-                style.display = show;
-            }
-            if (!s.visible) {
-                return;
-            }
-            var props = new Object;
-            props.alpha = s["cAlpha"];
-            var mtx = s["cMatrix"];
-            var oldProps = s._oldProps;
-            var d = annie.devicePixelRatio;
-            if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
-                style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
-                oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
-            }
-            if (oldProps.alpha != props.alpha) {
-                style.opacity = props.alpha;
-                oldProps.alpha = props.alpha;
+            if (o) {
+                var style = o.style;
+                var visible = s.visible;
+                var parent_1 = s.parent;
+                while (visible && parent_1) {
+                    visible = parent_1.visible;
+                    parent_1 = parent_1.parent;
+                }
+                var show = visible ? "block" : "none";
+                if (show != style.display) {
+                    style.display = show;
+                }
+                if (visible && (um || s._updateInfo.UM)) {
+                    var props = {};
+                    props.alpha = s.cAlpha;
+                    var mtx = s.cMatrix;
+                    var oldProps = s._oldProps;
+                    var d = annie.devicePixelRatio;
+                    if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
+                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
+                        oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
+                    }
+                    if (oldProps.alpha != props.alpha) {
+                        style.opacity = props.alpha;
+                        oldProps.alpha = props.alpha;
+                    }
+                    s._updateInfo.UF = false;
+                    s._updateInfo.UM = false;
+                    s._updateInfo.UA = false;
+                }
             }
         };
         /**
@@ -4631,18 +4823,20 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        VideoPlayer.prototype.update = function () {
+        VideoPlayer.prototype.update = function (um, ua, uf) {
             var s = this;
-            //刷新视频
-            if (s.videoType == 0) {
-                s.video.update();
-                s.rect = this.video.rect;
-                s["_cacheImg"] = s.bitmapData = s.video.currentBitmap;
+            if (s.visible) {
+                //刷新视频
+                if (s.videoType == 0) {
+                    s.video.update(um, ua, uf);
+                    s.rect = this.video.rect;
+                    s["_cacheImg"] = s.bitmapData = s.video.currentBitmap;
+                }
+                else {
+                    s["_cacheImg"] = s.bitmapData = s.video.media;
+                }
+                _super.prototype.update.call(this, um, ua, uf);
             }
-            else {
-                s["_cacheImg"] = s.bitmapData = s.video.media;
-            }
-            _super.prototype.update.call(this);
         };
         return VideoPlayer;
     }(annie.Bitmap));
@@ -4819,137 +5013,140 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        TextField.prototype.update = function () {
+        TextField.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.pauseUpdate)
-                return;
-            _super.prototype.update.call(this);
-            for (var item in s._cacheObject) {
-                if (s._cacheObject[item] != s[item]) {
-                    s._cacheObject[item] = s[item];
-                    s._isNeedUpdate = true;
-                }
-            }
-            if (s._isNeedUpdate) {
-                s.text += "";
-                var can = s._cacheImg;
-                var ctx = can.getContext("2d");
-                var hardLines = s.text.toString().split(/(?:\r\n|\r|\n)/);
-                var realLines = [];
-                s._prepContext(ctx);
-                var lineH = void 0;
-                if (s.lineHeight) {
-                    lineH = s.lineHeight;
-                }
-                else {
-                    lineH = s._getMeasuredWidth("M") * 1.2;
-                }
-                if (!s.lineWidth) {
-                    s.lineWidth = lineH * 10;
-                }
-                else {
-                    if (s.lineWidth < lineH) {
-                        s.lineWidth = lineH;
+            if (!s.pauseUpdate && s.visible) {
+                _super.prototype.update.call(this, um, ua, uf);
+                for (var item in s._cacheObject) {
+                    if (s._cacheObject[item] != s[item]) {
+                        s._cacheObject[item] = s[item];
+                        s._isNeedUpdate = true;
                     }
                 }
-                if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines.push(hardLines[0]);
-                    var str = hardLines[0];
-                    var lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.lineWidth) {
-                        var w = s._getMeasuredWidth(str[0]);
-                        var lineStr = str[0];
-                        var wordW = 0;
-                        var strLen = str.length;
-                        for (var j = 1; j < strLen; j++) {
-                            wordW = ctx.measureText(str[j]).width;
-                            w += wordW;
-                            if (w > s.lineWidth) {
-                                realLines[0] = lineStr;
+                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                    s.text += "";
+                    var can = s._cacheImg;
+                    var ctx = can.getContext("2d");
+                    var hardLines = s.text.toString().split(/(?:\r\n|\r|\n)/);
+                    var realLines = [];
+                    s._prepContext(ctx);
+                    var lineH = void 0;
+                    if (s.lineHeight) {
+                        lineH = s.lineHeight;
+                    }
+                    else {
+                        lineH = s._getMeasuredWidth("M") * 1.2;
+                    }
+                    if (!s.lineWidth) {
+                        s.lineWidth = lineH * 10;
+                    }
+                    else {
+                        if (s.lineWidth < lineH) {
+                            s.lineWidth = lineH;
+                        }
+                    }
+                    if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
+                        realLines.push(hardLines[0]);
+                        var str = hardLines[0];
+                        var lineW = s._getMeasuredWidth(str);
+                        if (lineW > s.lineWidth) {
+                            var w = s._getMeasuredWidth(str[0]);
+                            var lineStr = str[0];
+                            var wordW = 0;
+                            var strLen = str.length;
+                            for (var j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > s.lineWidth) {
+                                    realLines[0] = lineStr;
+                                    break;
+                                }
+                                else {
+                                    lineStr += str[j];
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (var i = 0, l = hardLines.length; i < l; i++) {
+                            var str = hardLines[i];
+                            var w = s._getMeasuredWidth(str[0]);
+                            var lineStr = str[0];
+                            var wordW = 0;
+                            var strLen = str.length;
+                            for (var j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > this.lineWidth) {
+                                    realLines.push(lineStr);
+                                    lineStr = str[j];
+                                    w = wordW;
+                                }
+                                else {
+                                    lineStr += str[j];
+                                }
+                            }
+                            realLines.push(lineStr);
+                        }
+                    }
+                    var maxH = lineH * realLines.length;
+                    var maxW = s.lineWidth;
+                    var tx = 0;
+                    if (s.textAlign == "center") {
+                        tx = maxW * 0.5;
+                    }
+                    else if (s.textAlign == "right") {
+                        tx = maxW;
+                    }
+                    can.width = maxW + 20;
+                    can.height = maxH + 20;
+                    can.style.width = can.width / annie.devicePixelRatio + "px";
+                    can.style.height = can.height / annie.devicePixelRatio + "px";
+                    ctx.clearRect(0, 0, maxW, maxH);
+                    ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
+                    /////////////////////
+                    if (s.cFilters.length > 0) {
+                        var cf = s.cFilters;
+                        var cfLen = cf.length;
+                        for (var i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                ctx.shadowBlur = cf[i].blur;
+                                ctx.shadowColor = cf[i].color;
+                                ctx.shadowOffsetX = cf[i].offsetX;
+                                ctx.shadowOffsetY = cf[i].offsetY;
                                 break;
                             }
-                            else {
-                                lineStr += str[j];
-                            }
                         }
                     }
-                }
-                else {
-                    for (var i = 0, l = hardLines.length; i < l; i++) {
-                        var str = hardLines[i];
-                        var w = s._getMeasuredWidth(str[0]);
-                        var lineStr = str[0];
-                        var wordW = 0;
-                        var strLen = str.length;
-                        for (var j = 1; j < strLen; j++) {
-                            wordW = ctx.measureText(str[j]).width;
-                            w += wordW;
-                            if (w > this.lineWidth) {
-                                realLines.push(lineStr);
-                                lineStr = str[j];
-                                w = wordW;
-                            }
-                            else {
-                                lineStr += str[j];
-                            }
+                    else {
+                        ctx.shadowBlur = 0;
+                        ctx.shadowColor = "#0";
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    }
+                    ////////////////////
+                    s._prepContext(ctx);
+                    for (var i = 0; i < realLines.length; i++) {
+                        ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                    }
+                    //滤镜
+                    var len = s.cFilters.length;
+                    if (len > 0) {
+                        var imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
+                        for (var i = 0; i < len; i++) {
+                            var f = s.cFilters[i];
+                            f.drawFilter(imageData);
                         }
-                        realLines.push(lineStr);
+                        ctx.putImageData(imageData, 0, 0);
                     }
+                    s._cacheX = -10;
+                    s._cacheY = -10;
+                    s._isNeedUpdate = false;
+                    annie.WGRender.setDisplayInfo(s, 2);
                 }
-                var maxH = lineH * realLines.length;
-                var maxW = s.lineWidth;
-                var tx = 0;
-                if (s.textAlign == "center") {
-                    tx = maxW * 0.5;
-                }
-                else if (s.textAlign == "right") {
-                    tx = maxW;
-                }
-                can.width = maxW + 20;
-                can.height = maxH + 20;
-                can.style.width = can.width / annie.devicePixelRatio + "px";
-                can.style.height = can.height / annie.devicePixelRatio + "px";
-                ctx.clearRect(0, 0, maxW, maxH);
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                /////////////////////
-                if (s["cFilters"] && s["cFilters"].length > 0) {
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    for (var i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
-                        }
-                    }
-                }
-                else {
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = "#0";
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                }
-                ////////////////////
-                s._prepContext(ctx);
-                for (var i = 0; i < realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                }
-                //滤镜
-                if (s["cFilters"] && s["cFilters"].length > 0) {
-                    var len = s["cFilters"].length;
-                    var imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
-                    for (var i = 0; i < len; i++) {
-                        var f = s["cFilters"][i];
-                        f.drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-                }
-                s._cacheX = -10;
-                s._cacheY = -10;
-                s._isNeedUpdate = false;
-                annie.WGRender.setDisplayInfo(s, 2);
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
         };
         /**
@@ -5477,7 +5674,7 @@ var annie;
                 if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
                     e.preventDefault();
                 }
-                if (e.type == "touchmove") {
+                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
                     e.preventDefault();
                 }
             };
@@ -5611,7 +5808,8 @@ var annie;
             });
             setTimeout(function () {
                 s.resize();
-                s.update();
+                var su = s._updateInfo;
+                s.update(su.UM, su.UA, su.UF);
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成
@@ -5646,10 +5844,10 @@ var annie;
          * 刷新函数
          * @method update
          */
-        Stage.prototype.update = function () {
+        Stage.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (!s.pause) {
-                _super.prototype.update.call(this);
+            if (!s.pause && s.visible) {
+                _super.prototype.update.call(this, um, ua, uf);
             }
         };
         /**
@@ -5872,14 +6070,15 @@ var annie;
          */
         Stage.prototype.flush = function () {
             var s = this;
+            var su = s._updateInfo;
             if (s._flush == 0) {
-                s.update();
+                s.update(su.UM, su.UA, su.UF);
                 s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update();
+                    s.update(su.UM, su.UA, su.UF);
                     s._currentFlush = s._flush;
                 }
                 else {
@@ -8356,7 +8555,7 @@ var Flash2x;
         else {
             param = "?";
         }
-        jsonpScript.src = url + param + "_a_n_n_i_e_=" + Math.random() + "&callback=" + callbackName;
+        jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
     }
     Flash2x.jsonp = jsonp;
 })(Flash2x || (Flash2x = {}));

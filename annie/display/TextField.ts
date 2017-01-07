@@ -169,129 +169,133 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update():void {
+        public update(um: boolean, ua: boolean, uf: boolean):void {
             let s:any = this;
-            if(s.pauseUpdate)return;
-            super.update();
-            for(let item in s._cacheObject){
-                if(s._cacheObject[item]!=s[item]){
-                    s._cacheObject[item]=s[item];
-                    s._isNeedUpdate=true;
-                }
-            }
-            if(s._isNeedUpdate){
-                s.text+="";
-                let can=s._cacheImg;
-                let ctx = can.getContext("2d");
-                let hardLines:any = s.text.toString().split(/(?:\r\n|\r|\n)/);
-                let realLines:any = [];
-                s._prepContext(ctx);
-                let lineH:number;
-                if (s.lineHeight) {
-                    lineH = s.lineHeight;
-                } else {
-                    lineH = s._getMeasuredWidth("M") * 1.2;
-                }
-                if(!s.lineWidth){
-                    s.lineWidth=lineH*10;
-                }else{
-                    if(s.lineWidth<lineH){
-                        s.lineWidth=lineH;
+            if(!s.pauseUpdate&&s.visible) {
+                super.update(um,ua,uf);
+                for (let item in s._cacheObject) {
+                    if (s._cacheObject[item] != s[item]) {
+                        s._cacheObject[item] = s[item];
+                        s._isNeedUpdate = true;
                     }
                 }
-                if(s.text.indexOf("\n")<0&&s.lineType=="single"){
-                    realLines.push(hardLines[0]);
-                    let str = hardLines[0];
-                    let lineW=s._getMeasuredWidth(str);
-                    if(lineW>s.lineWidth) {
-                        let w=s._getMeasuredWidth(str[0]);
-                        let lineStr = str[0];
-                        let wordW = 0;
-                        let strLen=str.length;
-                        for (let j = 1; j < strLen; j++) {
-                            wordW = ctx.measureText(str[j]).width;
-                            w += wordW;
-                            if (w > s.lineWidth) {
-                                realLines[0] = lineStr;
+                if (s._isNeedUpdate||uf||s._updateInfo.UF) {
+                    s.text += "";
+                    let can = s._cacheImg;
+                    let ctx = can.getContext("2d");
+                    let hardLines: any = s.text.toString().split(/(?:\r\n|\r|\n)/);
+                    let realLines: any = [];
+                    s._prepContext(ctx);
+                    let lineH: number;
+                    if (s.lineHeight) {
+                        lineH = s.lineHeight;
+                    } else {
+                        lineH = s._getMeasuredWidth("M") * 1.2;
+                    }
+                    if (!s.lineWidth) {
+                        s.lineWidth = lineH * 10;
+                    } else {
+                        if (s.lineWidth < lineH) {
+                            s.lineWidth = lineH;
+                        }
+                    }
+                    if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
+                        realLines.push(hardLines[0]);
+                        let str = hardLines[0];
+                        let lineW = s._getMeasuredWidth(str);
+                        if (lineW > s.lineWidth) {
+                            let w = s._getMeasuredWidth(str[0]);
+                            let lineStr = str[0];
+                            let wordW = 0;
+                            let strLen = str.length;
+                            for (let j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > s.lineWidth) {
+                                    realLines[0] = lineStr;
+                                    break;
+                                } else {
+                                    lineStr += str[j];
+                                }
+                            }
+                        }
+                    } else {
+                        for (let i = 0, l = hardLines.length; i < l; i++) {
+                            let str = hardLines[i];
+                            let w = s._getMeasuredWidth(str[0]);
+                            let lineStr = str[0];
+                            let wordW = 0;
+                            let strLen = str.length;
+                            for (let j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > this.lineWidth) {
+                                    realLines.push(lineStr);
+                                    lineStr = str[j];
+                                    w = wordW;
+                                } else {
+                                    lineStr += str[j];
+                                }
+                            }
+                            realLines.push(lineStr);
+                        }
+                    }
+                    let maxH = lineH * realLines.length;
+                    let maxW = s.lineWidth;
+                    let tx = 0;
+                    if (s.textAlign == "center") {
+                        tx = maxW * 0.5;
+                    } else if (s.textAlign == "right") {
+                        tx = maxW;
+                    }
+                    can.width = maxW + 20;
+                    can.height = maxH + 20;
+                    can.style.width = can.width / devicePixelRatio + "px";
+                    can.style.height = can.height / devicePixelRatio + "px";
+                    ctx.clearRect(0, 0, maxW, maxH);
+                    ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
+                    /////////////////////
+                    if (s.cFilters.length > 0) {
+                        let cf = s.cFilters;
+                        let cfLen = cf.length;
+                        for (let i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                ctx.shadowBlur = cf[i].blur;
+                                ctx.shadowColor = cf[i].color;
+                                ctx.shadowOffsetX = cf[i].offsetX;
+                                ctx.shadowOffsetY = cf[i].offsetY;
                                 break;
-                            } else {
-                                lineStr += str[j];
                             }
                         }
+                    } else {
+                        ctx.shadowBlur = 0;
+                        ctx.shadowColor = "#0";
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
                     }
-                }else{
-                    for (let i = 0, l = hardLines.length; i < l; i++) {
-                        let str = hardLines[i];
-                        let w=s._getMeasuredWidth(str[0]);
-                        let lineStr=str[0];
-                        let wordW=0;
-                        let strLen=str.length;
-                        for (let j = 1;j<strLen;j++) {
-                            wordW= ctx.measureText(str[j]).width;
-                            w+=wordW;
-                            if (w>this.lineWidth){
-                                realLines.push(lineStr);
-                                lineStr = str[j];
-                                w=wordW;
-                            } else {
-                               lineStr+=str[j];
-                            }
+                    ////////////////////
+                    s._prepContext(ctx);
+                    for (let i = 0; i < realLines.length; i++) {
+                        ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                    }
+                    //滤镜
+                    let len = s.cFilters.length;
+                    if (len > 0) {
+                        let imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
+                        for (let i = 0; i < len; i++) {
+                            let f: any = s.cFilters[i];
+                            f.drawFilter(imageData);
                         }
-                        realLines.push(lineStr);
+                        ctx.putImageData(imageData, 0, 0);
                     }
+                    s._cacheX = -10;
+                    s._cacheY = -10;
+                    s._isNeedUpdate = false;
+                    WGRender.setDisplayInfo(s, 2);
                 }
-                let maxH=lineH * realLines.length;
-                let maxW=s.lineWidth;
-                let tx = 0;
-                if (s.textAlign == "center") {
-                    tx = maxW * 0.5;
-                } else if (s.textAlign == "right") {
-                    tx = maxW;
-                }
-                can.width = maxW+20;
-                can.height = maxH+20;
-                can.style.width=can.width/devicePixelRatio+"px";
-                can.style.height=can.height/devicePixelRatio+"px";
-                ctx.clearRect(0, 0, maxW, maxH);
-                ctx.setTransform(1, 0, 0, 1, tx+10, 10);
-                /////////////////////
-                if(s["cFilters"]&&s["cFilters"].length>0) {
-                    let cf = s.cFilters;
-                    let cfLen = cf.length;
-                    for (let i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
-                        }
-                    }
-                }else{
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = "#0";
-                    ctx.shadowOffsetX =0;
-                    ctx.shadowOffsetY =0;
-                }
-                ////////////////////
-                s._prepContext(ctx);
-                for (let i = 0; i<realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                }
-                //滤镜
-                if(s["cFilters"]&&s["cFilters"].length>0) {
-                    let len=s["cFilters"].length;
-                    let imageData = ctx.getImageData(0, 0, maxW+20, maxH+20);
-                    for(let i=0;i<len;i++) {
-                        let f:any = s["cFilters"][i];
-                        f.drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData,0,0);
-                }
-                s._cacheX=-10;
-                s._cacheY=-10;
-                s._isNeedUpdate = false;
-                WGRender.setDisplayInfo(s,2);
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
         }
         /**

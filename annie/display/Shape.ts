@@ -48,7 +48,7 @@ namespace annie {
             }
             return colorObj;
         }
-
+        private _isNeedUpdate:boolean=true;
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -653,207 +653,212 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update(): void {
+        public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
-            super.update();
-            if (s._isNeedUpdate) {
-                //更新缓存
-                let cLen: number = s._command.length;
-                let leftX: number;
-                let leftY: number;
-                let buttonRightX: number;
-                let buttonRightY: number;
-                let i: number;
-                if (cLen > 0) {
-                    //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
-                    let data: any;
-                    let lastX = 0;
-                    let lastY = 0;
-                    let lineWidth = 0;
-                    for (i = 0; i < cLen; i++) {
-                        data = s._command[i];
-                        if (data[0] == 1) {
-                            if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
-                                if (leftX == undefined) {
-                                    leftX = data[2][0];
-                                }
-                                if (leftY == undefined) {
-                                    leftY = data[2][1];
-                                }
-                                if (buttonRightX == undefined) {
-                                    buttonRightX = data[2][0];
-                                }
-                                if (buttonRightY == undefined) {
-                                    buttonRightY = data[2][1];
-                                }
-                                if (data[1] == "bezierCurveTo") {
-                                    leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
-                                    leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
-                                    buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
-                                    buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
-                                    lastX = data[2][4];
-                                    lastY = data[2][5];
-                                } else {
-                                    leftX = Math.min(leftX, data[2][0]);
-                                    leftY = Math.min(leftY, data[2][1]);
-                                    buttonRightX = Math.max(buttonRightX, data[2][0]);
-                                    buttonRightY = Math.max(buttonRightY, data[2][1]);
-                                    lastX = data[2][0];
-                                    lastY = data[2][1];
-                                }
-                            } else if (data[1] == "quadraticCurveTo") {
-                                //求中点
-                                let mid1X = (lastX + data[2][0]) * 0.5;
-                                let mid1Y = (lastX + data[2][1]) * 0.5;
-                                let mid2X = (data[2][0] + data[2][2]) * 0.5;
-                                let mid2Y = (data[2][1] + data[2][3]) * 0.5;
-                                if (leftX == undefined) {
-                                    leftX = mid1X;
-                                }
-                                if (leftY == undefined) {
-                                    leftY = mid1Y;
-                                }
-                                if (buttonRightX == undefined) {
-                                    buttonRightX = mid1X;
-                                }
-                                if (buttonRightY == undefined) {
-                                    buttonRightY = mid1Y;
-                                }
-                                leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
-                                leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
-                                buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
-                                buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
-                                lastX = data[2][2];
-                                lastY = data[2][3];
-                            } else if (data[1] == "arc") {
-                                let yuanPointX = data[2][0];
-                                let yuanPointY = data[2][1];
-                                let radio = data[2][2];
-                                let yuanLeftX = yuanPointX - radio;
-                                let yuanLeftY = yuanPointY - radio;
-                                let yuanBRX = yuanPointX + radio;
-                                let yuanBRY = yuanPointY + radio;
-                                if (leftX == undefined) {
-                                    leftX = yuanLeftX;
-                                }
-                                if (leftY == undefined) {
-                                    leftY = yuanLeftY;
-                                }
-                                if (buttonRightX == undefined) {
-                                    buttonRightX = yuanBRX;
-                                }
-                                if (buttonRightY == undefined) {
-                                    buttonRightY = yuanBRY;
-                                }
-                                leftX = Math.min(leftX, yuanLeftX);
-                                leftY = Math.min(leftY, yuanLeftY);
-                                buttonRightX = Math.max(buttonRightX, yuanBRX);
-                                buttonRightY = Math.max(buttonRightY, yuanBRY);
-                            }
-                        } else {
-                            if (data[1] == "lineWidth") {
-                                if (lineWidth < data[2]) {
-                                    lineWidth = data[2];
-                                }
-                            }
-                        }
-                    }
-                    if (leftX != undefined) {
-                        leftX -= 20 + lineWidth >> 1;
-                        leftY -= 20 + lineWidth >> 1;
-                        buttonRightX += 20 + lineWidth >> 1;
-                        buttonRightY += 20 + lineWidth >> 1;
-                        let w = buttonRightX - leftX;
-                        let h = buttonRightY - leftY;
-                        s.rect.x = leftX + 20;
-                        s.rect.y = leftY + 20;
-                        s.rect.width = w - 20;
-                        s.rect.height = h - 20;
-                        if (!s.useMask) {
-                            ///////////////////////////
-                            s._cacheX = leftX;
-                            s._cacheY = leftY;
-                            let _canvas = s._cacheImg;
-                            _canvas.width = w;
-                            _canvas.height = h;
-                            _canvas.style.width = w / devicePixelRatio + "px";
-                            _canvas.style.height = h / devicePixelRatio + "px";
-                            let ctx = _canvas["getContext"]('2d');
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                            /////////////////////
-                            if (s["cFilters"] && s["cFilters"].length > 0) {
-                                let cf = s.cFilters;
-                                let cfLen = cf.length;
-                                for (let i = 0; i < cfLen; i++) {
-                                    if (s.cFilters[i].type == "Shadow") {
-                                        ctx.shadowBlur += cf[i].blur;
-                                        ctx.shadowColor += cf[i].color;
-                                        ctx.shadowOffsetX += cf[i].offsetX;
-                                        ctx.shadowOffsetY += cf[i].offsetY;
-                                        break;
+            if(s.visible) {
+                super.update(um, ua, uf);
+                if (s._isNeedUpdate || uf||s._updateInfo.UF) {
+                    //更新缓存
+                    let cLen: number = s._command.length;
+                    let leftX: number;
+                    let leftY: number;
+                    let buttonRightX: number;
+                    let buttonRightY: number;
+                    let i: number;
+                    if (cLen > 0) {
+                        //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
+                        let data: any;
+                        let lastX = 0;
+                        let lastY = 0;
+                        let lineWidth = 0;
+                        for (i = 0; i < cLen; i++) {
+                            data = s._command[i];
+                            if (data[0] == 1) {
+                                if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
+                                    if (leftX == undefined) {
+                                        leftX = data[2][0];
                                     }
+                                    if (leftY == undefined) {
+                                        leftY = data[2][1];
+                                    }
+                                    if (buttonRightX == undefined) {
+                                        buttonRightX = data[2][0];
+                                    }
+                                    if (buttonRightY == undefined) {
+                                        buttonRightY = data[2][1];
+                                    }
+                                    if (data[1] == "bezierCurveTo") {
+                                        leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
+                                        leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
+                                        buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
+                                        buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
+                                        lastX = data[2][4];
+                                        lastY = data[2][5];
+                                    } else {
+                                        leftX = Math.min(leftX, data[2][0]);
+                                        leftY = Math.min(leftY, data[2][1]);
+                                        buttonRightX = Math.max(buttonRightX, data[2][0]);
+                                        buttonRightY = Math.max(buttonRightY, data[2][1]);
+                                        lastX = data[2][0];
+                                        lastY = data[2][1];
+                                    }
+                                } else if (data[1] == "quadraticCurveTo") {
+                                    //求中点
+                                    let mid1X = (lastX + data[2][0]) * 0.5;
+                                    let mid1Y = (lastX + data[2][1]) * 0.5;
+                                    let mid2X = (data[2][0] + data[2][2]) * 0.5;
+                                    let mid2Y = (data[2][1] + data[2][3]) * 0.5;
+                                    if (leftX == undefined) {
+                                        leftX = mid1X;
+                                    }
+                                    if (leftY == undefined) {
+                                        leftY = mid1Y;
+                                    }
+                                    if (buttonRightX == undefined) {
+                                        buttonRightX = mid1X;
+                                    }
+                                    if (buttonRightY == undefined) {
+                                        buttonRightY = mid1Y;
+                                    }
+                                    leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
+                                    leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
+                                    buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
+                                    buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
+                                    lastX = data[2][2];
+                                    lastY = data[2][3];
+                                } else if (data[1] == "arc") {
+                                    let yuanPointX = data[2][0];
+                                    let yuanPointY = data[2][1];
+                                    let radio = data[2][2];
+                                    let yuanLeftX = yuanPointX - radio;
+                                    let yuanLeftY = yuanPointY - radio;
+                                    let yuanBRX = yuanPointX + radio;
+                                    let yuanBRY = yuanPointY + radio;
+                                    if (leftX == undefined) {
+                                        leftX = yuanLeftX;
+                                    }
+                                    if (leftY == undefined) {
+                                        leftY = yuanLeftY;
+                                    }
+                                    if (buttonRightX == undefined) {
+                                        buttonRightX = yuanBRX;
+                                    }
+                                    if (buttonRightY == undefined) {
+                                        buttonRightY = yuanBRY;
+                                    }
+                                    leftX = Math.min(leftX, yuanLeftX);
+                                    leftY = Math.min(leftY, yuanLeftY);
+                                    buttonRightX = Math.max(buttonRightX, yuanBRX);
+                                    buttonRightY = Math.max(buttonRightY, yuanBRY);
                                 }
                             } else {
-                                ctx.shadowBlur = 0;
-                                ctx.shadowColor = "#0";
-                                ctx.shadowOffsetX = 0;
-                                ctx.shadowOffsetY = 0;
-                            }
-                            ////////////////////
-                            let data: any;
-                            for (i = 0; i < cLen; i++) {
-                                data = s._command[i];
-                                if (data[0] > 0) {
-                                    let paramsLen = data[2].length;
-                                    if (paramsLen == 0) {
-                                        ctx[data[1]]();
-                                    } else if (paramsLen == 2) {
-                                        ctx[data[1]](data[2][0], data[2][1]);
-                                    } else if (paramsLen == 4) {
-                                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
-                                    } else if (paramsLen == 5) {
-                                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
-                                    } else if (paramsLen == 6) {
-                                        if (data[0] == 2) {
-                                            //位图填充
-                                            data[2][4] -= leftX;
-                                            data[2][5] -= leftY;
-                                        }
-                                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                                if (data[1] == "lineWidth") {
+                                    if (lineWidth < data[2]) {
+                                        lineWidth = data[2];
                                     }
-                                } else {
-                                    ctx[data[1]] = data[2];
                                 }
-                            }
-                            ///////////////////////////
-                            //滤镜
-                            if (s["cFilters"] && s["cFilters"].length > 0) {
-                                let len = s["cFilters"].length;
-                                let imageData = ctx.getImageData(0, 0, w, h);
-                                for (let i = 0; i < len; i++) {
-                                    let f: any = s["cFilters"][i];
-                                    f.drawFilter(imageData);
-                                }
-                                ctx.putImageData(imageData, 0, 0);
                             }
                         }
-                        //
+                        if (leftX != undefined) {
+                            leftX -= 20 + lineWidth >> 1;
+                            leftY -= 20 + lineWidth >> 1;
+                            buttonRightX += 20 + lineWidth >> 1;
+                            buttonRightY += 20 + lineWidth >> 1;
+                            let w = buttonRightX - leftX;
+                            let h = buttonRightY - leftY;
+                            s.rect.x = leftX + 20;
+                            s.rect.y = leftY + 20;
+                            s.rect.width = w - 20;
+                            s.rect.height = h - 20;
+                            if (!s.useMask) {
+                                ///////////////////////////
+                                s._cacheX = leftX;
+                                s._cacheY = leftY;
+                                let _canvas = s._cacheImg;
+                                _canvas.width = w;
+                                _canvas.height = h;
+                                _canvas.style.width = w / devicePixelRatio + "px";
+                                _canvas.style.height = h / devicePixelRatio + "px";
+                                let ctx = _canvas["getContext"]('2d');
+                                ctx.clearRect(0, 0, w, h);
+                                ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                                /////////////////////
+                                if (s["cFilters"] && s["cFilters"].length > 0) {
+                                    let cf = s.cFilters;
+                                    let cfLen = cf.length;
+                                    for (let i = 0; i < cfLen; i++) {
+                                        if (s.cFilters[i].type == "Shadow") {
+                                            ctx.shadowBlur += cf[i].blur;
+                                            ctx.shadowColor += cf[i].color;
+                                            ctx.shadowOffsetX += cf[i].offsetX;
+                                            ctx.shadowOffsetY += cf[i].offsetY;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    ctx.shadowBlur = 0;
+                                    ctx.shadowColor = "#0";
+                                    ctx.shadowOffsetX = 0;
+                                    ctx.shadowOffsetY = 0;
+                                }
+                                ////////////////////
+                                let data: any;
+                                for (i = 0; i < cLen; i++) {
+                                    data = s._command[i];
+                                    if (data[0] > 0) {
+                                        let paramsLen = data[2].length;
+                                        if (paramsLen == 0) {
+                                            ctx[data[1]]();
+                                        } else if (paramsLen == 2) {
+                                            ctx[data[1]](data[2][0], data[2][1]);
+                                        } else if (paramsLen == 4) {
+                                            ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
+                                        } else if (paramsLen == 5) {
+                                            ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
+                                        } else if (paramsLen == 6) {
+                                            if (data[0] == 2) {
+                                                //位图填充
+                                                data[2][4] -= leftX;
+                                                data[2][5] -= leftY;
+                                            }
+                                            ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                                        }
+                                    } else {
+                                        ctx[data[1]] = data[2];
+                                    }
+                                }
+                                ///////////////////////////
+                                //滤镜
+                                if (s["cFilters"] && s["cFilters"].length > 0) {
+                                    let len = s["cFilters"].length;
+                                    let imageData = ctx.getImageData(0, 0, w, h);
+                                    for (let i = 0; i < len; i++) {
+                                        let f: any = s["cFilters"][i];
+                                        f.drawFilter(imageData);
+                                    }
+                                    ctx.putImageData(imageData, 0, 0);
+                                }
+                            }
+                            //
+                        } else {
+                            s._cacheImg.width = 0;
+                            s._cacheImg.height = 0;
+                            s._cacheX = 0;
+                            s._cacheY = 0;
+                        }
+
                     } else {
                         s._cacheImg.width = 0;
                         s._cacheImg.height = 0;
                         s._cacheX = 0;
                         s._cacheY = 0;
                     }
-
-                } else {
-                    s._cacheImg.width = 0;
-                    s._cacheImg.height = 0;
-                    s._cacheX = 0;
-                    s._cacheY = 0;
+                    s._isNeedUpdate = false;
+                    WGRender.setDisplayInfo(s, 1);
                 }
-                s._isNeedUpdate = false;
-                WGRender.setDisplayInfo(s, 1);
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
         }
 

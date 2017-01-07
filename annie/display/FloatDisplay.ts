@@ -103,40 +103,42 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update():void{
-            super.update();
+        public update(um: boolean, ua: boolean, uf: boolean):void{
+            super.update(um,ua,uf);
             let s=this;
             let o = s.htmlElement;
-            if (!o) {
-                return;
+            if (o) {
+                let style = o.style;
+                let visible = s.visible;
+                let parent = s.parent;
+                while (visible && parent) {
+                    visible = parent.visible;
+                    parent = parent.parent;
+                }
+                let show = visible ? "block" : "none";
+                if (show != style.display) {
+                    style.display = show;
+                }
+                if (visible&&(um||s._updateInfo.UM)) {
+                    let props: any = {};
+                    props.alpha = s.cAlpha;
+                    let mtx = s.cMatrix;
+                    let oldProps: any = s._oldProps;
+                    let d = annie.devicePixelRatio;
+                    if (!Matrix.isEqual(oldProps.matrix, mtx)) {
+                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
+                        oldProps.matrix = {tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d};
+                    }
+                    if (oldProps.alpha != props.alpha) {
+                        style.opacity = props.alpha;
+                        oldProps.alpha = props.alpha;
+                    }
+                    s._updateInfo.UF=false;
+                    s._updateInfo.UM=false;
+                    s._updateInfo.UA=false;
+                }
             }
-            let style = o.style;
-            let visible=s.visible;
-            let parent=s.parent;
-            while(visible&&parent){
-                visible=parent.visible;
-                parent=parent.parent;
-            }
-            let show = visible ? "block" : "none";
-            if(show!=style.display){
-                style.display = show;
-            }
-            if (!s.visible){
-                return;
-            }
-            let props:any=new Object;
-            props.alpha= s["cAlpha"];
-            let mtx = s["cMatrix"];
-            let oldProps:any = s._oldProps;
-            let d=annie.devicePixelRatio;
-            if (!Matrix.isEqual(oldProps.matrix,mtx)){
-                style.transform = style.webkitTransform="matrix(" + (mtx.a/d) + "," + (mtx.b/d) + "," + (mtx.c/d) + "," + (mtx.d/d) + "," + (mtx.tx/d)+"," + (mtx.ty/d)+")";
-                oldProps.matrix={tx:mtx.tx,ty:mtx.ty,a:mtx.a,b:mtx.b,c:mtx.c,d:mtx.d};
-            }
-            if (oldProps.alpha != props.alpha){
-                style.opacity =props.alpha;
-                oldProps.alpha = props.alpha;
-            }
+
         }
         /**
          * 重写getBounds

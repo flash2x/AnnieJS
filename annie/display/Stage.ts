@@ -272,7 +272,8 @@ namespace annie {
             });
             setTimeout(function () {
                 s.resize();
-                s.update();
+                let su=s._updateInfo;
+                s.update(su.UM,su.UA,su.UF);
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成
@@ -305,10 +306,10 @@ namespace annie {
          * 刷新函数
          * @method update
          */
-        public update():void {
+        public update(um: boolean, ua: boolean, uf: boolean):void {
             let s=this;
-            if(!s.pause) {
-                super.update();
+            if(!s.pause&&s.visible) {
+                super.update(um,ua,uf);
             }
         }
         private _touchEvent:annie.TouchEvent;
@@ -536,13 +537,14 @@ namespace annie {
          */
         private flush():void {
             let s = this;
+            let su=s._updateInfo;
             if (s._flush == 0) {
-                s.update();
+                s.update(su.UM,su.UA,su.UF);
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update();
+                    s.update(su.UM,su.UA,su.UF);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
@@ -655,7 +657,7 @@ namespace annie {
             if((e.type=="touchend")&&(annie.osType=="ios")&&(s.iosTouchendPreventDefault)){
                 e.preventDefault();
             }
-            if(e.type=="touchmove"){
+            if((e.type=="touchmove")||(e.type=="touchstart"&&annie.osType=="android")){
                 e.preventDefault();
             }
         };

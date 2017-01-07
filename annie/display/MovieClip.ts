@@ -504,159 +504,159 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update():void {
-            //super.update();
+        public update(um: boolean, ua: boolean, uf: boolean):void {
             let s:any = this;
-            if (s.pauseUpdate)return;
-            if (s._graphicInfo) {
-                //核心代码
-                //loopType,firstFrame,parentFrameIndex
-                let curParentFrameIndex:number = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
-                let tempCurrentFrame = 1;
-                let pStartFrame = s._graphicInfo.parentFrameIndex + 1;
-                let cStartFrame = s._graphicInfo.firstFrame + 1;
-                if (s._graphicInfo.loopType == "play once") {
-                    if (curParentFrameIndex - pStartFrame >= 0) {
-                        tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
-                        if (tempCurrentFrame > s.totalFrames) {
+            if(s.visible&&!s.pauseUpdate) {
+                if (s._graphicInfo){
+                    //核心代码
+                    //loopType,firstFrame,parentFrameIndex
+                    let curParentFrameIndex: number = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
+                    let tempCurrentFrame = 1;
+                    let pStartFrame = s._graphicInfo.parentFrameIndex + 1;
+                    let cStartFrame = s._graphicInfo.firstFrame + 1;
+                    if (s._graphicInfo.loopType == "play once") {
+                        if (curParentFrameIndex - pStartFrame >= 0) {
+                            tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
+                            if (tempCurrentFrame > s.totalFrames) {
+                                tempCurrentFrame = s.totalFrames;
+                            }
+                        }
+                    } else if (s._graphicInfo.loopType == "loop") {
+                        if (curParentFrameIndex - pStartFrame >= 0) {
+                            tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
+                        }
+                        if (tempCurrentFrame == 0) {
                             tempCurrentFrame = s.totalFrames;
                         }
-                    }
-                } else if (s._graphicInfo.loopType == "loop") {
-                    if (curParentFrameIndex - pStartFrame >= 0) {
-                        tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
-                    }
-                    if (tempCurrentFrame == 0) {
-                        tempCurrentFrame = s.totalFrames;
-                    }
-                } else {
-                    tempCurrentFrame = cStartFrame;
-                }
-                if (s.currentFrame != tempCurrentFrame) {
-                    s.currentFrame = tempCurrentFrame;
-                    s._isNeedUpdateChildren = true;
-                }
-                s.isPlaying = false;
-            } else {
-                if (s.isPlaying && s._isUpdateFrame) {
-                    //核心代码
-                    if (s.isFront) {
-                        s.currentFrame++;
-                        if (s.currentFrame > s.totalFrames) {
-                            s.currentFrame = 1;
-                        }
                     } else {
-                        s.currentFrame--;
-                        if (s.currentFrame < 1) {
-                            s.currentFrame = s.totalFrames;
-                        }
+                        tempCurrentFrame = cStartFrame;
                     }
-                    s._isNeedUpdateChildren = true;
-                }
-            }
-            s._isUpdateFrame = true;
-            if (s._isNeedUpdateChildren) {
-                let layerCount = s._timeline.length;
-                let frameCount = 0;
-                let frame:McFrame = null;
-                let displayObject:any = null;
-                let infoObject:any = null;
-                let frameChildrenCount = 0;
-                let lastFrameChildren = s.children;
-                let i:number;
-                let frameEvents:any = [];
-                for (i = 0; i < s.children.length-1; i++) {
-                    lastFrameChildren[i].parent = null;
-                }
-                s.children = [];
-                for (i = 0; i < layerCount; i++) {
-                    frameCount = s._timeline[i].length;
-                    if (s.currentFrame <= frameCount) {
-                        frame = s._timeline[i][s.currentFrame - 1];
-                        if (frame == undefined)continue;
-                        if (frame.keyIndex == (s.currentFrame - 1)) {
-                            if (frame.soundName != "") {
-                                Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
+                    if (s.currentFrame != tempCurrentFrame) {
+                        s.currentFrame = tempCurrentFrame;
+                        s._isNeedUpdateChildren = true;
+                    }
+                    s.isPlaying = false;
+                } else {
+                    if (s.isPlaying && s._isUpdateFrame) {
+                        //核心代码
+                        if (s.isFront) {
+                            s.currentFrame++;
+                            if (s.currentFrame > s.totalFrames) {
+                                s.currentFrame = 1;
                             }
-                            if (frame.eventName != "" && s.hasEventListener(Event.CALL_FRAME)) {
-                                let event = new Event(Event.CALL_FRAME);
-                                event.data = {frameIndex: s.currentFrame, frameName: frame.eventName};
-                                frameEvents.push(event);
+                        } else {
+                            s.currentFrame--;
+                            if (s.currentFrame < 1) {
+                                s.currentFrame = s.totalFrames;
                             }
                         }
-                        frameChildrenCount = frame.frameChildList.length;
-                        for (let j = 0; j < frameChildrenCount; j++) {
-                            infoObject = frame.frameChildList[j];
-                            displayObject = infoObject.display;
-                            displayObject.x = infoObject.x;
-                            displayObject.y = infoObject.y;
-                            displayObject.scaleX = infoObject.scaleX;
-                            displayObject.scaleY = infoObject.scaleY;
-                            displayObject.rotation = infoObject.rotation;
-                            displayObject.skewX = infoObject.skewX;
-                            displayObject.skewY = infoObject.skewY;
-                            displayObject.alpha = infoObject.alpha;
-                            if (infoObject.filters) {
-                                displayObject.filters = infoObject.filters;
-                            } else {
-                                displayObject.filters = null;
-                            }
-                            if (infoObject.graphicInfo) {
-                                displayObject["_graphicInfo"] = infoObject.graphicInfo;
-                            } else {
-                                if (displayObject["_graphicInfo"]) {
-                                    displayObject["_graphicInfo"] = null;
+                        s._isNeedUpdateChildren = true;
+                    }
+                }
+                s._isUpdateFrame = true;
+                if (s._isNeedUpdateChildren) {
+                    let layerCount = s._timeline.length;
+                    let frameCount = 0;
+                    let frame: McFrame = null;
+                    let displayObject: any = null;
+                    let infoObject: any = null;
+                    let frameChildrenCount = 0;
+                    let lastFrameChildren = s.children;
+                    let i: number;
+                    let frameEvents: any = [];
+                    for (i = 0; i < s.children.length - 1; i++) {
+                        lastFrameChildren[i].parent = null;
+                    }
+                    s.children = [];
+                    for (i = 0; i < layerCount; i++) {
+                        frameCount = s._timeline[i].length;
+                        if (s.currentFrame <= frameCount) {
+                            frame = s._timeline[i][s.currentFrame - 1];
+                            if (frame == undefined)continue;
+                            if (frame.keyIndex == (s.currentFrame - 1)) {
+                                if (frame.soundName != "") {
+                                    Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
+                                }
+                                if (frame.eventName != "" && s.hasEventListener(Event.CALL_FRAME)) {
+                                    let event = new Event(Event.CALL_FRAME);
+                                    event.data = {frameIndex: s.currentFrame, frameName: frame.eventName};
+                                    frameEvents.push(event);
                                 }
                             }
-                            if (displayObject["_donotUpdateinMC"] != undefined) {
-                                for (let o in displayObject["_donotUpdateinMC"]) {
-                                    if (displayObject["_donotUpdateinMC"][o] != undefined) {
-                                        displayObject[o] = displayObject["_donotUpdateinMC"][o];
+                            frameChildrenCount = frame.frameChildList.length;
+                            for (let j = 0; j < frameChildrenCount; j++) {
+                                infoObject = frame.frameChildList[j];
+                                displayObject = infoObject.display;
+                                displayObject.x = infoObject.x;
+                                displayObject.y = infoObject.y;
+                                displayObject.scaleX = infoObject.scaleX;
+                                displayObject.scaleY = infoObject.scaleY;
+                                displayObject.rotation = infoObject.rotation;
+                                displayObject.skewX = infoObject.skewX;
+                                displayObject.skewY = infoObject.skewY;
+                                displayObject.alpha = infoObject.alpha;
+                                if (infoObject.filters) {
+                                    displayObject.filters = infoObject.filters;
+                                } else {
+                                    displayObject.filters = null;
+                                }
+                                if (infoObject.graphicInfo) {
+                                    displayObject["_graphicInfo"] = infoObject.graphicInfo;
+                                } else {
+                                    if (displayObject["_graphicInfo"]) {
+                                        displayObject["_graphicInfo"] = null;
                                     }
                                 }
-                            }
-                            displayObject.parent = s;
-                            s.children.push(displayObject);
-                            if (lastFrameChildren.indexOf(displayObject) < 0) {
-                                displayObject._onDispatchBubbledEvent("onAddToStage");
+                                if (displayObject["_donotUpdateinMC"] != undefined) {
+                                    for (let o in displayObject["_donotUpdateinMC"]) {
+                                        if (displayObject["_donotUpdateinMC"][o] != undefined) {
+                                            displayObject[o] = displayObject["_donotUpdateinMC"][o];
+                                        }
+                                    }
+                                }
+                                displayObject.parent = s;
+                                s.children.push(displayObject);
+                                if (lastFrameChildren.indexOf(displayObject) < 0) {
+                                    displayObject._onDispatchBubbledEvent("onAddToStage");
+                                }
                             }
                         }
                     }
-                }
-                s._isNeedUpdateChildren = false;
-                //update一定要放在事件处理之前
-                let len = lastFrameChildren.length;
-                for (i = 0; i < len; i++) {
-                    if (!lastFrameChildren[i].parent){
-                        lastFrameChildren[i].parent=s;
-                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage",true);
-                        lastFrameChildren[i].parent=null;
+                    s._isNeedUpdateChildren = false;
+                    //update一定要放在事件处理之前
+                    let len = lastFrameChildren.length;
+                    for (i = 0; i < len; i++) {
+                        if (!lastFrameChildren[i].parent) {
+                            lastFrameChildren[i].parent = s;
+                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                            lastFrameChildren[i].parent = null;
+                        }
                     }
-                }
-                s.children.push(s.floatView);
-                super.update();
-                //看看是否到了第一帧，或是最后一帧,如果是准备事件
-                if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
-                    if (s.hasEventListener(Event.END_FRAME)) {
-                        let event = new Event(Event.END_FRAME);
-                        event.data = {
-                            frameIndex: s.currentFrame,
-                            frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
-                        };
-                        frameEvents.push(event);
+                    s.children.push(s.floatView);
+                    super.update(um,ua,uf);
+                    //看看是否到了第一帧，或是最后一帧,如果是准备事件
+                    if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
+                        if (s.hasEventListener(Event.END_FRAME)) {
+                            let event = new Event(Event.END_FRAME);
+                            event.data = {
+                                frameIndex: s.currentFrame,
+                                frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
+                            };
+                            frameEvents.push(event);
+                        }
                     }
+                    //看看是否有帧事件,有则派发
+                    len = frameEvents.length;
+                    for (i = 0; i < len; i++) {
+                        s.dispatchEvent(frameEvents[i]);
+                    }
+                    //看看是否有回调,有则调用
+                    if (s._scriptLayer[s.currentFrame - 1] != undefined) {
+                        s._scriptLayer[s.currentFrame - 1]();
+                    }
+                } else {
+                    super.update(um,ua,uf);
                 }
-                //看看是否有帧事件,有则派发
-                len = frameEvents.length;
-                for (i = 0; i < len; i++) {
-                    s.dispatchEvent(frameEvents[i]);
-                }
-                //看看是否有回调,有则调用
-                if (s._scriptLayer[s.currentFrame - 1] != undefined) {
-                    s._scriptLayer[s.currentFrame - 1]();
-                }
-            }else{
-                super.update();
             }
         }
         /**

@@ -13,7 +13,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class Sprite extends DisplayObject {
-        public constructor() {
+        public constructor(){
             super();
             this._instanceType="annie.Sprite";
         }
@@ -137,6 +137,7 @@ namespace annie {
             if (child.parent) {
                 if(!sameParent) {
                     child.parent.removeChild(child);
+                    child["_cp"]=true;
                 }else{
                      len=s.children.length;
                     for (let i = 0; i < len; i++) {
@@ -250,15 +251,29 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update():void {
+        public update(um: boolean, ua: boolean, uf: boolean):void {
             let s = this;
-            super.update();
-            let len=s.children.length;
-            let child:any;
-            for (let i = len-1; i>=0; i--) {
-                child=s.children[i];
-                //因为悬浮的html元素要时时更新来检查他的visible属性
-                child.update();
+            if(s.visible) {
+                super.update(um, ua, uf);
+                if (s._updateInfo.UM) {
+                    um = true;
+                }
+                if (s._updateInfo.UA) {
+                    ua = true;
+                }
+                if (s._updateInfo.UF) {
+                    uf = true;
+                }
+                let len = s.children.length;
+                let child: any;
+                for (let i = len - 1; i >= 0; i--){
+                    child = s.children[i];
+                    //因为悬浮的html元素要时时更新来检查他的visible属性
+                    child.update(um, ua, uf);
+                }
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
         }
         /**
@@ -346,7 +361,7 @@ namespace annie {
                                     if(s.totalFrames&&maskObj.totalFrames) {
                                         maskObj.gotoAndStop(s.currentFrame);
                                     }
-                                    maskObj.update();
+                                    maskObj .update(true);
                                     maskObjIds.push(mId);
                                 }
                                 renderObj.beginMask(maskObj);
@@ -365,7 +380,7 @@ namespace annie {
                                 if(s.totalFrames&&maskObj.totalFrames) {
                                     maskObj.gotoAndStop(s.currentFrame);
                                 }
-                                maskObj.update();
+                                maskObj.update(true);
                                 maskObjIds.push(mId);
                             }
                             renderObj.beginMask(maskObj);

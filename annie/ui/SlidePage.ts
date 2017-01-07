@@ -244,7 +244,6 @@ namespace annieUI {
             s.slideCon = new annie.Sprite();
             for (var i = 0; i < s.listLen; i++) {
                 s.pageList[i].pageId = i;
-                s.pageList[i].visible = true;
                 s.pageList[i].canSlidePrev = true;
                 s.pageList[i].canSlideNext = true;
                 if (s.isVertical) {
@@ -252,7 +251,6 @@ namespace annieUI {
                 } else {
                     s.pageList[i].x = i * s.stageW;
                 }
-                s.pageList[0].visible = true;
                 s.slideCon.addChild(s.pageList[i]);
             }
             if (s.isMoving) {
@@ -328,7 +326,6 @@ namespace annieUI {
                             if (!s.canSlideNext || !s.pageList[s.currentPageIndex].canSlideNext) {
                                 return;
                             }
-                            // s.pageList[s.currentPageIndex + 1].visible = true;
                             s.currentPageIndex++;
                             s.slideToIndex(s.currentPageIndex);
                         } else {
@@ -346,7 +343,6 @@ namespace annieUI {
                             if (!s.canSlidePrev || !s.pageList[s.currentPageIndex].canSlidePrev) {
                                 return;
                             }
-                            // s.pageList[s.currentPageIndex - 1].visible = true;
                             s.currentPageIndex--;
                             s.slideToIndex(s.currentPageIndex);
                         } else {
@@ -425,7 +421,6 @@ namespace annieUI {
             // console.log('addLisLen:'+addListLen);
             for (var i = 0; i < addListLen; i++) {
                 list[i].pageId = s.listLen;
-                list[i].visible = true;
                 list[i].canSlidePrev = true;
                 list[i].canSlideNext = true;
                 if (s.isVertical) {
