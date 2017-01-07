@@ -43,7 +43,6 @@ namespace annie {
         private _maskSrcTexture: any = null;
         private _textures: any = [];
         private _curTextureId: number = -1;
-
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -282,7 +281,6 @@ namespace annie {
             gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
             gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
         }
-
         /**
          *  调用渲染
          * @public

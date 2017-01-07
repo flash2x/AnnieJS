@@ -293,13 +293,13 @@ namespace annie {
             let rc = s.renderObj.rootContainer;
             let mouseEvent=s.onMouseEvent.bind(s);
             if (osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent);
-                rc.addEventListener('touchmove', mouseEvent);
-                rc.addEventListener('touchend', mouseEvent);
+                rc.addEventListener("touchstart", mouseEvent,false);
+                rc.addEventListener('touchmove', mouseEvent,false);
+                rc.addEventListener('touchend', mouseEvent,false);
             } else {
-                rc.addEventListener("mousedown", mouseEvent);
-                rc.addEventListener('mousemove',mouseEvent);
-                rc.addEventListener('mouseup', mouseEvent);
+                rc.addEventListener("mousedown", mouseEvent,false);
+                rc.addEventListener('mousemove',mouseEvent,false);
+                rc.addEventListener('mouseup', mouseEvent,false);
             }
         }
         /**

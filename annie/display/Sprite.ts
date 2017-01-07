@@ -1,7 +1,7 @@
 /**
  * @module annie
  */
-namespace annie {
+namespace annie{
     /**
      * 显示对象的容器类,可以将其他显示对象放入其中,是annie引擎的核心容器类.
      * Sprite 类是基本显示列表构造块：一个可显示图形并且也可包含子项的显示列表节点。
@@ -121,7 +121,6 @@ namespace annie {
                 return elements;
             }
         }
-
         /**
          * 添加一个child到Sprite中并指定添加到哪个层级
          * @method addChildAt
@@ -252,7 +251,7 @@ namespace annie {
          * @since 1.0.0
          */
         public update(um: boolean, ua: boolean, uf: boolean):void {
-            let s = this;
+            let s:any = this;
             if(s.visible) {
                 super.update(um, ua, uf);
                 if (s._updateInfo.UM) {
@@ -266,10 +265,20 @@ namespace annie {
                 }
                 let len = s.children.length;
                 let child: any;
+                let maskObjIds:any = [];
                 for (let i = len - 1; i >= 0; i--){
                     child = s.children[i];
-                    //因为悬浮的html元素要时时更新来检查他的visible属性
                     child.update(um, ua, uf);
+                    //更新遮罩
+                    if(child.mask&&(maskObjIds.indexOf(child.mask.instanceId)<0)&&child.visible&&child.alpha){
+                        if(s.totalFrames&&child.mask.totalFrames) {
+                            child.mask.gotoAndStop(s.currentFrame);
+                        }
+                        child.mask.parent=s;
+                        child.mask.update(um,ua,uf);
+                        child.mask.parent=null;
+                        maskObjIds.push(child.mask.instanceId);
+                    }
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -331,7 +340,6 @@ namespace annie {
             }
           return rect;
         }
-
         /**
          * 重写渲染
          * @method render
@@ -342,7 +350,6 @@ namespace annie {
         public render(renderObj:IRender):void {
             let s:any = this;
             let maskObj:any;
-            let maskObjIds:any = [];
             let child:any;
             let len:number= s.children.length;
             for (let i = 0; i < len; i++) {
@@ -353,17 +360,6 @@ namespace annie {
                             if (child.mask != maskObj) {
                                 renderObj.endMask();
                                 maskObj = child.mask;
-                                let mId:number = maskObj.instanceId;
-                                //就是检测遮罩是否被更新过。因为动画遮罩反复更新的话他会播放同一次渲染要确定只能更新一回。
-                                if (maskObjIds.indexOf(mId) < 0) {
-                                    maskObj.parent=s;
-                                    maskObj.stage=s.stage;
-                                    if(s.totalFrames&&maskObj.totalFrames) {
-                                        maskObj.gotoAndStop(s.currentFrame);
-                                    }
-                                    maskObj .update(true);
-                                    maskObjIds.push(mId);
-                                }
                                 renderObj.beginMask(maskObj);
                             }
                         } else {
@@ -373,16 +369,6 @@ namespace annie {
                     } else {
                         if (child.mask) {
                             maskObj = child.mask;
-                            let mId:number = maskObj.instanceId;
-                            if (maskObjIds.indexOf(mId) < 0) {
-                                maskObj.parent=s;
-                                maskObj.stage=s.stage;
-                                if(s.totalFrames&&maskObj.totalFrames) {
-                                    maskObj.gotoAndStop(s.currentFrame);
-                                }
-                                maskObj.update(true);
-                                maskObjIds.push(mId);
-                            }
                             renderObj.beginMask(maskObj);
                         }
                     }

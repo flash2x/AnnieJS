@@ -236,7 +236,6 @@ namespace annie {
             s._currentLayerFrame.setDisplayInfo(display, displayBaseInfo, displayExtendInfo);
             return s;
         }
-
         //setGraphic
         /**
          * Flash2x工具调用的方法,用户一般不需要使用

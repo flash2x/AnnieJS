@@ -3185,7 +3185,7 @@ var annie;
             if (child.parent) {
                 if (!sameParent) {
                     child.parent.removeChild(child);
-                    child["_cp"] = false;
+                    child["_cp"] = true;
                 }
                 else {
                     len = s.children.length;
@@ -3322,12 +3322,21 @@ var annie;
                 }
                 var len = s.children.length;
                 var child = void 0;
+                var maskObjIds = [];
                 for (var i = len - 1; i >= 0; i--) {
                     child = s.children[i];
-                    //因为悬浮的html元素要时时更新来检查他的visible属性
                     child.update(um, ua, uf);
+                    //更新遮罩
+                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
+                        if (s.totalFrames && child.mask.totalFrames) {
+                            child.mask.gotoAndStop(s.currentFrame);
+                        }
+                        child.mask.parent = s;
+                        child.mask.update(um, ua, uf);
+                        child.mask.parent = null;
+                        maskObjIds.push(child.mask.instanceId);
+                    }
                 }
-                //为什么放到这里才设置呢，因为有遮罩可能也要用到这个参数
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
                 s._updateInfo.UF = false;
@@ -3402,7 +3411,6 @@ var annie;
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             var maskObj;
-            var maskObjIds = [];
             var child;
             var len = s.children.length;
             for (var i = 0; i < len; i++) {
@@ -3413,17 +3421,6 @@ var annie;
                             if (child.mask != maskObj) {
                                 renderObj.endMask();
                                 maskObj = child.mask;
-                                var mId = maskObj.instanceId;
-                                //就是检测遮罩是否被更新过。因为动画遮罩反复更新的话他会播放同一次渲染要确定只能更新一回。
-                                if (maskObjIds.indexOf(mId) < 0) {
-                                    maskObj.parent = s;
-                                    maskObj.stage = s.stage;
-                                    if (s.totalFrames && maskObj.totalFrames) {
-                                        maskObj.gotoAndStop(s.currentFrame);
-                                    }
-                                    maskObj.update(true);
-                                    maskObjIds.push(mId);
-                                }
                                 renderObj.beginMask(maskObj);
                             }
                         }
@@ -3435,16 +3432,6 @@ var annie;
                     else {
                         if (child.mask) {
                             maskObj = child.mask;
-                            var mId = maskObj.instanceId;
-                            if (maskObjIds.indexOf(mId) < 0) {
-                                maskObj.parent = s;
-                                maskObj.stage = s.stage;
-                                if (s.totalFrames && maskObj.totalFrames) {
-                                    maskObj.gotoAndStop(s.currentFrame);
-                                }
-                                maskObj.update(true);
-                                maskObjIds.push(mId);
-                            }
                             renderObj.beginMask(maskObj);
                         }
                     }
@@ -5830,14 +5817,14 @@ var annie;
             var rc = s.renderObj.rootContainer;
             var mouseEvent = s.onMouseEvent.bind(s);
             if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent);
-                rc.addEventListener('touchmove', mouseEvent);
-                rc.addEventListener('touchend', mouseEvent);
+                rc.addEventListener("touchstart", mouseEvent, false);
+                rc.addEventListener('touchmove', mouseEvent, false);
+                rc.addEventListener('touchend', mouseEvent, false);
             }
             else {
-                rc.addEventListener("mousedown", mouseEvent);
-                rc.addEventListener('mousemove', mouseEvent);
-                rc.addEventListener('mouseup', mouseEvent);
+                rc.addEventListener("mousedown", mouseEvent, false);
+                rc.addEventListener('mousemove', mouseEvent, false);
+                rc.addEventListener('mouseup', mouseEvent, false);
             }
         }
         /**

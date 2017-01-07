@@ -650,7 +650,7 @@ var annieUI;
                 s.slideCon.mouseChildren = false;
             }
             s.slideCon.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEventHandler.bind(s));
-            s.slideCon.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
+            //s.slideCon.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
             s.slideCon.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEventHandler.bind(s));
             s.addChild(s.slideCon);
         };
@@ -669,36 +669,6 @@ var annieUI;
                 s.isMouseDown = true;
             }
             else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown) {
-                    return;
-                }
-                s.touchEndX = e.stageX;
-                s.touchEndY = e.stageY;
-                // s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
-                if (s.isVertical) {
-                    if (s.currentPageIndex == 0) {
-                        if (s.touchStartY < s.touchEndY) {
-                            s.slideCon.y += Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
-                        }
-                    }
-                    if (s.currentPageIndex == s.listLen - 1) {
-                        if (s.touchStartY > s.touchEndY) {
-                            s.slideCon.y -= Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
-                        }
-                    }
-                }
-                else {
-                    if (s.currentPageIndex == 0) {
-                        if (s.touchStartX < s.touchEndX) {
-                            s.slideCon.x += Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
-                        }
-                    }
-                    if (s.currentPageIndex == s.listLen - 1) {
-                        if (s.touchStartX > s.touchEndX) {
-                            s.slideCon.x -= Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
-                        }
-                    }
-                }
             }
             else if (e.type == annie.MouseEvent.MOUSE_UP) {
                 if (s.isMoving) {
