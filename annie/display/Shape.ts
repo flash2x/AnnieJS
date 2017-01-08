@@ -840,7 +840,7 @@ namespace annie {
                         s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
-                    WGRender.setDisplayInfo(s, 1);
+                    //WGRender.setDisplayInfo(s, 1);
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;

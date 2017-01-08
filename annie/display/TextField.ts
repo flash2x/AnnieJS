@@ -291,7 +291,7 @@ namespace annie {
                     s._cacheX = -10;
                     s._cacheY = -10;
                     s._isNeedUpdate = false;
-                    WGRender.setDisplayInfo(s, 2);
+                    //WGRender.setDisplayInfo(s, 2);
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
