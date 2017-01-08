@@ -1334,7 +1334,17 @@ declare namespace annie {
          * @since 1.0.0
          */
         static getBitmapStyle(image: any): any;
-        useMask: boolean;
+        /**
+         * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
+         * 默认将不开启
+         * @property cacheAsBitmap
+         * @public
+         * @since 1.0.4
+         * @type {boolean}
+         * @default false
+         */
+        cacheAsBitmap: boolean;
+        private _cAb;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -1621,6 +1631,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(um: boolean, ua: boolean, uf: boolean): void;
+        private _drawShape(ctx);
         /**
          * 重写getBounds
          * @method getBounds

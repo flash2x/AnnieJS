@@ -63,8 +63,18 @@ namespace annie {
             return ctx.createPattern(image, "repeat");
         }
 
-        public useMask: boolean = false;
-
+        /**
+         * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
+         * 默认将不开启
+         * @property cacheAsBitmap
+         * @public
+         * @since 1.0.4
+         * @type {boolean}
+         * @default false
+         */
+        public get cacheAsBitmap():boolean{return this._cAb;}
+        public set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
+        private _cAb:boolean=false;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -111,7 +121,7 @@ namespace annie {
          * @type {boolean}
          * @default true
          */
-        public hitPixel: boolean = true;
+        public hitPixel: boolean = false;
 
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
@@ -770,7 +780,7 @@ namespace annie {
                             s.rect.y = leftY + 20;
                             s.rect.width = w - 20;
                             s.rect.height = h - 20;
-                            if (!s.useMask) {
+                            if (s.cacheAsBitmap) {
                                 ///////////////////////////
                                 s._cacheX = leftX;
                                 s._cacheY = leftY;
@@ -802,31 +812,7 @@ namespace annie {
                                     ctx.shadowOffsetY = 0;
                                 }
                                 ////////////////////
-                                let data: any;
-                                for (i = 0; i < cLen; i++) {
-                                    data = s._command[i];
-                                    if (data[0] > 0) {
-                                        let paramsLen = data[2].length;
-                                        if (paramsLen == 0) {
-                                            ctx[data[1]]();
-                                        } else if (paramsLen == 2) {
-                                            ctx[data[1]](data[2][0], data[2][1]);
-                                        } else if (paramsLen == 4) {
-                                            ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
-                                        } else if (paramsLen == 5) {
-                                            ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
-                                        } else if (paramsLen == 6) {
-                                            if (data[0] == 2) {
-                                                //位图填充
-                                                data[2][4] -= leftX;
-                                                data[2][5] -= leftY;
-                                            }
-                                            ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
-                                        }
-                                    } else {
-                                        ctx[data[1]] = data[2];
-                                    }
-                                }
+                                s._drawShape(ctx);
                                 ///////////////////////////
                                 //滤镜
                                 if (s["cFilters"] && s["cFilters"].length > 0) {
@@ -861,7 +847,38 @@ namespace annie {
                 s._updateInfo.UF = false;
             }
         }
-
+        private _drawShape(ctx:any):void{
+            let s=this;
+            let com=s._command;
+            let cLen=com.length;
+            let data: any;
+            let leftX:number=s._cacheX;
+            let leftY:number=s._cacheY;
+            for (let i = 0; i < cLen; i++) {
+                data = com[i];
+                if (data[0] > 0) {
+                    let paramsLen = data[2].length;
+                    if (paramsLen == 0) {
+                        ctx[data[1]]();
+                    } else if (paramsLen == 2) {
+                        ctx[data[1]](data[2][0], data[2][1]);
+                    } else if (paramsLen == 4) {
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
+                    } else if (paramsLen == 5) {
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
+                    } else if (paramsLen == 6) {
+                        if (data[0] == 2) {
+                            //位图填充
+                            data[2][4] -= leftX;
+                            data[2][5] -= leftY;
+                        }
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                    }
+                } else {
+                    ctx[data[1]] = data[2];
+                }
+            }
+        }
         /**
          * 重写getBounds
          * @method getBounds
@@ -887,7 +904,7 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
-            if (s.hitPixel&&!s.useMask) {
+            if (s.hitPixel||s.cacheAsBitmap) {
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;

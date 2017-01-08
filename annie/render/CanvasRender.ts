@@ -139,10 +139,14 @@ namespace annie {
                 }
             } else{
                 //矢量和文字
-                if(target._cacheImg){
-                    //需要渲染缓存
-                    s._ctx.translate(target._cacheX,target._cacheY);
-                    s._ctx.drawImage(target._cacheImg, 0, 0);
+                if(!target._cAb){
+                    target._drawShape(s._ctx);
+                }else {
+                    if (target._cacheImg) {
+                        //需要渲染缓存
+                        s._ctx.translate(target._cacheX, target._cacheY);
+                        s._ctx.drawImage(target._cacheImg, 0, 0);
+                    }
                 }
             }
             //s._ctx.restore();

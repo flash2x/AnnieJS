@@ -2139,7 +2139,7 @@ var annie;
              */
             this._command = [];
             this._isNeedUpdate = true;
-            this.useMask = false;
+            this._cAb = false;
             /**
              * @property _cacheCanvas
              * @since 1.0.0
@@ -2158,7 +2158,7 @@ var annie;
              * @type {boolean}
              * @default true
              */
-            this.hitPixel = true;
+            this.hitPixel = false;
             this.rect = new annie.Rectangle();
             /**
              * 径向渐变填充 一般给Flash2x用
@@ -2278,6 +2278,24 @@ var annie;
             var ctx = annie.DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         };
+        Object.defineProperty(Shape.prototype, "cacheAsBitmap", {
+            /**
+             * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
+             * 默认将不开启
+             * @property cacheAsBitmap
+             * @public
+             * @since 1.0.4
+             * @type {boolean}
+             * @default false
+             */
+            get: function () { return this._cAb; },
+            set: function (value) { if (this._cAb != value) {
+                this._cAb = value;
+                this._isNeedUpdate = true;
+            } },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -2798,7 +2816,7 @@ var annie;
                             s.rect.y = leftY + 20;
                             s.rect.width = w - 20;
                             s.rect.height = h - 20;
-                            if (!s.useMask) {
+                            if (s.cacheAsBitmap) {
                                 ///////////////////////////
                                 s._cacheX = leftX;
                                 s._cacheY = leftY;
@@ -2831,36 +2849,7 @@ var annie;
                                     ctx.shadowOffsetY = 0;
                                 }
                                 ////////////////////
-                                var data_1;
-                                for (i = 0; i < cLen; i++) {
-                                    data_1 = s._command[i];
-                                    if (data_1[0] > 0) {
-                                        var paramsLen = data_1[2].length;
-                                        if (paramsLen == 0) {
-                                            ctx[data_1[1]]();
-                                        }
-                                        else if (paramsLen == 2) {
-                                            ctx[data_1[1]](data_1[2][0], data_1[2][1]);
-                                        }
-                                        else if (paramsLen == 4) {
-                                            ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3]);
-                                        }
-                                        else if (paramsLen == 5) {
-                                            ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4]);
-                                        }
-                                        else if (paramsLen == 6) {
-                                            if (data_1[0] == 2) {
-                                                //位图填充
-                                                data_1[2][4] -= leftX;
-                                                data_1[2][5] -= leftY;
-                                            }
-                                            ctx[data_1[1]](data_1[2][0], data_1[2][1], data_1[2][2], data_1[2][3], data_1[2][4], data_1[2][5]);
-                                        }
-                                    }
-                                    else {
-                                        ctx[data_1[1]] = data_1[2];
-                                    }
-                                }
+                                s._drawShape(ctx);
                                 ///////////////////////////
                                 //滤镜
                                 if (s["cFilters"] && s["cFilters"].length > 0) {
@@ -2895,6 +2884,43 @@ var annie;
                 s._updateInfo.UF = false;
             }
         };
+        Shape.prototype._drawShape = function (ctx) {
+            var s = this;
+            var com = s._command;
+            var cLen = com.length;
+            var data;
+            var leftX = s._cacheX;
+            var leftY = s._cacheY;
+            for (var i = 0; i < cLen; i++) {
+                data = com[i];
+                if (data[0] > 0) {
+                    var paramsLen = data[2].length;
+                    if (paramsLen == 0) {
+                        ctx[data[1]]();
+                    }
+                    else if (paramsLen == 2) {
+                        ctx[data[1]](data[2][0], data[2][1]);
+                    }
+                    else if (paramsLen == 4) {
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
+                    }
+                    else if (paramsLen == 5) {
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
+                    }
+                    else if (paramsLen == 6) {
+                        if (data[0] == 2) {
+                            //位图填充
+                            data[2][4] -= leftX;
+                            data[2][5] -= leftY;
+                        }
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                    }
+                }
+                else {
+                    ctx[data[1]] = data[2];
+                }
+            }
+        };
         /**
          * 重写getBounds
          * @method getBounds
@@ -2921,7 +2947,7 @@ var annie;
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
-            if (s.hitPixel && !s.useMask) {
+            if (s.hitPixel || s.cacheAsBitmap) {
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -7075,10 +7101,15 @@ var annie;
             }
             else {
                 //矢量和文字
-                if (target._cacheImg) {
-                    //需要渲染缓存
-                    s._ctx.translate(target._cacheX, target._cacheY);
-                    s._ctx.drawImage(target._cacheImg, 0, 0);
+                if (!target._cAb) {
+                    target._drawShape(s._ctx);
+                }
+                else {
+                    if (target._cacheImg) {
+                        //需要渲染缓存
+                        s._ctx.translate(target._cacheX, target._cacheY);
+                        s._ctx.drawImage(target._cacheImg, 0, 0);
+                    }
                 }
             }
             //s._ctx.restore();

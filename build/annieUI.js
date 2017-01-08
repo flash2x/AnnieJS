@@ -649,9 +649,9 @@ var annieUI;
                 s.slideCon.mouseEnable = false;
                 s.slideCon.mouseChildren = false;
             }
-            s.slideCon.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEventHandler.bind(s));
-            //s.slideCon.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
-            s.slideCon.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEventHandler.bind(s));
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEventHandler.bind(s));
+            //s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEventHandler.bind(s));
             s.addChild(s.slideCon);
         };
         /**
@@ -664,8 +664,8 @@ var annieUI;
                 return;
             }
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchStartX = e.stageX;
-                s.touchStartY = e.stageY;
+                s.touchStartX = e.localX;
+                s.touchStartY = e.localY;
                 s.isMouseDown = true;
             }
             else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
@@ -675,8 +675,8 @@ var annieUI;
                     return;
                 }
                 s.isMouseDown = false;
-                s.touchEndX = e.stageX;
-                s.touchEndY = e.stageY;
+                s.touchEndX = e.localX;
+                s.touchEndY = e.localY;
                 s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
                 if (s.distance > 24) {
                     if (s.isVertical) {

@@ -77,6 +77,7 @@
     修复annie.DisplayObject.getDrawRect在没有子集的情况下返回null
     新增Flash2x.jsonp()方法
     重写显示对象的update的算法，大量优化，效率提高200%
+    矢量不再默认缓存为位图，需要手动设置annie.Shape实例的cacaheAsBitmpa属性开启
 ##AnnieJS 1.0.3 版本
     删除annie.canTouchMove,不再控制html的可移动所有浮在AnnieJS上的Html元素自己管自己,现在canvas本身是不会上下滑动的了
     增加支持输入文本在手机端自动回收软键盘
