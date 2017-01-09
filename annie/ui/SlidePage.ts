@@ -258,7 +258,7 @@ namespace annieUI {
                 s.slideCon.mouseChildren = false;
             }
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEventHandler.bind(s));
-            //s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEventHandler.bind(s));
             s.addChild(s.slideCon);
         }
@@ -277,11 +277,9 @@ namespace annieUI {
                 s.touchStartY = e.localY;
                 s.isMouseDown = true;
             } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-               /* if (!s.isMouseDown) {
+                if (!s.isMouseDown) {
                     return;
                 }
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
                 // s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
                 if (s.isVertical) {
                     if (s.currentPageIndex == 0) {
@@ -305,7 +303,7 @@ namespace annieUI {
                             s.slideCon.x -= Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
                         }
                     }
-                }*/
+                }
             } else if (e.type == annie.MouseEvent.MOUSE_UP) {
                 if (s.isMoving) {
                     return;

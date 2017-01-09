@@ -268,17 +268,19 @@ namespace annie{
                 let maskObjIds:any = [];
                 for (let i = len - 1; i >= 0; i--){
                     child = s.children[i];
-                    child.update(um, ua, uf);
                     //更新遮罩
                     if(child.mask&&(maskObjIds.indexOf(child.mask.instanceId)<0)&&child.visible&&child.alpha){
+                        child.mask.parent=s;
                         if(s.totalFrames&&child.mask.totalFrames) {
                             child.mask.gotoAndStop(s.currentFrame);
+                            //一定要为true
+                            child.mask.update(true,true);
+                        }else {
+                            child.mask.update(um,true);
                         }
-                        child.mask.parent=s;
-                        child.mask.update(um,ua,uf);
-                        child.mask.parent=null;
                         maskObjIds.push(child.mask.instanceId);
                     }
+                    child.update(um, ua, uf);
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;

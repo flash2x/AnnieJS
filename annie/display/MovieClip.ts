@@ -417,7 +417,6 @@ namespace annie {
                 s._isUpdateFrame = false;
             }
         }
-
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
          * @method play

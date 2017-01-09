@@ -7,7 +7,7 @@ namespace annie {
      * @public
      * @since 1.0.1
      * @public
-     * @property debug
+     * @property annie.debug
      * @type {boolean}
      * @example
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
@@ -18,13 +18,13 @@ namespace annie {
      * annie引擎的版本号
      * @public
      * @since 1.0.1
-     * @property version
+     * @property annie.version
      * @type {string}
      * @example
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    export let version:string="1.0.3";
+    export let version:string="1.0.4";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -99,7 +99,7 @@ namespace annie {
     }
     /**
      * 跳转到指定网址
-     * @method navigateToURL
+     * @method annie.navigateToURL
      * @public
      * @since 1.0.0
      * @param {string} url
@@ -112,7 +112,7 @@ namespace annie {
     }
     /**
      * 向后台发送数据,但不会理会任何的后台反馈
-     * @method sendToURL
+     * @method annie.sendToURL
      * @public
      * @since 1.0.0
      * @param {string} url
@@ -129,7 +129,7 @@ namespace annie {
     let _dRender:any=null;
     /**
      * 将显示对象转成base64的图片数据
-     * @method toDisplayDataURL
+     * @method annie.toDisplayDataURL
      * @static
      * @param {annie.DisplayObject} obj 显示对象
      * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切

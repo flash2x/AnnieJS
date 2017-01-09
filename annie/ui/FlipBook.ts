@@ -112,8 +112,6 @@ namespace annieUI {
             s.shadow1.visible = false;
             s.rPage1.mask=s.rMask1;
             s.rPage0.mask=s.rMask0;
-            s.rMask0.useMask=true;
-            s.rMask1.useMask=true;
             s.setPage(s.currPage);
             s.stage.addEventListener(MouseEvent.MOUSE_DOWN, s.onMouseDown.bind(s));
             s.stage.addEventListener(MouseEvent.MOUSE_UP, s.onMouseUp.bind(s));
@@ -269,7 +267,6 @@ namespace annieUI {
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.mask = maskShape;
-            maskShape.useMask=true;
         }
         private getShadow(shape: Shape, maskShape: Shape, point1: Point, point2: Point, maskArray: any, arg: number): void {
             let myScale: number;

@@ -1269,7 +1269,7 @@ var annie;
              * @property _updateInfo
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              */
-            this._updateInfo = { UM: true, UA: false, UF: false };
+            this._updateInfo = { UM: true, UA: true, UF: false };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -2682,7 +2682,8 @@ var annie;
          */
         Shape.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cacheImg.width > 0) {
+            //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
+            if (s._cacheImg.width > 0 && !s._updateInfo.UM) {
                 renderObj.draw(s, 1);
             }
             //super.render();
@@ -2814,16 +2815,16 @@ var annie;
                             s.rect.y = leftY + 20;
                             s.rect.width = w - 20;
                             s.rect.height = h - 20;
-                            if (s.cacheAsBitmap) {
+                            if (s._cAb) {
                                 ///////////////////////////
                                 s._cacheX = leftX;
                                 s._cacheY = leftY;
                                 var _canvas = s._cacheImg;
+                                var ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;
                                 _canvas.style.width = w / annie.devicePixelRatio + "px";
                                 _canvas.style.height = h / annie.devicePixelRatio + "px";
-                                var ctx = _canvas["getContext"]('2d');
                                 ctx.clearRect(0, 0, w, h);
                                 ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                                 /////////////////////
@@ -2881,7 +2882,8 @@ var annie;
                 s._updateInfo.UF = false;
             }
         };
-        Shape.prototype._drawShape = function (ctx) {
+        Shape.prototype._drawShape = function (ctx, isMask) {
+            if (isMask === void 0) { isMask = false; }
             var s = this;
             var com = s._command;
             var cLen = com.length;
@@ -2914,7 +2916,8 @@ var annie;
                     }
                 }
                 else {
-                    ctx[data[1]] = data[2];
+                    if (!isMask)
+                        ctx[data[1]] = data[2];
                 }
             }
         };
@@ -2944,7 +2947,7 @@ var annie;
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
-            if (s.hitPixel || s.cacheAsBitmap) {
+            if (s.hitPixel || s._cAb) {
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -3348,17 +3351,20 @@ var annie;
                 var maskObjIds = [];
                 for (var i = len - 1; i >= 0; i--) {
                     child = s.children[i];
-                    child.update(um, ua, uf);
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
+                        child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames) {
                             child.mask.gotoAndStop(s.currentFrame);
+                            //一定要为true
+                            child.mask.update(true, true);
                         }
-                        child.mask.parent = s;
-                        child.mask.update(um, ua, uf);
-                        child.mask.parent = null;
+                        else {
+                            child.mask.update(um, true);
+                        }
                         maskObjIds.push(child.mask.instanceId);
                     }
+                    child.update(um, ua, uf);
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -5777,6 +5783,7 @@ var annie;
                     s.renderObj.reSize();
                     s.setAlign();
                 }
+                s._updateInfo.UM = true;
             };
             var s = this;
             this._instanceType = "annie.Stage";
@@ -5818,8 +5825,7 @@ var annie;
             });
             setTimeout(function () {
                 s.resize();
-                var su = s._updateInfo;
-                s.update(su.UM, su.UA, su.UF);
+                s.update(true, true, false);
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成
@@ -7020,36 +7026,14 @@ var annie;
             if (target.children && target.children.length > 0) {
                 target = target.children[0];
             }
-            if (target._command) {
+            if (target._command && target._command.length > 0) {
                 s._ctx.save();
                 s._ctx.globalAlpha = 0;
                 var tm = target.cMatrix;
                 s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                var data = void 0;
-                var cLen = target._command.length;
-                for (var i = 0; i < cLen; i++) {
-                    data = target._command[i];
-                    if (data[0] == 1) {
-                        isHadPath = true;
-                        var paramsLen = data[2].length;
-                        if (paramsLen == 0) {
-                            s._ctx[data[1]]();
-                        }
-                        else if (paramsLen == 2) {
-                            s._ctx[data[1]](data[2][0], data[2][1]);
-                        }
-                        else if (paramsLen == 4) {
-                            s._ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
-                        }
-                        else if (paramsLen == 5) {
-                            s._ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
-                        }
-                        else if (paramsLen == 6) {
-                            s._ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
-                        }
-                    }
-                }
+                target._drawShape(s._ctx, true);
                 s._ctx.restore();
+                isHadPath = true;
             }
             //和后面endMask的restore对应
             s._ctx.save();
@@ -7076,8 +7060,7 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target, type) {
             var s = this;
-            if (!target._cacheImg || (target._cacheImg.nodeName == "IMG" && !target._cacheImg.complete))
-                return;
+            //没有更新的视觉不渲染
             //s._ctx.save();
             s._ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;
@@ -7098,7 +7081,7 @@ var annie;
             }
             else {
                 //矢量和文字
-                if (!target._cAb) {
+                if ((type == 1) && (!target._cAb)) {
                     target._drawShape(s._ctx);
                 }
                 else {
@@ -8846,7 +8829,7 @@ var annie;
      * @public
      * @since 1.0.1
      * @public
-     * @property debug
+     * @property annie.debug
      * @type {boolean}
      * @example
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
@@ -8857,13 +8840,13 @@ var annie;
      * annie引擎的版本号
      * @public
      * @since 1.0.1
-     * @property version
+     * @property annie.version
      * @type {string}
      * @example
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.3";
+    annie.version = "1.0.4";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -8940,7 +8923,7 @@ var annie;
     };
     /**
      * 跳转到指定网址
-     * @method navigateToURL
+     * @method annie.navigateToURL
      * @public
      * @since 1.0.0
      * @param {string} url
@@ -8954,7 +8937,7 @@ var annie;
     annie.navigateToURL = navigateToURL;
     /**
      * 向后台发送数据,但不会理会任何的后台反馈
-     * @method sendToURL
+     * @method annie.sendToURL
      * @public
      * @since 1.0.0
      * @param {string} url
@@ -8972,7 +8955,7 @@ var annie;
     var _dRender = null;
     /**
      * 将显示对象转成base64的图片数据
-     * @method toDisplayDataURL
+     * @method annie.toDisplayDataURL
      * @static
      * @param {annie.DisplayObject} obj 显示对象
      * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切

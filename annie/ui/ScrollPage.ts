@@ -159,11 +159,11 @@ namespace annieUI {
             s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
-            s.view.mask = s.maskObj;
-            s.setMask(vW,vH);
             s.maskObj.alpha=0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
+            s.view.mask = s.maskObj;
+            s.setMask(vW,vH);
             s.maxDistance = maxDistance;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));

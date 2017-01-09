@@ -27,7 +27,7 @@ namespace annie {
          * @property _updateInfo
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
          */
-        protected _updateInfo: {UM: boolean, UA: boolean, UF: boolean} = {UM: true, UA: false, UF: false};
+        protected _updateInfo: {UM: boolean, UA: boolean, UF: boolean} = {UM: true, UA: true, UF: false};
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage

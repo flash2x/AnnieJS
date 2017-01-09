@@ -64,36 +64,14 @@ namespace annie {
             if(target.children&&target.children.length>0){
                 target=target.children[0];
             }
-            if(target._command){
+            if(target._command&&target._command.length>0){
                 s._ctx.save();
                 s._ctx.globalAlpha=0;
                 let tm=target.cMatrix;
                 s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                let data:any;
-                let cLen:number = target._command.length;
-                for (let i = 0; i < cLen; i++) {
-                    data = target._command[i];
-                    if (data[0] == 1) {
-                        isHadPath = true;
-                        let paramsLen = data[2].length;
-                        if (paramsLen == 0) {
-                            s._ctx[data[1]]();
-                        } else if (paramsLen == 2) {
-                            s._ctx[data[1]](data[2][0], data[2][1]);
-                        } else if (paramsLen == 4) {
-                            s._ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3]);
-                        }else if(paramsLen==5){
-                            s._ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
-                        }else if(paramsLen==6){
-                            s._ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
-                        }
-                    }
-                    /*else {
-                     //这里因为是作为遮罩,所以不需要任何填充或线条
-                     s._ctx[data[1]] = data[2];
-                     }*/
-                }
+                target._drawShape(s._ctx,true);
                 s._ctx.restore();
+                isHadPath = true;
             }
             //和后面endMask的restore对应
             s._ctx.save();
@@ -120,7 +98,7 @@ namespace annie {
          */
         public draw(target:any, type:number):void{
             let s = this;
-            if(!target._cacheImg||(target._cacheImg.nodeName=="IMG"&&!target._cacheImg.complete))return;
+            //没有更新的视觉不渲染
             //s._ctx.save();
             s._ctx.globalAlpha = target.cAlpha;
             let tm=target.cMatrix;
@@ -139,7 +117,7 @@ namespace annie {
                 }
             } else{
                 //矢量和文字
-                if(!target._cAb){
+                if((type==1)&&(!target._cAb)){
                     target._drawShape(s._ctx);
                 }else {
                     if (target._cacheImg) {

@@ -651,7 +651,8 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s = this;
-            if (s._cacheImg.width > 0) {
+            //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
+            if (s._cacheImg.width > 0&&!s._updateInfo.UM) {
                 renderObj.draw(s, 1);
             }
             //super.render();
@@ -780,16 +781,16 @@ namespace annie {
                             s.rect.y = leftY + 20;
                             s.rect.width = w - 20;
                             s.rect.height = h - 20;
-                            if (s.cacheAsBitmap) {
+                            if (s._cAb){
                                 ///////////////////////////
                                 s._cacheX = leftX;
                                 s._cacheY = leftY;
                                 let _canvas = s._cacheImg;
+                                let ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;
                                 _canvas.style.width = w / devicePixelRatio + "px";
                                 _canvas.style.height = h / devicePixelRatio + "px";
-                                let ctx = _canvas["getContext"]('2d');
                                 ctx.clearRect(0, 0, w, h);
                                 ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                                 /////////////////////
@@ -847,7 +848,7 @@ namespace annie {
                 s._updateInfo.UF = false;
             }
         }
-        private _drawShape(ctx:any):void{
+        private _drawShape(ctx:any,isMask:boolean=false):void{
             let s=this;
             let com=s._command;
             let cLen=com.length;
@@ -875,6 +876,7 @@ namespace annie {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
                     }
                 } else {
+                    if(!isMask)
                     ctx[data[1]] = data[2];
                 }
             }
@@ -904,7 +906,7 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
-            if (s.hitPixel||s.cacheAsBitmap) {
+            if (s.hitPixel||s._cAb) {
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
