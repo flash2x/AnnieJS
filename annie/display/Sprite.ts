@@ -50,6 +50,15 @@ namespace annie{
         }
 
         /**
+         * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
+         * @property isCacheShape
+         * @since 1.0.5
+         * @type {boolean}
+         * @public
+         * @default false
+         */
+        public isCacheShape=false;
+        /**
          * 从Sprite中移除一个child
          * @method removeChild
          * @public

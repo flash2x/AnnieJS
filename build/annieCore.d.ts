@@ -1343,7 +1343,7 @@ declare namespace annie {
          * @type {boolean}
          * @default false
          */
-        cacheAsBitmap: boolean;
+        private cacheAsBitmap;
         private _cAb;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
@@ -1708,6 +1708,15 @@ declare namespace annie {
          */
         addChild(child: DisplayObject): void;
         /**
+         * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
+         * @property isCacheShape
+         * @since 1.0.5
+         * @type {boolean}
+         * @public
+         * @default false
+         */
+        isCacheShape: boolean;
+        /**
          * 从Sprite中移除一个child
          * @method removeChild
          * @public
@@ -1853,11 +1862,11 @@ declare namespace annie {
          * 开始播放媒体
          * @method play
          * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数
+         * @param {number} loop 循环次数 默认为1
          * @public
          * @since 1.0.0
          */
-        play(start: number, loop: number): void;
+        play(start?: number, loop?: number): void;
         private _SBWeixin;
         private _weixinSB();
         /**

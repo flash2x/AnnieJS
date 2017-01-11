@@ -2290,7 +2290,6 @@ var annie;
              * @type {boolean}
              * @default false
              */
-            get: function () { return this._cAb; },
             set: function (value) { if (this._cAb != value) {
                 this._cAb = value;
                 this._isNeedUpdate = true;
@@ -2702,6 +2701,8 @@ var annie;
             var s = this;
             if (s.visible) {
                 _super.prototype.update.call(this, um, ua, uf);
+                if (s.parent)
+                    s.cacheAsBitmap = s.parent.isCacheShape;
                 if (s._isNeedUpdate || uf || s._updateInfo.UF) {
                     //更新缓存
                     var cLen = s._command.length;
@@ -3110,6 +3111,15 @@ var annie;
              * @readonly
              */
             this.children = [];
+            /**
+             * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
+             * @property isCacheShape
+             * @since 1.0.5
+             * @type {boolean}
+             * @public
+             * @default false
+             */
+            this.isCacheShape = false;
             this._instanceType = "annie.Sprite";
         }
         /**
@@ -3547,11 +3557,13 @@ var annie;
          * 开始播放媒体
          * @method play
          * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数
+         * @param {number} loop 循环次数 默认为1
          * @public
          * @since 1.0.0
          */
         Media.prototype.play = function (start, loop) {
+            if (start === void 0) { start = 1; }
+            if (loop === void 0) { loop = 1; }
             var s = this;
             s._loop = loop;
             //TODO 好像设置了也没什么用，后期再看看

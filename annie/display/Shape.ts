@@ -62,7 +62,6 @@ namespace annie {
             let ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         }
-
         /**
          * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
          * 默认将不开启
@@ -72,8 +71,7 @@ namespace annie {
          * @type {boolean}
          * @default false
          */
-        public get cacheAsBitmap():boolean{return this._cAb;}
-        public set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
+        private set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
         private _cAb:boolean=false;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
@@ -668,6 +666,7 @@ namespace annie {
             let s = this;
             if(s.visible) {
                 super.update(um, ua, uf);
+                if(s.parent)s.cacheAsBitmap=s.parent.isCacheShape;
                 if (s._isNeedUpdate || uf||s._updateInfo.UF) {
                     //更新缓存
                     let cLen: number = s._command.length;

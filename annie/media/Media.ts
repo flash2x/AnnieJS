@@ -27,7 +27,6 @@ namespace annie {
          */
         public type = "";
         private _loop: number = 0;
-
         /**
          * 构造函数
          * @method Media
@@ -64,11 +63,11 @@ namespace annie {
          * 开始播放媒体
          * @method play
          * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数
+         * @param {number} loop 循环次数 默认为1
          * @public
          * @since 1.0.0
          */
-        public play(start: number, loop: number): void {
+        public play(start: number=1, loop: number=1): void {
             let s = this;
             s._loop = loop;
             //TODO 好像设置了也没什么用，后期再看看
