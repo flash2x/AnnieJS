@@ -369,7 +369,9 @@ namespace annie {
         }
 
         public set filters(value: any[]){
-            if(value) {
+            if(!value)return;
+            if(value.length==0&&this._filters.length==0)return;
+            if(value&&value.length>0) {
                 this._filters = value;
             }else{
                 this._filters.length=0;
@@ -505,7 +507,7 @@ namespace annie {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-            if (uf || s._updateInfo.UF) {
+            if (uf || s._updateInfo.UF){
                 s.cFilters.length = 0;
                 let sf = s._filters;
                 let len = sf.length;

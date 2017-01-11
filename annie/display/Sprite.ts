@@ -274,9 +274,9 @@ namespace annie{
                         if(s.totalFrames&&child.mask.totalFrames) {
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
-                            child.mask.update(true,true);
+                            child.mask.update(true);
                         }else {
-                            child.mask.update(um,true);
+                            child.mask.update(um);
                         }
                         maskObjIds.push(child.mask.instanceId);
                     }

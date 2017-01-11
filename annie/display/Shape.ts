@@ -794,9 +794,9 @@ namespace annie {
                                 ctx.clearRect(0, 0, w, h);
                                 ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                                 /////////////////////
-                                if (s["cFilters"] && s["cFilters"].length > 0) {
-                                    let cf = s.cFilters;
-                                    let cfLen = cf.length;
+                                let cf = s.cFilters;
+                                let cfLen = cf.length;
+                                if (cfLen > 0) {
                                     for (let i = 0; i < cfLen; i++) {
                                         if (s.cFilters[i].type == "Shadow") {
                                             ctx.shadowBlur += cf[i].blur;
@@ -816,11 +816,11 @@ namespace annie {
                                 s._drawShape(ctx);
                                 ///////////////////////////
                                 //滤镜
-                                if (s["cFilters"] && s["cFilters"].length > 0) {
-                                    let len = s["cFilters"].length;
+                                let len = s.cFilters.length;
+                                if (len> 0) {
                                     let imageData = ctx.getImageData(0, 0, w, h);
                                     for (let i = 0; i < len; i++) {
-                                        let f: any = s["cFilters"][i];
+                                        let f: any = s.cFilters[i];
                                         f.drawFilter(imageData);
                                     }
                                     ctx.putImageData(imageData, 0, 0);

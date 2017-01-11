@@ -1644,7 +1644,11 @@ var annie;
                 return this._filters;
             },
             set: function (value) {
-                if (value) {
+                if (!value)
+                    return;
+                if (value.length == 0 && this._filters.length == 0)
+                    return;
+                if (value && value.length > 0) {
                     this._filters = value;
                 }
                 else {
@@ -2828,9 +2832,9 @@ var annie;
                                 ctx.clearRect(0, 0, w, h);
                                 ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                                 /////////////////////
-                                if (s["cFilters"] && s["cFilters"].length > 0) {
-                                    var cf = s.cFilters;
-                                    var cfLen = cf.length;
+                                var cf = s.cFilters;
+                                var cfLen = cf.length;
+                                if (cfLen > 0) {
                                     for (var i_1 = 0; i_1 < cfLen; i_1++) {
                                         if (s.cFilters[i_1].type == "Shadow") {
                                             ctx.shadowBlur += cf[i_1].blur;
@@ -2851,11 +2855,11 @@ var annie;
                                 s._drawShape(ctx);
                                 ///////////////////////////
                                 //滤镜
-                                if (s["cFilters"] && s["cFilters"].length > 0) {
-                                    var len = s["cFilters"].length;
+                                var len = s.cFilters.length;
+                                if (len > 0) {
                                     var imageData = ctx.getImageData(0, 0, w, h);
                                     for (var i_2 = 0; i_2 < len; i_2++) {
-                                        var f = s["cFilters"][i_2];
+                                        var f = s.cFilters[i_2];
                                         f.drawFilter(imageData);
                                     }
                                     ctx.putImageData(imageData, 0, 0);
@@ -3357,10 +3361,10 @@ var annie;
                         if (s.totalFrames && child.mask.totalFrames) {
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
-                            child.mask.update(true, true);
+                            child.mask.update(true);
                         }
                         else {
-                            child.mask.update(um, true);
+                            child.mask.update(um);
                         }
                         maskObjIds.push(child.mask.instanceId);
                     }
