@@ -24,7 +24,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    export let version:string="1.0.4";
+    export let version:string="1.0.5";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -96,7 +96,7 @@ namespace annie {
         SHOW_ALL: "showAll",
         FIXED_WIDTH:"fixedWidth",
         FIXED_HEIGHT:"fixedHeight"
-    }
+    };
     /**
      * 跳转到指定网址
      * @method annie.navigateToURL
@@ -137,16 +137,20 @@ namespace annie {
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    export let toDisplayDataURL=function(obj:any,rect:Rectangle=null,typeInfo:any=null,bgColor:string=""):string {
+    export let toDisplayDataURL=function(obj:DisplayObject,rect:Rectangle=null,typeInfo:any=null,bgColor:string=""):string {
         if(!_dRender){
             _dRender=new CanvasRender(null);
         }
         _dRender._stage=obj;
         _dRender.rootContainer=DisplayObject["_canvas"];
+        let objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
+        obj.parent=null;
+        obj.x=rect?-rect.x:0;
+        obj.y=rect?-rect.y:0;
+        obj.scaleX=obj.scaleY=1;
+        obj.rotation=obj.skewX=obj.skewY=0;
+        obj.update(false,false,false);
         //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        if(!obj.stage){
-            obj.update();
-        }
         let whObj:any=obj.getBounds();
         let w:number=rect?rect.width:whObj.width;
         let h:number=rect?rect.height:whObj.height;
@@ -159,13 +163,6 @@ namespace annie {
             _dRender._ctx.fillStyle=bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
-        let objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
-        obj.parent=null;
-        obj.x=rect?-rect.x:0;
-        obj.y=rect?-rect.y:0;
-        obj.scaleX=obj.scaleY=1;
-        obj.rotation=obj.skewX=obj.skewY=0;
-        obj.update();
         obj.render(_dRender);
         obj.parent=objInfo.p;
         obj.x=objInfo.x;

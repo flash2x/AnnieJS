@@ -111,7 +111,6 @@ namespace annie {
         public update(um: boolean, ua: boolean, uf: boolean):void{
             let s = this;
             if(s.visible) {
-                if (!s.bitmapData || (s.bitmapData.nodeName == "IMG" && !s.bitmapData.complete))return;
                 super.update(um,ua,uf);
                 //滤镜
                 if (s._isNeedUpdate || uf||s._updateInfo.UF){
@@ -211,7 +210,6 @@ namespace annie {
          * @return {Image}
          */
         public static convertToImage(bitmap:annie.Bitmap):any{
-            if(!bitmap.bitmapData||(bitmap.bitmapData.nodeName=="IMG"&&!bitmap.bitmapData.complete))return;
             if(!bitmap.rect){
                 return bitmap.bitmapData;
             }else{

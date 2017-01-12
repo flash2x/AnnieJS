@@ -393,13 +393,14 @@ var annieUI;
                 s.bitmap.bitmapData = s.photo;
                 s.maskObj.clear();
                 s.maskObj.beginFill("#000000");
+                var scale = s.radio / (s.photo.width < s.photo.height ? s.photo.width : s.photo.height);
+                s.bitmap.scaleX = s.bitmap.scaleY = scale;
+                s.bitmap.x = (s.radio - s.photo.width * scale) >> 1;
+                s.bitmap.y = (s.radio - s.photo.height * scale) >> 1;
                 if (s.maskType == 0) {
-                    s.bitmap.scaleX = s.bitmap.scaleY = s.radio * 2 / s.photo.width;
-                    s.maskObj.drawCircle(s.radio, s.radio, s.radio);
+                    s.maskObj.drawCircle(s.radio >> 1, s.radio >> 1, s.radio >> 1);
                 }
                 else {
-                    var w = s.photo.width > s.photo.height ? s.photo.width : s.photo.height;
-                    s.bitmap.scaleX = s.bitmap.scaleY = s.radio / w;
                     s.maskObj.drawRect(0, 0, s.radio, s.radio);
                 }
                 s.maskObj.endFill();
@@ -408,18 +409,21 @@ var annieUI;
             s.bitmap.mask = s.maskObj;
         }
         /**
-         * 被始化头像
+         * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
          * @method init
          * @param src 头像的地址
-         * @param radio 指定头像的长宽
-         * @param maskType 遮罩类型，是圆形遮罩还是方形遮罩
+         * @param radio 指定头像的长宽或者直径
+         * @param maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形
          */
         FacePhoto.prototype.init = function (src, radio, maskType) {
             if (radio === void 0) { radio = 0; }
             if (maskType === void 0) { maskType = 0; }
-            this.radio = radio;
-            this.photo.src = src;
-            this.maskType = maskType;
+            var s = this;
+            s.radio = radio;
+            if (s.photo.src != src)
+                s.photo.src = src;
+            if (s.maskType != maskType)
+                s.maskType = maskType;
         };
         return FacePhoto;
     }(Sprite));

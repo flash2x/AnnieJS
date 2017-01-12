@@ -71,6 +71,11 @@
 #AnnieJS 版本更新列表
 ##AnnieJS 1.0.5 版本
     新增 annie.Sprite 一个属性 isCacheShape 以此来控制对应容器中是否要缓存矢量为位图，并提高精确的鼠标点击
+    修复手动调用stage.resize()后，stage显示区域显示错误的bug
+    更新鼠标或者触摸事件机制，同步成原生事件流，以前的版本，annie.MouseEvent事件是无法让原生标签的声音或视频播放的，现在可以了
+    修复打包成swf后，如果Flash2x.loadScene第四个参数设置路径后加载报错的问题
+    修复annie.toDisplayDataURL方法截图不准确的bug
+    修复annieUI.FacePhoto在不是正方形情况下显示有误的bug
 ##AnnieJS 1.0.4 版本
     优化annie.URLLoader 错误事件提示
     增加annie.URLLoader 加载完整事件里返回加载数据类型参数

@@ -504,7 +504,7 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean):void {
             let s:any = this;
-            if(s.visible&&!s.pauseUpdate) {
+            if(s.visible) {
                 if (s._graphicInfo){
                     //核心代码
                     //loopType,firstFrame,parentFrameIndex

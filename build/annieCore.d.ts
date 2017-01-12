@@ -2916,12 +2916,6 @@ declare namespace annie {
          */
         private _lastMousePoint;
         /**
-         * 每一次需要刷新整个引擎时积累的鼠标或触摸事件信息对象,同一刷新阶段内相同的事件类型将会被后面的同类事件覆盖
-         * @type {Object}
-         * @private
-         */
-        private _mouseEventInfo;
-        /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}
          * @private
@@ -2966,7 +2960,6 @@ declare namespace annie {
          */
         private _mouseDownPoint;
         private _initMouseEvent(event, cp, sp);
-        private _mt();
         /**
          * 循环刷新页面的函数
          */
@@ -4257,7 +4250,7 @@ declare namespace annie {
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
+    let toDisplayDataURL: (obj: DisplayObject, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
 }
 /**
  * @class 全局
