@@ -504,6 +504,8 @@ var annieUI;
              * @private
              */
             this.touchEndX = 0;
+            this.movingX = 0;
+            this.movingY = 0;
             /**
              * 触摸点结束点Y
              * @property touchEndY
@@ -636,7 +638,7 @@ var annieUI;
             s.stageW = s.stage.desWidth;
             s.stageH = s.stage.desHeight;
             s.listLen = s.pageList.length; //页面个数
-            s.slideCon = new annie.Sprite();
+            s.view = new annie.Sprite();
             for (var i = 0; i < s.listLen; i++) {
                 s.pageList[i].pageId = i;
                 s.pageList[i].canSlidePrev = true;
@@ -647,16 +649,16 @@ var annieUI;
                 else {
                     s.pageList[i].x = i * s.stageW;
                 }
-                s.slideCon.addChild(s.pageList[i]);
+                s.view.addChild(s.pageList[i]);
             }
             if (s.isMoving) {
-                s.slideCon.mouseEnable = false;
-                s.slideCon.mouseChildren = false;
+                s.view.mouseEnable = false;
+                s.view.mouseChildren = false;
             }
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEventHandler.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEventHandler.bind(s));
-            s.addChild(s.slideCon);
+            s.addChild(s.view);
         };
         /**
          * 触摸事件
@@ -668,49 +670,59 @@ var annieUI;
                 return;
             }
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchStartX = e.localX;
-                s.touchStartY = e.localY;
+                s.touchStartX = s.touchEndX = e.localX;
+                s.touchStartY = s.touchEndY = e.localY;
+                s.movingX = s.movingY = 0;
                 s.isMouseDown = true;
             }
             else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
                 if (!s.isMouseDown) {
                     return;
                 }
+                var movingX = e.localX - s.touchEndX;
+                var movingY = e.localY - s.touchEndY;
+                if (s.movingX != 0 && s.movingY != 0) {
+                    if ((s.movingX > 0 && movingX < 0) || (s.movingX < 0 && movingX > 0) || (s.movingY > 0 && movingY < 0) || (s.movingY < 0 && movingY > 0)) {
+                        s.isMouseDown = false;
+                    }
+                }
+                s.touchEndX = e.localX;
+                s.touchEndY = e.localY;
+                s.movingX = movingX;
+                s.movingY = movingY;
                 // s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
                 if (s.isVertical) {
                     if (s.currentPageIndex == 0) {
                         if (s.touchStartY < s.touchEndY) {
-                            s.slideCon.y += Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
+                            s.view.y += Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
                         }
                     }
                     if (s.currentPageIndex == s.listLen - 1) {
                         if (s.touchStartY > s.touchEndY) {
-                            s.slideCon.y -= Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
+                            s.view.y -= Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
                         }
                     }
                 }
                 else {
                     if (s.currentPageIndex == 0) {
                         if (s.touchStartX < s.touchEndX) {
-                            s.slideCon.x += Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
+                            s.view.x += Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
                         }
                     }
                     if (s.currentPageIndex == s.listLen - 1) {
                         if (s.touchStartX > s.touchEndX) {
-                            s.slideCon.x -= Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
+                            s.view.x -= Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
                         }
                     }
                 }
             }
             else if (e.type == annie.MouseEvent.MOUSE_UP) {
-                if (s.isMoving) {
+                if (s.isMoving || !s.isMouseDown) {
                     return;
                 }
                 s.isMouseDown = false;
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
                 s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
-                if (s.distance > 24) {
+                if (s.distance > 50) {
                     if (s.isVertical) {
                         s.slideDirection = s.touchStartY > s.touchEndY ? 'next' : 'prev';
                     }
@@ -718,7 +730,7 @@ var annieUI;
                         s.slideDirection = s.touchStartX > s.touchEndX ? 'next' : 'prev';
                     }
                     if (s.slideDirection == 'next') {
-                        globalDispatcher.dispatchEvent(new annie.Event('onSlideNextEvent'));
+                        s.dispatchEvent(new annie.Event('onSlideNextEvent'));
                         if (s.currentPageIndex < s.listLen - 1) {
                             if (!s.canSlideNext || !s.pageList[s.currentPageIndex].canSlideNext) {
                                 return;
@@ -727,17 +739,17 @@ var annieUI;
                             s.slideToIndex(s.currentPageIndex);
                         }
                         else {
-                            s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
+                            s.isVertical == true ? annie.Tween.to(s.view, .2, {
                                 y: -s.stageH * (s.listLen - 1),
                                 ease: annie.Tween.backOut
-                            }) : annie.Tween.to(s.slideCon, .2, {
+                            }) : annie.Tween.to(s.view, .2, {
                                 x: -s.stageW * (s.listLen - 1),
                                 ease: annie.Tween.backOut
                             });
                         }
                     }
                     else {
-                        globalDispatcher.dispatchEvent(new annie.Event('onSlidePrevEvent'));
+                        s.dispatchEvent(new annie.Event('onSlidePrevEvent'));
                         if (s.currentPageIndex > 0) {
                             if (!s.canSlidePrev || !s.pageList[s.currentPageIndex].canSlidePrev) {
                                 return;
@@ -746,10 +758,10 @@ var annieUI;
                             s.slideToIndex(s.currentPageIndex);
                         }
                         else {
-                            s.isVertical == true ? annie.Tween.to(s.slideCon, .2, {
+                            s.isVertical == true ? annie.Tween.to(s.view, .2, {
                                 y: 0,
                                 ease: annie.Tween.backOut
-                            }) : annie.Tween.to(s.slideCon, .2, { x: 0, ease: annie.Tween.backOut });
+                            }) : annie.Tween.to(s.view, .2, { x: 0, ease: annie.Tween.backOut });
                         }
                     }
                 }
@@ -768,7 +780,7 @@ var annieUI;
                 return;
             }
             if (s.isVertical) {
-                annie.Tween.to(s.slideCon, s.slideSpeed, {
+                annie.Tween.to(s.view, s.slideSpeed, {
                     y: -index * s.stageH, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
@@ -777,15 +789,15 @@ var annieUI;
                         //             s.pageList[i].visible = false;
                         //     }
                         // }, 200);
-                        s.slideCon.mouseEnable = true;
-                        s.slideCon.mouseChildren = true;
+                        s.view.mouseEnable = true;
+                        s.view.mouseChildren = true;
                         s.isMoving = false;
                     }
                 });
                 s.isMoving = true;
             }
             else {
-                annie.Tween.to(s.slideCon, s.slideSpeed, {
+                annie.Tween.to(s.view, s.slideSpeed, {
                     x: -index * s.stageW, onComplete: function () {
                         s.isFunction(s.callback) && s.callback(index);
                         // setTimeout(function () {
@@ -794,8 +806,8 @@ var annieUI;
                         //             s.pageList[i].visible = false;
                         //     }
                         // }, 200);
-                        s.slideCon.mouseEnable = true;
-                        s.slideCon.mouseChildren = true;
+                        s.view.mouseEnable = true;
+                        s.view.mouseChildren = true;
                         s.isMoving = false;
                     }
                 });
@@ -831,7 +843,7 @@ var annieUI;
                 s.pageList.push(list[i]);
                 s.listLen = s.pageList.length;
                 // console.log('加长度后：'+s.listLen);
-                s.slideCon.addChildAt(list[i], s.listLen);
+                s.view.addChildAt(list[i], s.listLen);
             }
         };
         /**

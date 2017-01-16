@@ -98,7 +98,7 @@ namespace annie {
             this.media.currentTime = 0;
         }
         /**
-         * 暂停播放
+         * 暂停播放,或者恢复播放
          * @method pause
          * @public
          * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数

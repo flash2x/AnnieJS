@@ -76,6 +76,8 @@
     修复打包成swf后，如果Flash2x.loadScene第四个参数设置路径后加载报错的问题
     修复annie.toDisplayDataURL方法截图不准确的bug
     修复annieUI.FacePhoto在不是正方形情况下显示有误的bug
+    修复获取显示对象的width height属性值时偶尔会不准确的bug
+    修复输入文本设置成加粗，斜体发布时报错的bug
 ##AnnieJS 1.0.4 版本
     优化annie.URLLoader 错误事件提示
     增加annie.URLLoader 加载完整事件里返回加载数据类型参数

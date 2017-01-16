@@ -239,11 +239,11 @@ declare namespace annieUI {
         private listLen;
         /**
          * 页面滑动容器
-         * @property slideCon
+         * @property view
          * @type {annie.Sprite}
          * @private
          */
-        private slideCon;
+        private view;
         /**
          * 滑动完成回调函数
          * @method callback
@@ -293,6 +293,8 @@ declare namespace annieUI {
          * @private
          */
         private touchEndX;
+        private movingX;
+        private movingY;
         /**
          * 触摸点结束点Y
          * @property touchEndY

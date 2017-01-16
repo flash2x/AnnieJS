@@ -443,10 +443,10 @@ namespace Flash2x {
             textObj = new annie.InputText(lineType);
             textObj.initInfo(text, width, height, color, align, size, face, showBorder, lineSpacing / size);
             if (italic) {
-                textObj.setItalic(true);
+                textObj.italic=true;
             }
             if (bold) {
-                textObj.setBold(true);
+                textObj.bold=true;
             }
         }
         return textObj;

@@ -33,6 +33,9 @@ namespace annie {
          * @since 1.0.0
          */
         public init(target:any, times:number, data:any, isTo:boolean = true):void {
+            if(times<=0||typeof(times)!="number"){
+                throw new Error("annie.Tween.to()或者annie.Tween.form()方法的第二个参数一定要是大于0的数字");
+            }
             let s = this;
             s._currentFrame = 1;
             s._totalFrames = times*30>>0;
@@ -59,7 +62,7 @@ namespace annie {
                         if(data[item]===false) {
                             s._isLoop=0;
                         }else if(data[item]===true){
-                            s._isLoop=32767;
+                            s._isLoop=Number.MAX_VALUE;
                         }else{
                             s._isLoop=data[item];
                         }
@@ -116,7 +119,7 @@ namespace annie {
             for (let item in s._disData) {
                 s.target[item] = s._startData[item] + s._disData[item] * per;
             }
-            if (s._update) {
+            if (s._update){
                 s._update();
             }
             let cf=s._completeFun;
@@ -167,7 +170,7 @@ namespace annie {
          * @method to
          * @static
          * @param {Object} target
-         * @param {number} totalFrame 总时间长度 用帧数来表示时间
+         * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
@@ -189,7 +192,7 @@ namespace annie {
          * @method from
          * @static
          * @param {Object} target
-         * @param {number} totalFrame 总时间长度 用帧数来表示时间
+         * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。

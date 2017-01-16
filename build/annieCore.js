@@ -1800,7 +1800,7 @@ var annie;
         };
         Object.defineProperty(DisplayObject.prototype, "width", {
             /**
-             * 获取或者设置显示对象在父级里的x方向的宽
+             * 获取或者设置显示对象在父级里的x方向的宽,如果你要同时获取款高
              * 之前需要使用getWH或者setWH 现已废弃
              * @property  width
              * @public
@@ -1809,6 +1809,7 @@ var annie;
              */
             get: function () {
                 var s = this;
+                s.update(false, false, false);
                 var dr = s.getDrawRect();
                 return dr.width;
             },
@@ -1834,6 +1835,7 @@ var annie;
              */
             get: function () {
                 var s = this;
+                s.update(false, false, false);
                 var dr = s.getDrawRect();
                 return dr.height;
             },
@@ -3216,7 +3218,7 @@ var annie;
          */
         Sprite.prototype.addChildAt = function (child, index) {
             var s = this;
-            var sameParent = s == child.parent;
+            var sameParent = (s == child.parent);
             var len;
             if (child.parent) {
                 if (!sameParent) {
@@ -3591,7 +3593,7 @@ var annie;
             this.media.currentTime = 0;
         };
         /**
-         * 暂停播放
+         * 暂停播放,或者恢复播放
          * @method pause
          * @public
          * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
@@ -7924,10 +7926,10 @@ var Flash2x;
             textObj = new annie.InputText(lineType);
             textObj.initInfo(text, width, height, color, align, size, face, showBorder, lineSpacing / size);
             if (italic) {
-                textObj.setItalic(true);
+                textObj.italic = true;
             }
             if (bold) {
-                textObj.setBold(true);
+                textObj.bold = true;
             }
         }
         return textObj;
@@ -8113,6 +8115,9 @@ var annie;
          */
         TweenObj.prototype.init = function (target, times, data, isTo) {
             if (isTo === void 0) { isTo = true; }
+            if (times <= 0 || typeof (times) != "number") {
+                throw new Error("annie.Tween.to()或者annie.Tween.form()方法的第二个参数一定要是大于0的数字");
+            }
             var s = this;
             s._currentFrame = 1;
             s._totalFrames = times * 30 >> 0;
@@ -8140,7 +8145,7 @@ var annie;
                             s._isLoop = 0;
                         }
                         else if (data[item] === true) {
-                            s._isLoop = 32767;
+                            s._isLoop = Number.MAX_VALUE;
                         }
                         else {
                             s._isLoop = data[item];
@@ -8256,7 +8261,7 @@ var annie;
          * @method to
          * @static
          * @param {Object} target
-         * @param {number} totalFrame 总时间长度 用帧数来表示时间
+         * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
@@ -8277,7 +8282,7 @@ var annie;
          * @method from
          * @static
          * @param {Object} target
-         * @param {number} totalFrame 总时间长度 用帧数来表示时间
+         * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。

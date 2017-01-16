@@ -560,9 +560,8 @@ namespace annie {
                 s.stage = null;
             }
         }
-
         /**
-         * 获取或者设置显示对象在父级里的x方向的宽
+         * 获取或者设置显示对象在父级里的x方向的宽,如果你要同时获取款高
          * 之前需要使用getWH或者setWH 现已废弃
          * @property  width
          * @public
@@ -571,11 +570,12 @@ namespace annie {
          */
         public get width(): number {
             let s = this;
+            s.update(false,false,false);
             let dr = s.getDrawRect();
             return dr.width;
         }
 
-        public set width(value: number) {
+        public set width(value: number){
             let s = this;
             let w = s.width;
             if (value != 0) {
@@ -583,7 +583,6 @@ namespace annie {
                 s.scaleX *= sx;
             }
         }
-
         /**
          * 获取或者设置显示对象在父级里的y方向的高
          * 之前需要使用getWH或者setWH 现已废弃
@@ -594,10 +593,10 @@ namespace annie {
          */
         public get height(): number {
             let s = this;
+            s.update(false,false,false);
             let dr = s.getDrawRect();
             return dr.height;
         }
-
         public set height(value: number) {
             let s = this;
             let h = s.height;
@@ -606,7 +605,6 @@ namespace annie {
                 s.scaleY *= sy;
             }
         }
-
         /**
          * 画缓存位图的时候需要使用
          * @property _bitmapCanvas

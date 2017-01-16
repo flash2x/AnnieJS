@@ -286,7 +286,7 @@ namespace annieUI {
                     s.speed = currentValue - s.lastValue;
                     if (s.speed > s.minDis) {
                         s.addSpeed = -2;
-                        if (s.speed > s.maxSpeed) {
+                        if (s.speed > s.maxSpeed){
                             s.speed = s.maxSpeed;
                         }
                     } else if (s.speed < -s.minDis) {

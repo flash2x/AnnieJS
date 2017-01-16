@@ -140,7 +140,7 @@ namespace annie{
          */
         public addChildAt(child:DisplayObject, index:number):void {
             let s = this;
-            let sameParent=s==child.parent;
+            let sameParent=(s==child.parent);
             let len:number;
             if (child.parent) {
                 if(!sameParent) {

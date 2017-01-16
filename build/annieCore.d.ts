@@ -1143,7 +1143,7 @@ declare namespace annie {
          */
         _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
         /**
-         * 获取或者设置显示对象在父级里的x方向的宽
+         * 获取或者设置显示对象在父级里的x方向的宽,如果你要同时获取款高
          * 之前需要使用getWH或者setWH 现已废弃
          * @property  width
          * @public
@@ -1877,7 +1877,7 @@ declare namespace annie {
          */
         stop(): void;
         /**
-         * 暂停播放
+         * 暂停播放,或者恢复播放
          * @method pause
          * @public
          * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
@@ -3768,7 +3768,7 @@ declare namespace annie {
          * @method to
          * @static
          * @param {Object} target
-         * @param {number} totalFrame 总时间长度 用帧数来表示时间
+         * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
@@ -3787,7 +3787,7 @@ declare namespace annie {
          * @method from
          * @static
          * @param {Object} target
-         * @param {number} totalFrame 总时间长度 用帧数来表示时间
+         * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
