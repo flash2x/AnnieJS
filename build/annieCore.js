@@ -7622,7 +7622,7 @@ var Flash2x;
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
             for (var i = 0; i < _totalLoadRes; i++) {
-                _currentConfig.push([{ src: _domain + "src/" + _loadSceneNames[i] + ".swf" }]);
+                _currentConfig.push([{ src: "src/" + _loadSceneNames[i] + ".swf" }]);
             }
             _loadRes();
         }
