@@ -444,7 +444,6 @@ namespace annieUI {
                 s.view.addChildAt(list[i], s.listLen);
             }
         }
-
         /**
          * 平面中两点距离公式
          * @param x1
