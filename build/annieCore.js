@@ -1344,15 +1344,7 @@ var annie;
             this._skewY = 0;
             this._anchorX = 0;
             this._anchorY = 0;
-            /**
-             * 显未对象是否可见
-             * @property visible
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             * @default 0
-             */
-            this.visible = true;
+            this._visible = true;
             /**
              * 显示对象的混合模式
              * 支持的混合模式大概有
@@ -1609,6 +1601,26 @@ var annie;
                 var s = this;
                 if (s._anchorY != value) {
                     s._anchorY = value;
+                    s._updateInfo.UM = true;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DisplayObject.prototype, "visible", {
+            /**
+             * 显未对象是否可见
+             * @property visible
+             * @public
+             * @since 1.0.0
+             * @type {boolean}
+             * @default 0
+             */
+            get: function () { return this._visible; },
+            set: function (value) {
+                var s = this;
+                if (s._visible != value) {
+                    s._visible = value;
                     s._updateInfo.UM = true;
                 }
             },
@@ -5796,8 +5808,9 @@ var annie;
                     s.divWidth = whObj.w;
                     s.renderObj.reSize();
                     s.setAlign();
+                    s._updateInfo.UM = true;
+                    s.update(true, true, false);
                 }
-                s._updateInfo.UM = true;
             };
             var s = this;
             this._instanceType = "annie.Stage";
@@ -5839,7 +5852,6 @@ var annie;
             });
             setTimeout(function () {
                 s.resize();
-                s.update(true, true, false);
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成

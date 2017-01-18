@@ -273,7 +273,6 @@ namespace annie {
             });
             setTimeout(function () {
                 s.resize();
-                s.update(true,true,false);
                 //同时添加到主更新循环中
                 Stage.addUpdateObj(s);
                 //告诉大家我初始化完成
@@ -743,8 +742,9 @@ namespace annie {
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
+                s._updateInfo.UM=true;
+                s.update(true,true,false);
             }
-            s._updateInfo.UM=true;
         };
         public getBounds():Rectangle{
             return this.viewRect;

@@ -1007,6 +1007,7 @@ declare namespace annie {
          * @default 0
          */
         visible: boolean;
+        _visible: boolean;
         /**
          * 显示对象的混合模式
          * 支持的混合模式大概有

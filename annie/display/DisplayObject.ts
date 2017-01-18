@@ -321,7 +321,15 @@ namespace annie {
          * @type {boolean}
          * @default 0
          */
-        public visible: boolean = true;
+        public get visible(){return this._visible;}
+        public set visible(value:boolean){
+            let s=this;
+            if(s._visible!=value){
+                s._visible=value;
+                s._updateInfo.UM=true;
+            }
+        }
+        public _visible: boolean = true;
         /**
          * 显示对象的混合模式
          * 支持的混合模式大概有
