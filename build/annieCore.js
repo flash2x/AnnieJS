@@ -2151,7 +2151,7 @@ var annie;
              */
             this._command = [];
             this._isNeedUpdate = true;
-            this._cAb = false;
+            this._cAb = true;
             /**
              * @property _cacheCanvas
              * @since 1.0.0
@@ -2161,16 +2161,6 @@ var annie;
             this._cacheImg = window.document.createElement("canvas");
             this._cacheX = 0;
             this._cacheY = 0;
-            /**
-             * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
-             * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
-             * @property hitPixel
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             * @default true
-             */
-            this.hitPixel = false;
             this.rect = new annie.Rectangle();
             /**
              * 径向渐变填充 一般给Flash2x用
@@ -2291,6 +2281,7 @@ var annie;
             return ctx.createPattern(image, "repeat");
         };
         Object.defineProperty(Shape.prototype, "cacheAsBitmap", {
+            get: function () { return this._cAb; },
             /**
              * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
              * 默认将不开启
@@ -2962,7 +2953,7 @@ var annie;
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
-            if (s.hitPixel || s._cAb) {
+            if (s._cAb) {
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -3127,9 +3118,9 @@ var annie;
              * @since 1.0.5
              * @type {boolean}
              * @public
-             * @default false
+             * @default true
              */
-            this.isCacheShape = false;
+            this.isCacheShape = true;
             this._instanceType = "annie.Sprite";
         }
         /**
@@ -5551,18 +5542,18 @@ var annie;
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default false
+             * @default true
              */
-            this.autoSteering = false;
+            this.autoSteering = true;
             /**
              * 当设备尺寸更新，或者旋转后是否自动更新尺寸。
              * @property autoResize
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default false
+             * @default true
              */
-            this.autoResize = false;
+            this.autoResize = true;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -5816,11 +5807,7 @@ var annie;
             this._instanceType = "annie.Stage";
             s.stage = this;
             if (annie.osType == "pc") {
-                s.autoResize = true;
-            }
-            else {
-                s.autoSteering = true;
-                s.autoResize = true;
+                s.autoSteering = false;
             }
             s._lastMousePoint = new annie.Point();
             s.name = "stageInstance_" + s.instanceId;

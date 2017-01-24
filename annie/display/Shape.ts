@@ -72,7 +72,8 @@ namespace annie {
          * @default false
          */
         private set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
-        private _cAb:boolean=false;
+        private get cacheAsBitmap(){return this._cAb;}
+        private _cAb:boolean=true;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -110,16 +111,6 @@ namespace annie {
         private _cacheY: number = 0;
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
-        /**
-         * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
-         * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
-         * @property hitPixel
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default true
-         */
-        public hitPixel: boolean = false;
 
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
@@ -905,7 +896,7 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
-            if (s.hitPixel||s._cAb) {
+            if (s._cAb) {
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;

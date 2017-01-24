@@ -1369,16 +1369,6 @@ declare namespace annie {
         private _isBitmapStroke;
         private _isBitmapFill;
         /**
-         * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
-         * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
-         * @property hitPixel
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default true
-         */
-        hitPixel: boolean;
-        /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
          * @method addDraw
          * @param {string} commandName ctx指令的方法名 如moveTo lineTo arcTo等
@@ -1714,7 +1704,7 @@ declare namespace annie {
          * @since 1.0.5
          * @type {boolean}
          * @public
-         * @default false
+         * @default true
          */
         isCacheShape: boolean;
         /**
@@ -2799,7 +2789,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default false
+         * @default true
          */
         autoSteering: boolean;
         /**
@@ -2808,7 +2798,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default false
+         * @default true
          */
         autoResize: boolean;
         /**

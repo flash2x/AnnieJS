@@ -90,18 +90,18 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default false
+         * @default true
          */
-        public autoSteering:boolean = false;
+        public autoSteering:boolean = true;
         /**
          * 当设备尺寸更新，或者旋转后是否自动更新尺寸。
          * @property autoResize
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default false
+         * @default true
          */
-        public autoResize:boolean = false;
+        public autoResize:boolean = true;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
          * @property desWidth
@@ -239,10 +239,7 @@ namespace annie {
             this._instanceType="annie.Stage";
             s.stage = this;
             if (annie.osType == "pc"){
-                s.autoResize=true;
-            }else{
-                s.autoSteering = true;
-                s.autoResize=true;
+                s.autoSteering=false;
             }
             s._lastMousePoint = new Point();
             s.name = "stageInstance_" + s.instanceId;

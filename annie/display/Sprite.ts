@@ -55,9 +55,9 @@ namespace annie{
          * @since 1.0.5
          * @type {boolean}
          * @public
-         * @default false
+         * @default true
          */
-        public isCacheShape=false;
+        public isCacheShape=true;
         /**
          * 从Sprite中移除一个child
          * @method removeChild
