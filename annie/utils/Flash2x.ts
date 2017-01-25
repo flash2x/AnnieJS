@@ -374,31 +374,32 @@ namespace Flash2x {
         }
         if (extendInfo && extendInfo.length > 0) {
             let index = 0;
-            display.filters = [];
+            let filters:any = [];
             while (extendInfo[index] != undefined) {
                 if (extendInfo[index] == 0) {
-                    display.filters.push(new ColorFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3], extendInfo[index + 4], extendInfo[index + 5], extendInfo[index + 6], extendInfo[index + 7], extendInfo[index + 8]));
+                    filters.push(new ColorFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3], extendInfo[index + 4], extendInfo[index + 5], extendInfo[index + 6], extendInfo[index + 7], extendInfo[index + 8]));
                     index += 9;
                 } else if (extendInfo[index] == 1) {
-                    display.filters.push(new BlurFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3]));
+                    filters.push(new BlurFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3]));
                     index += 4;
                 } else if (extendInfo[index] == 2) {
                     let blur = (extendInfo[index + 1] + extendInfo[index + 2]) * 0.5;
                     let color = Shape.getRGBA(extendInfo[index + 4], extendInfo[index + 5]);
                     let offsetX = extendInfo[index + 7] * Math.cos(extendInfo[index + 6] / 180 * Math.PI);
                     let offsetY = extendInfo[index + 7] * Math.sin(extendInfo[index + 6] / 180 * Math.PI);
-                    display.filters.push(new ShadowFilter(color, offsetX, offsetY, blur));
+                    filters.push(new ShadowFilter(color, offsetX, offsetY, blur));
                     index += 8;
                 } else if (extendInfo[index] == 3) {
                     let blur = (extendInfo[index + 1] + extendInfo[index + 2]) * 0.5;
                     let color = Shape.getRGBA(extendInfo[index + 4], extendInfo[index + 5]);
-                    display.filters.push(new ShadowFilter(color, 0, 0, blur));
+                    filters.push(new ShadowFilter(color, 0, 0, blur));
                     index += 6;
                 } else if (extendInfo[index] == 4) {
-                    display.filters.push(new ColorMatrixFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3], extendInfo[index + 4]));
+                    filters.push(new ColorMatrixFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3], extendInfo[index + 4]));
                     index += 5;
                 }
             }
+            display.filters=filters;
         }
     }
 

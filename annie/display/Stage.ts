@@ -490,7 +490,7 @@ namespace annie {
                 }
                 s._mouseEventInfo = {};
             }
-            if(s.isMultiTouch&&s.muliPoints.length==2){
+            if(s.isMultiTouch&&s.muliPoints.length>=2){
                 //如果有事件，抛事件
                 if(!s._touchEvent) {
                     s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
@@ -740,7 +740,7 @@ namespace annie {
                 s.renderObj.reSize();
                 s.setAlign();
                 s._updateInfo.UM=true;
-                s.update(true,true,false);
+                s.update(true,true,true);
             }
         };
         public getBounds():Rectangle{
