@@ -7384,7 +7384,26 @@ var annie;
             if (!img)
                 return;
             var gl = s._gl;
-            var gi = target._glInfo;
+            var tc = target.rect;
+            var gi = {};
+            if (type == 0) {
+                gi.x = tc.x / img.width;
+                gi.y = tc.y / img.height;
+                gi.w = (tc.x + tc.width) / img.width;
+                gi.h = (tc.y + tc.height) / img.height;
+                gi.pw = tc.width;
+                gi.ph = tc.height;
+            }
+            else {
+                var cX = target._cacheX;
+                var cY = target._cacheY;
+                gi.x = cX / img.width;
+                gi.y = cY / img.height;
+                gi.w = (img.width - cX) / img.width;
+                gi.h = (img.height - cY) / img.height;
+                gi.pw = (img.width - cX * 2);
+                gi.ph = (img.height - cY * 2);
+            }
             ////////////////////////////////////////////
             var vertices = [
                 //x,y,textureX,textureY
@@ -7464,23 +7483,16 @@ var annie;
             gl.activeTexture(gl.TEXTURE0);
             var texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            var h, w;
             if (bitmapData) {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
-                w = bitmapData.width;
-                h = bitmapData.height;
             }
             else {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-                w = width;
-                h = height;
             }
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            texture.width = w;
-            texture.height = h;
             return texture;
         };
         return WGRender;
