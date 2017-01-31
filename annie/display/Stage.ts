@@ -257,8 +257,7 @@ namespace annie {
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                //s.renderObj = new WGRender(s);
-                s.renderObj = new CanvasRender(s);
+                s.renderObj = new WGRender(s);
             }
             s.renderObj.init();
             window.addEventListener("resize", function (e:any) {

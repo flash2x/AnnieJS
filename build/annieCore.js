@@ -5826,8 +5826,7 @@ var annie;
             }
             else {
                 //webgl
-                //s.renderObj = new WGRender(s);
-                s.renderObj = new annie.CanvasRender(s);
+                s.renderObj = new annie.WGRender(s);
             }
             s.renderObj.init();
             window.addEventListener("resize", function (e) {
@@ -7136,6 +7135,357 @@ var annie;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * WebGl 渲染器
+     * @class annie.WGRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.2
+     */
+    var WGRender = (function (_super) {
+        __extends(WGRender, _super);
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.2
+         */
+        function WGRender(stage) {
+            _super.call(this);
+            /**
+             * 渲染器所在最上层的对象
+             * @property rootContainer
+             * @public
+             * @since 1.0.2
+             * @type {any}
+             * @default null
+             */
+            this.rootContainer = null;
+            this._maxTextureCount = 32;
+            this._uniformTexture = 0;
+            this._uniformMaskTexture = 0;
+            this._posAttr = 0;
+            this._textAttr = 0;
+            this._textures = [];
+            this._curTextureId = -1;
+            this._instanceType = "annie.WGRender";
+            this._stage = stage;
+        }
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.2
+         * @public
+         */
+        WGRender.prototype.begin = function () {
+            var s = this;
+            var gl = s._gl;
+            if (s._stage.bgColor != "") {
+                var color = s._stage.bgColor;
+                var r = parseInt("0x" + color.substr(1, 2));
+                var g = parseInt("0x" + color.substr(3, 2));
+                var b = parseInt("0x" + color.substr(5, 2));
+                gl.clearColor(r / 255, g / 255, b / 255, 1.0);
+            }
+            else {
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
+            }
+            gl.clear(gl.COLOR_BUFFER_BIT);
+        };
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.2
+         */
+        WGRender.prototype.beginMask = function (target) {
+            //更新缓冲模板
+            /* let s = this;
+             let gl = s._gl;
+             gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
+             gl.viewport(0, 0, 1024, 1024);
+             gl.disable(gl.BLEND);
+             if (s._maskObjList.length == 0) {
+             gl.clearColor(0.0, 0.0, 0.0, 0.0);
+             gl.clear(gl.COLOR_BUFFER_BIT);
+             gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
+             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
+             }
+             s._maskObjList.push(target);
+             //告诉shader这个时候是画遮罩本身的帧缓冲
+             gl.uniform1i(s._uMask, s._maskObjList.length*100);
+             s.draw(target, 1);
+             gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
+             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
+             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+             gl.uniform1i(s._uMask, s._maskObjList.length);
+             gl.viewport(0, 0, s._dW, s._dH);
+             gl.enable(gl.BLEND);*/
+        };
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.2
+         */
+        WGRender.prototype.endMask = function () {
+            /*let s = this;
+             let gl=s._gl;
+             let len = s._maskObjList.length;
+             if(len>1){
+             s._maskObjList.pop();
+             let mlCopy:any=s._maskObjList.concat();
+             s._maskObjList.length=0;
+             for(let i:number=0;i<mlCopy.length;i++){
+             s.beginMask(mlCopy[i]);
+             }
+             }else{
+             gl.uniform1i(s._uMask, 0);
+             s._maskObjList.length=0;
+             }*/
+        };
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.2
+         * @method reSize
+         */
+        WGRender.prototype.reSize = function () {
+            var s = this;
+            var c = s.rootContainer;
+            c.width = s._stage.divWidth * annie.devicePixelRatio;
+            c.height = s._stage.divHeight * annie.devicePixelRatio;
+            c.style.width = s._stage.divWidth + "px";
+            c.style.height = s._stage.divHeight + "px";
+            s._gl.viewport(0, 0, c.width, c.height);
+            s._dW = c.width;
+            s._dH = c.height;
+            s._pMatrix = new Float32Array([
+                1 / s._dW * 2, 0.0, 0.0,
+                0.0, -1 / s._dH * 2, 0.0,
+                -1.0, 1.0, 1.0
+            ]);
+        };
+        WGRender.prototype._getShader = function (id) {
+            var s = this;
+            var gl = s._gl;
+            // Find the shader script element
+            var shaderText = "";
+            // Create the shader object instance
+            var shader = null;
+            if (id == 0) {
+                shaderText = 'precision highp float;' +
+                    'varying vec2 v_TC;' +
+                    'uniform sampler2D u_texture;' +
+                    'uniform float u_A;' +
+                    'void main() {' +
+                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
+                    '}';
+                shader = gl.createShader(gl.FRAGMENT_SHADER);
+            }
+            else {
+                shaderText = 'precision highp float;' +
+                    'attribute vec2 a_P;' +
+                    'attribute vec2 a_TC;' +
+                    'varying vec2 v_TC;' +
+                    'uniform mat3 vMatrix;' +
+                    'uniform mat3 pMatrix;' +
+                    'void main() {' +
+                    'gl_Position =vec4((pMatrix*vMatrix*vec3(a_P, 1.0)).xy, 1.0, 1.0);' +
+                    'v_TC = a_TC;' +
+                    '}';
+                shader = gl.createShader(gl.VERTEX_SHADER);
+            }
+            // Set the shader source code in the shader object instance and compile the shader
+            gl.shaderSource(shader, shaderText);
+            gl.compileShader(shader);
+            // Attach the shaders to the shader program
+            gl.attachShader(s._program, shader);
+            return shader;
+        };
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.2
+         * @method init
+         */
+        WGRender.prototype.init = function () {
+            var s = this;
+            if (!s.rootContainer) {
+                s.rootContainer = document.createElement("canvas");
+                s._stage.rootDiv.appendChild(s.rootContainer);
+            }
+            var c = s.rootContainer;
+            var gl = c.getContext("webgl") || c.getContext('experimental-webgl');
+            s._gl = gl;
+            s._program = gl.createProgram();
+            var _program = s._program;
+            //初始化顶点着色器和片元着色器
+            s._getShader(0);
+            s._getShader(1);
+            //链接到gpu
+            gl.linkProgram(_program);
+            //使用当前编译的程序
+            gl.useProgram(_program);
+            //改变y轴方向,以对应纹理坐标
+            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            //设置支持有透明度纹理
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+            //取消深度检测
+            gl.disable(gl.DEPTH_TEST);
+            //开启混合模式
+            gl.enable(gl.BLEND);
+            gl.disable(gl.CULL_FACE);
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+            // 新建缓存
+            s._buffer = gl.createBuffer();
+            //
+            s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
+            s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
+            s._uA = gl.getUniformLocation(s._program, 'u_A');
+            //
+            s._cM = new annie.Matrix();
+            s._maxTextureCount = 3; // gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
+            s._posAttr = gl.getAttribLocation(s._program, "a_P");
+            s._textAttr = gl.getAttribLocation(s._program, "a_TC");
+            gl.enableVertexAttribArray(s._posAttr);
+            gl.enableVertexAttribArray(s._textAttr);
+        };
+        WGRender.prototype.setBuffer = function (buffer, data) {
+            var s = this;
+            var gl = s._gl;
+            //绑定buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+            //将buffer赋值给一变量
+            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
+            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
+        };
+        /**
+         *  调用渲染
+         * @public
+         * @since 1.0.2
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
+         */
+        WGRender.prototype.draw = function (target, type) {
+            var s = this;
+            var img = target._cacheImg;
+            if (!img)
+                return;
+            var gl = s._gl;
+            var gi = target._glInfo;
+            ////////////////////////////////////////////
+            var vertices = [
+                //x,y,textureX,textureY
+                0.0, 0.0, gi.x, gi.y,
+                gi.pw, 0.0, gi.w, gi.y,
+                0.0, gi.ph, gi.x, gi.h,
+                gi.pw, gi.ph, gi.w, gi.h
+            ];
+            var m;
+            if (type > 0) {
+                m = s._cM;
+                m.identity();
+                if (type == 2) {
+                    m.tx = target._cacheX * 2;
+                    m.ty = target._cacheY * 2;
+                }
+                else {
+                    m.tx = -img.width;
+                    m.ty = -img.height;
+                }
+                m.prepend(target.cMatrix);
+            }
+            else {
+                m = target.cMatrix;
+            }
+            var vMatrix = new Float32Array([
+                m.a, m.b, 0,
+                m.c, m.d, 0,
+                m.tx, m.ty, 1
+            ]);
+            gl.uniform1i(s._uniformTexture, s.createTexture(img));
+            s.setBuffer(s._buffer, new Float32Array(vertices));
+            gl.uniform1f(s._uA, target.cAlpha);
+            gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
+            gl.uniformMatrix3fv(s._vMI, false, vMatrix);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+        /*
+        
+                private activeTexture(bitmapData: any): number {
+                    let s = this;
+                    let gl = s._gl;
+                    let newId: number = -1;
+                    let isHave: boolean = false;
+                    for (let i = 1; i < s._maxTextureCount; i++) {
+                        if (s._textures[i] == null) {
+                            newId = i;
+                            break;
+                        }
+                        if (s._textures[i] == texture) {
+                            newId = i;
+                            isHave = true;
+                            break;
+                        }
+                    }
+                    if (newId < 0) {
+                        if (s._curTextureId < s._maxTextureCount - 1) {
+                            s._curTextureId++;
+                        } else {
+                            s._curTextureId = 1;
+                        }
+                        newId = s._curTextureId;
+                    }
+                    gl.activeTexture(gl["TEXTURE" + newId]);
+                    if (!isHave) {
+                        gl.bindTexture(gl.TEXTURE_2D, texture);
+                    }
+                    s._textures[newId] = texture;
+                    return newId;
+                }
+        */
+        WGRender.prototype.createTexture = function (bitmapData, width, height) {
+            if (bitmapData === void 0) { bitmapData = null; }
+            if (width === void 0) { width = 1; }
+            if (height === void 0) { height = 1; }
+            var gl = this._gl;
+            gl.activeTexture(gl.TEXTURE0);
+            var texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            var h, w;
+            if (bitmapData) {
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+                w = bitmapData.width;
+                h = bitmapData.height;
+            }
+            else {
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                w = width;
+                h = height;
+            }
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            texture.width = w;
+            texture.height = h;
+            return texture;
+        };
+        return WGRender;
+    }(annie.AObject));
+    annie.WGRender = WGRender;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -8860,7 +9210,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.5";
+    annie.version = "1.0.6";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
