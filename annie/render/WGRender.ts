@@ -30,14 +30,11 @@ namespace annie {
         private _pMI: number;
         private _vMI: number;
         private _uA: number;
-        private _uMask: number;
         private _cM: annie.Matrix;
         private _maxTextureCount: number = 32;
         private _uniformTexture: number = 0;
-        private _uniformMaskTexture: number = 0;
         private _posAttr: number = 0;
         private _textAttr: number = 0;
-        private _textures: any = [];
         private _curTextureId: number = -1;
 
         /**

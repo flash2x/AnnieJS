@@ -739,7 +739,6 @@ namespace annie {
                 s.renderObj.reSize();
                 s.setAlign();
                 s._updateInfo.UM=true;
-                s.update(true,true,true);
             }
         };
         public getBounds():Rectangle{

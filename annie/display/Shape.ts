@@ -658,7 +658,7 @@ namespace annie {
             if(s.visible) {
                 super.update(um, ua, uf);
                 if(s.parent)s.cacheAsBitmap=s.parent.isCacheShape;
-                if (s._isNeedUpdate || uf||s._updateInfo.UF) {
+                if (s._isNeedUpdate || uf||s._updateInfo.UF){
                     //更新缓存
                     let cLen: number = s._command.length;
                     let leftX: number;
@@ -858,12 +858,14 @@ namespace annie {
                     } else if (paramsLen == 5) {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
                     } else if (paramsLen == 6) {
+                        let lx=data[2][4];
+                        let ly=data[2][5];
                         if (data[0] == 2) {
                             //位图填充
-                            data[2][4] -= leftX;
-                            data[2][5] -= leftY;
+                            lx-=leftX;
+                            ly-=leftY;
                         }
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {
                     if(!isMask)

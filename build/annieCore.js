@@ -2913,12 +2913,14 @@ var annie;
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
                     }
                     else if (paramsLen == 6) {
+                        var lx = data[2][4];
+                        var ly = data[2][5];
                         if (data[0] == 2) {
                             //位图填充
-                            data[2][4] -= leftX;
-                            data[2][5] -= leftY;
+                            lx -= leftX;
+                            ly -= leftY;
                         }
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 }
                 else {
@@ -5800,7 +5802,6 @@ var annie;
                     s.renderObj.reSize();
                     s.setAlign();
                     s._updateInfo.UM = true;
-                    s.update(true, true, true);
                 }
             };
             var s = this;
@@ -7170,10 +7171,8 @@ var annie;
             this.rootContainer = null;
             this._maxTextureCount = 32;
             this._uniformTexture = 0;
-            this._uniformMaskTexture = 0;
             this._posAttr = 0;
             this._textAttr = 0;
-            this._textures = [];
             this._curTextureId = -1;
             this._instanceType = "annie.WGRender";
             this._stage = stage;

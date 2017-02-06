@@ -3547,14 +3547,11 @@ declare namespace annie {
         private _pMI;
         private _vMI;
         private _uA;
-        private _uMask;
         private _cM;
         private _maxTextureCount;
         private _uniformTexture;
-        private _uniformMaskTexture;
         private _posAttr;
         private _textAttr;
-        private _textures;
         private _curTextureId;
         /**
          * @CanvasRender
