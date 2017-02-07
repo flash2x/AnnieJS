@@ -11,7 +11,6 @@ namespace annie {
      */
     export class MouseEvent extends Event {
         /**
-         * 鼠标或者手指按下事件
          * @property MOUSE_DOWN
          * @static
          * @public
@@ -20,7 +19,6 @@ namespace annie {
          */
         public static MOUSE_DOWN:string = "onMouseDown";
         /**
-         * 鼠标或者手指抬起事件
          * @property MOUSE_UP
          * @static
          * @public
@@ -29,16 +27,6 @@ namespace annie {
          */
         public static MOUSE_UP:string = "onMouseUp";
         /**
-         * 鼠标或者手指单击
-         * @property CLICK
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        public static CLICK:string = "onMouseClick";
-        /**
-         * 鼠标或者手指移动事件
          * @property MOUSE_MOVE
          * @static
          * @public
@@ -46,24 +34,6 @@ namespace annie {
          * @type {string}
          */
         public static MOUSE_MOVE:string = "onMouseMove";
-        /**
-         * 鼠标或者手指移入到显示对象上里触发的事件
-         * @property MOUSE_OVER
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        public static MOUSE_OVER:string = "onMouseOver";
-        /**
-         * 鼠标或者手指移出显示对象边界触发的事件
-         * @property MOUSE_OUT
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        public static MOUSE_OUT:string = "onMouseOut";
         /**
          * mouse或touch事件时rootDiv坐标x点
          * @property clientX

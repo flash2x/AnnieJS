@@ -11,7 +11,7 @@ namespace annie {
      */
     export class Rectangle extends AObject {
         /**
-         * 构造函数
+         * 初始化一个矩形
          * @method Rectangle
          * @param {number} x
          * @param {number} y
@@ -72,7 +72,7 @@ namespace annie {
             return point.x>=s.x&&point.x<=(s.x+s.width)&&point.y>=s.y&&point.y<=(s.y+s.height);
         }
         /**
-         * 将多个矩形合成为一个大的矩形
+         * 将多个rect合成为一个大的rect
          * 返回包含所有给定的矩阵拼合之后的一个最小矩形
          * @method createFromRects
          * @param {annie.Rectangle} rect
@@ -105,8 +105,8 @@ namespace annie {
             return new Rectangle(x,y,wx1-x,hy1-y);
         }
         /**
-         * 通过一系列点来生成一个矩形
-         * 返回包含所有给定的点的最小矩形
+         * 通过一系列点来确定一个矩形
+         * 返回包含所有给定的点的一个最小矩形
          * @method createFromPoints
          * @static
          * @public

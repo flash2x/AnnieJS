@@ -9,14 +9,6 @@ namespace annie {
      * @public
      */
     export class Point extends annie.AObject {
-        /**
-         * 构造函数
-         * @method Point
-         * @public
-         * @since 1.0.0
-         * @param x
-         * @param y
-         */
         constructor(x:number=0, y:number=0) {
             super();
             var s = this;

@@ -11,16 +11,6 @@ namespace annie {
      */
     export class Event extends AObject {
         /**
-         * 舞台尺寸发生变化时触发
-         * @Event
-         * @property RESIZE
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        public static RESIZE:string = "onResize";
-        /**
          * 舞台初始化完成后会触发的事件
          * @Event
          * @property ON_STAGE_INIT
@@ -71,7 +61,7 @@ namespace annie {
          */
         public static END_FRAME:string = "onEndFrame";
         /**
-         * MovieClip 帧标签事件
+         * MovieClip 帧事件
          * @Event
          * @property CALL_FRAME
          * @type {string}
@@ -121,7 +111,6 @@ namespace annie {
          */
         public static ABORT:string = "onAbort";
         /**
-         * 开始事件
          * @Event
          * @property START
          * @type {string}
@@ -131,7 +120,6 @@ namespace annie {
          */
         public static START:string = "onStart";
         /**
-         * 事件类型名
          * @property type
          * @type {string}
          * @public
@@ -174,14 +162,6 @@ namespace annie {
         public preventDefault(){
             this._pd=true;
         }
-
-        /**
-         * 是否阻止事件向下冒泡
-         * @property _pd
-         * @type {boolean}
-         * @private
-         * @since 1.0.0
-         */
         private _pd:boolean=false;
     }
 }

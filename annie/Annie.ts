@@ -3,23 +3,6 @@
  */
 namespace annie {
     /**
-     * 是否开启调试模式
-     * @public
-     * @since 1.0.1
-     * @public
-     * @property debug
-     * @type {boolean}
-     */
-    export var debug:boolean=false;
-    /**
-     * annie引擎的版本号
-     * @public
-     * @since 1.0.1
-     * @property version
-     * @type {string}
-     */
-    export var version:string="1.0.1";
-    /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
      * @type {number}
@@ -116,59 +99,14 @@ namespace annie {
      * @default false
      */
     export var canHTMLTouchMove:boolean=false;
-    // 作为将显示对象导出成图片的render渲染器
-    var _dRender:any=null;
     /**
-     * 将显示对象转成base64的图片数据
-     * @method toDisplayDataURL
+     * 启用调试模式
+     * @type {boolean}
      * @static
-     * @param {annie.DisplayObject} obj 显示对象
-     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
-     * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
-     * @return {string} base64格式数据
+     * @public
+     * @default
+     * @since 1.0.0
+     * @default false
      */
-    export var toDisplayDataURL=function(obj:any,rect:Rectangle=null,typeInfo:any=null,bgColor:string=""):string {
-        if(!_dRender){
-            _dRender=new CanvasRender(null);
-        }
-        _dRender._stage=obj;
-        _dRender.rootContainer=DisplayObject["_canvas"];
-        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        if(!obj.stage){
-            obj.update();
-        }
-        var whObj:any=obj.getBounds();
-        var w:number=rect?rect.width:whObj.width;
-        var h:number=rect?rect.height:whObj.height;
-        _dRender.rootContainer.width=w;
-        _dRender.rootContainer.height=h;
-        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if(bgColor==""){
-            _dRender._ctx.clearRect(0, 0, w, h);
-        }else{
-            _dRender._ctx.fillStyle=bgColor;
-            _dRender._ctx.fillRect(0, 0, w, h);
-        }
-        var objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
-        obj.parent=null;
-        obj.x=rect?-rect.x:0;
-        obj.y=rect?-rect.y:0;
-        obj.scaleX=obj.scaleY=1;
-        obj.rotation=obj.skewX=obj.skewY=0;
-        obj.update();
-        obj.render(_dRender);
-        obj.parent=objInfo.p;
-        obj.x=objInfo.x;
-        obj.y=objInfo.y;
-        obj.scaleX= objInfo.scX;
-        obj.scaleY=objInfo.scY;
-        obj.rotation=objInfo.r;
-        obj.skewX=objInfo.skX;
-        obj.skewY=objInfo.skY;
-        if(!typeInfo){
-            typeInfo={type:"png"};
-        }
-        return _dRender.rootContainer.toDataURL("image/"+typeInfo.type,typeInfo.quality);
-    };
+    export var isDebug=false;
 }

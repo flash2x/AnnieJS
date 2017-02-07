@@ -1,20 +1,10 @@
 /**
  * Created by anlun on 16/8/14.
  */
-/**
- * @module annieUI
- */
 namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     import osType = annie.osType;
-    /**
-     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annieUI.ScrollPage
-     * @public
-     * @extends annie.Sprite
-     * @since 1.0.0
-     */
     export class ScrollPage extends Sprite {
         /**
          * 横向还是纵向 默认为纵向
@@ -131,37 +121,47 @@ namespace annieUI {
          * @default 20
          * @type {number}
          */
-        public  fSpeed: number = 20;
+        public fSpeed: number = 20;
+        private isMaoPao: boolean = true;
         private paramXY: string = "y";
         private stopTimes: number = -1;
-        private isMouseDown:boolean=false;
+
         /**
          * 构造函数
          * @method  ScrollPage
-         * @param {number}vW 可视区域宽
-         * @param {number}vH 可视区域高
-         * @param {number}maxDistance 最大滚动的长度
-         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @param vW 可视区域宽
+         * @param vH 可视区域高
+         * @param maxDistance 最大滚动的长度
+         * @param isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          */
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             var s = this;
-            s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
-            s.view.mask = s.maskObj;
-            s.setMask(vW,vH);
-            s.maskObj.alpha=0;
-            s.addChild(s.maskObj);
             s.addChild(s.view);
+            s.maskObj.beginFill("#000000");
+            s.maskObj.rect(0, 0, vW, vH);
+            s.viewWidth = vW;
+            s.viewHeight = vH;
+            s.maskObj.endFill();
+            s.view.mask = s.maskObj;
             s.maxDistance = maxDistance;
+            s.isVertical = isVertical;
+
+            if (s.isVertical) {
+                s.distance = s.viewHeight;
+                s.paramXY = "y";
+            } else {
+                s.distance = s.viewWidth;
+                s.paramXY = "x";
+            }
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view: any = s.view;
-                if (!s.isStop){
+                if (!s.isStop) {
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
                         //是否超过了边界,如果超过了,则加快加速度,让其停止
@@ -210,9 +210,7 @@ namespace annieUI {
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
-         * @param {boolean}isVertical 是纵向还是横向,不传值则默认为纵向
-         * @since 1.0.0
-         * @public
+         * @param isVertical 是纵向还是横向,不传值则默认为纵向
          */
         public changeDirection(isVertical: boolean = true): void {
             var s = this;
@@ -225,30 +223,7 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
-        /**
-         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
-         * @method setMask
-         * @param {number}w 设置可见区域的宽
-         * @param {number}h 设置可见区域的高
-         * @public
-         * @since 1.0.0
-         */
-        private setMask(w:number,h:number):void{
-            var s:any=this;
-            s.maskObj.clear();
-            s.maskObj.beginFill("#000000");
-            s.maskObj.rect(0, 0, w, h);
-            s.viewWidth = w;
-            s.viewHeight = h;
-            s.maskObj.endFill();
-            if (s.isVertical) {
-                s.distance = s.viewHeight;
-                s.paramXY = "y";
-            } else {
-                s.distance = s.viewWidth;
-                s.paramXY = "x";
-            }
-        }
+
         private onMouseEvent(e: annie.MouseEvent): void {
             var s = this;
             var view: any = s.view;
@@ -256,6 +231,10 @@ namespace annieUI {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {
                         s.isStop = true;
+                        //并且需要告诉对应的鼠标弹起事件时不要向下冒泡
+                        s.isMaoPao = false;
+                    } else {
+                        s.isMaoPao = true;
                     }
                     if (s.isVertical) {
                         s.lastValue = e.localY;
@@ -263,9 +242,7 @@ namespace annieUI {
                         s.lastValue = e.localX;
                     }
                     s.speed = 0;
-                    s.isMouseDown=true;
                 } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                    if(!s.isMouseDown)return;
                     var currentValue: number;
                     if (s.isVertical) {
                         currentValue = e.localY;
@@ -292,14 +269,20 @@ namespace annieUI {
                             speedPer = 0.2;
                         }
                         view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
+                        s.isMaoPao = false;
                     }
                     s.lastValue = currentValue;
                     s.stopTimes = 0;
                 } else {
-                    s.isMouseDown=false;
                     s.isStop = false;
                     s.stopTimes = -1;
                 }
+            }
+            if(annie.osType=="android"){
+                return;
+            }
+            if (!s.isMaoPao) {
+                e.preventDefault();
             }
         }
     }

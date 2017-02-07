@@ -38,36 +38,52 @@ namespace annie {
         }
 
         /**
-         * 全局的鼠标事件的监听数对象表
-         * @property _MECO
-         * @private
+         * 主要为了记录项目中是否有添加onMouseMove的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
+         * @property _count0
+         * @static
+         * @type {number}
          * @since 1.0.0
+         * @private
          */
-
-        private static _MECO:any={};
+        private static _count0:number=0;
+        /**
+         * 主要为了记录项目中是否有添加onMouseMown的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
+         * @property _count1
+         * @static
+         * @type {number}
+         * @since 1.0.0
+         * @private
+         */
+        private static _count1:number=0;
+        /**
+         * 主要为了记录项目中是否有添加onMouseUp的数量，以此来考虑是否在更新的过程中需要遍历显示列表来提高性能
+         * @property _count2
+         * @static
+         * @type {number}
+         * @since 1.0.0
+         * @private
+         */
+        private static _count2:number=0;
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
          * @returns {number}
          * @static
-         * @private
+         * @public
          * @since 1.0.0
-         * @param {string} type 获取事件类型，默认是所有
          */
-        public static getMouseEventCount(type:string=""):number{
-            var count:number=0;
-            if(type==""){
-                //返回所有鼠标事件数
-                for(var item in EventDispatcher._MECO){
-                    count+=EventDispatcher._MECO[item];
-                }
-            }else {
-                if (EventDispatcher._MECO[type]){
-                    count=EventDispatcher._MECO[type];
-                }
+        public static getMouseEventCount(type:string):number{
+            var id:number=0;
+            if(type=="onMouseDown"){
+                id=EventDispatcher._count1;
+            }else if(type=="onMouseUp"){
+                id=EventDispatcher._count2;
+            }else{
+                id=EventDispatcher._count0;
             }
-            return count;
+            return id;
         }
+
         /**
          * 给对象添加一个侦听
          * @method addEventListener
@@ -110,11 +126,15 @@ namespace annie {
             if(isAdd){
                 count=1;
             }
-            if(!EventDispatcher._MECO[type]){
-                EventDispatcher._MECO[type]=0;
+            if(type=="onMouseDown") {
+                EventDispatcher._count1+=count;
+            }else if(type=="onMouseUp"){
+                EventDispatcher._count2+=count;
+            }else if(type=="onMouseMove"){
+                EventDispatcher._count0+=count;
             }
-            EventDispatcher._MECO[type]+=count;
         }
+
         /**
          * 广播侦听
          * @method dispatchEvent
@@ -168,7 +188,7 @@ namespace annie {
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
          */
-        public removeEventListener(type:string,listener:Function):void{
+        public removeEventListener(type:string, listener:Function):void {
             var s=this;
             var listeners = s.eventTypes[type];
             if (listeners) {

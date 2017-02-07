@@ -3,7 +3,7 @@
  */
 namespace annie{
     /**
-     * 投影或者发光滤镜
+     * 投影或者发光.
      * @class annie.ShadowFilter
      * @extends annie.AObject
      * @public
@@ -233,7 +233,7 @@ namespace annie{
         }
     }
     /**
-     * 矩阵变色滤镜
+     * 矩阵变色
      * @class annie.ColorMatrixFilter
      * @extends annie.AObject
      * @public
@@ -443,7 +443,7 @@ namespace annie{
         }
     }
     /**
-     * 模糊滤镜
+     * 模糊
      * @class annie.BlurFilter
      * @extends annie.AOjbect
      * @public

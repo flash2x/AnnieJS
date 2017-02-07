@@ -37,7 +37,7 @@ namespace annie {
          */
         public static getGradientColor(colors:Array<string>, ratios:Array<number>, points:Array<number>):any {
             var colorObj:any;
-            var ctx = DisplayObject["_canvas"].getContext("2d");
+            var ctx = Shape._cacheCanvas.getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }else{
@@ -59,7 +59,7 @@ namespace annie {
          * @since 1.0.0
          */
         public static getBitmapStyle(image:any):any{
-            var ctx = DisplayObject["_canvas"].getContext("2d");
+            var ctx = Shape._cacheCanvas.getContext("2d");
             return ctx.createPattern(image,"repeat");
         }
         /**
@@ -94,13 +94,14 @@ namespace annie {
          * @private
          * @type {Canvas}
          */
-        private _cacheImg:any=window.document.createElement("canvas");
+        public static _cacheCanvas:any = window.document.createElement("canvas");
+        private _cacheImg:any=window.document.createElement("img");
         private _cacheX:number = 0;
         private _cacheY:number = 0;
         private _isBitmapStroke:Matrix;
         private _isBitmapFill:Matrix;
         /**
-         * 碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
+         *碰撞或鼠标点击时的检测精度,为false只会粗略检测,如果形状规则,建议使用,检测速度快。
          * 为true则会进行像素检测,只会检测有像素区域,检测效果好,建议需要严格的点击碰撞检测
          * @property hitPixel
          * @public
@@ -139,7 +140,7 @@ namespace annie {
          * @since 1.0.0
          */
         public roundRect(x:number,y:number,w:number,h:number,rTL:number=0,rTR:number=0,rBL:number=0,rBR:number=0):void{
-            //var ctx = DisplayObject._canvas.getContext("2d");
+            //var ctx = Shape._cacheCanvas.getContext("2d");
             var max = (w<h?w:h)/2;
             var mTL=0, mTR=0, mBR=0, mBL=0;
             if (rTL < 0) { rTL *= (mTL=-1); }
@@ -270,8 +271,9 @@ namespace annie {
          * @since 1.0.0
          */
         public arc(x:number, y:number,radius:number, start:number, end:number):void{
-            this._command.push([1,"arc",[x,y,radius,start/180*Math.PI,end/180*Math.PI]]);
+            this._command.push([1,"arc",[x,y,radius,start,end]]);
         }
+
         /**
          * 画一个圆
          * @method circle
@@ -607,7 +609,7 @@ namespace annie {
         };
 
         /**
-         * 重写渲染
+         *
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -622,7 +624,6 @@ namespace annie {
         }
 
         /**
-         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
@@ -742,7 +743,7 @@ namespace annie {
                         s._cacheX = leftX;
                         s._cacheY = leftY;
                         ///////////////////////////
-                        var _canvas = s._cacheImg;
+                        var _canvas = Shape._cacheCanvas;
                         _canvas.width = w;
                         _canvas.height = h;
                         var ctx = _canvas["getContext"]('2d');
@@ -754,10 +755,10 @@ namespace annie {
                             var cfLen = cf.length;
                             for (var i = 0; i < cfLen; i++) {
                                 if (s.cFilters[i].type == "Shadow") {
-                                    ctx.shadowBlur += cf[i].blur;
-                                    ctx.shadowColor += cf[i].color;
-                                    ctx.shadowOffsetX += cf[i].offsetX;
-                                    ctx.shadowOffsetY += cf[i].offsetY;
+                                    ctx.shadowBlur = cf[i].blur;
+                                    ctx.shadowColor = cf[i].color;
+                                    ctx.shadowOffsetX = cf[i].offsetX;
+                                    ctx.shadowOffsetY = cf[i].offsetY;
                                     break;
                                 }
                             }
@@ -805,15 +806,14 @@ namespace annie {
                             ctx.putImageData(imageData,0,0);
                         }
                         //
+                        s._cacheImg.src = _canvas.toDataURL("image/png");
                     } else {
-                        s._cacheImg.width=0;
-                        s._cacheImg.height=0;
+                        s._cacheImg.src ="";
                         s._cacheX=0;
                         s._cacheY=0;
                     }
                 }else{
-                    s._cacheImg.width=0;
-                    s._cacheImg.height=0;
+                    s._cacheImg.src="";
                     s._cacheX=0;
                     s._cacheY=0;
                 }
@@ -823,7 +823,7 @@ namespace annie {
         /*private _drawPath(){
             var s=this;
             var leftX:number=s._cacheX,leftY:number=s._cacheY,w:number=s._cacheW,h:number=s._cacheH;
-            var _canvas = DisplayObject._canvas;
+            var _canvas = Shape._cacheCanvas;
             _canvas.width = w;
             _canvas.height = h;
             var ctx = _canvas["getContext"]('2d');
@@ -857,7 +857,6 @@ namespace annie {
             }
         }*/
         /**
-         * 重写getBounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -875,7 +874,6 @@ namespace annie {
             return r;
         }
         /**
-         * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
@@ -893,7 +891,7 @@ namespace annie {
                     return s;
                 }
             //继续检测
-                var _canvas = DisplayObject["_canvas"];
+                var _canvas = Shape._cacheCanvas;
                 _canvas.width = 1;
                 _canvas.height = 1;
                 var ctx = _canvas["getContext"]('2d');

@@ -68,7 +68,6 @@ namespace annie {
          * @since 1.0.0
          * @type {number}
          * @default 1
-         * @readonly
          */
         public currentFrame:number=1;
 
@@ -80,7 +79,6 @@ namespace annie {
          * @since 1.0.0
          * @type {boolean}
          * @default true
-         * @readonly
          */
         public isPlaying:boolean=true;
 
@@ -91,7 +89,6 @@ namespace annie {
          * @since 1.0.0
          * @type {boolean}
          * @default true
-         * @readonly
          */
         public isFront:boolean=true;
         /**
@@ -101,7 +98,6 @@ namespace annie {
          * @since 1.0.0
          * @type {number}
          * @default 1
-         * @readonly
          */
         public totalFrames:number=1;
         private _scriptLayer:any=[];
@@ -262,18 +258,15 @@ namespace annie {
             //将mc设置成按钮形式
             if(s.totalFrames>1) {
                 s.gotoAndStop(1);
-                s.addEventListener("onMouseDown",this._mouseEvent.bind(this));
-                s.addEventListener("onMouseUp",this._mouseEvent.bind(this));
-                s.addEventListener("onMouseOut",this._mouseEvent.bind(this));
+                s.addEventListener("onMouseDown", function () {
+                    this.gotoAndStop(2);
+                }.bind(s));
+                s.addEventListener("onMouseUp", function () {
+                    this.gotoAndStop(1);
+                }.bind(s));
             }
         }
-        private _mouseEvent=function (e:MouseEvent):void {
-            if(e.type==annie.MouseEvent.MOUSE_DOWN){
-                this.gotoAndStop(2);
-            }else{
-                this.gotoAndStop(1);
-            }
-        };
+
         //setLabelFrame;
         /**
          * Flash2x工具调用的方法,用户一般不需要使用
@@ -460,12 +453,7 @@ namespace annie {
         }
 
         /**
-         * 动画播放过程中更改movieClip中的一个child的显示属性，
-         * 如果是停止状态，可以直接设置子级显示属性
-         * 因为moveClip在播放的过程中是无法更新子级的显示属性的，
-         * 比如你要更新子级的坐标，透明度，旋转等等，这些更改都会无效
-         * 因为，moveClip自己记录了子级每一帧的这些属性，所有你需要通过
-         * 此方法告诉moveClip我要自己控制这些属性
+         * 更改mc中的一个孩子的显示属性
          * @method setFrameChild
          * @public
          * @since 1.0.0
@@ -497,7 +485,6 @@ namespace annie {
         }
 
         /**
-         * 重写刷新
          * @method update
          * @public
          * @since 1.0.0

@@ -1,6 +1,7 @@
 /**
  * @class 全局
  */
+import Stage = annie.Stage;
 /**
  * 往控制台打印调试信息
  * @method trace
@@ -26,7 +27,7 @@ var trace = function (...arg:any[]) {
 var globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
 //禁止页面滑动
 document.ontouchmove = function(e){
-    if(!annie.canHTMLTouchMove&&!annie.debug){
+    if(!annie.canHTMLTouchMove) {
         e.preventDefault();
     }
 };
@@ -37,5 +38,5 @@ import F2xText=annie.TextField;
 import F2xInputText=annie.InputText;
 import F2xBitmap=annie.Bitmap;
 import F2xShape=annie.Shape;
-annie.Stage["addUpdateObj"](annie.Tween);
-annie.Stage["flushAll"]();
+Stage["addUpdateObj"](annie.Tween);
+Stage["flushAll"]();

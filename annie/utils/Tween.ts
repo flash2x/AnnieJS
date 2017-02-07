@@ -19,17 +19,6 @@ namespace annie {
         public _completeFun:Function;
         public _ease:Function;
         private _isFront:boolean = true;
-
-        /**
-         * 初始化数据
-         * @method init
-         * @param target
-         * @param times
-         * @param data
-         * @param isTo
-         * @public
-         * @since 1.0.0
-         */
         public init(target:any, times:number, data:any, isTo:boolean = true):void {
             var s = this;
             s._currentFrame = 1;
@@ -85,13 +74,6 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 更新数据
-         * @method update
-         * @since 1.0.0
-         * @public
-         */
         public update():void {
             var s = this;
             if (s._isFront && s._delay > 0) {
@@ -111,9 +93,10 @@ namespace annie {
             }
             if (s._isFront) {
                 s._currentFrame++;
-
                 if (s._currentFrame > s._totalFrames) {
-                    var cf=s._completeFun;
+                    if (s._completeFun) {
+                        s._completeFun();
+                    }
                     if (s._isLoop>0) {
                         s._isFront = false;
                         s._currentFrame = s._totalFrames;
@@ -121,22 +104,18 @@ namespace annie {
                     } else {
                         Tween.kill(s.getInstanceId());
                     }
-                    if(cf){
-                        cf();
-                    }
                 }
             } else {
                 s._currentFrame--;
                 if (s._currentFrame <0) {
-                    var cf=s._completeFun;
+                    if (s._completeFun) {
+                        s._completeFun();
+                    }
                     if (s._isLoop>0) {
                         s._isFront = true;
                         s._currentFrame = 1;
                     }else{
                         Tween.kill(s.getInstanceId());
-                    }
-                    if(cf){
-                        cf();
                     }
                 }
             }
@@ -160,8 +139,7 @@ namespace annie {
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
-         * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
+         * @param {boolean} data.useFrame 第二个参数是用时间值还是用帧数
          * @public
          * @since 1.0.0
          */
@@ -180,8 +158,7 @@ namespace annie {
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
-         * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
+         * @param {boolean} data.useFrame 第二个参数是用时间值还是用帧数
          * @public
          * @since 1.0.0
          */
@@ -255,15 +232,15 @@ namespace annie {
         private static _tweenList:Array<TweenObj> = [];
 
         /**
-         * quadraticIn缓动类型
-         * @method quadraticIn
+         * quadraticIN缓动类型
+         * @method quadraticIN
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        public static quadraticIn(k:number):number {
+        public static quadraticIN(k:number):number {
             return k * k;
         }
         /**
@@ -294,15 +271,15 @@ namespace annie {
             return -0.5 * (--k * (k - 2) - 1);
         }
         /**
-         * cubicIn 缓动类型
-         * @method cubicIn
+         * cubicIN 缓动类型
+         * @method cubicIN
          * @static
          * @public
          * @since 1.0.0
          * @param {number}k
          * @returns {number}
          */
-        public static cubicIn(k:number):number {
+        public static cubicIN(k:number):number {
             return k * k * k;
 
         }
@@ -719,9 +696,6 @@ namespace annie {
         }
         /**
          * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
-         * @method flush
-         * @private
-         * @since 1.0.0
          */
         private static flush():void{
             if(isUpdateTween){

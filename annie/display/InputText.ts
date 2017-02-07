@@ -89,7 +89,7 @@ namespace annie {
         }
 
         /**
-         * 设置文本是否为粗体
+         * 设置粗体
          * @method setBold
          * @param {boolean} bold true或false
          * @public

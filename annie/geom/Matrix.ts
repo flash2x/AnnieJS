@@ -95,7 +95,6 @@ namespace annie {
         public ty:number=0;
 
         /**
-         * 构造函数
          * @method Matrix
          * @param {number} a
          * @param {number} b
@@ -118,7 +117,6 @@ namespace annie {
         }
 
         /**
-         * 复制一个矩阵
          * @method clone
          * @since 1.0.0
          * @public
@@ -216,7 +214,7 @@ namespace annie {
         }
 
         /**
-         * 设置一个矩阵通过普通的显示对象的相关九大属性
+         * 设置一个矩阵通过普通的属性
          * @method createBox
          * @param {number} x
          * @param {number} y
@@ -289,7 +287,7 @@ namespace annie {
         };
 
         /**
-         * 判断两个矩阵是否相等
+         * 判断
          * @method isEqual
          * @static
          * @public

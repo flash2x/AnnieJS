@@ -15,7 +15,16 @@ namespace annie {
      */
     export class Bitmap extends DisplayObject {
         /**
-         * HTML的一个Image对象或者是canvas对象或者是video对象
+         * 画缓存位图的时候需要使用
+         * @property _bitmapCanvas
+         * @private
+         * @static
+         * @since 1.0.0
+         * @type {Canvas}
+         */
+        private static _bitmapCanvas:any = window.document.createElement("canvas");
+        /**
+         * HTML的一个Image对象
          * @property bitmapData
          * @public
          * @since 1.0.0
@@ -34,7 +43,7 @@ namespace annie {
          */
         public rect:Rectangle = null;
         /**
-         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+         * 缓存起来的位图对象。最后真正送到渲染器去渲染的对象
          * @property _cacheImg
          * @private
          * @since 1.0.0
@@ -83,7 +92,7 @@ namespace annie {
             s.rect = rect;
         }
         /**
-         * 重写渲染
+         * 调用渲染
          * @method render
          * @param {annie.IRender} renderObj
          * @public
@@ -97,7 +106,7 @@ namespace annie {
         }
 
         /**
-         * 重写刷新
+         * @调用更新
          * @method update
          * @public
          * @since 1.0.0
@@ -108,10 +117,7 @@ namespace annie {
             //滤镜
             if(s._isNeedUpdate){
                 if (s["cFilters"] && s["cFilters"].length > 0) {
-                    if(!s._realCacheImg){
-                        s._realCacheImg=window.document.createElement("canvas");
-                    }
-                    var _canvas = s._realCacheImg;
+                    var _canvas = Bitmap._bitmapCanvas;
                     var tr = s.rect;
                     var w = tr ? tr.width : s.bitmapData.width;
                     var h = tr ? tr.height : s.bitmapData.height;
@@ -151,7 +157,10 @@ namespace annie {
                         f.drawFilter(imageData);
                     }
                     ctx.putImageData(imageData, 0, 0);
-                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
+                    if(!s._realCacheImg){
+                        s._realCacheImg=window.document.createElement("img");
+                    }
+                    s._realCacheImg.src = _canvas.toDataURL("image/png");
                     s._cacheImg = s._realCacheImg;
                     s._cacheX = -10;
                     s._cacheY = -10;
@@ -166,7 +175,6 @@ namespace annie {
             }
         }
         /**
-         * 重写getBounds
          * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public
@@ -192,14 +200,14 @@ namespace annie {
          * @static
          * @public
          * @since 1.0.0
-         * @param {annie.Bitmap} bitmap
+         * @param bitmap
          * @return {Image}
          */
         public static getBitmapData(bitmap:annie.Bitmap):any{
             if(!bitmap.rect){
                 return bitmap.bitmapData;
             }else{
-                var _canvas = annie.DisplayObject._canvas;
+                var _canvas = Bitmap._bitmapCanvas;
                 var w:number=bitmap.rect.width;
                 var h:number=bitmap.rect.height;
                 _canvas.width=w;

@@ -82,7 +82,7 @@ namespace annie {
          * @param {string} sceneName fla通过flash2x转换时设置的包名
          * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
          * @param {Function} completeFun 加载完成回高,无回调参数
-         * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
+         * @param {string} domain 加载时要设置的url前缀,一般为默认。
          */
         export var loadScene = function(sceneName:any, progressFun:Function, completeFun:Function,domain:string = ""):void {
             //加载资源配置文件
