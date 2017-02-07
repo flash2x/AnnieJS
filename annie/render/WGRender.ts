@@ -31,11 +31,12 @@ namespace annie {
         private _vMI: number;
         private _uA: number;
         private _cM: annie.Matrix;
-        private _maxTextureCount: number = 32;
+        private _maxTextureCount: number = 0;
         private _uniformTexture: number = 0;
         private _posAttr: number = 0;
         private _textAttr: number = 0;
         private _curTextureId: number = -1;
+        private _textures:WebGLTexture[]=[];
 
         /**
          * @CanvasRender
@@ -79,27 +80,6 @@ namespace annie {
          */
         public beginMask(target: any): void {
             //更新缓冲模板
-            /* let s = this;
-             let gl = s._gl;
-             gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
-             gl.viewport(0, 0, 1024, 1024);
-             gl.disable(gl.BLEND);
-             if (s._maskObjList.length == 0) {
-             gl.clearColor(0.0, 0.0, 0.0, 0.0);
-             gl.clear(gl.COLOR_BUFFER_BIT);
-             gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
-             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
-             }
-             s._maskObjList.push(target);
-             //告诉shader这个时候是画遮罩本身的帧缓冲
-             gl.uniform1i(s._uMask, s._maskObjList.length*100);
-             s.draw(target, 1);
-             gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
-             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
-             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-             gl.uniform1i(s._uMask, s._maskObjList.length);
-             gl.viewport(0, 0, s._dW, s._dH);
-             gl.enable(gl.BLEND);*/
         }
 
         /**
@@ -109,20 +89,6 @@ namespace annie {
          * @since 1.0.2
          */
         public endMask(): void {
-            /*let s = this;
-             let gl=s._gl;
-             let len = s._maskObjList.length;
-             if(len>1){
-             s._maskObjList.pop();
-             let mlCopy:any=s._maskObjList.concat();
-             s._maskObjList.length=0;
-             for(let i:number=0;i<mlCopy.length;i++){
-             s.beginMask(mlCopy[i]);
-             }
-             }else{
-             gl.uniform1i(s._uMask, 0);
-             s._maskObjList.length=0;
-             }*/
         }
 
         /**
@@ -230,7 +196,7 @@ namespace annie {
             s._uA = gl.getUniformLocation(s._program, 'u_A');
             //
             s._cM = new annie.Matrix();
-            s._maxTextureCount = 3;// gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)+1;
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
             s._posAttr = gl.getAttribLocation(s._program, "a_P");
             s._textAttr = gl.getAttribLocation(s._program, "a_TC");
@@ -318,55 +284,36 @@ namespace annie {
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
-/*
-
-        private activeTexture(bitmapData: any): number {
-            let s = this;
+        public createTexture(bitmapData: any):number {
+            let s=this;
             let gl = s._gl;
-            let newId: number = -1;
-            let isHave: boolean = false;
-            for (let i = 1; i < s._maxTextureCount; i++) {
-                if (s._textures[i] == null) {
-                    newId = i;
-                    break;
-                }
-                if (s._textures[i] == texture) {
-                    newId = i;
-                    isHave = true;
-                    break;
+            let mi:number=s._maxTextureCount;
+            if(bitmapData.tid!=undefined){
+                let ti=bitmapData.tid%mi;
+                if(bitmapData.tid==s._textures[ti]){
+                    gl.activeTexture(gl["TEXTURE"+ti]);
+                    return ti;
                 }
             }
-            if (newId < 0) {
-                if (s._curTextureId < s._maxTextureCount - 1) {
-                    s._curTextureId++;
-                } else {
-                    s._curTextureId = 1;
-                }
-                newId = s._curTextureId;
+            let ci:number=s._curTextureId;
+            if(ci<Number.MAX_VALUE){
+                ci++;
+            }else{
+                ci=0;
             }
-            gl.activeTexture(gl["TEXTURE" + newId]);
-            if (!isHave) {
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-            }
-            s._textures[newId] = texture;
-            return newId;
-        }
-*/
-        public createTexture(bitmapData: any = null, width: number = 1, height: number = 1): WebGLTexture {
-            let gl = this._gl;
-            gl.activeTexture(gl.TEXTURE0);
+            let ti=ci%mi;
+            gl.activeTexture(gl["TEXTURE"+ti]);
             let texture: any = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            if (bitmapData) {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
-            } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-            }
+            bitmapData.tid=ci;
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            return texture;
+            s._textures[ti]=ci;
+            s._curTextureId=ci;
+            return ti;
         }
     }
 }

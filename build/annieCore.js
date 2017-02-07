@@ -7169,11 +7169,12 @@ var annie;
              * @default null
              */
             this.rootContainer = null;
-            this._maxTextureCount = 32;
+            this._maxTextureCount = 0;
             this._uniformTexture = 0;
             this._posAttr = 0;
             this._textAttr = 0;
             this._curTextureId = -1;
+            this._textures = [];
             this._instanceType = "annie.WGRender";
             this._stage = stage;
         }
@@ -7207,27 +7208,6 @@ var annie;
          */
         WGRender.prototype.beginMask = function (target) {
             //更新缓冲模板
-            /* let s = this;
-             let gl = s._gl;
-             gl.bindFramebuffer(gl.FRAMEBUFFER, s._maskFbo);
-             gl.viewport(0, 0, 1024, 1024);
-             gl.disable(gl.BLEND);
-             if (s._maskObjList.length == 0) {
-             gl.clearColor(0.0, 0.0, 0.0, 0.0);
-             gl.clear(gl.COLOR_BUFFER_BIT);
-             gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
-             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
-             }
-             s._maskObjList.push(target);
-             //告诉shader这个时候是画遮罩本身的帧缓冲
-             gl.uniform1i(s._uMask, s._maskObjList.length*100);
-             s.draw(target, 1);
-             gl.bindTexture(gl.TEXTURE_2D, s._maskTexture);
-             gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 1024, 1024, 0);
-             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-             gl.uniform1i(s._uMask, s._maskObjList.length);
-             gl.viewport(0, 0, s._dW, s._dH);
-             gl.enable(gl.BLEND);*/
         };
         /**
          * 结束遮罩时调用
@@ -7236,20 +7216,6 @@ var annie;
          * @since 1.0.2
          */
         WGRender.prototype.endMask = function () {
-            /*let s = this;
-             let gl=s._gl;
-             let len = s._maskObjList.length;
-             if(len>1){
-             s._maskObjList.pop();
-             let mlCopy:any=s._maskObjList.concat();
-             s._maskObjList.length=0;
-             for(let i:number=0;i<mlCopy.length;i++){
-             s.beginMask(mlCopy[i]);
-             }
-             }else{
-             gl.uniform1i(s._uMask, 0);
-             s._maskObjList.length=0;
-             }*/
         };
         /**
          * 当舞台尺寸改变时会调用
@@ -7352,7 +7318,7 @@ var annie;
             s._uA = gl.getUniformLocation(s._program, 'u_A');
             //
             s._cM = new annie.Matrix();
-            s._maxTextureCount = 3; // gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) + 1;
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
             s._posAttr = gl.getAttribLocation(s._program, "a_P");
             s._textAttr = gl.getAttribLocation(s._program, "a_TC");
@@ -7440,59 +7406,38 @@ var annie;
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
-        /*
-        
-                private activeTexture(bitmapData: any): number {
-                    let s = this;
-                    let gl = s._gl;
-                    let newId: number = -1;
-                    let isHave: boolean = false;
-                    for (let i = 1; i < s._maxTextureCount; i++) {
-                        if (s._textures[i] == null) {
-                            newId = i;
-                            break;
-                        }
-                        if (s._textures[i] == texture) {
-                            newId = i;
-                            isHave = true;
-                            break;
-                        }
-                    }
-                    if (newId < 0) {
-                        if (s._curTextureId < s._maxTextureCount - 1) {
-                            s._curTextureId++;
-                        } else {
-                            s._curTextureId = 1;
-                        }
-                        newId = s._curTextureId;
-                    }
-                    gl.activeTexture(gl["TEXTURE" + newId]);
-                    if (!isHave) {
-                        gl.bindTexture(gl.TEXTURE_2D, texture);
-                    }
-                    s._textures[newId] = texture;
-                    return newId;
+        WGRender.prototype.createTexture = function (bitmapData) {
+            var s = this;
+            var gl = s._gl;
+            var mi = s._maxTextureCount;
+            if (bitmapData.tid != undefined) {
+                var ti_1 = bitmapData.tid % mi;
+                if (bitmapData.tid == s._textures[ti_1]) {
+                    gl.activeTexture(gl["TEXTURE" + ti_1]);
+                    trace("f");
+                    return ti_1;
                 }
-        */
-        WGRender.prototype.createTexture = function (bitmapData, width, height) {
-            if (bitmapData === void 0) { bitmapData = null; }
-            if (width === void 0) { width = 1; }
-            if (height === void 0) { height = 1; }
-            var gl = this._gl;
-            gl.activeTexture(gl.TEXTURE0);
-            var texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            if (bitmapData) {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+            }
+            var ci = s._curTextureId;
+            if (ci < Number.MAX_VALUE) {
+                ci++;
             }
             else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                ci = 0;
             }
+            var ti = ci % mi;
+            gl.activeTexture(gl["TEXTURE" + ti]);
+            var texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            bitmapData.tid = ci;
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            return texture;
+            s._textures[ti] = ci;
+            s._curTextureId = ci;
+            return ti;
         };
         return WGRender;
     }(annie.AObject));

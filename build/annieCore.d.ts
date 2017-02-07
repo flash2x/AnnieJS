@@ -3553,6 +3553,7 @@ declare namespace annie {
         private _posAttr;
         private _textAttr;
         private _curTextureId;
+        private _textures;
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -3607,7 +3608,7 @@ declare namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         draw(target: any, type: number): void;
-        createTexture(bitmapData?: any, width?: number, height?: number): WebGLTexture;
+        createTexture(bitmapData: any): number;
     }
 }
 /**
