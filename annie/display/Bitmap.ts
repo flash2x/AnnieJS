@@ -26,8 +26,8 @@ namespace annie {
         public set bitmapData(value:any){this._bitmapData=value;this._isNeedUpdate=true;}
         private _bitmapData:any = null;
         /**
-         * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-         * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
+         * 有时候一张大图，我们只需要显示它的某一部分，其它不显示。对！你可能猜到了
+         * SpriteSheet就用到了这个属性。默认值为null表示全尺寸显示bitmapData需要显示的范围
          * @property rect
          * @public
          * @since 1.0.0
