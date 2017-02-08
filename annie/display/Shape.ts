@@ -831,7 +831,8 @@ namespace annie {
                         s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
-                    //WGRender.setDisplayInfo(s, 1);
+                    //给webgl更新新
+                    s._cacheImg.updateTexture=true;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;

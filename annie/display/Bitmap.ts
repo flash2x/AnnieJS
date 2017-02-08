@@ -173,7 +173,7 @@ namespace annie {
                         s._cacheImg = s._bitmapData;
                     }
                     //给webgl更新新
-                    //WGRender.setDisplayInfo(s, 0);
+                    s._cacheImg.updateTexture=true;
                 }
                 s._updateInfo.UF=false;
                 s._updateInfo.UM=false;

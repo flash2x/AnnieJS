@@ -2066,6 +2066,8 @@ var annie;
                         s._cacheY = 0;
                         s._cacheImg = s._bitmapData;
                     }
+                    //给webgl更新新
+                    s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UF = false;
                 s._updateInfo.UM = false;
@@ -2882,6 +2884,8 @@ var annie;
                         s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
+                    //给webgl更新新
+                    s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -5177,6 +5181,8 @@ var annie;
                     s._cacheX = -10;
                     s._cacheY = -10;
                     s._isNeedUpdate = false;
+                    //给webgl更新新
+                    s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -7346,8 +7352,6 @@ var annie;
         WGRender.prototype.draw = function (target, type) {
             var s = this;
             var img = target._cacheImg;
-            if (!img)
-                return;
             var gl = s._gl;
             var tc = target.rect;
             var gi = {};
@@ -7410,22 +7414,26 @@ var annie;
             var s = this;
             var gl = s._gl;
             var mi = s._maxTextureCount;
+            var ci = s._curTextureId;
+            var ti = 0;
             if (bitmapData.tid != undefined) {
-                var ti_1 = bitmapData.tid % mi;
-                if (bitmapData.tid == s._textures[ti_1]) {
-                    gl.activeTexture(gl["TEXTURE" + ti_1]);
-                    trace("f");
-                    return ti_1;
+                ci = bitmapData.tid;
+                ti = ci % mi;
+                if (bitmapData.tid == s._textures[ti] && !bitmapData.updateTexture) {
+                    gl.activeTexture(gl["TEXTURE" + ti]);
+                    return ti;
                 }
             }
-            var ci = s._curTextureId;
-            if (ci < Number.MAX_VALUE) {
-                ci++;
-            }
             else {
-                ci = 0;
+                if (ci < Number.MAX_VALUE) {
+                    ci++;
+                }
+                else {
+                    ci = 0;
+                }
+                ti = ci % mi;
             }
-            var ti = ci % mi;
+            bitmapData.updateTexture = false;
             gl.activeTexture(gl["TEXTURE" + ti]);
             var texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);

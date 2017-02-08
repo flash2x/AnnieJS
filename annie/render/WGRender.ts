@@ -226,7 +226,6 @@ namespace annie {
         public draw(target: any, type: number): void {
             let s = this;
             let img = target._cacheImg;
-            if (!img)return;
             let gl = s._gl;
             let tc: any = target.rect;
             let gi:any={};
@@ -284,24 +283,28 @@ namespace annie {
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
-        public createTexture(bitmapData: any):number {
+        public createTexture(bitmapData: any):number{
             let s=this;
             let gl = s._gl;
             let mi:number=s._maxTextureCount;
+            let ci:number=s._curTextureId;
+            let ti=0;
             if(bitmapData.tid!=undefined){
-                let ti=bitmapData.tid%mi;
-                if(bitmapData.tid==s._textures[ti]){
+                ci=bitmapData.tid;
+                ti=ci%mi;
+                if(bitmapData.tid==s._textures[ti]&&!bitmapData.updateTexture){
                     gl.activeTexture(gl["TEXTURE"+ti]);
                     return ti;
                 }
+            }else {
+                if (ci < Number.MAX_VALUE) {
+                    ci++;
+                } else {
+                    ci = 0;
+                }
+                ti=ci%mi;
             }
-            let ci:number=s._curTextureId;
-            if(ci<Number.MAX_VALUE){
-                ci++;
-            }else{
-                ci=0;
-            }
-            let ti=ci%mi;
+            bitmapData.updateTexture=false;
             gl.activeTexture(gl["TEXTURE"+ti]);
             let texture: any = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
