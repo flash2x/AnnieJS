@@ -196,7 +196,6 @@ namespace annieUI {
             return typeof fn === 'function';
         }
 
-        private aa=1;
         /**
          * 构造函数
          * @method SlidePage
@@ -214,7 +213,6 @@ namespace annieUI {
          *      slideSpeed: .32,//默认值为.4，滑动速度
          *      callback:callback//滑动完成回调函数
          *       });
-         *       l1
          */
         constructor(option: any) {
             super();
