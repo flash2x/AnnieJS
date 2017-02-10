@@ -46,10 +46,11 @@ namespace annie {
          * @since 1.0.0
          * @public
          * @example
-         *   var floatDisplay = new annie.FloatDisplay();
-         *   floatDisplay.init(document.getElementById('Flash2x'));
-         *   s.addChild(floatDisplay);
-         * @examplelink <p><a href="" target="_blank">测试链接</a></p>
+         *      var floatDisplay = new annie.FloatDisplay();
+         *      floatDisplay.init(document.getElementById('Flash2x'));
+         *      s.addChild(floatDisplay);
+         *
+         * <p><a href="" target="_blank">测试链接</a></p>
          */
         public constructor() {
             super();

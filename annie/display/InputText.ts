@@ -38,8 +38,8 @@ namespace annie {
          * @since 1.0.0
          * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
          * @example
-         * var inputText=new annie.InputText('singleline');
-         * inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
+         *      var inputText=new annie.InputText('singleline');
+         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         public constructor(inputType: string) {
             super();
