@@ -13,7 +13,7 @@ namespace annie {
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    export let debug:boolean=false;
+    export let debug: boolean = false;
     /**
      * annie引擎的版本号
      * @public
@@ -24,7 +24,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    export let version:string="1.0.5";
+    export let version: string = "1.0.5";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -36,7 +36,7 @@ namespace annie {
      *      //打印当前设备的retina值
      *      trace(annie.devicePixelRatio);
      */
-    export let devicePixelRatio:number = window.devicePixelRatio ? window.devicePixelRatio : 1;
+    export let devicePixelRatio: number = window.devicePixelRatio ? window.devicePixelRatio : 1;
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
@@ -48,15 +48,15 @@ namespace annie {
      *      //获取当前设备类型
      *      trace(annie.osType);
      */
-    export let osType:string = (function (){
+    export let osType: string = (function () {
         let n = navigator.userAgent.toLocaleLowerCase();
         let reg1 = /android/;
         let reg2 = /iphone|ipod|ipad/;
-        if (reg1.test(n)){
+        if (reg1.test(n)) {
             return "android";
-        }else if(reg2.test(n)){
+        } else if (reg2.test(n)) {
             return "ios"
-        }else{
+        } else {
             return "pc";
         }
     })();
@@ -89,14 +89,15 @@ namespace annie {
      *      }
      *
      */
-    export let StageScaleMode:{EXACT_FIT:string,NO_BORDER:string,NO_SCALE:string,SHOW_ALL:string,FIXED_WIDTH:string,FIXED_HEIGHT:string} = {
+    export let StageScaleMode: {EXACT_FIT: string,NO_BORDER: string,NO_SCALE: string,SHOW_ALL: string,FIXED_WIDTH: string,FIXED_HEIGHT: string} = {
         EXACT_FIT: "exactFit",
         NO_BORDER: "noBorder",
         NO_SCALE: "noScale",
         SHOW_ALL: "showAll",
-        FIXED_WIDTH:"fixedWidth",
-        FIXED_HEIGHT:"fixedHeight"
+        FIXED_WIDTH: "fixedWidth",
+        FIXED_HEIGHT: "fixedHeight"
     };
+
     /**
      * 跳转到指定网址
      * @method annie.navigateToURL
@@ -105,11 +106,15 @@ namespace annie {
      * @param {string} url
      * @static
      * @example
-     *      annie.navigateToURL("http://www.annie2x.com");
+     *   displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
+     *     annie.navigateToURL("http://www.annie2x.com");
+     *   })
+     *
      */
-    export function navigateToURL(url:string):void {
+    export function navigateToURL(url: string): void {
         window.location.href = url;
     }
+
     /**
      * 向后台发送数据,但不会理会任何的后台反馈
      * @method annie.sendToURL
@@ -120,13 +125,14 @@ namespace annie {
      * @example
      *      annie.sendToURL("http://www.annie2x.com");
      */
-    export function sendToURL(url:string):void {
+    export function sendToURL(url: string): void {
         let req = new XMLHttpRequest();
         req.open("get", url, true);
         req.send();
     }
+
     // 作为将显示对象导出成图片的render渲染器
-    let _dRender:any=null;
+    let _dRender: any = null;
     /**
      * 将显示对象转成base64的图片数据
      * @method annie.toDisplayDataURL
@@ -137,44 +143,53 @@ namespace annie {
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      */
-    export let toDisplayDataURL=function(obj:DisplayObject,rect:Rectangle=null,typeInfo:any=null,bgColor:string=""):string {
-        if(!_dRender){
-            _dRender=new CanvasRender(null);
+    export let toDisplayDataURL = function (obj: DisplayObject, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
+        if (!_dRender) {
+            _dRender = new CanvasRender(null);
         }
-        _dRender._stage=obj;
-        _dRender.rootContainer=DisplayObject["_canvas"];
-        let objInfo={p:obj.parent,x:obj.x,y:obj.y,scX:obj.scaleX,scY:obj.scaleY,r:obj.rotation,skX:obj.skewX,skY:obj.skewY};
-        obj.parent=null;
-        obj.x=rect?-rect.x:0;
-        obj.y=rect?-rect.y:0;
-        obj.scaleX=obj.scaleY=1;
-        obj.rotation=obj.skewX=obj.skewY=0;
-        obj.update(false,false,false);
+        _dRender._stage = obj;
+        _dRender.rootContainer = DisplayObject["_canvas"];
+        let objInfo = {
+            p: obj.parent,
+            x: obj.x,
+            y: obj.y,
+            scX: obj.scaleX,
+            scY: obj.scaleY,
+            r: obj.rotation,
+            skX: obj.skewX,
+            skY: obj.skewY
+        };
+        obj.parent = null;
+        obj.x = rect ? -rect.x : 0;
+        obj.y = rect ? -rect.y : 0;
+        obj.scaleX = obj.scaleY = 1;
+        obj.rotation = obj.skewX = obj.skewY = 0;
+        obj.update(false, false, false);
         //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        let whObj:any=obj.getBounds();
-        let w:number=rect?rect.width:whObj.width;
-        let h:number=rect?rect.height:whObj.height;
-        _dRender.rootContainer.width=w;
-        _dRender.rootContainer.height=h;
+        let whObj: any = obj.getBounds();
+        let w: number = rect ? rect.width : whObj.width;
+        let h: number = rect ? rect.height : whObj.height;
+        _dRender.rootContainer.width = w;
+        _dRender.rootContainer.height = h;
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if(bgColor==""){
+        if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
-        }else{
-            _dRender._ctx.fillStyle=bgColor;
+        } else {
+            _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
         obj.render(_dRender);
-        obj.parent=objInfo.p;
-        obj.x=objInfo.x;
-        obj.y=objInfo.y;
-        obj.scaleX= objInfo.scX;
-        obj.scaleY=objInfo.scY;
-        obj.rotation=objInfo.r;
-        obj.skewX=objInfo.skX;
-        obj.skewY=objInfo.skY;
-        if(!typeInfo){
-            typeInfo={type:"png"};
+        obj.parent = objInfo.p;
+        obj.x = objInfo.x;
+        obj.y = objInfo.y;
+        obj.scaleX = objInfo.scX;
+        obj.scaleY = objInfo.scY;
+        obj.rotation = objInfo.r;
+        obj.skewX = objInfo.skX;
+        obj.skewY = objInfo.skY;
+        if (!typeInfo) {
+            typeInfo = {type: "png"};
         }
-        return _dRender.rootContainer.toDataURL("image/"+typeInfo.type,typeInfo.quality);
+        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
 }

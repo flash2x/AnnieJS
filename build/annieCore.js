@@ -50,9 +50,9 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        AObject._object_id = 0;
         return AObject;
     }());
+    AObject._object_id = 0;
     annie.AObject = AObject;
     /**
      * 事件触发基类
@@ -64,10 +64,11 @@ var annie;
     var EventDispatcher = (function (_super) {
         __extends(EventDispatcher, _super);
         function EventDispatcher() {
-            _super.call(this);
-            this.eventTypes = null;
-            this._instanceType = "annie.EventDispatcher";
-            this.eventTypes = {};
+            var _this = _super.call(this) || this;
+            _this.eventTypes = null;
+            _this._instanceType = "annie.EventDispatcher";
+            _this.eventTypes = {};
+            return _this;
         }
         /**
          * 看看有多少mouse或者touch侦听数
@@ -228,16 +229,16 @@ var annie;
             }
             s.eventTypes = {};
         };
-        /**
-         * 全局的鼠标事件的监听数对象表
-         * @property _MECO
-         * @private
-         * @since 1.0.0
-         */
-        EventDispatcher._MECO = {};
-        EventDispatcher._totalMEC = 0;
         return EventDispatcher;
     }(AObject));
+    /**
+     * 全局的鼠标事件的监听数对象表
+     * @property _MECO
+     * @private
+     * @since 1.0.0
+     */
+    EventDispatcher._MECO = {};
+    EventDispatcher._totalMEC = 0;
     annie.EventDispatcher = EventDispatcher;
 })(annie || (annie = {}));
 /**
@@ -259,7 +260,7 @@ var annie;
          * @param {string} type 事件类型
          */
         function Event(type) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 事件类型名
              * @property type
@@ -267,7 +268,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.type = "";
+            _this.type = "";
             /**
              * 触发此事件的对象
              * @property target
@@ -275,7 +276,7 @@ var annie;
              * @since 1.0.0
              * @type {any}
              */
-            this.target = null;
+            _this.target = null;
             /**
              * 随着事件一起附带的信息对象
              * 所有需要随事件一起发送的信息都可以放在此对象中
@@ -285,7 +286,7 @@ var annie;
              * @type {any}
              * @default null
              */
-            this.data = null;
+            _this.data = null;
             /**
              * 是否阻止事件向下冒泡
              * @property _pd
@@ -293,9 +294,10 @@ var annie;
              * @private
              * @since 1.0.0
              */
-            this._pd = false;
-            this._instanceType = "annie.Event";
-            this.type = type;
+            _this._pd = false;
+            _this._instanceType = "annie.Event";
+            _this.type = type;
+            return _this;
         }
         /**
          * 阻止向下冒泡事件,如果在接收到事件后调用事件的这个方法,那么这个事件将不会再向显示对象的子级派送
@@ -306,128 +308,128 @@ var annie;
         Event.prototype.preventDefault = function () {
             this._pd = true;
         };
-        /**
-         * 舞台尺寸发生变化时触发
-         * @Event
-         * @property RESIZE
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.RESIZE = "onResize";
-        /**
-         * 舞台初始化完成后会触发的事件
-         * @Event
-         * @property ON_STAGE_INIT
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.INIT_TO_STAGE = "onInitStage";
-        /**
-         * 显示对象加入到舞台事件
-         * @Event
-         * @property ADD_TO_STAGE
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.ADD_TO_STAGE = "onAddToStage";
-        /**
-         * 显示对象从舞台移出事件
-         * @Event
-         * @property REMOVE_TO_STAGE
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.REMOVE_TO_STAGE = "onRemoveToStage";
-        /**
-         * 显示对象 循环帧事件
-         * @Event
-         * @property ENTER_FRAME
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.ENTER_FRAME = "onEnterFrame";
-        /**
-         * MovieClip 播放完成事件
-         * @Event
-         * @property END_FRAME
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.END_FRAME = "onEndFrame";
-        /**
-         * MovieClip 帧标签事件
-         * @Event
-         * @property CALL_FRAME
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.CALL_FRAME = "onCallFrame";
-        /**
-         * 完成事件
-         * @Event
-         * @property COMPLETE
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.COMPLETE = "onComplete";
-        /**
-         * 加载过程事件
-         * @Event
-         * @property PROGRESS
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.PROGRESS = "onProgress";
-        /**
-         * 出错事件
-         * @Event
-         * @property ERROR
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.ERROR = "onError";
-        /**
-         * 中断事件
-         * @Event
-         * @property ABORT
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.ABORT = "onAbort";
-        /**
-         * 开始事件
-         * @Event
-         * @property START
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.START = "onStart";
         return Event;
     }(annie.AObject));
+    /**
+     * 舞台尺寸发生变化时触发
+     * @Event
+     * @property RESIZE
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.RESIZE = "onResize";
+    /**
+     * 舞台初始化完成后会触发的事件
+     * @Event
+     * @property ON_STAGE_INIT
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.INIT_TO_STAGE = "onInitStage";
+    /**
+     * 显示对象加入到舞台事件
+     * @Event
+     * @property ADD_TO_STAGE
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.ADD_TO_STAGE = "onAddToStage";
+    /**
+     * 显示对象从舞台移出事件
+     * @Event
+     * @property REMOVE_TO_STAGE
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.REMOVE_TO_STAGE = "onRemoveToStage";
+    /**
+     * 显示对象 循环帧事件
+     * @Event
+     * @property ENTER_FRAME
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.ENTER_FRAME = "onEnterFrame";
+    /**
+     * MovieClip 播放完成事件
+     * @Event
+     * @property END_FRAME
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.END_FRAME = "onEndFrame";
+    /**
+     * MovieClip 帧标签事件
+     * @Event
+     * @property CALL_FRAME
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.CALL_FRAME = "onCallFrame";
+    /**
+     * 完成事件
+     * @Event
+     * @property COMPLETE
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.COMPLETE = "onComplete";
+    /**
+     * 加载过程事件
+     * @Event
+     * @property PROGRESS
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.PROGRESS = "onProgress";
+    /**
+     * 出错事件
+     * @Event
+     * @property ERROR
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.ERROR = "onError";
+    /**
+     * 中断事件
+     * @Event
+     * @property ABORT
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.ABORT = "onAbort";
+    /**
+     * 开始事件
+     * @Event
+     * @property START
+     * @type {string}
+     * @static
+     * @public
+     * @since 1.0.0
+     */
+    Event.START = "onStart";
     annie.Event = Event;
 })(annie || (annie = {}));
 /**
@@ -451,7 +453,7 @@ var annie;
          * @param {string} type
          */
         function MouseEvent(type) {
-            _super.call(this, type);
+            var _this = _super.call(this, type) || this;
             /**
              * mouse或touch事件时rootDiv坐标x点
              * @property clientX
@@ -459,7 +461,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.clientX = 0;
+            _this.clientX = 0;
             /**
              * mouse或touch事件时rootDiv坐标y点
              * @property clientY
@@ -467,7 +469,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.clientY = 0;
+            _this.clientY = 0;
             /**
              * mouse或touch事件时全局坐标x点
              * @property stageX
@@ -475,7 +477,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.stageX = 0;
+            _this.stageX = 0;
             /**
              * mouse或touch事件时全局坐标y点
              * @property stageY
@@ -483,7 +485,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.stageY = 0;
+            _this.stageY = 0;
             /**
              * mouse或touch事件时本地坐标x点
              * @property localX
@@ -491,7 +493,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.localX = 0;
+            _this.localX = 0;
             /**
              * mouse或touch事件时本地坐标y点
              * @property localY
@@ -499,7 +501,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.localY = 0;
+            _this.localY = 0;
             /**
              * 绑定此事件的侦听对象
              * @property currentTarget
@@ -508,65 +510,66 @@ var annie;
              * @type{annie.DisplayObject}
              * @default null
              */
-            this.currentTarget = null;
-            this._instanceType = "annie.MouseEvent";
+            _this.currentTarget = null;
+            _this._instanceType = "annie.MouseEvent";
+            return _this;
         }
-        /**
-         * 鼠标或者手指按下事件
-         * @property MOUSE_DOWN
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_DOWN = "onMouseDown";
-        /**
-         * 鼠标或者手指抬起事件
-         * @property MOUSE_UP
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_UP = "onMouseUp";
-        /**
-         * 鼠标或者手指单击
-         * @property CLICK
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.CLICK = "onMouseClick";
-        /**
-         * 鼠标或者手指移动事件
-         * @property MOUSE_MOVE
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_MOVE = "onMouseMove";
-        /**
-         * 鼠标或者手指移入到显示对象上里触发的事件
-         * @property MOUSE_OVER
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_OVER = "onMouseOver";
-        /**
-         * 鼠标或者手指移出显示对象边界触发的事件
-         * @property MOUSE_OUT
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_OUT = "onMouseOut";
         return MouseEvent;
     }(annie.Event));
+    /**
+     * 鼠标或者手指按下事件
+     * @property MOUSE_DOWN
+     * @static
+     * @public
+     * @since 1.0.0
+     * @type {string}
+     */
+    MouseEvent.MOUSE_DOWN = "onMouseDown";
+    /**
+     * 鼠标或者手指抬起事件
+     * @property MOUSE_UP
+     * @static
+     * @public
+     * @since 1.0.0
+     * @type {string}
+     */
+    MouseEvent.MOUSE_UP = "onMouseUp";
+    /**
+     * 鼠标或者手指单击
+     * @property CLICK
+     * @static
+     * @public
+     * @since 1.0.0
+     * @type {string}
+     */
+    MouseEvent.CLICK = "onMouseClick";
+    /**
+     * 鼠标或者手指移动事件
+     * @property MOUSE_MOVE
+     * @static
+     * @public
+     * @since 1.0.0
+     * @type {string}
+     */
+    MouseEvent.MOUSE_MOVE = "onMouseMove";
+    /**
+     * 鼠标或者手指移入到显示对象上里触发的事件
+     * @property MOUSE_OVER
+     * @static
+     * @public
+     * @since 1.0.0
+     * @type {string}
+     */
+    MouseEvent.MOUSE_OVER = "onMouseOver";
+    /**
+     * 鼠标或者手指移出显示对象边界触发的事件
+     * @property MOUSE_OUT
+     * @static
+     * @public
+     * @since 1.0.0
+     * @type {string}
+     */
+    MouseEvent.MOUSE_OUT = "onMouseOut";
     annie.MouseEvent = MouseEvent;
 })(annie || (annie = {}));
 /**
@@ -588,7 +591,7 @@ var annie;
          * @param {string} type
          */
         function TouchEvent(type) {
-            _super.call(this, type);
+            var _this = _super.call(this, type) || this;
             /**
              * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第1个点。
              * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
@@ -598,7 +601,7 @@ var annie;
              * @since 1.0.3
              * @type {annie.Point}
              */
-            this.clientPoint1 = new annie.Point();
+            _this.clientPoint1 = new annie.Point();
             /**
              * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第2个点。
              * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
@@ -608,31 +611,32 @@ var annie;
              * @since 1.0.3
              * @type {annie.Point}
              */
-            this.clientPoint2 = new annie.Point();
+            _this.clientPoint2 = new annie.Point();
             /**
              * 相对于上一次的缩放值
              * @property scale
              * @since 1.0.3
              */
-            this.scale = 0;
+            _this.scale = 0;
             /**
              * 相对于上一次的旋转值
              * @property rotate
              * @since 1.0.3
              */
-            this.rotate = 0;
-            this._instanceType = "annie.TouchEvent";
+            _this.rotate = 0;
+            _this._instanceType = "annie.TouchEvent";
+            return _this;
         }
-        /**
-         * @property TOUCH_BEGIN
-         * @static
-         * @public
-         * @since 1.0.3
-         * @type {string}
-         */
-        TouchEvent.ON_MULTI_TOUCH = "onMultiTouch";
         return TouchEvent;
     }(annie.Event));
+    /**
+     * @property TOUCH_BEGIN
+     * @static
+     * @public
+     * @since 1.0.3
+     * @type {string}
+     */
+    TouchEvent.ON_MULTI_TOUCH = "onMultiTouch";
     annie.TouchEvent = TouchEvent;
 })(annie || (annie = {}));
 /**
@@ -659,25 +663,26 @@ var annie;
         function Point(x, y) {
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * @property x
              * @public
              * @since 1.0.0
              * @type{number}
              */
-            this.x = 0;
+            _this.x = 0;
             /**
              * @property y
              * @since 1.0.0
              * @public
              * @type {number}
              */
-            this.y = 0;
-            var s = this;
+            _this.y = 0;
+            var s = _this;
             s._instanceType = "annie.Point";
             s.x = x;
             s.y = y;
+            return _this;
         }
         /**
          * 求两点之间的距离
@@ -765,7 +770,7 @@ var annie;
             if (d === void 0) { d = 1; }
             if (tx === void 0) { tx = 0; }
             if (ty === void 0) { ty = 0; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * @property a
              * @type {number}
@@ -773,42 +778,42 @@ var annie;
              * @default 1
              * @since 1.0.0
              */
-            this.a = 1;
+            _this.a = 1;
             /**
              * @property b
              * @public
              * @since 1.0.0
              * @type {number}
              */
-            this.b = 0;
+            _this.b = 0;
             /**
              * @property c
              * @type {number}
              * @public
              * @since 1.0.0
              */
-            this.c = 0;
+            _this.c = 0;
             /**
              * @property d
              * @type {number}
              * @public
              * @since 1.0.0
              */
-            this.d = 1;
+            _this.d = 1;
             /**
              * @property tx
              * @type {number}
              * @public
              * @since 1.0.0
              */
-            this.tx = 0;
+            _this.tx = 0;
             /**
              * @property ty
              * @type {number}
              * @since 1.0.0
              * @public
              */
-            this.ty = 0;
+            _this.ty = 0;
             /**
              * 将一个点通过矩阵变换后的点
              * @method transformPoint
@@ -819,7 +824,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.transformPoint = function (x, y, bp) {
+            _this.transformPoint = function (x, y, bp) {
                 if (bp === void 0) { bp = null; }
                 var s = this;
                 if (!bp) {
@@ -836,7 +841,7 @@ var annie;
              * @since 1.0.0
              * @param {annie.Matrix} mtx
              */
-            this.prepend = function (mtx) {
+            _this.prepend = function (mtx) {
                 var s = this;
                 var a = mtx.a;
                 var b = mtx.b;
@@ -854,7 +859,7 @@ var annie;
                 s.tx = a * tx1 + c * s.ty + tx;
                 s.ty = b * tx1 + d * s.ty + ty;
             };
-            var s = this;
+            var s = _this;
             s._instanceType = "annie.Matrix";
             s.a = a;
             s.b = b;
@@ -862,6 +867,7 @@ var annie;
             s.d = d;
             s.tx = tx;
             s.ty = ty;
+            return _this;
         }
         /**
          * 复制一个矩阵
@@ -1094,7 +1100,7 @@ var annie;
             if (y === void 0) { y = 0; }
             if (width === void 0) { width = 0; }
             if (height === void 0) { height = 0; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * @property x
              * @public
@@ -1102,7 +1108,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            this.x = 0;
+            _this.x = 0;
             /**
              * @property y
              * @public
@@ -1110,7 +1116,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            this.y = 0;
+            _this.y = 0;
             /**
              * @property width
              * @public
@@ -1118,7 +1124,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            this.width = 0;
+            _this.width = 0;
             /**
              * @property height
              * @public
@@ -1126,13 +1132,14 @@ var annie;
              * @type{number}
              * @default 0
              */
-            this.height = 0;
-            var s = this;
+            _this.height = 0;
+            var s = _this;
             s._instanceType = "annie.Rectangle";
             s.x = x;
             s.y = y;
             s.height = height;
             s.width = width;
+            return _this;
         }
         /**
          * 判断一个点是否在矩形内包括边
@@ -1263,13 +1270,13 @@ var annie;
          * @public
          */
         function DisplayObject() {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 更新信息
              * @property _updateInfo
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              */
-            this._updateInfo = { UM: true, UA: true, UF: false };
+            _this._updateInfo = { UM: true, UA: true, UF: false };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -1279,7 +1286,7 @@ var annie;
              * @default null;
              * @readonly
              * */
-            this.stage = null;
+            _this.stage = null;
             /**
              * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
              * @property cAlpha
@@ -1288,7 +1295,7 @@ var annie;
              * @since 1.0.0
              * @default 1
              */
-            this.cAlpha = 1;
+            _this.cAlpha = 1;
             /**
              * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
@@ -1297,7 +1304,7 @@ var annie;
              * @default null
              * @since 1.0.0
              */
-            this.cMatrix = new annie.Matrix();
+            _this.cMatrix = new annie.Matrix();
             /**
              * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
              * @property _enterFrameEvent
@@ -1306,7 +1313,7 @@ var annie;
              * @default null
              * @since 1.0.0
              */
-            this._enterFrameEvent = null;
+            _this._enterFrameEvent = null;
             /**
              * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
              * @property mouseEnable
@@ -1315,7 +1322,7 @@ var annie;
              * @since 1.0.0
              * @default false
              */
-            this.mouseEnable = true;
+            _this.mouseEnable = true;
             /**
              * 显示对象上对显示列表上的最终的所有滤镜组
              * @property cFilters
@@ -1324,7 +1331,7 @@ var annie;
              * @since 1.0.0
              * @type {Array}
              */
-            this.cFilters = [];
+            _this.cFilters = [];
             /**
              * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
              * @property name
@@ -1333,18 +1340,18 @@ var annie;
              * @type {string}
              * @default ""
              */
-            this.name = "";
-            this._x = 0;
-            this._y = 0;
-            this._scaleX = 1;
-            this._scaleY = 1;
-            this._rotation = 0;
-            this._alpha = 1;
-            this._skewX = 0;
-            this._skewY = 0;
-            this._anchorX = 0;
-            this._anchorY = 0;
-            this._visible = true;
+            _this.name = "";
+            _this._x = 0;
+            _this._y = 0;
+            _this._scaleX = 1;
+            _this._scaleY = 1;
+            _this._rotation = 0;
+            _this._alpha = 1;
+            _this._skewX = 0;
+            _this._skewY = 0;
+            _this._anchorX = 0;
+            _this._anchorY = 0;
+            _this._visible = true;
             /**
              * 显示对象的混合模式
              * 支持的混合模式大概有
@@ -1354,8 +1361,8 @@ var annie;
              * @type {string}
              * @default 0
              */
-            this.blendMode = "normal";
-            this._matrix = new annie.Matrix();
+            _this.blendMode = "normal";
+            _this._matrix = new annie.Matrix();
             /**
              * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
              * @property mask
@@ -1364,8 +1371,8 @@ var annie;
              * @type {annie.DisplayObject}
              * @default null
              */
-            this.mask = null;
-            this._filters = [];
+            _this.mask = null;
+            _this._filters = [];
             /**
              * 显示对象的父级
              * @property parent
@@ -1375,16 +1382,17 @@ var annie;
              * @default null
              * @readonly
              */
-            this.parent = null;
+            _this.parent = null;
             /**
              * 是否自己的父级发生的改变
              * @type {boolean}
              * @private
              */
-            this._cp = false;
+            _this._cp = false;
             //需要用webgl渲染的信息
-            this._glInfo = {};
-            this._instanceType = "annie.DisplayObject";
+            _this._glInfo = {};
+            _this._instanceType = "annie.DisplayObject";
+            return _this;
         }
         Object.defineProperty(DisplayObject.prototype, "x", {
             /**
@@ -1862,24 +1870,24 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
-        DisplayObject._bp = new annie.Point();
-        /**
-         * 画缓存位图的时候需要使用
-         * @property _bitmapCanvas
-         * @private
-         * @static
-         * @since 1.0.0
-         * @type {Canvas}
-         */
-        DisplayObject._canvas = window.document.createElement("canvas");
         return DisplayObject;
     }(annie.EventDispatcher));
+    /**
+     * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+     * @type {annie.Point}
+     * @private
+     * @static
+     */
+    DisplayObject._bp = new annie.Point();
+    /**
+     * 画缓存位图的时候需要使用
+     * @property _bitmapCanvas
+     * @private
+     * @static
+     * @since 1.0.0
+     * @type {Canvas}
+     */
+    DisplayObject._canvas = window.document.createElement("canvas");
     annie.DisplayObject = DisplayObject;
 })(annie || (annie = {}));
 /**
@@ -1911,18 +1919,18 @@ var annie;
         function Bitmap(bitmapData, rect) {
             if (bitmapData === void 0) { bitmapData = null; }
             if (rect === void 0) { rect = null; }
-            _super.call(this);
-            this._bitmapData = null;
+            var _this = _super.call(this) || this;
+            _this._bitmapData = null;
             /**
-             * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-             * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
+             * 有时候一张大图，我们只需要显示它的某一部分，其它不显示。对！你可能猜到了
+             * SpriteSheet就用到了这个属性。默认值为null表示全尺寸显示bitmapData需要显示的范围
              * @property rect
              * @public
              * @since 1.0.0
              * @type {annie.Rectangle}
              * @default null
              */
-            this.rect = null;
+            _this.rect = null;
             /**
              * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
              * @property _cacheImg
@@ -1931,9 +1939,9 @@ var annie;
              * @type {any}
              * @default null
              */
-            this._cacheImg = null;
-            this._realCacheImg = null;
-            this._isNeedUpdate = true;
+            _this._cacheImg = null;
+            _this._realCacheImg = null;
+            _this._isNeedUpdate = true;
             /**
              * @property _cacheX
              * @private
@@ -1941,7 +1949,7 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this._cacheX = 0;
+            _this._cacheX = 0;
             /**
              * @property _cacheY
              * @private
@@ -1949,7 +1957,7 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this._cacheY = 0;
+            _this._cacheY = 0;
             /**
              * @property _isCache
              * @private
@@ -1957,11 +1965,12 @@ var annie;
              * @type {boolean}
              * @default false
              */
-            this._isCache = false;
-            var s = this;
+            _this._isCache = false;
+            var s = _this;
             s._instanceType = "annie.Bitmap";
             s.bitmapData = bitmapData;
             s.rect = rect;
+            return _this;
         }
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
             /**
@@ -2140,7 +2149,7 @@ var annie;
     var Shape = (function (_super) {
         __extends(Shape, _super);
         function Shape() {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
              * @property _command
@@ -2149,19 +2158,19 @@ var annie;
              * @type {Array}
              * @default []
              */
-            this._command = [];
-            this._isNeedUpdate = true;
-            this._cAb = true;
+            _this._command = [];
+            _this._isNeedUpdate = true;
+            _this._cAb = true;
             /**
              * @property _cacheCanvas
              * @since 1.0.0
              * @private
              * @type {Canvas}
              */
-            this._cacheImg = window.document.createElement("canvas");
-            this._cacheX = 0;
-            this._cacheY = 0;
-            this.rect = new annie.Rectangle();
+            _this._cacheImg = window.document.createElement("canvas");
+            _this._cacheX = 0;
+            _this._cacheY = 0;
+            _this.rect = new annie.Rectangle();
             /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
@@ -2171,7 +2180,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.beginRadialGradientFill = function (colors, ratios, points) {
+            _this.beginRadialGradientFill = function (colors, ratios, points) {
                 this._fill(Shape.getGradientColor(colors, ratios, points));
             };
             /**
@@ -2184,7 +2193,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth) {
+            _this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth) {
                 if (lineWidth === void 0) { lineWidth = 1; }
                 this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
             };
@@ -2195,7 +2204,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.decodePath = function (data) {
+            _this.decodePath = function (data) {
                 var s = this;
                 var instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
                 var paramCount = [2, 2, 4, 6, 0];
@@ -2239,7 +2248,8 @@ var annie;
                     s.addDraw(f, params);
                 }
             };
-            this._instanceType = "annie.Shape";
+            _this._instanceType = "annie.Shape";
+            return _this;
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
@@ -3003,74 +3013,74 @@ var annie;
                 }
             }
         };
-        Shape.BASE_64 = {
-            "A": 0,
-            "B": 1,
-            "C": 2,
-            "D": 3,
-            "E": 4,
-            "F": 5,
-            "G": 6,
-            "H": 7,
-            "I": 8,
-            "J": 9,
-            "K": 10,
-            "L": 11,
-            "M": 12,
-            "N": 13,
-            "O": 14,
-            "P": 15,
-            "Q": 16,
-            "R": 17,
-            "S": 18,
-            "T": 19,
-            "U": 20,
-            "V": 21,
-            "W": 22,
-            "X": 23,
-            "Y": 24,
-            "Z": 25,
-            "a": 26,
-            "b": 27,
-            "c": 28,
-            "d": 29,
-            "e": 30,
-            "f": 31,
-            "g": 32,
-            "h": 33,
-            "i": 34,
-            "j": 35,
-            "k": 36,
-            "l": 37,
-            "m": 38,
-            "n": 39,
-            "o": 40,
-            "p": 41,
-            "q": 42,
-            "r": 43,
-            "s": 44,
-            "t": 45,
-            "u": 46,
-            "v": 47,
-            "w": 48,
-            "x": 49,
-            "y": 50,
-            "z": 51,
-            "0": 52,
-            "1": 53,
-            "2": 54,
-            "3": 55,
-            "4": 56,
-            "5": 57,
-            "6": 58,
-            "7": 59,
-            "8": 60,
-            "9": 61,
-            "+": 62,
-            "/": 63
-        };
         return Shape;
     }(annie.DisplayObject));
+    Shape.BASE_64 = {
+        "A": 0,
+        "B": 1,
+        "C": 2,
+        "D": 3,
+        "E": 4,
+        "F": 5,
+        "G": 6,
+        "H": 7,
+        "I": 8,
+        "J": 9,
+        "K": 10,
+        "L": 11,
+        "M": 12,
+        "N": 13,
+        "O": 14,
+        "P": 15,
+        "Q": 16,
+        "R": 17,
+        "S": 18,
+        "T": 19,
+        "U": 20,
+        "V": 21,
+        "W": 22,
+        "X": 23,
+        "Y": 24,
+        "Z": 25,
+        "a": 26,
+        "b": 27,
+        "c": 28,
+        "d": 29,
+        "e": 30,
+        "f": 31,
+        "g": 32,
+        "h": 33,
+        "i": 34,
+        "j": 35,
+        "k": 36,
+        "l": 37,
+        "m": 38,
+        "n": 39,
+        "o": 40,
+        "p": 41,
+        "q": 42,
+        "r": 43,
+        "s": 44,
+        "t": 45,
+        "u": 46,
+        "v": 47,
+        "w": 48,
+        "x": 49,
+        "y": 50,
+        "z": 51,
+        "0": 52,
+        "1": 53,
+        "2": 54,
+        "3": 55,
+        "4": 56,
+        "5": 57,
+        "6": 58,
+        "7": 59,
+        "8": 60,
+        "9": 61,
+        "+": 62,
+        "/": 63
+    };
     annie.Shape = Shape;
 })(annie || (annie = {}));
 /**
@@ -3091,7 +3101,7 @@ var annie;
     var Sprite = (function (_super) {
         __extends(Sprite, _super);
         function Sprite() {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 是否可以让children接收鼠标事件,如果为false
              * 鼠标事件将不会往下冒泡
@@ -3101,7 +3111,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.mouseChildren = true;
+            _this.mouseChildren = true;
             /**
              * 显示对象的child列表
              * @property children
@@ -3111,7 +3121,7 @@ var annie;
              * @default []
              * @readonly
              */
-            this.children = [];
+            _this.children = [];
             /**
              * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
              * @property isCacheShape
@@ -3120,8 +3130,9 @@ var annie;
              * @public
              * @default true
              */
-            this.isCacheShape = true;
-            this._instanceType = "annie.Sprite";
+            _this.isCacheShape = true;
+            _this._instanceType = "annie.Sprite";
+            return _this;
         }
         /**
          * 添加一个显示对象到Sprite
@@ -3512,7 +3523,7 @@ var annie;
          * @since 1.0.0
          */
         function Media(src, type) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * html 标签 有可能是audio 或者 video
              * @property media
@@ -3520,16 +3531,16 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.media = null;
+            _this.media = null;
             /**
              * 媒体类型 VIDEO 或者 AUDIO
              * @type {string}
              * @since 1.0.0
              * @since 1.0.0
              */
-            this.type = "";
-            this._loop = 0;
-            var s = this;
+            _this.type = "";
+            _this._loop = 0;
+            var s = _this;
             s._instanceType = "annie.Media";
             if (typeof (src) == "string") {
                 s.media = document.createElement(type);
@@ -3553,6 +3564,7 @@ var annie;
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
             }, false);
+            return _this;
         }
         /**
          * 开始播放媒体
@@ -3630,8 +3642,9 @@ var annie;
     var Sound = (function (_super) {
         __extends(Sound, _super);
         function Sound(src) {
-            _super.call(this, src, "Audio");
-            this._instanceType = "annie.Sound";
+            var _this = _super.call(this, src, "Audio") || this;
+            _this._instanceType = "annie.Sound";
+            return _this;
         }
         return Sound;
     }(annie.Media));
@@ -3652,8 +3665,8 @@ var annie;
     var Video = (function (_super) {
         __extends(Video, _super);
         function Video(src, width, height) {
-            _super.call(this, src, "Video");
-            var s = this;
+            var _this = _super.call(this, src, "Video") || this;
+            var s = _this;
             s._instanceType = "annie.Video";
             s.media.setAttribute("playsinline", "true");
             s.media.setAttribute("webkit-playsinline", "true");
@@ -3664,6 +3677,7 @@ var annie;
             s.media.controls = false;
             s.media.width = width;
             s.media.height = height;
+            return _this;
         }
         return Video;
     }(annie.Media));
@@ -3695,7 +3709,7 @@ var annie;
          * @since 1.0.0
          */
         function ImageFrames(src, width, height) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * img文件所在的文件夹路径
              * @property src
@@ -3703,10 +3717,10 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.src = "";
-            this._lastSrc = "";
-            this._needBufferFrame = 0;
-            this._currentLoadIndex = 0;
+            _this.src = "";
+            _this._lastSrc = "";
+            _this._needBufferFrame = 0;
+            _this._currentLoadIndex = 0;
             /**
              * 当前播放到序列的哪一帧
              * @property currentFrame
@@ -3715,7 +3729,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            this.currentFrame = 0;
+            _this.currentFrame = 0;
             /**
              * 当前播放的序列所在的spriteSheet大图引用
              * @property currentBitmap
@@ -3724,7 +3738,7 @@ var annie;
              * @default null
              * @type {number}
              */
-            this.currentBitmap = null;
+            _this.currentBitmap = null;
             /**
              * 序列的总帧数
              * @property totalsFrame
@@ -3733,7 +3747,7 @@ var annie;
              * @type{number}
              * @default 1;
              */
-            this.totalsFrame = 1;
+            _this.totalsFrame = 1;
             /**
              * 当前帧所在的spriteSheet里的位置区域
              * @property rect
@@ -3741,7 +3755,7 @@ var annie;
              * @since 1.0.0
              * @type {annie.Rectangle}
              */
-            this.rect = null;
+            _this.rect = null;
             /**
              * 是否循环播放
              * @property loop
@@ -3749,13 +3763,13 @@ var annie;
              * @since 1.0.0
              * @type {boolean}
              */
-            this.loop = false;
-            this._isLoaded = false;
+            _this.loop = false;
+            _this._isLoaded = false;
             /**
              * 是否能播放状态
              * @type {boolean}
              */
-            this.canPlay = false;
+            _this.canPlay = false;
             /**
              * 是否在播放中
              * @property isPlaying
@@ -3763,7 +3777,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.isPlaying = true;
+            _this.isPlaying = true;
             /**
              * 是否在自动播放
              * @property autoplay
@@ -3771,14 +3785,15 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.autoplay = false;
-            var s = this;
+            _this.autoplay = false;
+            var s = _this;
             s._instanceType = "annie.ImageFrames";
             s.src = src;
             s.rect = new annie.Rectangle(0, 0, width, height);
             s.list = [];
             s._urlLoader = new annie.URLLoader();
             s._urlLoader.addEventListener(annie.Event.COMPLETE, s.success.bind(s));
+            return _this;
         }
         /**
          * 资源加载成功
@@ -4001,7 +4016,7 @@ var annie;
         __extends(MovieClip, _super);
         //private _isOnStage:boolean=false;
         function MovieClip() {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 时间轴 一般给Flash2x工具使用
              * @property _timeline
@@ -4009,7 +4024,7 @@ var annie;
              * @since 1.0.0
              * @type {Array}
              */
-            this._timeline = [];
+            _this._timeline = [];
             /**
              * 有些时候我们需要在一个时间轴动画类中添加子元素
              * 在默认情况下，MovieClip只有在停止播放的情况下
@@ -4023,7 +4038,7 @@ var annie;
              * @property floatView
              * @type {annie.Sprite}
              */
-            this.floatView = new annie.Sprite();
+            _this.floatView = new annie.Sprite();
             /**
              * mc的当前帧
              * @property currentFrame
@@ -4033,7 +4048,7 @@ var annie;
              * @default 1
              * @readonly
              */
-            this.currentFrame = 1;
+            _this.currentFrame = 1;
             /**
              * 当前动画是否处于播放状态
              * @property isPlaying
@@ -4044,7 +4059,7 @@ var annie;
              * @default true
              * @readonly
              */
-            this.isPlaying = true;
+            _this.isPlaying = true;
             /**
              * 动画的播放方向,是顺着播还是在倒着播
              * @property isFront
@@ -4054,7 +4069,7 @@ var annie;
              * @default true
              * @readonly
              */
-            this.isFront = true;
+            _this.isFront = true;
             /**
              * 当前动画的总帧数
              * @property totalFrames
@@ -4064,13 +4079,13 @@ var annie;
              * @default 1
              * @readonly
              */
-            this.totalFrames = 1;
-            this._scriptLayer = [];
-            this._labelFrame = {};
-            this._frameLabel = {};
-            this._isNeedUpdateChildren = true;
-            this._isUpdateFrame = false;
-            this._mouseEvent = function (e) {
+            _this.totalFrames = 1;
+            _this._scriptLayer = [];
+            _this._labelFrame = {};
+            _this._frameLabel = {};
+            _this._isNeedUpdateChildren = true;
+            _this._isUpdateFrame = false;
+            _this._mouseEvent = function (e) {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     this.gotoAndStop(2);
                 }
@@ -4078,9 +4093,10 @@ var annie;
                     this.gotoAndStop(1);
                 }
             };
-            var s = this;
+            var s = _this;
             s._instanceType = "annie.MovieClip";
             s.addChild(s.floatView);
+            return _this;
         }
         /**
          * 调用止方法将停止当前帧
@@ -4646,7 +4662,7 @@ var annie;
     var FloatDisplay = (function (_super) {
         __extends(FloatDisplay, _super);
         function FloatDisplay() {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
              * @property htmlElement
@@ -4654,7 +4670,7 @@ var annie;
              * @since 1.0.0
              * @type{HtmlElement}
              */
-            this.htmlElement = null;
+            _this.htmlElement = null;
             /**
              * 上一交刷新时保留的数据
              * @property _oldProps
@@ -4662,7 +4678,7 @@ var annie;
              * @since 1.0.0
              * @type {{alpha: number, matrix: {a: number, b: number, c: number, d: number, tx: number, ty: number}}}
              */
-            this._oldProps = { alpha: 1, matrix: { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 } };
+            _this._oldProps = { alpha: 1, matrix: { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 } };
             /**
              * 是否已经添加了舞台事件
              * @property _isAdded
@@ -4670,9 +4686,9 @@ var annie;
              * @type {boolean}
              * @private
              */
-            this._isAdded = false;
-            this._instanceType = "annie.FloatDisplay";
-            var s = this;
+            _this._isAdded = false;
+            _this._instanceType = "annie.FloatDisplay";
+            var s = _this;
             s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
                 if (s.htmlElement) {
                     s.htmlElement.style.display = "none";
@@ -4689,6 +4705,7 @@ var annie;
                     }
                 }
             });
+            return _this;
         }
         /**
          * 初始化方法
@@ -4816,7 +4833,7 @@ var annie;
          */
         function VideoPlayer(src, type, width, height) {
             if (type === void 0) { type = 0; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 播放的视频类型 值为0是序列图,1是视频 只读
              * @property videoType
@@ -4825,8 +4842,8 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this.videoType = 0;
-            var s = this;
+            _this.videoType = 0;
+            var s = _this;
             s._instanceType = "annie.VideoPlayer";
             var isUseVideo = true;
             if (type == 0) {
@@ -4849,6 +4866,7 @@ var annie;
                 s.video = new annie.ImageFrames(src, width, height);
             }
             s.videoType = isUseVideo ? 1 : 0;
+            return _this;
         }
         /**
          * 重写update
@@ -4890,11 +4908,11 @@ var annie;
     var TextField = (function (_super) {
         __extends(TextField, _super);
         function TextField() {
-            _super.call(this);
-            this._cacheImg = window.document.createElement("canvas");
-            this._cacheX = 0;
-            this._cacheY = 0;
-            this._cacheObject = { bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
+            var _this = _super.call(this) || this;
+            _this._cacheImg = window.document.createElement("canvas");
+            _this._cacheX = 0;
+            _this._cacheY = 0;
+            _this._cacheObject = { bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
             /**
              * 文本的对齐方式
              * @property textAlign
@@ -4903,7 +4921,7 @@ var annie;
              * @type {string}
              * @default left
              */
-            this.textAlign = "left";
+            _this.textAlign = "left";
             /**
              * 文本的行高
              * @property lineHeight
@@ -4912,7 +4930,7 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this.lineHeight = 0;
+            _this.lineHeight = 0;
             /**
              * 文本的宽
              * @property lineWidth
@@ -4921,7 +4939,7 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this.lineWidth = 0;
+            _this.lineWidth = 0;
             /**
              * 文本类型,单行还是多行 single multi
              * @property lineType
@@ -4930,7 +4948,7 @@ var annie;
              * @type {string} 两种 single和multi
              * @default single
              */
-            this.lineType = "single";
+            _this.lineType = "single";
             /**
              * 文本内容
              * @property text
@@ -4939,7 +4957,7 @@ var annie;
              * @default ""
              * @since 1.0.0
              */
-            this.text = "";
+            _this.text = "";
             /**
              * 文本的css字体样式
              * @property font
@@ -4948,7 +4966,7 @@ var annie;
              * @type {string}
              * @default 12px Arial
              */
-            this.font = "Arial";
+            _this.font = "Arial";
             /**
              * 文本的size
              * @property size
@@ -4957,7 +4975,7 @@ var annie;
              * @type {number}
              * @default 12
              */
-            this.size = 12;
+            _this.size = 12;
             /**
              * 文本的颜色值
              * @property color
@@ -4966,7 +4984,7 @@ var annie;
              * @since 1.0.0
              * @default #fff
              */
-            this.color = "#fff";
+            _this.color = "#fff";
             /**
              * 文本是否倾斜
              * @property italic
@@ -4975,7 +4993,7 @@ var annie;
              * @default false
              * @type {boolean}
              */
-            this.italic = false;
+            _this.italic = false;
             /**
              * 文本是否加粗
              * @property bold
@@ -4984,8 +5002,9 @@ var annie;
              * @default false
              * @type {boolean}
              */
-            this.bold = false;
-            this._instanceType = "annie.TextField";
+            _this.bold = false;
+            _this._instanceType = "annie.TextField";
+            return _this;
         }
         /**
          * 设置文本在canvas里的渲染样式
@@ -5224,7 +5243,7 @@ var annie;
          * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
          */
         function InputText(inputType) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 输入文本的类型.
              * multiline 多行
@@ -5236,7 +5255,7 @@ var annie;
              * @type {string}
              * @default "singleline"
              */
-            this.inputType = "singleline";
+            _this.inputType = "singleline";
             /**
              * 在手机端是否需要自动收回软键盘，在pc端此参数无效
              * @property isAutoDownKeyBoard
@@ -5244,9 +5263,9 @@ var annie;
              * @since 1.0.3
              * @default true
              */
-            this.isAutoDownKeyBoard = true;
+            _this.isAutoDownKeyBoard = true;
             var input = null;
-            var s = this;
+            var s = _this;
             s._instanceType = "annie.InputText";
             if (inputType != "multiline") {
                 input = document.createElement("input");
@@ -5270,6 +5289,7 @@ var annie;
                 s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
             });
             s.init(input);
+            return _this;
         }
         InputText.prototype.init = function (htmlElement) {
             _super.prototype.init.call(this, htmlElement);
@@ -5462,7 +5482,7 @@ var annie;
             if (frameRate === void 0) { frameRate = 30; }
             if (scaleMode === void 0) { scaleMode = "fixedHeight"; }
             if (renderType === void 0) { renderType = 0; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
              * 所以需要自己灵活设置,默认阻止.
@@ -5472,7 +5492,7 @@ var annie;
              * @since 1.0.4
              * @public
              */
-            this.iosTouchendPreventDefault = true;
+            _this.iosTouchendPreventDefault = true;
             /**
              * 整个引擎的最上层的div元素,
              * 承载canvas的那个div html元素
@@ -5482,7 +5502,7 @@ var annie;
              * @type {Html Div}
              * @default null
              */
-            this.rootDiv = null;
+            _this.rootDiv = null;
             /**
              * 当前stage所使用的渲染器
              * 渲染器有两种,一种是canvas 一种是webGl
@@ -5492,7 +5512,7 @@ var annie;
              * @type {IRender}
              * @default null
              */
-            this.renderObj = null;
+            _this.renderObj = null;
             /**
              * 渲染模式值 只读 CANVAS:0, webGl: 1
              * @property renderType
@@ -5503,7 +5523,7 @@ var annie;
              * @default 0
              * @readonly
              */
-            this.renderType = 0;
+            _this.renderType = 0;
             /**
              * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
              * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -5514,7 +5534,7 @@ var annie;
              * @since 1.0.0
              * @default false
              */
-            this.pause = false;
+            _this.pause = false;
             /**
              * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
              * @property viewRect
@@ -5527,14 +5547,14 @@ var annie;
              * @example
              *      //始终让一个对象顶对齐，或者
              */
-            this.viewRect = new annie.Rectangle();
+            _this.viewRect = new annie.Rectangle();
             /**
              * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
              * @property isMultiTouch
              * @since 1.0.3
              * @type {boolean}
              */
-            this.isMultiTouch = false;
+            _this.isMultiTouch = false;
             /**
              * 当设备尺寸更新，或者旋转后是否自动更新方向
              * 端默认不开启
@@ -5544,7 +5564,7 @@ var annie;
              * @type {boolean}
              * @default true
              */
-            this.autoSteering = true;
+            _this.autoSteering = true;
             /**
              * 当设备尺寸更新，或者旋转后是否自动更新尺寸。
              * @property autoResize
@@ -5553,7 +5573,7 @@ var annie;
              * @type {boolean}
              * @default true
              */
-            this.autoResize = true;
+            _this.autoResize = true;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -5563,7 +5583,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            this.desWidth = 0;
+            _this.desWidth = 0;
             /**
              * 舞台的尺寸高,也就是我们常说的设计尺寸
              * @property desHeight
@@ -5573,7 +5593,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            this.desHeight = 0;
+            _this.desHeight = 0;
             /**
              * 舞台在当前设备中的真实高
              * @property divHeight
@@ -5583,7 +5603,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            this.divHeight = 0;
+            _this.divHeight = 0;
             /**
              * 舞台在当前设备中的真实宽
              * @property divWidth
@@ -5593,7 +5613,7 @@ var annie;
              * @readonly
              * @type {number}
              */
-            this.divWidth = 0;
+            _this.divWidth = 0;
             /**
              * 舞台的背景色
              * 默认就是透明背景
@@ -5604,7 +5624,7 @@ var annie;
              * @type {string}
              * @default "";
              */
-            this.bgColor = "";
+            _this.bgColor = "";
             /**
              * 舞台的缩放模式
              * 默认为空就是无缩放的真实大小
@@ -5633,7 +5653,7 @@ var annie;
              *      }
              *
              */
-            this.scaleMode = "onScale";
+            _this.scaleMode = "onScale";
             /**
              * 原始为60的刷新速度时的计数器
              * @property _flush
@@ -5642,7 +5662,7 @@ var annie;
              * @default 0
              * @type {number}
              */
-            this._flush = 0;
+            _this._flush = 0;
             /**
              * 当前的刷新次数计数器
              * @property _currentFlush
@@ -5651,31 +5671,31 @@ var annie;
              * @default 0
              * @type {number}
              */
-            this._currentFlush = 0;
+            _this._currentFlush = 0;
             /**
              * 每一次需要刷新整个引擎时积累的鼠标或触摸事件信息对象,同一刷新阶段内相同的事件类型将会被后面的同类事件覆盖
              * @type {Object}
              * @private
              */
-            this._mouseEventInfo = {};
-            this._lastDpList = [];
+            _this._mouseEventInfo = {};
+            _this._lastDpList = [];
             /**
              * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
              * @private
              */
-            this._ml = [];
+            _this._ml = [];
             /**
              * 刷新mouse或者touch事件
              * @private
              */
-            this._mouseDownPoint = new annie.Point(0, 0);
+            _this._mouseDownPoint = new annie.Point(0, 0);
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
              * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
              * @private
              */
-            this._mouseEventTypes = {
+            _this._mouseEventTypes = {
                 mousedown: "onMouseDown",
                 mouseup: "onMouseUp",
                 mousemove: "onMouseMove",
@@ -5683,12 +5703,12 @@ var annie;
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp"
             };
-            this.muliPoints = [];
+            _this.muliPoints = [];
             /**
              * 当document有鼠标或触摸事件时调用
              * @param e
              */
-            this.onMouseEvent = function (e) {
+            _this.onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
                 if (annie.osType == "pc" || e.targetTouches.length < 2) {
@@ -5713,7 +5733,7 @@ var annie;
             /**
              * 设置舞台的对齐模式
              */
-            this.setAlign = function () {
+            _this.setAlign = function () {
                 var s = this;
                 var divH = s.divHeight * annie.devicePixelRatio;
                 var divW = s.divWidth * annie.devicePixelRatio;
@@ -5790,7 +5810,7 @@ var annie;
              * @since 1.0.0
              * @
              */
-            this.resize = function () {
+            _this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
                 //这里判断
@@ -5803,9 +5823,9 @@ var annie;
                     s.update(true, true, true);
                 }
             };
-            var s = this;
-            this._instanceType = "annie.Stage";
-            s.stage = this;
+            var s = _this;
+            _this._instanceType = "annie.Stage";
+            s.stage = _this;
             if (annie.osType == "pc") {
                 s.autoSteering = false;
             }
@@ -5868,6 +5888,7 @@ var annie;
                 rc.addEventListener('mousemove', mouseEvent, false);
                 rc.addEventListener('mouseup', mouseEvent, false);
             }
+            return _this;
         }
         /**
          * 刷新函数
@@ -6234,19 +6255,19 @@ var annie;
                 }
             }
         };
-        /**
-         * 上一次鼠标或触碰经过的显示对象列表
-         * @type {Array}
-         * @private
-         */
-        Stage._isLoadedVConsole = false;
-        /**
-         * 要循环调用 flush 函数对象列表
-         * @type {Array}
-         */
-        Stage.allUpdateObjList = [];
         return Stage;
     }(annie.Sprite));
+    /**
+     * 上一次鼠标或触碰经过的显示对象列表
+     * @type {Array}
+     * @private
+     */
+    Stage._isLoadedVConsole = false;
+    /**
+     * 要循环调用 flush 函数对象列表
+     * @type {Array}
+     */
+    Stage.allUpdateObjList = [];
     annie.Stage = Stage;
 })(annie || (annie = {}));
 /**
@@ -6275,7 +6296,7 @@ var annie;
             if (offsetX === void 0) { offsetX = 2; }
             if (offsetY === void 0) { offsetY = 2; }
             if (blur === void 0) { blur = 2; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 颜色值
              * @property color
@@ -6285,7 +6306,7 @@ var annie;
              * @default black
              * @type {string}
              */
-            this.color = "black";
+            _this.color = "black";
             /**
              * x方向投影距离
              * @property offsetX
@@ -6295,7 +6316,7 @@ var annie;
              * @default 2
              * @type {number}
              */
-            this.offsetX = 2;
+            _this.offsetX = 2;
             /**
              * y方向投影距离
              * @property offsetY
@@ -6305,7 +6326,7 @@ var annie;
              * @default 2
              * @type {number}
              */
-            this.offsetY = 2;
+            _this.offsetY = 2;
             /**
              * 模糊值
              * @property blur
@@ -6315,7 +6336,7 @@ var annie;
              * @default 2
              * @type {number}
              */
-            this.blur = 2;
+            _this.blur = 2;
             /**
              * 滤镜类型 只读
              * @property color
@@ -6325,13 +6346,14 @@ var annie;
              * @default Shadow
              * @type {string}
              */
-            this.type = "Shadow";
-            var s = this;
+            _this.type = "Shadow";
+            var s = _this;
             s._instanceType = "annie.ShadowFilter";
             s.offsetX = offsetX;
             s.offsetY = offsetY;
             s.blur = blur;
             s.color = color;
+            return _this;
         }
         /**
          *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
@@ -6387,7 +6409,7 @@ var annie;
             if (greenOffset === void 0) { greenOffset = 0; }
             if (blueOffset === void 0) { blueOffset = 0; }
             if (alphaOffset === void 0) { alphaOffset = 0; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * @property redMultiplier
              * @public
@@ -6395,7 +6417,7 @@ var annie;
              * @readonly
              * @type {number}
              */
-            this.redMultiplier = 0;
+            _this.redMultiplier = 0;
             /**
              * @property redOffset
              * @public
@@ -6403,7 +6425,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.redOffset = 0;
+            _this.redOffset = 0;
             /**
              * @property greenMultiplier
              * @public
@@ -6411,7 +6433,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.greenMultiplier = 0;
+            _this.greenMultiplier = 0;
             /**
              * @property greenOffset
              * @public
@@ -6419,7 +6441,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.greenOffset = 0;
+            _this.greenOffset = 0;
             /**
              * @property blueMultiplier
              * @public
@@ -6427,7 +6449,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.blueMultiplier = 0;
+            _this.blueMultiplier = 0;
             /**
              * @property blueOffset
              * @public
@@ -6435,7 +6457,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.blueOffset = 0;
+            _this.blueOffset = 0;
             /**
              * @property alphaMultiplier
              * @public
@@ -6443,7 +6465,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.alphaMultiplier = 0;
+            _this.alphaMultiplier = 0;
             /**
              * @property alphaOffset
              * @public
@@ -6451,7 +6473,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.alphaOffset = 0;
+            _this.alphaOffset = 0;
             /**
              * @property type
              * @public
@@ -6459,8 +6481,8 @@ var annie;
              * @since 1.0.0
              * @type {string}
              */
-            this.type = "Color";
-            var s = this;
+            _this.type = "Color";
+            var s = _this;
             s._instanceType = "annie.ColorFilter";
             s.redMultiplier = redMultiplier;
             s.greenMultiplier = greenMultiplier;
@@ -6470,6 +6492,7 @@ var annie;
             s.greenOffset = greenOffset;
             s.blueOffset = blueOffset;
             s.alphaOffset = alphaOffset;
+            return _this;
         }
         /**
          * 绘画滤镜效果
@@ -6525,7 +6548,7 @@ var annie;
          * @since 1.0.0
          */
         function ColorMatrixFilter(brightness, contrast, saturation, hue) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * @property brightness
              * @public
@@ -6533,7 +6556,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.brightness = 0;
+            _this.brightness = 0;
             /**
              * @property contrast
              * @public
@@ -6541,7 +6564,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.contrast = 0;
+            _this.contrast = 0;
             /**
              * @property saturation
              * @public
@@ -6549,7 +6572,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.saturation = 0;
+            _this.saturation = 0;
             /**
              * @property hue
              * @public
@@ -6557,7 +6580,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.hue = 0;
+            _this.hue = 0;
             /**
              * 滤镜类型 只读
              * @property type
@@ -6566,8 +6589,8 @@ var annie;
              * @since 1.0.0
              * @type {string}
              */
-            this.type = "ColorMatrix";
-            var s = this;
+            _this.type = "ColorMatrix";
+            var s = _this;
             s._instanceType = "annie.ColorMatrixFilter";
             s.brightness = brightness;
             s.contrast = contrast;
@@ -6592,7 +6615,7 @@ var annie;
                 ]);
             }
             //contrast
-            contrast = this._cleanValue(contrast, 100);
+            contrast = _this._cleanValue(contrast, 100);
             var x;
             if (contrast != 0) {
                 if (contrast < 0) {
@@ -6617,7 +6640,7 @@ var annie;
                 ]);
             }
             //saturation
-            saturation = this._cleanValue(saturation, 100);
+            saturation = _this._cleanValue(saturation, 100);
             if (saturation != 0) {
                 x = 1 + ((saturation > 0) ? 3 * saturation / 100 : saturation / 100);
                 var lumR = 0.3086;
@@ -6632,7 +6655,7 @@ var annie;
                 ]);
             }
             //hue
-            hue = this._cleanValue(hue, 180) / 180 * Math.PI;
+            hue = _this._cleanValue(hue, 180) / 180 * Math.PI;
             if (hue != 0) {
                 var cosVal = Math.cos(hue);
                 var sinVal = Math.sin(hue);
@@ -6647,6 +6670,7 @@ var annie;
                     0, 0, 0, 0, 1
                 ]);
             }
+            return _this;
         }
         /**
          * 绘画滤镜效果
@@ -6707,21 +6731,21 @@ var annie;
             var s = this;
             return s.type + s.brightness + s.hue + s.saturation + s.contrast;
         };
-        ColorMatrixFilter.DELTA_INDEX = [
-            0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11,
-            0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24,
-            0.25, 0.27, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42,
-            0.44, 0.46, 0.48, 0.5, 0.53, 0.56, 0.59, 0.62, 0.65, 0.68,
-            0.71, 0.74, 0.77, 0.80, 0.83, 0.86, 0.89, 0.92, 0.95, 0.98,
-            1.0, 1.06, 1.12, 1.18, 1.24, 1.30, 1.36, 1.42, 1.48, 1.54,
-            1.60, 1.66, 1.72, 1.78, 1.84, 1.90, 1.96, 2.0, 2.12, 2.25,
-            2.37, 2.50, 2.62, 2.75, 2.87, 3.0, 3.2, 3.4, 3.6, 3.8,
-            4.0, 4.3, 4.7, 4.9, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0,
-            7.3, 7.5, 7.8, 8.0, 8.4, 8.7, 9.0, 9.4, 9.6, 9.8,
-            10.0
-        ];
         return ColorMatrixFilter;
     }(annie.AObject));
+    ColorMatrixFilter.DELTA_INDEX = [
+        0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11,
+        0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24,
+        0.25, 0.27, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42,
+        0.44, 0.46, 0.48, 0.5, 0.53, 0.56, 0.59, 0.62, 0.65, 0.68,
+        0.71, 0.74, 0.77, 0.80, 0.83, 0.86, 0.89, 0.92, 0.95, 0.98,
+        1.0, 1.06, 1.12, 1.18, 1.24, 1.30, 1.36, 1.42, 1.48, 1.54,
+        1.60, 1.66, 1.72, 1.78, 1.84, 1.90, 1.96, 2.0, 2.12, 2.25,
+        2.37, 2.50, 2.62, 2.75, 2.87, 3.0, 3.2, 3.4, 3.6, 3.8,
+        4.0, 4.3, 4.7, 4.9, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0,
+        7.3, 7.5, 7.8, 8.0, 8.4, 8.7, 9.0, 9.4, 9.6, 9.8,
+        10.0
+    ];
     annie.ColorMatrixFilter = ColorMatrixFilter;
     /**
      * 模糊滤镜
@@ -6744,7 +6768,7 @@ var annie;
             if (blurX === void 0) { blurX = 2; }
             if (blurY === void 0) { blurY = 2; }
             if (quality === void 0) { quality = 1; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 滤镜类型 只读
              * @property type
@@ -6753,7 +6777,7 @@ var annie;
              * @since 1.0.0
              * @type {string}
              */
-            this.type = "blur";
+            _this.type = "blur";
             /**
              * @property blurX
              * @public
@@ -6761,7 +6785,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.blurX = 0;
+            _this.blurX = 0;
             /**
              * @property blurY
              * @public
@@ -6769,7 +6793,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.blurY = 0;
+            _this.blurY = 0;
             /**
              * @property quality
              * @public
@@ -6777,12 +6801,13 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            this.quality = 1;
-            var s = this;
+            _this.quality = 1;
+            var s = _this;
             s._instanceType = "annie.BlurFilter";
             s.blurX = blurX > 8 ? 8 : blurX;
             s.blurY = blurY > 8 ? 8 : blurY;
             s.quality = quality > 3 ? 3 : quality;
+            return _this;
         }
         /**
          *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
@@ -6964,10 +6989,10 @@ var annie;
                 }
             }
         };
-        BlurFilter.SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
-        BlurFilter.MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
         return BlurFilter;
     }(annie.AObject));
+    BlurFilter.SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
+    BlurFilter.MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
     annie.BlurFilter = BlurFilter;
 })(annie || (annie = {}));
 /**
@@ -6992,7 +7017,7 @@ var annie;
          * @since 1.0.0
          */
         function CanvasRender(stage) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * 渲染器所在最上层的对象
              * @property rootContainer
@@ -7001,9 +7026,10 @@ var annie;
              * @type {any}
              * @default null
              */
-            this.rootContainer = null;
-            this._instanceType = "annie.CanvasRender";
-            this._stage = stage;
+            _this.rootContainer = null;
+            _this._instanceType = "annie.CanvasRender";
+            _this._stage = stage;
+            return _this;
         }
         /**
          * 开始渲染时执行
@@ -7156,8 +7182,8 @@ var annie;
          * @param type text json js xml image sound css svg video unKnow
          */
         function URLLoader() {
-            _super.call(this);
-            this.headers = [];
+            var _this = _super.call(this) || this;
+            _this.headers = [];
             /**
              * 后台返回来的数据类弄
              * @property responseType
@@ -7166,7 +7192,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.responseType = null;
+            _this.responseType = null;
             /**
              * 请求的url地址
              * @property url
@@ -7174,7 +7200,7 @@ var annie;
              * @since 1.0.0
              * @type {string}
              */
-            this.url = "";
+            _this.url = "";
             /**
              * 请求后台的类型 get post
              * @property method
@@ -7183,7 +7209,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.method = "get";
+            _this.method = "get";
             /**
              * 需要像后台传送的数据对象
              * @property data
@@ -7192,7 +7218,7 @@ var annie;
              * @default null
              * @type {Object}
              */
-            this.data = null;
+            _this.data = null;
             /**
              * 格式化post请求参数
              * @method _fqs
@@ -7202,7 +7228,7 @@ var annie;
              * @private
              * @since 1.0.0
              */
-            this._fqs = function (data, query) {
+            _this._fqs = function (data, query) {
                 var params = [];
                 if (data) {
                     for (var n in data) {
@@ -7223,7 +7249,7 @@ var annie;
              * @return {any}
              * @private
              */
-            this._fus = function (src, data) {
+            _this._fus = function (src, data) {
                 var s = this;
                 if (data == null || data == "") {
                     return src;
@@ -7239,7 +7265,8 @@ var annie;
                     return src + "?" + s._fqs(data, query);
                 }
             };
-            this._instanceType = "annie.URLLoader";
+            _this._instanceType = "annie.URLLoader";
+            return _this;
         }
         /**
          * 取消加载
@@ -8111,14 +8138,15 @@ var annie;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
-            _super.call(this);
-            this._currentFrame = 0;
-            this._totalFrames = 0;
-            this._isLoop = 0;
-            this._delay = 0;
-            this._isFront = true;
-            this._cParams = null;
-            this._loop = false;
+            var _this = _super.call(this) || this;
+            _this._currentFrame = 0;
+            _this._totalFrames = 0;
+            _this._isLoop = 0;
+            _this._delay = 0;
+            _this._isFront = true;
+            _this._cParams = null;
+            _this._loop = false;
+            return _this;
         }
         /**
          * 初始化数据
@@ -8827,10 +8855,10 @@ var annie;
             }
             isUpdateTween = !isUpdateTween;
         };
-        Tween._tweenPool = [];
-        Tween._tweenList = [];
         return Tween;
     }());
+    Tween._tweenPool = [];
+    Tween._tweenList = [];
     annie.Tween = Tween;
 })(annie || (annie = {}));
 /**
@@ -9039,7 +9067,7 @@ var annie;
 var trace = function () {
     var arg = [];
     for (var _i = 0; _i < arguments.length; _i++) {
-        arg[_i - 0] = arguments[_i];
+        arg[_i] = arguments[_i];
     }
     for (var i in arguments) {
         console.log(arguments[i]);

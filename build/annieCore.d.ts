@@ -22,7 +22,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        instanceId: number;
+        readonly instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -30,7 +30,7 @@ declare namespace annie {
          * @public
          * @return {string}
          */
-        instanceType: string;
+        readonly instanceType: string;
     }
     /**
      * 事件触发基类
@@ -1026,7 +1026,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        matrix: Matrix;
+        readonly matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1200,8 +1200,8 @@ declare namespace annie {
         bitmapData: any;
         private _bitmapData;
         /**
-         * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-         * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
+         * 有时候一张大图，我们只需要显示它的某一部分，其它不显示。对！你可能猜到了
+         * SpriteSheet就用到了这个属性。默认值为null表示全尺寸显示bitmapData需要显示的范围
          * @property rect
          * @public
          * @since 1.0.0

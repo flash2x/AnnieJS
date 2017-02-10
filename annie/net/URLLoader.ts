@@ -2,37 +2,52 @@
  * @module annie
  */
 namespace annie {
-    export let Eval:any=eval.bind(window);
+    export let Eval: any = eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
      * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
+     * @example
+     *      var urlLoader = new annie.URLLoader();
+     *      urlLoader.addEventListener('onComplete', function (e) {
+     *      //trace(e.data.response);
+     *      var bitmapData = e.data.response,//bitmap图片数据
+     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
+     *      //居中对齐
+     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+     *      s.addChild(bitmap);
+     *      });
+     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
      */
     export class URLLoader extends EventDispatcher {
         /**
          * @param type text json js xml image sound css svg video unKnow
          */
-        public constructor(){
+        public constructor() {
             super();
-            this._instanceType="annie.URLLoader";
+            this._instanceType = "annie.URLLoader";
         }
+
         /**
          * 取消加载
          * @method loadCancel
          * @public
          * @since 1.0.0
          */
-        public loadCancel():void {
+        public loadCancel(): void {
             let s = this;
             if (s._req) {
                 s._req.abort();
                 //s._req = null;
             }
         }
-        private _req:XMLHttpRequest;
-        private headers:Array<string>=[];
+
+        private _req: XMLHttpRequest;
+        private headers: Array<string> = [];
+
         /**
          * 加载或请求数据
          * @method load
@@ -41,7 +56,7 @@ namespace annie {
          * @param {string} url
          * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
-        public load(url:string, contentType:string = "form"):void {
+        public load(url: string, contentType: string = "form"): void {
             let s = this;
             s.loadCancel();
             if (s.responseType == null || s.responseType == "") {
@@ -65,51 +80,51 @@ namespace annie {
                     s.responseType = "json";
                 } else if (ext == "txt") {
                     s.responseType = "text";
-                } else if (ext == "js"||ext=="swf") {
+                } else if (ext == "js" || ext == "swf") {
                     s.responseType = "js";
                 } else {
                     s.responseType = "unKnow";
                 }
             }
-            let req:any=null;
-            if(!s._req){
-                s._req=new XMLHttpRequest();
-                req=s._req;
+            let req: any = null;
+            if (!s._req) {
+                s._req = new XMLHttpRequest();
+                req = s._req;
                 req.withCredentials = false;
-                req.onprogress = function (event:any):void {
+                req.onprogress = function (event: any): void {
                     if (!event || event.loaded > 0 && event.total == 0) {
                         return; // Sometimes we get no "total", so just ignore the progress event.
                     }
-                    s.dispatchEvent("onProgress",{loadedBytes:event.loaded,totalBytes:event.total});
+                    s.dispatchEvent("onProgress", {loadedBytes: event.loaded, totalBytes: event.total});
                 };
-                req.onerror = function (event:any):void {
+                req.onerror = function (event: any): void {
                     reSendTimes++;
-                    if(reSendTimes>3){
-                        s.dispatchEvent("onError", {id:2,msg:event["message"]});
-                    }else {
+                    if (reSendTimes > 3) {
+                        s.dispatchEvent("onError", {id: 2, msg: event["message"]});
+                    } else {
                         //断线重连
                         req.abort();
                         if (!s.data) {
                             req.send();
                         } else {
-                            if (contentType=="form") {
-                                req.setRequestHeader("Content-type","application/x-www-form-urlencoded;charset=UTF-8");
+                            if (contentType == "form") {
+                                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
                                 req.send(s._fqs(s.data, null));
                             } else {
-                                var type="application/json";
-                                if(contentType!="json") {
-                                    type="multipart/form-data";
+                                var type = "application/json";
+                                if (contentType != "json") {
+                                    type = "multipart/form-data";
                                 }
-                                req.setRequestHeader("Content-type", type+";charset=UTF-8");
+                                req.setRequestHeader("Content-type", type + ";charset=UTF-8");
                                 req.send(s.data);
                             }
                         }
                     }
                 };
-                req.onreadystatechange = function (event:any):void {
+                req.onreadystatechange = function (event: any): void {
                     let t = event.target;
                     if (t["readyState"] == 4) {
-                        if(req.status==200) {
+                        if (req.status == 200) {
                             let e: Event = new Event("onComplete");
                             try {
                                 let result = t["response"];
@@ -160,7 +175,7 @@ namespace annie {
                                         item = JSON.parse(result);
                                         break;
                                     case "js":
-                                        item="JS_CODE";
+                                        item = "JS_CODE";
                                         Eval(result);
                                         break;
                                     case "text":
@@ -173,20 +188,20 @@ namespace annie {
                                 e.data["response"] = item;
                                 s.data = null;
                                 s.responseType = "";
-                           }catch (e) {
+                            } catch (e) {
                                 s.dispatchEvent("onError", {id: 1, msg: "服务器返回信息有误"});
                             }
                             s.dispatchEvent(e);
-                        }else{
+                        } else {
                             //服务器返回报错
-                            s.dispatchEvent("onError", {id:0,msg:"访问地址不存在"});
+                            s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});
                         }
                     }
                 };
-            }else {
+            } else {
                 req = s._req;
             }
-            let reSendTimes=0;
+            let reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
@@ -195,28 +210,28 @@ namespace annie {
             }
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 req.responseType = "blob";
-            }else{
-                req.responseType ="text";
+            } else {
+                req.responseType = "text";
             }
             req.open(s.method, s.url, true);
-            if(s.headers.length>0){
-                for(let h=0;h<s.headers.length;h+=2){
-                    req.setRequestHeader(s.headers[h],s.headers[h+1]);
+            if (s.headers.length > 0) {
+                for (let h = 0; h < s.headers.length; h += 2) {
+                    req.setRequestHeader(s.headers[h], s.headers[h + 1]);
                 }
-                s.headers.length=0;
+                s.headers.length = 0;
             }
             if (!s.data) {
                 req.send();
             } else {
-                if (contentType=="form") {
-                    req.setRequestHeader("Content-type","application/x-www-form-urlencoded;charset=UTF-8");
+                if (contentType == "form") {
+                    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
                     req.send(s._fqs(s.data, null));
                 } else {
-                    var type="application/json";
-                    if(contentType!="json") {
-                        type="multipart/form-data";
+                    var type = "application/json";
+                    if (contentType != "json") {
+                        type = "multipart/form-data";
                     }
-                    req.setRequestHeader("Content-type", type+";charset=UTF-8");
+                    req.setRequestHeader("Content-type", type + ";charset=UTF-8");
                     req.send(s.data);
                 }
             }
@@ -224,6 +239,7 @@ namespace annie {
              s.dispatchEvent("onStart");
              };*/
         }
+
         /**
          * 后台返回来的数据类弄
          * @property responseType
@@ -232,7 +248,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public responseType:string = null;
+        public responseType: string = null;
         /**
          * 请求的url地址
          * @property url
@@ -240,7 +256,7 @@ namespace annie {
          * @since 1.0.0
          * @type {string}
          */
-        public url:string = "";
+        public url: string = "";
         /**
          * 请求后台的类型 get post
          * @property method
@@ -249,7 +265,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public method:string = "get";
+        public method: string = "get";
         /**
          * 需要像后台传送的数据对象
          * @property data
@@ -258,7 +274,7 @@ namespace annie {
          * @default null
          * @type {Object}
          */
-        public data:Object = null;
+        public data: Object = null;
         /**
          * 格式化post请求参数
          * @method _fqs
@@ -268,8 +284,8 @@ namespace annie {
          * @private
          * @since 1.0.0
          */
-        private _fqs = function (data:any, query:any):string {
-            let params:any = [];
+        private _fqs = function (data: any, query: any): string {
+            let params: any = [];
             if (data) {
                 for (let n in data) {
                     params.push(encodeURIComponent(n) + "=" + encodeURIComponent(data[n]));
@@ -289,12 +305,12 @@ namespace annie {
          * @return {any}
          * @private
          */
-        private _fus = function (src:any, data:any):string {
+        private _fus = function (src: any, data: any): string {
             let s = this;
             if (data == null || data == "") {
                 return src;
             }
-            let query:any = [];
+            let query: any = [];
             let idx = src.indexOf("?");
             if (idx != -1) {
                 let q = src.slice(idx + 1);
@@ -311,8 +327,8 @@ namespace annie {
          * @param name
          * @param value
          */
-        public addHeader(name:string,value:string):void{
-            this.headers.push(name,value);
+        public addHeader(name: string, value: string): void {
+            this.headers.push(name, value);
         }
     }
 }
