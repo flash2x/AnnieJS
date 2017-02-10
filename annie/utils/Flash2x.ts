@@ -8,7 +8,6 @@ namespace Flash2x {
     import Event = annie.Event;
     import ColorFilter=annie.ColorFilter;
     import Shape=annie.Shape;
-    import Rectangle=annie.Rectangle;
     import Bitmap=annie.Bitmap;
     import BlurFilter=annie.BlurFilter;
     import ShadowFilter=annie.ShadowFilter;
