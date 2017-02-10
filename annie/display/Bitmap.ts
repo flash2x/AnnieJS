@@ -40,8 +40,6 @@ namespace annie {
          * @since 1.0.0
          * @type {annie.Rectangle}
          * @default null
-         * @example
-         * var rect=new annie.Rectangle(0,0,100,200)
          */
         public rect: Rectangle = null;
         /**
@@ -88,17 +86,24 @@ namespace annie {
          * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
          * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
          * @example
-         * var imgEle=new Image();
-         * imgEle.onload=function (e) {
-         *        var bitmap = new annie.Bitmap(imgEle)
-         *         //居中对齐
-         *         bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *         bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-         *        s.addChild(bitmap);
-         *  }
-         * imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
+         *      var imgEle=new Image();
+         *      imgEle.onload=function (e) {
+         *          var bitmap = new annie.Bitmap(imgEle)
+         *          //居中对齐
+         *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+         *          s.addChild(bitmap);
          *
-         * @examplelink <p><a href="" target="_blank">测试链接</a></p>
+         *          //截取图片的某一部分显示
+         *          var rect = new annie.Rectangle(0, 0, 200, 200),
+         *          rectBitmap = new annie.Bitmap(imgEle, rect);
+         *          rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *          rectBitmap.y = 100;
+         *          s.addChild(rectBitmap);
+         *      }
+         *      imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
+         *
+         * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
          */
         public constructor(bitmapData: any = null, rect: Rectangle = null) {
             super();
@@ -233,6 +238,10 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
          * @return {Image}
+         * @example
+         *      var rect = new annie.Rectangle(0, 0, 200, 200),
+         *      yourBitmap = new annie.Bitmap(SpriteSheetImg, rect);
+         *      var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
          */
         public static convertToImage(bitmap: annie.Bitmap): any {
             if (!bitmap.rect) {

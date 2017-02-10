@@ -106,9 +106,9 @@ namespace annie {
      * @param {string} url
      * @static
      * @example
-     *   displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *     annie.navigateToURL("http://www.annie2x.com");
-     *   })
+     *      displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
+     *              annie.navigateToURL("http://www.annie2x.com");
+     *      })
      *
      */
     export function navigateToURL(url: string): void {
@@ -123,7 +123,9 @@ namespace annie {
      * @param {string} url
      * @static
      * @example
-     *      annie.sendToURL("http://www.annie2x.com");
+     *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
+     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
+     *      })
      */
     export function sendToURL(url: string): void {
         let req = new XMLHttpRequest();
@@ -142,6 +144,18 @@ namespace annie {
      * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
+     * @example
+     *      annie.toDisplayDataURL(DisplayObj, {
+     *               x: 0,
+     *               y: 32,
+     *               width: 441,
+     *               height: 694
+     *       }, {
+     *               type: "jpg"//数据类型jpg/png
+     *               quality: 90//图片质量值1-100,png格式不需要设置quality
+     *       }, '#CDDBEB');
+     *
+     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
      */
     export let toDisplayDataURL = function (obj: DisplayObject, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
