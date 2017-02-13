@@ -29,6 +29,7 @@ namespace annie {
         }
 
         /**
+         * 矩形左上角的 x 坐标
          * @property x
          * @public
          * @since 1.0.0
@@ -37,6 +38,7 @@ namespace annie {
          */
         public x:number=0;
         /**
+         * 矩形左上角的 y 坐标
          * @property y
          * @public
          * @since 1.0.0
@@ -45,6 +47,7 @@ namespace annie {
          */
         public y:number=0;
         /**
+         * 矩形的宽度（以像素为单位）
          * @property width
          * @public
          * @since 1.0.0
@@ -53,6 +56,7 @@ namespace annie {
          */
         public width:number=0;
         /**
+         * 矩形的高度（以像素为单位）
          * @property height
          * @public
          * @since 1.0.0

@@ -25,6 +25,7 @@ namespace annie {
             s.y = y;
         }
         /**
+         * 水平坐标
          * @property x
          * @public
          * @since 1.0.0
@@ -32,6 +33,7 @@ namespace annie {
          */
         public x:number=0;
         /**
+         * 垂直坐标
          * @property y
          * @since 1.0.0
          * @public

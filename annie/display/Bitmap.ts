@@ -239,9 +239,14 @@ namespace annie {
          * @param {annie.Bitmap} bitmap
          * @return {Image}
          * @example
-         *      var rect = new annie.Rectangle(0, 0, 200, 200),
-         *      yourBitmap = new annie.Bitmap(SpriteSheetImg, rect);
-         *      var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
+         *      var spriteSheetImg = new Image(),
+         *          rect = new annie.Rectangle(0, 0, 200, 200),
+         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
+         *       spriteSheetImg.onload=function(e){
+         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
+         *          trace(singleSmallImg);
+         *       }
+         *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
          */
         public static convertToImage(bitmap: annie.Bitmap): any {
             if (!bitmap.rect) {
