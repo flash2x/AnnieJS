@@ -70,7 +70,12 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
 ##AnnieJS 1.0.6 版本
-    修复少量Bug
+    修复动画元件设置滤色效果后，在动画的情况下失灵的bug
+    修复矢量位图填充元件在有些动画情况下视觉错乱的bug
+    更改URLLoader加载声音时的返回类型，现在直接返回为annie.Sound类型，以前返回的是html声音标签
+    更改URLLoader加载视频时的返回类型，现在直接返回为annie.Video类型，以前返回的是html视频标签
+    重新支持webgl
+    优化底层结构
 ##AnnieJS 1.0.5 版本
     新增 annie.Sprite 一个属性 isCacheShape 以此来控制对应容器中是否要缓存矢量为位图，并提高精确的鼠标点击
     修复手动调用stage.resize()后，stage显示区域显示错误的bug

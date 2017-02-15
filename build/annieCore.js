@@ -1217,7 +1217,29 @@ var annie;
                     h = arg[i].y;
                 }
             }
-            return new Rectangle(x, y, w, h);
+            return new Rectangle(x, y, w - x, h - y);
+        };
+        /**
+         * 通过两个点来确定一个矩形
+         * @param rect
+         * @param p1
+         * @param p2
+         */
+        Rectangle.createRectform2Point = function (rect, p1, p2) {
+            var x = p1.x, y = p1.y, w = p1.x, h = p1.y;
+            if (x > p2.x) {
+                x = p2.x;
+            }
+            if (y > p2.y) {
+                x = p2.y;
+            }
+            if (w < p2.x) {
+                w = p2.x;
+            }
+            if (h < p2.y) {
+                h = p2.y;
+            }
+            rect.x = x, rect.y = y, rect.width = w - x, rect.height = h - y;
         };
         /**
          * 判读两个矩形是否相交
@@ -1382,8 +1404,33 @@ var annie;
              * @private
              */
             this._cp = false;
-            //需要用webgl渲染的信息
-            this._glInfo = {};
+            /**
+             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+             * @property _cacheImg
+             * @protected
+             * @since 1.0.0
+             * @type {any}
+             * @default null
+             */
+            this._cacheImg = null;
+            /**
+             * @property _cacheX
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            this._cacheX = 0;
+            /**
+             * @property _cacheY
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            this._cacheY = 0;
+            this._bounds = new annie.Rectangle();
+            this._drawRect = new annie.Rectangle();
             this._instanceType = "annie.DisplayObject";
         }
         Object.defineProperty(DisplayObject.prototype, "x", {
@@ -1735,10 +1782,8 @@ var annie;
             var rect = s.getBounds();
             var p1 = s.matrix.transformPoint(rect.x, rect.y);
             var p2 = s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height);
-            rect = annie.Rectangle.createFromPoints(p1, p2);
-            rect.width -= rect.x;
-            rect.height -= rect.y;
-            return rect;
+            annie.Rectangle.createRectform2Point(s._drawRect, p1, p2);
+            return s._drawRect;
         };
         /**
          * 更新函数
@@ -1748,6 +1793,13 @@ var annie;
          */
         DisplayObject.prototype.update = function (um, ua, uf) {
             var s = this;
+            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new annie.Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
+            }
             if (s._cp) {
                 um = ua = uf = true;
                 s._cp = false;
@@ -1783,13 +1835,6 @@ var annie;
                         }
                     }
                 }
-            }
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new annie.Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
             }
         };
         /**
@@ -1913,8 +1958,10 @@ var annie;
             if (rect === void 0) { rect = null; }
             _super.call(this);
             this._bitmapData = null;
+            this._realCacheImg = null;
+            this._isNeedUpdate = true;
             /**
-             * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
              * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
              * @property rect
              * @public
@@ -1923,33 +1970,6 @@ var annie;
              * @default null
              */
             this.rect = null;
-            /**
-             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-             * @property _cacheImg
-             * @private
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            this._cacheImg = null;
-            this._realCacheImg = null;
-            this._isNeedUpdate = true;
-            /**
-             * @property _cacheX
-             * @private
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this._cacheX = 0;
-            /**
-             * @property _cacheY
-             * @private
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            this._cacheY = 0;
             /**
              * @property _isCache
              * @private
@@ -2155,16 +2175,6 @@ var annie;
             this._isNeedUpdate = true;
             this._cAb = true;
             /**
-             * @property _cacheCanvas
-             * @since 1.0.0
-             * @private
-             * @type {Canvas}
-             */
-            this._cacheImg = window.document.createElement("canvas");
-            this._cacheX = 0;
-            this._cacheY = 0;
-            this.rect = new annie.Rectangle();
-            /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
              * @param {Array} colors 一组颜色值
@@ -2242,6 +2252,7 @@ var annie;
                 }
             };
             this._instanceType = "annie.Shape";
+            this._cacheImg = window.document.createElement("canvas");
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
@@ -2813,16 +2824,14 @@ var annie;
                             }
                         }
                         if (leftX != undefined) {
+                            s._bounds.width = buttonRightX - leftX;
+                            s._bounds.height = buttonRightY - leftY;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
                             buttonRightY += 20 + lineWidth >> 1;
                             var w = buttonRightX - leftX;
                             var h = buttonRightY - leftY;
-                            s.rect.x = leftX + 20;
-                            s.rect.y = leftY + 20;
-                            s.rect.width = w - 20;
-                            s.rect.height = h - 20;
                             if (s._cAb) {
                                 ///////////////////////////
                                 s._cacheX = leftX;
@@ -2941,7 +2950,7 @@ var annie;
          * @returns {annie.Rectangle}
          */
         Shape.prototype.getBounds = function () {
-            return this.rect;
+            return this._bounds;
         };
         /**
          * 重写hitTestPoint
@@ -3658,6 +3667,8 @@ var annie;
     var Video = (function (_super) {
         __extends(Video, _super);
         function Video(src, width, height) {
+            if (width === void 0) { width = 0; }
+            if (height === void 0) { height = 0; }
             _super.call(this, src, "Video");
             var s = this;
             s._instanceType = "annie.Video";
@@ -3668,8 +3679,10 @@ var annie;
             s.media.poster = "";
             s.media.preload = "auto";
             s.media.controls = false;
-            s.media.width = width;
-            s.media.height = height;
+            if (width && height) {
+                s.media.width = width;
+                s.media.height = height;
+            }
         }
         return Video;
     }(annie.Media));
@@ -4897,9 +4910,6 @@ var annie;
         __extends(TextField, _super);
         function TextField() {
             _super.call(this);
-            this._cacheImg = window.document.createElement("canvas");
-            this._cacheX = 0;
-            this._cacheY = 0;
             this._cacheObject = { bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
             /**
              * 文本的对齐方式
@@ -4992,6 +5002,7 @@ var annie;
              */
             this.bold = false;
             this._instanceType = "annie.TextField";
+            this._cacheImg = window.document.createElement("canvas");
         }
         /**
          * 设置文本在canvas里的渲染样式
@@ -5183,6 +5194,8 @@ var annie;
                     s._isNeedUpdate = false;
                     //给webgl更新新
                     s._cacheImg.updateTexture = true;
+                    s._bounds.height = maxH;
+                    s._bounds.width = maxW;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -5197,15 +5210,7 @@ var annie;
          * @since 1.0.0
          */
         TextField.prototype.getBounds = function () {
-            var s = this;
-            var r = new annie.Rectangle();
-            if (s._cacheImg.width > 0) {
-                r.x = 0;
-                r.y = 0;
-                r.width = s._cacheImg.width - 20;
-                r.height = s._cacheImg.height - 20;
-            }
-            return r;
+            return this._bounds;
         };
         return TextField;
     }(annie.DisplayObject));
@@ -7354,24 +7359,31 @@ var annie;
             var img = target._cacheImg;
             var gl = s._gl;
             var tc = target.rect;
-            var gi = {};
-            if (type == 0) {
-                gi.x = tc.x / img.width;
-                gi.y = tc.y / img.height;
-                gi.w = (tc.x + tc.width) / img.width;
-                gi.h = (tc.y + tc.height) / img.height;
-                gi.pw = tc.width;
-                gi.ph = tc.height;
+            var gi;
+            if (img.updateTexture && img._glInfo) {
+                gi = img._glInfo;
             }
             else {
-                var cX = target._cacheX;
-                var cY = target._cacheY;
-                gi.x = cX / img.width;
-                gi.y = cY / img.height;
-                gi.w = (img.width - cX) / img.width;
-                gi.h = (img.height - cY) / img.height;
-                gi.pw = (img.width - cX * 2);
-                gi.ph = (img.height - cY * 2);
+                gi = {};
+                if (type == 0 && tc) {
+                    gi.x = tc.x / img.width;
+                    gi.y = tc.y / img.height;
+                    gi.w = (tc.x + tc.width) / img.width;
+                    gi.h = (tc.y + tc.height) / img.height;
+                    gi.pw = tc.width;
+                    gi.ph = tc.height;
+                }
+                else {
+                    var cX = target._cacheX;
+                    var cY = target._cacheY;
+                    gi.x = cX / img.width;
+                    gi.y = cY / img.height;
+                    gi.w = (img.width - cX) / img.width;
+                    gi.h = (img.height - cY) / img.height;
+                    gi.pw = (img.width - cX * 2);
+                    gi.ph = (img.height - cY * 2);
+                }
+                img._glInfo = gi;
             }
             ////////////////////////////////////////////
             var vertices = [
@@ -7416,12 +7428,15 @@ var annie;
             var mi = s._maxTextureCount;
             var ci = s._curTextureId;
             var ti = 0;
-            if (bitmapData.tid != undefined) {
+            if (bitmapData.tid != undefined && bitmapData.tid != null) {
                 ci = bitmapData.tid;
                 ti = ci % mi;
-                if (bitmapData.tid == s._textures[ti] && !bitmapData.updateTexture) {
-                    gl.activeTexture(gl["TEXTURE" + ti]);
-                    return ti;
+                if (bitmapData.tid == s._textures[ti]) {
+                    if (!bitmapData.updateTexture) {
+                        gl.activeTexture(gl["TEXTURE" + ti]);
+                        s._curTextureId = ci;
+                        return ti;
+                    }
                 }
             }
             else {
@@ -7437,7 +7452,7 @@ var annie;
             gl.activeTexture(gl["TEXTURE" + ti]);
             var texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            bitmapData.tid = ci;
+            bitmapData.tic = ci;
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -7671,37 +7686,41 @@ var annie;
                                     case "image":
                                     case "sound":
                                     case "video":
+                                        var itemObj_1;
                                         var isBlob_1 = true;
                                         if (s.responseType == "image") {
-                                            item_1 = document.createElement("img");
-                                            item_1.onload = function () {
+                                            itemObj_1 = document.createElement("img");
+                                            itemObj_1.onload = function () {
                                                 if (isBlob_1) {
                                                     URL.revokeObjectURL(item_1.src);
                                                 }
-                                                item_1.onload = null;
+                                                itemObj_1.onload = null;
                                             };
+                                            item_1 = itemObj_1;
                                         }
                                         else {
                                             if (s.responseType == "sound") {
-                                                item_1 = document.createElement("AUDIO");
+                                                itemObj_1 = document.createElement("AUDIO");
+                                                item_1 = new annie.Sound(itemObj_1);
                                             }
                                             else if (s.responseType == "video") {
-                                                item_1 = document.createElement("VIDEO");
+                                                itemObj_1 = document.createElement("VIDEO");
+                                                item_1 = new annie.Video(itemObj_1);
                                             }
-                                            item_1.preload = true;
-                                            item_1.load();
-                                            item_1.onloadeddata = function () {
+                                            itemObj_1.preload = true;
+                                            itemObj_1.load();
+                                            itemObj_1.onloadeddata = function () {
                                                 if (isBlob_1) {
                                                 }
-                                                item_1.onloadeddata = null;
+                                                itemObj_1.onloadeddata = null;
                                             };
                                         }
                                         try {
-                                            item_1.src = URL.createObjectURL(result);
+                                            itemObj_1.src = URL.createObjectURL(result);
                                         }
                                         catch (err) {
                                             isBlob_1 = false;
-                                            item_1.src = s.url;
+                                            itemObj_1.src = s.url;
                                         }
                                         break;
                                     case "json":
@@ -7975,13 +7994,7 @@ var Flash2x;
         var scene = _loadSceneNames[_loadIndex];
         if (!Flash2x._isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
-                var id = _currentConfig[_loadIndex][0].id;
-                if (e.data.type == "sound") {
-                    res[scene][id] = new annie.Sound(e.data.response);
-                }
-                else {
-                    res[scene][id] = e.data.response;
-                }
+                res[scene][_currentConfig[_loadIndex][0].id] = e.data.response;
             }
         }
         else {

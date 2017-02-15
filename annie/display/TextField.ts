@@ -13,10 +13,8 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType="annie.TextField";
+            this._cacheImg=window.document.createElement("canvas");
         }
-        private _cacheImg:any=window.document.createElement("canvas");
-        private _cacheX:number = 0;
-        private _cacheY:number = 0;
         private _cacheObject:any ={bold:false,italic:false,size:12,lineType:"single",text:"ILoveAnnie",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
         /**
          * 文本的对齐方式
@@ -293,6 +291,8 @@ namespace annie {
                     s._isNeedUpdate = false;
                     //给webgl更新新
                     s._cacheImg.updateTexture=true;
+                    s._bounds.height=maxH;
+                    s._bounds.width=maxW;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -307,15 +307,7 @@ namespace annie {
          * @since 1.0.0
          */
         public getBounds():Rectangle{
-            let s=this;
-            let r=new Rectangle();
-            if(s._cacheImg.width>0){
-                r.x = 0;
-                r.y = 0;
-                r.width = s._cacheImg.width - 20;
-                r.height = s._cacheImg.height - 20;
-            }
-            return r;
+            return this._bounds;
         }
     }
 }

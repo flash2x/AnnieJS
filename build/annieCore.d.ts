@@ -793,6 +793,13 @@ declare namespace annie {
          */
         static createFromPoints(p1: Point, ...arg: Point[]): Rectangle;
         /**
+         * 通过两个点来确定一个矩形
+         * @param rect
+         * @param p1
+         * @param p2
+         */
+        static createRectform2Point(rect: Rectangle, p1: Point, p2: Point): void;
+        /**
          * 判读两个矩形是否相交
          * @method testRectCross
          * @public
@@ -1170,7 +1177,33 @@ declare namespace annie {
          * @type {Canvas}
          */
         static _canvas: any;
-        _glInfo: any;
+        /**
+         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+         * @property _cacheImg
+         * @protected
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        protected _cacheImg: any;
+        /**
+         * @property _cacheX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _cacheX: number;
+        /**
+         * @property _cacheY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _cacheY: number;
+        protected _bounds: Rectangle;
+        protected _drawRect: Rectangle;
     }
 }
 /**
@@ -1199,8 +1232,10 @@ declare namespace annie {
          */
         bitmapData: any;
         private _bitmapData;
+        private _realCacheImg;
+        private _isNeedUpdate;
         /**
-         * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+         * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
          * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
          * @property rect
          * @public
@@ -1209,33 +1244,6 @@ declare namespace annie {
          * @default null
          */
         rect: Rectangle;
-        /**
-         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _cacheImg
-         * @private
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        private _cacheImg;
-        private _realCacheImg;
-        private _isNeedUpdate;
-        /**
-         * @property _cacheX
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        private _cacheX;
-        /**
-         * @property _cacheY
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        private _cacheY;
         /**
          * @property _isCache
          * @private
@@ -1357,15 +1365,6 @@ declare namespace annie {
          * @returns {string}
          */
         static getRGBA(color: string, alpha: number): string;
-        /**
-         * @property _cacheCanvas
-         * @since 1.0.0
-         * @private
-         * @type {Canvas}
-         */
-        private _cacheImg;
-        private _cacheX;
-        private _cacheY;
         private _isBitmapStroke;
         private _isBitmapFill;
         /**
@@ -1431,7 +1430,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void;
-        private rect;
         /**
          * 三次贝赛尔曲线
          * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
@@ -1904,7 +1902,7 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Video extends Media {
-        constructor(src: any, width: number, height: number);
+        constructor(src: any, width?: number, height?: number);
     }
 }
 /**
@@ -2462,9 +2460,6 @@ declare namespace annie {
      */
     class TextField extends DisplayObject {
         constructor();
-        private _cacheImg;
-        private _cacheX;
-        private _cacheY;
         private _cacheObject;
         /**
          * 文本的对齐方式

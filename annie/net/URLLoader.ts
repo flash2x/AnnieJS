@@ -124,36 +124,40 @@ namespace annie {
                                     case "image":
                                     case "sound":
                                     case "video":
+                                        let itemObj:any;
                                         let isBlob: boolean = true;
                                         if (s.responseType == "image") {
-                                            item = document.createElement("img");
-                                            item.onload = function () {
+                                            itemObj = document.createElement("img");
+                                            itemObj.onload = function () {
                                                 if (isBlob) {
                                                     URL.revokeObjectURL(item.src);
                                                 }
-                                                item.onload = null;
+                                                itemObj.onload = null;
                                             };
+                                            item=itemObj;
                                         } else {
                                             if (s.responseType == "sound") {
-                                                item = document.createElement("AUDIO");
+                                                itemObj = document.createElement("AUDIO");
+                                                item=new Sound(itemObj);
                                             } else if (s.responseType == "video") {
-                                                item = document.createElement("VIDEO");
+                                                itemObj = document.createElement("VIDEO");
+                                                item=new Video(itemObj);
                                             }
-                                            item.preload = true;
-                                            item.load();
-                                            item.onloadeddata = function () {
+                                            itemObj.preload = true;
+                                            itemObj.load();
+                                            itemObj.onloadeddata = function () {
                                                 if (isBlob) {
                                                     //执行下面的代码android有问题，会闪退
                                                     //URL.revokeObjectURL(item.src);
                                                 }
-                                                item.onloadeddata = null;
+                                                itemObj.onloadeddata = null;
                                             };
                                         }
                                         try {
-                                            item.src = URL.createObjectURL(result);
+                                            itemObj.src = URL.createObjectURL(result);
                                         } catch (err) {
                                             isBlob = false;
-                                            item.src = s.url;
+                                            itemObj.src = s.url;
                                         }
                                         break;
                                     case "json":

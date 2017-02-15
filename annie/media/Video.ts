@@ -10,7 +10,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class Video extends Media {
-        public constructor(src:any,width:number,height:number) {
+        public constructor(src:any,width:number=0,height:number=0) {
             super(src, "Video");
             let s=this;
             s._instanceType="annie.Video";
@@ -21,8 +21,10 @@ namespace annie {
             s.media.poster="";
             s.media.preload="auto";
             s.media.controls=false;
-            s.media.width=width;
-            s.media.height=height;
+            if(width&&height) {
+                s.media.width = width;
+                s.media.height = height;
+            }
         }
     }
 }

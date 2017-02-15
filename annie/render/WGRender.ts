@@ -228,23 +228,29 @@ namespace annie {
             let img = target._cacheImg;
             let gl = s._gl;
             let tc: any = target.rect;
-            let gi:any={};
-            if (type==0) {
-                gi.x = tc.x / img.width;
-                gi.y = tc.y / img.height;
-                gi.w = (tc.x + tc.width) / img.width;
-                gi.h = (tc.y + tc.height) / img.height;
-                gi.pw = tc.width;
-                gi.ph = tc.height;
-            } else {
-                var cX: number = target._cacheX;
-                var cY: number = target._cacheY;
-                gi.x = cX / img.width;
-                gi.y = cY / img.height;
-                gi.w = (img.width - cX) / img.width;
-                gi.h = (img.height - cY) / img.height;
-                gi.pw = (img.width - cX * 2);
-                gi.ph = (img.height - cY * 2);
+            let gi:any;
+            if(img.updateTexture&&img._glInfo){
+                gi=img._glInfo;
+            }else {
+                gi={};
+                if (type == 0 && tc) {
+                    gi.x = tc.x / img.width;
+                    gi.y = tc.y / img.height;
+                    gi.w = (tc.x + tc.width) / img.width;
+                    gi.h = (tc.y + tc.height) / img.height;
+                    gi.pw = tc.width;
+                    gi.ph = tc.height;
+                } else {
+                    var cX: number = target._cacheX;
+                    var cY: number = target._cacheY;
+                    gi.x = cX / img.width;
+                    gi.y = cY / img.height;
+                    gi.w = (img.width - cX) / img.width;
+                    gi.h = (img.height - cY) / img.height;
+                    gi.pw = (img.width - cX * 2);
+                    gi.ph = (img.height - cY * 2);
+                }
+                img._glInfo=gi;
             }
             ////////////////////////////////////////////
             let vertices =
@@ -289,12 +295,16 @@ namespace annie {
             let mi:number=s._maxTextureCount;
             let ci:number=s._curTextureId;
             let ti=0;
-            if(bitmapData.tid!=undefined){
+            if(bitmapData.tid!=undefined&&bitmapData.tid!=null){
                 ci=bitmapData.tid;
                 ti=ci%mi;
-                if(bitmapData.tid==s._textures[ti]&&!bitmapData.updateTexture){
-                    gl.activeTexture(gl["TEXTURE"+ti]);
-                    return ti;
+                if(bitmapData.tid==s._textures[ti]){
+                    if(!bitmapData.updateTexture) {
+                        gl.activeTexture(gl["TEXTURE" + ti]);
+                        s._curTextureId=ci;
+                        return ti;
+                    }
+
                 }
             }else {
                 if (ci < Number.MAX_VALUE) {
@@ -308,7 +318,7 @@ namespace annie {
             gl.activeTexture(gl["TEXTURE"+ti]);
             let texture: any = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            bitmapData.tid=ci;
+            bitmapData.tic=ci;
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);

@@ -25,8 +25,10 @@ namespace annie {
         public get bitmapData():any{return this._bitmapData};
         public set bitmapData(value:any){this._bitmapData=value;this._isNeedUpdate=true;}
         private _bitmapData:any = null;
+        private _realCacheImg:any=null;
+        private _isNeedUpdate:boolean=true;
         /**
-         * 有时候一张大图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+         * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
          * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
          * @property rect
          * @public
@@ -34,34 +36,7 @@ namespace annie {
          * @type {annie.Rectangle}
          * @default null
          */
-        public rect:Rectangle = null;
-        /**
-         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _cacheImg
-         * @private
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        private _cacheImg:any=null;
-        private _realCacheImg:any=null;
-        private _isNeedUpdate:boolean=true;
-        /**
-         * @property _cacheX
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        private _cacheX:number = 0;
-        /**
-         * @property _cacheY
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        private _cacheY:number = 0;
+        public rect:Rectangle=null;
         /**
          * @property _isCache
          * @private

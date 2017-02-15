@@ -179,12 +179,7 @@ namespace Flash2x {
         let scene = _loadSceneNames[_loadIndex];
         if(!_isReleased){
             if (e.data.type != "js" && e.data.type != "css") {
-                let id = _currentConfig[_loadIndex][0].id;
-                if (e.data.type == "sound") {
-                    res[scene][id] = new annie.Sound(e.data.response);
-                } else {
-                    res[scene][id] = e.data.response;
-                }
+                res[scene][_currentConfig[_loadIndex][0].id] = e.data.response;
             }
         }else{
             var F2x:any=Flash2x;

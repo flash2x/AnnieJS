@@ -13,6 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
+            this._cacheImg=window.document.createElement("canvas");
         }
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -99,16 +100,6 @@ namespace annie {
             }
             return color;
         }
-
-        /**
-         * @property _cacheCanvas
-         * @since 1.0.0
-         * @private
-         * @type {Canvas}
-         */
-        private _cacheImg: any = window.document.createElement("canvas");
-        private _cacheX: number = 0;
-        private _cacheY: number = 0;
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
 
@@ -230,9 +221,6 @@ namespace annie {
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
             this._command.push([1, "quadraticCurveTo", [cpX, cpY, x, y]]);
         }
-
-        private rect: Rectangle = new Rectangle();
-
         /**
          * 三次贝赛尔曲线
          * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
@@ -761,16 +749,14 @@ namespace annie {
                             }
                         }
                         if (leftX != undefined) {
+                            s._bounds.width=buttonRightX - leftX;
+                            s._bounds.height=buttonRightY - leftY;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
                             buttonRightY += 20 + lineWidth >> 1;
                             let w = buttonRightX - leftX;
                             let h = buttonRightY - leftY;
-                            s.rect.x = leftX + 20;
-                            s.rect.y = leftY + 20;
-                            s.rect.width = w - 20;
-                            s.rect.height = h - 20;
                             if (s._cAb){
                                 ///////////////////////////
                                 s._cacheX = leftX;
@@ -833,6 +819,7 @@ namespace annie {
                     s._isNeedUpdate = false;
                     //给webgl更新新
                     s._cacheImg.updateTexture=true;
+
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -882,7 +869,7 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds(): Rectangle {
-            return this.rect;
+          return this._bounds;
         }
 
         /**
@@ -911,7 +898,7 @@ namespace annie {
                     return s;
                 }
             }else{
-                if (s.getBounds().isPointIn(p)) {
+                if (s.getBounds().isPointIn(p)){
                     return s;
                 }
             }
