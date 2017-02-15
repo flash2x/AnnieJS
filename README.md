@@ -76,6 +76,7 @@
     更改URLLoader加载声音时的返回类型，现在直接返回为annie.Sound类型，以前返回的是html声音标签
     更改URLLoader加载视频时的返回类型，现在直接返回为annie.Video类型，以前返回的是html视频标签
     重新支持webgl
+    支持动态文本设置边框属性
     优化底层结构
 ##AnnieJS 1.0.5 版本
     新增 annie.Sprite 一个属性 isCacheShape 以此来控制对应容器中是否要缓存矢量为位图，并提高精确的鼠标点击
@@ -155,6 +156,11 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
+## Flash2x 3.0.6
+    支持动态文本边框导出
+    支持导出LayaBox相关引擎
+## Flash2x 3.0.5
+    少量优化导出结构
 ## Flash2x 3.0.4
    更新gulp构建模式下支持将fla打包成一个单独的swf资源文件供html5调用，实现一个fla生成一个swf文件别无其他资源文件的完美解决方案
 ## Flash2x 3.0.3
