@@ -15,7 +15,7 @@ namespace annie {
             this._instanceType="annie.TextField";
             this._cacheImg=window.document.createElement("canvas");
         }
-        private _cacheObject:any ={bold:false,italic:false,size:12,lineType:"single",text:"ILoveAnnie",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
+        private _cacheObject:any ={border:false,bold:false,italic:false,size:12,lineType:"single",text:"ILoveAnnie",textAlign:"left",font:"Arial",color:"#fff",lineWidth:0,lineHeight:0};
         /**
          * 文本的对齐方式
          * @property textAlign
@@ -106,6 +106,14 @@ namespace annie {
          * @type {boolean}
          */
         public bold:boolean=false;
+        /**
+         * 设置或获取是否有边框
+         * @property property
+         * @param {boolean} show true或false
+         * @public
+         * @since 1.0.6
+         */
+        public border:boolean=false;
 
         /**
          * 设置文本在canvas里的渲染样式
@@ -250,7 +258,14 @@ namespace annie {
                     can.height = maxH + 20;
                     can.style.width = can.width / devicePixelRatio + "px";
                     can.style.height = can.height / devicePixelRatio + "px";
-                    ctx.clearRect(0, 0, maxW, maxH);
+                    ctx.clearRect(0, 0, can.width, can.width);
+                    if(s.border) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = "#000";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(10.5, 10.5, maxW, maxH);
+                        ctx.closePath();
+                    }
                     ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                     /////////////////////
                     if (s.cFilters.length > 0) {

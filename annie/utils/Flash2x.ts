@@ -434,6 +434,7 @@ namespace Flash2x {
             textObj.bold = bold;
             textObj.color = color;
             textObj.lineType = lineType;
+            textObj.border=showBorder;
         } else {
             textObj = new annie.InputText(lineType);
             textObj.initInfo(text, width, height, color, align, size, face, showBorder, lineSpacing / size);

@@ -4910,7 +4910,7 @@ var annie;
         __extends(TextField, _super);
         function TextField() {
             _super.call(this);
-            this._cacheObject = { bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
+            this._cacheObject = { border: false, bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
             /**
              * 文本的对齐方式
              * @property textAlign
@@ -5001,6 +5001,14 @@ var annie;
              * @type {boolean}
              */
             this.bold = false;
+            /**
+             * 设置或获取是否有边框
+             * @property property
+             * @param {boolean} show true或false
+             * @public
+             * @since 1.0.6
+             */
+            this.border = false;
             this._instanceType = "annie.TextField";
             this._cacheImg = window.document.createElement("canvas");
         }
@@ -5152,7 +5160,14 @@ var annie;
                     can.height = maxH + 20;
                     can.style.width = can.width / annie.devicePixelRatio + "px";
                     can.style.height = can.height / annie.devicePixelRatio + "px";
-                    ctx.clearRect(0, 0, maxW, maxH);
+                    ctx.clearRect(0, 0, can.width, can.width);
+                    if (s.border) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = "#000";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(10.5, 10.5, maxW, maxH);
+                        ctx.closePath();
+                    }
                     ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                     /////////////////////
                     if (s.cFilters.length > 0) {
@@ -8265,6 +8280,7 @@ var Flash2x;
             textObj.bold = bold;
             textObj.color = color;
             textObj.lineType = lineType;
+            textObj.border = showBorder;
         }
         else {
             textObj = new annie.InputText(lineType);

@@ -2552,6 +2552,14 @@ declare namespace annie {
          */
         bold: boolean;
         /**
+         * 设置或获取是否有边框
+         * @property property
+         * @param {boolean} show true或false
+         * @public
+         * @since 1.0.6
+         */
+        border: boolean;
+        /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
          * @private
