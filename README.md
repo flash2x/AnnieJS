@@ -25,7 +25,7 @@
     4.安装Adobe Flash CS6 及以上版本
     5.强烈推荐google Chrome浏览器，调试利器
     6.下载并安装Flash2xManager管理软件,用此软件一健配置工具和引擎(支持Mac和win)
-##[点击下载Flash2xManager工具](https://pan.baidu.com/s/1pKpMmUJ#path=%252FFlash2x%25E4%25B8%258B%25E8%25BD%25BD)
+##[点击下载Flash2xManager工具](http://flash2x.org)
 #小试牛刀
     1.安装好以上所说的相关工具后，打开Adobe Flash软件 随便新建一个Fla文件制作些东西保存(一定要保存)。
     2.打开Flash的菜单->窗口->扩展(cs6是[其他])->Flash2x，这时就启动了我们的Flash2x工具。
