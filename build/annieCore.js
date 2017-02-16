@@ -7224,6 +7224,7 @@ var annie;
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
             gl.clear(gl.COLOR_BUFFER_BIT);
+            s._textures.length = 0;
         };
         /**
          * 开始有遮罩时调用
@@ -7373,13 +7374,13 @@ var annie;
             var s = this;
             var img = target._cacheImg;
             var gl = s._gl;
-            var tc = target.rect;
             var gi;
-            if (img.updateTexture && img._glInfo) {
-                gi = img._glInfo;
+            if (img.updateTexture && target._glInfo) {
+                gi = target._glInfo;
             }
             else {
                 gi = {};
+                var tc = target.rect;
                 if (type == 0 && tc) {
                     gi.x = tc.x / img.width;
                     gi.y = tc.y / img.height;
@@ -7398,7 +7399,7 @@ var annie;
                     gi.pw = (img.width - cX * 2);
                     gi.ph = (img.height - cY * 2);
                 }
-                img._glInfo = gi;
+                target._glInfo = gi;
             }
             ////////////////////////////////////////////
             var vertices = [
@@ -7437,45 +7438,55 @@ var annie;
             gl.uniformMatrix3fv(s._vMI, false, vMatrix);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
+        WGRender.prototype.getActiveId = function () {
+            for (var i = 0; i < this._maxTextureCount; i++) {
+                if (!this._textures[i]) {
+                    return i;
+                }
+            }
+            return 0;
+        };
         WGRender.prototype.createTexture = function (bitmapData) {
             var s = this;
             var gl = s._gl;
-            var mi = s._maxTextureCount;
-            var ci = s._curTextureId;
-            var ti = 0;
-            if (bitmapData.tid != undefined && bitmapData.tid != null) {
-                ci = bitmapData.tid;
-                ti = ci % mi;
-                if (bitmapData.tid == s._textures[ti]) {
-                    if (!bitmapData.updateTexture) {
-                        gl.activeTexture(gl["TEXTURE" + ti]);
-                        s._curTextureId = ci;
-                        return ti;
-                    }
+            var tid = 0;
+            var needUpdate = true;
+            var isChanged = false;
+            if (bitmapData._texture) {
+                tid = bitmapData._tid;
+                //如果被占用则需要重新申请
+                if (s._textures[tid] != bitmapData) {
+                    //更新tid
+                    tid = s.getActiveId();
+                    isChanged = true;
+                }
+                if (!bitmapData.updateTexture) {
+                    needUpdate = false;
                 }
             }
             else {
-                if (ci < Number.MAX_VALUE) {
-                    ci++;
+                tid = s.getActiveId();
+            }
+            gl.activeTexture(gl["TEXTURE" + tid]);
+            if (needUpdate) {
+                var texture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                bitmapData._texture = texture;
+            }
+            else {
+                if (isChanged) {
+                    gl.bindTexture(gl.TEXTURE_2D, bitmapData._texture);
                 }
-                else {
-                    ci = 0;
-                }
-                ti = ci % mi;
             }
             bitmapData.updateTexture = false;
-            gl.activeTexture(gl["TEXTURE" + ti]);
-            var texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            bitmapData.tic = ci;
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            s._textures[ti] = ci;
-            s._curTextureId = ci;
-            return ti;
+            bitmapData._tid = tid;
+            s._textures[tid] = bitmapData;
+            return tid;
         };
         return WGRender;
     }(annie.AObject));

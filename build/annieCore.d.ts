@@ -3611,6 +3611,7 @@ declare namespace annie {
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
         draw(target: any, type: number): void;
+        private getActiveId();
         createTexture(bitmapData: any): number;
     }
 }
