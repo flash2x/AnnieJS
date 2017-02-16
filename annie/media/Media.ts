@@ -6,7 +6,7 @@ namespace annie {
     /**
      * 抽象类 一般不直接使用
      * @class annie.Media
-     * @extends annie.AObject
+     * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
      */
