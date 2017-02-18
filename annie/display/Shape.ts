@@ -396,13 +396,13 @@ namespace annie {
         /**
          * 给线条着色
          * @method beginStroke
-         * @param {string} color
-         * @param {number} lineWidth
+         * @param {string} color  颜色值
+         * @param {number} lineWidth 宽度
          * @public
          * @since 1.0.0
          */
-        public beginStroke(color: string, lineWidth: number = 1): void {
-            this._stroke(color, lineWidth);
+        public beginStroke(color: string, lineWidth: number = 1,cap:string="",join:string="",miter:number=0): void {
+            this._stroke(color, lineWidth,cap,join,miter);
         }
 
         /**
@@ -412,11 +412,14 @@ namespace annie {
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1): void {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10): void {
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth,cap,join,miter);
         }
 
         /**
@@ -426,11 +429,14 @@ namespace annie {
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1) {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10) {
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth,cap,join,miter);
         }
 
         /**
@@ -439,20 +445,26 @@ namespace annie {
          * @param {Image} image
          * @param {annie.Matrix} matrix
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1): void {
+        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10): void {
             let s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth);
+            s._stroke(Shape.getBitmapStyle(image), lineWidth,cap,join,miter);
         }
 
-        private _stroke(strokeStyle: any, width: number): void {
+        private _stroke(strokeStyle: any, width: number,cap:string,join:string,miter:number): void {
             let c = this._command;
             c.push([0, "lineWidth", width]);
+            c.push([0, "lineCap", cap]);
+            c.push([0, "lineJoin", join]);
+            c.push([0, "miterLimit", miter]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
             this._isNeedUpdate = true;

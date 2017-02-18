@@ -26,6 +26,7 @@ var annie;
              * @public
              * @since 1.0.0
              * @returns {number}
+             * @readonly
              * @example
              *      //获取 annie引擎类对象唯一码
              *      trace(this.instanceId);
@@ -43,6 +44,7 @@ var annie;
              * @since 1.0.3
              * @public
              * @return {string}
+             * @readonly
              */
             get: function () {
                 return this._instanceType;
@@ -2193,12 +2195,18 @@ var annie;
              * @param {Array} ratios 一组范围比例值
              * @param {Array} points 一组点
              * @param {number} lineWidth
+             * @param {string} cap 线头的形状 butt round square 默认 butt
+             * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+             * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
              * @public
              * @since 1.0.0
              */
-            this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth) {
+            this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth, cap, join, miter) {
                 if (lineWidth === void 0) { lineWidth = 1; }
-                this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+                if (cap === void 0) { cap = "butt"; }
+                if (join === void 0) { join = "miter"; }
+                if (miter === void 0) { miter = 10; }
+                this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
             };
             /**
              * 解析一段路径 一般给Flash2x用
@@ -2604,14 +2612,17 @@ var annie;
         /**
          * 给线条着色
          * @method beginStroke
-         * @param {string} color
-         * @param {number} lineWidth
+         * @param {string} color  颜色值
+         * @param {number} lineWidth 宽度
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.beginStroke = function (color, lineWidth) {
+        Shape.prototype.beginStroke = function (color, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
-            this._stroke(color, lineWidth);
+            if (cap === void 0) { cap = ""; }
+            if (join === void 0) { join = ""; }
+            if (miter === void 0) { miter = 0; }
+            this._stroke(color, lineWidth, cap, join, miter);
         };
         /**
          * 画线性渐变的线条 一般给Flash2x用
@@ -2620,12 +2631,18 @@ var annie;
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.beginLinearGradientStroke = function (colors, ratios, points, lineWidth) {
+        Shape.prototype.beginLinearGradientStroke = function (colors, ratios, points, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+            if (cap === void 0) { cap = "butt"; }
+            if (join === void 0) { join = "miter"; }
+            if (miter === void 0) { miter = 10; }
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
         };
         /**
          * 线条位图填充 一般给Flash2x用
@@ -2633,20 +2650,29 @@ var annie;
          * @param {Image} image
          * @param {annie.Matrix} matrix
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.beginBitmapStroke = function (image, matrix, lineWidth) {
+        Shape.prototype.beginBitmapStroke = function (image, matrix, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
+            if (cap === void 0) { cap = "butt"; }
+            if (join === void 0) { join = "miter"; }
+            if (miter === void 0) { miter = 10; }
             var s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth);
+            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
         };
-        Shape.prototype._stroke = function (strokeStyle, width) {
+        Shape.prototype._stroke = function (strokeStyle, width, cap, join, miter) {
             var c = this._command;
             c.push([0, "lineWidth", width]);
+            c.push([0, "lineCap", cap]);
+            c.push([0, "lineJoin", join]);
+            c.push([0, "miterLimit", miter]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
             this._isNeedUpdate = true;
@@ -3513,7 +3539,7 @@ var annie;
     /**
      * 抽象类 一般不直接使用
      * @class annie.Media
-     * @extends annie.AObject
+     * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
      */
@@ -8363,16 +8389,16 @@ var Flash2x;
         }
         if (strokeObj) {
             if (strokeObj.type == 0) {
-                shape.beginStroke(strokeObj.color, strokeObj.lineWidth);
+                shape.beginStroke(strokeObj.color, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
             else if (strokeObj.type == 1) {
-                shape.beginRadialGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth);
+                shape.beginRadialGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
             else if (strokeObj.type == 2) {
-                shape.beginLinearGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth);
+                shape.beginLinearGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
             else {
-                shape.beginBitmapStroke(sb(strokeObj.bitmapScene, strokeObj.bitmapName), strokeObj.matrix, strokeObj.lineWidth);
+                shape.beginBitmapStroke(sb(strokeObj.bitmapScene, strokeObj.bitmapName), strokeObj.matrix, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
         }
         if (pathObj.type == 0) {
