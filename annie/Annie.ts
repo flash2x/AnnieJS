@@ -127,6 +127,7 @@ namespace annie {
      *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
      *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
      *      })
+     *      //测试
      */
     export function sendToURL(url: string): void {
         let req = new XMLHttpRequest();
