@@ -13,6 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
+            this._cacheImg=window.document.createElement("canvas");
         }
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -99,16 +100,6 @@ namespace annie {
             }
             return color;
         }
-
-        /**
-         * @property _cacheCanvas
-         * @since 1.0.0
-         * @private
-         * @type {Canvas}
-         */
-        private _cacheImg: any = window.document.createElement("canvas");
-        private _cacheX: number = 0;
-        private _cacheY: number = 0;
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
 
@@ -230,9 +221,6 @@ namespace annie {
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
             this._command.push([1, "quadraticCurveTo", [cpX, cpY, x, y]]);
         }
-
-        private rect: Rectangle = new Rectangle();
-
         /**
          * 三次贝赛尔曲线
          * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
@@ -408,13 +396,13 @@ namespace annie {
         /**
          * 给线条着色
          * @method beginStroke
-         * @param {string} color
-         * @param {number} lineWidth
+         * @param {string} color  颜色值
+         * @param {number} lineWidth 宽度
          * @public
          * @since 1.0.0
          */
-        public beginStroke(color: string, lineWidth: number = 1): void {
-            this._stroke(color, lineWidth);
+        public beginStroke(color: string, lineWidth: number = 1,cap:string="",join:string="",miter:number=0): void {
+            this._stroke(color, lineWidth,cap,join,miter);
         }
 
         /**
@@ -424,11 +412,14 @@ namespace annie {
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1): void {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10): void {
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth,cap,join,miter);
         }
 
         /**
@@ -438,11 +429,14 @@ namespace annie {
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1) {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10) {
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth,cap,join,miter);
         }
 
         /**
@@ -451,20 +445,26 @@ namespace annie {
          * @param {Image} image
          * @param {annie.Matrix} matrix
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1): void {
+        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10): void {
             let s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth);
+            s._stroke(Shape.getBitmapStyle(image), lineWidth,cap,join,miter);
         }
 
-        private _stroke(strokeStyle: any, width: number): void {
+        private _stroke(strokeStyle: any, width: number,cap:string,join:string,miter:number): void {
             let c = this._command;
             c.push([0, "lineWidth", width]);
+            c.push([0, "lineCap", cap]);
+            c.push([0, "lineJoin", join]);
+            c.push([0, "miterLimit", miter]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
             this._isNeedUpdate = true;
@@ -658,7 +658,7 @@ namespace annie {
             if(s.visible) {
                 super.update(um, ua, uf);
                 if(s.parent)s.cacheAsBitmap=s.parent.isCacheShape;
-                if (s._isNeedUpdate || uf||s._updateInfo.UF) {
+                if (s._isNeedUpdate || uf||s._updateInfo.UF){
                     //更新缓存
                     let cLen: number = s._command.length;
                     let leftX: number;
@@ -761,16 +761,14 @@ namespace annie {
                             }
                         }
                         if (leftX != undefined) {
+                            s._bounds.width=buttonRightX - leftX;
+                            s._bounds.height=buttonRightY - leftY;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
                             buttonRightY += 20 + lineWidth >> 1;
                             let w = buttonRightX - leftX;
                             let h = buttonRightY - leftY;
-                            s.rect.x = leftX + 20;
-                            s.rect.y = leftY + 20;
-                            s.rect.width = w - 20;
-                            s.rect.height = h - 20;
                             if (s._cAb){
                                 ///////////////////////////
                                 s._cacheX = leftX;
@@ -831,7 +829,9 @@ namespace annie {
                         s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
-                    //WGRender.setDisplayInfo(s, 1);
+                    //给webgl更新新
+                    s._cacheImg.updateTexture=true;
+
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -858,12 +858,14 @@ namespace annie {
                     } else if (paramsLen == 5) {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
                     } else if (paramsLen == 6) {
+                        let lx=data[2][4];
+                        let ly=data[2][5];
                         if (data[0] == 2) {
                             //位图填充
-                            data[2][4] -= leftX;
-                            data[2][5] -= leftY;
+                            lx-=leftX;
+                            ly-=leftY;
                         }
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {
                     if(!isMask)
@@ -879,7 +881,7 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds(): Rectangle {
-            return this.rect;
+          return this._bounds;
         }
 
         /**
@@ -908,7 +910,7 @@ namespace annie {
                     return s;
                 }
             }else{
-                if (s.getBounds().isPointIn(p)) {
+                if (s.getBounds().isPointIn(p)){
                     return s;
                 }
             }

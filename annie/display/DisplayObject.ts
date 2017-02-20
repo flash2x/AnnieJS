@@ -483,10 +483,8 @@ namespace annie {
             let rect = s.getBounds();
             let p1: Point = s.matrix.transformPoint(rect.x, rect.y);
             let p2: Point = s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height);
-            rect = Rectangle.createFromPoints(p1, p2);
-            rect.width -= rect.x;
-            rect.height -= rect.y;
-            return rect;
+            Rectangle.createRectform2Point(s._drawRect,p1, p2);
+            return s._drawRect;
         }
         /**
          * 更新函数
@@ -496,6 +494,13 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void{
             let s = this;
+            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
+            }
             if(s._cp){
                 um=ua=uf=true;
                 s._cp=false;
@@ -532,13 +537,7 @@ namespace annie {
                     }
                 }
             }
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
-            }
+
         }
         /**
          * 抽象方法
@@ -622,7 +621,32 @@ namespace annie {
          * @type {Canvas}
          */
         public static _canvas: any = window.document.createElement("canvas");
-        //需要用webgl渲染的信息
-        public _glInfo: any = {};
+        /**
+         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+         * @property _cacheImg
+         * @protected
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        protected _cacheImg:any=null;
+        /**
+         * @property _cacheX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _cacheX:number = 0;
+        /**
+         * @property _cacheY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _cacheY:number = 0;
+        protected _bounds:Rectangle=new Rectangle();
+        protected _drawRect:Rectangle=new Rectangle();
     }
 }

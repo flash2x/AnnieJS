@@ -32,11 +32,14 @@ namespace annie {
             s.media.setAttribute("webkit-playsinline", "true");
             s.media.setAttribute("x-webkit-airplay", "true");
             s.media.setAttribute("x5-video-player-type", "h5");
-            s.media.poster = "";
-            s.media.preload = "auto";
-            s.media.controls = false;
-            s.media.width = width;
-            s.media.height = height;
+
+            s.media.poster="";
+            s.media.preload="auto";
+            s.media.controls=false;
+            if(width&&height) {
+                s.media.width = width;
+                s.media.height = height;
+            }
         }
     }
 }

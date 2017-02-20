@@ -26,6 +26,7 @@ var annie;
              * @public
              * @since 1.0.0
              * @returns {number}
+             * @readonly
              * @example
              *      //获取 annie引擎类对象唯一码
              *      trace(this.instanceId);
@@ -43,6 +44,7 @@ var annie;
              * @since 1.0.3
              * @public
              * @return {string}
+             * @readonly
              */
             get: function () {
                 return this._instanceType;
@@ -1224,7 +1226,29 @@ var annie;
                     h = arg[i].y;
                 }
             }
-            return new Rectangle(x, y, w, h);
+            return new Rectangle(x, y, w - x, h - y);
+        };
+        /**
+         * 通过两个点来确定一个矩形
+         * @param rect
+         * @param p1
+         * @param p2
+         */
+        Rectangle.createRectform2Point = function (rect, p1, p2) {
+            var x = p1.x, y = p1.y, w = p1.x, h = p1.y;
+            if (x > p2.x) {
+                x = p2.x;
+            }
+            if (y > p2.y) {
+                x = p2.y;
+            }
+            if (w < p2.x) {
+                w = p2.x;
+            }
+            if (h < p2.y) {
+                h = p2.y;
+            }
+            rect.x = x, rect.y = y, rect.width = w - x, rect.height = h - y;
         };
         /**
          * 判读两个矩形是否相交
@@ -1388,11 +1412,36 @@ var annie;
              * @type {boolean}
              * @private
              */
-            _this._cp = false;
-            //需要用webgl渲染的信息
-            _this._glInfo = {};
-            _this._instanceType = "annie.DisplayObject";
-            return _this;
+
+            this._cp = false;
+            /**
+             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+             * @property _cacheImg
+             * @protected
+             * @since 1.0.0
+             * @type {any}
+             * @default null
+             */
+            this._cacheImg = null;
+            /**
+             * @property _cacheX
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            this._cacheX = 0;
+            /**
+             * @property _cacheY
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            this._cacheY = 0;
+            this._bounds = new annie.Rectangle();
+            this._drawRect = new annie.Rectangle();
+            this._instanceType = "annie.DisplayObject";
         }
         Object.defineProperty(DisplayObject.prototype, "x", {
             /**
@@ -1743,10 +1792,8 @@ var annie;
             var rect = s.getBounds();
             var p1 = s.matrix.transformPoint(rect.x, rect.y);
             var p2 = s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height);
-            rect = annie.Rectangle.createFromPoints(p1, p2);
-            rect.width -= rect.x;
-            rect.height -= rect.y;
-            return rect;
+            annie.Rectangle.createRectform2Point(s._drawRect, p1, p2);
+            return s._drawRect;
         };
         /**
          * 更新函数
@@ -1756,6 +1803,13 @@ var annie;
          */
         DisplayObject.prototype.update = function (um, ua, uf) {
             var s = this;
+            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new annie.Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
+            }
             if (s._cp) {
                 um = ua = uf = true;
                 s._cp = false;
@@ -1791,13 +1845,6 @@ var annie;
                         }
                     }
                 }
-            }
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new annie.Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
             }
         };
         /**
@@ -1932,33 +1979,6 @@ var annie;
              */
             _this.rect = null;
             /**
-             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-             * @property _cacheImg
-             * @private
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            _this._cacheImg = null;
-            _this._realCacheImg = null;
-            _this._isNeedUpdate = true;
-            /**
-             * @property _cacheX
-             * @private
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            _this._cacheX = 0;
-            /**
-             * @property _cacheY
-             * @private
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            _this._cacheY = 0;
-            /**
              * @property _isCache
              * @private
              * @since 1.0.0
@@ -2075,6 +2095,8 @@ var annie;
                         s._cacheY = 0;
                         s._cacheImg = s._bitmapData;
                     }
+                    //给webgl更新新
+                    s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UF = false;
                 s._updateInfo.UM = false;
@@ -2161,17 +2183,6 @@ var annie;
             _this._command = [];
             _this._isNeedUpdate = true;
             _this._cAb = true;
-            /**
-             * @property _cacheCanvas
-             * @since 1.0.0
-             * @private
-             * @type {Canvas}
-             */
-            _this._cacheImg = window.document.createElement("canvas");
-            _this._cacheX = 0;
-            _this._cacheY = 0;
-            _this.rect = new annie.Rectangle();
-            /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
              * @param {Array} colors 一组颜色值
@@ -2190,12 +2201,18 @@ var annie;
              * @param {Array} ratios 一组范围比例值
              * @param {Array} points 一组点
              * @param {number} lineWidth
+             * @param {string} cap 线头的形状 butt round square 默认 butt
+             * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+             * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
              * @public
              * @since 1.0.0
              */
-            _this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth) {
+            this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth, cap, join, miter) {
                 if (lineWidth === void 0) { lineWidth = 1; }
-                this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+                if (cap === void 0) { cap = "butt"; }
+                if (join === void 0) { join = "miter"; }
+                if (miter === void 0) { miter = 10; }
+                this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
             };
             /**
              * 解析一段路径 一般给Flash2x用
@@ -2601,14 +2618,17 @@ var annie;
         /**
          * 给线条着色
          * @method beginStroke
-         * @param {string} color
-         * @param {number} lineWidth
+         * @param {string} color  颜色值
+         * @param {number} lineWidth 宽度
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.beginStroke = function (color, lineWidth) {
+        Shape.prototype.beginStroke = function (color, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
-            this._stroke(color, lineWidth);
+            if (cap === void 0) { cap = ""; }
+            if (join === void 0) { join = ""; }
+            if (miter === void 0) { miter = 0; }
+            this._stroke(color, lineWidth, cap, join, miter);
         };
         /**
          * 画线性渐变的线条 一般给Flash2x用
@@ -2617,12 +2637,18 @@ var annie;
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.beginLinearGradientStroke = function (colors, ratios, points, lineWidth) {
+        Shape.prototype.beginLinearGradientStroke = function (colors, ratios, points, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth);
+            if (cap === void 0) { cap = "butt"; }
+            if (join === void 0) { join = "miter"; }
+            if (miter === void 0) { miter = 10; }
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
         };
         /**
          * 线条位图填充 一般给Flash2x用
@@ -2630,20 +2656,29 @@ var annie;
          * @param {Image} image
          * @param {annie.Matrix} matrix
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        Shape.prototype.beginBitmapStroke = function (image, matrix, lineWidth) {
+        Shape.prototype.beginBitmapStroke = function (image, matrix, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
+            if (cap === void 0) { cap = "butt"; }
+            if (join === void 0) { join = "miter"; }
+            if (miter === void 0) { miter = 10; }
             var s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth);
+            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
         };
-        Shape.prototype._stroke = function (strokeStyle, width) {
+        Shape.prototype._stroke = function (strokeStyle, width, cap, join, miter) {
             var c = this._command;
             c.push([0, "lineWidth", width]);
+            c.push([0, "lineCap", cap]);
+            c.push([0, "lineJoin", join]);
+            c.push([0, "miterLimit", miter]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
             this._isNeedUpdate = true;
@@ -2821,16 +2856,14 @@ var annie;
                             }
                         }
                         if (leftX != undefined) {
+                            s._bounds.width = buttonRightX - leftX;
+                            s._bounds.height = buttonRightY - leftY;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
                             buttonRightY += 20 + lineWidth >> 1;
                             var w = buttonRightX - leftX;
                             var h = buttonRightY - leftY;
-                            s.rect.x = leftX + 20;
-                            s.rect.y = leftY + 20;
-                            s.rect.width = w - 20;
-                            s.rect.height = h - 20;
                             if (s._cAb) {
                                 ///////////////////////////
                                 s._cacheX = leftX;
@@ -2892,6 +2925,8 @@ var annie;
                         s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
+                    //给webgl更新新
+                    s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -2923,12 +2958,14 @@ var annie;
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
                     }
                     else if (paramsLen == 6) {
+                        var lx = data[2][4];
+                        var ly = data[2][5];
                         if (data[0] == 2) {
                             //位图填充
-                            data[2][4] -= leftX;
-                            data[2][5] -= leftY;
+                            lx -= leftX;
+                            ly -= leftY;
                         }
-                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4], data[2][5]);
+                        ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 }
                 else {
@@ -2945,7 +2982,7 @@ var annie;
          * @returns {annie.Rectangle}
          */
         Shape.prototype.getBounds = function () {
-            return this.rect;
+            return this._bounds;
         };
         /**
          * 重写hitTestPoint
@@ -3509,7 +3546,7 @@ var annie;
     /**
      * 抽象类 一般不直接使用
      * @class annie.Media
-     * @extends annie.AObject
+     * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
      */
@@ -3665,8 +3702,11 @@ var annie;
     var Video = (function (_super) {
         __extends(Video, _super);
         function Video(src, width, height) {
-            var _this = _super.call(this, src, "Video") || this;
-            var s = _this;
+
+            if (width === void 0) { width = 0; }
+            if (height === void 0) { height = 0; }
+            _super.call(this, src, "Video");
+            var s = this;
             s._instanceType = "annie.Video";
             s.media.setAttribute("playsinline", "true");
             s.media.setAttribute("webkit-playsinline", "true");
@@ -3675,9 +3715,11 @@ var annie;
             s.media.poster = "";
             s.media.preload = "auto";
             s.media.controls = false;
-            s.media.width = width;
-            s.media.height = height;
-            return _this;
+
+            if (width && height) {
+                s.media.width = width;
+                s.media.height = height;
+            }
         }
         return Video;
     }(annie.Media));
@@ -4908,11 +4950,8 @@ var annie;
     var TextField = (function (_super) {
         __extends(TextField, _super);
         function TextField() {
-            var _this = _super.call(this) || this;
-            _this._cacheImg = window.document.createElement("canvas");
-            _this._cacheX = 0;
-            _this._cacheY = 0;
-            _this._cacheObject = { bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
+            _super.call(this);
+            this._cacheObject = { border: false, bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
             /**
              * 文本的对齐方式
              * @property textAlign
@@ -5002,9 +5041,18 @@ var annie;
              * @default false
              * @type {boolean}
              */
-            _this.bold = false;
-            _this._instanceType = "annie.TextField";
-            return _this;
+
+            this.bold = false;
+            /**
+             * 设置或获取是否有边框
+             * @property property
+             * @param {boolean} show true或false
+             * @public
+             * @since 1.0.6
+             */
+            this.border = false;
+            this._instanceType = "annie.TextField";
+            this._cacheImg = window.document.createElement("canvas");
         }
         /**
          * 设置文本在canvas里的渲染样式
@@ -5154,7 +5202,14 @@ var annie;
                     can.height = maxH + 20;
                     can.style.width = can.width / annie.devicePixelRatio + "px";
                     can.style.height = can.height / annie.devicePixelRatio + "px";
-                    ctx.clearRect(0, 0, maxW, maxH);
+                    ctx.clearRect(0, 0, can.width, can.width);
+                    if (s.border) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = "#000";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(10.5, 10.5, maxW, maxH);
+                        ctx.closePath();
+                    }
                     ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                     /////////////////////
                     if (s.cFilters.length > 0) {
@@ -5194,6 +5249,10 @@ var annie;
                     s._cacheX = -10;
                     s._cacheY = -10;
                     s._isNeedUpdate = false;
+                    //给webgl更新新
+                    s._cacheImg.updateTexture = true;
+                    s._bounds.height = maxH;
+                    s._bounds.width = maxW;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -5208,15 +5267,7 @@ var annie;
          * @since 1.0.0
          */
         TextField.prototype.getBounds = function () {
-            var s = this;
-            var r = new annie.Rectangle();
-            if (s._cacheImg.width > 0) {
-                r.x = 0;
-                r.y = 0;
-                r.width = s._cacheImg.width - 20;
-                r.height = s._cacheImg.height - 20;
-            }
-            return r;
+            return this._bounds;
         };
         return TextField;
     }(annie.DisplayObject));
@@ -5820,7 +5871,6 @@ var annie;
                     s.renderObj.reSize();
                     s.setAlign();
                     s._updateInfo.UM = true;
-                    s.update(true, true, true);
                 }
             };
             var s = _this;
@@ -5846,8 +5896,7 @@ var annie;
             }
             else {
                 //webgl
-                //s.renderObj = new WGRender(s);
-                s.renderObj = new annie.CanvasRender(s);
+                s.renderObj = new annie.WGRender(s);
             }
             s.renderObj.init();
             window.addEventListener("resize", function (e) {
@@ -7168,6 +7217,335 @@ var annie;
  */
 var annie;
 (function (annie) {
+    /**
+     * WebGl 渲染器
+     * @class annie.WGRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.2
+     */
+    var WGRender = (function (_super) {
+        __extends(WGRender, _super);
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.2
+         */
+        function WGRender(stage) {
+            _super.call(this);
+            /**
+             * 渲染器所在最上层的对象
+             * @property rootContainer
+             * @public
+             * @since 1.0.2
+             * @type {any}
+             * @default null
+             */
+            this.rootContainer = null;
+            this._maxTextureCount = 0;
+            this._uniformTexture = 0;
+            this._posAttr = 0;
+            this._textAttr = 0;
+            this._curTextureId = -1;
+            this._textures = [];
+            this._instanceType = "annie.WGRender";
+            this._stage = stage;
+        }
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.2
+         * @public
+         */
+        WGRender.prototype.begin = function () {
+            var s = this;
+            var gl = s._gl;
+            if (s._stage.bgColor != "") {
+                var color = s._stage.bgColor;
+                var r = parseInt("0x" + color.substr(1, 2));
+                var g = parseInt("0x" + color.substr(3, 2));
+                var b = parseInt("0x" + color.substr(5, 2));
+                gl.clearColor(r / 255, g / 255, b / 255, 1.0);
+            }
+            else {
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
+            }
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            s._textures.length = 0;
+        };
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.2
+         */
+        WGRender.prototype.beginMask = function (target) {
+            //更新缓冲模板
+        };
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.2
+         */
+        WGRender.prototype.endMask = function () {
+        };
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.2
+         * @method reSize
+         */
+        WGRender.prototype.reSize = function () {
+            var s = this;
+            var c = s.rootContainer;
+            c.width = s._stage.divWidth * annie.devicePixelRatio;
+            c.height = s._stage.divHeight * annie.devicePixelRatio;
+            c.style.width = s._stage.divWidth + "px";
+            c.style.height = s._stage.divHeight + "px";
+            s._gl.viewport(0, 0, c.width, c.height);
+            s._dW = c.width;
+            s._dH = c.height;
+            s._pMatrix = new Float32Array([
+                1 / s._dW * 2, 0.0, 0.0,
+                0.0, -1 / s._dH * 2, 0.0,
+                -1.0, 1.0, 1.0
+            ]);
+        };
+        WGRender.prototype._getShader = function (id) {
+            var s = this;
+            var gl = s._gl;
+            // Find the shader script element
+            var shaderText = "";
+            // Create the shader object instance
+            var shader = null;
+            if (id == 0) {
+                shaderText = 'precision highp float;' +
+                    'varying vec2 v_TC;' +
+                    'uniform sampler2D u_texture;' +
+                    'uniform float u_A;' +
+                    'void main() {' +
+                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
+                    '}';
+                shader = gl.createShader(gl.FRAGMENT_SHADER);
+            }
+            else {
+                shaderText = 'precision highp float;' +
+                    'attribute vec2 a_P;' +
+                    'attribute vec2 a_TC;' +
+                    'varying vec2 v_TC;' +
+                    'uniform mat3 vMatrix;' +
+                    'uniform mat3 pMatrix;' +
+                    'void main() {' +
+                    'gl_Position =vec4((pMatrix*vMatrix*vec3(a_P, 1.0)).xy, 1.0, 1.0);' +
+                    'v_TC = a_TC;' +
+                    '}';
+                shader = gl.createShader(gl.VERTEX_SHADER);
+            }
+            // Set the shader source code in the shader object instance and compile the shader
+            gl.shaderSource(shader, shaderText);
+            gl.compileShader(shader);
+            // Attach the shaders to the shader program
+            gl.attachShader(s._program, shader);
+            return shader;
+        };
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.2
+         * @method init
+         */
+        WGRender.prototype.init = function () {
+            var s = this;
+            if (!s.rootContainer) {
+                s.rootContainer = document.createElement("canvas");
+                s._stage.rootDiv.appendChild(s.rootContainer);
+            }
+            var c = s.rootContainer;
+            var gl = c.getContext("webgl") || c.getContext('experimental-webgl');
+            s._gl = gl;
+            s._program = gl.createProgram();
+            var _program = s._program;
+            //初始化顶点着色器和片元着色器
+            s._getShader(0);
+            s._getShader(1);
+            //链接到gpu
+            gl.linkProgram(_program);
+            //使用当前编译的程序
+            gl.useProgram(_program);
+            //改变y轴方向,以对应纹理坐标
+            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            //设置支持有透明度纹理
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+            //取消深度检测
+            gl.disable(gl.DEPTH_TEST);
+            //开启混合模式
+            gl.enable(gl.BLEND);
+            gl.disable(gl.CULL_FACE);
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+            // 新建缓存
+            s._buffer = gl.createBuffer();
+            //
+            s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
+            s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
+            s._uA = gl.getUniformLocation(s._program, 'u_A');
+            //
+            s._cM = new annie.Matrix();
+            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) + 1;
+            s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
+            s._posAttr = gl.getAttribLocation(s._program, "a_P");
+            s._textAttr = gl.getAttribLocation(s._program, "a_TC");
+            gl.enableVertexAttribArray(s._posAttr);
+            gl.enableVertexAttribArray(s._textAttr);
+        };
+        WGRender.prototype.setBuffer = function (buffer, data) {
+            var s = this;
+            var gl = s._gl;
+            //绑定buffer
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+            //将buffer赋值给一变量
+            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
+            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
+        };
+        /**
+         *  调用渲染
+         * @public
+         * @since 1.0.2
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
+         */
+        WGRender.prototype.draw = function (target, type) {
+            var s = this;
+            var img = target._cacheImg;
+            var gl = s._gl;
+            var gi;
+            if (img.updateTexture && target._glInfo) {
+                gi = target._glInfo;
+            }
+            else {
+                gi = {};
+                var tc = target.rect;
+                if (type == 0 && tc) {
+                    gi.x = tc.x / img.width;
+                    gi.y = tc.y / img.height;
+                    gi.w = (tc.x + tc.width) / img.width;
+                    gi.h = (tc.y + tc.height) / img.height;
+                    gi.pw = tc.width;
+                    gi.ph = tc.height;
+                }
+                else {
+                    var cX = target._cacheX;
+                    var cY = target._cacheY;
+                    gi.x = cX / img.width;
+                    gi.y = cY / img.height;
+                    gi.w = (img.width - cX) / img.width;
+                    gi.h = (img.height - cY) / img.height;
+                    gi.pw = (img.width - cX * 2);
+                    gi.ph = (img.height - cY * 2);
+                }
+                target._glInfo = gi;
+            }
+            ////////////////////////////////////////////
+            var vertices = [
+                //x,y,textureX,textureY
+                0.0, 0.0, gi.x, gi.y,
+                gi.pw, 0.0, gi.w, gi.y,
+                0.0, gi.ph, gi.x, gi.h,
+                gi.pw, gi.ph, gi.w, gi.h
+            ];
+            var m;
+            if (type > 0) {
+                m = s._cM;
+                m.identity();
+                if (type == 2) {
+                    m.tx = target._cacheX * 2;
+                    m.ty = target._cacheY * 2;
+                }
+                else {
+                    m.tx = -img.width;
+                    m.ty = -img.height;
+                }
+                m.prepend(target.cMatrix);
+            }
+            else {
+                m = target.cMatrix;
+            }
+            var vMatrix = new Float32Array([
+                m.a, m.b, 0,
+                m.c, m.d, 0,
+                m.tx, m.ty, 1
+            ]);
+            gl.uniform1i(s._uniformTexture, s.createTexture(img));
+            s.setBuffer(s._buffer, new Float32Array(vertices));
+            gl.uniform1f(s._uA, target.cAlpha);
+            gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
+            gl.uniformMatrix3fv(s._vMI, false, vMatrix);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+        WGRender.prototype.getActiveId = function () {
+            for (var i = 0; i < this._maxTextureCount; i++) {
+                if (!this._textures[i]) {
+                    return i;
+                }
+            }
+            return 0;
+        };
+        WGRender.prototype.createTexture = function (bitmapData) {
+            var s = this;
+            var gl = s._gl;
+            var tid = 0;
+            var needUpdate = true;
+            var isChanged = false;
+            if (bitmapData._texture) {
+                tid = bitmapData._tid;
+                //如果被占用则需要重新申请
+                if (s._textures[tid] != bitmapData) {
+                    //更新tid
+                    tid = s.getActiveId();
+                    isChanged = true;
+                }
+                if (!bitmapData.updateTexture) {
+                    needUpdate = false;
+                }
+            }
+            else {
+                tid = s.getActiveId();
+            }
+            gl.activeTexture(gl["TEXTURE" + tid]);
+            if (needUpdate) {
+                var texture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                bitmapData._texture = texture;
+            }
+            else {
+                if (isChanged) {
+                    gl.bindTexture(gl.TEXTURE_2D, bitmapData._texture);
+                }
+            }
+            bitmapData.updateTexture = false;
+            bitmapData._tid = tid;
+            s._textures[tid] = bitmapData;
+            return tid;
+        };
+        return WGRender;
+    }(annie.AObject));
+    annie.WGRender = WGRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
     annie.Eval = eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
@@ -7384,37 +7762,41 @@ var annie;
                                     case "image":
                                     case "sound":
                                     case "video":
+                                        var itemObj_1;
                                         var isBlob_1 = true;
                                         if (s.responseType == "image") {
-                                            item_1 = document.createElement("img");
-                                            item_1.onload = function () {
+                                            itemObj_1 = document.createElement("img");
+                                            itemObj_1.onload = function () {
                                                 if (isBlob_1) {
                                                     URL.revokeObjectURL(item_1.src);
                                                 }
-                                                item_1.onload = null;
+                                                itemObj_1.onload = null;
                                             };
+                                            item_1 = itemObj_1;
                                         }
                                         else {
                                             if (s.responseType == "sound") {
-                                                item_1 = document.createElement("AUDIO");
+                                                itemObj_1 = document.createElement("AUDIO");
+                                                item_1 = new annie.Sound(itemObj_1);
                                             }
                                             else if (s.responseType == "video") {
-                                                item_1 = document.createElement("VIDEO");
+                                                itemObj_1 = document.createElement("VIDEO");
+                                                item_1 = new annie.Video(itemObj_1);
                                             }
-                                            item_1.preload = true;
-                                            item_1.load();
-                                            item_1.onloadeddata = function () {
+                                            itemObj_1.preload = true;
+                                            itemObj_1.load();
+                                            itemObj_1.onloadeddata = function () {
                                                 if (isBlob_1) {
                                                 }
-                                                item_1.onloadeddata = null;
+                                                itemObj_1.onloadeddata = null;
                                             };
                                         }
                                         try {
-                                            item_1.src = URL.createObjectURL(result);
+                                            itemObj_1.src = URL.createObjectURL(result);
                                         }
                                         catch (err) {
                                             isBlob_1 = false;
-                                            item_1.src = s.url;
+                                            itemObj_1.src = s.url;
                                         }
                                         break;
                                     case "json":
@@ -7688,13 +8070,7 @@ var Flash2x;
         var scene = _loadSceneNames[_loadIndex];
         if (!Flash2x._isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
-                var id = _currentConfig[_loadIndex][0].id;
-                if (e.data.type == "sound") {
-                    res[scene][id] = new annie.Sound(e.data.response);
-                }
-                else {
-                    res[scene][id] = e.data.response;
-                }
+                res[scene][_currentConfig[_loadIndex][0].id] = e.data.response;
             }
         }
         else {
@@ -7965,6 +8341,7 @@ var Flash2x;
             textObj.bold = bold;
             textObj.color = color;
             textObj.lineType = lineType;
+            textObj.border = showBorder;
         }
         else {
             textObj = new annie.InputText(lineType);
@@ -8036,16 +8413,16 @@ var Flash2x;
         }
         if (strokeObj) {
             if (strokeObj.type == 0) {
-                shape.beginStroke(strokeObj.color, strokeObj.lineWidth);
+                shape.beginStroke(strokeObj.color, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
             else if (strokeObj.type == 1) {
-                shape.beginRadialGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth);
+                shape.beginRadialGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
             else if (strokeObj.type == 2) {
-                shape.beginLinearGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth);
+                shape.beginLinearGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
             else {
-                shape.beginBitmapStroke(sb(strokeObj.bitmapScene, strokeObj.bitmapName), strokeObj.matrix, strokeObj.lineWidth);
+                shape.beginBitmapStroke(sb(strokeObj.bitmapScene, strokeObj.bitmapName), strokeObj.matrix, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             }
         }
         if (pathObj.type == 0) {
@@ -8888,7 +9265,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.5";
+    annie.version = "1.0.6";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

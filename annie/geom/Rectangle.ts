@@ -138,9 +138,31 @@ namespace annie {
                     h=arg[i].y;
                 }
             }
-            return new Rectangle(x,y,w,h);
+            return new Rectangle(x,y,w-x,h-y);
         }
 
+        /**
+         * 通过两个点来确定一个矩形
+         * @param rect
+         * @param p1
+         * @param p2
+         */
+        public static createRectform2Point(rect:Rectangle,p1:Point,p2:Point):void{
+            let x=p1.x,y=p1.y,w=p1.x,h=p1.y;
+                if(x>p2.x){
+                    x=p2.x;
+                }
+                if(y>p2.y){
+                    x=p2.y;
+                }
+                if(w<p2.x){
+                    w=p2.x;
+                }
+                if(h<p2.y){
+                    h=p2.y;
+                }
+                rect.x=x,rect.y=y,rect.width=w-x,rect.height=h-y;
+        }
         /**
          * 判读两个矩形是否相交
          * @method testRectCross

@@ -258,8 +258,7 @@ namespace annie {
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                //s.renderObj = new WGRender(s);
-                s.renderObj = new CanvasRender(s);
+                s.renderObj = new WGRender(s);
             }
             s.renderObj.init();
             window.addEventListener("resize", function (e: any) {
@@ -749,8 +748,7 @@ namespace annie {
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
-                s._updateInfo.UM = true;
-                s.update(true, true, true);
+                s._updateInfo.UM=true;
             }
         };
 

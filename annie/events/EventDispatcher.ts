@@ -22,6 +22,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @returns {number}
+         * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
@@ -36,6 +37,7 @@ namespace annie {
          * @since 1.0.3
          * @public
          * @return {string}
+         * @readonly
          */
         public get instanceType(): string {
             return this._instanceType;

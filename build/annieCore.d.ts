@@ -18,6 +18,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @returns {number}
+         * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
@@ -29,6 +30,7 @@ declare namespace annie {
          * @since 1.0.3
          * @public
          * @return {string}
+         * @readonly
          */
         readonly instanceType: string;
     }
@@ -793,6 +795,13 @@ declare namespace annie {
          */
         static createFromPoints(p1: Point, ...arg: Point[]): Rectangle;
         /**
+         * 通过两个点来确定一个矩形
+         * @param rect
+         * @param p1
+         * @param p2
+         */
+        static createRectform2Point(rect: Rectangle, p1: Point, p2: Point): void;
+        /**
          * 判读两个矩形是否相交
          * @method testRectCross
          * @public
@@ -1170,7 +1179,33 @@ declare namespace annie {
          * @type {Canvas}
          */
         static _canvas: any;
-        _glInfo: any;
+        /**
+         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+         * @property _cacheImg
+         * @protected
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        protected _cacheImg: any;
+        /**
+         * @property _cacheX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _cacheX: number;
+        /**
+         * @property _cacheY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _cacheY: number;
+        protected _bounds: Rectangle;
+        protected _drawRect: Rectangle;
     }
 }
 /**
@@ -1199,9 +1234,11 @@ declare namespace annie {
          */
         bitmapData: any;
         private _bitmapData;
+        private _realCacheImg;
+        private _isNeedUpdate;
         /**
-         * 有时候一张大图，我们只需要显示它的某一部分，其它不显示。对！你可能猜到了
-         * SpriteSheet就用到了这个属性。默认值为null表示全尺寸显示bitmapData需要显示的范围
+         * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+         * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
          * @property rect
          * @public
          * @since 1.0.0
@@ -1209,33 +1246,6 @@ declare namespace annie {
          * @default null
          */
         rect: Rectangle;
-        /**
-         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _cacheImg
-         * @private
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        private _cacheImg;
-        private _realCacheImg;
-        private _isNeedUpdate;
-        /**
-         * @property _cacheX
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        private _cacheX;
-        /**
-         * @property _cacheY
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        private _cacheY;
         /**
          * @property _isCache
          * @private
@@ -1357,15 +1367,6 @@ declare namespace annie {
          * @returns {string}
          */
         static getRGBA(color: string, alpha: number): string;
-        /**
-         * @property _cacheCanvas
-         * @since 1.0.0
-         * @private
-         * @type {Canvas}
-         */
-        private _cacheImg;
-        private _cacheX;
-        private _cacheY;
         private _isBitmapStroke;
         private _isBitmapFill;
         /**
@@ -1431,7 +1432,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void;
-        private rect;
         /**
          * 三次贝赛尔曲线
          * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
@@ -1545,12 +1545,12 @@ declare namespace annie {
         /**
          * 给线条着色
          * @method beginStroke
-         * @param {string} color
-         * @param {number} lineWidth
+         * @param {string} color  颜色值
+         * @param {number} lineWidth 宽度
          * @public
          * @since 1.0.0
          */
-        beginStroke(color: string, lineWidth?: number): void;
+        beginStroke(color: string, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
         /**
          * 画线性渐变的线条 一般给Flash2x用
          * @method beginLinearGradientStroke
@@ -1558,10 +1558,13 @@ declare namespace annie {
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth?: number): void;
+        beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
         /**
          * 画径向渐变的线条 一般给Flash2x用
          * @method beginRadialGradientStroke
@@ -1569,21 +1572,27 @@ declare namespace annie {
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        beginRadialGradientStroke: (colors: string[], ratios: number[], points: number[], lineWidth?: number) => void;
+        beginRadialGradientStroke: (colors: string[], ratios: number[], points: number[], lineWidth?: number, cap?: string, join?: string, miter?: number) => void;
         /**
          * 线条位图填充 一般给Flash2x用
          * @method beginBitmapStroke
          * @param {Image} image
          * @param {annie.Matrix} matrix
          * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        beginBitmapStroke(image: any, matrix: Matrix, lineWidth?: number): void;
-        private _stroke(strokeStyle, width);
+        beginBitmapStroke(image: any, matrix: Matrix, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
+        private _stroke(strokeStyle, width, cap, join, miter);
         /**
          * 结束填充
          * @method endFill
@@ -1820,7 +1829,7 @@ declare namespace annie {
     /**
      * 抽象类 一般不直接使用
      * @class annie.Media
-     * @extends annie.AObject
+     * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
      */
@@ -1904,7 +1913,7 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Video extends Media {
-        constructor(src: any, width: number, height: number);
+        constructor(src: any, width?: number, height?: number);
     }
 }
 /**
@@ -2462,9 +2471,6 @@ declare namespace annie {
      */
     class TextField extends DisplayObject {
         constructor();
-        private _cacheImg;
-        private _cacheX;
-        private _cacheY;
         private _cacheObject;
         /**
          * 文本的对齐方式
@@ -2556,6 +2562,14 @@ declare namespace annie {
          * @type {boolean}
          */
         bold: boolean;
+        /**
+         * 设置或获取是否有边框
+         * @property property
+         * @param {boolean} show true或false
+         * @public
+         * @since 1.0.6
+         */
+        border: boolean;
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
@@ -3513,6 +3527,103 @@ declare namespace annie {
          * @method reSize
          */
         reSize(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * WebGl 渲染器
+     * @class annie.WGRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.2
+     */
+    class WGRender extends AObject implements IRender {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.2
+         * @type {any}
+         * @default null
+         */
+        rootContainer: any;
+        private _gl;
+        private _stage;
+        private _program;
+        private _buffer;
+        private _dW;
+        private _dH;
+        private _pMatrix;
+        private _pMI;
+        private _vMI;
+        private _uA;
+        private _cM;
+        private _maxTextureCount;
+        private _uniformTexture;
+        private _posAttr;
+        private _textAttr;
+        private _curTextureId;
+        private _textures;
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.2
+         */
+        constructor(stage: Stage);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.2
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.2
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.2
+         */
+        endMask(): void;
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.2
+         * @method reSize
+         */
+        reSize(): void;
+        private _getShader(id);
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.2
+         * @method init
+         */
+        init(): void;
+        private setBuffer(buffer, data);
+        /**
+         *  调用渲染
+         * @public
+         * @since 1.0.2
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
+         */
+        draw(target: any, type: number): void;
+        private getActiveId();
+        createTexture(bitmapData: any): number;
     }
 }
 /**

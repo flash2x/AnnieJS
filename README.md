@@ -25,7 +25,7 @@
     4.安装Adobe Flash CS6 及以上版本
     5.强烈推荐google Chrome浏览器，调试利器
     6.下载并安装Flash2xManager管理软件,用此软件一健配置工具和引擎(支持Mac和win)
-##[点击下载Flash2xManager工具](https://pan.baidu.com/s/1pKpMmUJ#path=%252FFlash2x%25E4%25B8%258B%25E8%25BD%25BD)
+##[点击下载Flash2xManager工具](http://flash2x.org)
 #小试牛刀
     1.安装好以上所说的相关工具后，打开Adobe Flash软件 随便新建一个Fla文件制作些东西保存(一定要保存)。
     2.打开Flash的菜单->窗口->扩展(cs6是[其他])->Flash2x，这时就启动了我们的Flash2x工具。
@@ -70,7 +70,15 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
 ##AnnieJS 1.0.6 版本
-    修复少量Bug
+    修复EnterFrame事件中更新显示对象属性无效的bug
+    修复动画元件设置滤色效果后，在动画的情况下失灵的bug
+    修复矢量位图填充元件在有些动画情况下视觉错乱的bug
+    更改URLLoader加载声音时的返回类型，现在直接返回为annie.Sound类型，以前返回的是html声音标签
+    更改URLLoader加载视频时的返回类型，现在直接返回为annie.Video类型，以前返回的是html视频标签
+    重新支持webgl
+    支持动态文本设置边框属性
+    支持矢量线条设置末端形状及拼接形状属性设置
+    优化底层结构
 ##AnnieJS 1.0.5 版本
     新增 annie.Sprite 一个属性 isCacheShape 以此来控制对应容器中是否要缓存矢量为位图，并提高精确的鼠标点击
     修复手动调用stage.resize()后，stage显示区域显示错误的bug
@@ -149,6 +157,12 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
+## Flash2x 3.0.6
+    修复静态文本多行时只导出第一行的bug
+    支持动态文本边框导出
+    支持导出LayaBox相关引擎
+## Flash2x 3.0.5
+    少量优化导出结构
 ## Flash2x 3.0.4
    更新gulp构建模式下支持将fla打包成一个单独的swf资源文件供html5调用，实现一个fla生成一个swf文件别无其他资源文件的完美解决方案
 ## Flash2x 3.0.3
