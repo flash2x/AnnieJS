@@ -33,6 +33,11 @@ namespace annie {
          * @param {string|HtmlElement} src
          * @param {string} type
          * @since 1.0.0
+         * @example
+         *      var media = new annie.Media('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3', 'Audio');
+         *          media.play();//媒体播放
+         *          //media.pause();//暂停播放
+         *          //media.stop();//停止播放
          */
         public constructor(src: any, type: string) {
             super();

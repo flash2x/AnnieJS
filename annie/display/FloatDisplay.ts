@@ -21,7 +21,7 @@ namespace annie {
          * @since 1.0.0
          * @type{HtmlElement}
          */
-        public htmlElement:any=null;
+        public htmlElement: any = null;
 
         /**
          * 上一交刷新时保留的数据
@@ -30,7 +30,7 @@ namespace annie {
          * @since 1.0.0
          * @type {{alpha: number, matrix: {a: number, b: number, c: number, d: number, tx: number, ty: number}}}
          */
-        private _oldProps:Object={alpha:1,matrix:{a:1,b:0,c:0,d:1,tx:0,ty:0}};
+        private _oldProps: Object = {alpha: 1, matrix: {a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0}};
         /**
          * 是否已经添加了舞台事件
          * @property _isAdded
@@ -38,20 +38,33 @@ namespace annie {
          * @type {boolean}
          * @private
          */
-        private _isAdded:boolean=false;
-        public constructor(){
+        private _isAdded: boolean = false;
+
+        /**
+         * 构造函数
+         * @method FloatDisplay
+         * @since 1.0.0
+         * @public
+         * @example
+         *      var floatDisplay = new annie.FloatDisplay();
+         *      floatDisplay.init(document.getElementById('Flash2x'));
+         *      s.addChild(floatDisplay);
+         *
+         * <p><a href="" target="_blank">测试链接</a></p>
+         */
+        public constructor() {
             super();
-            this._instanceType="annie.FloatDisplay";
+            this._instanceType = "annie.FloatDisplay";
             let s = this;
-            s.addEventListener(Event.REMOVE_TO_STAGE, function (e:Event) {
+            s.addEventListener(Event.REMOVE_TO_STAGE, function (e: Event) {
                 if (s.htmlElement) {
                     s.htmlElement.style.display = "none";
                 }
             });
-            s.addEventListener(Event.ADD_TO_STAGE, function (e:Event) {
+            s.addEventListener(Event.ADD_TO_STAGE, function (e: Event) {
                 if (!s._isAdded) {
                     s._isAdded = true;
-                    s.stage.rootDiv.insertBefore(s.htmlElement,s.stage.rootDiv.childNodes[0]);
+                    s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
                 } else {
                     if (s.htmlElement && s.visible) {
                         s.htmlElement.style.display = "block";
@@ -59,6 +72,7 @@ namespace annie {
                 }
             });
         }
+
         /**
          * 初始化方法
          * @method init
@@ -66,34 +80,35 @@ namespace annie {
          * @since 1.0.0
          * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
          */
-        public init(htmlElement:any):void{
-            let s =this;
+        public init(htmlElement: any): void {
+            let s = this;
             if (typeof(htmlElement) == "string") {
                 htmlElement = document.getElementById(htmlElement);
-            }else if(htmlElement._instanceType=="annie.Video"){
-                htmlElement=htmlElement.media;
+            } else if (htmlElement._instanceType == "annie.Video") {
+                htmlElement = htmlElement.media;
             }
             let style = htmlElement.style;
             style.position = "absolute";
-            style.display="none";
-            style.transformOrigin = style.WebkitTransformOrigin= "0 0 0";
+            style.display = "none";
+            style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
             s.htmlElement = htmlElement;
         }
+
         /**
          * 删除html元素,这样就等于解了封装
          * @method delElement
          * @since 1.0.0
          * @public
          */
-        public delElement():void{
-            let elem=this.htmlElement;
-            if(elem){
-                elem.style.display="none";
-                if(elem.parentNode) {
+        public delElement(): void {
+            let elem = this.htmlElement;
+            if (elem) {
+                elem.style.display = "none";
+                if (elem.parentNode) {
                     elem.parentNode.removeChild(elem);
                 }
-                this._isAdded=false;
-                this.htmlElement=null;
+                this._isAdded = false;
+                this.htmlElement = null;
             }
         }
 
@@ -103,9 +118,9 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean):void{
-            super.update(um,ua,uf);
-            let s=this;
+        public update(um: boolean, ua: boolean, uf: boolean): void {
+            super.update(um, ua, uf);
+            let s = this;
             let o = s.htmlElement;
             if (o) {
                 let style = o.style;
@@ -119,7 +134,7 @@ namespace annie {
                 if (show != style.display) {
                     style.display = show;
                 }
-                if (visible&&(um||s._updateInfo.UM)) {
+                if (visible && (um || s._updateInfo.UM)) {
                     let props: any = {};
                     props.alpha = s.cAlpha;
                     let mtx = s.cMatrix;
@@ -133,13 +148,14 @@ namespace annie {
                         style.opacity = props.alpha;
                         oldProps.alpha = props.alpha;
                     }
-                    s._updateInfo.UF=false;
-                    s._updateInfo.UM=false;
-                    s._updateInfo.UA=false;
+                    s._updateInfo.UF = false;
+                    s._updateInfo.UM = false;
+                    s._updateInfo.UA = false;
                 }
             }
 
         }
+
         /**
          * 重写getBounds
          * @method getBounds
@@ -147,17 +163,18 @@ namespace annie {
          * @since 1.0.0
          * @returns {annie.Rectangle}
          */
-        public getBounds():Rectangle{
-            let s=this;
-            let r=new Rectangle();
-            if(s.htmlElement){
-                let hs=s.htmlElement.style;
-                r.width=parseInt(hs.width);
-                r.height=parseInt(hs.height);
+        public getBounds(): Rectangle {
+            let s = this;
+            let r = new Rectangle();
+            if (s.htmlElement) {
+                let hs = s.htmlElement.style;
+                r.width = parseInt(hs.width);
+                r.height = parseInt(hs.height);
             }
             return r;
         }
-        public render(renderObj:IRender):void{
+
+        public render(renderObj: IRender): void {
 
         }
     }

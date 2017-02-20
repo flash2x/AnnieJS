@@ -463,6 +463,7 @@ namespace annie{
          */
         public type:string="blur";
         /**
+         * 水平模糊量
          * @property blurX
          * @public
          * @readonly
@@ -471,6 +472,7 @@ namespace annie{
          */
         public blurX:number=0;
         /**
+         * 垂直模糊量
          * @property blurY
          * @public
          * @readonly
@@ -479,6 +481,7 @@ namespace annie{
          */
         public blurY:number=0;
         /**
+         * 模糊品质
          * @property quality
          * @public
          * @readonly
@@ -493,6 +496,18 @@ namespace annie{
          * @param {number} blurX
          * @param {number} blurY
          * @param {number} quality
+         * @example
+         *      var imgEle = new Image();
+         *           imgEle.onload = function (e) {
+         *       var rect = new annie.Rectangle(0, 0, 200, 200),
+         *           rectBitmap = new annie.Bitmap(imgEle, rect);
+         *           rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *           rectBitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+         *           var blur=new annie.BlurFilter(30,30,1);//实例化模糊滤镜
+         *           rectBitmap.filters=[blur];//为bitmap添加模糊滤镜效果
+         *           s.addChild(rectBitmap);
+         *       }
+         *       imgEle.src = 'http://test.annie2x.com/biglong/logo.jpg';
          */
         public constructor(blurX:number=2, blurY:number=2, quality:number=1){
             super();

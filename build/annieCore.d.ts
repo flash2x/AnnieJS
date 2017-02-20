@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        instanceId: number;
+        readonly instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        instanceType: string;
+        readonly instanceType: string;
     }
     /**
      * 事件触发基类
@@ -1035,7 +1035,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        matrix: Matrix;
+        readonly matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip

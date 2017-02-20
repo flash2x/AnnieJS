@@ -64,7 +64,7 @@ namespace annieUI {
          * 最小鼠标滑动距离
          * @type {number}
          */
-        private  minDis:number=2;
+        private minDis: number = 2;
         /**
          * 遮罩对象
          * @property maskObj
@@ -131,10 +131,10 @@ namespace annieUI {
          * @default 20
          * @type {number}
          */
-        public  fSpeed: number = 20;
+        public fSpeed: number = 20;
         private paramXY: string = "y";
         private stopTimes: number = -1;
-        private isMouseDown:boolean=false;
+        private isMouseDown: boolean = false;
         /**
          * 是否是通过scrollTo方法在滑动中
          * @property autoScroll
@@ -143,7 +143,8 @@ namespace annieUI {
          * @private
          * @default false;
          */
-        private autoScroll:boolean=false;
+        private autoScroll: boolean = false;
+
         /**
          * 构造函数
          * @method  ScrollPage
@@ -151,19 +152,26 @@ namespace annieUI {
          * @param {number}vH 可视区域高
          * @param {number}maxDistance 最大滚动的长度
          * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @example
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *          s.addChild(s.sPage);
+         *          s.sPage.view.addChild(new home.Content());
+         *          s.sPage.y=s.stage.viewRect.y;
+         *          s.sPage.mouseEnable=false;
+         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
          */
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             let s = this;
-            s._instanceType="annieUI.ScrollPage";
+            s._instanceType = "annieUI.ScrollPage";
             s.isVertical = isVertical;
             s.view = new Sprite();
             s.maskObj = new Shape();
-            s.maskObj.alpha=0;
+            s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.setMask(vW,vH);
+            s.setMask(vW, vH);
             s.maxDistance = maxDistance;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
@@ -171,8 +179,8 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 let view: any = s.view;
-                if(s.autoScroll)return;
-                if (!s.isStop){
+                if (s.autoScroll)return;
+                if (!s.isStop) {
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
                         //是否超过了边界,如果超过了,则加快加速度,让其停止
@@ -217,6 +225,7 @@ namespace annieUI {
                 }
             })
         }
+
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
@@ -235,6 +244,7 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
+
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
          * @method setMask
@@ -243,8 +253,8 @@ namespace annieUI {
          * @public
          * @since 1.0.0
          */
-        private setMask(w:number,h:number):void{
-            let s:any=this;
+        private setMask(w: number, h: number): void {
+            let s: any = this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
             s.maskObj.drawRect(0, 0, w, h);
@@ -259,9 +269,10 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
-        private onMouseEvent(e: annie.MouseEvent): void{
+
+        private onMouseEvent(e: annie.MouseEvent): void {
             let s = this;
-            if(s.autoScroll)return;
+            if (s.autoScroll)return;
             let view: any = s.view;
             if (s.distance < s.maxDistance) {
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
@@ -274,9 +285,9 @@ namespace annieUI {
                         s.lastValue = e.localX;
                     }
                     s.speed = 0;
-                    s.isMouseDown=true;
+                    s.isMouseDown = true;
                 } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                    if(!s.isMouseDown)return;
+                    if (!s.isMouseDown)return;
                     let currentValue: number;
                     if (s.isVertical) {
                         currentValue = e.localY;
@@ -286,7 +297,7 @@ namespace annieUI {
                     s.speed = currentValue - s.lastValue;
                     if (s.speed > s.minDis) {
                         s.addSpeed = -2;
-                        if (s.speed > s.maxSpeed){
+                        if (s.speed > s.maxSpeed) {
                             s.speed = s.maxSpeed;
                         }
                     } else if (s.speed < -s.minDis) {
@@ -307,7 +318,7 @@ namespace annieUI {
                     s.lastValue = currentValue;
                     s.stopTimes = 0;
                 } else {
-                    s.isMouseDown=false;
+                    s.isMouseDown = false;
                     s.isStop = false;
                     s.stopTimes = -1;
                 }
@@ -322,17 +333,17 @@ namespace annieUI {
          * @since 1.0.2
          * @public
          */
-        public scrollTo(dis:number,time:number=0):void{
-            let s=this;
-            s.autoScroll=true;
-            s.isStop=true;
-            s.isMouseDown=false;
-            let obj:any={};
-            obj.onComplete=function () {
-                s.autoScroll=false;
+        public scrollTo(dis: number, time: number = 0): void {
+            let s = this;
+            s.autoScroll = true;
+            s.isStop = true;
+            s.isMouseDown = false;
+            let obj: any = {};
+            obj.onComplete = function () {
+                s.autoScroll = false;
             };
-            obj[s.paramXY]=dis;
-            annie.Tween.to(s.view,time,obj);
+            obj[s.paramXY] = dis;
+            annie.Tween.to(s.view, time, obj);
         }
     }
 }
