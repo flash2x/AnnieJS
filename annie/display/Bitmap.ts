@@ -13,7 +13,7 @@ namespace annie {
      * @extends annie.DisplayObject
      * @since 1.0.0
      */
-    export class Bitmap extends DisplayObject{
+    export class Bitmap extends DisplayObject {
         /**
          * HTML的一个Image对象或者是canvas对象或者是video对象
          * @property bitmapData
@@ -22,6 +22,7 @@ namespace annie {
          * @type {any}
          * @default null
          */
+      
         public get bitmapData():any{return this._bitmapData};
         public set bitmapData(value:any){this._bitmapData=value;this._isNeedUpdate=true;}
         private _bitmapData:any = null;
@@ -44,7 +45,7 @@ namespace annie {
          * @type {boolean}
          * @default false
          */
-        private _isCache:boolean = false;
+        private _isCache: boolean = false;
 
         /**
          * 构造函数
@@ -53,14 +54,34 @@ namespace annie {
          * @public
          * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
          * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
+         * @example
+         *      var imgEle=new Image();
+         *      imgEle.onload=function (e) {
+         *          var bitmap = new annie.Bitmap(imgEle)
+         *          //居中对齐
+         *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+         *          s.addChild(bitmap);
+         *
+         *          //截取图片的某一部分显示
+         *          var rect = new annie.Rectangle(0, 0, 200, 200),
+         *          rectBitmap = new annie.Bitmap(imgEle, rect);
+         *          rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *          rectBitmap.y = 100;
+         *          s.addChild(rectBitmap);
+         *      }
+         *      imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
+         *
+         * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
          */
-        public constructor(bitmapData:any=null, rect:Rectangle = null) {
+        public constructor(bitmapData: any = null, rect: Rectangle = null) {
             super();
             let s = this;
-            s._instanceType="annie.Bitmap";
+            s._instanceType = "annie.Bitmap";
             s.bitmapData = bitmapData;
             s.rect = rect;
         }
+
         /**
          * 重写渲染
          * @method render
@@ -68,28 +89,29 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public render(renderObj:IRender):void {
-            let s=this;
-            if(s.visible&&s.cAlpha>0) {
+        public render(renderObj: IRender): void {
+            let s = this;
+            if (s.visible && s.cAlpha > 0) {
                 if (s._cacheImg) {
                     renderObj.draw(s, 0);
                 }
             }
             //super.render();
         }
+
         /**
          * 重写刷新
          * @method update
          * @public
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean):void{
+        public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
-            if(s.visible) {
-                super.update(um,ua,uf);
+            if (s.visible) {
+                super.update(um, ua, uf);
                 //滤镜
-                if (s._isNeedUpdate || uf||s._updateInfo.UF){
-                    s._isNeedUpdate=false;
+                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                    s._isNeedUpdate = false;
                     if (s.cFilters.length > 0) {
                         if (!s._realCacheImg) {
                             s._realCacheImg = window.document.createElement("canvas");
@@ -150,11 +172,12 @@ namespace annie {
                     //给webgl更新新
                     s._cacheImg.updateTexture=true;
                 }
-                s._updateInfo.UF=false;
-                s._updateInfo.UM=false;
-                s._updateInfo.UA=false;
+                s._updateInfo.UF = false;
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
             }
         }
+
         /**
          * 重写getBounds
          * 获取Bitmap对象的Bounds
@@ -163,18 +186,19 @@ namespace annie {
          * @since 1.0.0
          * @returns {annie.Rectangle}
          */
-        public getBounds():Rectangle {
+        public getBounds(): Rectangle {
             let s = this;
             let r = new Rectangle();
             if (s.rect) {
                 r.width = s.rect.width;
                 r.height = s.rect.height;
             } else {
-                r.width = s.bitmapData?s.bitmapData.width:0;
-                r.height = s.bitmapData?s.bitmapData.height:0;
+                r.width = s.bitmapData ? s.bitmapData.width : 0;
+                r.height = s.bitmapData ? s.bitmapData.height : 0;
             }
             return r;
         }
+
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
          * @method convertToImage
@@ -183,21 +207,30 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
          * @return {Image}
+         * @example
+         *      var spriteSheetImg = new Image(),
+         *          rect = new annie.Rectangle(0, 0, 200, 200),
+         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
+         *       spriteSheetImg.onload=function(e){
+         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
+         *          trace(singleSmallImg);
+         *       }
+         *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
          */
-        public static convertToImage(bitmap:annie.Bitmap):any{
-            if(!bitmap.rect){
+        public static convertToImage(bitmap: annie.Bitmap): any {
+            if (!bitmap.rect) {
                 return bitmap.bitmapData;
-            }else{
+            } else {
                 let _canvas = annie.DisplayObject._canvas;
-                let w:number=bitmap.rect.width;
-                let h:number=bitmap.rect.height;
-                _canvas.width=w;
-                _canvas.height=h;
+                let w: number = bitmap.rect.width;
+                let h: number = bitmap.rect.height;
+                _canvas.width = w;
+                _canvas.height = h;
                 let ctx = _canvas.getContext("2d");
-                let tr=bitmap.rect;
-                ctx.clearRect(0, 0, w,h);
+                let tr = bitmap.rect;
+                ctx.clearRect(0, 0, w, h);
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                let _realCacheImg=window.document.createElement("img");
+                let _realCacheImg = window.document.createElement("img");
                 _realCacheImg.src = _canvas.toDataURL("image/png");
                 return _realCacheImg;
             }

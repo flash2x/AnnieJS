@@ -213,6 +213,9 @@ namespace annieUI {
          *      slideSpeed: .32,//默认值为.4，滑动速度
          *      callback:callback//滑动完成回调函数
          *       });
+         *       slideBox.slideToIndex(2);//滑动到第2屏
+         *       slideBox.addPageList(new Page5());//添加一屏内容
+         * <p><a href="https://github.com/flash2x/demo5" target="_blank">测试链接</a></p>
          */
         constructor(option: any) {
             super();

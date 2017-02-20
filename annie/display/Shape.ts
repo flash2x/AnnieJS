@@ -184,7 +184,7 @@ namespace annie {
         }
 
         /**
-         * 从上一点画到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * 从上一点画到某一点,如果没有设置上一点，则上一点默认为(0,0)
          * @method lineTo
          * @param {number} x
          * @param {number} y
