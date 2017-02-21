@@ -593,3 +593,45 @@ declare namespace annieUI {
         private pos(target1, target2);
     }
 }
+/**
+ * Created by Saron on 2017/2/21.
+ */
+/**
+ * @module annieUI
+ */
+declare namespace annieUI {
+    import Sprite = annie.Sprite;
+    /**
+     * 大转盘抽奖类
+     * @class annieUI.BigTurntable
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
+    class BigTurntable extends Sprite {
+        /**
+         * 是否在转动中
+         * @property isTurnning
+         * @public
+         * @since 1.0.0
+         * @default false
+         * @type {boolean}
+         */
+        private isTurnning;
+        /**
+         * 是否为函数
+         * @param fn
+         * @returns {boolean}
+         * @private
+         */
+        private isFunction(fn);
+        constructor(option: any);
+        /**
+         * 转动方法
+         * @param turnObj  转动对象
+         * @param targetRotation 目标角度
+         * @param callback 转动结束回调函数
+         */
+        private turnTo(turnObj, targetRotation, callback);
+    }
+}

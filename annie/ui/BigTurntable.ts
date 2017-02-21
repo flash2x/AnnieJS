@@ -16,29 +16,14 @@ namespace annieUI {
      */
     export class BigTurntable extends Sprite {
         /**
-         * 转动对象
-         * @property turnObj
-         * @private
+         * 是否在转动中
+         * @property isTurnning
+         * @public
          * @since 1.0.0
-         * @type {annie.DisplayObject}
+         * @default false
+         * @type {boolean}
          */
-        private turnObj: annie.DisplayObject;
-        /**
-         * 目标角度
-         * @property targetRotation
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         */
-        private targetRotation: number;
-        /**
-         * 转盘转动结束回调函数
-         * @method callback
-         * @private
-         * @since 1.0.0
-         * @type {function}
-         */
-        private callback: any;
+        private isTurnning: boolean = false;
 
         /**
          * 是否为函数
@@ -54,23 +39,39 @@ namespace annieUI {
             super();
         }
 
-        private turnTo(turnObj,targetRotation,callback) {
-            let s = this;
+        /**
+         * 转动方法
+         * @param turnObj  转动对象
+         * @param targetRotation 目标角度
+         * @param callback 转动结束回调函数
+         */
+        private turnTo(turnObj: annie.DisplayObject, targetRotation: number, callback: any) {
+            let s = this,
+                turnObjInitRotation: number = 0;
             if (!turnObj) {
                 throw new Error('turnObj转动对象不能为空');
             }
             if (!s.isFunction(callback)) {
                 throw new Error('callback参数数据格式不对！callback应为函数');
             }
+            if (s.isTurnning) {
+                return;
+            }
+            turnObjInitRotation = turnObj.rotation;//转动对象rotation初始值
+            s.isTurnning = true;
             /*抽奖转盘*/
             annie.Tween.to(turnObj, 2, {
-                rotation: (180 + turnObj.rotation), ease: annie.Tween.quarticIn, onComplete: function () {
+                rotation: (180 + turnObjInitRotation), ease: annie.Tween.quarticIn, onComplete: function () {
                     annie.Tween.to(turnObj, 3, {
                         rotation: (10 * 360 ), onComplete: function () {
                             annie.Tween.to(turnObj, 4, {
-                                rotation: (12 * 360) + targetRotation,
+                                rotation: (12 * 360) + targetRotation + turnObjInitRotation,
                                 ease: annie.Tween.quarticOut,
-                                onComplete: callback
+                                onComplete: function () {
+                                    turnObj.rotation = targetRotation + turnObjInitRotation;
+                                    s.isTurnning = false;
+                                    s.isFunction(callback) && callback();//执行结束回调函数
+                                }
                             })
                         }
                     })
