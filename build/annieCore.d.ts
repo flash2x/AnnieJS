@@ -90,6 +90,14 @@ declare namespace annie {
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @returns {boolean} 如果有收听者则返回true
+         * @example
+         *      var mySprite=new annie.Sprite(),
+         *          yourEvent=new annie.Event("yourCustomerEvent");
+         *       yourEvent.data='Flash2x';
+         *       mySprite.addEventListener("yourCustomerEvent",function(e){
+         *          trace(e.data);
+         *        })
+         *       mySprite.dispatchEvent(yourEvent);
          */
         dispatchEvent(event: any, data?: any): boolean;
         /**
@@ -511,6 +519,7 @@ declare namespace annie {
          */
         constructor(x?: number, y?: number);
         /**
+         * 水平坐标
          * @property x
          * @public
          * @since 1.0.0
@@ -518,6 +527,7 @@ declare namespace annie {
          */
         x: number;
         /**
+         * 垂直坐标
          * @property y
          * @since 1.0.0
          * @public
@@ -731,6 +741,7 @@ declare namespace annie {
          */
         constructor(x?: number, y?: number, width?: number, height?: number);
         /**
+         * 矩形左上角的 x 坐标
          * @property x
          * @public
          * @since 1.0.0
@@ -739,6 +750,7 @@ declare namespace annie {
          */
         x: number;
         /**
+         * 矩形左上角的 y 坐标
          * @property y
          * @public
          * @since 1.0.0
@@ -747,6 +759,7 @@ declare namespace annie {
          */
         y: number;
         /**
+         * 矩形的宽度（以像素为单位）
          * @property width
          * @public
          * @since 1.0.0
@@ -755,6 +768,7 @@ declare namespace annie {
          */
         width: number;
         /**
+         * 矩形的高度（以像素为单位）
          * @property height
          * @public
          * @since 1.0.0
@@ -1118,7 +1132,7 @@ declare namespace annie {
         abstract getBounds(): Rectangle;
         /**
          * 获取对象形变后外切矩形。
-         * 可以从这个方法中读取到此显示对象变形后x方向上的宽主y方向上的高
+         * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
          * @method getDrawRect
          * @public
          * @since 1.0.0
@@ -1261,6 +1275,25 @@ declare namespace annie {
          * @public
          * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
          * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
+         * @example
+         *      var imgEle=new Image();
+         *      imgEle.onload=function (e) {
+         *          var bitmap = new annie.Bitmap(imgEle)
+         *          //居中对齐
+         *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+         *          s.addChild(bitmap);
+         *
+         *          //截取图片的某一部分显示
+         *          var rect = new annie.Rectangle(0, 0, 200, 200),
+         *          rectBitmap = new annie.Bitmap(imgEle, rect);
+         *          rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *          rectBitmap.y = 100;
+         *          s.addChild(rectBitmap);
+         *      }
+         *      imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
+         *
+         * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
          */
         constructor(bitmapData?: any, rect?: Rectangle);
         /**
@@ -1295,6 +1328,15 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
          * @return {Image}
+         * @example
+         *      var spriteSheetImg = new Image(),
+         *          rect = new annie.Rectangle(0, 0, 200, 200),
+         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
+         *       spriteSheetImg.onload=function(e){
+         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
+         *          trace(singleSmallImg);
+         *       }
+         *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
          */
         static convertToImage(bitmap: annie.Bitmap): any;
     }
@@ -1403,7 +1445,7 @@ declare namespace annie {
          */
         moveTo(x: number, y: number): void;
         /**
-         * 从上一点画到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * 从上一点画到某一点,如果没有设置上一点，则上一点默认为(0,0)
          * @method lineTo
          * @param {number} x
          * @param {number} y
@@ -1856,6 +1898,11 @@ declare namespace annie {
          * @param {string|HtmlElement} src
          * @param {string} type
          * @since 1.0.0
+         * @example
+         *      var media = new annie.Media('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3', 'Audio');
+         *          media.play();//媒体播放
+         *          //media.pause();//暂停播放
+         *          //media.stop();//停止播放
          */
         constructor(src: any, type: string);
         /**
@@ -1898,6 +1945,18 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Sound extends Media {
+        /**
+         * 构造函数
+         * @method  Sound
+         * @since 1.0.0
+         * @public
+         * @param src
+         * @example
+         *      var soundPlayer = new annie.Sound('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3');
+         *          soundPlayer.play();//播放音乐
+         *          //soundPlayer.pause();//暂停音乐
+         *          //soundPlayer.stop();//停止音乐
+         */
         constructor(src: any);
     }
 }
@@ -1913,6 +1972,20 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Video extends Media {
+        /**
+         * 构造函数
+         * @method Video
+         * @param src
+         * @param width
+         * @param height
+         * @public
+         * @since 1.0.0
+         * @example
+         *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
+         *          videoPlayer.play();//播放视频
+         *          //videoPlayer.pause();//暂停视频
+         *          //videoPlayer.stop();//停止播放
+         */
         constructor(src: any, width?: number, height?: number);
     }
 }
@@ -2379,6 +2452,18 @@ declare namespace annie {
          * @private
          */
         private _isAdded;
+        /**
+         * 构造函数
+         * @method FloatDisplay
+         * @since 1.0.0
+         * @public
+         * @example
+         *      var floatDisplay = new annie.FloatDisplay();
+         *      floatDisplay.init(document.getElementById('Flash2x'));
+         *      s.addChild(floatDisplay);
+         *
+         * <p><a href="" target="_blank">测试链接</a></p>
+         */
         constructor();
         /**
          * 初始化方法
@@ -2649,6 +2734,9 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
+         * @example
+         *      var inputText=new annie.InputText('singleline');
+         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         constructor(inputType: string);
         init(htmlElement: any): void;
@@ -3360,6 +3448,7 @@ declare namespace annie {
          */
         type: string;
         /**
+         * 水平模糊量
          * @property blurX
          * @public
          * @readonly
@@ -3368,6 +3457,7 @@ declare namespace annie {
          */
         blurX: number;
         /**
+         * 垂直模糊量
          * @property blurY
          * @public
          * @readonly
@@ -3376,6 +3466,7 @@ declare namespace annie {
          */
         blurY: number;
         /**
+         * 模糊品质
          * @property quality
          * @public
          * @readonly
@@ -3390,6 +3481,18 @@ declare namespace annie {
          * @param {number} blurX
          * @param {number} blurY
          * @param {number} quality
+         * @example
+         *      var imgEle = new Image();
+         *           imgEle.onload = function (e) {
+         *       var rect = new annie.Rectangle(0, 0, 200, 200),
+         *           rectBitmap = new annie.Bitmap(imgEle, rect);
+         *           rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+         *           rectBitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+         *           var blur=new annie.BlurFilter(30,30,1);//实例化模糊滤镜
+         *           rectBitmap.filters=[blur];//为bitmap添加模糊滤镜效果
+         *           s.addChild(rectBitmap);
+         *       }
+         *       imgEle.src = 'http://test.annie2x.com/biglong/logo.jpg';
          */
         constructor(blurX?: number, blurY?: number, quality?: number);
         /**
@@ -3637,6 +3740,18 @@ declare namespace annie {
      * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
+     * @example
+     *      var urlLoader = new annie.URLLoader();
+     *      urlLoader.addEventListener('onComplete', function (e) {
+     *      //trace(e.data.response);
+     *      var bitmapData = e.data.response,//bitmap图片数据
+     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
+     *      //居中对齐
+     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+     *      s.addChild(bitmap);
+     *      });
+     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
      */
     class URLLoader extends EventDispatcher {
         /**
@@ -3846,6 +3961,24 @@ declare namespace Flash2x {
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
      * @param {string} info.responseType 后台返回数据的类型,默认为"json"
+     * @example
+     *      //get
+     *      Flash2x.ajax({
+     *             type: "GET",
+     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
+     *             responseType: 'json',
+     *             success: function (result) {trace(result)},
+     *             error: function (result) {trace(result)}
+     *      })
+     *      //post
+     *      Flash2x.ajax({
+     *             type: "POST",
+     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
+     *             data: {phone:'135******58'},
+     *             responseType: 'json',
+     *             success: function (result) {trace(result)},
+     *             error: function (result) {trace(result)}
+     *      })
      */
     function ajax(info: any): void;
     /**
@@ -3857,6 +3990,10 @@ declare namespace Flash2x {
      * @param callbackFun
      * @static
      * @since 1.0.4
+     * @example
+     *      Flash2x.jsonp('js/testData.js', 1, 'getdata', function (result) {
+     *          trace(result);
+     *      })
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
 }
@@ -4334,7 +4471,10 @@ declare namespace annie {
      * @param {string} url
      * @static
      * @example
-     *      annie.navigateToURL("http://www.annie2x.com");
+     *      displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
+     *              annie.navigateToURL("http://www.annie2x.com");
+     *      })
+     *
      */
     function navigateToURL(url: string): void;
     /**
@@ -4345,7 +4485,9 @@ declare namespace annie {
      * @param {string} url
      * @static
      * @example
-     *      annie.sendToURL("http://www.annie2x.com");
+     *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
+     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
+     *      })
      */
     function sendToURL(url: string): void;
     /**
@@ -4357,6 +4499,18 @@ declare namespace annie {
      * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
+     * @example
+     *      annie.toDisplayDataURL(DisplayObj, {
+     *               x: 0,
+     *               y: 32,
+     *               width: 441,
+     *               height: 694
+     *       }, {
+     *               type: "jpg"//数据类型jpg/png
+     *               quality: 90//图片质量值1-100,png格式不需要设置quality
+     *       }, '#CDDBEB');
+     *
+     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
      */
     let toDisplayDataURL: (obj: DisplayObject, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
 }

@@ -149,6 +149,13 @@ declare namespace annieUI {
          * @param {number}vH 可视区域高
          * @param {number}maxDistance 最大滚动的长度
          * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @example
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *          s.addChild(s.sPage);
+         *          s.sPage.view.addChild(new home.Content());
+         *          s.sPage.y=s.stage.viewRect.y;
+         *          s.sPage.mouseEnable=false;
+         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
          */
         constructor(vW: number, vH: number, maxDistance: number, isVertical?: boolean);
         /**
@@ -195,8 +202,27 @@ declare namespace annieUI {
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
-    */
+     */
     class FacePhoto extends Sprite {
+        /**
+         * 构造函数
+         * @method  FacePhoto
+         * @since 1.0.0
+         * @public
+         * @example
+         *      var circleface = new annieUI.FacePhoto(),
+         *          rectFace=new annieUI.FacePhoto();
+         *          //圆形头像
+         *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
+         *          circleface.x = 260;
+         *          circleface.y = 100;
+         *          s.addChild(circleface);
+         *          //方形头像
+         *          rectFace.init('http://test.annie2x.com/biglong/logo.jpg', 200, 1);
+         *          rectFace.x = 260;
+         *          rectFace.y = 400;
+         *          s.addChild(rectFace);
+         */
         constructor();
         private photo;
         private bitmap;
@@ -421,6 +447,9 @@ declare namespace annieUI {
          *      slideSpeed: .32,//默认值为.4，滑动速度
          *      callback:callback//滑动完成回调函数
          *       });
+         *       slideBox.slideToIndex(2);//滑动到第2屏
+         *       slideBox.addPageList(new Page5());//添加一屏内容
+         * <p><a href="https://github.com/flash2x/demo5" target="_blank">测试链接</a></p>
          */
         constructor(option: any);
         /**

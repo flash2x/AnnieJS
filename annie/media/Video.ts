@@ -24,7 +24,7 @@ namespace annie {
          *          //videoPlayer.pause();//暂停视频
          *          //videoPlayer.stop();//停止播放
          */
-        public constructor(src: any, width: number, height: number) {
+        public constructor(src: any, width: number=0, height: number=0) {
             super(src, "Video");
             let s = this;
             s._instanceType = "annie.Video";
