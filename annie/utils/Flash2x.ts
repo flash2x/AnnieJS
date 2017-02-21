@@ -451,8 +451,9 @@ namespace Flash2x {
 
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
+     * @method sb
      */
-    function sb(sceneName: string, bitmapName: string): annie.Bitmap {
+    export function sb(sceneName: string, bitmapName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + bitmapName;
         if (res[sceneName][sbName]) {
             return res[sceneName][sbName];
