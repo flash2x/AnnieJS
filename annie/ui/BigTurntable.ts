@@ -52,25 +52,25 @@ namespace annieUI {
 
         constructor(option: any) {
             super();
-            var s = this;
-            if (!option['turnObj']) {
+        }
+
+        private turnTo(turnObj,targetRotation,callback) {
+            let s = this;
+            if (!turnObj) {
                 throw new Error('turnObj转动对象不能为空');
             }
-            if (!s.isFunction(option['callback'])) {
+            if (!s.isFunction(callback)) {
                 throw new Error('callback参数数据格式不对！callback应为函数');
             }
-            s.turnObj = option['turnObj'];
-            s.targetRotation = option['targetRotation'] ? option['targetRotation'] : 0;
-            s.callback = option['callback'];
             /*抽奖转盘*/
-            annie.Tween.to(s.turnObj, 2, {
-                rotation: (180 + s.turnObj.rotation), ease: annie.Tween.quarticIn, onComplete: function () {
-                    annie.Tween.to(s.turnObj, 3, {
+            annie.Tween.to(turnObj, 2, {
+                rotation: (180 + turnObj.rotation), ease: annie.Tween.quarticIn, onComplete: function () {
+                    annie.Tween.to(turnObj, 3, {
                         rotation: (10 * 360 ), onComplete: function () {
-                            annie.Tween.to(s.turnObj, 4, {
-                                rotation: (12 * 360) + s.targetRotation,
+                            annie.Tween.to(turnObj, 4, {
+                                rotation: (12 * 360) + targetRotation,
                                 ease: annie.Tween.quarticOut,
-                                onComplete: s.callback
+                                onComplete: callback
                             })
                         }
                     })
