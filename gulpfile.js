@@ -44,7 +44,7 @@ var uiList=[
     "annie/ui/FacePhoto.ts",
     "annie/ui/SlidePage.ts",
     "annie/ui/FlipBook.ts",
-    "annie/ui/BigTurntable.ts"
+    "annie/ui/BigTurnTable.ts"
 ];
 var onBuildCore = function(){
     var op = {

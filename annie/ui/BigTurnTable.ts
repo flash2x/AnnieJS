@@ -9,12 +9,12 @@ namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 大转盘抽奖类
-     * @class annieUI.BigTurntable
+     * @class annieUI.BigTurnTable
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    export class BigTurntable extends Sprite {
+    export class BigTurnTable extends Sprite {
         /**
          * 是否在转动中
          * @property isTurnning
@@ -44,6 +44,11 @@ namespace annieUI {
          * @param turnObj  转动对象
          * @param targetRotation 目标角度
          * @param callback 转动结束回调函数
+         * @example
+         *      var lotteryController=new annieUI.BigTurnTable();
+         *      lotteryController.turnTo(turnObj,120,function(){
+         *      trace('turnFinish!');
+         *      })
          */
         private turnTo(turnObj: annie.DisplayObject, targetRotation: number, callback: any) {
             let s = this,

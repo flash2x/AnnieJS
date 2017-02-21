@@ -1403,14 +1403,14 @@ var annieUI;
     var Sprite = annie.Sprite;
     /**
      * 大转盘抽奖类
-     * @class annieUI.BigTurntable
+     * @class annieUI.BigTurnTable
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var BigTurntable = (function (_super) {
-        __extends(BigTurntable, _super);
-        function BigTurntable(option) {
+    var BigTurnTable = (function (_super) {
+        __extends(BigTurnTable, _super);
+        function BigTurnTable(option) {
             var _this = _super.call(this) || this;
             /**
              * 是否在转动中
@@ -1429,7 +1429,7 @@ var annieUI;
          * @returns {boolean}
          * @private
          */
-        BigTurntable.prototype.isFunction = function (fn) {
+        BigTurnTable.prototype.isFunction = function (fn) {
             return typeof fn === 'function';
         };
         /**
@@ -1437,8 +1437,13 @@ var annieUI;
          * @param turnObj  转动对象
          * @param targetRotation 目标角度
          * @param callback 转动结束回调函数
+         * @example
+         *      var lotteryController=new annieUI.BigTurnTable();
+         *      lotteryController.turnTo(turnObj,120,function(){
+         *      trace('turnFinish!');
+         *      })
          */
-        BigTurntable.prototype.turnTo = function (turnObj, targetRotation, callback) {
+        BigTurnTable.prototype.turnTo = function (turnObj, targetRotation, callback) {
             var s = this, turnObjInitRotation = 0;
             if (!turnObj) {
                 throw new Error('turnObj转动对象不能为空');
@@ -1470,7 +1475,7 @@ var annieUI;
                 }
             });
         };
-        return BigTurntable;
+        return BigTurnTable;
     }(Sprite));
-    annieUI.BigTurntable = BigTurntable;
+    annieUI.BigTurnTable = BigTurnTable;
 })(annieUI || (annieUI = {}));
