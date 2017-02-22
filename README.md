@@ -157,6 +157,8 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
+## Flash2x 3.0.7
+    持导出Egret相关引擎
 ## Flash2x 3.0.6
     修复静态文本多行时只导出第一行的bug
     支持动态文本边框导出
