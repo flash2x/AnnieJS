@@ -553,6 +553,7 @@ namespace annie {
                 }
                 s._isUpdateFrame = true;
                 if (s._isNeedUpdateChildren) {
+                    let t=-1;
                     let layerCount = s._timeline.length;
                     let frameCount = 0;
                     let frame: McFrame = null;
@@ -614,8 +615,11 @@ namespace annie {
                                 }
                                 displayObject.parent = s;
                                 s.children.push(displayObject);
-                                if (lastFrameChildren.indexOf(displayObject) < 0) {
+                                t=lastFrameChildren.indexOf(displayObject);
+                                if ( t< 0) {
                                     displayObject._onDispatchBubbledEvent("onAddToStage");
+                                }else{
+                                    lastFrameChildren.splice(t,1);
                                 }
                             }
                         }
@@ -624,11 +628,9 @@ namespace annie {
                     //update一定要放在事件处理之前
                     let len = lastFrameChildren.length;
                     for (i = 0; i < len; i++) {
-                        if (!lastFrameChildren[i].parent) {
-                            lastFrameChildren[i].parent = s;
-                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
-                            lastFrameChildren[i].parent = null;
-                        }
+                        lastFrameChildren[i].parent = s;
+                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                        lastFrameChildren[i].parent = null;
                     }
                     s.children.push(s.floatView);
                     super.update(um,ua,uf);
