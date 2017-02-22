@@ -446,7 +446,6 @@ namespace Flash2x {
             }
         }
         return textObj;
-
     }
 
     /**
