@@ -3938,6 +3938,11 @@ declare namespace Flash2x {
      */
     function t(type: number, text: string, size: number, color: string, face: string, top: number, left: number, width: number, height: number, lineSpacing: number, align: string, italic?: boolean, bold?: boolean, lineType?: string, showBorder?: boolean): any;
     /**
+     * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
+     * @method sb
+     */
+    function sb(sceneName: string, bitmapName: string): annie.Bitmap;
+    /**
      * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
      * @method s
      * @public

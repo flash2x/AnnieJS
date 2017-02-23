@@ -87,7 +87,9 @@ namespace annie {
             }catch(e){
                 s.media.play();
             }
+
         }
+
         private _SBWeixin:any;
         private _weixinSB(){
             this.media.play();

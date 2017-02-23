@@ -110,8 +110,10 @@ var annie;
          */
         EventDispatcher.prototype.addEventListener = function (type, listener) {
             if (!type) {
-                trace("添加侦听的type值为undefined");
-                return;
+                throw new Error("添加侦听的type值为undefined");
+            }
+            if (!listener) {
+                throw new Error("侦听回调函数不能为null");
             }
             var s = this;
             if (!s.eventTypes[type]) {
@@ -4614,6 +4616,7 @@ var annie;
                 }
                 s._isUpdateFrame = true;
                 if (s._isNeedUpdateChildren) {
+                    var t = -1;
                     var layerCount = s._timeline.length;
                     var frameCount = 0;
                     var frame = null;
@@ -4678,8 +4681,12 @@ var annie;
                                 }
                                 displayObject.parent = s;
                                 s.children.push(displayObject);
-                                if (lastFrameChildren.indexOf(displayObject) < 0) {
+                                t = lastFrameChildren.indexOf(displayObject);
+                                if (t < 0) {
                                     displayObject._onDispatchBubbledEvent("onAddToStage");
+                                }
+                                else {
+                                    lastFrameChildren.splice(t, 1);
                                 }
                             }
                         }
@@ -4688,11 +4695,9 @@ var annie;
                     //update一定要放在事件处理之前
                     var len = lastFrameChildren.length;
                     for (i = 0; i < len; i++) {
-                        if (!lastFrameChildren[i].parent) {
-                            lastFrameChildren[i].parent = s;
-                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
-                            lastFrameChildren[i].parent = null;
-                        }
+                        lastFrameChildren[i].parent = s;
+                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                        lastFrameChildren[i].parent = null;
                     }
                     s.children.push(s.floatView);
                     _super.prototype.update.call(this, um, ua, uf);
@@ -7843,68 +7848,54 @@ var annie;
                             try {
                                 var result = t["response"];
                                 e.data = { type: s.responseType, response: null };
-                                var item_1;
+                                var item = void 0;
                                 switch (s.responseType) {
                                     case "css":
-                                        item_1 = document.createElement("link");
-                                        item_1.rel = "stylesheet";
-                                        item_1.href = s.url;
+                                        item = document.createElement("link");
+                                        item.rel = "stylesheet";
+                                        item.href = s.url;
                                         break;
                                     case "image":
                                     case "sound":
                                     case "video":
                                         var itemObj_1;
-                                        var isBlob_1 = true;
                                         if (s.responseType == "image") {
                                             itemObj_1 = document.createElement("img");
                                             itemObj_1.onload = function () {
-                                                if (isBlob_1) {
-                                                    URL.revokeObjectURL(item_1.src);
-                                                }
+                                                URL.revokeObjectURL(itemObj_1.src);
                                                 itemObj_1.onload = null;
                                             };
-                                            item_1 = itemObj_1;
+                                            item = itemObj_1;
+                                            itemObj_1.src = URL.createObjectURL(result);
                                         }
                                         else {
                                             if (s.responseType == "sound") {
                                                 itemObj_1 = document.createElement("AUDIO");
-                                                item_1 = new annie.Sound(itemObj_1);
+                                                item = new annie.Sound(itemObj_1);
                                             }
                                             else if (s.responseType == "video") {
                                                 itemObj_1 = document.createElement("VIDEO");
-                                                item_1 = new annie.Video(itemObj_1);
+                                                item = new annie.Video(itemObj_1);
                                             }
                                             itemObj_1.preload = true;
-                                            itemObj_1.load();
-                                            itemObj_1.onloadeddata = function () {
-                                                if (isBlob_1) {
-                                                }
-                                                itemObj_1.onloadeddata = null;
-                                            };
-                                        }
-                                        try {
-                                            itemObj_1.src = URL.createObjectURL(result);
-                                        }
-                                        catch (err) {
-                                            isBlob_1 = false;
                                             itemObj_1.src = s.url;
                                         }
                                         break;
                                     case "json":
-                                        item_1 = JSON.parse(result);
+                                        item = JSON.parse(result);
                                         break;
                                     case "js":
-                                        item_1 = "JS_CODE";
+                                        item = "JS_CODE";
                                         annie.Eval(result);
                                         break;
                                     case "text":
                                     case "unKnow":
                                     case "xml":
                                     default:
-                                        item_1 = result;
+                                        item = result;
                                         break;
                                 }
-                                e.data["response"] = item_1;
+                                e.data["response"] = item;
                                 s.data = null;
                                 s.responseType = "";
                             }
@@ -8449,6 +8440,7 @@ var Flash2x;
     Flash2x.t = t;
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
+     * @method sb
      */
     function sb(sceneName, bitmapName) {
         var sbName = "_f2x_s" + bitmapName;
@@ -8475,6 +8467,7 @@ var Flash2x;
             }
         }
     }
+    Flash2x.sb = sb;
     /**
      * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
      * @method s
