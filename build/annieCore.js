@@ -7865,8 +7865,8 @@ var annie;
                                                 URL.revokeObjectURL(itemObj_1.src);
                                                 itemObj_1.onload = null;
                                             };
-                                            item = itemObj_1;
                                             itemObj_1.src = URL.createObjectURL(result);
+                                            item = itemObj_1;
                                         }
                                         else {
                                             if (s.responseType == "sound") {

@@ -146,8 +146,8 @@ namespace annie {
                                                 URL.revokeObjectURL(itemObj.src);
                                                 itemObj.onload = null;
                                             };
-                                            item=itemObj;
                                             itemObj.src = URL.createObjectURL(result);
+                                            item=itemObj;
                                         } else {
                                             if (s.responseType == "sound") {
                                                 itemObj = document.createElement("AUDIO");
