@@ -471,7 +471,6 @@ namespace annie {
                 s._isNeedUpdateChildren = true;
             }
         }
-
         /**
          * 动画播放过程中更改movieClip中的一个child的显示属性，
          * 如果是停止状态，可以直接设置子级显示属性
