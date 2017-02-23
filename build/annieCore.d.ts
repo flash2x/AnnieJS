@@ -3877,9 +3877,8 @@ declare namespace Flash2x {
      * @static
      * @since 1.0.2
      * @param {string} sceneName
-     * @param {WebGLRenderingContext} gl 如果是webgl渲染模式，请设置渲染的webgl对象，以方便删除不再需要使用的texture对象
      */
-    function unLoadScene(sceneName: string, gl?: WebGLRenderingContext): void;
+    function unLoadScene(sceneName: string): void;
     /**
      * 获取已经加载场景中的声音或视频资源
      * @method getMediaByName
