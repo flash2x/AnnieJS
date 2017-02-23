@@ -4695,9 +4695,12 @@ var annie;
                     //update一定要放在事件处理之前
                     var len = lastFrameChildren.length;
                     for (i = 0; i < len; i++) {
-                        lastFrameChildren[i].parent = s;
-                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
-                        lastFrameChildren[i].parent = null;
+                        //不加这个判读在removeAllChildren时会报错
+                        if (!lastFrameChildren[i].parent) {
+                            lastFrameChildren[i].parent = s;
+                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                            lastFrameChildren[i].parent = null;
+                        }
                     }
                     s.children.push(s.floatView);
                     _super.prototype.update.call(this, um, ua, uf);
