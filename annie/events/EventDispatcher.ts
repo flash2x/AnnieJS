@@ -108,8 +108,10 @@ namespace annie {
          */
         public addEventListener(type: string, listener: Function): void {
             if (!type) {
-                trace("添加侦听的type值为undefined");
-                return;
+                throw new Error("添加侦听的type值为undefined");
+            }
+            if(!listener){
+                throw new Error("侦听回调函数不能为null");
             }
             let s = this;
             if (!s.eventTypes[type]) {
