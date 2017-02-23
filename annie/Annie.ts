@@ -25,7 +25,7 @@ namespace annie {
      *      trace(annie.version);
      */
 
-    export let version:string="1.0.6";
+    export let version:string="1.0.7";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
