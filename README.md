@@ -69,6 +69,11 @@
 #如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
+##AnnieJS 1.0.7 版本
+    优化MovieClip类结构
+    修复hasEventListener有时不准确的bug
+    修复化ULRLoader加载声音后在某些手机最小化时项目闪退的bug
+    优化底层结构
 ##AnnieJS 1.0.6 版本
     修复EnterFrame事件中更新显示对象属性无效的bug
     修复动画元件设置滤色效果后，在动画的情况下失灵的bug
