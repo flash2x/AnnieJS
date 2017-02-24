@@ -194,7 +194,7 @@ namespace annie {
          * @returns {boolean} 如果有则返回true
          */
         public hasEventListener(type: string): boolean {
-            if (this.eventTypes[type]) {
+            if (this.eventTypes[type]&&this.eventTypes[type].length>0) {
                 return true
             }
             return false;
