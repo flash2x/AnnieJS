@@ -3143,15 +3143,15 @@ declare namespace annie {
          * @public
          * @since
          */
-        private static addUpdateObj(target);
+        static addUpdateObj(target: any): void;
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj
          * @param target
-         * @private
+         * @public
          * @since 1.0.0
          */
-        private static removeUpdateObj(target);
+        static removeUpdateObj(target: any): void;
     }
 }
 /**

@@ -782,7 +782,7 @@ namespace annie {
          * @public
          * @since
          */
-        private static addUpdateObj(target: any): void {
+        public static addUpdateObj(target: any): void {
             let isHave: boolean = false;
             let len = Stage.allUpdateObjList.length;
             for (let i = 0; i < len; i++) {
@@ -800,10 +800,10 @@ namespace annie {
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj
          * @param target
-         * @private
+         * @public
          * @since 1.0.0
          */
-        private static removeUpdateObj(target: any): void {
+        public static removeUpdateObj(target: any): void {
             let len = Stage.allUpdateObjList.length;
             for (let i = 0; i < len; i++) {
                 if (Stage.allUpdateObjList[i] === target) {

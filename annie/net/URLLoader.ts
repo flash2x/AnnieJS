@@ -41,13 +41,11 @@ namespace annie {
             let s = this;
             if (s._req) {
                 s._req.abort();
-                //s._req = null;
+                s._req = null;
             }
         }
-
         private _req: XMLHttpRequest;
         private headers: Array<string> = [];
-
         /**
          * 加载或请求数据
          * @method load
@@ -87,8 +85,8 @@ namespace annie {
                 }
             }
             let req: any = null;
-            if (!s._req) {
-                s._req = new XMLHttpRequest();
+           // if (!s._req) {
+                req = new XMLHttpRequest();
                 req = s._req;
                 req.withCredentials = false;
                 req.onprogress = function (event: any): void {
@@ -99,7 +97,7 @@ namespace annie {
                 };
                 req.onerror = function (event: any): void {
                     reSendTimes++;
-                    if (reSendTimes > 3) {
+                    if (reSendTimes > 2) {
                         s.dispatchEvent("onError", {id: 2, msg: event["message"]});
                     } else {
                         //断线重连
@@ -187,9 +185,10 @@ namespace annie {
                         }
                     }
                 };
-            } else {
-                req = s._req;
-            }
+            //} else {
+               // req = s._req;
+               // s._req.readyState=0;
+            //}
             let reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
@@ -227,6 +226,7 @@ namespace annie {
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
+            s._req=req;
         }
 
         /**
@@ -309,7 +309,6 @@ namespace annie {
                 return src + "?" + s._fqs(data, query);
             }
         };
-
         /**
          * 添加自定义头
          * @addHeader
