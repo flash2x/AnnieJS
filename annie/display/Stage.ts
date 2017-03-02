@@ -745,14 +745,15 @@ namespace annie {
         public resize = function () {
             let s = this;
             let whObj = s.getRootDivWH(s.rootDiv);
-            //这里判断
-            //if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize();
-                s.setAlign();
-                s._updateInfo.UM=true;
-            //}
+            //这里判断,因为android手机输入键盘弹出来居然会触发resize事件，操操操
+            if(annie.osType=="android"&&(Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100)) {
+               return;
+            }
+            s.divHeight = whObj.h;
+            s.divWidth = whObj.w;
+            s.renderObj.reSize();
+            s.setAlign();
+            s._updateInfo.UM=true;
         };
 
         public getBounds(): Rectangle {
