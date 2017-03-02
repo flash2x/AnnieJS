@@ -5809,6 +5809,7 @@ var annie;
              */
             this._mouseEventInfo = {};
             this._lastDpList = [];
+            this._rid = -1;
             /**
              * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
@@ -5944,13 +5945,13 @@ var annie;
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
                 //这里判断
-                if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
-                    s.divHeight = whObj.h;
-                    s.divWidth = whObj.w;
-                    s.renderObj.reSize();
-                    s.setAlign();
-                    s._updateInfo.UM = true;
-                }
+                //if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
+                s.divHeight = whObj.h;
+                s.divWidth = whObj.w;
+                s.renderObj.reSize();
+                s.setAlign();
+                s._updateInfo.UM = true;
+                //}
             };
             var s = this;
             this._instanceType = "annie.Stage";
@@ -5978,12 +5979,15 @@ var annie;
                 s.renderObj = new annie.WGRender(s);
             }
             s.renderObj.init();
-            window.addEventListener("resize", function (e) {
-                if (s.autoResize) {
-                    s.resize();
-                }
-                var event = new annie.Event("onResize");
-                s.dispatchEvent(event);
+            window.addEventListener('orientationchange' in window ? 'orientationchange' : 'resize', function (e) {
+                clearTimeout(s._rid);
+                s._rid = setTimeout(function () {
+                    if (s.autoResize) {
+                        s.resize();
+                    }
+                    var event = new annie.Event("onResize");
+                    s.dispatchEvent(event);
+                }, 100);
             });
             setTimeout(function () {
                 s.resize();
@@ -7806,10 +7810,7 @@ var annie;
                     s.responseType = "unKnow";
                 }
             }
-            var req = null;
-            // if (!s._req) {
-            req = new XMLHttpRequest();
-            req = s._req;
+            var req = new XMLHttpRequest();
             req.withCredentials = false;
             req.onprogress = function (event) {
                 if (!event || event.loaded > 0 && event.total == 0) {

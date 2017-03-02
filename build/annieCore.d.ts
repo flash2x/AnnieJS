@@ -3021,6 +3021,7 @@ declare namespace annie {
          */
         private static _isLoadedVConsole;
         private _lastDpList;
+        private _rid;
         /**
          * 显示对象入口函数
          * @method Stage

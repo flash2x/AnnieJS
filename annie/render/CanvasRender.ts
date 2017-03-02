@@ -129,7 +129,6 @@ namespace annie {
             }
             //s._ctx.restore();
         }
-
         /**
          * 初始化渲染器
          * @public

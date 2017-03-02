@@ -220,7 +220,7 @@ namespace annie {
          */
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = [];
-
+        private _rid=-1;
         /**
          * 显示对象入口函数
          * @method Stage
@@ -261,12 +261,15 @@ namespace annie {
                 s.renderObj = new WGRender(s);
             }
             s.renderObj.init();
-            window.addEventListener("resize", function (e: any) {
-                if (s.autoResize) {
-                    s.resize();
-                }
-                let event = new Event("onResize");
-                s.dispatchEvent(event);
+            window.addEventListener('orientationchange' in window ? 'orientationchange' : 'resize', function (e: any) {
+                clearTimeout(s._rid);
+                s._rid=setTimeout(function () {
+                    if (s.autoResize) {
+                        s.resize();
+                    }
+                    let event = new Event("onResize");
+                    s.dispatchEvent(event);
+                },100);
             });
             setTimeout(function () {
                 s.resize();
@@ -743,13 +746,13 @@ namespace annie {
             let s = this;
             let whObj = s.getRootDivWH(s.rootDiv);
             //这里判断
-            if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
+            //if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
                 s._updateInfo.UM=true;
-            }
+            //}
         };
 
         public getBounds(): Rectangle {

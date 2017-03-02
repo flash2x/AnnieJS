@@ -84,10 +84,7 @@ namespace annie {
                     s.responseType = "unKnow";
                 }
             }
-            let req: any = null;
-           // if (!s._req) {
-                req = new XMLHttpRequest();
-                req = s._req;
+            let req: any=new XMLHttpRequest();
                 req.withCredentials = false;
                 req.onprogress = function (event: any): void {
                     if (!event || event.loaded > 0 && event.total == 0) {
