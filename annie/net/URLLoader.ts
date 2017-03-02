@@ -152,7 +152,7 @@ namespace annie {
                                                 item=new Video(itemObj);
                                             }
                                             itemObj.preload = true;
-                                            itemObj.src = s.url;
+                                            itemObj.src = URL.createObjectURL(result);
                                         }
                                         break;
                                     case "json":

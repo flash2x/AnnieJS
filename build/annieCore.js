@@ -5944,7 +5944,7 @@ var annie;
             this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                //这里判断
+                //这里判断,因为android手机输入键盘弹出来居然会触发resize事件，操操操
                 if (annie.osType == "android" && (Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100)) {
                     return;
                 }
@@ -7884,7 +7884,7 @@ var annie;
                                             item = new annie.Video(itemObj_1);
                                         }
                                         itemObj_1.preload = true;
-                                        itemObj_1.src = s.url;
+                                        itemObj_1.src = URL.createObjectURL(result);
                                     }
                                     break;
                                 case "json":
@@ -9367,7 +9367,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.8";
+    annie.version = "1.0.7";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
