@@ -5945,13 +5945,14 @@ var annie;
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
                 //这里判断
-                //if ((s.divWidth + s.divHeight) == 0 || Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100) {
+                if (annie.osType == "android" && (Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100)) {
+                    return;
+                }
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
                 s._updateInfo.UM = true;
-                //}
             };
             var s = this;
             this._instanceType = "annie.Stage";
@@ -9366,7 +9367,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.7";
+    annie.version = "1.0.8";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

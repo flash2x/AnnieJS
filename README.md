@@ -69,6 +69,9 @@
 #如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
+##AnnieJS 1.0.8 版本
+    支持引擎在手机淘宝中的Html5环境下运行
+    修复横屏项目在部分手机无法横屏显示的bug
 ##AnnieJS 1.0.7 版本
     优化MovieClip类结构
     修复hasEventListener有时不准确的bug
@@ -162,6 +165,9 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
+## Flash2x 3.0.8
+    修复导出复杂矢量时报错的bug
+    修复导出特殊字符时报错的bug
 ## Flash2x 3.0.7
     持导出Egret相关引擎
 ## Flash2x 3.0.6
