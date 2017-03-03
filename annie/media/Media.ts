@@ -82,12 +82,16 @@ namespace annie {
                 trace(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            try{
-                WeixinJSBridge.invoke("getNetworkType",{},s._SBWeixin);
-            }catch(e){
+            let wsb:any=  window;
+            if(wsb.WeixinJSBridge) {
+                try {
+                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+                } catch (e) {
+                    s.media.play();
+                }
+            }else{
                 s.media.play();
             }
-
         }
 
         private _SBWeixin:any;

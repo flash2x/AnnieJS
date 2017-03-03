@@ -3665,10 +3665,16 @@ var annie;
                 trace(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            try {
-                WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+            var wsb = window;
+            if (wsb.WeixinJSBridge) {
+                try {
+                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+                }
+                catch (e) {
+                    s.media.play();
+                }
             }
-            catch (e) {
+            else {
                 s.media.play();
             }
         };
@@ -5944,10 +5950,6 @@ var annie;
             this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                //这里判断,因为android手机输入键盘弹出来居然会触发resize事件，操操操
-                if (annie.osType == "android" && (Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100)) {
-                    return;
-                }
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
@@ -5957,8 +5959,10 @@ var annie;
             var s = this;
             this._instanceType = "annie.Stage";
             s.stage = this;
+            var resizeEvent = "orientationchange";
             if (annie.osType == "pc") {
                 s.autoSteering = false;
+                resizeEvent = "resize";
             }
             s._lastMousePoint = new annie.Point();
             s.name = "stageInstance_" + s.instanceId;
@@ -5980,7 +5984,7 @@ var annie;
                 s.renderObj = new annie.WGRender(s);
             }
             s.renderObj.init();
-            window.addEventListener('orientationchange' in window ? 'orientationchange' : 'resize', function (e) {
+            window.addEventListener(resizeEvent, function (e) {
                 clearTimeout(s._rid);
                 s._rid = setTimeout(function () {
                     if (s.autoResize) {
@@ -5988,7 +5992,7 @@ var annie;
                     }
                     var event = new annie.Event("onResize");
                     s.dispatchEvent(event);
-                }, 100);
+                }, 200);
             });
             setTimeout(function () {
                 s.resize();
@@ -6302,11 +6306,8 @@ var annie;
         Stage.prototype.getRootDivWH = function (div) {
             var sw = div.style.width;
             var sh = div.style.height;
-            var iw = window.innerWidth
-                || document.documentElement.clientWidth
-                || document.body.clientWidth;
-            var ih = window.innerHeight || document.documentElement.clientHeight
-                || document.body.clientHeight;
+            var iw = document.body.clientWidth;
+            var ih = document.body.clientHeight;
             var vW = parseInt(sw);
             var vH = parseInt(sh);
             if (vW.toString() == "NaN") {
@@ -7885,6 +7886,7 @@ var annie;
                                         }
                                         itemObj_1.preload = true;
                                         itemObj_1.src = URL.createObjectURL(result);
+                                        itemObj_1.load();
                                     }
                                     break;
                                 case "json":

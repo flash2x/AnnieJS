@@ -153,6 +153,7 @@ namespace annie {
                                             }
                                             itemObj.preload = true;
                                             itemObj.src = URL.createObjectURL(result);
+                                            itemObj.load();
                                         }
                                         break;
                                     case "json":

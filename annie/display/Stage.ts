@@ -239,8 +239,10 @@ namespace annie {
             let s = this;
             this._instanceType = "annie.Stage";
             s.stage = this;
+            let resizeEvent="orientationchange";
             if (annie.osType == "pc") {
                 s.autoSteering = false;
+                resizeEvent="resize";
             }
             s._lastMousePoint = new Point();
             s.name = "stageInstance_" + s.instanceId;
@@ -261,15 +263,15 @@ namespace annie {
                 s.renderObj = new WGRender(s);
             }
             s.renderObj.init();
-            window.addEventListener('orientationchange' in window ? 'orientationchange' : 'resize', function (e: any) {
-                clearTimeout(s._rid);
+            window.addEventListener(resizeEvent, function (e: any) {
+               clearTimeout(s._rid);
                 s._rid=setTimeout(function () {
                     if (s.autoResize) {
                         s.resize();
                     }
                     let event = new Event("onResize");
                     s.dispatchEvent(event);
-                },100);
+                },200);
             });
             setTimeout(function () {
                 s.resize();
@@ -593,11 +595,8 @@ namespace annie {
         public getRootDivWH(div: HTMLDivElement) {
             let sw = div.style.width;
             let sh = div.style.height;
-            let iw = window.innerWidth
-                || document.documentElement.clientWidth
-                || document.body.clientWidth;
-            let ih = window.innerHeight || document.documentElement.clientHeight
-                || document.body.clientHeight;
+            let iw = document.body.clientWidth;
+            let ih = document.body.clientHeight;
             let vW = parseInt(sw);
             let vH = parseInt(sh);
             if (vW.toString() == "NaN") {
@@ -745,10 +744,6 @@ namespace annie {
         public resize = function () {
             let s = this;
             let whObj = s.getRootDivWH(s.rootDiv);
-            //这里判断,因为android手机输入键盘弹出来居然会触发resize事件，操操操
-            if(annie.osType=="android"&&(Math.abs((whObj.h + whObj.w) - (s.divWidth + s.divHeight)) < 100)) {
-                return;
-            }
             s.divHeight = whObj.h;
             s.divWidth = whObj.w;
             s.renderObj.reSize();
