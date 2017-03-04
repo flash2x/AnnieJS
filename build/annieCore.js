@@ -5949,20 +5949,19 @@ var annie;
              */
             this.resize = function () {
                 var s = this;
+                s._updateInfo.UM = true;
                 var whObj = s.getRootDivWH(s.rootDiv);
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
-                s._updateInfo.UM = true;
             };
             var s = this;
             this._instanceType = "annie.Stage";
             s.stage = this;
-            var resizeEvent = "orientationchange";
+            var resizeEvent = "resize";
             if (annie.osType == "pc") {
                 s.autoSteering = false;
-                resizeEvent = "resize";
             }
             s._lastMousePoint = new annie.Point();
             s.name = "stageInstance_" + s.instanceId;
@@ -9369,7 +9368,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.7";
+    annie.version = "1.0.8";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

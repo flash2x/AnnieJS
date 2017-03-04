@@ -239,10 +239,10 @@ namespace annie {
             let s = this;
             this._instanceType = "annie.Stage";
             s.stage = this;
-            let resizeEvent="orientationchange";
+            let resizeEvent="resize";
             if (annie.osType == "pc") {
                 s.autoSteering = false;
-                resizeEvent="resize";
+                //resizeEvent="resize";
             }
             s._lastMousePoint = new Point();
             s.name = "stageInstance_" + s.instanceId;
@@ -264,7 +264,7 @@ namespace annie {
             }
             s.renderObj.init();
             window.addEventListener(resizeEvent, function (e: any) {
-               clearTimeout(s._rid);
+                clearTimeout(s._rid);
                 s._rid=setTimeout(function () {
                     if (s.autoResize) {
                         s.resize();
@@ -303,7 +303,6 @@ namespace annie {
                 rc.addEventListener('mouseup', mouseEvent, false);
             }
         }
-
         /**
          * 刷新函数
          * @method update
@@ -742,13 +741,13 @@ namespace annie {
          * @
          */
         public resize = function () {
-            let s = this;
+            let s:Stage = this;
+            s._updateInfo.UM=true;
             let whObj = s.getRootDivWH(s.rootDiv);
             s.divHeight = whObj.h;
             s.divWidth = whObj.w;
             s.renderObj.reSize();
             s.setAlign();
-            s._updateInfo.UM=true;
         };
 
         public getBounds(): Rectangle {
