@@ -119,7 +119,7 @@ namespace annie {
                 req.onreadystatechange = function (event: any): void {
                     let t = event.target;
                     if (t["readyState"] == 4) {
-                        if (req.status == 200) {
+                        if (req.status == 200||req.status == 0) {
                             let e: Event = new Event("onComplete");
                             try {
                                 let result = t["response"];
@@ -152,7 +152,7 @@ namespace annie {
                                                 item=new Video(itemObj);
                                             }
                                             itemObj.preload = true;
-                                            itemObj.src = URL.createObjectURL(result);
+                                            itemObj.src =s.url;
                                             itemObj.load();
                                         }
                                         break;

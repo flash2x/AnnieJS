@@ -35,7 +35,6 @@ namespace annie {
         private _uniformTexture: number = 0;
         private _posAttr: number = 0;
         private _textAttr: number = 0;
-        private _curTextureId: number = -1;
         private _textures:WebGLTexture[]=[];
 
         /**

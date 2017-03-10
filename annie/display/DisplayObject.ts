@@ -266,7 +266,6 @@ namespace annie {
                 s._updateInfo.UM = true;
             }
         }
-
         private _skewY: number = 0;
 
         /**

@@ -3670,7 +3670,6 @@ declare namespace annie {
         private _uniformTexture;
         private _posAttr;
         private _textAttr;
-        private _curTextureId;
         private _textures;
         /**
          * @CanvasRender
