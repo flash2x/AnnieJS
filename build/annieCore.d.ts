@@ -3009,12 +3009,6 @@ declare namespace annie {
          */
         private _lastMousePoint;
         /**
-         * 每一次需要刷新整个引擎时积累的鼠标或触摸事件信息对象,同一刷新阶段内相同的事件类型将会被后面的同类事件覆盖
-         * @type {Object}
-         * @private
-         */
-        private _mouseEventInfo;
-        /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}
          * @private

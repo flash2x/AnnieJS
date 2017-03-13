@@ -208,12 +208,6 @@ namespace annie {
          */
         private _lastMousePoint: Point;
         /**
-         * 每一次需要刷新整个引擎时积累的鼠标或触摸事件信息对象,同一刷新阶段内相同的事件类型将会被后面的同类事件覆盖
-         * @type {Object}
-         * @private
-         */
-        private _mouseEventInfo: any = {};
-        /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}
          * @private
@@ -508,12 +502,10 @@ namespace annie {
                 if (osType == "pc") {
                     points = [e];
                 } else {
-                    points = e.targetTouches;
+                    points = e.changedTouches;
                 }
-                if (points && points.length > 0) {
-                    s._lastMousePoint.x = (points[0].clientX - points[0].target.offsetLeft) * devicePixelRatio;
-                    s._lastMousePoint.y = (points[0].clientY - points[0].target.offsetTop) * devicePixelRatio;
-                }
+                s._lastMousePoint.x = (points[0].clientX - points[0].target.offsetLeft) * devicePixelRatio;
+                s._lastMousePoint.y = (points[0].clientY - points[0].target.offsetTop) * devicePixelRatio;
                 //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                 cp = s._lastMousePoint;
                 sp = s.globalToLocal(cp, DisplayObject._bp);
@@ -542,7 +534,7 @@ namespace annie {
                             if (!s._ml[eLen]) {
                                 event = new MouseEvent("onMouseClick");
                                 s._ml[eLen] = event;
-                            } else {
+                            }else {
                                 event = s._ml[eLen];
                                 event.type = "onMouseClick";
                             }
@@ -588,64 +580,66 @@ namespace annie {
                         }
                     }
                     //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                    if (s._lastDpList) {
-                        //从第二个开始，因为第一个对象始终是stage顶级对象
-                        let len1 = s._lastDpList.length;
-                        let len2 = displayList.length;
-                        len = len1 > len2 ? len1 : len2;
-                        let isDiff = false;
-                        let overEvent: annie.MouseEvent;
-                        let outEvent: annie.MouseEvent;
-                        for (let i = 1; i < len; i++) {
-                            if (!isDiff) {
-                                if (s._lastDpList[i] != displayList[i]) {
-                                    //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
-                                    isDiff = true;
-                                    if (!s._ml[eLen]) {
-                                        overEvent = new MouseEvent("onMouseOver");
-                                        s._ml[eLen] = overEvent;
-                                    } else {
-                                        overEvent = s._ml[eLen];
-                                        overEvent.type = "onMouseOver";
+                    if(EventDispatcher.getMouseEventCount("onMouseOver") > 0||EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
+                        if (s._lastDpList) {
+                            //从第二个开始，因为第一个对象始终是stage顶级对象
+                            let len1 = s._lastDpList.length;
+                            let len2 = displayList.length;
+                            len = len1 > len2 ? len1 : len2;
+                            let isDiff = false;
+                            let overEvent: annie.MouseEvent;
+                            let outEvent: annie.MouseEvent;
+                            for (let i = 1; i < len; i++) {
+                                if (!isDiff) {
+                                    if (s._lastDpList[i] != displayList[i]) {
+                                        //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
+                                        isDiff = true;
+                                        if (!s._ml[eLen]) {
+                                            overEvent = new MouseEvent("onMouseOver");
+                                            s._ml[eLen] = overEvent;
+                                        } else {
+                                            overEvent = s._ml[eLen];
+                                            overEvent.type = "onMouseOver";
+                                        }
+                                        s._initMouseEvent(overEvent, cp, sp);
+                                        eLen++;
+                                        if (!s._ml[eLen]) {
+                                            outEvent = new MouseEvent("onMouseOut");
+                                            s._ml[eLen] = outEvent;
+                                        } else {
+                                            outEvent = s._ml[eLen];
+                                            outEvent.type = "onMouseOut";
+                                        }
+                                        s._initMouseEvent(outEvent, cp, sp);
                                     }
-                                    s._initMouseEvent(overEvent, cp, sp);
-                                    eLen++;
-                                    if (!s._ml[eLen]) {
-                                        outEvent = new MouseEvent("onMouseOut");
-                                        s._ml[eLen] = outEvent;
-                                    } else {
-                                        outEvent = s._ml[eLen];
-                                        outEvent.type = "onMouseOut";
-                                    }
-                                    s._initMouseEvent(outEvent, cp, sp);
                                 }
-                            }
-                            if (isDiff) {
-                                if (s._lastDpList[i]) {
-                                    //触发onMouseOut事件
-                                    if (outEvent["_pd"] === false) {
-                                        d = s._lastDpList[i];
-                                        if (d.hasEventListener("onMouseOut")) {
-                                            outEvent.currentTarget = d;
-                                            outEvent.target = s._lastDpList[len1 - 1];
-                                            lp = d.globalToLocal(cp);
-                                            outEvent.localX = lp.x;
-                                            outEvent.localY = lp.y;
-                                            d.dispatchEvent(outEvent);
+                                if (isDiff) {
+                                    if (s._lastDpList[i]) {
+                                        //触发onMouseOut事件
+                                        if (outEvent["_pd"] === false) {
+                                            d = s._lastDpList[i];
+                                            if (d.hasEventListener("onMouseOut")) {
+                                                outEvent.currentTarget = d;
+                                                outEvent.target = s._lastDpList[len1 - 1];
+                                                lp = d.globalToLocal(cp);
+                                                outEvent.localX = lp.x;
+                                                outEvent.localY = lp.y;
+                                                d.dispatchEvent(outEvent);
+                                            }
                                         }
                                     }
-                                }
-                                if (displayList[i]) {
-                                    //触发onMouseOver事件
-                                    if (overEvent["_pd"] === false) {
-                                        d = displayList[i];
-                                        if (d.hasEventListener("onMouseOver")) {
-                                            overEvent.currentTarget = d;
-                                            overEvent.target = displayList[len2 - 1];
-                                            lp = d.globalToLocal(cp);
-                                            overEvent.localX = lp.x;
-                                            overEvent.localY = lp.y;
-                                            d.dispatchEvent(overEvent);
+                                    if (displayList[i]) {
+                                        //触发onMouseOver事件
+                                        if (overEvent["_pd"] === false) {
+                                            d = displayList[i];
+                                            if (d.hasEventListener("onMouseOver")) {
+                                                overEvent.currentTarget = d;
+                                                overEvent.target = displayList[len2 - 1];
+                                                lp = d.globalToLocal(cp);
+                                                overEvent.localX = lp.x;
+                                                overEvent.localY = lp.y;
+                                                d.dispatchEvent(overEvent);
+                                            }
                                         }
                                     }
                                 }
@@ -654,7 +648,6 @@ namespace annie {
                     }
                     s._lastDpList = displayList;
                 }
-                s._mouseEventInfo = {};
             }
             if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
                 e.preventDefault();
@@ -792,7 +785,6 @@ namespace annie {
                 Stage.allUpdateObjList.push(target);
             }
         }
-
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj

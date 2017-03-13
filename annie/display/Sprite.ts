@@ -145,7 +145,6 @@ namespace annie{
             if (child.parent) {
                 if(!sameParent) {
                     child.parent.removeChild(child);
-                    child["_cp"]=true;
                 }else{
                      len=s.children.length;
                     for (let i = 0; i < len; i++) {
@@ -237,6 +236,7 @@ namespace annie{
             } else {
                 child = s.children.splice(index, 1)[0];
             }
+            child["_cp"]=true;
             child._onDispatchBubbledEvent("onRemoveToStage");
             child.parent=null;
         }

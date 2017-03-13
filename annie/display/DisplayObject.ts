@@ -501,7 +501,7 @@ namespace annie {
                 s.dispatchEvent(s._enterFrameEvent);
             }
             if(s._cp){
-                um=ua=uf=true;
+                s._updateInfo.UM=s._updateInfo.UA=s._updateInfo.UF=true;
                 s._cp=false;
             }
             if (s._updateInfo.UM) {
