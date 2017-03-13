@@ -3002,13 +3002,6 @@ declare namespace annie {
          */
         private _currentFlush;
         /**
-         * 最后一次有坐标点的鼠标或触摸事件，touchend事件不会有坐标点。为了弥补这个缺陷此属性应用而生
-         * @property _lastMousePoint
-         * @private
-         * @since 1.0.0
-         */
-        private _lastMousePoint;
-        /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}
          * @private

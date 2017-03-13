@@ -201,19 +201,12 @@ namespace annie {
          */
         private _currentFlush: number = 0;
         /**
-         * 最后一次有坐标点的鼠标或触摸事件，touchend事件不会有坐标点。为了弥补这个缺陷此属性应用而生
-         * @property _lastMousePoint
-         * @private
-         * @since 1.0.0
-         */
-        private _lastMousePoint: Point;
-        /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}
          * @private
          */
         private static _isLoadedVConsole: boolean = false;
-        private _lastDpList: any = [];
+        private _lastDpList: any = {};
         private _rid = -1;
 
         /**
@@ -239,7 +232,6 @@ namespace annie {
                 s.autoSteering = false;
                 //resizeEvent="resize";
             }
-            s._lastMousePoint = new Point();
             s.name = "stageInstance_" + s.instanceId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;
@@ -336,7 +328,7 @@ namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _mouseDownPoint: Point = new Point(0, 0);
+        private _mouseDownPoint:any={};
 
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point): void {
             event["_pd"] = false;
@@ -489,7 +481,7 @@ namespace annie {
             if (EventDispatcher._totalMEC > 0) {
                 let item = s._mouseEventTypes[e.type];
                 let points: any;
-                let events: any = [];
+                let events: any;
                 let event: any;
                 //stageMousePoint
                 let sp: Point;
@@ -498,155 +490,164 @@ namespace annie {
                 //clientPoint
                 let cp: Point;
                 //事件个数
-                let eLen: number = 0;
+                let eLen: number;
+                let identifier:any;
                 if (osType == "pc") {
+                    e.identifier="pc";
                     points = [e];
                 } else {
                     points = e.changedTouches;
                 }
-                s._lastMousePoint.x = (points[0].clientX - points[0].target.offsetLeft) * devicePixelRatio;
-                s._lastMousePoint.y = (points[0].clientY - points[0].target.offsetTop) * devicePixelRatio;
-                //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
-                cp = s._lastMousePoint;
-                sp = s.globalToLocal(cp, DisplayObject._bp);
-                if (EventDispatcher.getMouseEventCount(item) > 0) {
-                    if (!s._ml[eLen]) {
-                        event = new MouseEvent(item);
-                        s._ml[eLen] = event;
-                    } else {
-                        event = s._ml[eLen];
-                        event.type = item;
-                    }
-                    events.push(event);
-                    s._initMouseEvent(event, cp, sp);
-                    eLen++;
-                }
-                if (item == "onMouseDown") {
-                    s._mouseDownPoint.x = cp.x;
-                    s._mouseDownPoint.y = cp.y;
-                    //清空上次存在的显示列表
-                    s._lastDpList = null;
-                } else if (item == "onMouseUp") {
-                    if (annie.Point.distance(s._mouseDownPoint, cp) < 10) {
-                        //click事件
-                        //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                        if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                            if (!s._ml[eLen]) {
-                                event = new MouseEvent("onMouseClick");
-                                s._ml[eLen] = event;
-                            }else {
-                                event = s._ml[eLen];
-                                event.type = "onMouseClick";
-                            }
-                            events.push(event);
-                            s._initMouseEvent(event, cp, sp);
-                            eLen++;
+                for(let o=0;o<points.length;o++) {
+                    eLen=0;
+                    events=[];
+                    identifier="m"+points[o].identifier;
+                    cp=new Point((points[o].clientX - points[o].target.offsetLeft) * devicePixelRatio,(points[o].clientY - points[o].target.offsetTop) * devicePixelRatio);
+                    //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
+                    sp = s.globalToLocal(cp, DisplayObject._bp);
+                    if (EventDispatcher.getMouseEventCount(item) > 0) {
+                        if (!s._ml[eLen]) {
+                            event = new MouseEvent(item);
+                            s._ml[eLen] = event;
+                        } else {
+                            event = s._ml[eLen];
+                            event.type = item;
                         }
+                        events.push(event);
+                        s._initMouseEvent(event, cp, sp);
+                        eLen++;
                     }
-                }
-                if (eLen > 0) {
-                    //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                    let d: any = s.hitTestPoint(cp, true);
-                    let displayList: Array<DisplayObject> = [];
-                    if (d) {
-                        //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
-                        //找出真正的target,因为有些父级可能会mouseChildren=false;
-                        while (d) {
-                            if (d["mouseChildren"] === false) {
-                                //丢掉之前的层级,因为根本没用了
-                                displayList.length = 0;
-                            }
-                            displayList.push(d);
-                            d = d.parent;
-                        }
-                    } else {
-                        displayList.push(s);
-                    }
-                    let len: number = displayList.length;
-                    displayList.reverse();
-                    for (let i = 0; i < len; i++) {
-                        d = displayList[i];
-                        for (let j = 0; j < eLen; j++) {
-                            if (events[j]["_pd"] === false) {
-                                if (d.hasEventListener(events[j].type)) {
-                                    events[j].currentTarget = d;
-                                    events[j].target = displayList[len - 1];
-                                    lp = d.globalToLocal(cp);
-                                    events[j].localX = lp.x;
-                                    events[j].localY = lp.y;
-                                    d.dispatchEvent(events[j]);
+                    if (item == "onMouseDown") {
+                        s._mouseDownPoint[identifier] = cp;
+                        //清空上次存在的显示列表
+                    } else if (item == "onMouseUp") {
+                        if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
+                            //click事件
+                            //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                            if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
+                                if (!s._ml[eLen]) {
+                                    event = new MouseEvent("onMouseClick");
+                                    s._ml[eLen] = event;
+                                } else {
+                                    event = s._ml[eLen];
+                                    event.type = "onMouseClick";
                                 }
+                                events.push(event);
+                                s._initMouseEvent(event, cp, sp);
+                                eLen++;
                             }
                         }
+                        s._mouseDownPoint[identifier]=null;
+                        s._lastDpList[identifier] = null;
+                        delete s._mouseDownPoint[identifier];
+                        delete s._lastDpList[identifier];
                     }
-                    //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                    if(EventDispatcher.getMouseEventCount("onMouseOver") > 0||EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
-                        if (s._lastDpList) {
-                            //从第二个开始，因为第一个对象始终是stage顶级对象
-                            let len1 = s._lastDpList.length;
-                            let len2 = displayList.length;
-                            len = len1 > len2 ? len1 : len2;
-                            let isDiff = false;
-                            let overEvent: annie.MouseEvent;
-                            let outEvent: annie.MouseEvent;
-                            for (let i = 1; i < len; i++) {
-                                if (!isDiff) {
-                                    if (s._lastDpList[i] != displayList[i]) {
-                                        //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
-                                        isDiff = true;
-                                        if (!s._ml[eLen]) {
-                                            overEvent = new MouseEvent("onMouseOver");
-                                            s._ml[eLen] = overEvent;
-                                        } else {
-                                            overEvent = s._ml[eLen];
-                                            overEvent.type = "onMouseOver";
-                                        }
-                                        s._initMouseEvent(overEvent, cp, sp);
-                                        eLen++;
-                                        if (!s._ml[eLen]) {
-                                            outEvent = new MouseEvent("onMouseOut");
-                                            s._ml[eLen] = outEvent;
-                                        } else {
-                                            outEvent = s._ml[eLen];
-                                            outEvent.type = "onMouseOut";
-                                        }
-                                        s._initMouseEvent(outEvent, cp, sp);
+                    if (eLen > 0) {
+                        //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
+                        let d: any = s.hitTestPoint(cp, true);
+                        let displayList: Array<DisplayObject> = [];
+                        if (d) {
+                            //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
+                            //找出真正的target,因为有些父级可能会mouseChildren=false;
+                            while (d) {
+                                if (d["mouseChildren"] === false) {
+                                    //丢掉之前的层级,因为根本没用了
+                                    displayList.length = 0;
+                                }
+                                displayList.push(d);
+                                d = d.parent;
+                            }
+                        } else {
+                            displayList.push(s);
+                        }
+                        let len: number = displayList.length;
+                        displayList.reverse();
+                        for (let i = 0; i < len; i++) {
+                            d = displayList[i];
+                            for (let j = 0; j < eLen; j++) {
+                                if (events[j]["_pd"] === false) {
+                                    if (d.hasEventListener(events[j].type)) {
+                                        events[j].currentTarget = d;
+                                        events[j].target = displayList[len - 1];
+                                        lp = d.globalToLocal(cp);
+                                        events[j].localX = lp.x;
+                                        events[j].localY = lp.y;
+                                        d.dispatchEvent(events[j]);
                                     }
                                 }
-                                if (isDiff) {
-                                    if (s._lastDpList[i]) {
-                                        //触发onMouseOut事件
-                                        if (outEvent["_pd"] === false) {
-                                            d = s._lastDpList[i];
-                                            if (d.hasEventListener("onMouseOut")) {
-                                                outEvent.currentTarget = d;
-                                                outEvent.target = s._lastDpList[len1 - 1];
-                                                lp = d.globalToLocal(cp);
-                                                outEvent.localX = lp.x;
-                                                outEvent.localY = lp.y;
-                                                d.dispatchEvent(outEvent);
+                            }
+                        }
+                        //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
+                        if(item=="onMouseMove"){
+                            if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
+                                if (s._lastDpList[identifier]) {
+                                    //从第二个开始，因为第一个对象始终是stage顶级对象
+                                    let len1 = s._lastDpList[identifier].length;
+                                    let len2 = displayList.length;
+                                    len = len1 > len2 ? len1 : len2;
+                                    let isDiff = false;
+                                    let overEvent: annie.MouseEvent;
+                                    let outEvent: annie.MouseEvent;
+                                    for (let i = 1; i < len; i++) {
+                                        if (!isDiff) {
+                                            if (s._lastDpList[identifier][i] != displayList[i]) {
+                                                //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
+                                                isDiff = true;
+                                                if (!s._ml[eLen]) {
+                                                    overEvent = new MouseEvent("onMouseOver");
+                                                    s._ml[eLen] = overEvent;
+                                                } else {
+                                                    overEvent = s._ml[eLen];
+                                                    overEvent.type = "onMouseOver";
+                                                }
+                                                s._initMouseEvent(overEvent, cp, sp);
+                                                eLen++;
+                                                if (!s._ml[eLen]) {
+                                                    outEvent = new MouseEvent("onMouseOut");
+                                                    s._ml[eLen] = outEvent;
+                                                } else {
+                                                    outEvent = s._ml[eLen];
+                                                    outEvent.type = "onMouseOut";
+                                                }
+                                                s._initMouseEvent(outEvent, cp, sp);
+                                            }
+                                        }
+                                        if (isDiff) {
+                                            if (s._lastDpList[identifier][i]) {
+                                                //触发onMouseOut事件
+                                                if (outEvent["_pd"] === false) {
+                                                    d = s._lastDpList[identifier][i];
+                                                    if (d.hasEventListener("onMouseOut")) {
+                                                        outEvent.currentTarget = d;
+                                                        outEvent.target = s._lastDpList[identifier][len1 - 1];
+                                                        lp = d.globalToLocal(cp);
+                                                        outEvent.localX = lp.x;
+                                                        outEvent.localY = lp.y;
+                                                        d.dispatchEvent(outEvent);
+                                                    }
+                                                }
+                                            }
+                                            if (displayList[i]) {
+                                                //触发onMouseOver事件
+                                                if (overEvent["_pd"] === false) {
+                                                    d = displayList[i];
+                                                    if (d.hasEventListener("onMouseOver")) {
+                                                        overEvent.currentTarget = d;
+                                                        overEvent.target = displayList[len2 - 1];
+                                                        lp = d.globalToLocal(cp);
+                                                        overEvent.localX = lp.x;
+                                                        overEvent.localY = lp.y;
+                                                        d.dispatchEvent(overEvent);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                    if (displayList[i]) {
-                                        //触发onMouseOver事件
-                                        if (overEvent["_pd"] === false) {
-                                            d = displayList[i];
-                                            if (d.hasEventListener("onMouseOver")) {
-                                                overEvent.currentTarget = d;
-                                                overEvent.target = displayList[len2 - 1];
-                                                lp = d.globalToLocal(cp);
-                                                overEvent.localX = lp.x;
-                                                overEvent.localY = lp.y;
-                                                d.dispatchEvent(overEvent);
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
+                        s._lastDpList[identifier] = displayList;
                     }
-                    s._lastDpList = displayList;
                 }
             }
             if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
