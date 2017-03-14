@@ -58,11 +58,11 @@ namespace annie {
                     s.media.pause();
                 }
                 s.dispatchEvent("onPlayEnd");
-            }.bind(s), false);
+            }.bind(s));
             s.type = type.toLocaleUpperCase();
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", {currentTime: s.media.currentTime});
-            }, false);
+            });
         }
         /**
          * 开始播放媒体
@@ -72,7 +72,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public play(start: number=1, loop: number=1): void {
+        public play(start: number=0, loop: number=1): void {
             let s = this;
             s._loop = loop;
             //TODO 好像设置了也没什么用，后期再看看

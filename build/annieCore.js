@@ -3638,11 +3638,11 @@ var annie;
                     s.media.pause();
                 }
                 s.dispatchEvent("onPlayEnd");
-            }.bind(s), false);
+            }.bind(s));
             s.type = type.toLocaleUpperCase();
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
-            }, false);
+            });
         }
         /**
          * 开始播放媒体
@@ -3653,7 +3653,7 @@ var annie;
          * @since 1.0.0
          */
         Media.prototype.play = function (start, loop) {
-            if (start === void 0) { start = 1; }
+            if (start === void 0) { start = 0; }
             if (loop === void 0) { loop = 1; }
             var s = this;
             s._loop = loop;
@@ -7872,15 +7872,16 @@ var annie;
                                     else {
                                         if (s.responseType == "sound") {
                                             itemObj_1 = document.createElement("AUDIO");
+                                            itemObj_1.preload = true;
+                                            itemObj_1.src = s.url;
                                             item = new annie.Sound(itemObj_1);
                                         }
                                         else if (s.responseType == "video") {
                                             itemObj_1 = document.createElement("VIDEO");
+                                            itemObj_1.preload = true;
+                                            itemObj_1.src = s.url;
                                             item = new annie.Video(itemObj_1);
                                         }
-                                        itemObj_1.preload = true;
-                                        itemObj_1.src = s.url;
-                                        itemObj_1.load();
                                     }
                                     break;
                                 case "json":

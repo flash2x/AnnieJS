@@ -146,14 +146,15 @@ namespace annie {
                                         } else {
                                             if (s.responseType == "sound") {
                                                 itemObj = document.createElement("AUDIO");
+                                                itemObj.preload = true;
+                                                itemObj.src =s.url;
                                                 item=new Sound(itemObj);
                                             } else if (s.responseType == "video") {
                                                 itemObj = document.createElement("VIDEO");
+                                                itemObj.preload = true;
+                                                itemObj.src =s.url;
                                                 item=new Video(itemObj);
                                             }
-                                            itemObj.preload = true;
-                                            itemObj.src =s.url;
-                                            itemObj.load();
                                         }
                                         break;
                                     case "json":
