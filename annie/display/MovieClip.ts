@@ -284,11 +284,16 @@ namespace annie {
             }
         }
         private _mouseEvent=function (e:MouseEvent):void {
-            if(e.type==annie.MouseEvent.MOUSE_DOWN){
-                this.gotoAndStop(2);
+            let s=this;
+            let frame=2;
+            if(e.type=="onMouseDown"){
+                if(s.currentFrame>2){
+                    frame=3;
+                }
             }else{
-                this.gotoAndStop(1);
+                frame=1;
             }
+            s.gotoAndStop(frame);
         };
         //setLabelFrame;
         /**

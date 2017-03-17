@@ -3036,6 +3036,10 @@ var annie;
             var s = this;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
+            var image = s._cacheImg;
+            if (image.width == 0 || image.height == 0) {
+                return null;
+            }
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
             if (s._cAb) {
@@ -3045,7 +3049,7 @@ var annie;
                 var ctx = _canvas["getContext"]('2d');
                 ctx.clearRect(0, 0, 1, 1);
                 ctx.setTransform(1, 0, 0, 1, s._cacheX - p.x, s._cacheY - p.y);
-                ctx.drawImage(s._cacheImg, 0, 0);
+                ctx.drawImage(image, 0, 0);
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                     return s;
                 }
@@ -4197,12 +4201,17 @@ var annie;
             this._isNeedUpdateChildren = true;
             this._isUpdateFrame = false;
             this._mouseEvent = function (e) {
-                if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                    this.gotoAndStop(2);
+                var s = this;
+                var frame = 2;
+                if (e.type == "onMouseDown") {
+                    if (s.currentFrame > 2) {
+                        frame = 3;
+                    }
                 }
                 else {
-                    this.gotoAndStop(1);
+                    frame = 1;
                 }
+                s.gotoAndStop(frame);
             };
             var s = this;
             s._instanceType = "annie.MovieClip";

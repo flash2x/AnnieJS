@@ -896,6 +896,10 @@ namespace annie {
         public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
             let s = this;
             if (isMouseEvent && !s.mouseEnable)return null;
+            let image=s._cacheImg;
+            if(image.width==0||image.height==0){
+                return null;
+            }
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
             if (s._cAb) {
@@ -905,7 +909,7 @@ namespace annie {
                 let ctx = _canvas["getContext"]('2d');
                 ctx.clearRect(0, 0, 1, 1);
                 ctx.setTransform(1, 0, 0, 1, s._cacheX - p.x, s._cacheY - p.y);
-                ctx.drawImage(s._cacheImg, 0, 0);
+                ctx.drawImage(image, 0, 0);
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                     return s;
                 }
