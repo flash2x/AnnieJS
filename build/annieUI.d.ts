@@ -443,7 +443,7 @@ declare namespace annieUI {
          * @example
          *      var slideBox = new annieUI.SlidePage({
          *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *      isVertical: true,//默认值为true,ture为纵向,falas为横向
+         *      isVertical: true,//默认值为true,true为纵向,false为横向
          *      slideSpeed: .32,//默认值为.4，滑动速度
          *      callback:callback//滑动完成回调函数
          *       });

@@ -36,7 +36,6 @@ namespace annie {
         private _posAttr: number = 0;
         private _textAttr: number = 0;
         private _textures:WebGLTexture[]=[];
-
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -48,7 +47,6 @@ namespace annie {
             this._instanceType = "annie.WGRender";
             this._stage = stage;
         }
-
         /**
          * 开始渲染时执行
          * @method begin
@@ -70,7 +68,6 @@ namespace annie {
             gl.clear(gl.COLOR_BUFFER_BIT);
             s._textures.length=0;
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -81,7 +78,6 @@ namespace annie {
         public beginMask(target: any): void {
             //更新缓冲模板
         }
-
         /**
          * 结束遮罩时调用
          * @method endMask

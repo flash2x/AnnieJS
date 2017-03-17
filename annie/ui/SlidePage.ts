@@ -209,7 +209,7 @@ namespace annieUI {
          * @example
          *      var slideBox = new annieUI.SlidePage({
          *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *      isVertical: true,//默认值为true,ture为纵向,falas为横向
+         *      isVertical: true,//默认值为true,true为纵向,false为横向
          *      slideSpeed: .32,//默认值为.4，滑动速度
          *      callback:callback//滑动完成回调函数
          *       });
@@ -220,19 +220,19 @@ namespace annieUI {
         constructor(option: any) {
             super();
             var s = this;
-            if (!s.isArray(option['pageList'])) {
+            if (!s.isArray(option.pageList)) {
                 throw 'pageList参数数据格式不对！pageList应为页面对象列表数组';
             }
             if (!s.isFunction(option['callback'])) {
                 throw 'callback参数数据格式不对！callback应为函数';
             }
-            s.pageList = option['pageList'];
-            s.onMoveStart = option['onMoveStart'];
-            s.callback = option['callback'];
-            s.isVertical = option['isVertical'] ? option['isVertical'] : true;
-            s.canSlidePrev = option['canSlidePrev'] ? option['canSlidePrev'] : true;
-            s.canSlideNext = option['canSlideNext'] ? option['canSlideNext'] : true;
-            s.slideSpeed = option['slideSpeed'] ? option['slideSpeed'] : .4;
+            s.pageList = option.pageList;
+            s.onMoveStart = option.onMoveStart;
+            s.callback = option.callback;
+            s.isVertical = option.isVertical!=undefined ? option.isVertical : true;
+            s.canSlidePrev = option.canSlidePrev!=undefined ? option.canSlidePrev : true;
+            s.canSlideNext = option.canSlideNext!=undefined ? option.canSlideNext : true;
+            s.slideSpeed = option.slideSpeed!=undefined ? option.slideSpeed : .4;
             s.addEventListener(annie.Event.ADD_TO_STAGE, s.onAddToStage.bind(s));
             // console.log(s);
         }

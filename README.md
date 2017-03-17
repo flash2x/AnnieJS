@@ -69,6 +69,9 @@
 #如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 #AnnieJS 版本更新列表
+##AnnieJS 1.0.9 版本
+    进一步优化声音
+    修复annieUI.SlidePage类设置横向滑动失效的问题
 ##AnnieJS 1.0.8 版本
     如果是老版本项目升级上来的，请将index.html头部样式表里加上'height:100%'
     支持引擎在多个流行APP中的Html5环境下运行

@@ -276,7 +276,8 @@ namespace annie {
             s.mouseChildren=false;
             //将mc设置成按钮形式
             if(s.totalFrames>1) {
-                s.gotoAndStop(1);
+                // s.gotoAndStop(1);
+                s._scriptLayer[0] = function(){s.stop()};
                 s.addEventListener("onMouseDown",this._mouseEvent.bind(this));
                 s.addEventListener("onMouseUp",this._mouseEvent.bind(this));
                 s.addEventListener("onMouseOut",this._mouseEvent.bind(this));
