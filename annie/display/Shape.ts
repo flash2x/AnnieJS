@@ -761,18 +761,18 @@ namespace annie {
                             }
                         }
                         if (leftX != undefined) {
-                            s._bounds.width=buttonRightX - leftX;
-                            s._bounds.height=buttonRightY - leftY;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
                             buttonRightY += 20 + lineWidth >> 1;
                             let w = buttonRightX - leftX;
                             let h = buttonRightY - leftY;
+                            s._cacheX = leftX;
+                            s._cacheY = leftY;
+                            s._bounds.width=w-10;
+                            s._bounds.height=h-10;
                             if (s._cAb){
                                 ///////////////////////////
-                                s._cacheX = leftX;
-                                s._cacheY = leftY;
                                 let _canvas = s._cacheImg;
                                 let ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
@@ -914,6 +914,8 @@ namespace annie {
                     return s;
                 }
             }else{
+                p.x-=s._cacheX;
+                p.y-=s._cacheY;
                 if (s.getBounds().isPointIn(p)){
                     return s;
                 }
