@@ -19,19 +19,20 @@ namespace annie {
          * @type {any}
          * @default null
          */
-        public rootContainer:any=null;
-        private _ctx:any;
-        private _stage:Stage;
+        public rootContainer: any = null;
+        private _ctx: any;
+        private _stage: Stage;
+
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
-        public constructor(stage:Stage){
+        public constructor(stage: Stage) {
             super();
-            this._instanceType="annie.CanvasRender";
-            this._stage=stage;
+            this._instanceType = "annie.CanvasRender";
+            this._stage = stage;
         }
 
         /**
@@ -40,17 +41,18 @@ namespace annie {
          * @since 1.0.0
          * @public
          */
-        public begin():void{
-            let s=this;
-            let c=s.rootContainer;
+        public begin(): void {
+            let s = this;
+            let c = s.rootContainer;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
                 s._ctx.fillRect(0, 0, c.width + 1, c.height + 1);
-            }else{
+            } else {
                 s._ctx.clearRect(0, 0, c.width + 1, c.height + 1);
             }
         }
+
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -58,36 +60,38 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginMask(target:any):void{
-            let s:CanvasRender=this;
+        public beginMask(target: any): void {
+            let s: CanvasRender = this;
             let isHadPath = false;
-            if(target.children&&target.children.length>0){
-                target=target.children[0];
+            if (target.children && target.children.length > 0) {
+                target = target.children[0];
             }
-            if(target._command&&target._command.length>0){
+            if (target._command && target._command.length > 0) {
                 s._ctx.save();
-                s._ctx.globalAlpha=0;
-                let tm=target.cMatrix;
+                s._ctx.globalAlpha = 0;
+                let tm = target.cMatrix;
                 s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                target._drawShape(s._ctx,true);
+                target._drawShape(s._ctx, true);
                 s._ctx.restore();
                 isHadPath = true;
             }
             //和后面endMask的restore对应
             s._ctx.save();
-            if(isHadPath) {
+            if (isHadPath) {
                 s._ctx.clip();
             }
         }
+
         /**
          * 结束遮罩时调用
          * @method endMask
          * @public
          * @since 1.0.0
          */
-        public endMask():void{
+        public endMask(): void {
             this._ctx.restore();
         }
+
         /**
          * 调用渲染
          * @public
@@ -96,52 +100,42 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
-        public draw(target:any, type:number):void{
+        public draw(target: any, type: number): void {
             let s = this;
-            //没有更新的视觉不渲染
-            //s._ctx.save();
-            s._ctx.globalAlpha = target.cAlpha;
-            let tm=target.cMatrix;
-            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (type == 0) {
-                //图片
-                if(target._cacheImg){
+            //不可见的视觉不渲染
+            let ctx = s._ctx;
+            ctx.globalAlpha = target.cAlpha;
+            let tm = target.cMatrix;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if ((type == 1) && (!target._cAb)) {
+                target._drawShape(ctx);
+            } else {
+                let texture = target._cacheImg;
+                if (texture && texture.width > 0 && texture.height > 0) {
                     let tr = target.rect;
-                    //因为如果有滤镜的话是重新画了图的,所以尺寸什么的跟SpriteSheet无关了
-                    if (tr&&!target._isCache){
-                        s._ctx.drawImage(target._cacheImg, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
+                    if (type == 0 && tr && !target._isCache) {
+                        ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
                     } else {
-                        s._ctx.translate(target._cacheX,target._cacheY);
-                        s._ctx.drawImage(target._cacheImg, 0, 0);
-                    }
-                }
-            } else{
-                //矢量和文字
-                if((type==1)&&(!target._cAb)){
-                    target._drawShape(s._ctx);
-                }else {
-                    if (target._cacheImg) {
-                        //需要渲染缓存
-                        s._ctx.translate(target._cacheX, target._cacheY);
-                        s._ctx.drawImage(target._cacheImg, 0, 0);
+                        ctx.translate(target._cacheX, target._cacheY);
+                        ctx.drawImage(texture, 0, 0);
                     }
                 }
             }
-            //s._ctx.restore();
         }
+
         /**
          * 初始化渲染器
          * @public
          * @since 1.0.0
          * @method init
          */
-        public init():void {
+        public init(): void {
             let s = this;
-            if(!s.rootContainer) {
+            if (!s.rootContainer) {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
             }
-            let c=s.rootContainer;
+            let c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
         }
 
@@ -151,11 +145,11 @@ namespace annie {
          * @since 1.0.0
          * @method reSize
          */
-        public reSize():void{
-            let s=this;
-            let c=s.rootContainer;
-            c.width = s._stage.divWidth *devicePixelRatio;
-            c.height = s._stage.divHeight *devicePixelRatio;
+        public reSize(): void {
+            let s = this;
+            let c = s.rootContainer;
+            c.width = s._stage.divWidth * devicePixelRatio;
+            c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
         }

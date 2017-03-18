@@ -13,7 +13,6 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._cacheImg=window.document.createElement("canvas");
         }
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -331,6 +330,14 @@ namespace annie {
             let s = this;
             s._command = [];
             s._isNeedUpdate = true;
+            if(s._cacheImg) {
+                s._cacheImg.width = 0;
+                s._cacheImg.height = 0;
+            }
+            s._cacheX = 0;
+            s._cacheY = 0;
+            s._bounds.width=0;
+            s._bounds.height=0;
         }
 
         /**
@@ -641,7 +648,7 @@ namespace annie {
         public render(renderObj: IRender): void {
             let s = this;
             //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
-            if (s._cacheImg.width > 0&&!s._updateInfo.UM) {
+            if (!s._updateInfo.UM) {
                 renderObj.draw(s, 1);
             }
             //super.render();
@@ -773,7 +780,12 @@ namespace annie {
                             s._bounds.height=h-10;
                             if (s._cAb){
                                 ///////////////////////////
+                                if(!s._cacheImg) {
+                                    s._cacheImg = window.document.createElement("canvas");
+                                }
                                 let _canvas = s._cacheImg;
+                                //给webgl更新新
+                                s._cacheImg.updateTexture=true;
                                 let ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;
@@ -814,23 +826,9 @@ namespace annie {
                                     ctx.putImageData(imageData, 0, 0);
                                 }
                             }
-                            //
-                        } else {
-                            s._cacheImg.width = 0;
-                            s._cacheImg.height = 0;
-                            s._cacheX = 0;
-                            s._cacheY = 0;
                         }
-
-                    } else {
-                        s._cacheImg.width = 0;
-                        s._cacheImg.height = 0;
-                        s._cacheX = 0;
-                        s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
-                    //给webgl更新新
-                    s._cacheImg.updateTexture=true;
 
                 }
                 s._updateInfo.UM = false;
@@ -896,13 +894,13 @@ namespace annie {
         public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
             let s = this;
             if (isMouseEvent && !s.mouseEnable)return null;
-            let image=s._cacheImg;
-            if(image.width==0||image.height==0){
-                return null;
-            }
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
             if (s._cAb) {
+                let image=s._cacheImg;
+                if(!image||image.width==0||image.height==0){
+                    return null;
+                }
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;

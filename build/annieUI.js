@@ -1000,6 +1000,7 @@ var annieUI;
             s.stage.addEventListener(MouseEvent.MOUSE_UP, s.onMouseUp.bind(s));
             s.stage.addEventListener(MouseEvent.MOUSE_MOVE, s.onMouseMove.bind(s));
             s.addEventListener(Event.ENTER_FRAME, s.onEnterFrame.bind(s));
+            s.isCacheShape = false;
         };
         FlipBook.prototype.drawPage = function (num, movePoint) {
             var s = this;

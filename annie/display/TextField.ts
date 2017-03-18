@@ -162,11 +162,7 @@ namespace annie {
          * @since 1.0.0
          */
         public render(renderObj:IRender):void {
-            let s = this;
-            if(s._cacheImg.width>0){
-                renderObj.draw(s, 2);
-            }
-            //super.render();
+            renderObj.draw(this, 2);
         }
         /**
          * 重写 update

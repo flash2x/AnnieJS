@@ -2044,11 +2044,7 @@ var annie;
          */
         Bitmap.prototype.render = function (renderObj) {
             var s = this;
-            if (s.visible && s.cAlpha > 0) {
-                if (s._cacheImg) {
-                    renderObj.draw(s, 0);
-                }
-            }
+            renderObj.draw(s, 0);
             //super.render();
         };
         /**
@@ -2304,7 +2300,6 @@ var annie;
                 }
             };
             this._instanceType = "annie.Shape";
-            this._cacheImg = window.document.createElement("canvas");
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
@@ -2609,6 +2604,14 @@ var annie;
             var s = this;
             s._command = [];
             s._isNeedUpdate = true;
+            if (s._cacheImg) {
+                s._cacheImg.width = 0;
+                s._cacheImg.height = 0;
+            }
+            s._cacheX = 0;
+            s._cacheY = 0;
+            s._bounds.width = 0;
+            s._bounds.height = 0;
         };
         /**
          * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
@@ -2770,7 +2773,7 @@ var annie;
         Shape.prototype.render = function (renderObj) {
             var s = this;
             //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
-            if (s._cacheImg.width > 0 && !s._updateInfo.UM) {
+            if (!s._updateInfo.UM) {
                 renderObj.draw(s, 1);
             }
             //super.render();
@@ -2906,7 +2909,12 @@ var annie;
                             s._bounds.height = h - 10;
                             if (s._cAb) {
                                 ///////////////////////////
+                                if (!s._cacheImg) {
+                                    s._cacheImg = window.document.createElement("canvas");
+                                }
                                 var _canvas = s._cacheImg;
+                                //给webgl更新新
+                                s._cacheImg.updateTexture = true;
                                 var ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;
@@ -2949,22 +2957,8 @@ var annie;
                                 }
                             }
                         }
-                        else {
-                            s._cacheImg.width = 0;
-                            s._cacheImg.height = 0;
-                            s._cacheX = 0;
-                            s._cacheY = 0;
-                        }
-                    }
-                    else {
-                        s._cacheImg.width = 0;
-                        s._cacheImg.height = 0;
-                        s._cacheX = 0;
-                        s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
-                    //给webgl更新新
-                    s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -3036,13 +3030,13 @@ var annie;
             var s = this;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            var image = s._cacheImg;
-            if (image.width == 0 || image.height == 0) {
-                return null;
-            }
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
             if (s._cAb) {
+                var image = s._cacheImg;
+                if (!image || image.width == 0 || image.height == 0) {
+                    return null;
+                }
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
@@ -3441,41 +3435,41 @@ var annie;
          */
         Sprite.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.visible) {
-                _super.prototype.update.call(this, um, ua, uf);
-                if (s._updateInfo.UM) {
-                    um = true;
-                }
-                if (s._updateInfo.UA) {
-                    ua = true;
-                }
-                if (s._updateInfo.UF) {
-                    uf = true;
-                }
-                var len = s.children.length;
-                var child = void 0;
-                var maskObjIds = [];
-                for (var i = len - 1; i >= 0; i--) {
-                    child = s.children[i];
-                    //更新遮罩
-                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
-                        child.mask.parent = s;
-                        if (s.totalFrames && child.mask.totalFrames) {
-                            child.mask.gotoAndStop(s.currentFrame);
-                            //一定要为true
-                            child.mask.update(true);
-                        }
-                        else {
-                            child.mask.update(um);
-                        }
-                        maskObjIds.push(child.mask.instanceId);
-                    }
-                    child.update(um, ua, uf);
-                }
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
-                s._updateInfo.UF = false;
+            //if(s.visible){
+            _super.prototype.update.call(this, um, ua, uf);
+            if (s._updateInfo.UM) {
+                um = true;
             }
+            if (s._updateInfo.UA) {
+                ua = true;
+            }
+            if (s._updateInfo.UF) {
+                uf = true;
+            }
+            var len = s.children.length;
+            var child;
+            var maskObjIds = [];
+            for (var i = len - 1; i >= 0; i--) {
+                child = s.children[i];
+                //更新遮罩
+                if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
+                    child.mask.parent = s;
+                    if (s.totalFrames && child.mask.totalFrames) {
+                        child.mask.gotoAndStop(s.currentFrame);
+                        //一定要为true
+                        child.mask.update(true);
+                    }
+                    else {
+                        child.mask.update(um);
+                    }
+                    maskObjIds.push(child.mask.instanceId);
+                }
+                child.update(um, ua, uf);
+            }
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
+            s._updateInfo.UF = false;
+            //}
         };
         /**
          * 重写碰撞测试
@@ -5195,11 +5189,7 @@ var annie;
          * @since 1.0.0
          */
         TextField.prototype.render = function (renderObj) {
-            var s = this;
-            if (s._cacheImg.width > 0) {
-                renderObj.draw(s, 2);
-            }
-            //super.render();
+            renderObj.draw(this, 2);
         };
         /**
          * 重写 update
@@ -7246,39 +7236,27 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target, type) {
             var s = this;
-            //没有更新的视觉不渲染
-            //s._ctx.save();
-            s._ctx.globalAlpha = target.cAlpha;
+            //不可见的视觉不渲染
+            var ctx = s._ctx;
+            ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;
-            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (type == 0) {
-                //图片
-                if (target._cacheImg) {
-                    var tr = target.rect;
-                    //因为如果有滤镜的话是重新画了图的,所以尺寸什么的跟SpriteSheet无关了
-                    if (tr && !target._isCache) {
-                        s._ctx.drawImage(target._cacheImg, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
-                    }
-                    else {
-                        s._ctx.translate(target._cacheX, target._cacheY);
-                        s._ctx.drawImage(target._cacheImg, 0, 0);
-                    }
-                }
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if ((type == 1) && (!target._cAb)) {
+                target._drawShape(ctx);
             }
             else {
-                //矢量和文字
-                if ((type == 1) && (!target._cAb)) {
-                    target._drawShape(s._ctx);
-                }
-                else {
-                    if (target._cacheImg) {
-                        //需要渲染缓存
-                        s._ctx.translate(target._cacheX, target._cacheY);
-                        s._ctx.drawImage(target._cacheImg, 0, 0);
+                var texture = target._cacheImg;
+                if (texture && texture.width > 0 && texture.height > 0) {
+                    var tr = target.rect;
+                    if (type == 0 && tr && !target._isCache) {
+                        ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
+                    }
+                    else {
+                        ctx.translate(target._cacheX, target._cacheY);
+                        ctx.drawImage(texture, 0, 0);
                     }
                 }
             }
-            //s._ctx.restore();
         };
         /**
          * 初始化渲染器
@@ -7522,70 +7500,72 @@ var annie;
         WGRender.prototype.draw = function (target, type) {
             var s = this;
             var img = target._cacheImg;
-            var gl = s._gl;
-            var gi;
-            if (img.updateTexture && target._glInfo) {
-                gi = target._glInfo;
-            }
-            else {
-                gi = {};
-                var tc = target.rect;
-                if (type == 0 && tc) {
-                    gi.x = tc.x / img.width;
-                    gi.y = tc.y / img.height;
-                    gi.w = (tc.x + tc.width) / img.width;
-                    gi.h = (tc.y + tc.height) / img.height;
-                    gi.pw = tc.width;
-                    gi.ph = tc.height;
+            if (img && img.width > 0 && img.height > 0) {
+                var gl = s._gl;
+                var gi = void 0;
+                if (img.updateTexture && target._glInfo) {
+                    gi = target._glInfo;
                 }
                 else {
-                    var cX = target._cacheX;
-                    var cY = target._cacheY;
-                    gi.x = cX / img.width;
-                    gi.y = cY / img.height;
-                    gi.w = (img.width - cX) / img.width;
-                    gi.h = (img.height - cY) / img.height;
-                    gi.pw = (img.width - cX * 2);
-                    gi.ph = (img.height - cY * 2);
+                    gi = {};
+                    var tc = target.rect;
+                    if (type == 0 && tc) {
+                        gi.x = tc.x / img.width;
+                        gi.y = tc.y / img.height;
+                        gi.w = (tc.x + tc.width) / img.width;
+                        gi.h = (tc.y + tc.height) / img.height;
+                        gi.pw = tc.width;
+                        gi.ph = tc.height;
+                    }
+                    else {
+                        var cX = target._cacheX;
+                        var cY = target._cacheY;
+                        gi.x = cX / img.width;
+                        gi.y = cY / img.height;
+                        gi.w = (img.width - cX) / img.width;
+                        gi.h = (img.height - cY) / img.height;
+                        gi.pw = (img.width - cX * 2);
+                        gi.ph = (img.height - cY * 2);
+                    }
+                    target._glInfo = gi;
                 }
-                target._glInfo = gi;
-            }
-            ////////////////////////////////////////////
-            var vertices = [
-                //x,y,textureX,textureY
-                0.0, 0.0, gi.x, gi.y,
-                gi.pw, 0.0, gi.w, gi.y,
-                0.0, gi.ph, gi.x, gi.h,
-                gi.pw, gi.ph, gi.w, gi.h
-            ];
-            var m;
-            if (type > 0) {
-                m = s._cM;
-                m.identity();
-                if (type == 2) {
-                    m.tx = target._cacheX * 2;
-                    m.ty = target._cacheY * 2;
+                ////////////////////////////////////////////
+                var vertices = [
+                    //x,y,textureX,textureY
+                    0.0, 0.0, gi.x, gi.y,
+                    gi.pw, 0.0, gi.w, gi.y,
+                    0.0, gi.ph, gi.x, gi.h,
+                    gi.pw, gi.ph, gi.w, gi.h
+                ];
+                var m = void 0;
+                if (type > 0) {
+                    m = s._cM;
+                    m.identity();
+                    if (type == 2) {
+                        m.tx = target._cacheX * 2;
+                        m.ty = target._cacheY * 2;
+                    }
+                    else {
+                        m.tx = -img.width;
+                        m.ty = -img.height;
+                    }
+                    m.prepend(target.cMatrix);
                 }
                 else {
-                    m.tx = -img.width;
-                    m.ty = -img.height;
+                    m = target.cMatrix;
                 }
-                m.prepend(target.cMatrix);
+                var vMatrix = new Float32Array([
+                    m.a, m.b, 0,
+                    m.c, m.d, 0,
+                    m.tx, m.ty, 1
+                ]);
+                gl.uniform1i(s._uniformTexture, s.createTexture(img));
+                s.setBuffer(s._buffer, new Float32Array(vertices));
+                gl.uniform1f(s._uA, target.cAlpha);
+                gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
+                gl.uniformMatrix3fv(s._vMI, false, vMatrix);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             }
-            else {
-                m = target.cMatrix;
-            }
-            var vMatrix = new Float32Array([
-                m.a, m.b, 0,
-                m.c, m.d, 0,
-                m.tx, m.ty, 1
-            ]);
-            gl.uniform1i(s._uniformTexture, s.createTexture(img));
-            s.setBuffer(s._buffer, new Float32Array(vertices));
-            gl.uniform1f(s._uA, target.cAlpha);
-            gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
-            gl.uniformMatrix3fv(s._vMI, false, vMatrix);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
         WGRender.prototype.getActiveId = function () {
             for (var i = 0; i < this._maxTextureCount; i++) {

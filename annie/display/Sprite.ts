@@ -261,7 +261,7 @@ namespace annie{
          */
         public update(um: boolean, ua: boolean, uf: boolean):void {
             let s:any = this;
-            if(s.visible) {
+            if(s.visible){
                 super.update(um, ua, uf);
                 if (s._updateInfo.UM) {
                     um = true;

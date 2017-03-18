@@ -91,11 +91,7 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s = this;
-            if (s.visible && s.cAlpha > 0) {
-                if (s._cacheImg) {
-                    renderObj.draw(s, 0);
-                }
-            }
+            renderObj.draw(s, 0);
             //super.render();
         }
 

@@ -117,6 +117,7 @@ namespace annieUI {
             s.stage.addEventListener(MouseEvent.MOUSE_UP, s.onMouseUp.bind(s));
             s.stage.addEventListener(MouseEvent.MOUSE_MOVE, s.onMouseMove.bind(s));
             s.addEventListener(Event.ENTER_FRAME, s.onEnterFrame.bind(s));
+            s.isCacheShape=false;
         }
         private drawPage(num: number, movePoint: Point): void {
             let s = this;
