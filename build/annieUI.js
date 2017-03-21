@@ -1202,6 +1202,7 @@ var annieUI;
                     s.dispatchEvent("onFlipStart");
                 }
             }
+            e.updateAfterEvent();
         };
         FlipBook.prototype.onMouseUp = function (e) {
             var s = this;

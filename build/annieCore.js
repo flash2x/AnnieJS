@@ -524,6 +524,15 @@ var annie;
             this._instanceType = "annie.MouseEvent";
         }
         /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        MouseEvent.prototype.updateAfterEvent = function () {
+            this.target.stage._uae = true;
+        };
+        /**
          * 鼠标或者手指按下事件
          * @property MOUSE_DOWN
          * @static
@@ -635,6 +644,15 @@ var annie;
             this.rotate = 0;
             this._instanceType = "annie.TouchEvent";
         }
+        /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        TouchEvent.prototype.updateAfterEvent = function () {
+            this.target.stage._uae = true;
+        };
         /**
          * @property TOUCH_BEGIN
          * @static
@@ -2215,7 +2233,7 @@ var annie;
              */
             this._command = [];
             this._isNeedUpdate = true;
-            this._cAb = true;
+            this._cAb = false;
             /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
@@ -2415,7 +2433,6 @@ var annie;
             if (rTR === void 0) { rTR = 0; }
             if (rBL === void 0) { rBL = 0; }
             if (rBR === void 0) { rBR = 0; }
-            //let ctx = DisplayObject._canvas.getContext("2d");
             var max = (w < h ? w : h) / 2;
             var mTL = 0, mTR = 0, mBR = 0, mBL = 0;
             if (rTL < 0) {
@@ -2788,8 +2805,6 @@ var annie;
             var s = this;
             if (s.visible) {
                 _super.prototype.update.call(this, um, ua, uf);
-                if (s.parent)
-                    s.cacheAsBitmap = s.parent.isCacheShape;
                 if (s._isNeedUpdate || uf || s._updateInfo.UF) {
                     //更新缓存
                     var cLen = s._command.length;
@@ -3197,15 +3212,6 @@ var annie;
              * @readonly
              */
             this.children = [];
-            /**
-             * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
-             * @property isCacheShape
-             * @since 1.0.5
-             * @type {boolean}
-             * @public
-             * @default true
-             */
-            this.isCacheShape = true;
             this._instanceType = "annie.Sprite";
         }
         /**
@@ -3435,41 +3441,41 @@ var annie;
          */
         Sprite.prototype.update = function (um, ua, uf) {
             var s = this;
-            //if(s.visible){
-            _super.prototype.update.call(this, um, ua, uf);
-            if (s._updateInfo.UM) {
-                um = true;
-            }
-            if (s._updateInfo.UA) {
-                ua = true;
-            }
-            if (s._updateInfo.UF) {
-                uf = true;
-            }
-            var len = s.children.length;
-            var child;
-            var maskObjIds = [];
-            for (var i = len - 1; i >= 0; i--) {
-                child = s.children[i];
-                //更新遮罩
-                if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
-                    child.mask.parent = s;
-                    if (s.totalFrames && child.mask.totalFrames) {
-                        child.mask.gotoAndStop(s.currentFrame);
-                        //一定要为true
-                        child.mask.update(true);
-                    }
-                    else {
-                        child.mask.update(um);
-                    }
-                    maskObjIds.push(child.mask.instanceId);
+            if (s.visible) {
+                _super.prototype.update.call(this, um, ua, uf);
+                if (s._updateInfo.UM) {
+                    um = true;
                 }
-                child.update(um, ua, uf);
+                if (s._updateInfo.UA) {
+                    ua = true;
+                }
+                if (s._updateInfo.UF) {
+                    uf = true;
+                }
+                var len = s.children.length;
+                var child = void 0;
+                var maskObjIds = [];
+                for (var i = len - 1; i >= 0; i--) {
+                    child = s.children[i];
+                    //更新遮罩
+                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
+                        child.mask.parent = s;
+                        if (s.totalFrames && child.mask.totalFrames) {
+                            child.mask.gotoAndStop(s.currentFrame);
+                            //一定要为true
+                            child.mask.update(true);
+                        }
+                        else {
+                            child.mask.update(um);
+                        }
+                        maskObjIds.push(child.mask.instanceId);
+                    }
+                    child.update(um, ua, uf);
+                }
+                s._updateInfo.UM = false;
+                s._updateInfo.UA = false;
+                s._updateInfo.UF = false;
             }
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-            s._updateInfo.UF = false;
-            //}
         };
         /**
          * 重写碰撞测试
@@ -4890,12 +4896,7 @@ var annie;
             var o = s.htmlElement;
             if (o) {
                 var style = o.style;
-                var visible = s.visible;
-                var parent_1 = s.parent;
-                while (visible && parent_1) {
-                    visible = parent_1.visible;
-                    parent_1 = parent_1.parent;
-                }
+                var visible = s._visible;
                 var show = visible ? "block" : "none";
                 if (show != style.display) {
                     style.display = show;
@@ -5813,6 +5814,12 @@ var annie;
             this._lastDpList = {};
             this._rid = -1;
             /**
+             * 鼠标事件后强制更新
+             * @type {boolean}
+             * @private
+             */
+            this._uae = false;
+            /**
              * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
              * @private
@@ -6057,6 +6064,10 @@ var annie;
                 }
                 if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
                     e.preventDefault();
+                }
+                if (s._uae) {
+                    s.update(true, true, true);
+                    s._uae = false;
                 }
             };
             /**

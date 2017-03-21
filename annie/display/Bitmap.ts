@@ -103,7 +103,7 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
-            if (s.visible) {
+            if (s.visible){
                 super.update(um, ua, uf);
                 //滤镜
                 if (s._isNeedUpdate || uf || s._updateInfo.UF) {

@@ -437,6 +437,13 @@ declare namespace annie {
          * @param {string} type
          */
         constructor(type: string);
+        /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        updateAfterEvent(): void;
     }
 }
 /**
@@ -496,6 +503,13 @@ declare namespace annie {
          * @param {string} type
          */
         constructor(type: string);
+        /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        updateAfterEvent(): void;
     }
 }
 /**
@@ -1750,15 +1764,6 @@ declare namespace annie {
          */
         addChild(child: DisplayObject): void;
         /**
-         * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
-         * @property isCacheShape
-         * @since 1.0.5
-         * @type {boolean}
-         * @public
-         * @default true
-         */
-        isCacheShape: boolean;
-        /**
          * 从Sprite中移除一个child
          * @method removeChild
          * @public
@@ -3009,6 +3014,12 @@ declare namespace annie {
         private static _isLoadedVConsole;
         private _lastDpList;
         private _rid;
+        /**
+         * 鼠标事件后强制更新
+         * @type {boolean}
+         * @private
+         */
+        private _uae;
         /**
          * 显示对象入口函数
          * @method Stage

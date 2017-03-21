@@ -208,6 +208,12 @@ namespace annie {
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
         private _rid = -1;
+        /**
+         * 鼠标事件后强制更新
+         * @type {boolean}
+         * @private
+         */
+        private _uae=false;
 
         /**
          * 显示对象入口函数
@@ -655,6 +661,10 @@ namespace annie {
             }
             if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
                 e.preventDefault();
+            }
+            if(s._uae){
+                s.update(true,true,true);
+                s._uae=false;
             }
         };
         /**

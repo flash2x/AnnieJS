@@ -111,7 +111,6 @@ namespace annie {
                 this.htmlElement = null;
             }
         }
-
         /**
          * 重写刷新
          * @method update
@@ -124,12 +123,7 @@ namespace annie {
             let o = s.htmlElement;
             if (o) {
                 let style = o.style;
-                let visible = s.visible;
-                let parent = s.parent;
-                while (visible && parent) {
-                    visible = parent.visible;
-                    parent = parent.parent;
-                }
+                let visible = s._visible;
                 let show = visible ? "block" : "none";
                 if (show != style.display) {
                     style.display = show;

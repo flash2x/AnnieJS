@@ -73,7 +73,7 @@ namespace annie {
          */
         private set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
         private get cacheAsBitmap(){return this._cAb;}
-        private _cAb:boolean=true;
+        private _cAb:boolean=false;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -131,7 +131,6 @@ namespace annie {
          * @since 1.0.0
          */
         public drawRoundRect(x: number, y: number, w: number, h: number, rTL: number = 0, rTR: number = 0, rBL: number = 0, rBR: number = 0): void {
-            //let ctx = DisplayObject._canvas.getContext("2d");
             let max = (w < h ? w : h) / 2;
             let mTL = 0, mTR = 0, mBR = 0, mBL = 0;
             if (rTL < 0) {
@@ -664,7 +663,6 @@ namespace annie {
             let s = this;
             if(s.visible) {
                 super.update(um, ua, uf);
-                if(s.parent)s.cacheAsBitmap=s.parent.isCacheShape;
                 if (s._isNeedUpdate || uf||s._updateInfo.UF){
                     //更新缓存
                     let cLen: number = s._command.length;
