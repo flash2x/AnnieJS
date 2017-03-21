@@ -1,4 +1,4 @@
-# AnnieJS(官方交流探讨QQ群:185090134)
+#AnnieJS(官方交流探讨QQ群:185090134)
 ## [AnnieJS 官网:http://www.annie2x.com](http://www.annie2x.com)
 ## [Flash2x 官网:http://www.flash2x.org](http://www.flash2x.org)
 ## [AnnieJS API文档:http://api.annie2x.com](http://api.annie2x.com) 
@@ -10,7 +10,7 @@
     AnnieJS 最大的优势就是短小精悍。全部核心代码压缩后不到70k，该有的功能都有了。
     AnnieJS 需要结合Adobe 及 Flash2x工具使用才能发挥它最大的优势。
     Flash2x 是一款优秀的Adobe Flash插件。
-# 相比Flash自带的CreateJs有什么区别和优势
+#相比Flash自带的CreateJs有什么区别和优势
     不得不承认CreateJs非常的优秀，但是它当初不是以移动优先的原则设计的，大量的逻辑和判断代码针对移动端没有任何意义。
     CreateJs鼠标穿透非常让人头疼，上层的显示对象无法阻断事件会一直往下冒泡，非常讨厌。
     CreateJs鼠标事件也是非常让人头疼，如果你的按钮是有透明的地方或者说接近透明的地方，那么这个地方根本无法获取到鼠标事件
@@ -143,7 +143,7 @@
     增加annie.Tween 中的loop循环参数
     增加annie.Rectangle 中testRectCross方法 检测矩形相交
     进一步优化引擎内核
-## AnnieJS 1.0.1 版本更新列表
+##AnnieJS 1.0.1 版本更新列表
     修复静态文本多行显示不正确bug
     URLLoader支持泛型跨域
     修复了Tween中的两个命名不规范的静态缓动方法名
@@ -171,31 +171,31 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 #Flash2x 版本更新列表
-## Flash2x 3.0.8
+##Flash2x 3.0.8
     修复导出复杂矢量时报错的bug
     修复导出特殊字符时报错的bug
-## Flash2x 3.0.7
+##Flash2x 3.0.7
     持导出Egret相关引擎
-## Flash2x 3.0.6
+##Flash2x 3.0.6
     修复静态文本多行时只导出第一行的bug
     支持动态文本边框导出
     支持导出LayaBox相关引擎
     修复导出文本时有双引号会报错的bug
     修复在animate cc 2017中导出中英数混全文本时导出不全的bug
-## Flash2x 3.0.5
+##Flash2x 3.0.5
     少量优化导出结构
-## Flash2x 3.0.4
+##Flash2x 3.0.4
     更新gulp构建模式下支持将fla打包成一个单独的swf资源文件供html5调用，实现一个fla生成一个swf文件别无其他资源文件的完美解决方案
-## Flash2x 3.0.3
+##Flash2x 3.0.3
     更新AnnieJS引擎及相应的模板包
-## Flash2x 3.0.2
+##Flash2x 3.0.2
     支持Flash Canvas 文档导出
     增加对单帧的动画剪辑的时间轴上的代码脚本导出
-## Flash2x 3.0.1
+##Flash2x 3.0.1
     修复导出矢量图时偶尔报错的bug
     修复多行静态文本导出后只显示一行的bug
     修复了清除缓存模式下Main.js没有被清除缓存的bug
     修复导出序列视频annie.ImageVideo会抖动的bug
-## Flash2x 3.0.0
+##Flash2x 3.0.0
     支持将flash以上所提到的资源和功能导出，以提供给AnnieJS引擎使用。
     支持自定义开发功能，给需要想导出成其他引擎的开发者开发使用。
