@@ -202,28 +202,13 @@ namespace annie {
                         }
                     }
                     if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
-                        realLines.push(hardLines[0]);
                         let str = hardLines[0];
-                        let lineW = s._getMeasuredWidth(str);
-                        if (lineW > s.lineWidth) {
-                            let w = s._getMeasuredWidth(str[0]);
-                            let lineStr = str[0];
-                            let wordW = 0;
-                            let strLen = str.length;
-                            for (let j = 1; j < strLen; j++) {
-                                wordW = ctx.measureText(str[j]).width;
-                                w += wordW;
-                                if (w > s.lineWidth) {
-                                    realLines[0] = lineStr;
-                                    break;
-                                } else {
-                                    lineStr += str[j];
-                                }
-                            }
-                        }
+                        s.lineWidth = s._getMeasuredWidth(str);
+                        realLines.push(str);
                     } else {
                         for (let i = 0, l = hardLines.length; i < l; i++) {
                             let str = hardLines[i];
+                            if(!str)continue;
                             let w = s._getMeasuredWidth(str[0]);
                             let lineStr = str[0];
                             let wordW = 0;

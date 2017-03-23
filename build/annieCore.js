@@ -5232,30 +5232,15 @@ var annie;
                         }
                     }
                     if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
-                        realLines.push(hardLines[0]);
                         var str = hardLines[0];
-                        var lineW = s._getMeasuredWidth(str);
-                        if (lineW > s.lineWidth) {
-                            var w = s._getMeasuredWidth(str[0]);
-                            var lineStr = str[0];
-                            var wordW = 0;
-                            var strLen = str.length;
-                            for (var j = 1; j < strLen; j++) {
-                                wordW = ctx.measureText(str[j]).width;
-                                w += wordW;
-                                if (w > s.lineWidth) {
-                                    realLines[0] = lineStr;
-                                    break;
-                                }
-                                else {
-                                    lineStr += str[j];
-                                }
-                            }
-                        }
+                        s.lineWidth = s._getMeasuredWidth(str);
+                        realLines.push(str);
                     }
                     else {
                         for (var i = 0, l = hardLines.length; i < l; i++) {
                             var str = hardLines[i];
+                            if (!str)
+                                continue;
                             var w = s._getMeasuredWidth(str[0]);
                             var lineStr = str[0];
                             var wordW = 0;
