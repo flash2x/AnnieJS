@@ -1901,10 +1901,7 @@ var annie;
              * @return {number}
              */
             get: function () {
-                var s = this;
-                s.update(false, false, false);
-                var dr = s.getDrawRect();
-                return dr.width;
+                return this.getWH().width;
             },
             set: function (value) {
                 var s = this;
@@ -1927,10 +1924,7 @@ var annie;
              * @return {number}
              */
             get: function () {
-                var s = this;
-                s.update(false, false, false);
-                var dr = s.getDrawRect();
-                return dr.height;
+                return this.getWH().height;
             },
             set: function (value) {
                 var s = this;
@@ -1943,6 +1937,20 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @returns {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        DisplayObject.prototype.getWH = function () {
+            var s = this;
+            s.update(false, false, false);
+            var dr = s.getDrawRect();
+            s._updateInfo.UM = true;
+            return { width: dr.width, height: dr.height };
+        };
         /**
          * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
          * @type {annie.Point}
@@ -2048,7 +2056,13 @@ var annie;
              * @default null
              */
             get: function () { return this._bitmapData; },
-            set: function (value) { this._bitmapData = value; this._isNeedUpdate = true; },
+            set: function (value) {
+                this._bitmapData = value;
+                this._isNeedUpdate = true;
+                if (!value) {
+                    this._bounds.width = this._bounds.height = 0;
+                }
+            },
             enumerable: true,
             configurable: true
         });
@@ -2076,7 +2090,8 @@ var annie;
             if (s.visible) {
                 _super.prototype.update.call(this, um, ua, uf);
                 //滤镜
-                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                var bitmapData = s._bitmapData;
+                if ((s._isNeedUpdate || uf || s._updateInfo.UF) && bitmapData) {
                     s._isNeedUpdate = false;
                     if (s.cFilters.length > 0) {
                         if (!s._realCacheImg) {
@@ -2084,8 +2099,8 @@ var annie;
                         }
                         var _canvas = s._realCacheImg;
                         var tr = s.rect;
-                        var w = tr ? tr.width : s.bitmapData.width;
-                        var h = tr ? tr.height : s.bitmapData.height;
+                        var w = tr ? tr.width : bitmapData.width;
+                        var h = tr ? tr.height : bitmapData.height;
                         var newW = w + 20;
                         var newH = h + 20;
                         _canvas.width = newW;
@@ -2135,9 +2150,11 @@ var annie;
                         s._isCache = false;
                         s._cacheX = 0;
                         s._cacheY = 0;
-                        s._cacheImg = s._bitmapData;
+                        s._cacheImg = bitmapData;
                     }
                     //给webgl更新新
+                    s._bounds.width = s._cacheImg.width + s._cacheX * 2;
+                    s._bounds.height = s._cacheImg.height + s._cacheY * 2;
                     s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UF = false;
@@ -2155,16 +2172,7 @@ var annie;
          */
         Bitmap.prototype.getBounds = function () {
             var s = this;
-            var r = new annie.Rectangle();
-            if (s.rect) {
-                r.width = s.rect.width;
-                r.height = s.rect.height;
-            }
-            else {
-                r.width = s.bitmapData ? s.bitmapData.width : 0;
-                r.height = s.bitmapData ? s.bitmapData.height : 0;
-            }
-            return r;
+            return s._bounds;
         };
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
@@ -5894,7 +5902,7 @@ var annie;
                         cp = new annie.Point((points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio, (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio);
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
-                        if (annie.EventDispatcher.getMouseEventCount(item) > 0) {
+                        if (annie.EventDispatcher.getMouseEventCount() > 0) {
                             if (!s._ml[eLen]) {
                                 event_3 = new annie.MouseEvent(item);
                                 s._ml[eLen] = event_3;
@@ -5928,10 +5936,6 @@ var annie;
                                     eLen++;
                                 }
                             }
-                            s._mouseDownPoint[identifier] = null;
-                            s._lastDpList[identifier] = null;
-                            delete s._mouseDownPoint[identifier];
-                            delete s._lastDpList[identifier];
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
@@ -5970,7 +5974,7 @@ var annie;
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                            if (item == "onMouseMove") {
+                            if (item != "onMouseDown") {
                                 if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                     if (s._lastDpList[identifier]) {
                                         //从第二个开始，因为第一个对象始终是stage顶级对象
@@ -6040,7 +6044,15 @@ var annie;
                                     }
                                 }
                             }
-                            s._lastDpList[identifier] = displayList;
+                            if (item == "onMouseUp") {
+                                s._mouseDownPoint[identifier] = null;
+                                s._lastDpList[identifier] = null;
+                                delete s._mouseDownPoint[identifier];
+                                delete s._lastDpList[identifier];
+                            }
+                            else {
+                                s._lastDpList[identifier] = displayList;
+                            }
                         }
                     }
                 }
@@ -7833,10 +7845,11 @@ var annie;
                 var t = event.target;
                 if (t["readyState"] == 4) {
                     if (req.status == 200 || req.status == 0) {
-                        var e = new annie.Event("onComplete");
+                        var isImage = false;
+                        var e_1 = new annie.Event("onComplete");
                         try {
                             var result = t["response"];
-                            e.data = { type: s.responseType, response: null };
+                            e_1.data = { type: s.responseType, response: null };
                             var item = void 0;
                             switch (s.responseType) {
                                 case "css":
@@ -7849,10 +7862,12 @@ var annie;
                                 case "video":
                                     var itemObj_1;
                                     if (s.responseType == "image") {
+                                        isImage = true;
                                         itemObj_1 = document.createElement("img");
                                         itemObj_1.onload = function () {
                                             URL.revokeObjectURL(itemObj_1.src);
                                             itemObj_1.onload = null;
+                                            s.dispatchEvent(e_1);
                                         };
                                         itemObj_1.src = URL.createObjectURL(result);
                                         item = itemObj_1;
@@ -7886,14 +7901,15 @@ var annie;
                                     item = result;
                                     break;
                             }
-                            e.data["response"] = item;
+                            e_1.data["response"] = item;
                             s.data = null;
                             s.responseType = "";
                         }
-                        catch (e) {
+                        catch (error) {
                             s.dispatchEvent("onError", { id: 1, msg: "服务器返回信息有误" });
                         }
-                        s.dispatchEvent(e);
+                        if (!isImage)
+                            s.dispatchEvent(e_1);
                     }
                     else {
                         //服务器返回报错

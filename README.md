@@ -74,6 +74,10 @@
     修复annie.Shape画线在手机端会报错的bug
     修复annie.Shape在不缓存成位置下的点击区域失效的bug
     修复annie.TextField多行默认值为空时报错的bug
+    修复annie.URLLoader加载Image后获取宽高为0的bug
+    修复annie.Bitmap设置bitmapData为null时渲染报错的bug
+    修复annie.MouseEvent onMouseOver onMouseOut 偶尔会不触发的bug
+    新增了annie.MouseEvent annie.TouchEvent的updateAfterEvent方法
     优化按钮元件鼠标按下后的状态，以前是按下后固定跳到第二个状态。现在优化成如果有第三个状态，则跳到第三个，没有的话再跳到第二个
 ##AnnieJS 1.0.8 版本
     如果是老版本项目升级上来的，请将index.html头部样式表里加上'height:100%'

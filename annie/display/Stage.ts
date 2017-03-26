@@ -511,7 +511,7 @@ namespace annie {
                     cp=new Point((points[o].clientX - points[o].target.offsetLeft) * devicePixelRatio,(points[o].clientY - points[o].target.offsetTop) * devicePixelRatio);
                     //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                     sp = s.globalToLocal(cp, DisplayObject._bp);
-                    if (EventDispatcher.getMouseEventCount(item) > 0) {
+                    if (EventDispatcher.getMouseEventCount() > 0) {
                         if (!s._ml[eLen]) {
                             event = new MouseEvent(item);
                             s._ml[eLen] = event;
@@ -543,10 +543,6 @@ namespace annie {
                                 eLen++;
                             }
                         }
-                        s._mouseDownPoint[identifier]=null;
-                        s._lastDpList[identifier] = null;
-                        delete s._mouseDownPoint[identifier];
-                        delete s._lastDpList[identifier];
                     }
                     if (eLen > 0) {
                         //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
@@ -584,7 +580,7 @@ namespace annie {
                             }
                         }
                         //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                        if(item=="onMouseMove"){
+                        if(item!="onMouseDown"){
                             if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                 if (s._lastDpList[identifier]) {
                                     //从第二个开始，因为第一个对象始终是stage顶级对象
@@ -652,7 +648,14 @@ namespace annie {
                                 }
                             }
                         }
-                        s._lastDpList[identifier] = displayList;
+                        if(item=="onMouseUp"){
+                            s._mouseDownPoint[identifier]=null;
+                            s._lastDpList[identifier] = null;
+                            delete s._mouseDownPoint[identifier];
+                            delete s._lastDpList[identifier];
+                        }else {
+                            s._lastDpList[identifier] = displayList;
+                        }
                     }
                 }
             }

@@ -174,7 +174,7 @@ namespace annie {
         public update(um: boolean, ua: boolean, uf: boolean):void {
             super.update(um,ua,uf);
             let s:any = this;
-            if(s.visible) {
+            if(s.visible){
                 for (let item in s._cacheObject) {
                     if (s._cacheObject[item] != s[item]) {
                         s._cacheObject[item] = s[item];

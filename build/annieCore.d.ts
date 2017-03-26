@@ -1199,6 +1199,17 @@ declare namespace annie {
          */
         height: number;
         /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @returns {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        getWH(): {
+            width: number;
+            height: number;
+        };
+        /**
          * 画缓存位图的时候需要使用
          * @property _bitmapCanvas
          * @private

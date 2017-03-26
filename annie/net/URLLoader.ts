@@ -120,6 +120,7 @@ namespace annie {
                     let t = event.target;
                     if (t["readyState"] == 4) {
                         if (req.status == 200||req.status == 0) {
+                            let isImage:boolean=false;
                             let e: Event = new Event("onComplete");
                             try {
                                 let result = t["response"];
@@ -136,10 +137,12 @@ namespace annie {
                                     case "video":
                                         let itemObj:any;
                                         if (s.responseType == "image") {
+                                            isImage=true;
                                             itemObj = document.createElement("img");
                                             itemObj.onload = function () {
                                                 URL.revokeObjectURL(itemObj.src);
                                                 itemObj.onload = null;
+                                                s.dispatchEvent(e);
                                             };
                                             itemObj.src = URL.createObjectURL(result);
                                             item=itemObj;
@@ -174,10 +177,10 @@ namespace annie {
                                 e.data["response"] = item;
                                 s.data = null;
                                 s.responseType = "";
-                            } catch (e) {
+                            } catch (error) {
                                 s.dispatchEvent("onError", {id: 1, msg: "服务器返回信息有误"});
                             }
-                            s.dispatchEvent(e);
+                            if(!isImage)s.dispatchEvent(e);
                         } else {
                             //服务器返回报错
                             s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});

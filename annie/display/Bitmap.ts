@@ -24,7 +24,13 @@ namespace annie {
          */
       
         public get bitmapData():any{return this._bitmapData};
-        public set bitmapData(value:any){this._bitmapData=value;this._isNeedUpdate=true;}
+        public set bitmapData(value:any){
+            this._bitmapData=value;
+            this._isNeedUpdate=true;
+            if(!value){
+                this._bounds.width=this._bounds.height=0;
+            }
+        }
         private _bitmapData:any = null;
         private _realCacheImg:any=null;
         private _isNeedUpdate:boolean=true;
@@ -106,7 +112,8 @@ namespace annie {
             if (s.visible){
                 super.update(um, ua, uf);
                 //滤镜
-                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                let bitmapData=s._bitmapData;
+                if ((s._isNeedUpdate || uf || s._updateInfo.UF)&&bitmapData) {
                     s._isNeedUpdate = false;
                     if (s.cFilters.length > 0) {
                         if (!s._realCacheImg) {
@@ -114,8 +121,8 @@ namespace annie {
                         }
                         let _canvas = s._realCacheImg;
                         let tr = s.rect;
-                        let w = tr ? tr.width : s.bitmapData.width;
-                        let h = tr ? tr.height : s.bitmapData.height;
+                        let w = tr ? tr.width : bitmapData.width;
+                        let h = tr ? tr.height : bitmapData.height;
                         let newW = w + 20;
                         let newH = h + 20;
                         _canvas.width = newW;
@@ -163,9 +170,11 @@ namespace annie {
                         s._isCache = false;
                         s._cacheX = 0;
                         s._cacheY = 0;
-                        s._cacheImg = s._bitmapData;
+                        s._cacheImg = bitmapData;
                     }
                     //给webgl更新新
+                    s._bounds.width=s._cacheImg.width+s._cacheX*2;
+                    s._bounds.height=s._cacheImg.height+s._cacheY*2;
                     s._cacheImg.updateTexture=true;
                 }
                 s._updateInfo.UF = false;
@@ -184,15 +193,7 @@ namespace annie {
          */
         public getBounds(): Rectangle {
             let s = this;
-            let r = new Rectangle();
-            if (s.rect) {
-                r.width = s.rect.width;
-                r.height = s.rect.height;
-            } else {
-                r.width = s.bitmapData ? s.bitmapData.width : 0;
-                r.height = s.bitmapData ? s.bitmapData.height : 0;
-            }
-            return r;
+            return s._bounds;
         }
 
         /**

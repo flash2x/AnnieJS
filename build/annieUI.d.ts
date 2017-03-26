@@ -53,11 +53,11 @@ declare namespace annieUI {
         /**
          * @property 滚动距离
          * @type {number}
-         * @private
+         * @protected
          * @default 0
          * @since 1.0.0
          */
-        private distance;
+        protected distance: number;
         /**
          * 最小鼠标滑动距离
          * @type {number}
@@ -90,11 +90,11 @@ declare namespace annieUI {
         /**
          * 速度
          * @property speed
-         * @private
+         * @protected
          * @since 1.0.0
          * @type {number}
          */
-        private speed;
+        protected speed: number;
         /**
          * 加速度
          * @property addSpeed
@@ -130,7 +130,7 @@ declare namespace annieUI {
          * @type {number}
          */
         fSpeed: number;
-        private paramXY;
+        protected paramXY: string;
         private stopTimes;
         private isMouseDown;
         /**
@@ -591,5 +591,49 @@ declare namespace annieUI {
         private arc(argR, argN1, argN2);
         private angle(target1, target2);
         private pos(target1, target2);
+    }
+}
+/**
+ * Created by anlun on 16/8/14.
+ */
+/**
+ * @module annieUI
+ */
+declare namespace annieUI {
+    import DisplayObject = annie.DisplayObject;
+    interface IScrollListItem extends DisplayObject {
+        initData(id: number, data: Array<any>): void;
+        id: number;
+        data: number;
+    }
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.ScrollPage
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
+    class ScrollList extends ScrollPage {
+        private _items;
+        private _itemsDis;
+        private _itemCount;
+        private _isInit;
+        private _data;
+        /**
+         * 构造函数
+         * @method  ScrollList
+         * @param {number}vW 可视区域宽
+         * @param {number}vH 可视区域高
+         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @example
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *          s.addChild(s.sPage);
+         *          s.sPage.view.addChild(new home.Content());
+         *          s.sPage.y=s.stage.viewRect.y;
+         *          s.sPage.mouseEnable=false;
+         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
+         */
+        constructor(itemClassName: any, itemDis: number, vW: number, vH: number, isVertical?: boolean);
+        updateData(data: Array<any>): void;
     }
 }
