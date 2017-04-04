@@ -12,7 +12,7 @@ namespace Flash2x {
     import BlurFilter=annie.BlurFilter;
     import ShadowFilter=annie.ShadowFilter;
     import ColorMatrixFilter=annie.ColorMatrixFilter;
-    export let _isReleased=false;
+    export let _isReleased = false;
     /**
      * 存储加载资源的总对象
      * @type {Object}
@@ -91,19 +91,25 @@ namespace Flash2x {
      */
     export let loadScene = function (sceneName: any, progressFun: Function, completeFun: Function, domain: string = ""): void {
         //加载资源配置文件
-        if (_isLoading) {
-            _JSONQueue.loadCancel();
-            _loaderQueue.loadCancel();
-        }
+        // if (_isLoading) {
+        //     _JSONQueue.loadCancel();
+        //     _loaderQueue.loadCancel();
+        // }
         _loadSceneNames = [];
         if (domain == undefined) {
             domain = "";
         }
         _domain = domain;
+        let info: any = {};
         if (typeof(sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
                 _loadSceneNames.push(sceneName);
                 res[sceneName] = new Object();
+            }else{
+                info.sceneName = sceneName;
+                info.sceneId = 1;
+                info.sceneTotal =1;
+                completeFun(info);
             }
         }
         else {
@@ -112,13 +118,15 @@ namespace Flash2x {
                 if (!isLoadedScene(sceneName[i])) {
                     res[sceneName[i]] = new Object();
                     _loadSceneNames.push(sceneName[i]);
+                }else{
+                    info.sceneName = sceneName[i];
+                    info.sceneId = i+1;
+                    info.sceneTotal =len;
+                    completeFun(info);
                 }
             }
         }
         if (_loadSceneNames.length == 0) {
-            if (completeFun) {
-                completeFun();
-            }
             return;
         }
         if (!_isInited) {
@@ -128,7 +136,7 @@ namespace Flash2x {
             _loaderQueue = new URLLoader();
             _loaderQueue.addEventListener(Event.COMPLETE, _onRESComplete);
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
-            _isInited=true;
+            _isInited = true;
         }
         _loadPer = 0;
         _loadIndex = 0;
@@ -138,23 +146,25 @@ namespace Flash2x {
         _completeCallback = completeFun;
         _progressCallback = progressFun;
         _currentConfig = [];
-        if(!_isReleased) {
+        if (!_isReleased) {
             _loadConfig();
-        }else{
+        } else {
             //加载正式的单个文件
             _loadIndex = 0;
-            _totalLoadRes=_loadSceneNames.length;
+            _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
-            for(let i=0;i<_totalLoadRes;i++) {
-                _currentConfig.push([{src:"src/"+_loadSceneNames[i]+".swf"}]);
+            for (let i = 0; i < _totalLoadRes; i++) {
+                _currentConfig.push([{src: "src/" + _loadSceneNames[i] + ".swf"}]);
             }
             _loadRes();
         }
     };
+
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
-    function onCFGComplete(e: Event): void{
+
+    function onCFGComplete(e: Event): void {
         //配置文件加载完成
         let resList: any = e.data.response;
         _currentConfig.push(resList);
@@ -170,36 +180,39 @@ namespace Flash2x {
             _loadRes();
         }
     }
+
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
+
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
-        if(!_isReleased){
+        if (!_isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
                 res[scene][_currentConfig[_loadIndex][0].id] = e.data.response;
             }
-        }else{
-            var F2x:any=Flash2x;
-            var JSResItem:any=F2x[scene+"Res"];
-            for(var item in JSResItem){
-                var resItem:any;
-                if(JSResItem[item].indexOf("audio/")>0){
-                    resItem=new annie.Sound(JSResItem[item]);
-                }else if(JSResItem[item].indexOf("image/")>0){
-                    resItem=new Image();
-                    resItem.src=JSResItem[item];
-                }else{
-                    resItem=JSON.parse(JSResItem[item]);
+        } else {
+            var F2x: any = Flash2x;
+            var JSResItem: any = F2x[scene + "Res"];
+            for (var item in JSResItem) {
+                var resItem: any;
+                if (JSResItem[item].indexOf("audio/") > 0) {
+                    resItem = new annie.Sound(JSResItem[item]);
+                } else if (JSResItem[item].indexOf("image/") > 0) {
+                    resItem = new Image();
+                    resItem.src = JSResItem[item];
+                } else {
+                    resItem = JSON.parse(JSResItem[item]);
                 }
-                res[scene][item]=resItem;
+                res[scene][item] = resItem;
             }
-            delete F2x[scene+"Res"];
+            delete F2x[scene + "Res"];
         }
         _checkComplete();
     }
+
     function _checkComplete() {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -224,11 +237,12 @@ namespace Flash2x {
             }
         }
     }
+
     function _loadRes(): void {
-        let url=_domain + _currentConfig[_loadIndex][0].src;
-        if(_isReleased){
-            _loaderQueue.responseType="js";
-            url+="?v="+_isReleased;
+        let url = _domain + _currentConfig[_loadIndex][0].src;
+        if (_isReleased) {
+            _loaderQueue.responseType = "js";
+            url += "?v=" + _isReleased;
         }
         _loaderQueue.load(url);
     }
@@ -359,7 +373,7 @@ namespace Flash2x {
         }
         if (extendInfo && extendInfo.length > 0) {
             let index = 0;
-            let filters:any = [];
+            let filters: any = [];
             while (extendInfo[index] != undefined) {
                 if (extendInfo[index] == 0) {
                     filters.push(new ColorFilter(extendInfo[index + 1], extendInfo[index + 2], extendInfo[index + 3], extendInfo[index + 4], extendInfo[index + 5], extendInfo[index + 6], extendInfo[index + 7], extendInfo[index + 8]));
@@ -384,7 +398,7 @@ namespace Flash2x {
                     index += 5;
                 }
             }
-            display.filters=filters;
+            display.filters = filters;
         }
     }
 
@@ -425,15 +439,15 @@ namespace Flash2x {
             textObj.bold = bold;
             textObj.color = color;
             textObj.lineType = lineType;
-            textObj.border=showBorder;
+            textObj.border = showBorder;
         } else {
             textObj = new annie.InputText(lineType);
             textObj.initInfo(text, width, height, color, align, size, face, showBorder, lineSpacing / size);
             if (italic) {
-                textObj.italic=true;
+                textObj.italic = true;
             }
             if (bold) {
-                textObj.bold=true;
+                textObj.bold = true;
             }
         }
         return textObj;
@@ -492,7 +506,7 @@ namespace Flash2x {
         }
         if (strokeObj) {
             if (strokeObj.type == 0) {
-                shape.beginStroke(strokeObj.color, strokeObj.lineWidth,strokeObj.caps, strokeObj.joints, strokeObj.miter);
+                shape.beginStroke(strokeObj.color, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             } else if (strokeObj.type == 1) {
                 shape.beginRadialGradientStroke(strokeObj.gradient[0], strokeObj.gradient[1], strokeObj.points, strokeObj.lineWidth, strokeObj.caps, strokeObj.joints, strokeObj.miter);
             } else if (strokeObj.type == 2) {
@@ -559,7 +573,7 @@ namespace Flash2x {
         }
         urlLoader.load(info.url);
     }
-    let jsonpScript:any=null;
+
     /**
      * jsonp调用方法
      * @method jsonp
@@ -574,29 +588,29 @@ namespace Flash2x {
      *          trace(result);
      *      })
      */
-    export function jsonp(url:string,type:number,callbackName:string,callbackFun:any){
-        let w:any=window;
-        if(type==1){
-            w[callbackName]=callbackFun;
+    export function jsonp(url: string, type: number, callbackName: string, callbackFun: any) {
+        let w: any = window;
+        if (type == 1) {
+            w[callbackName] = callbackFun;
         }
-        if(!jsonpScript){
-            jsonpScript=document.createElement('script');
-            jsonpScript.onload=function (){
-                if(type==0) {
-                    callbackFun(w[callbackName]);
-                }
-                jsonpScript.src="";
-                w[callbackName]=null;
-                delete w[callbackName];
-            };
-            document.getElementsByTagName('head')[0].appendChild(jsonpScript);
+        let jsonpScript: any = document.createElement('script');
+        let head:any=document.getElementsByTagName('head')[0];
+        jsonpScript.onload = function (e:any) {
+            if (type == 0) {
+                callbackFun(w[callbackName]);
+            }
+            e.path[0].src = "";
+            w[callbackName] = null;
+            delete w[callbackName];
+            head.removeChild(e.path[0]);
+        };
+        head.appendChild(jsonpScript);
+        let param: string;
+        if (url.indexOf("?") > 0) {
+            param = "&";
+        } else {
+            param = "?";
         }
-        let param:string;
-        if(url.indexOf("?")>0) {
-            param="&";
-        }else{
-            param="?";
-        }
-        jsonpScript.src = url + param+"a_n_n_i_e="+Math.random()+"&callback="+callbackName;
+        jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
     }
 }

@@ -139,7 +139,7 @@ declare namespace annieUI {
          * @since 1.0.2
          * @type {boolean}
          * @private
-         * @default false;
+         * @default false
          */
         private autoScroll;
         /**
@@ -619,6 +619,10 @@ declare namespace annieUI {
         private _itemCount;
         private _isInit;
         private _data;
+        private gp;
+        private lp;
+        private downL;
+        loadingView: DisplayObject;
         /**
          * 构造函数
          * @method  ScrollList
@@ -635,5 +639,6 @@ declare namespace annieUI {
          */
         constructor(itemClassName: any, itemDis: number, vW: number, vH: number, isVertical?: boolean);
         updateData(data: Array<any>): void;
+        setLoading(downLoading: DisplayObject): void;
     }
 }

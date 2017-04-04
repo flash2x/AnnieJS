@@ -77,6 +77,8 @@
     修复annie.URLLoader加载Image后获取宽高为0的bug
     修复annie.Bitmap设置bitmapData为null时渲染报错的bug
     修复annie.MouseEvent onMouseOver onMouseOut 偶尔会不触发的bug
+    修复Flash2x.jsonp不能同时调用多次的bug
+    修复再次Flash2x.loadScene同一场景时报错的bug
     新增了annie.MouseEvent annie.TouchEvent的updateAfterEvent方法
     优化按钮元件鼠标按下后的状态，以前是按下后固定跳到第二个状态。现在优化成如果有第三个状态，则跳到第三个，没有的话再跳到第二个
 ##AnnieJS 1.0.8 版本

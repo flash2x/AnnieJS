@@ -7844,7 +7844,7 @@ var annie;
             req.onreadystatechange = function (event) {
                 var t = event.target;
                 if (t["readyState"] == 4) {
-                    if (req.status == 200 || req.status == 0) {
+                    if (req.status == 200) {
                         var isImage = false;
                         var e_1 = new annie.Event("onComplete");
                         try {
@@ -8071,19 +8071,26 @@ var Flash2x;
     Flash2x.loadScene = function (sceneName, progressFun, completeFun, domain) {
         if (domain === void 0) { domain = ""; }
         //加载资源配置文件
-        if (_isLoading) {
-            _JSONQueue.loadCancel();
-            _loaderQueue.loadCancel();
-        }
+        // if (_isLoading) {
+        //     _JSONQueue.loadCancel();
+        //     _loaderQueue.loadCancel();
+        // }
         _loadSceneNames = [];
         if (domain == undefined) {
             domain = "";
         }
         _domain = domain;
+        var info = {};
         if (typeof (sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
                 _loadSceneNames.push(sceneName);
                 res[sceneName] = new Object();
+            }
+            else {
+                info.sceneName = sceneName;
+                info.sceneId = 1;
+                info.sceneTotal = 1;
+                completeFun(info);
             }
         }
         else {
@@ -8093,12 +8100,15 @@ var Flash2x;
                     res[sceneName[i]] = new Object();
                     _loadSceneNames.push(sceneName[i]);
                 }
+                else {
+                    info.sceneName = sceneName[i];
+                    info.sceneId = i + 1;
+                    info.sceneTotal = len;
+                    completeFun(info);
+                }
             }
         }
         if (_loadSceneNames.length == 0) {
-            if (completeFun) {
-                completeFun();
-            }
             return;
         }
         if (!_isInited) {
@@ -8567,7 +8577,6 @@ var Flash2x;
         urlLoader.load(info.url);
     }
     Flash2x.ajax = ajax;
-    var jsonpScript = null;
     /**
      * jsonp调用方法
      * @method jsonp
@@ -8587,18 +8596,18 @@ var Flash2x;
         if (type == 1) {
             w[callbackName] = callbackFun;
         }
-        if (!jsonpScript) {
-            jsonpScript = document.createElement('script');
-            jsonpScript.onload = function () {
-                if (type == 0) {
-                    callbackFun(w[callbackName]);
-                }
-                jsonpScript.src = "";
-                w[callbackName] = null;
-                delete w[callbackName];
-            };
-            document.getElementsByTagName('head')[0].appendChild(jsonpScript);
-        }
+        var jsonpScript = document.createElement('script');
+        var head = document.getElementsByTagName('head')[0];
+        jsonpScript.onload = function (e) {
+            if (type == 0) {
+                callbackFun(w[callbackName]);
+            }
+            e.path[0].src = "";
+            w[callbackName] = null;
+            delete w[callbackName];
+            head.removeChild(e.path[0]);
+        };
+        head.appendChild(jsonpScript);
         var param;
         if (url.indexOf("?") > 0) {
             param = "&";

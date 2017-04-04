@@ -24,6 +24,12 @@ namespace annieUI {
         private _itemCount:number;
         private _isInit:boolean=false;
         private _data:Array<any>=[];
+        private gp:any=new annie.Point();
+        private lp:any=new annie.Point();
+        private downL:DisplayObject=null;
+        public get loadingView():DisplayObject{
+            return this.downL;
+        }
         /**
          * 构造函数
          * @method  ScrollList
@@ -45,7 +51,7 @@ namespace annieUI {
             s._itemCount =Math.ceil(s.distance/itemDis)+2;
             s._items=[];
             s._itemsDis=itemDis;
-            s.maxSpeed<itemDis*0.8;
+            s.maxSpeed=itemDis*0.8;
             for(let i=0;i<s._itemCount;i++){
                 let item=new itemClassName();
                 item.visible=false;
@@ -55,29 +61,32 @@ namespace annieUI {
             }
             s.addEventListener(annie.Event.ENTER_FRAME,function (e:annie.Event) {
                 if (s.speed!=0){
-                    let gp:any=new annie.Point();
-                    let lp:any=new annie.Point();
                     let item:any=null;
                     if(s.speed<0){
                         item=s._items[0];
                     }else{
                         item=s._items[s._items.length-1];
                     }
+                    let lp=s.lp;
+                    let gp=s.gp;
                     lp.x=item.x;
                     lp.y=item.y;
                     s.view.localToGlobal(lp,gp);
                     s.globalToLocal(gp,lp);
+                    let newId:number=0;
                     if(s.speed<0){
                         lp[s.paramXY]+=s._itemsDis;
-                        if(lp[s.paramXY]<0&&item.id+s._itemCount<s._data.length){
+                        newId=item.id+s._itemCount;
+                        if(lp[s.paramXY]<0&&newId<s._data.length){
                             //向上求数据
-                            item.initData(item.id+s._itemCount,s._data[item.id+s._itemCount]);
+                            item.initData(newId,s._data[newId]);
                             item[s.paramXY]=item.id*s._itemsDis;
                             s._items.push(s._items.shift());
                         }
                     }else{
-                        if(lp[s.paramXY]>(s._itemCount-2)*s._itemsDis&&item.id-s._itemCount>=0){
-                            item.initData(item.id-s._itemCount,s._data[item.id-s._itemCount]);
+                        newId=item.id-s._itemCount;
+                        if(lp[s.paramXY]>(s._itemCount-2)*s._itemsDis&&newId>=0){
+                            item.initData(newId,s._data[newId]);
                             item[s.paramXY]=item.id*s._itemsDis;
                             s._items.unshift(s._items.pop());
                         }
@@ -86,7 +95,7 @@ namespace annieUI {
             });
         }
         public updateData(data:Array<any>):void{
-            let s=this;
+            let s:any=this;
             if(!s._isInit){
                 s._data=data;
                 for(let i=0;i<data.length&&i<s._itemCount;i++){
@@ -98,6 +107,29 @@ namespace annieUI {
                 s._data=s._data.concat(data);
             }
             s.maxDistance=s._data.length*s._itemsDis;
+            if(s.downL){
+                s.downL[s.paramXY]=Math.max(s.distance,s.maxDistance);
+                var wh=s.downL.getWH();
+                s.maxDistance+=(s.paramXY=="x"?wh.width:wh.height);
+            }
+        }
+        public setLoading(downLoading:DisplayObject):void{
+            let s:any=this;
+            if(s.downL){
+                s.view.removeChild(s.downL);
+                let wh=s.downL.getWH();
+                s.maxDistance-=(s.paramXY=="x"?wh.width:wh.height);
+                s.downL=null;
+            }
+            if(downLoading){
+                s.downL=downLoading;
+                s.view.addChild(downLoading);
+                s.downL[s.paramXY]=Math.max(s.distance,s.maxDistance);
+                let wh=s.downL.getWH();
+                s.maxDistance+=(s.paramXY=="x"?wh.width:wh.height);
+            }else{
+                s.isStop=false;
+            }
         }
     }
 }

@@ -140,7 +140,7 @@ namespace annieUI {
          * @since 1.0.2
          * @type {boolean}
          * @private
-         * @default false;
+         * @default false
          */
         private autoScroll: boolean = false;
         /**
@@ -189,6 +189,7 @@ namespace annieUI {
                         }
                         //说明超过了界线,准备回弹
                         if (s.speed * s.addSpeed > 0) {
+                            // trace("回弹");
                             s.speed = 0;
                         }
                     } else {
@@ -198,11 +199,15 @@ namespace annieUI {
                                 view[s.paramXY] += 0.4 * (0 - view[s.paramXY]);
                                 if (Math.abs(view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
+                                    //trace("上回弹");
+                                    s.dispatchEvent("onScrollHead");
                                 }
                             } else {
                                 view[s.paramXY] += 0.4 * (s.distance - s.maxDistance - view[s.paramXY]);
                                 if (Math.abs(s.distance - s.maxDistance - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
+                                    //trace("上回弹");
+                                    s.dispatchEvent("onScrollEnd");
                                 }
                             }
                         } else {
@@ -217,6 +222,7 @@ namespace annieUI {
                             if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
                                 s.isStop = false;
                                 s.stopTimes = -1;
+                                // trace("回弹2");
                             }
                         }
                     }
