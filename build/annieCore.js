@@ -2152,7 +2152,6 @@ var annie;
                         s._cacheY = 0;
                         s._cacheImg = bitmapData;
                     }
-                    //给webgl更新新
                     var bw = void 0;
                     var bh = void 0;
                     if (s.rect) {
@@ -2165,6 +2164,7 @@ var annie;
                     }
                     s._bounds.width = bw;
                     s._bounds.height = bh;
+                    //给webgl更新新
                     s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UF = false;
@@ -2808,9 +2808,9 @@ var annie;
         Shape.prototype.render = function (renderObj) {
             var s = this;
             //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
-            if (!s._updateInfo.UM) {
-                renderObj.draw(s, 1);
-            }
+            // if (!s._updateInfo.UM) {
+            renderObj.draw(s, 1);
+            // }
             //super.render();
         };
         /**
@@ -2929,7 +2929,12 @@ var annie;
                                 }
                             }
                         }
-                        if (leftX != undefined) {
+                        if (leftX != undefined || lineWidth > 0) {
+                            if (leftX == undefined) {
+                                leftX = 0;
+                                leftY = 0;
+                            }
+                            ;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
@@ -2947,7 +2952,7 @@ var annie;
                                 }
                                 var _canvas = s._cacheImg;
                                 //给webgl更新新
-                                s._cacheImg.updateTexture = true;
+                                _canvas.updateTexture = true;
                                 var ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;

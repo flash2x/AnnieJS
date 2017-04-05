@@ -765,7 +765,10 @@ namespace annie {
                                 }
                             }
                         }
-                        if (leftX != undefined) {
+                        if (leftX != undefined||lineWidth>0) {
+                            if(leftX==undefined){
+                                leftX=0;leftY=0;
+                            };
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
@@ -783,7 +786,7 @@ namespace annie {
                                 }
                                 let _canvas = s._cacheImg;
                                 //给webgl更新新
-                                s._cacheImg.updateTexture=true;
+                                _canvas.updateTexture=true;
                                 let ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;
@@ -827,7 +830,6 @@ namespace annie {
                         }
                     }
                     s._isNeedUpdate = false;
-
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
