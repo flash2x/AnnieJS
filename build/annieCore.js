@@ -2153,8 +2153,18 @@ var annie;
                         s._cacheImg = bitmapData;
                     }
                     //给webgl更新新
-                    s._bounds.width = s._cacheImg.width + s._cacheX * 2;
-                    s._bounds.height = s._cacheImg.height + s._cacheY * 2;
+                    var bw = void 0;
+                    var bh = void 0;
+                    if (s.rect) {
+                        bw = s.rect.width;
+                        bh = s.rect.height;
+                    }
+                    else {
+                        bw = s._cacheImg.width + s._cacheX * 2;
+                        bh = s._cacheImg.height + s._cacheY * 2;
+                    }
+                    s._bounds.width = bw;
+                    s._bounds.height = bh;
                     s._cacheImg.updateTexture = true;
                 }
                 s._updateInfo.UF = false;

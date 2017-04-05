@@ -172,9 +172,19 @@ namespace annie {
                         s._cacheY = 0;
                         s._cacheImg = bitmapData;
                     }
+
+                    let bw:number;
+                    let bh:number;
+                    if(s.rect){
+                        bw=s.rect.width;
+                        bh=s.rect.height;
+                    }else{
+                        bw=s._cacheImg.width+s._cacheX*2;
+                        bh=s._cacheImg.height+s._cacheY*2;
+                    }
+                    s._bounds.width=bw;
+                    s._bounds.height=bh;
                     //给webgl更新新
-                    s._bounds.width=s._cacheImg.width+s._cacheX*2;
-                    s._bounds.height=s._cacheImg.height+s._cacheY*2;
                     s._cacheImg.updateTexture=true;
                 }
                 s._updateInfo.UF = false;
