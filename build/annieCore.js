@@ -2191,7 +2191,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
-         * @return {Image}
+         * @return {Canvas}
          * @example
          *      var spriteSheetImg = new Image(),
          *          rect = new annie.Rectangle(0, 0, 200, 200),
@@ -2207,18 +2207,18 @@ var annie;
                 return bitmap.bitmapData;
             }
             else {
-                var _canvas = annie.DisplayObject._canvas;
+                var _canvas = window.document.createElement("canvas");
                 var w = bitmap.rect.width;
                 var h = bitmap.rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
+                _canvas.style.width = w / annie.devicePixelRatio + "px";
+                _canvas.style.height = h / annie.devicePixelRatio + "px";
                 var ctx = _canvas.getContext("2d");
                 var tr = bitmap.rect;
                 ctx.clearRect(0, 0, w, h);
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                var _realCacheImg = window.document.createElement("img");
-                _realCacheImg.src = _canvas.toDataURL("image/png");
-                return _realCacheImg;
+                return _canvas;
             }
         };
         return Bitmap;
@@ -2684,6 +2684,7 @@ var annie;
                 s._isBitmapFill = matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
+            s.cacheAsBitmap = true;
         };
         Shape.prototype._fill = function (fillStyle) {
             var c = this._command;
@@ -2748,6 +2749,7 @@ var annie;
                 s._isBitmapStroke = matrix;
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
+            s.cacheAsBitmap = true;
         };
         Shape.prototype._stroke = function (strokeStyle, width, cap, join, miter) {
             var c = this._command;
@@ -2808,9 +2810,9 @@ var annie;
         Shape.prototype.render = function (renderObj) {
             var s = this;
             //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
-            // if (!s._updateInfo.UM) {
-            renderObj.draw(s, 1);
-            // }
+            if (!s._updateInfo.UM) {
+                renderObj.draw(s, 1);
+            }
             //super.render();
         };
         /**
@@ -2934,7 +2936,6 @@ var annie;
                                 leftX = 0;
                                 leftY = 0;
                             }
-                            ;
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
@@ -5255,9 +5256,26 @@ var annie;
                         }
                     }
                     if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
+                        realLines.push(hardLines[0]);
                         var str = hardLines[0];
-                        s.lineWidth = s._getMeasuredWidth(str);
-                        realLines.push(str);
+                        var lineW = s._getMeasuredWidth(str);
+                        if (lineW > s.lineWidth) {
+                            var w = s._getMeasuredWidth(str[0]);
+                            var lineStr = str[0];
+                            var wordW = 0;
+                            var strLen = str.length;
+                            for (var j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > s.lineWidth) {
+                                    realLines[0] = lineStr;
+                                    break;
+                                }
+                                else {
+                                    lineStr += str[j];
+                                }
+                            }
+                        }
                     }
                     else {
                         for (var i = 0, l = hardLines.length; i < l; i++) {
