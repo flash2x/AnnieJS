@@ -386,10 +386,11 @@ namespace annie {
          */
         public beginBitmapFill(image: any, matrix: Matrix): void {
             let s = this;
-            if (matrix) {
+            if (matrix){
                 s._isBitmapFill = matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
+            s.cacheAsBitmap=true;
         }
 
         private _fill(fillStyle: any): void {
@@ -463,6 +464,7 @@ namespace annie {
                 s._isBitmapStroke = matrix;
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth,cap,join,miter);
+            s.cacheAsBitmap=true;
         }
 
         private _stroke(strokeStyle: any, width: number,cap:string,join:string,miter:number): void {
@@ -768,7 +770,7 @@ namespace annie {
                         if (leftX != undefined||lineWidth>0) {
                             if(leftX==undefined){
                                 leftX=0;leftY=0;
-                            };
+                            }
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;

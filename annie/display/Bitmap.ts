@@ -213,7 +213,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
-         * @return {Image}
+         * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
          *          rect = new annie.Rectangle(0, 0, 200, 200),
@@ -228,18 +228,18 @@ namespace annie {
             if (!bitmap.rect) {
                 return bitmap.bitmapData;
             } else {
-                let _canvas = annie.DisplayObject._canvas;
+                let _canvas =window.document.createElement("canvas");
                 let w: number = bitmap.rect.width;
                 let h: number = bitmap.rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
+                _canvas.style.width = w / devicePixelRatio + "px";
+                _canvas.style.height = h / devicePixelRatio + "px";
                 let ctx = _canvas.getContext("2d");
                 let tr = bitmap.rect;
                 ctx.clearRect(0, 0, w, h);
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                let _realCacheImg = window.document.createElement("img");
-                _realCacheImg.src = _canvas.toDataURL("image/png");
-                return _realCacheImg;
+                return _canvas;
             }
         }
     }
