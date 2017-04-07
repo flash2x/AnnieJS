@@ -1352,7 +1352,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
-         * @return {Canvas}
+         * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
          *          rect = new annie.Rectangle(0, 0, 200, 200),

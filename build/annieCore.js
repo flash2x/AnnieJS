@@ -2191,7 +2191,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
-         * @return {Canvas}
+         * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
          *          rect = new annie.Rectangle(0, 0, 200, 200),
@@ -4931,10 +4931,10 @@ var annie;
                     var mtx = s.cMatrix;
                     var oldProps = s._oldProps;
                     var d = annie.devicePixelRatio;
-                    if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
-                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
-                        oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
-                    }
+                    // if (!Matrix.isEqual(oldProps.matrix, mtx)) {
+                    style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
+                    oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
+                    // }
                     if (oldProps.alpha != props.alpha) {
                         style.opacity = props.alpha;
                         oldProps.alpha = props.alpha;
