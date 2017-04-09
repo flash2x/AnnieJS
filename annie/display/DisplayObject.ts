@@ -178,9 +178,7 @@ namespace annie {
                 s._updateInfo.UM = true;
             }
         }
-
         private _scaleY: number = 1;
-
         /**
          * 显示对象旋转角度
          * @property rotation
@@ -202,7 +200,6 @@ namespace annie {
         }
 
         private _rotation: number = 0;
-
         /**
          * 显示对象透明度
          * @property alpha
@@ -261,7 +258,7 @@ namespace annie {
 
         public set skewY(value: number) {
             let s=this;
-            if(s._scaleY!=value) {
+            if(s.skewY!=value) {
                 s._skewY = value;
                 s._updateInfo.UM = true;
             }

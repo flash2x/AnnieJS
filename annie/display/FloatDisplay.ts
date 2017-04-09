@@ -135,6 +135,7 @@ namespace annie {
                     let oldProps: any = s._oldProps;
                     let d = annie.devicePixelRatio;
                     if (!Matrix.isEqual(oldProps.matrix, mtx)) {
+                        trace(mtx);
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
                         oldProps.matrix = {tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d};
                     }

@@ -81,6 +81,7 @@
     修复再次Flash2x.loadScene同一场景时报错的bug
     修复矢量位置填充初次渲染失效的bug
     修复annie.MovieClip中代码跳帧操作或者其他操作更新子级的transform相关属性时偶尔会有残影的bug
+    修复annie.DisplayObject渲染刷新优化无效的bug
     优化按钮元件鼠标按下后的状态，以前是按下后固定跳到第二个状态。现在优化成如果有第三个状态，则跳到第三个，没有的话再跳到第二个
     新增了annie.MouseEvent annie.TouchEvent的updateAfterEvent方法
     新增了annieUI.ScrollList类

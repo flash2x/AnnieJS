@@ -600,7 +600,7 @@ namespace annie {
                                 displayObject.skewX = infoObject.skewX;
                                 displayObject.skewY = infoObject.skewY;
                                 displayObject.alpha = infoObject.alpha;
-                                if (infoObject.filters) {
+                                if (infoObject.filters){
                                     displayObject.filters = infoObject.filters;
                                 } else {
                                     displayObject.filters = null;

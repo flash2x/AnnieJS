@@ -1638,7 +1638,7 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (s._scaleY != value) {
+                if (s.skewY != value) {
                     s._skewY = value;
                     s._updateInfo.UM = true;
                 }
@@ -4932,6 +4932,7 @@ var annie;
                     var oldProps = s._oldProps;
                     var d = annie.devicePixelRatio;
                     if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
+                        trace(mtx);
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
                         oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
                     }
@@ -7888,67 +7889,62 @@ var annie;
                     if (req.status == 200) {
                         var isImage = false;
                         var e_1 = new annie.Event("onComplete");
-                        try {
-                            var result = t["response"];
-                            e_1.data = { type: s.responseType, response: null };
-                            var item = void 0;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    var itemObj_1;
-                                    if (s.responseType == "image") {
-                                        isImage = true;
-                                        itemObj_1 = document.createElement("img");
-                                        itemObj_1.onload = function () {
-                                            URL.revokeObjectURL(itemObj_1.src);
-                                            itemObj_1.onload = null;
-                                            s.dispatchEvent(e_1);
-                                        };
-                                        itemObj_1.src = URL.createObjectURL(result);
-                                        item = itemObj_1;
+                        var result = t["response"];
+                        e_1.data = { type: s.responseType, response: null };
+                        var item = void 0;
+                        switch (s.responseType) {
+                            case "css":
+                                item = document.createElement("link");
+                                item.rel = "stylesheet";
+                                item.href = s.url;
+                                break;
+                            case "image":
+                            case "sound":
+                            case "video":
+                                var itemObj_1;
+                                if (s.responseType == "image") {
+                                    isImage = true;
+                                    itemObj_1 = document.createElement("img");
+                                    itemObj_1.onload = function () {
+                                        URL.revokeObjectURL(itemObj_1.src);
+                                        itemObj_1.onload = null;
+                                        s.dispatchEvent(e_1);
+                                    };
+                                    itemObj_1.src = URL.createObjectURL(result);
+                                    item = itemObj_1;
+                                }
+                                else {
+                                    if (s.responseType == "sound") {
+                                        itemObj_1 = document.createElement("AUDIO");
+                                        itemObj_1.preload = true;
+                                        itemObj_1.src = s.url;
+                                        item = new annie.Sound(itemObj_1);
                                     }
-                                    else {
-                                        if (s.responseType == "sound") {
-                                            itemObj_1 = document.createElement("AUDIO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                            item = new annie.Sound(itemObj_1);
-                                        }
-                                        else if (s.responseType == "video") {
-                                            itemObj_1 = document.createElement("VIDEO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                            item = new annie.Video(itemObj_1);
-                                        }
+                                    else if (s.responseType == "video") {
+                                        itemObj_1 = document.createElement("VIDEO");
+                                        itemObj_1.preload = true;
+                                        itemObj_1.src = s.url;
+                                        item = new annie.Video(itemObj_1);
                                     }
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                    item = "JS_CODE";
-                                    annie.Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e_1.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
+                                }
+                                break;
+                            case "json":
+                                item = JSON.parse(result);
+                                break;
+                            case "js":
+                                item = "JS_CODE";
+                                annie.Eval(result);
+                                break;
+                            case "text":
+                            case "unKnow":
+                            case "xml":
+                            default:
+                                item = result;
+                                break;
                         }
-                        catch (error) {
-                            s.dispatchEvent("onError", { id: 1, msg: "服务器返回信息有误" });
-                        }
+                        e_1.data["response"] = item;
+                        s.data = null;
+                        s.responseType = "";
                         if (!isImage)
                             s.dispatchEvent(e_1);
                     }
@@ -7958,10 +7954,6 @@ var annie;
                     }
                 }
             };
-            //} else {
-            // req = s._req;
-            // s._req.readyState=0;
-            //}
             var reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
