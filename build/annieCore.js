@@ -1704,7 +1704,7 @@ var annie;
                 var s = this;
                 if (s._visible != value) {
                     s._visible = value;
-                    s._updateInfo.UM = true;
+                    s._cp = true;
                 }
             },
             enumerable: true,
