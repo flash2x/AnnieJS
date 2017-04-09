@@ -322,7 +322,7 @@ namespace annie {
             let s=this;
             if(s._visible!=value){
                 s._visible=value;
-                s._updateInfo.UM=true;
+                s._cp=true;
             }
         }
         public _visible: boolean = true;
