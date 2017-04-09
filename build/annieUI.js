@@ -1403,27 +1403,23 @@ var annieUI;
 var annieUI;
 (function (annieUI) {
     /**
-     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annieUI.ScrollPage
+     * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.Sprite
-     * @since 1.0.0
+     * @extends annie.ScrollPage
+     * @since 1.0.9
      */
     var ScrollList = (function (_super) {
         __extends(ScrollList, _super);
         /**
          * 构造函数
-         * @method  ScrollList
-         * @param {number}vW 可视区域宽
-         * @param {number}vH 可视区域高
-         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
-         * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
-         *          s.addChild(s.sPage);
-         *          s.sPage.view.addChild(new home.Content());
-         *          s.sPage.y=s.stage.viewRect.y;
-         *          s.sPage.mouseEnable=false;
-         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
+         * @method ScrollList
+         * @param itemClassName 可以做为Item的类
+         * @param itemDis 各个Item的间隔
+         * @param vW 列表的宽
+         * @param vH 列表的高
+         * @param isVertical 是横向滚动还是纵向滚动
+         * @since 1.0.9
          */
         function ScrollList(itemClassName, itemDis, vW, vH, isVertical) {
             if (isVertical === void 0) { isVertical = true; }
@@ -1485,12 +1481,24 @@ var annieUI;
             });
         }
         Object.defineProperty(ScrollList.prototype, "loadingView", {
+            /**
+             * 获取下拉滚动的loadingView对象
+             * @property loadingView
+             * @since 1.0.9
+             * @returns {DisplayObject}
+             */
             get: function () {
                 return this.downL;
             },
             enumerable: true,
             configurable: true
         });
+        /**
+         * 更新列表数据
+         * @method updateData
+         * @param data
+         * @since 1.0.9
+         */
         ScrollList.prototype.updateData = function (data) {
             var s = this;
             if (!s._isInit) {
@@ -1511,6 +1519,12 @@ var annieUI;
                 s.maxDistance += (s.paramXY == "x" ? wh.width : wh.height);
             }
         };
+        /**
+         * 设置加载数据时显示的loading对象
+         * @since 1.0.9
+         * @method setLoading
+         * @param downLoading
+         */
         ScrollList.prototype.setLoading = function (downLoading) {
             var s = this;
             if (s.downL) {

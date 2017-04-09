@@ -607,11 +607,11 @@ declare namespace annieUI {
         data: number;
     }
     /**
-     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annieUI.ScrollPage
+     * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.Sprite
-     * @since 1.0.0
+     * @extends annie.ScrollPage
+     * @since 1.0.9
      */
     class ScrollList extends ScrollPage {
         private _items;
@@ -622,23 +622,37 @@ declare namespace annieUI {
         private gp;
         private lp;
         private downL;
+        /**
+         * 获取下拉滚动的loadingView对象
+         * @property loadingView
+         * @since 1.0.9
+         * @returns {DisplayObject}
+         */
         loadingView: DisplayObject;
         /**
          * 构造函数
-         * @method  ScrollList
-         * @param {number}vW 可视区域宽
-         * @param {number}vH 可视区域高
-         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
-         * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
-         *          s.addChild(s.sPage);
-         *          s.sPage.view.addChild(new home.Content());
-         *          s.sPage.y=s.stage.viewRect.y;
-         *          s.sPage.mouseEnable=false;
-         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
+         * @method ScrollList
+         * @param itemClassName 可以做为Item的类
+         * @param itemDis 各个Item的间隔
+         * @param vW 列表的宽
+         * @param vH 列表的高
+         * @param isVertical 是横向滚动还是纵向滚动
+         * @since 1.0.9
          */
         constructor(itemClassName: any, itemDis: number, vW: number, vH: number, isVertical?: boolean);
+        /**
+         * 更新列表数据
+         * @method updateData
+         * @param data
+         * @since 1.0.9
+         */
         updateData(data: Array<any>): void;
+        /**
+         * 设置加载数据时显示的loading对象
+         * @since 1.0.9
+         * @method setLoading
+         * @param downLoading
+         */
         setLoading(downLoading: DisplayObject): void;
     }
 }
