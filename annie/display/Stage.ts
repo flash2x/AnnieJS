@@ -730,7 +730,11 @@ namespace annie {
                 if (isDesH == isDivH) {
                     s.rotation = 0;
                 } else {
-                    s.rotation = 90;
+                    if(desH>desW){
+                        s.rotation = -90;
+                    }else{
+                        s.rotation = 90;
+                    }
                 }
             } else {
                 s.rotation = 0;

@@ -4932,8 +4932,7 @@ var annie;
                     var oldProps = s._oldProps;
                     var d = annie.devicePixelRatio;
                     if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
-                        trace(mtx);
-                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
+                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                         oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
                     }
                     if (oldProps.alpha != props.alpha) {
@@ -5436,6 +5435,9 @@ var annie;
             s._instanceType = "annie.InputText";
             if (inputType != "multiline") {
                 input = document.createElement("input");
+                if (inputType.indexOf("multiline") >= 0) {
+                    inputType = "input";
+                }
                 input.type = inputType;
             }
             else {
@@ -6164,7 +6166,12 @@ var annie;
                         s.rotation = 0;
                     }
                     else {
-                        s.rotation = 90;
+                        if (desH > desW) {
+                            s.rotation = -90;
+                        }
+                        else {
+                            s.rotation = 90;
+                        }
                     }
                 }
                 else {
