@@ -4727,6 +4727,7 @@ var annie;
                                 t = lastFrameChildren.indexOf(displayObject);
                                 if (t < 0) {
                                     displayObject._onDispatchBubbledEvent("onAddToStage");
+                                    displayObject._cp = true;
                                 }
                                 else {
                                     lastFrameChildren.splice(t, 1);
