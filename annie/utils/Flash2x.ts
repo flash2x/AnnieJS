@@ -613,4 +613,16 @@ namespace Flash2x {
         }
         jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
     }
+
+    /**
+     * 获取参数
+     * @param name
+     * @returns {any}
+     * @since 1.0.9
+     */
+    export function getQueryString(name:string) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return decodeURIComponent(r[2]); return null;
+    }
 }

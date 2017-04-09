@@ -3364,6 +3364,7 @@ var annie;
                 s.children.splice(index, 0, child);
             }
             if (s.stage && !sameParent) {
+                child["_cp"] = true;
                 child._onDispatchBubbledEvent("onAddToStage");
             }
         };
@@ -3440,7 +3441,6 @@ var annie;
             else {
                 child = s.children.splice(index, 1)[0];
             }
-            child["_cp"] = true;
             child._onDispatchBubbledEvent("onRemoveToStage");
             child.parent = null;
         };
@@ -4155,7 +4155,6 @@ var annie;
      */
     var MovieClip = (function (_super) {
         __extends(MovieClip, _super);
-        //private _isOnStage:boolean=false;
         function MovieClip() {
             _super.call(this);
             /**
@@ -4226,6 +4225,7 @@ var annie;
             this._frameLabel = {};
             this._isNeedUpdateChildren = true;
             this._isUpdateFrame = false;
+            this._goFrame = 1;
             this._mouseEvent = function (e) {
                 var s = this;
                 var frame = 2;
@@ -4457,8 +4457,8 @@ var annie;
          */
         MovieClip.prototype.nextFrame = function () {
             var s = this;
-            if (s.currentFrame < s.totalFrames) {
-                s.currentFrame++;
+            if (s._goFrame < s.totalFrames) {
+                s._goFrame++;
                 s._isNeedUpdateChildren = true;
             }
             s.isPlaying = false;
@@ -4472,8 +4472,8 @@ var annie;
          */
         MovieClip.prototype.prevFrame = function () {
             var s = this;
-            if (s.currentFrame > 1) {
-                s.currentFrame--;
+            if (s._goFrame > 1) {
+                s._goFrame--;
                 s._isNeedUpdateChildren = true;
             }
             s.isPlaying = false;
@@ -4507,8 +4507,8 @@ var annie;
                 }
                 tempFrame = frameIndex;
             }
-            if (s.currentFrame != tempFrame) {
-                s.currentFrame = tempFrame;
+            if (s._goFrame != tempFrame) {
+                s._goFrame = tempFrame;
                 s._isNeedUpdateChildren = true;
                 s._isUpdateFrame = false;
             }
@@ -4567,8 +4567,8 @@ var annie;
                 }
                 tempFrame = frameIndex;
             }
-            if (s.currentFrame != tempFrame) {
-                s.currentFrame = tempFrame;
+            if (s._goFrame != tempFrame) {
+                s._goFrame = tempFrame;
                 s._isUpdateFrame = false;
                 s._isNeedUpdateChildren = true;
             }
@@ -4632,8 +4632,8 @@ var annie;
                     else {
                         tempCurrentFrame = cStartFrame;
                     }
-                    if (s.currentFrame != tempCurrentFrame) {
-                        s.currentFrame = tempCurrentFrame;
+                    if (s._goFrame != tempCurrentFrame) {
+                        s._goFrame = tempCurrentFrame;
                         s._isNeedUpdateChildren = true;
                     }
                     s.isPlaying = false;
@@ -4642,20 +4642,21 @@ var annie;
                     if (s.isPlaying && s._isUpdateFrame) {
                         //核心代码
                         if (s.isFront) {
-                            s.currentFrame++;
-                            if (s.currentFrame > s.totalFrames) {
-                                s.currentFrame = 1;
+                            s._goFrame++;
+                            if (s._goFrame > s.totalFrames) {
+                                s._goFrame = 1;
                             }
                         }
                         else {
-                            s.currentFrame--;
-                            if (s.currentFrame < 1) {
-                                s.currentFrame = s.totalFrames;
+                            s._goFrame--;
+                            if (s._goFrame < 1) {
+                                s._goFrame = s.totalFrames;
                             }
                         }
                         s._isNeedUpdateChildren = true;
                     }
                 }
+                var currentFrame = s.currentFrame = s._goFrame;
                 s._isUpdateFrame = true;
                 if (s._isNeedUpdateChildren) {
                     var t = -1;
@@ -4674,17 +4675,17 @@ var annie;
                     s.children = [];
                     for (i = 0; i < layerCount; i++) {
                         frameCount = s._timeline[i].length;
-                        if (s.currentFrame <= frameCount) {
-                            frame = s._timeline[i][s.currentFrame - 1];
+                        if (currentFrame <= frameCount) {
+                            frame = s._timeline[i][currentFrame - 1];
                             if (frame == undefined)
                                 continue;
-                            if (frame.keyIndex == (s.currentFrame - 1)) {
+                            if (frame.keyIndex == (currentFrame - 1)) {
                                 if (frame.soundName != "") {
                                     Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
                                 }
                                 if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
                                     var event_1 = new annie.Event(annie.Event.CALL_FRAME);
-                                    event_1.data = { frameIndex: s.currentFrame, frameName: frame.eventName };
+                                    event_1.data = { frameIndex: currentFrame, frameName: frame.eventName };
                                     frameEvents.push(event_1);
                                 }
                             }
@@ -4741,18 +4742,18 @@ var annie;
                         if (!lastFrameChildren[i].parent) {
                             lastFrameChildren[i].parent = s;
                             lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                            lastFrameChildren[i]._cp = true;
                             lastFrameChildren[i].parent = null;
                         }
                     }
                     s.children.push(s.floatView);
-                    _super.prototype.update.call(this, um, ua, uf);
                     //看看是否到了第一帧，或是最后一帧,如果是准备事件
-                    if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
+                    if ((currentFrame == 1 && !s.isFront) || (currentFrame == s.totalFrames && s.isFront)) {
                         if (s.hasEventListener(annie.Event.END_FRAME)) {
                             var event_2 = new annie.Event(annie.Event.END_FRAME);
                             event_2.data = {
-                                frameIndex: s.currentFrame,
-                                frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
+                                frameIndex: currentFrame,
+                                frameName: currentFrame == 1 ? "firstFrame" : "endFrame"
                             };
                             frameEvents.push(event_2);
                         }
@@ -4763,13 +4764,11 @@ var annie;
                         s.dispatchEvent(frameEvents[i]);
                     }
                     //看看是否有回调,有则调用
-                    if (s._scriptLayer[s.currentFrame - 1] != undefined) {
-                        s._scriptLayer[s.currentFrame - 1]();
+                    if (s._scriptLayer[currentFrame - 1] != undefined) {
+                        s._scriptLayer[currentFrame - 1]();
                     }
                 }
-                else {
-                    _super.prototype.update.call(this, um, ua, uf);
-                }
+                _super.prototype.update.call(this, um, ua, uf);
             }
         };
         /**
@@ -4784,6 +4783,7 @@ var annie;
             _super.prototype._onDispatchBubbledEvent.call(this, type);
             if (updateMc) {
                 var s = this;
+                s._goFrame = 1;
                 s.currentFrame = 1;
                 s.isPlaying = true;
                 s.isFront = true;
@@ -4931,10 +4931,10 @@ var annie;
                     var mtx = s.cMatrix;
                     var oldProps = s._oldProps;
                     var d = annie.devicePixelRatio;
-                    // if (!Matrix.isEqual(oldProps.matrix, mtx)) {
-                    style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
-                    oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
-                    // }
+                    if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
+                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
+                        oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
+                    }
                     if (oldProps.alpha != props.alpha) {
                         style.opacity = props.alpha;
                         oldProps.alpha = props.alpha;
@@ -6178,7 +6178,6 @@ var annie;
              * @method resize
              * @public
              * @since 1.0.0
-             * @
              */
             this.resize = function () {
                 var s = this;
@@ -6379,7 +6378,11 @@ var annie;
             return this.viewRect;
         };
         /**
-         *
+         * 刷新所有定时器
+         * @static
+         * @private
+         * @since 1.0.0
+         * @method flushAll
          */
         Stage.flushAll = function () {
             var len = Stage.allUpdateObjList.length;
@@ -6395,6 +6398,7 @@ var annie;
          * @method addUpdateObj
          * @param target 要循化调用 flush 函数的对象
          * @public
+         * @static
          * @since
          */
         Stage.addUpdateObj = function (target) {
@@ -6407,7 +6411,7 @@ var annie;
                 }
             }
             if (!isHave) {
-                Stage.allUpdateObjList.push(target);
+                Stage.allUpdateObjList.unshift(target);
             }
         };
         /**
@@ -6415,6 +6419,7 @@ var annie;
          * @method removeUpdateObj
          * @param target
          * @public
+         * @static
          * @since 1.0.0
          */
         Stage.removeUpdateObj = function (target) {
@@ -6434,6 +6439,9 @@ var annie;
         Stage._isLoadedVConsole = false;
         /**
          * 要循环调用 flush 函数对象列表
+         * @method allUpdateObjList
+         * @static
+         * @since 1.0.0
          * @type {Array}
          */
         Stage.allUpdateObjList = [];
@@ -8651,6 +8659,20 @@ var Flash2x;
         jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
     }
     Flash2x.jsonp = jsonp;
+    /**
+     * 获取参数
+     * @param name
+     * @returns {any}
+     * @since 1.0.9
+     */
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null)
+            return decodeURIComponent(r[2]);
+        return null;
+    }
+    Flash2x.getQueryString = getQueryString;
 })(Flash2x || (Flash2x = {}));
 /**
  * @module annie

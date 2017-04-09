@@ -735,7 +735,7 @@ namespace annie {
             } else {
                 s.rotation = 0;
             }
-        }
+        };
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -744,9 +744,8 @@ namespace annie {
          * @method resize
          * @public
          * @since 1.0.0
-         * @
          */
-        public resize = function () {
+        public resize = function ():void {
             let s: Stage = this;
             s._updateInfo.UM = true;
             let whObj = s.getRootDivWH(s.rootDiv);
@@ -755,19 +754,23 @@ namespace annie {
             s.renderObj.reSize();
             s.setAlign();
         };
-
         public getBounds(): Rectangle {
             return this.viewRect;
         }
-
         /**
          * 要循环调用 flush 函数对象列表
+         * @method allUpdateObjList
+         * @static
+         * @since 1.0.0
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
-
         /**
-         *
+         * 刷新所有定时器
+         * @static
+         * @private
+         * @since 1.0.0
+         * @method flushAll
          */
         private static flushAll(): void {
             let len = Stage.allUpdateObjList.length;
@@ -776,7 +779,6 @@ namespace annie {
             }
             requestAnimationFrame(Stage.flushAll);
         }
-
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -784,6 +786,7 @@ namespace annie {
          * @method addUpdateObj
          * @param target 要循化调用 flush 函数的对象
          * @public
+         * @static
          * @since
          */
         public static addUpdateObj(target: any): void {
@@ -796,7 +799,7 @@ namespace annie {
                 }
             }
             if (!isHave) {
-                Stage.allUpdateObjList.push(target);
+                Stage.allUpdateObjList.unshift(target);
             }
         }
         /**
@@ -804,6 +807,7 @@ namespace annie {
          * @method removeUpdateObj
          * @param target
          * @public
+         * @static
          * @since 1.0.0
          */
         public static removeUpdateObj(target: any): void {

@@ -2232,6 +2232,7 @@ declare namespace annie {
         private _currentLayerFrame;
         private _graphicInfo;
         private _isUpdateFrame;
+        private _goFrame;
         constructor();
         /**
          * 调用止方法将停止当前帧
@@ -3131,17 +3132,23 @@ declare namespace annie {
          * @method resize
          * @public
          * @since 1.0.0
-         * @
          */
         resize: () => void;
         getBounds(): Rectangle;
         /**
          * 要循环调用 flush 函数对象列表
+         * @method allUpdateObjList
+         * @static
+         * @since 1.0.0
          * @type {Array}
          */
         private static allUpdateObjList;
         /**
-         *
+         * 刷新所有定时器
+         * @static
+         * @private
+         * @since 1.0.0
+         * @method flushAll
          */
         private static flushAll();
         /**
@@ -3151,6 +3158,7 @@ declare namespace annie {
          * @method addUpdateObj
          * @param target 要循化调用 flush 函数的对象
          * @public
+         * @static
          * @since
          */
         static addUpdateObj(target: any): void;
@@ -3159,6 +3167,7 @@ declare namespace annie {
          * @method removeUpdateObj
          * @param target
          * @public
+         * @static
          * @since 1.0.0
          */
         static removeUpdateObj(target: any): void;
@@ -4009,6 +4018,13 @@ declare namespace Flash2x {
      *      })
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
+    /**
+     * 获取参数
+     * @param name
+     * @returns {any}
+     * @since 1.0.9
+     */
+    function getQueryString(name: string): string;
 }
 /**
  * @module annie

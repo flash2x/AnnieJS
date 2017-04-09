@@ -240,7 +240,7 @@ namespace annie {
         public createBox(x:number,y:number,scaleX:number, scaleY:number, rotation:number,skewX:number, skewY:number, ax:number, ay:number):void {
             let s = this;
             if(rotation!=0){
-                skewX =skewY=rotation%360;
+                skewX=skewY=rotation%360;
             }else {
                 skewX %= 360;
                 skewY %= 360;

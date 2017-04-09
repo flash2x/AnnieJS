@@ -155,6 +155,7 @@ namespace annie{
                 s.children.splice(index, 0, child);
             }
             if(s.stage&&!sameParent){
+                child["_cp"]=true;
                 child._onDispatchBubbledEvent("onAddToStage");
             }
         }
@@ -226,7 +227,6 @@ namespace annie{
             } else {
                 child = s.children.splice(index, 1)[0];
             }
-            child["_cp"]=true;
             child._onDispatchBubbledEvent("onRemoveToStage");
             child.parent=null;
         }
