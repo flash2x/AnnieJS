@@ -48,16 +48,6 @@ namespace annie{
         public addChild(child:DisplayObject):void {
             this.addChildAt(child, this.children.length);
         }
-
-        /**
-         * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
-         * @property isCacheShape
-         * @since 1.0.5
-         * @type {boolean}
-         * @public
-         * @default true
-         */
-        public isCacheShape=true;
         /**
          * 从Sprite中移除一个child
          * @method removeChild
@@ -165,6 +155,7 @@ namespace annie{
                 s.children.splice(index, 0, child);
             }
             if(s.stage&&!sameParent){
+                child["_cp"]=true;
                 child._onDispatchBubbledEvent("onAddToStage");
             }
         }
@@ -236,7 +227,6 @@ namespace annie{
             } else {
                 child = s.children.splice(index, 1)[0];
             }
-            child["_cp"]=true;
             child._onDispatchBubbledEvent("onRemoveToStage");
             child.parent=null;
         }
@@ -261,7 +251,7 @@ namespace annie{
          */
         public update(um: boolean, ua: boolean, uf: boolean):void {
             let s:any = this;
-            if(s.visible) {
+            if(s.visible){
                 super.update(um, ua, uf);
                 if (s._updateInfo.UM) {
                     um = true;

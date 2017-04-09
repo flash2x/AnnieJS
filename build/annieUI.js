@@ -79,7 +79,7 @@ var annieUI;
             /**
              * @property 滚动距离
              * @type {number}
-             * @private
+             * @protected
              * @default 0
              * @since 1.0.0
              */
@@ -116,7 +116,7 @@ var annieUI;
             /**
              * 速度
              * @property speed
-             * @private
+             * @protected
              * @since 1.0.0
              * @type {number}
              */
@@ -165,7 +165,7 @@ var annieUI;
              * @since 1.0.2
              * @type {boolean}
              * @private
-             * @default false;
+             * @default false
              */
             this.autoScroll = false;
             var s = this;
@@ -199,6 +199,7 @@ var annieUI;
                         }
                         //说明超过了界线,准备回弹
                         if (s.speed * s.addSpeed > 0) {
+                            // trace("回弹");
                             s.speed = 0;
                         }
                     }
@@ -207,14 +208,18 @@ var annieUI;
                         if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
                             if (s.addSpeed < 0) {
                                 view[s.paramXY] += 0.4 * (0 - view[s.paramXY]);
-                                if (Math.abs(view[s.paramXY]) < 0.2) {
+                                if (Math.abs(view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
+                                    //trace("上回弹");
+                                    s.dispatchEvent("onScrollHead");
                                 }
                             }
                             else {
                                 view[s.paramXY] += 0.4 * (s.distance - s.maxDistance - view[s.paramXY]);
-                                if (Math.abs(s.distance - s.maxDistance - view[s.paramXY]) < 0.2) {
+                                if (Math.abs(s.distance - s.maxDistance - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
+                                    //trace("上回弹");
+                                    s.dispatchEvent("onScrollEnd");
                                 }
                             }
                         }
@@ -486,7 +491,7 @@ var annieUI;
          * @example
          *      var slideBox = new annieUI.SlidePage({
          *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *      isVertical: true,//默认值为true,ture为纵向,falas为横向
+         *      isVertical: true,//默认值为true,true为纵向,false为横向
          *      slideSpeed: .32,//默认值为.4，滑动速度
          *      callback:callback//滑动完成回调函数
          *       });
@@ -633,19 +638,19 @@ var annieUI;
                 return Object.prototype.toString.call(obj) === '[object Array]';
             };
             var s = this;
-            if (!s.isArray(option['pageList'])) {
+            if (!s.isArray(option.pageList)) {
                 throw 'pageList参数数据格式不对！pageList应为页面对象列表数组';
             }
             if (!s.isFunction(option['callback'])) {
                 throw 'callback参数数据格式不对！callback应为函数';
             }
-            s.pageList = option['pageList'];
-            s.onMoveStart = option['onMoveStart'];
-            s.callback = option['callback'];
-            s.isVertical = option['isVertical'] ? option['isVertical'] : true;
-            s.canSlidePrev = option['canSlidePrev'] ? option['canSlidePrev'] : true;
-            s.canSlideNext = option['canSlideNext'] ? option['canSlideNext'] : true;
-            s.slideSpeed = option['slideSpeed'] ? option['slideSpeed'] : .4;
+            s.pageList = option.pageList;
+            s.onMoveStart = option.onMoveStart;
+            s.callback = option.callback;
+            s.isVertical = option.isVertical != undefined ? option.isVertical : true;
+            s.canSlidePrev = option.canSlidePrev != undefined ? option.canSlidePrev : true;
+            s.canSlideNext = option.canSlideNext != undefined ? option.canSlideNext : true;
+            s.slideSpeed = option.slideSpeed != undefined ? option.slideSpeed : .4;
             s.addEventListener(annie.Event.ADD_TO_STAGE, s.onAddToStage.bind(s));
             // console.log(s);
         }
@@ -1201,6 +1206,7 @@ var annieUI;
                     s.dispatchEvent("onFlipStart");
                 }
             }
+            e.updateAfterEvent();
         };
         FlipBook.prototype.onMouseUp = function (e) {
             var s = this;
@@ -1387,4 +1393,144 @@ var annieUI;
         return FlipBook;
     }(Sprite));
     annieUI.FlipBook = FlipBook;
+})(annieUI || (annieUI = {}));
+/**
+ * Created by anlun on 16/8/14.
+ */
+/**
+ * @module annieUI
+ */
+var annieUI;
+(function (annieUI) {
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.ScrollPage
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
+    var ScrollList = (function (_super) {
+        __extends(ScrollList, _super);
+        /**
+         * 构造函数
+         * @method  ScrollList
+         * @param {number}vW 可视区域宽
+         * @param {number}vH 可视区域高
+         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @example
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *          s.addChild(s.sPage);
+         *          s.sPage.view.addChild(new home.Content());
+         *          s.sPage.y=s.stage.viewRect.y;
+         *          s.sPage.mouseEnable=false;
+         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
+         */
+        function ScrollList(itemClassName, itemDis, vW, vH, isVertical) {
+            if (isVertical === void 0) { isVertical = true; }
+            _super.call(this, vW, vH, 0, isVertical);
+            this._items = null;
+            this._isInit = false;
+            this._data = [];
+            this.gp = new annie.Point();
+            this.lp = new annie.Point();
+            this.downL = null;
+            var s = this;
+            s._instanceType = "annieUI.ScrollList";
+            s._itemCount = Math.ceil(s.distance / itemDis) + 2;
+            s._items = [];
+            s._itemsDis = itemDis;
+            s.maxSpeed = itemDis * 0.8;
+            for (var i = 0; i < s._itemCount; i++) {
+                var item = new itemClassName();
+                item.visible = false;
+                item[s.paramXY] = i * itemDis;
+                s._items.push(item);
+                s.view.addChild(item);
+            }
+            s.addEventListener(annie.Event.ENTER_FRAME, function (e) {
+                if (s.speed != 0) {
+                    var item = null;
+                    if (s.speed < 0) {
+                        item = s._items[0];
+                    }
+                    else {
+                        item = s._items[s._items.length - 1];
+                    }
+                    var lp = s.lp;
+                    var gp = s.gp;
+                    lp.x = item.x;
+                    lp.y = item.y;
+                    s.view.localToGlobal(lp, gp);
+                    s.globalToLocal(gp, lp);
+                    var newId = 0;
+                    if (s.speed < 0) {
+                        lp[s.paramXY] += s._itemsDis;
+                        newId = item.id + s._itemCount;
+                        if (lp[s.paramXY] < 0 && newId < s._data.length) {
+                            //向上求数据
+                            item.initData(newId, s._data[newId]);
+                            item[s.paramXY] = item.id * s._itemsDis;
+                            s._items.push(s._items.shift());
+                        }
+                    }
+                    else {
+                        newId = item.id - s._itemCount;
+                        if (lp[s.paramXY] > (s._itemCount - 2) * s._itemsDis && newId >= 0) {
+                            item.initData(newId, s._data[newId]);
+                            item[s.paramXY] = item.id * s._itemsDis;
+                            s._items.unshift(s._items.pop());
+                        }
+                    }
+                }
+            });
+        }
+        Object.defineProperty(ScrollList.prototype, "loadingView", {
+            get: function () {
+                return this.downL;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ScrollList.prototype.updateData = function (data) {
+            var s = this;
+            if (!s._isInit) {
+                s._data = data;
+                for (var i = 0; i < data.length && i < s._itemCount; i++) {
+                    s._items[i].initData(i, data[i]);
+                    s._items[i]._visible = true;
+                }
+                s._isInit = true;
+            }
+            else {
+                s._data = s._data.concat(data);
+            }
+            s.maxDistance = s._data.length * s._itemsDis;
+            if (s.downL) {
+                s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
+                var wh = s.downL.getWH();
+                s.maxDistance += (s.paramXY == "x" ? wh.width : wh.height);
+            }
+        };
+        ScrollList.prototype.setLoading = function (downLoading) {
+            var s = this;
+            if (s.downL) {
+                s.view.removeChild(s.downL);
+                var wh = s.downL.getWH();
+                s.maxDistance -= (s.paramXY == "x" ? wh.width : wh.height);
+                s.downL = null;
+            }
+            if (downLoading) {
+                s.downL = downLoading;
+                s.view.addChild(downLoading);
+                s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
+                var wh = s.downL.getWH();
+                s.maxDistance += (s.paramXY == "x" ? wh.width : wh.height);
+            }
+            else {
+                s.isStop = false;
+            }
+        };
+        return ScrollList;
+    }(annieUI.ScrollPage));
+    annieUI.ScrollList = ScrollList;
 })(annieUI || (annieUI = {}));

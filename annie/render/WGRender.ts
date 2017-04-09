@@ -36,7 +36,6 @@ namespace annie {
         private _posAttr: number = 0;
         private _textAttr: number = 0;
         private _textures:WebGLTexture[]=[];
-
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -48,7 +47,6 @@ namespace annie {
             this._instanceType = "annie.WGRender";
             this._stage = stage;
         }
-
         /**
          * 开始渲染时执行
          * @method begin
@@ -70,7 +68,6 @@ namespace annie {
             gl.clear(gl.COLOR_BUFFER_BIT);
             s._textures.length=0;
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -81,7 +78,6 @@ namespace annie {
         public beginMask(target: any): void {
             //更新缓冲模板
         }
-
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -225,68 +221,70 @@ namespace annie {
         public draw(target: any, type: number): void {
             let s = this;
             let img = target._cacheImg;
-            let gl = s._gl;
-            let gi:any;
-            if(img.updateTexture&&target._glInfo){
-                gi=target._glInfo;
-            }else {
-                gi={};
-                let tc: any = target.rect;
-                if (type == 0 && tc) {
-                    gi.x = tc.x / img.width;
-                    gi.y = tc.y / img.height;
-                    gi.w = (tc.x + tc.width) / img.width;
-                    gi.h = (tc.y + tc.height) / img.height;
-                    gi.pw = tc.width;
-                    gi.ph = tc.height;
+            if(img&&img.width>0&&img.height>0) {
+                let gl = s._gl;
+                let gi: any;
+                if (img.updateTexture && target._glInfo) {
+                    gi = target._glInfo;
                 } else {
-                    let cX: number = target._cacheX;
-                    let cY: number = target._cacheY;
-                    gi.x = cX / img.width;
-                    gi.y = cY / img.height;
-                    gi.w = (img.width - cX) / img.width;
-                    gi.h = (img.height - cY) / img.height;
-                    gi.pw = (img.width - cX * 2);
-                    gi.ph = (img.height - cY * 2);
+                    gi = {};
+                    let tc: any = target.rect;
+                    if (type == 0 && tc) {
+                        gi.x = tc.x / img.width;
+                        gi.y = tc.y / img.height;
+                        gi.w = (tc.x + tc.width) / img.width;
+                        gi.h = (tc.y + tc.height) / img.height;
+                        gi.pw = tc.width;
+                        gi.ph = tc.height;
+                    } else {
+                        let cX: number = target._cacheX;
+                        let cY: number = target._cacheY;
+                        gi.x = cX / img.width;
+                        gi.y = cY / img.height;
+                        gi.w = (img.width - cX) / img.width;
+                        gi.h = (img.height - cY) / img.height;
+                        gi.pw = (img.width - cX * 2);
+                        gi.ph = (img.height - cY * 2);
+                    }
+                    target._glInfo = gi;
                 }
-                target._glInfo=gi;
-            }
-            ////////////////////////////////////////////
-            let vertices =
-                [
-                    //x,y,textureX,textureY
-                    0.0, 0.0, gi.x, gi.y,
-                    gi.pw, 0.0, gi.w, gi.y,
-                    0.0, gi.ph, gi.x, gi.h,
-                    gi.pw, gi.ph, gi.w, gi.h
-                ];
-            let m: any;
-            if (type> 0) {
-                m = s._cM;
-                m.identity();
-                if (type == 2) {
-                    m.tx = target._cacheX * 2;
-                    m.ty = target._cacheY * 2;
+                ////////////////////////////////////////////
+                let vertices =
+                    [
+                        //x,y,textureX,textureY
+                        0.0, 0.0, gi.x, gi.y,
+                        gi.pw, 0.0, gi.w, gi.y,
+                        0.0, gi.ph, gi.x, gi.h,
+                        gi.pw, gi.ph, gi.w, gi.h
+                    ];
+                let m: any;
+                if (type > 0) {
+                    m = s._cM;
+                    m.identity();
+                    if (type == 2) {
+                        m.tx = target._cacheX * 2;
+                        m.ty = target._cacheY * 2;
+                    } else {
+                        m.tx = -img.width;
+                        m.ty = -img.height;
+                    }
+                    m.prepend(target.cMatrix);
                 } else {
-                    m.tx = -img.width;
-                    m.ty = -img.height;
+                    m = target.cMatrix;
                 }
-                m.prepend(target.cMatrix);
-            } else {
-                m = target.cMatrix;
+                let vMatrix: any = new Float32Array(
+                    [
+                        m.a, m.b, 0,
+                        m.c, m.d, 0,
+                        m.tx, m.ty, 1
+                    ]);
+                gl.uniform1i(s._uniformTexture, s.createTexture(img));
+                s.setBuffer(s._buffer, new Float32Array(vertices));
+                gl.uniform1f(s._uA, target.cAlpha);
+                gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
+                gl.uniformMatrix3fv(s._vMI, false, vMatrix);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             }
-            let vMatrix: any = new Float32Array(
-                [
-                    m.a, m.b, 0,
-                    m.c, m.d, 0,
-                    m.tx, m.ty, 1
-                ]);
-            gl.uniform1i(s._uniformTexture, s.createTexture(img));
-            s.setBuffer(s._buffer, new Float32Array(vertices));
-            gl.uniform1f(s._uA, target.cAlpha);
-            gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
-            gl.uniformMatrix3fv(s._vMI, false, vMatrix);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
         private getActiveId():number{
             for(let i=0;i<this._maxTextureCount;i++){

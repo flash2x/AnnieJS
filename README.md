@@ -18,25 +18,25 @@
     CreateJs对于交互式项目，核心库越小越好，显然CreateJs代码库有点过大
     那么AnnieJS的作者经过了长期使用CreateJs经验之后，做了大量的优化和工作才做出了现在的这款AnnieJS引擎
     重新定义了Flash开发H5的工作流程,具体优势各位看官接着往下看
-# 使用前准备工作
+#使用前准备工作
     1.安装 Ant 或者 Gulp 构建工具，选一种你熟悉的就行
     2.如果使用typeScript开发，则需要安装 node.js typeScript 运行环境
     3.强烈推荐WebStorm，我们所有的源码和项目也是使用此工具制作
     4.安装Adobe Flash CS6 及以上版本
     5.强烈推荐google Chrome浏览器，调试利器
     6.下载并安装Flash2xManager管理软件,用此软件一健配置工具和引擎(支持Mac和win)
-## [点击下载Flash2xManager工具](http://flash2x.org)
-# 小试牛刀
+##[点击下载Flash2xManager工具](http://flash2x.org)
+#小试牛刀
     1.安装好以上所说的相关工具后，打开Adobe Flash软件 随便新建一个Fla文件制作些东西保存(一定要保存)。
     2.打开Flash的菜单->窗口->扩展(cs6是[其他])->Flash2x，这时就启动了我们的Flash2x工具。
     3.选择一个你熟悉的语言简单设置或者不需要任何设置，点击发布，直到提示发布成功。
     4.发布的项目在你使用的Fla文件的同目录下，用WebStorm打开此项目。这个很重要，如果发布后直接双击index.html是看不到任何效果的。
     5.如果是发布的TS语言项目，则需要在WebStorm下方的Terminal命令窗口输入 tsc,等待编译完成，再执行第6步。如果是js项目，则跳过这一步。
     6.在打开的webStorm项目里找到index.html 右键点击绿色三角箭头的按钮 Run'index.html'，就可以看到你的成果啦。
-# 使用多fla来制作大型项目
-## 经常一个大型项目不可能一个人全部做完，也不可能一个fla文件全部做完。那么Flash2x还支持多fla分开制作最后合成同一项目，使用起来也非常方便简单。
-### 确定好开发语言后，大家应该都使用相同语言,如果对flash2x构架特别熟悉，也可以混合开发的那另说。开发大致分为两种情况。
-#### A.一个人整合并制作步骤如下:
+#使用多fla来制作大型项目
+##经常一个大型项目不可能一个人全部做完，也不可能一个fla文件全部做完。那么Flash2x还支持多fla分开制作最后合成同一项目，使用起来也非常方便简单。
+###确定好开发语言后，大家应该都使用相同语言,如果对flash2x构架特别熟悉，也可以混合开发的那另说。开发大致分为两种情况。
+####A.一个人整合并制作步骤如下:
     1.将所有的制作好的fla文件放在同一个目录下
     2.用flash打开每个fla文件，在Flash2x工具面板里点击设置按钮，将各个fla的发布目录设置成同一目录名。
     3.点击Flash2x 面板的发布按钮，将所有的fla发布到你设置的目录里，但又不会相互干扰和覆盖
@@ -45,31 +45,48 @@
     6.加上loading及其他代码。
     7.如果中途需要修改fla文件内容，则可以将相应fla文件给到动画师制作，完成后再覆盖回来发布就行。
     8.最后测试打包上线
-#### B.多个人制作最给再给一个人整合步骤如下:
+####B.多个人制作最给再给一个人整合步骤如下:
     1.各个fla开发人员在自己的电脑上发布项目，但所有人员都规定发布到命名相同的目录里。
     2.各个开发模块功能开发好之后，将fla及发布目录下的src目录和resource目录(如果是ts开发的则是resource 和tsSrc目录)发给整合人员
     3.整合人员将所有fla放在同一个目录下，并有fla目录下新建一个发布目录，发布目录名就是大家一致确定的目录名。
     4.将src目录和resource目录放入发布目录里。
     5.打开所有fla文件用Flash2x 工具重新发布一次。
     6.以下步骤和一个人整合并制作的步骤相同
-# 打包压缩资源并发布成最终版
-## 打包的构建工具目前支持两种，一种是Ant,一种是Gulp.
-### A.Ant打包构建方案
+#打包压缩资源并发布成最终版
+##打包的构建工具目前支持两种，一种是Ant,一种是Gulp.
+###A.Ant打包构建方案
     1.配置好Ant，并能全局使用。所谓的全局使用就是在命令终端只要输入ant三个字母，终端就会有相应的提示，这就表示全局安装成功。没有成功的百度下。
     2.在WebStorm里，一般在下面有个Terminal，打开它，在里面输入 'ant'，等待片刻，打包完成。
     3.打包完成后，会在项目目录里生成一个released目录，这个目录里的内容就是最终你可以发布出去的内容。
-### B.Gulp打包构建方案
+###B.Gulp打包构建方案
     1.配置好Glup,并能全局使用，什么是全局和Ant一样。
     2.在WebStorm里，打开Terminal 输入 'npm install'，这时会安装相应的node.js组件，等待安装完成
     3.安装完成后，在Terminal 输入 'gulp' 打包将会进行。
     4.如果打包的过程中出现错误，一般是项目目录下的tools文件夹没有执行权限，更改一下tools的目录执行权限，再次运行 'gulp'
     5.打包完成后，会在项目目录里生成一个released目录，这个目录里的内容就是最终你可以发布出去的内容。
-### 在手机上调出vConsole调试面板查看调试信息
+###在手机上调出vConsole调试面板查看调试信息
     在main.js或者main.ts中将'annie.debug=false;'设成 'annie.debug=true;'
-# 如何更新引擎及工具
+#如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
-# AnnieJS 版本更新列表
-## AnnieJS 1.0.8 版本
+#AnnieJS 版本更新列表
+##AnnieJS 1.0.9 版本
+    修复annie.Shape画线在手机端会报错的bug
+    修复annie.Shape在不缓存成位置下的点击区域失效的bug
+    修复annie.TextField多行默认值为空时报错的bug
+    修复annie.URLLoader加载Image后获取宽高为0的bug
+    修复annie.Bitmap设置bitmapData为null时渲染报错的bug
+    修复annie.MouseEvent onMouseOver onMouseOut 偶尔会不触发的bug
+    修复Flash2x.jsonp不能同时调用多次的bug
+    修复再次Flash2x.loadScene同一场景时报错的bug
+    修复矢量位置填充初次渲染失效的bug
+    修复annie.MovieClip中代码跳帧操作或者其他操作更新子级的transform相关属性时偶尔会有残影的bug
+    修复annie.DisplayObject渲染刷新优化无效的bug
+    修复annie.FloatDisplay，annie.InputText在横屏情况下旋转会失效的bug
+    优化按钮元件鼠标按下后的状态，以前是按下后固定跳到第二个状态。现在优化成如果有第三个状态，则跳到第三个，没有的话再跳到第二个
+    新增了annie.MouseEvent annie.TouchEvent的updateAfterEvent方法
+    修复annieUI.SlidePage类设置横向滑动失效的问题
+    新增了annieUI.ScrollList类
+##AnnieJS 1.0.8 版本
     如果是老版本项目升级上来的，请将index.html头部样式表里加上'height:100%'
     支持引擎在多个流行APP中的Html5环境下运行
     修复横屏项目在部分手机无法横屏显示的bug
@@ -78,12 +95,12 @@
     优化在手机淘宝，手机qq，手机微博，手机微信以及手机浏览器上的整体兼容性
     优化鼠标或者触摸事件，基本同步原生事件.特别是对不支持自动播放音乐的浏览器需要侦听事件时特别有用。
     优化移动端多个手指点击不同的对象都能正确触发相应的触摸事件而不再相互混淆冲突
-## AnnieJS 1.0.7 版本
+##AnnieJS 1.0.7 版本
     优化MovieClip类结构
     修复hasEventListener有时不准确的bug
     修复化ULRLoader加载声音后在某些手机最小化时项目闪退的bug
     优化底层结构
-## AnnieJS 1.0.6 版本
+##AnnieJS 1.0.6 版本
     修复EnterFrame事件中更新显示对象属性无效的bug
     修复动画元件设置滤色效果后，在动画的情况下失灵的bug
     修复矢量位图填充元件在有些动画情况下视觉错乱的bug
@@ -93,7 +110,7 @@
     支持动态文本设置边框属性
     支持矢量线条设置末端形状及拼接形状属性设置
     优化底层结构
-## AnnieJS 1.0.5 版本
+##AnnieJS 1.0.5 版本
     新增 annie.Sprite 一个属性 isCacheShape 以此来控制对应容器中是否要缓存矢量为位图，并提高精确的鼠标点击
     修复手动调用stage.resize()后，stage显示区域显示错误的bug
     修复打包成swf后，如果Flash2x.loadScene第四个参数设置路径后加载报错的问题
@@ -101,7 +118,7 @@
     修复annieUI.FacePhoto在不是正方形情况下显示有误的bug
     修复获取显示对象的width height属性值时偶尔会不准确的bug
     修复输入文本设置成加粗，斜体发布时报错的bug
-## AnnieJS 1.0.4 版本
+##AnnieJS 1.0.4 版本
     优化annie.URLLoader 错误事件提示
     增加annie.URLLoader 加载完整事件里返回加载数据类型参数
     修复annie.VideoPlayer 播放mp4报错问题
@@ -111,7 +128,7 @@
     重写显示对象的update的算法，大量优化，效率提高200%
     矢量不再默认缓存为位图，需要手动设置annie.Shape实例的cacaheAsBitmpa属性开启
     暂时去掉对webgl的支持，在2d交互项目使用过程中目前没发现有什么突飞猛进的作用，实用性和性价比不高，反而增加了引擎体积，等webgl成熟后再支持
-## AnnieJS 1.0.3 版本
+##AnnieJS 1.0.3 版本
     删除annie.canTouchMove,不再控制html的可移动所有浮在AnnieJS上的Html元素自己管自己,现在canvas本身是不会上下滑动的了
     增加支持输入文本在手机端自动回收软键盘
     增加支持两点的放大缩小及旋转手势
@@ -131,7 +148,7 @@
     增加annie.AObject.instanceType 属性进行获取对象类型
     增加Flash2x.loadScene()的完成时回调参数。在加载多场景的时候很有用，比如有些时候，我不想等所有的场景加载完才运行，这样我可以通过完成时回调参数来判断加载到哪里了。
     进一步优化引擎内核
-## AnnieJS 1.0.2 版本
+##AnnieJS 1.0.2 版本
     新增annie.MoveClip类中的container属性，方便对MovieClip中添加不是用fla生成的子级对象
     支持WEBGL渲染，提高渲染性能。
     但不能迷恋WEBGL，还是需要看应用情景,偏大量交互动画长篇建议用Canvas渲染;一般交互项目或者偏游戏类型的项目建议用WEBGL。具体性能可实地测试项目后再来定夺
@@ -152,7 +169,7 @@
     将annie.Shape.arc方法的参数由弧度更改成角度
     支持vconsole调试，这样在手机上测试的时候就可以查看到调试信息(非常有用)
     更改了鼠标事件执行顺序，以前是在渲染前,现在更改后渲染后,逻辑更合理
-## AnnieJS 1.0.0 版本
+##AnnieJS 1.0.0 版本
     支持flash 剪辑,动画剪辑，按钮,文本，矢量，图形,SpriteSheet，声音等对象
     支持flash 遮罩，引导，传统补间，高级补间，骨骼动画
     支持Flash 模糊，发光，投影，高级色彩，变色滤镜
@@ -170,7 +187,7 @@
     支持tween 动画类
     支持urlLoader 加载类
     支持flash2x 管理类
-# Flash2x 版本更新列表
+#Flash2x 版本更新列表
 ## Flash2x 3.0.8
     修复导出复杂矢量时报错的bug
     修复导出特殊字符时报错的bug

@@ -437,6 +437,13 @@ declare namespace annie {
          * @param {string} type
          */
         constructor(type: string);
+        /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        updateAfterEvent(): void;
     }
 }
 /**
@@ -496,6 +503,13 @@ declare namespace annie {
          * @param {string} type
          */
         constructor(type: string);
+        /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        updateAfterEvent(): void;
     }
 }
 /**
@@ -1185,6 +1199,17 @@ declare namespace annie {
          */
         height: number;
         /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @returns {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        getWH(): {
+            width: number;
+            height: number;
+        };
+        /**
          * 画缓存位图的时候需要使用
          * @property _bitmapCanvas
          * @private
@@ -1327,7 +1352,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
-         * @return {Image}
+         * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
          *          rect = new annie.Rectangle(0, 0, 200, 200),
@@ -1749,15 +1774,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         addChild(child: DisplayObject): void;
-        /**
-         * 是否需要将此容器中矢量对象缓存为位图，这样的话可以精确鼠标点击事件，如果不缓存的话，拿到的矢量鼠标事件范围就都是矩形的
-         * @property isCacheShape
-         * @since 1.0.5
-         * @type {boolean}
-         * @public
-         * @default true
-         */
-        isCacheShape: boolean;
         /**
          * 从Sprite中移除一个child
          * @method removeChild
@@ -2216,6 +2232,7 @@ declare namespace annie {
         private _currentLayerFrame;
         private _graphicInfo;
         private _isUpdateFrame;
+        private _goFrame;
         constructor();
         /**
          * 调用止方法将停止当前帧
@@ -3010,6 +3027,12 @@ declare namespace annie {
         private _lastDpList;
         private _rid;
         /**
+         * 鼠标事件后强制更新
+         * @type {boolean}
+         * @private
+         */
+        private _uae;
+        /**
          * 显示对象入口函数
          * @method Stage
          * @param {string} rootDivId
@@ -3109,17 +3132,23 @@ declare namespace annie {
          * @method resize
          * @public
          * @since 1.0.0
-         * @
          */
         resize: () => void;
         getBounds(): Rectangle;
         /**
          * 要循环调用 flush 函数对象列表
+         * @method allUpdateObjList
+         * @static
+         * @since 1.0.0
          * @type {Array}
          */
         private static allUpdateObjList;
         /**
-         *
+         * 刷新所有定时器
+         * @static
+         * @private
+         * @since 1.0.0
+         * @method flushAll
          */
         private static flushAll();
         /**
@@ -3129,6 +3158,7 @@ declare namespace annie {
          * @method addUpdateObj
          * @param target 要循化调用 flush 函数的对象
          * @public
+         * @static
          * @since
          */
         static addUpdateObj(target: any): void;
@@ -3137,6 +3167,7 @@ declare namespace annie {
          * @method removeUpdateObj
          * @param target
          * @public
+         * @static
          * @since 1.0.0
          */
         static removeUpdateObj(target: any): void;
@@ -3987,6 +4018,13 @@ declare namespace Flash2x {
      *      })
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
+    /**
+     * 获取参数
+     * @param name
+     * @returns {any}
+     * @since 1.0.9
+     */
+    function getQueryString(name: string): string;
 }
 /**
  * @module annie
@@ -4010,7 +4048,7 @@ declare namespace annie {
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
-         * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
+         * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
@@ -4029,7 +4067,7 @@ declare namespace annie {
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
-         * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
+         * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位

@@ -178,9 +178,7 @@ namespace annie {
                 s._updateInfo.UM = true;
             }
         }
-
         private _scaleY: number = 1;
-
         /**
          * 显示对象旋转角度
          * @property rotation
@@ -202,7 +200,6 @@ namespace annie {
         }
 
         private _rotation: number = 0;
-
         /**
          * 显示对象透明度
          * @property alpha
@@ -261,7 +258,7 @@ namespace annie {
 
         public set skewY(value: number) {
             let s=this;
-            if(s._scaleY!=value) {
+            if(s.skewY!=value) {
                 s._skewY = value;
                 s._updateInfo.UM = true;
             }
@@ -536,7 +533,6 @@ namespace annie {
                     }
                 }
             }
-
         }
         /**
          * 抽象方法
@@ -575,10 +571,7 @@ namespace annie {
          * @return {number}
          */
         public get width(): number {
-            let s = this;
-            s.update(false,false,false);
-            let dr = s.getDrawRect();
-            return dr.width;
+            return this.getWH().width;
         }
 
         public set width(value: number){
@@ -598,10 +591,7 @@ namespace annie {
          * @return {number}
          */
         public get height(): number {
-            let s = this;
-            s.update(false,false,false);
-            let dr = s.getDrawRect();
-            return dr.height;
+            return this.getWH().height;
         }
         public set height(value: number) {
             let s = this;
@@ -610,6 +600,20 @@ namespace annie {
                 let sy = value / h;
                 s.scaleY *= sy;
             }
+        }
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @returns {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        public getWH():{width:number,height:number}{
+            let s = this;
+            s.update(false,false,false);
+            let dr = s.getDrawRect();
+            s._updateInfo.UM = true;
+            return {width:dr.width,height:dr.height};
         }
         /**
          * 画缓存位图的时候需要使用

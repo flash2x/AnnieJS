@@ -162,11 +162,7 @@ namespace annie {
          * @since 1.0.0
          */
         public render(renderObj:IRender):void {
-            let s = this;
-            if(s._cacheImg.width>0){
-                renderObj.draw(s, 2);
-            }
-            //super.render();
+            renderObj.draw(this, 2);
         }
         /**
          * 重写 update
@@ -178,7 +174,7 @@ namespace annie {
         public update(um: boolean, ua: boolean, uf: boolean):void {
             super.update(um,ua,uf);
             let s:any = this;
-            if(s.visible) {
+            if(s.visible){
                 for (let item in s._cacheObject) {
                     if (s._cacheObject[item] != s[item]) {
                         s._cacheObject[item] = s[item];
@@ -228,6 +224,7 @@ namespace annie {
                     } else {
                         for (let i = 0, l = hardLines.length; i < l; i++) {
                             let str = hardLines[i];
+                            if(!str)continue;
                             let w = s._getMeasuredWidth(str[0]);
                             let lineStr = str[0];
                             let wordW = 0;

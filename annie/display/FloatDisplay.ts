@@ -111,7 +111,6 @@ namespace annie {
                 this.htmlElement = null;
             }
         }
-
         /**
          * 重写刷新
          * @method update
@@ -124,12 +123,7 @@ namespace annie {
             let o = s.htmlElement;
             if (o) {
                 let style = o.style;
-                let visible = s.visible;
-                let parent = s.parent;
-                while (visible && parent) {
-                    visible = parent.visible;
-                    parent = parent.parent;
-                }
+                let visible = s._visible;
                 let show = visible ? "block" : "none";
                 if (show != style.display) {
                     style.display = show;
@@ -141,7 +135,7 @@ namespace annie {
                     let oldProps: any = s._oldProps;
                     let d = annie.devicePixelRatio;
                     if (!Matrix.isEqual(oldProps.matrix, mtx)) {
-                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d) + "," + (mtx.b / d) + "," + (mtx.c / d) + "," + (mtx.d / d) + "," + (mtx.tx / d) + "," + (mtx.ty / d) + ")";
+                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                         oldProps.matrix = {tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d};
                     }
                     if (oldProps.alpha != props.alpha) {

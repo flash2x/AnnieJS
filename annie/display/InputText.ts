@@ -48,6 +48,9 @@ namespace annie {
             s._instanceType = "annie.InputText";
             if (inputType != "multiline") {
                 input = document.createElement("input");
+                if(inputType.indexOf("multiline")>=0){
+                    inputType="input";
+                }
                 input.type = inputType;
             } else {
                 input = document.createElement("textarea");

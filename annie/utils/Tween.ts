@@ -120,7 +120,7 @@ namespace annie {
                 s.target[item] = s._startData[item] + s._disData[item] * per;
             }
             if (s._update){
-                s._update();
+                s._update(per);
             }
             let cf=s._completeFun;
             let pm=s._cParams;
@@ -176,7 +176,7 @@ namespace annie {
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
-         * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
+         * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
@@ -198,7 +198,7 @@ namespace annie {
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
-         * @param {Function} data.onUpdate 进入每帧后执行函数.默认为null
+         * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
          * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位

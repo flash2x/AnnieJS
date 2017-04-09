@@ -314,6 +314,7 @@ namespace annieUI {
                     s.dispatchEvent("onFlipStart")
                 }
             }
+            e.updateAfterEvent();
         }
         private onMouseUp(e: MouseEvent): void {
             let s = this;

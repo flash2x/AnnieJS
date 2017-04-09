@@ -13,7 +13,6 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._cacheImg=window.document.createElement("canvas");
         }
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -74,7 +73,7 @@ namespace annie {
          */
         private set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
         private get cacheAsBitmap(){return this._cAb;}
-        private _cAb:boolean=true;
+        private _cAb:boolean=false;
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -132,7 +131,6 @@ namespace annie {
          * @since 1.0.0
          */
         public drawRoundRect(x: number, y: number, w: number, h: number, rTL: number = 0, rTR: number = 0, rBL: number = 0, rBR: number = 0): void {
-            //let ctx = DisplayObject._canvas.getContext("2d");
             let max = (w < h ? w : h) / 2;
             let mTL = 0, mTR = 0, mBR = 0, mBL = 0;
             if (rTL < 0) {
@@ -331,6 +329,14 @@ namespace annie {
             let s = this;
             s._command = [];
             s._isNeedUpdate = true;
+            if(s._cacheImg) {
+                s._cacheImg.width = 0;
+                s._cacheImg.height = 0;
+            }
+            s._cacheX = 0;
+            s._cacheY = 0;
+            s._bounds.width=0;
+            s._bounds.height=0;
         }
 
         /**
@@ -380,10 +386,11 @@ namespace annie {
          */
         public beginBitmapFill(image: any, matrix: Matrix): void {
             let s = this;
-            if (matrix) {
+            if (matrix){
                 s._isBitmapFill = matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
+            s.cacheAsBitmap=true;
         }
 
         private _fill(fillStyle: any): void {
@@ -457,6 +464,7 @@ namespace annie {
                 s._isBitmapStroke = matrix;
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth,cap,join,miter);
+            s.cacheAsBitmap=true;
         }
 
         private _stroke(strokeStyle: any, width: number,cap:string,join:string,miter:number): void {
@@ -641,7 +649,7 @@ namespace annie {
         public render(renderObj: IRender): void {
             let s = this;
             //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
-            if (s._cacheImg.width > 0&&!s._updateInfo.UM) {
+            if (!s._updateInfo.UM) {
                 renderObj.draw(s, 1);
             }
             //super.render();
@@ -657,7 +665,6 @@ namespace annie {
             let s = this;
             if(s.visible) {
                 super.update(um, ua, uf);
-                if(s.parent)s.cacheAsBitmap=s.parent.isCacheShape;
                 if (s._isNeedUpdate || uf||s._updateInfo.UF){
                     //更新缓存
                     let cLen: number = s._command.length;
@@ -760,20 +767,28 @@ namespace annie {
                                 }
                             }
                         }
-                        if (leftX != undefined) {
-                            s._bounds.width=buttonRightX - leftX;
-                            s._bounds.height=buttonRightY - leftY;
+                        if (leftX != undefined||lineWidth>0) {
+                            if(leftX==undefined){
+                                leftX=0;leftY=0;
+                            }
                             leftX -= 20 + lineWidth >> 1;
                             leftY -= 20 + lineWidth >> 1;
                             buttonRightX += 20 + lineWidth >> 1;
                             buttonRightY += 20 + lineWidth >> 1;
                             let w = buttonRightX - leftX;
                             let h = buttonRightY - leftY;
+                            s._cacheX = leftX;
+                            s._cacheY = leftY;
+                            s._bounds.width=w-10;
+                            s._bounds.height=h-10;
                             if (s._cAb){
                                 ///////////////////////////
-                                s._cacheX = leftX;
-                                s._cacheY = leftY;
+                                if(!s._cacheImg) {
+                                    s._cacheImg = window.document.createElement("canvas");
+                                }
                                 let _canvas = s._cacheImg;
+                                //给webgl更新新
+                                _canvas.updateTexture=true;
                                 let ctx = _canvas["getContext"]('2d');
                                 _canvas.width = w;
                                 _canvas.height = h;
@@ -814,24 +829,9 @@ namespace annie {
                                     ctx.putImageData(imageData, 0, 0);
                                 }
                             }
-                            //
-                        } else {
-                            s._cacheImg.width = 0;
-                            s._cacheImg.height = 0;
-                            s._cacheX = 0;
-                            s._cacheY = 0;
                         }
-
-                    } else {
-                        s._cacheImg.width = 0;
-                        s._cacheImg.height = 0;
-                        s._cacheX = 0;
-                        s._cacheY = 0;
                     }
                     s._isNeedUpdate = false;
-                    //给webgl更新新
-                    s._cacheImg.updateTexture=true;
-
                 }
                 s._updateInfo.UM = false;
                 s._updateInfo.UA = false;
@@ -899,17 +899,23 @@ namespace annie {
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
             if (s._cAb) {
+                let image=s._cacheImg;
+                if(!image||image.width==0||image.height==0){
+                    return null;
+                }
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
                 let ctx = _canvas["getContext"]('2d');
                 ctx.clearRect(0, 0, 1, 1);
                 ctx.setTransform(1, 0, 0, 1, s._cacheX - p.x, s._cacheY - p.y);
-                ctx.drawImage(s._cacheImg, 0, 0);
+                ctx.drawImage(image, 0, 0);
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                     return s;
                 }
             }else{
+                p.x-=s._cacheX;
+                p.y-=s._cacheY;
                 if (s.getBounds().isPointIn(p)){
                     return s;
                 }

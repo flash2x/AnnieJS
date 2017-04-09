@@ -58,5 +58,14 @@ namespace annie {
             super(type);
             this._instanceType="annie.TouchEvent";
         }
+        /**
+         * 事件后立即更新显示列表状态
+         * @method updateAfterEvent
+         * @since 1.0.9
+         * @public
+         */
+        public updateAfterEvent(){
+            this.target.stage._uae=true;
+        }
     }
 }

@@ -125,7 +125,7 @@ namespace annie {
         private _currentLayerFrame:any;
         private _graphicInfo:any;
         private _isUpdateFrame = false;
-        //private _isOnStage:boolean=false;
+        private _goFrame:number=1;
         public constructor() {
             super();
             let s=this;
@@ -276,18 +276,24 @@ namespace annie {
             s.mouseChildren=false;
             //将mc设置成按钮形式
             if(s.totalFrames>1) {
-                s.gotoAndStop(1);
+                // s.gotoAndStop(1);
+                s._scriptLayer[0] = function(){s.stop()};
                 s.addEventListener("onMouseDown",this._mouseEvent.bind(this));
                 s.addEventListener("onMouseUp",this._mouseEvent.bind(this));
                 s.addEventListener("onMouseOut",this._mouseEvent.bind(this));
             }
         }
         private _mouseEvent=function (e:MouseEvent):void {
-            if(e.type==annie.MouseEvent.MOUSE_DOWN){
-                this.gotoAndStop(2);
+            let s=this;
+            let frame=2;
+            if(e.type=="onMouseDown"){
+                if(s.currentFrame>2){
+                    frame=3;
+                }
             }else{
-                this.gotoAndStop(1);
+                frame=1;
             }
+            s.gotoAndStop(frame);
         };
         //setLabelFrame;
         /**
@@ -361,8 +367,8 @@ namespace annie {
          */
         public nextFrame():void {
             let s = this;
-            if (s.currentFrame < s.totalFrames) {
-                s.currentFrame++;
+            if (s._goFrame < s.totalFrames) {
+                s._goFrame++;
                 s._isNeedUpdateChildren = true;
             }
             s.isPlaying = false;
@@ -377,8 +383,8 @@ namespace annie {
          */
         public prevFrame():void {
             let s = this;
-            if (s.currentFrame > 1) {
-                s.currentFrame--;
+            if (s._goFrame > 1) {
+                s._goFrame--;
                 s._isNeedUpdateChildren = true;
             }
             s.isPlaying = false;
@@ -411,8 +417,8 @@ namespace annie {
                 }
                 tempFrame = frameIndex;
             }
-            if (s.currentFrame != tempFrame) {
-                s.currentFrame = tempFrame;
+            if (s._goFrame != tempFrame) {
+                s._goFrame = tempFrame;
                 s._isNeedUpdateChildren = true;
                 s._isUpdateFrame = false;
             }
@@ -465,8 +471,8 @@ namespace annie {
                 }
                 tempFrame = frameIndex;
             }
-            if (s.currentFrame != tempFrame) {
-                s.currentFrame = tempFrame;
+            if (s._goFrame != tempFrame) {
+                s._goFrame = tempFrame;
                 s._isUpdateFrame = false;
                 s._isNeedUpdateChildren = true;
             }
@@ -528,8 +534,8 @@ namespace annie {
                     } else {
                         tempCurrentFrame = cStartFrame;
                     }
-                    if (s.currentFrame != tempCurrentFrame) {
-                        s.currentFrame = tempCurrentFrame;
+                    if (s._goFrame != tempCurrentFrame) {
+                        s._goFrame = tempCurrentFrame;
                         s._isNeedUpdateChildren = true;
                     }
                     s.isPlaying = false;
@@ -537,19 +543,20 @@ namespace annie {
                     if (s.isPlaying && s._isUpdateFrame) {
                         //核心代码
                         if (s.isFront) {
-                            s.currentFrame++;
-                            if (s.currentFrame > s.totalFrames) {
-                                s.currentFrame = 1;
+                            s._goFrame++;
+                            if (s._goFrame > s.totalFrames) {
+                                s._goFrame = 1;
                             }
                         } else {
-                            s.currentFrame--;
-                            if (s.currentFrame < 1) {
-                                s.currentFrame = s.totalFrames;
+                            s._goFrame--;
+                            if (s._goFrame < 1) {
+                                s._goFrame = s.totalFrames;
                             }
                         }
                         s._isNeedUpdateChildren = true;
                     }
                 }
+                let currentFrame=s.currentFrame=s._goFrame;
                 s._isUpdateFrame = true;
                 if (s._isNeedUpdateChildren) {
                     let t=-1;
@@ -568,16 +575,16 @@ namespace annie {
                     s.children = [];
                     for (i = 0; i < layerCount; i++) {
                         frameCount = s._timeline[i].length;
-                        if (s.currentFrame <= frameCount) {
-                            frame = s._timeline[i][s.currentFrame - 1];
+                        if (currentFrame <= frameCount) {
+                            frame = s._timeline[i][currentFrame - 1];
                             if (frame == undefined)continue;
-                            if (frame.keyIndex == (s.currentFrame - 1)) {
+                            if (frame.keyIndex == (currentFrame - 1)) {
                                 if (frame.soundName != "") {
                                     Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
                                 }
                                 if (frame.eventName != "" && s.hasEventListener(Event.CALL_FRAME)) {
                                     let event = new Event(Event.CALL_FRAME);
-                                    event.data = {frameIndex: s.currentFrame, frameName: frame.eventName};
+                                    event.data = {frameIndex: currentFrame, frameName: frame.eventName};
                                     frameEvents.push(event);
                                 }
                             }
@@ -593,7 +600,7 @@ namespace annie {
                                 displayObject.skewX = infoObject.skewX;
                                 displayObject.skewY = infoObject.skewY;
                                 displayObject.alpha = infoObject.alpha;
-                                if (infoObject.filters) {
+                                if (infoObject.filters){
                                     displayObject.filters = infoObject.filters;
                                 } else {
                                     displayObject.filters = null;
@@ -631,18 +638,18 @@ namespace annie {
                         if (!lastFrameChildren[i].parent) {
                             lastFrameChildren[i].parent = s;
                             lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                            lastFrameChildren[i]._cp=true;
                             lastFrameChildren[i].parent = null;
                          }
                     }
                     s.children.push(s.floatView);
-                    super.update(um,ua,uf);
                     //看看是否到了第一帧，或是最后一帧,如果是准备事件
-                    if ((s.currentFrame == 1 && !s.isFront) || (s.currentFrame == s.totalFrames && s.isFront)) {
+                    if ((currentFrame == 1 && !s.isFront) || (currentFrame == s.totalFrames && s.isFront)) {
                         if (s.hasEventListener(Event.END_FRAME)) {
                             let event = new Event(Event.END_FRAME);
                             event.data = {
-                                frameIndex: s.currentFrame,
-                                frameName: s.currentFrame == 1 ? "firstFrame" : "endFrame"
+                                frameIndex: currentFrame,
+                                frameName: currentFrame == 1 ? "firstFrame" : "endFrame"
                             };
                             frameEvents.push(event);
                         }
@@ -653,12 +660,11 @@ namespace annie {
                         s.dispatchEvent(frameEvents[i]);
                     }
                     //看看是否有回调,有则调用
-                    if (s._scriptLayer[s.currentFrame - 1] != undefined) {
-                        s._scriptLayer[s.currentFrame - 1]();
+                    if (s._scriptLayer[currentFrame - 1] != undefined) {
+                        s._scriptLayer[currentFrame - 1]();
                     }
-                } else {
-                    super.update(um,ua,uf);
                 }
+                super.update(um,ua,uf);
             }
         }
         /**
@@ -672,7 +678,8 @@ namespace annie {
             super._onDispatchBubbledEvent(type);
             if (updateMc){
                 let s = this;
-                s.currentFrame = 1;
+                s._goFrame = 1;
+                s.currentFrame=1;
                 s.isPlaying = true;
                 s.isFront = true;
                 s._isNeedUpdateChildren = true;
