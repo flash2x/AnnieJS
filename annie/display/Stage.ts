@@ -301,10 +301,11 @@ namespace annie {
          * 刷新函数
          * @method update
          */
-        public update(um: boolean, ua: boolean, uf: boolean): void {
+        public update(): void {
             let s = this;
             if (!s.pause) {
-                super.update(um, ua, uf);
+                let su=s._updateInfo;
+                super.update(su.UM,su.UA,su.UF);
             }
         }
 
@@ -349,14 +350,13 @@ namespace annie {
          */
         private flush(): void {
             let s = this;
-            let su = s._updateInfo;
             if (s._flush == 0) {
-                s.update(su.UM, su.UA, su.UF);
+                s.update();
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(su.UM, su.UA, su.UF);
+                    s.update();
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
@@ -666,7 +666,7 @@ namespace annie {
                 e.preventDefault();
             }
             if(s._uae){
-                s.update(true,true,true);
+                s.update();
                 s._uae=false;
             }
         };

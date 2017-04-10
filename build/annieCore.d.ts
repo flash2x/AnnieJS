@@ -1263,6 +1263,8 @@ declare namespace annie {
         protected _cacheY: number;
         protected _bounds: Rectangle;
         protected _drawRect: Rectangle;
+        protected _isNeedUpdate: boolean;
+        protected _setProperty(property: string, value: any, type: number): void;
     }
 }
 /**
@@ -1292,7 +1294,6 @@ declare namespace annie {
         bitmapData: any;
         private _bitmapData;
         private _realCacheImg;
-        private _isNeedUpdate;
         /**
          * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
          * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
@@ -1419,7 +1420,6 @@ declare namespace annie {
          * @pubic
          */
         static getGradientColor(colors: Array<string>, ratios: Array<number>, points: Array<number>): any;
-        private _isNeedUpdate;
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -2591,7 +2591,6 @@ declare namespace annie {
      */
     class TextField extends DisplayObject {
         constructor();
-        private _cacheObject;
         /**
          * 文本的对齐方式
          * @property textAlign
@@ -2601,6 +2600,7 @@ declare namespace annie {
          * @default left
          */
         textAlign: string;
+        private _textAlign;
         /**
          * 文本的行高
          * @property lineHeight
@@ -2610,6 +2610,7 @@ declare namespace annie {
          * @default 0
          */
         lineHeight: number;
+        private _lineHeight;
         /**
          * 文本的宽
          * @property lineWidth
@@ -2619,6 +2620,7 @@ declare namespace annie {
          * @default 0
          */
         lineWidth: number;
+        private _lineWidth;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -2628,6 +2630,7 @@ declare namespace annie {
          * @default single
          */
         lineType: string;
+        private _lineType;
         /**
          * 文本内容
          * @property text
@@ -2637,6 +2640,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         text: string;
+        private _text;
         /**
          * 文本的css字体样式
          * @property font
@@ -2646,6 +2650,7 @@ declare namespace annie {
          * @default 12px Arial
          */
         font: string;
+        private _font;
         /**
          * 文本的size
          * @property size
@@ -2655,6 +2660,7 @@ declare namespace annie {
          * @default 12
          */
         size: number;
+        private _size;
         /**
          * 文本的颜色值
          * @property color
@@ -2664,6 +2670,7 @@ declare namespace annie {
          * @default #fff
          */
         color: string;
+        _color: string;
         /**
          * 文本是否倾斜
          * @property italic
@@ -2673,6 +2680,7 @@ declare namespace annie {
          * @type {boolean}
          */
         italic: boolean;
+        private _italic;
         /**
          * 文本是否加粗
          * @property bold
@@ -2682,6 +2690,7 @@ declare namespace annie {
          * @type {boolean}
          */
         bold: boolean;
+        _bold: boolean;
         /**
          * 设置或获取是否有边框
          * @property property
@@ -2690,6 +2699,7 @@ declare namespace annie {
          * @since 1.0.6
          */
         border: boolean;
+        private _border;
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
@@ -3068,7 +3078,7 @@ declare namespace annie {
          * 刷新函数
          * @method update
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        update(): void;
         private _touchEvent;
         /**
          * 渲染函数

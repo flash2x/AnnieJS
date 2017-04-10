@@ -307,7 +307,7 @@ namespace annie {
          */
         public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
             let s = this;
-            if (!s.visible)return null;
+            if (!s._visible)return null;
             if (isMouseEvent && !s.mouseEnable)return null;
             let len = s.children.length;
             let hitDisplayObject: DisplayObject;

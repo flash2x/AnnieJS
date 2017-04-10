@@ -14,6 +14,7 @@ namespace annie {
             super();
             this._instanceType = "annie.Shape";
         }
+
         /**
          * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
          * @property _command
@@ -23,6 +24,7 @@ namespace annie {
          * @default []
          */
         private _command: any = [];
+
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
          * 一般给用户使用较少,Flash2x工具自动使用
@@ -48,7 +50,6 @@ namespace annie {
             }
             return colorObj;
         }
-        private _isNeedUpdate:boolean=true;
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -62,6 +63,7 @@ namespace annie {
             let ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         }
+
         /**
          * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
          * 默认将不开启
@@ -71,9 +73,16 @@ namespace annie {
          * @type {boolean}
          * @default false
          */
-        private set cacheAsBitmap(value:boolean){if(this._cAb!=value){this._cAb=value;this._isNeedUpdate=true;}}
-        private get cacheAsBitmap(){return this._cAb;}
-        private _cAb:boolean=false;
+        private set cacheAsBitmap(value: boolean) {
+            this._setProperty("_cAb",value,3);
+        }
+
+        private get cacheAsBitmap() {
+            return this._cAb;
+        }
+
+        private _cAb: boolean = false;
+
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -99,6 +108,7 @@ namespace annie {
             }
             return color;
         }
+
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
 
@@ -219,6 +229,7 @@ namespace annie {
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
             this._command.push([1, "quadraticCurveTo", [cpX, cpY, x, y]]);
         }
+
         /**
          * 三次贝赛尔曲线
          * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
@@ -329,14 +340,14 @@ namespace annie {
             let s = this;
             s._command = [];
             s._isNeedUpdate = true;
-            if(s._cacheImg) {
+            if (s._cacheImg) {
                 s._cacheImg.width = 0;
                 s._cacheImg.height = 0;
             }
             s._cacheX = 0;
             s._cacheY = 0;
-            s._bounds.width=0;
-            s._bounds.height=0;
+            s._bounds.width = 0;
+            s._bounds.height = 0;
         }
 
         /**
@@ -386,11 +397,11 @@ namespace annie {
          */
         public beginBitmapFill(image: any, matrix: Matrix): void {
             let s = this;
-            if (matrix){
+            if (matrix) {
                 s._isBitmapFill = matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
-            s.cacheAsBitmap=true;
+            s.cacheAsBitmap = true;
         }
 
         private _fill(fillStyle: any): void {
@@ -408,8 +419,8 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginStroke(color: string, lineWidth: number = 1,cap:string="",join:string="",miter:number=0): void {
-            this._stroke(color, lineWidth,cap,join,miter);
+        public beginStroke(color: string, lineWidth: number = 1, cap: string = "", join: string = "", miter: number = 0): void {
+            this._stroke(color, lineWidth, cap, join, miter);
         }
 
         /**
@@ -425,8 +436,8 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10): void {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth,cap,join,miter);
+        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10): void {
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
         }
 
         /**
@@ -442,8 +453,8 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10) {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth,cap,join,miter);
+        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10) {
+            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
         }
 
         /**
@@ -458,16 +469,16 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1,cap:string="butt",join:string="miter",miter:number=10): void {
+        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10): void {
             let s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth,cap,join,miter);
-            s.cacheAsBitmap=true;
+            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
+            s.cacheAsBitmap = true;
         }
 
-        private _stroke(strokeStyle: any, width: number,cap:string,join:string,miter:number): void {
+        private _stroke(strokeStyle: any, width: number, cap: string, join: string, miter: number): void {
             let c = this._command;
             c.push([0, "lineWidth", width]);
             c.push([0, "lineCap", cap]);
@@ -663,188 +674,188 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
-            if(s.visible) {
-                super.update(um, ua, uf);
-                if (s._isNeedUpdate || uf||s._updateInfo.UF){
-                    //更新缓存
-                    let cLen: number = s._command.length;
-                    let leftX: number;
-                    let leftY: number;
-                    let buttonRightX: number;
-                    let buttonRightY: number;
-                    let i: number;
-                    if (cLen > 0) {
-                        //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
-                        let data: any;
-                        let lastX = 0;
-                        let lastY = 0;
-                        let lineWidth = 0;
-                        for (i = 0; i < cLen; i++) {
-                            data = s._command[i];
-                            if (data[0] == 1) {
-                                if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
-                                    if (leftX == undefined) {
-                                        leftX = data[2][0];
-                                    }
-                                    if (leftY == undefined) {
-                                        leftY = data[2][1];
-                                    }
-                                    if (buttonRightX == undefined) {
-                                        buttonRightX = data[2][0];
-                                    }
-                                    if (buttonRightY == undefined) {
-                                        buttonRightY = data[2][1];
-                                    }
-                                    if (data[1] == "bezierCurveTo") {
-                                        leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
-                                        leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
-                                        buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
-                                        buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
-                                        lastX = data[2][4];
-                                        lastY = data[2][5];
-                                    } else {
-                                        leftX = Math.min(leftX, data[2][0]);
-                                        leftY = Math.min(leftY, data[2][1]);
-                                        buttonRightX = Math.max(buttonRightX, data[2][0]);
-                                        buttonRightY = Math.max(buttonRightY, data[2][1]);
-                                        lastX = data[2][0];
-                                        lastY = data[2][1];
-                                    }
-                                } else if (data[1] == "quadraticCurveTo") {
-                                    //求中点
-                                    let mid1X = (lastX + data[2][0]) * 0.5;
-                                    let mid1Y = (lastX + data[2][1]) * 0.5;
-                                    let mid2X = (data[2][0] + data[2][2]) * 0.5;
-                                    let mid2Y = (data[2][1] + data[2][3]) * 0.5;
-                                    if (leftX == undefined) {
-                                        leftX = mid1X;
-                                    }
-                                    if (leftY == undefined) {
-                                        leftY = mid1Y;
-                                    }
-                                    if (buttonRightX == undefined) {
-                                        buttonRightX = mid1X;
-                                    }
-                                    if (buttonRightY == undefined) {
-                                        buttonRightY = mid1Y;
-                                    }
-                                    leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
-                                    leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
-                                    buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
-                                    buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
-                                    lastX = data[2][2];
-                                    lastY = data[2][3];
-                                } else if (data[1] == "arc") {
-                                    let yuanPointX = data[2][0];
-                                    let yuanPointY = data[2][1];
-                                    let radio = data[2][2];
-                                    let yuanLeftX = yuanPointX - radio;
-                                    let yuanLeftY = yuanPointY - radio;
-                                    let yuanBRX = yuanPointX + radio;
-                                    let yuanBRY = yuanPointY + radio;
-                                    if (leftX == undefined) {
-                                        leftX = yuanLeftX;
-                                    }
-                                    if (leftY == undefined) {
-                                        leftY = yuanLeftY;
-                                    }
-                                    if (buttonRightX == undefined) {
-                                        buttonRightX = yuanBRX;
-                                    }
-                                    if (buttonRightY == undefined) {
-                                        buttonRightY = yuanBRY;
-                                    }
-                                    leftX = Math.min(leftX, yuanLeftX);
-                                    leftY = Math.min(leftY, yuanLeftY);
-                                    buttonRightX = Math.max(buttonRightX, yuanBRX);
-                                    buttonRightY = Math.max(buttonRightY, yuanBRY);
+            super.update(um, ua, uf);
+            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                //更新缓存
+                let cLen: number = s._command.length;
+                let leftX: number;
+                let leftY: number;
+                let buttonRightX: number;
+                let buttonRightY: number;
+                let i: number;
+                if (cLen > 0) {
+                    //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
+                    let data: any;
+                    let lastX = 0;
+                    let lastY = 0;
+                    let lineWidth = 0;
+                    for (i = 0; i < cLen; i++) {
+                        data = s._command[i];
+                        if (data[0] == 1) {
+                            if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
+                                if (leftX == undefined) {
+                                    leftX = data[2][0];
                                 }
-                            } else {
-                                if (data[1] == "lineWidth") {
-                                    if (lineWidth < data[2]) {
-                                        lineWidth = data[2];
-                                    }
+                                if (leftY == undefined) {
+                                    leftY = data[2][1];
                                 }
-                            }
-                        }
-                        if (leftX != undefined||lineWidth>0) {
-                            if(leftX==undefined){
-                                leftX=0;leftY=0;
-                            }
-                            leftX -= 20 + lineWidth >> 1;
-                            leftY -= 20 + lineWidth >> 1;
-                            buttonRightX += 20 + lineWidth >> 1;
-                            buttonRightY += 20 + lineWidth >> 1;
-                            let w = buttonRightX - leftX;
-                            let h = buttonRightY - leftY;
-                            s._cacheX = leftX;
-                            s._cacheY = leftY;
-                            s._bounds.width=w-10;
-                            s._bounds.height=h-10;
-                            if (s._cAb){
-                                ///////////////////////////
-                                if(!s._cacheImg) {
-                                    s._cacheImg = window.document.createElement("canvas");
+                                if (buttonRightX == undefined) {
+                                    buttonRightX = data[2][0];
                                 }
-                                let _canvas = s._cacheImg;
-                                //给webgl更新新
-                                _canvas.updateTexture=true;
-                                let ctx = _canvas["getContext"]('2d');
-                                _canvas.width = w;
-                                _canvas.height = h;
-                                _canvas.style.width = w / devicePixelRatio + "px";
-                                _canvas.style.height = h / devicePixelRatio + "px";
-                                ctx.clearRect(0, 0, w, h);
-                                ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                                /////////////////////
-                                let cf = s.cFilters;
-                                let cfLen = cf.length;
-                                if (cfLen > 0) {
-                                    for (let i = 0; i < cfLen; i++) {
-                                        if (s.cFilters[i].type == "Shadow") {
-                                            ctx.shadowBlur += cf[i].blur;
-                                            ctx.shadowColor += cf[i].color;
-                                            ctx.shadowOffsetX += cf[i].offsetX;
-                                            ctx.shadowOffsetY += cf[i].offsetY;
-                                            break;
-                                        }
-                                    }
+                                if (buttonRightY == undefined) {
+                                    buttonRightY = data[2][1];
+                                }
+                                if (data[1] == "bezierCurveTo") {
+                                    leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
+                                    leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
+                                    buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
+                                    buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
+                                    lastX = data[2][4];
+                                    lastY = data[2][5];
                                 } else {
-                                    ctx.shadowBlur = 0;
-                                    ctx.shadowColor = "#0";
-                                    ctx.shadowOffsetX = 0;
-                                    ctx.shadowOffsetY = 0;
+                                    leftX = Math.min(leftX, data[2][0]);
+                                    leftY = Math.min(leftY, data[2][1]);
+                                    buttonRightX = Math.max(buttonRightX, data[2][0]);
+                                    buttonRightY = Math.max(buttonRightY, data[2][1]);
+                                    lastX = data[2][0];
+                                    lastY = data[2][1];
                                 }
-                                ////////////////////
-                                s._drawShape(ctx);
-                                ///////////////////////////
-                                //滤镜
-                                let len = s.cFilters.length;
-                                if (len> 0) {
-                                    let imageData = ctx.getImageData(0, 0, w, h);
-                                    for (let i = 0; i < len; i++) {
-                                        let f: any = s.cFilters[i];
-                                        f.drawFilter(imageData);
-                                    }
-                                    ctx.putImageData(imageData, 0, 0);
+                            } else if (data[1] == "quadraticCurveTo") {
+                                //求中点
+                                let mid1X = (lastX + data[2][0]) * 0.5;
+                                let mid1Y = (lastX + data[2][1]) * 0.5;
+                                let mid2X = (data[2][0] + data[2][2]) * 0.5;
+                                let mid2Y = (data[2][1] + data[2][3]) * 0.5;
+                                if (leftX == undefined) {
+                                    leftX = mid1X;
+                                }
+                                if (leftY == undefined) {
+                                    leftY = mid1Y;
+                                }
+                                if (buttonRightX == undefined) {
+                                    buttonRightX = mid1X;
+                                }
+                                if (buttonRightY == undefined) {
+                                    buttonRightY = mid1Y;
+                                }
+                                leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
+                                leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
+                                buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
+                                buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
+                                lastX = data[2][2];
+                                lastY = data[2][3];
+                            } else if (data[1] == "arc") {
+                                let yuanPointX = data[2][0];
+                                let yuanPointY = data[2][1];
+                                let radio = data[2][2];
+                                let yuanLeftX = yuanPointX - radio;
+                                let yuanLeftY = yuanPointY - radio;
+                                let yuanBRX = yuanPointX + radio;
+                                let yuanBRY = yuanPointY + radio;
+                                if (leftX == undefined) {
+                                    leftX = yuanLeftX;
+                                }
+                                if (leftY == undefined) {
+                                    leftY = yuanLeftY;
+                                }
+                                if (buttonRightX == undefined) {
+                                    buttonRightX = yuanBRX;
+                                }
+                                if (buttonRightY == undefined) {
+                                    buttonRightY = yuanBRY;
+                                }
+                                leftX = Math.min(leftX, yuanLeftX);
+                                leftY = Math.min(leftY, yuanLeftY);
+                                buttonRightX = Math.max(buttonRightX, yuanBRX);
+                                buttonRightY = Math.max(buttonRightY, yuanBRY);
+                            }
+                        } else {
+                            if (data[1] == "lineWidth") {
+                                if (lineWidth < data[2]) {
+                                    lineWidth = data[2];
                                 }
                             }
                         }
                     }
-                    s._isNeedUpdate = false;
+                    if (leftX != undefined || lineWidth > 0) {
+                        if (leftX == undefined) {
+                            leftX = 0;
+                            leftY = 0;
+                        }
+                        leftX -= 20 + lineWidth >> 1;
+                        leftY -= 20 + lineWidth >> 1;
+                        buttonRightX += 20 + lineWidth >> 1;
+                        buttonRightY += 20 + lineWidth >> 1;
+                        let w = buttonRightX - leftX;
+                        let h = buttonRightY - leftY;
+                        s._cacheX = leftX;
+                        s._cacheY = leftY;
+                        s._bounds.width = w - 10;
+                        s._bounds.height = h - 10;
+                        if (s._cAb) {
+                            ///////////////////////////
+                            if (!s._cacheImg) {
+                                s._cacheImg = window.document.createElement("canvas");
+                            }
+                            let _canvas = s._cacheImg;
+                            //给webgl更新新
+                            _canvas.updateTexture = true;
+                            let ctx = _canvas["getContext"]('2d');
+                            _canvas.width = w;
+                            _canvas.height = h;
+                            _canvas.style.width = w / devicePixelRatio + "px";
+                            _canvas.style.height = h / devicePixelRatio + "px";
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                            /////////////////////
+                            let cf = s.cFilters;
+                            let cfLen = cf.length;
+                            if (cfLen > 0) {
+                                for (let i = 0; i < cfLen; i++) {
+                                    if (s.cFilters[i].type == "Shadow") {
+                                        ctx.shadowBlur += cf[i].blur;
+                                        ctx.shadowColor += cf[i].color;
+                                        ctx.shadowOffsetX += cf[i].offsetX;
+                                        ctx.shadowOffsetY += cf[i].offsetY;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                ctx.shadowBlur = 0;
+                                ctx.shadowColor = "#0";
+                                ctx.shadowOffsetX = 0;
+                                ctx.shadowOffsetY = 0;
+                            }
+                            ////////////////////
+                            s._drawShape(ctx);
+                            ///////////////////////////
+                            //滤镜
+                            let len = s.cFilters.length;
+                            if (len > 0) {
+                                let imageData = ctx.getImageData(0, 0, w, h);
+                                for (let i = 0; i < len; i++) {
+                                    let f: any = s.cFilters[i];
+                                    f.drawFilter(imageData);
+                                }
+                                ctx.putImageData(imageData, 0, 0);
+                            }
+                        }
+                    }
                 }
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
-                s._updateInfo.UF = false;
+                s._isNeedUpdate = false;
             }
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
+            s._updateInfo.UF = false;
         }
-        private _drawShape(ctx:any,isMask:boolean=false):void{
-            let s=this;
-            let com=s._command;
-            let cLen=com.length;
+
+        private _drawShape(ctx: any, isMask: boolean = false): void {
+            let s = this;
+            let com = s._command;
+            let cLen = com.length;
             let data: any;
-            let leftX:number=s._cacheX;
-            let leftY:number=s._cacheY;
+            let leftX: number = s._cacheX;
+            let leftY: number = s._cacheY;
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
@@ -858,21 +869,22 @@ namespace annie {
                     } else if (paramsLen == 5) {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], data[2][4]);
                     } else if (paramsLen == 6) {
-                        let lx=data[2][4];
-                        let ly=data[2][5];
+                        let lx = data[2][4];
+                        let ly = data[2][5];
                         if (data[0] == 2) {
                             //位图填充
-                            lx-=leftX;
-                            ly-=leftY;
+                            lx -= leftX;
+                            ly -= leftY;
                         }
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {
-                    if(!isMask)
-                    ctx[data[1]] = data[2];
+                    if (!isMask)
+                        ctx[data[1]] = data[2];
                 }
             }
         }
+
         /**
          * 重写getBounds
          * @method getBounds
@@ -881,7 +893,7 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds(): Rectangle {
-          return this._bounds;
+            return this._bounds;
         }
 
         /**
@@ -899,8 +911,8 @@ namespace annie {
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint, DisplayObject._bp);
             if (s._cAb) {
-                let image=s._cacheImg;
-                if(!image||image.width==0||image.height==0){
+                let image = s._cacheImg;
+                if (!image || image.width == 0 || image.height == 0) {
                     return null;
                 }
                 let _canvas = DisplayObject["_canvas"];
@@ -913,15 +925,16 @@ namespace annie {
                 if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                     return s;
                 }
-            }else{
-                p.x-=s._cacheX;
-                p.y-=s._cacheY;
-                if (s.getBounds().isPointIn(p)){
+            } else {
+                p.x -= s._cacheX;
+                p.y -= s._cacheY;
+                if (s.getBounds().isPointIn(p)) {
                     return s;
                 }
             }
             return null;
         }
+
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor

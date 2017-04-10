@@ -104,15 +104,9 @@ namespace annie {
         public get x(): number {
             return this._x;
         }
-
         public set x(value: number) {
-            let s=this;
-            if(s._x!=value) {
-                s._x = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_x",value,0);
         }
-
         private _x: number = 0;
 
         /**
@@ -128,11 +122,7 @@ namespace annie {
         }
 
         public set y(value: number) {
-            let s=this;
-            if(s._y!=value) {
-                s._y = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_y",value,0);
         };
 
         private _y: number = 0;
@@ -150,11 +140,7 @@ namespace annie {
         }
 
         public set scaleX(value: number) {
-            let s=this;
-            if(s._scaleX!=value) {
-                s._scaleX = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_scaleX",value,0);
         }
 
         private _scaleX: number = 1;
@@ -172,11 +158,7 @@ namespace annie {
         }
 
         public set scaleY(value: number) {
-            let s=this;
-            if(s._scaleY) {
-                s._scaleY = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_scaleY",value,0);
         }
         private _scaleY: number = 1;
         /**
@@ -192,11 +174,7 @@ namespace annie {
         }
 
         public set rotation(value: number) {
-            let s=this;
-            if(s._rotation!=value) {
-                s._rotation = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_rotation",value,0);
         }
 
         private _rotation: number = 0;
@@ -213,11 +191,7 @@ namespace annie {
         }
 
         public set alpha(value: number) {
-            let s=this;
-            if(s._alpha!=value) {
-                s._alpha = value;
-                s._updateInfo.UA = true
-            }
+            this._setProperty("_alpha",value,1);
         }
 
         private _alpha: number = 1;
@@ -235,11 +209,7 @@ namespace annie {
         }
 
         public set skewX(value: number) {
-            var s=this;
-            if(s._skewX!=value) {
-                s._skewX = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_skewX",value,0);
         }
 
         private _skewX: number = 0;
@@ -257,11 +227,7 @@ namespace annie {
         }
 
         public set skewY(value: number) {
-            let s=this;
-            if(s.skewY!=value) {
-                s._skewY = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_skewY",value,0);
         }
         private _skewY: number = 0;
 
@@ -278,11 +244,7 @@ namespace annie {
         }
 
         public set anchorX(value: number) {
-            let s=this;
-            if(s._anchorX!=value) {
-                s._anchorX = value;
-                s._updateInfo.UM = true;
-            }
+            this._setProperty("_anchorX",value,0);
         }
 
         private _anchorX: number = 0;
@@ -300,14 +262,8 @@ namespace annie {
         }
 
         public set anchorY(value: number) {
-            let s=this;
-            if(s._anchorY!=value){
-                s._anchorY = value;
-                s._updateInfo.UM = true;
-            }
-
+            this._setProperty("_anchorY",value,0);
         }
-
         private _anchorY: number = 0;
         /**
          * 显未对象是否可见
@@ -319,11 +275,7 @@ namespace annie {
          */
         public get visible(){return this._visible;}
         public set visible(value:boolean){
-            let s=this;
-            if(s._visible!=value){
-                s._visible=value;
-                s._cp=true;
-            }
+            this._setProperty("_visible",value,0);
         }
         public _visible: boolean = true;
         /**
@@ -373,14 +325,7 @@ namespace annie {
         }
 
         public set filters(value: any[]){
-            if(!value)return;
-            if(value.length==0&&this._filters.length==0)return;
-            if(value&&value.length>0) {
-                this._filters = value;
-            }else{
-                this._filters.length=0;
-            }
-            this._updateInfo.UF = true;
+            this._setProperty("_filters",value,2);
         }
         private _filters: any[] = [];
         /**
@@ -512,9 +457,11 @@ namespace annie {
             if (uf || s._updateInfo.UF){
                 s.cFilters.length = 0;
                 let sf = s._filters;
-                let len = sf.length;
-                for (let i = 0; i < len; i++) {
-                    s.cFilters.push(sf[i]);
+                if(sf) {
+                    let len = sf.length;
+                    for (let i = 0; i < len; i++) {
+                        s.cFilters.push(sf[i]);
+                    }
                 }
                 if (s.parent) {
                     if (s.parent.cFilters.length > 0) {
@@ -651,5 +598,23 @@ namespace annie {
         protected _cacheY:number = 0;
         protected _bounds:Rectangle=new Rectangle();
         protected _drawRect:Rectangle=new Rectangle();
+        protected _isNeedUpdate: boolean = true;
+        protected _setProperty(property:string,value:any,type:number){
+            let s:any=this;
+            if(s[property]!=value){
+                s[property]=value;
+                if(type==0){
+                    s._updateInfo.UM = true;
+                }else if(type==1){
+                    s._updateInfo.UA = true;
+                }else if(type==2){
+                    s._updateInfo.UF = true;
+                }else if(type==3){
+                    s._isNeedUpdate = true;
+                }else if(type==4){
+                    s._cp=true;
+                }
+            }
+        }
     }
 }

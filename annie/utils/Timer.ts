@@ -30,10 +30,11 @@ namespace annie {
             if(delay<=0){
                 delay=1;
             }
-            this._delay=delay;
-            this._frameDelay=Math.ceil(delay*0.001*60);
-            this._repeatCount=repeatCount;
-            Timer._timerList.push(this);
+            let s=this;
+            s._delay=delay;
+            s._frameDelay=Math.ceil(delay*0.001*60);
+            s._repeatCount=repeatCount;
+            Timer._timerList.push(s);
         }
         /**
          * 重置定时器
@@ -42,9 +43,10 @@ namespace annie {
          * @since 1.0.9
          */
         public reset():void{
-            this._running=false;
-            this._currentCount=0;
-            this._currentFrameDelay=0;
+            let s=this;
+            s._running=false;
+            s._currentCount=0;
+            s._currentFrameDelay=0;
         }
         /**
          * 开始执行定时器
@@ -53,9 +55,10 @@ namespace annie {
          * @since 1.0.9
          */
         public start():void{
-            this._running=true;
-            if(this._currentCount == this._repeatCount){
-                this._currentCount=0;
+            let s=this;
+            s._running=true;
+            if(s._currentCount == s._repeatCount){
+                s._currentCount=0;
             }
         }
 
@@ -144,19 +147,20 @@ namespace annie {
             }
         }
         private update(){
-            if(this._running) {
-                this._currentFrameDelay++;
-                if (this._currentFrameDelay == this._frameDelay) {
-                    if(this._repeatCount) {
-                        this._currentCount++;
+            let s=this;
+            if(s._running) {
+                s._currentFrameDelay++;
+                if (s._currentFrameDelay == s._frameDelay) {
+                    if(s._repeatCount) {
+                        s._currentCount++;
                     }
-                    this._currentFrameDelay=0;
+                    s._currentFrameDelay=0;
                     //触发事件
-                    this.dispatchEvent("onTimer");
-                    if (this._repeatCount&&this._currentCount == this._repeatCount) {
+                    s.dispatchEvent("onTimer");
+                    if (s._repeatCount&&s._currentCount == s._repeatCount) {
                         //触发完成时事件
-                        this._running = false;
-                        this.dispatchEvent("onTimerComplete");
+                        s._running = false;
+                        s.dispatchEvent("onTimerComplete");
                     }
                 }
             }

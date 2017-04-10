@@ -1485,6 +1485,7 @@ var annie;
             this._cacheY = 0;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
+            this._isNeedUpdate = true;
             this._instanceType = "annie.DisplayObject";
         }
         Object.defineProperty(DisplayObject.prototype, "x", {
@@ -1500,11 +1501,7 @@ var annie;
                 return this._x;
             },
             set: function (value) {
-                var s = this;
-                if (s._x != value) {
-                    s._x = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_x", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1522,11 +1519,7 @@ var annie;
                 return this._y;
             },
             set: function (value) {
-                var s = this;
-                if (s._y != value) {
-                    s._y = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_y", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1545,11 +1538,7 @@ var annie;
                 return this._scaleX;
             },
             set: function (value) {
-                var s = this;
-                if (s._scaleX != value) {
-                    s._scaleX = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_scaleX", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1567,11 +1556,7 @@ var annie;
                 return this._scaleY;
             },
             set: function (value) {
-                var s = this;
-                if (s._scaleY) {
-                    s._scaleY = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_scaleY", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1589,11 +1574,7 @@ var annie;
                 return this._rotation;
             },
             set: function (value) {
-                var s = this;
-                if (s._rotation != value) {
-                    s._rotation = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_rotation", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1611,11 +1592,7 @@ var annie;
                 return this._alpha;
             },
             set: function (value) {
-                var s = this;
-                if (s._alpha != value) {
-                    s._alpha = value;
-                    s._updateInfo.UA = true;
-                }
+                this._setProperty("_alpha", value, 1);
             },
             enumerable: true,
             configurable: true
@@ -1633,11 +1610,7 @@ var annie;
                 return this._skewX;
             },
             set: function (value) {
-                var s = this;
-                if (s._skewX != value) {
-                    s._skewX = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_skewX", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1655,11 +1628,7 @@ var annie;
                 return this._skewY;
             },
             set: function (value) {
-                var s = this;
-                if (s.skewY != value) {
-                    s._skewY = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_skewY", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1677,11 +1646,7 @@ var annie;
                 return this._anchorX;
             },
             set: function (value) {
-                var s = this;
-                if (s._anchorX != value) {
-                    s._anchorX = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_anchorX", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1699,11 +1664,7 @@ var annie;
                 return this._anchorY;
             },
             set: function (value) {
-                var s = this;
-                if (s._anchorY != value) {
-                    s._anchorY = value;
-                    s._updateInfo.UM = true;
-                }
+                this._setProperty("_anchorY", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1719,11 +1680,7 @@ var annie;
              */
             get: function () { return this._visible; },
             set: function (value) {
-                var s = this;
-                if (s._visible != value) {
-                    s._visible = value;
-                    s._cp = true;
-                }
+                this._setProperty("_visible", value, 0);
             },
             enumerable: true,
             configurable: true
@@ -1757,17 +1714,7 @@ var annie;
                 return this._filters;
             },
             set: function (value) {
-                if (!value)
-                    return;
-                if (value.length == 0 && this._filters.length == 0)
-                    return;
-                if (value && value.length > 0) {
-                    this._filters = value;
-                }
-                else {
-                    this._filters.length = 0;
-                }
-                this._updateInfo.UF = true;
+                this._setProperty("_filters", value, 2);
             },
             enumerable: true,
             configurable: true
@@ -1869,15 +1816,17 @@ var annie;
             if (uf || s._updateInfo.UF) {
                 s.cFilters.length = 0;
                 var sf = s._filters;
-                var len = sf.length;
-                for (var i = 0; i < len; i++) {
-                    s.cFilters.push(sf[i]);
+                if (sf) {
+                    var len = sf.length;
+                    for (var i = 0; i < len; i++) {
+                        s.cFilters.push(sf[i]);
+                    }
                 }
                 if (s.parent) {
                     if (s.parent.cFilters.length > 0) {
-                        var len_1 = s.parent.cFilters.length;
+                        var len = s.parent.cFilters.length;
                         var pf = s.parent.cFilters;
-                        for (var i = len_1 - 1; i >= 0; i--) {
+                        for (var i = len - 1; i >= 0; i--) {
                             s.cFilters.unshift(pf[i]);
                         }
                     }
@@ -1969,6 +1918,27 @@ var annie;
             s._updateInfo.UM = true;
             return { width: dr.width, height: dr.height };
         };
+        DisplayObject.prototype._setProperty = function (property, value, type) {
+            var s = this;
+            if (s[property] != value) {
+                s[property] = value;
+                if (type == 0) {
+                    s._updateInfo.UM = true;
+                }
+                else if (type == 1) {
+                    s._updateInfo.UA = true;
+                }
+                else if (type == 2) {
+                    s._updateInfo.UF = true;
+                }
+                else if (type == 3) {
+                    s._isNeedUpdate = true;
+                }
+                else if (type == 4) {
+                    s._cp = true;
+                }
+            }
+        };
         /**
          * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
          * @type {annie.Point}
@@ -2040,7 +2010,6 @@ var annie;
             _super.call(this);
             this._bitmapData = null;
             this._realCacheImg = null;
-            this._isNeedUpdate = true;
             /**
              * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
              * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
@@ -2073,10 +2042,11 @@ var annie;
              * @type {any}
              * @default null
              */
-            get: function () { return this._bitmapData; },
+            get: function () {
+                return this._bitmapData;
+            },
             set: function (value) {
-                this._bitmapData = value;
-                this._isNeedUpdate = true;
+                this._setProperty("_bitmapData", value, 3);
                 if (!value) {
                     this._bounds.width = this._bounds.height = 0;
                 }
@@ -2105,90 +2075,88 @@ var annie;
          */
         Bitmap.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.visible) {
-                _super.prototype.update.call(this, um, ua, uf);
-                //滤镜
-                var bitmapData = s._bitmapData;
-                if ((s._isNeedUpdate || uf || s._updateInfo.UF) && bitmapData) {
-                    s._isNeedUpdate = false;
-                    if (s.cFilters.length > 0) {
-                        if (!s._realCacheImg) {
-                            s._realCacheImg = window.document.createElement("canvas");
+            _super.prototype.update.call(this, um, ua, uf);
+            //滤镜
+            var bitmapData = s._bitmapData;
+            if ((s._isNeedUpdate || uf || s._updateInfo.UF) && bitmapData) {
+                s._isNeedUpdate = false;
+                if (s.cFilters.length > 0) {
+                    if (!s._realCacheImg) {
+                        s._realCacheImg = window.document.createElement("canvas");
+                    }
+                    var _canvas = s._realCacheImg;
+                    var tr = s.rect;
+                    var w = tr ? tr.width : bitmapData.width;
+                    var h = tr ? tr.height : bitmapData.height;
+                    var newW = w + 20;
+                    var newH = h + 20;
+                    _canvas.width = newW;
+                    _canvas.height = newH;
+                    _canvas.style.width = newW / annie.devicePixelRatio + "px";
+                    _canvas.style.height = newH / annie.devicePixelRatio + "px";
+                    var ctx = _canvas.getContext("2d");
+                    ctx.clearRect(0, 0, newW, newH);
+                    ctx.translate(10, 10);
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = "#0";
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    /////////////////////
+                    var cf = s.cFilters;
+                    var cfLen = cf.length;
+                    for (var i = 0; i < cfLen; i++) {
+                        if (s.cFilters[i].type == "Shadow") {
+                            ctx.shadowBlur = cf[i].blur;
+                            ctx.shadowColor = cf[i].color;
+                            ctx.shadowOffsetX = cf[i].offsetX;
+                            ctx.shadowOffsetY = cf[i].offsetY;
+                            break;
                         }
-                        var _canvas = s._realCacheImg;
-                        var tr = s.rect;
-                        var w = tr ? tr.width : bitmapData.width;
-                        var h = tr ? tr.height : bitmapData.height;
-                        var newW = w + 20;
-                        var newH = h + 20;
-                        _canvas.width = newW;
-                        _canvas.height = newH;
-                        _canvas.style.width = newW / annie.devicePixelRatio + "px";
-                        _canvas.style.height = newH / annie.devicePixelRatio + "px";
-                        var ctx = _canvas.getContext("2d");
-                        ctx.clearRect(0, 0, newW, newH);
-                        ctx.translate(10, 10);
-                        ctx.shadowBlur = 0;
-                        ctx.shadowColor = "#0";
-                        ctx.shadowOffsetX = 0;
-                        ctx.shadowOffsetY = 0;
-                        /////////////////////
-                        var cf = s.cFilters;
-                        var cfLen = cf.length;
-                        for (var i = 0; i < cfLen; i++) {
-                            if (s.cFilters[i].type == "Shadow") {
-                                ctx.shadowBlur = cf[i].blur;
-                                ctx.shadowColor = cf[i].color;
-                                ctx.shadowOffsetX = cf[i].offsetX;
-                                ctx.shadowOffsetY = cf[i].offsetY;
-                                break;
-                            }
-                        }
-                        ////////////////////
-                        if (tr) {
-                            ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                        }
-                        else {
-                            ctx.drawImage(s._bitmapData, 0, 0);
-                        }
-                        var len = s["cFilters"].length;
-                        var imageData = ctx.getImageData(0, 0, newW, newH);
-                        for (var i = 0; i < len; i++) {
-                            var f = s["cFilters"][i];
-                            f.drawFilter(imageData);
-                        }
-                        ctx.putImageData(imageData, 0, 0);
-                        //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                        s._cacheImg = s._realCacheImg;
-                        s._cacheX = -10;
-                        s._cacheY = -10;
-                        s._isCache = true;
+                    }
+                    ////////////////////
+                    if (tr) {
+                        ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
                     }
                     else {
-                        s._isCache = false;
-                        s._cacheX = 0;
-                        s._cacheY = 0;
-                        s._cacheImg = bitmapData;
+                        ctx.drawImage(s._bitmapData, 0, 0);
                     }
-                    var bw = void 0;
-                    var bh = void 0;
-                    if (s.rect) {
-                        bw = s.rect.width;
-                        bh = s.rect.height;
+                    var len = s["cFilters"].length;
+                    var imageData = ctx.getImageData(0, 0, newW, newH);
+                    for (var i = 0; i < len; i++) {
+                        var f = s["cFilters"][i];
+                        f.drawFilter(imageData);
                     }
-                    else {
-                        bw = s._cacheImg.width + s._cacheX * 2;
-                        bh = s._cacheImg.height + s._cacheY * 2;
-                    }
-                    s._bounds.width = bw;
-                    s._bounds.height = bh;
-                    //给webgl更新新
-                    s._cacheImg.updateTexture = true;
+                    ctx.putImageData(imageData, 0, 0);
+                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
+                    s._cacheImg = s._realCacheImg;
+                    s._cacheX = -10;
+                    s._cacheY = -10;
+                    s._isCache = true;
                 }
-                s._updateInfo.UF = false;
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
+                else {
+                    s._isCache = false;
+                    s._cacheX = 0;
+                    s._cacheY = 0;
+                    s._cacheImg = bitmapData;
+                }
+                var bw = void 0;
+                var bh = void 0;
+                if (s.rect) {
+                    bw = s.rect.width;
+                    bh = s.rect.height;
+                }
+                else {
+                    bw = s._cacheImg.width + s._cacheX * 2;
+                    bh = s._cacheImg.height + s._cacheY * 2;
+                }
+                s._bounds.width = bw;
+                s._bounds.height = bh;
+                //给webgl更新新
+                s._cacheImg.updateTexture = true;
             }
+            s._updateInfo.UF = false;
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
         };
         /**
          * 重写getBounds
@@ -2268,7 +2236,6 @@ var annie;
              * @default []
              */
             this._command = [];
-            this._isNeedUpdate = true;
             this._cAb = false;
             /**
              * 径向渐变填充 一般给Flash2x用
@@ -2395,7 +2362,9 @@ var annie;
             return ctx.createPattern(image, "repeat");
         };
         Object.defineProperty(Shape.prototype, "cacheAsBitmap", {
-            get: function () { return this._cAb; },
+            get: function () {
+                return this._cAb;
+            },
             /**
              * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
              * 默认将不开启
@@ -2405,10 +2374,9 @@ var annie;
              * @type {boolean}
              * @default false
              */
-            set: function (value) { if (this._cAb != value) {
-                this._cAb = value;
-                this._isNeedUpdate = true;
-            } },
+            set: function (value) {
+                this._setProperty("_cAb", value, 3);
+            },
             enumerable: true,
             configurable: true
         });
@@ -2841,186 +2809,184 @@ var annie;
          */
         Shape.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.visible) {
-                _super.prototype.update.call(this, um, ua, uf);
-                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
-                    //更新缓存
-                    var cLen = s._command.length;
-                    var leftX = void 0;
-                    var leftY = void 0;
-                    var buttonRightX = void 0;
-                    var buttonRightY = void 0;
-                    var i = void 0;
-                    if (cLen > 0) {
-                        //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
-                        var data = void 0;
-                        var lastX = 0;
-                        var lastY = 0;
-                        var lineWidth = 0;
-                        for (i = 0; i < cLen; i++) {
-                            data = s._command[i];
-                            if (data[0] == 1) {
-                                if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
-                                    if (leftX == undefined) {
-                                        leftX = data[2][0];
-                                    }
-                                    if (leftY == undefined) {
-                                        leftY = data[2][1];
-                                    }
-                                    if (buttonRightX == undefined) {
-                                        buttonRightX = data[2][0];
-                                    }
-                                    if (buttonRightY == undefined) {
-                                        buttonRightY = data[2][1];
-                                    }
-                                    if (data[1] == "bezierCurveTo") {
-                                        leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
-                                        leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
-                                        buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
-                                        buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
-                                        lastX = data[2][4];
-                                        lastY = data[2][5];
-                                    }
-                                    else {
-                                        leftX = Math.min(leftX, data[2][0]);
-                                        leftY = Math.min(leftY, data[2][1]);
-                                        buttonRightX = Math.max(buttonRightX, data[2][0]);
-                                        buttonRightY = Math.max(buttonRightY, data[2][1]);
-                                        lastX = data[2][0];
-                                        lastY = data[2][1];
-                                    }
+            _super.prototype.update.call(this, um, ua, uf);
+            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                //更新缓存
+                var cLen = s._command.length;
+                var leftX = void 0;
+                var leftY = void 0;
+                var buttonRightX = void 0;
+                var buttonRightY = void 0;
+                var i = void 0;
+                if (cLen > 0) {
+                    //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
+                    var data = void 0;
+                    var lastX = 0;
+                    var lastY = 0;
+                    var lineWidth = 0;
+                    for (i = 0; i < cLen; i++) {
+                        data = s._command[i];
+                        if (data[0] == 1) {
+                            if (data[1] == "moveTo" || data[1] == "lineTo" || data[1] == "arcTo" || data[1] == "bezierCurveTo") {
+                                if (leftX == undefined) {
+                                    leftX = data[2][0];
                                 }
-                                else if (data[1] == "quadraticCurveTo") {
-                                    //求中点
-                                    var mid1X = (lastX + data[2][0]) * 0.5;
-                                    var mid1Y = (lastX + data[2][1]) * 0.5;
-                                    var mid2X = (data[2][0] + data[2][2]) * 0.5;
-                                    var mid2Y = (data[2][1] + data[2][3]) * 0.5;
-                                    if (leftX == undefined) {
-                                        leftX = mid1X;
-                                    }
-                                    if (leftY == undefined) {
-                                        leftY = mid1Y;
-                                    }
-                                    if (buttonRightX == undefined) {
-                                        buttonRightX = mid1X;
-                                    }
-                                    if (buttonRightY == undefined) {
-                                        buttonRightY = mid1Y;
-                                    }
-                                    leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
-                                    leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
-                                    buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
-                                    buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
-                                    lastX = data[2][2];
-                                    lastY = data[2][3];
+                                if (leftY == undefined) {
+                                    leftY = data[2][1];
                                 }
-                                else if (data[1] == "arc") {
-                                    var yuanPointX = data[2][0];
-                                    var yuanPointY = data[2][1];
-                                    var radio = data[2][2];
-                                    var yuanLeftX = yuanPointX - radio;
-                                    var yuanLeftY = yuanPointY - radio;
-                                    var yuanBRX = yuanPointX + radio;
-                                    var yuanBRY = yuanPointY + radio;
-                                    if (leftX == undefined) {
-                                        leftX = yuanLeftX;
-                                    }
-                                    if (leftY == undefined) {
-                                        leftY = yuanLeftY;
-                                    }
-                                    if (buttonRightX == undefined) {
-                                        buttonRightX = yuanBRX;
-                                    }
-                                    if (buttonRightY == undefined) {
-                                        buttonRightY = yuanBRY;
-                                    }
-                                    leftX = Math.min(leftX, yuanLeftX);
-                                    leftY = Math.min(leftY, yuanLeftY);
-                                    buttonRightX = Math.max(buttonRightX, yuanBRX);
-                                    buttonRightY = Math.max(buttonRightY, yuanBRY);
+                                if (buttonRightX == undefined) {
+                                    buttonRightX = data[2][0];
                                 }
-                            }
-                            else {
-                                if (data[1] == "lineWidth") {
-                                    if (lineWidth < data[2]) {
-                                        lineWidth = data[2];
-                                    }
+                                if (buttonRightY == undefined) {
+                                    buttonRightY = data[2][1];
                                 }
-                            }
-                        }
-                        if (leftX != undefined || lineWidth > 0) {
-                            if (leftX == undefined) {
-                                leftX = 0;
-                                leftY = 0;
-                            }
-                            leftX -= 20 + lineWidth >> 1;
-                            leftY -= 20 + lineWidth >> 1;
-                            buttonRightX += 20 + lineWidth >> 1;
-                            buttonRightY += 20 + lineWidth >> 1;
-                            var w = buttonRightX - leftX;
-                            var h = buttonRightY - leftY;
-                            s._cacheX = leftX;
-                            s._cacheY = leftY;
-                            s._bounds.width = w - 10;
-                            s._bounds.height = h - 10;
-                            if (s._cAb) {
-                                ///////////////////////////
-                                if (!s._cacheImg) {
-                                    s._cacheImg = window.document.createElement("canvas");
-                                }
-                                var _canvas = s._cacheImg;
-                                //给webgl更新新
-                                _canvas.updateTexture = true;
-                                var ctx = _canvas["getContext"]('2d');
-                                _canvas.width = w;
-                                _canvas.height = h;
-                                _canvas.style.width = w / annie.devicePixelRatio + "px";
-                                _canvas.style.height = h / annie.devicePixelRatio + "px";
-                                ctx.clearRect(0, 0, w, h);
-                                ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                                /////////////////////
-                                var cf = s.cFilters;
-                                var cfLen = cf.length;
-                                if (cfLen > 0) {
-                                    for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                        if (s.cFilters[i_1].type == "Shadow") {
-                                            ctx.shadowBlur += cf[i_1].blur;
-                                            ctx.shadowColor += cf[i_1].color;
-                                            ctx.shadowOffsetX += cf[i_1].offsetX;
-                                            ctx.shadowOffsetY += cf[i_1].offsetY;
-                                            break;
-                                        }
-                                    }
+                                if (data[1] == "bezierCurveTo") {
+                                    leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
+                                    leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
+                                    buttonRightX = Math.max(buttonRightX, data[2][0], data[2][2], data[2][4]);
+                                    buttonRightY = Math.max(buttonRightY, data[2][1], data[2][3], data[2][5]);
+                                    lastX = data[2][4];
+                                    lastY = data[2][5];
                                 }
                                 else {
-                                    ctx.shadowBlur = 0;
-                                    ctx.shadowColor = "#0";
-                                    ctx.shadowOffsetX = 0;
-                                    ctx.shadowOffsetY = 0;
+                                    leftX = Math.min(leftX, data[2][0]);
+                                    leftY = Math.min(leftY, data[2][1]);
+                                    buttonRightX = Math.max(buttonRightX, data[2][0]);
+                                    buttonRightY = Math.max(buttonRightY, data[2][1]);
+                                    lastX = data[2][0];
+                                    lastY = data[2][1];
                                 }
-                                ////////////////////
-                                s._drawShape(ctx);
-                                ///////////////////////////
-                                //滤镜
-                                var len = s.cFilters.length;
-                                if (len > 0) {
-                                    var imageData = ctx.getImageData(0, 0, w, h);
-                                    for (var i_2 = 0; i_2 < len; i_2++) {
-                                        var f = s.cFilters[i_2];
-                                        f.drawFilter(imageData);
-                                    }
-                                    ctx.putImageData(imageData, 0, 0);
+                            }
+                            else if (data[1] == "quadraticCurveTo") {
+                                //求中点
+                                var mid1X = (lastX + data[2][0]) * 0.5;
+                                var mid1Y = (lastX + data[2][1]) * 0.5;
+                                var mid2X = (data[2][0] + data[2][2]) * 0.5;
+                                var mid2Y = (data[2][1] + data[2][3]) * 0.5;
+                                if (leftX == undefined) {
+                                    leftX = mid1X;
+                                }
+                                if (leftY == undefined) {
+                                    leftY = mid1Y;
+                                }
+                                if (buttonRightX == undefined) {
+                                    buttonRightX = mid1X;
+                                }
+                                if (buttonRightY == undefined) {
+                                    buttonRightY = mid1Y;
+                                }
+                                leftX = Math.min(leftX, mid1X, mid2X, data[2][2]);
+                                leftY = Math.min(leftY, mid1Y, mid2Y, data[2][3]);
+                                buttonRightX = Math.max(buttonRightX, mid1X, mid2X, data[2][2]);
+                                buttonRightY = Math.max(buttonRightY, mid1Y, mid2Y, data[2][3]);
+                                lastX = data[2][2];
+                                lastY = data[2][3];
+                            }
+                            else if (data[1] == "arc") {
+                                var yuanPointX = data[2][0];
+                                var yuanPointY = data[2][1];
+                                var radio = data[2][2];
+                                var yuanLeftX = yuanPointX - radio;
+                                var yuanLeftY = yuanPointY - radio;
+                                var yuanBRX = yuanPointX + radio;
+                                var yuanBRY = yuanPointY + radio;
+                                if (leftX == undefined) {
+                                    leftX = yuanLeftX;
+                                }
+                                if (leftY == undefined) {
+                                    leftY = yuanLeftY;
+                                }
+                                if (buttonRightX == undefined) {
+                                    buttonRightX = yuanBRX;
+                                }
+                                if (buttonRightY == undefined) {
+                                    buttonRightY = yuanBRY;
+                                }
+                                leftX = Math.min(leftX, yuanLeftX);
+                                leftY = Math.min(leftY, yuanLeftY);
+                                buttonRightX = Math.max(buttonRightX, yuanBRX);
+                                buttonRightY = Math.max(buttonRightY, yuanBRY);
+                            }
+                        }
+                        else {
+                            if (data[1] == "lineWidth") {
+                                if (lineWidth < data[2]) {
+                                    lineWidth = data[2];
                                 }
                             }
                         }
                     }
-                    s._isNeedUpdate = false;
+                    if (leftX != undefined || lineWidth > 0) {
+                        if (leftX == undefined) {
+                            leftX = 0;
+                            leftY = 0;
+                        }
+                        leftX -= 20 + lineWidth >> 1;
+                        leftY -= 20 + lineWidth >> 1;
+                        buttonRightX += 20 + lineWidth >> 1;
+                        buttonRightY += 20 + lineWidth >> 1;
+                        var w = buttonRightX - leftX;
+                        var h = buttonRightY - leftY;
+                        s._cacheX = leftX;
+                        s._cacheY = leftY;
+                        s._bounds.width = w - 10;
+                        s._bounds.height = h - 10;
+                        if (s._cAb) {
+                            ///////////////////////////
+                            if (!s._cacheImg) {
+                                s._cacheImg = window.document.createElement("canvas");
+                            }
+                            var _canvas = s._cacheImg;
+                            //给webgl更新新
+                            _canvas.updateTexture = true;
+                            var ctx = _canvas["getContext"]('2d');
+                            _canvas.width = w;
+                            _canvas.height = h;
+                            _canvas.style.width = w / annie.devicePixelRatio + "px";
+                            _canvas.style.height = h / annie.devicePixelRatio + "px";
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                            /////////////////////
+                            var cf = s.cFilters;
+                            var cfLen = cf.length;
+                            if (cfLen > 0) {
+                                for (var i_1 = 0; i_1 < cfLen; i_1++) {
+                                    if (s.cFilters[i_1].type == "Shadow") {
+                                        ctx.shadowBlur += cf[i_1].blur;
+                                        ctx.shadowColor += cf[i_1].color;
+                                        ctx.shadowOffsetX += cf[i_1].offsetX;
+                                        ctx.shadowOffsetY += cf[i_1].offsetY;
+                                        break;
+                                    }
+                                }
+                            }
+                            else {
+                                ctx.shadowBlur = 0;
+                                ctx.shadowColor = "#0";
+                                ctx.shadowOffsetX = 0;
+                                ctx.shadowOffsetY = 0;
+                            }
+                            ////////////////////
+                            s._drawShape(ctx);
+                            ///////////////////////////
+                            //滤镜
+                            var len = s.cFilters.length;
+                            if (len > 0) {
+                                var imageData = ctx.getImageData(0, 0, w, h);
+                                for (var i_2 = 0; i_2 < len; i_2++) {
+                                    var f = s.cFilters[i_2];
+                                    f.drawFilter(imageData);
+                                }
+                                ctx.putImageData(imageData, 0, 0);
+                            }
+                        }
+                    }
                 }
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
-                s._updateInfo.UF = false;
+                s._isNeedUpdate = false;
             }
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
+            s._updateInfo.UF = false;
         };
         Shape.prototype._drawShape = function (ctx, isMask) {
             if (isMask === void 0) { isMask = false; }
@@ -3529,7 +3495,7 @@ var annie;
         Sprite.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
             if (isMouseEvent === void 0) { isMouseEvent = false; }
             var s = this;
-            if (!s.visible)
+            if (!s._visible)
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
@@ -4401,7 +4367,9 @@ var annie;
             //将mc设置成按钮形式
             if (s.totalFrames > 1) {
                 // s.gotoAndStop(1);
-                s._scriptLayer[0] = function () { s.stop(); };
+                s._scriptLayer[0] = function () {
+                    s.stop();
+                };
                 s.addEventListener("onMouseDown", this._mouseEvent.bind(this));
                 s.addEventListener("onMouseUp", this._mouseEvent.bind(this));
                 s.addEventListener("onMouseOut", this._mouseEvent.bind(this));
@@ -4623,172 +4591,170 @@ var annie;
          */
         MovieClip.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.visible) {
-                if (s._graphicInfo) {
-                    //核心代码
-                    //loopType,firstFrame,parentFrameIndex
-                    var curParentFrameIndex = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
-                    var tempCurrentFrame = 1;
-                    var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
-                    var cStartFrame = s._graphicInfo.firstFrame + 1;
-                    if (s._graphicInfo.loopType == "play once") {
-                        if (curParentFrameIndex - pStartFrame >= 0) {
-                            tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
-                            if (tempCurrentFrame > s.totalFrames) {
-                                tempCurrentFrame = s.totalFrames;
-                            }
-                        }
-                    }
-                    else if (s._graphicInfo.loopType == "loop") {
-                        if (curParentFrameIndex - pStartFrame >= 0) {
-                            tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
-                        }
-                        if (tempCurrentFrame == 0) {
+            if (s._graphicInfo) {
+                //核心代码
+                //loopType,firstFrame,parentFrameIndex
+                var curParentFrameIndex = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
+                var tempCurrentFrame = 1;
+                var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
+                var cStartFrame = s._graphicInfo.firstFrame + 1;
+                if (s._graphicInfo.loopType == "play once") {
+                    if (curParentFrameIndex - pStartFrame >= 0) {
+                        tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
+                        if (tempCurrentFrame > s.totalFrames) {
                             tempCurrentFrame = s.totalFrames;
                         }
                     }
-                    else {
-                        tempCurrentFrame = cStartFrame;
+                }
+                else if (s._graphicInfo.loopType == "loop") {
+                    if (curParentFrameIndex - pStartFrame >= 0) {
+                        tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
                     }
-                    if (s._goFrame != tempCurrentFrame) {
-                        s._goFrame = tempCurrentFrame;
-                        s._isNeedUpdateChildren = true;
+                    if (tempCurrentFrame == 0) {
+                        tempCurrentFrame = s.totalFrames;
                     }
-                    s.isPlaying = false;
                 }
                 else {
-                    if (s.isPlaying && s._isUpdateFrame) {
-                        //核心代码
-                        if (s.isFront) {
-                            s._goFrame++;
-                            if (s._goFrame > s.totalFrames) {
-                                s._goFrame = 1;
+                    tempCurrentFrame = cStartFrame;
+                }
+                if (s._goFrame != tempCurrentFrame) {
+                    s._goFrame = tempCurrentFrame;
+                    s._isNeedUpdateChildren = true;
+                }
+                s.isPlaying = false;
+            }
+            else {
+                if (s.isPlaying && s._isUpdateFrame) {
+                    //核心代码
+                    if (s.isFront) {
+                        s._goFrame++;
+                        if (s._goFrame > s.totalFrames) {
+                            s._goFrame = 1;
+                        }
+                    }
+                    else {
+                        s._goFrame--;
+                        if (s._goFrame < 1) {
+                            s._goFrame = s.totalFrames;
+                        }
+                    }
+                    s._isNeedUpdateChildren = true;
+                }
+            }
+            var currentFrame = s.currentFrame = s._goFrame;
+            s._isUpdateFrame = true;
+            if (s._isNeedUpdateChildren) {
+                var t = -1;
+                var layerCount = s._timeline.length;
+                var frameCount = 0;
+                var frame = null;
+                var displayObject = null;
+                var infoObject = null;
+                var frameChildrenCount = 0;
+                var lastFrameChildren = s.children;
+                var i = void 0;
+                var frameEvents = [];
+                for (i = 0; i < s.children.length - 1; i++) {
+                    lastFrameChildren[i].parent = null;
+                }
+                s.children = [];
+                for (i = 0; i < layerCount; i++) {
+                    frameCount = s._timeline[i].length;
+                    if (currentFrame <= frameCount) {
+                        frame = s._timeline[i][currentFrame - 1];
+                        if (frame == undefined)
+                            continue;
+                        if (frame.keyIndex == (currentFrame - 1)) {
+                            if (frame.soundName != "") {
+                                Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
+                            }
+                            if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
+                                var event_1 = new annie.Event(annie.Event.CALL_FRAME);
+                                event_1.data = { frameIndex: currentFrame, frameName: frame.eventName };
+                                frameEvents.push(event_1);
                             }
                         }
-                        else {
-                            s._goFrame--;
-                            if (s._goFrame < 1) {
-                                s._goFrame = s.totalFrames;
+                        frameChildrenCount = frame.frameChildList.length;
+                        for (var j = 0; j < frameChildrenCount; j++) {
+                            infoObject = frame.frameChildList[j];
+                            displayObject = infoObject.display;
+                            displayObject.x = infoObject.x;
+                            displayObject.y = infoObject.y;
+                            displayObject.scaleX = infoObject.scaleX;
+                            displayObject.scaleY = infoObject.scaleY;
+                            displayObject.rotation = infoObject.rotation;
+                            displayObject.skewX = infoObject.skewX;
+                            displayObject.skewY = infoObject.skewY;
+                            displayObject.alpha = infoObject.alpha;
+                            if (infoObject.filters) {
+                                displayObject.filters = infoObject.filters;
+                            }
+                            else {
+                                displayObject.filters = null;
+                            }
+                            if (infoObject.graphicInfo) {
+                                displayObject["_graphicInfo"] = infoObject.graphicInfo;
+                            }
+                            else {
+                                if (displayObject["_graphicInfo"]) {
+                                    displayObject["_graphicInfo"] = null;
+                                }
+                            }
+                            if (displayObject["_donotUpdateinMC"] != undefined) {
+                                for (var o in displayObject["_donotUpdateinMC"]) {
+                                    if (displayObject["_donotUpdateinMC"][o] != undefined) {
+                                        displayObject[o] = displayObject["_donotUpdateinMC"][o];
+                                    }
+                                }
+                            }
+                            displayObject.parent = s;
+                            s.children.push(displayObject);
+                            t = lastFrameChildren.indexOf(displayObject);
+                            if (t < 0) {
+                                displayObject._onDispatchBubbledEvent("onAddToStage");
+                                displayObject._cp = true;
+                            }
+                            else {
+                                lastFrameChildren.splice(t, 1);
                             }
                         }
-                        s._isNeedUpdateChildren = true;
                     }
                 }
-                var currentFrame = s.currentFrame = s._goFrame;
-                s._isUpdateFrame = true;
-                if (s._isNeedUpdateChildren) {
-                    var t = -1;
-                    var layerCount = s._timeline.length;
-                    var frameCount = 0;
-                    var frame = null;
-                    var displayObject = null;
-                    var infoObject = null;
-                    var frameChildrenCount = 0;
-                    var lastFrameChildren = s.children;
-                    var i = void 0;
-                    var frameEvents = [];
-                    for (i = 0; i < s.children.length - 1; i++) {
+                s._isNeedUpdateChildren = false;
+                //update一定要放在事件处理之前
+                var len = lastFrameChildren.length;
+                for (i = 0; i < len; i++) {
+                    //不加这个判读在removeAllChildren时会报错
+                    if (!lastFrameChildren[i].parent) {
+                        lastFrameChildren[i].parent = s;
+                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                        lastFrameChildren[i]._cp = true;
                         lastFrameChildren[i].parent = null;
                     }
-                    s.children = [];
-                    for (i = 0; i < layerCount; i++) {
-                        frameCount = s._timeline[i].length;
-                        if (currentFrame <= frameCount) {
-                            frame = s._timeline[i][currentFrame - 1];
-                            if (frame == undefined)
-                                continue;
-                            if (frame.keyIndex == (currentFrame - 1)) {
-                                if (frame.soundName != "") {
-                                    Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
-                                }
-                                if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
-                                    var event_1 = new annie.Event(annie.Event.CALL_FRAME);
-                                    event_1.data = { frameIndex: currentFrame, frameName: frame.eventName };
-                                    frameEvents.push(event_1);
-                                }
-                            }
-                            frameChildrenCount = frame.frameChildList.length;
-                            for (var j = 0; j < frameChildrenCount; j++) {
-                                infoObject = frame.frameChildList[j];
-                                displayObject = infoObject.display;
-                                displayObject.x = infoObject.x;
-                                displayObject.y = infoObject.y;
-                                displayObject.scaleX = infoObject.scaleX;
-                                displayObject.scaleY = infoObject.scaleY;
-                                displayObject.rotation = infoObject.rotation;
-                                displayObject.skewX = infoObject.skewX;
-                                displayObject.skewY = infoObject.skewY;
-                                displayObject.alpha = infoObject.alpha;
-                                if (infoObject.filters) {
-                                    displayObject.filters = infoObject.filters;
-                                }
-                                else {
-                                    displayObject.filters = null;
-                                }
-                                if (infoObject.graphicInfo) {
-                                    displayObject["_graphicInfo"] = infoObject.graphicInfo;
-                                }
-                                else {
-                                    if (displayObject["_graphicInfo"]) {
-                                        displayObject["_graphicInfo"] = null;
-                                    }
-                                }
-                                if (displayObject["_donotUpdateinMC"] != undefined) {
-                                    for (var o in displayObject["_donotUpdateinMC"]) {
-                                        if (displayObject["_donotUpdateinMC"][o] != undefined) {
-                                            displayObject[o] = displayObject["_donotUpdateinMC"][o];
-                                        }
-                                    }
-                                }
-                                displayObject.parent = s;
-                                s.children.push(displayObject);
-                                t = lastFrameChildren.indexOf(displayObject);
-                                if (t < 0) {
-                                    displayObject._onDispatchBubbledEvent("onAddToStage");
-                                    displayObject._cp = true;
-                                }
-                                else {
-                                    lastFrameChildren.splice(t, 1);
-                                }
-                            }
-                        }
-                    }
-                    s._isNeedUpdateChildren = false;
-                    //update一定要放在事件处理之前
-                    var len = lastFrameChildren.length;
-                    for (i = 0; i < len; i++) {
-                        //不加这个判读在removeAllChildren时会报错
-                        if (!lastFrameChildren[i].parent) {
-                            lastFrameChildren[i].parent = s;
-                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
-                            lastFrameChildren[i]._cp = true;
-                            lastFrameChildren[i].parent = null;
-                        }
-                    }
-                    s.children.push(s.floatView);
-                    //看看是否到了第一帧，或是最后一帧,如果是准备事件
-                    if ((currentFrame == 1 && !s.isFront) || (currentFrame == s.totalFrames && s.isFront)) {
-                        if (s.hasEventListener(annie.Event.END_FRAME)) {
-                            var event_2 = new annie.Event(annie.Event.END_FRAME);
-                            event_2.data = {
-                                frameIndex: currentFrame,
-                                frameName: currentFrame == 1 ? "firstFrame" : "endFrame"
-                            };
-                            frameEvents.push(event_2);
-                        }
-                    }
-                    //看看是否有帧事件,有则派发
-                    len = frameEvents.length;
-                    for (i = 0; i < len; i++) {
-                        s.dispatchEvent(frameEvents[i]);
-                    }
-                    //看看是否有回调,有则调用
-                    if (s._scriptLayer[currentFrame - 1] != undefined) {
-                        s._scriptLayer[currentFrame - 1]();
+                }
+                s.children.push(s.floatView);
+                //看看是否到了第一帧，或是最后一帧,如果是准备事件
+                if ((currentFrame == 1 && !s.isFront) || (currentFrame == s.totalFrames && s.isFront)) {
+                    if (s.hasEventListener(annie.Event.END_FRAME)) {
+                        var event_2 = new annie.Event(annie.Event.END_FRAME);
+                        event_2.data = {
+                            frameIndex: currentFrame,
+                            frameName: currentFrame == 1 ? "firstFrame" : "endFrame"
+                        };
+                        frameEvents.push(event_2);
                     }
                 }
-                _super.prototype.update.call(this, um, ua, uf);
+                //看看是否有帧事件,有则派发
+                len = frameEvents.length;
+                for (i = 0; i < len; i++) {
+                    s.dispatchEvent(frameEvents[i]);
+                }
+                //看看是否有回调,有则调用
+                if (s._scriptLayer[currentFrame - 1] != undefined) {
+                    s._scriptLayer[currentFrame - 1]();
+                }
             }
+            _super.prototype.update.call(this, um, ua, uf);
         };
         /**
          * 触发显示列表上相关的事件
@@ -5095,7 +5061,24 @@ var annie;
         __extends(TextField, _super);
         function TextField() {
             _super.call(this);
-            this._cacheObject = { border: false, bold: false, italic: false, size: 12, lineType: "single", text: "ILoveAnnie", textAlign: "left", font: "Arial", color: "#fff", lineWidth: 0, lineHeight: 0 };
+            this._textAlign = "left";
+            this._lineHeight = 0;
+            this._lineWidth = 0;
+            this._lineType = "single";
+            this._text = "";
+            this._font = "Arial";
+            this._size = 12;
+            this._color = "#fff";
+            this._italic = false;
+            this._bold = false;
+            this._border = false;
+            this._instanceType = "annie.TextField";
+            this._cacheImg = window.document.createElement("canvas");
+        }
+        Object.defineProperty(TextField.prototype, "textAlign", {
+            get: function () {
+                return this._textAlign;
+            },
             /**
              * 文本的对齐方式
              * @property textAlign
@@ -5104,7 +5087,16 @@ var annie;
              * @type {string}
              * @default left
              */
-            this.textAlign = "left";
+            set: function (value) {
+                this._setProperty("_textAlign", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "lineHeight", {
+            get: function () {
+                return this._lineHeight;
+            },
             /**
              * 文本的行高
              * @property lineHeight
@@ -5113,7 +5105,16 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this.lineHeight = 0;
+            set: function (value) {
+                this._setProperty("_lineHeight", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "lineWidth", {
+            get: function () {
+                return this._lineWidth;
+            },
             /**
              * 文本的宽
              * @property lineWidth
@@ -5122,7 +5123,16 @@ var annie;
              * @type {number}
              * @default 0
              */
-            this.lineWidth = 0;
+            set: function (value) {
+                this._setProperty("_lineWidth", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "lineType", {
+            get: function () {
+                return this._lineType;
+            },
             /**
              * 文本类型,单行还是多行 single multi
              * @property lineType
@@ -5131,7 +5141,16 @@ var annie;
              * @type {string} 两种 single和multi
              * @default single
              */
-            this.lineType = "single";
+            set: function (value) {
+                this._setProperty("_lineType", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "text", {
+            get: function () {
+                return this._text;
+            },
             /**
              * 文本内容
              * @property text
@@ -5140,7 +5159,16 @@ var annie;
              * @default ""
              * @since 1.0.0
              */
-            this.text = "";
+            set: function (value) {
+                this._setProperty("_text", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "font", {
+            get: function () {
+                return this._font;
+            },
             /**
              * 文本的css字体样式
              * @property font
@@ -5149,7 +5177,16 @@ var annie;
              * @type {string}
              * @default 12px Arial
              */
-            this.font = "Arial";
+            set: function (value) {
+                this._setProperty("_font", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "size", {
+            get: function () {
+                return this._size;
+            },
             /**
              * 文本的size
              * @property size
@@ -5158,7 +5195,16 @@ var annie;
              * @type {number}
              * @default 12
              */
-            this.size = 12;
+            set: function (value) {
+                this._setProperty("_size", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "color", {
+            get: function () {
+                return this._color;
+            },
             /**
              * 文本的颜色值
              * @property color
@@ -5167,7 +5213,16 @@ var annie;
              * @since 1.0.0
              * @default #fff
              */
-            this.color = "#fff";
+            set: function (value) {
+                this._setProperty("_color", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "italic", {
+            get: function () {
+                return this._italic;
+            },
             /**
              * 文本是否倾斜
              * @property italic
@@ -5176,7 +5231,16 @@ var annie;
              * @default false
              * @type {boolean}
              */
-            this.italic = false;
+            set: function (value) {
+                this._setProperty("_italic", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "bold", {
+            get: function () {
+                return this._bold;
+            },
             /**
              * 文本是否加粗
              * @property bold
@@ -5185,7 +5249,16 @@ var annie;
              * @default false
              * @type {boolean}
              */
-            this.bold = false;
+            set: function (value) {
+                this._setProperty("_bold", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "border", {
+            get: function () {
+                return this._border;
+            },
             /**
              * 设置或获取是否有边框
              * @property property
@@ -5193,10 +5266,12 @@ var annie;
              * @public
              * @since 1.0.6
              */
-            this.border = false;
-            this._instanceType = "annie.TextField";
-            this._cacheImg = window.document.createElement("canvas");
-        }
+            set: function (value) {
+                this._setProperty("_border", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
@@ -5209,16 +5284,16 @@ var annie;
             font += "px ";
             font += s.font;
             //font-weight:bold;font-style:italic;
-            if (s.bold) {
+            if (s._bold) {
                 font = "bold " + font;
             }
-            if (s.italic) {
+            if (s._italic) {
                 font = "italic " + font;
             }
             ctx.font = font;
-            ctx.textAlign = this.textAlign || "left";
+            ctx.textAlign = this._textAlign || "left";
             ctx.textBaseline = "top";
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = this._color;
         };
         /**
          * 获取文本宽
@@ -5255,150 +5330,142 @@ var annie;
         TextField.prototype.update = function (um, ua, uf) {
             _super.prototype.update.call(this, um, ua, uf);
             var s = this;
-            if (s.visible) {
-                for (var item in s._cacheObject) {
-                    if (s._cacheObject[item] != s[item]) {
-                        s._cacheObject[item] = s[item];
-                        s._isNeedUpdate = true;
+            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+                s.text += "";
+                var can = s._cacheImg;
+                var ctx = can.getContext("2d");
+                var hardLines = s.text.toString().split(/(?:\r\n|\r|\n)/);
+                var realLines = [];
+                s._prepContext(ctx);
+                var lineH = void 0;
+                if (s.lineHeight) {
+                    lineH = s.lineHeight;
+                }
+                else {
+                    lineH = s._getMeasuredWidth("M") * 1.2;
+                }
+                if (!s.lineWidth) {
+                    s.lineWidth = lineH * 10;
+                }
+                else {
+                    if (s.lineWidth < lineH) {
+                        s.lineWidth = lineH;
                     }
                 }
-                if (s._isNeedUpdate || uf || s._updateInfo.UF) {
-                    s.text += "";
-                    var can = s._cacheImg;
-                    var ctx = can.getContext("2d");
-                    var hardLines = s.text.toString().split(/(?:\r\n|\r|\n)/);
-                    var realLines = [];
-                    s._prepContext(ctx);
-                    var lineH = void 0;
-                    if (s.lineHeight) {
-                        lineH = s.lineHeight;
-                    }
-                    else {
-                        lineH = s._getMeasuredWidth("M") * 1.2;
-                    }
-                    if (!s.lineWidth) {
-                        s.lineWidth = lineH * 10;
-                    }
-                    else {
-                        if (s.lineWidth < lineH) {
-                            s.lineWidth = lineH;
-                        }
-                    }
-                    if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
-                        realLines.push(hardLines[0]);
-                        var str = hardLines[0];
-                        var lineW = s._getMeasuredWidth(str);
-                        if (lineW > s.lineWidth) {
-                            var w = s._getMeasuredWidth(str[0]);
-                            var lineStr = str[0];
-                            var wordW = 0;
-                            var strLen = str.length;
-                            for (var j = 1; j < strLen; j++) {
-                                wordW = ctx.measureText(str[j]).width;
-                                w += wordW;
-                                if (w > s.lineWidth) {
-                                    realLines[0] = lineStr;
-                                    break;
-                                }
-                                else {
-                                    lineStr += str[j];
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        for (var i = 0, l = hardLines.length; i < l; i++) {
-                            var str = hardLines[i];
-                            if (!str)
-                                continue;
-                            var w = s._getMeasuredWidth(str[0]);
-                            var lineStr = str[0];
-                            var wordW = 0;
-                            var strLen = str.length;
-                            for (var j = 1; j < strLen; j++) {
-                                wordW = ctx.measureText(str[j]).width;
-                                w += wordW;
-                                if (w > this.lineWidth) {
-                                    realLines.push(lineStr);
-                                    lineStr = str[j];
-                                    w = wordW;
-                                }
-                                else {
-                                    lineStr += str[j];
-                                }
-                            }
-                            realLines.push(lineStr);
-                        }
-                    }
-                    var maxH = lineH * realLines.length;
-                    var maxW = s.lineWidth;
-                    var tx = 0;
-                    if (s.textAlign == "center") {
-                        tx = maxW * 0.5;
-                    }
-                    else if (s.textAlign == "right") {
-                        tx = maxW;
-                    }
-                    can.width = maxW + 20;
-                    can.height = maxH + 20;
-                    can.style.width = can.width / annie.devicePixelRatio + "px";
-                    can.style.height = can.height / annie.devicePixelRatio + "px";
-                    ctx.clearRect(0, 0, can.width, can.width);
-                    if (s.border) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = "#000";
-                        ctx.lineWidth = 1;
-                        ctx.strokeRect(10.5, 10.5, maxW, maxH);
-                        ctx.closePath();
-                    }
-                    ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                    /////////////////////
-                    if (s.cFilters.length > 0) {
-                        var cf = s.cFilters;
-                        var cfLen = cf.length;
-                        for (var i = 0; i < cfLen; i++) {
-                            if (s.cFilters[i].type == "Shadow") {
-                                ctx.shadowBlur = cf[i].blur;
-                                ctx.shadowColor = cf[i].color;
-                                ctx.shadowOffsetX = cf[i].offsetX;
-                                ctx.shadowOffsetY = cf[i].offsetY;
+                if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
+                    realLines.push(hardLines[0]);
+                    var str = hardLines[0];
+                    var lineW = s._getMeasuredWidth(str);
+                    if (lineW > s.lineWidth) {
+                        var w = s._getMeasuredWidth(str[0]);
+                        var lineStr = str[0];
+                        var wordW = 0;
+                        var strLen = str.length;
+                        for (var j = 1; j < strLen; j++) {
+                            wordW = ctx.measureText(str[j]).width;
+                            w += wordW;
+                            if (w > s.lineWidth) {
+                                realLines[0] = lineStr;
                                 break;
                             }
+                            else {
+                                lineStr += str[j];
+                            }
                         }
                     }
-                    else {
-                        ctx.shadowBlur = 0;
-                        ctx.shadowColor = "#0";
-                        ctx.shadowOffsetX = 0;
-                        ctx.shadowOffsetY = 0;
-                    }
-                    ////////////////////
-                    s._prepContext(ctx);
-                    for (var i = 0; i < realLines.length; i++) {
-                        ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                    }
-                    //滤镜
-                    var len = s.cFilters.length;
-                    if (len > 0) {
-                        var imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
-                        for (var i = 0; i < len; i++) {
-                            var f = s.cFilters[i];
-                            f.drawFilter(imageData);
-                        }
-                        ctx.putImageData(imageData, 0, 0);
-                    }
-                    s._cacheX = -10;
-                    s._cacheY = -10;
-                    s._isNeedUpdate = false;
-                    //给webgl更新新
-                    s._cacheImg.updateTexture = true;
-                    s._bounds.height = maxH;
-                    s._bounds.width = maxW;
                 }
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
-                s._updateInfo.UF = false;
+                else {
+                    for (var i = 0, l = hardLines.length; i < l; i++) {
+                        var str = hardLines[i];
+                        if (!str)
+                            continue;
+                        var w = s._getMeasuredWidth(str[0]);
+                        var lineStr = str[0];
+                        var wordW = 0;
+                        var strLen = str.length;
+                        for (var j = 1; j < strLen; j++) {
+                            wordW = ctx.measureText(str[j]).width;
+                            w += wordW;
+                            if (w > this.lineWidth) {
+                                realLines.push(lineStr);
+                                lineStr = str[j];
+                                w = wordW;
+                            }
+                            else {
+                                lineStr += str[j];
+                            }
+                        }
+                        realLines.push(lineStr);
+                    }
+                }
+                var maxH = lineH * realLines.length;
+                var maxW = s.lineWidth;
+                var tx = 0;
+                if (s.textAlign == "center") {
+                    tx = maxW * 0.5;
+                }
+                else if (s.textAlign == "right") {
+                    tx = maxW;
+                }
+                can.width = maxW + 20;
+                can.height = maxH + 20;
+                can.style.width = can.width / annie.devicePixelRatio + "px";
+                can.style.height = can.height / annie.devicePixelRatio + "px";
+                ctx.clearRect(0, 0, can.width, can.width);
+                if (s.border) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#000";
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(10.5, 10.5, maxW, maxH);
+                    ctx.closePath();
+                }
+                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
+                /////////////////////
+                if (s.cFilters.length > 0) {
+                    var cf = s.cFilters;
+                    var cfLen = cf.length;
+                    for (var i = 0; i < cfLen; i++) {
+                        if (s.cFilters[i].type == "Shadow") {
+                            ctx.shadowBlur = cf[i].blur;
+                            ctx.shadowColor = cf[i].color;
+                            ctx.shadowOffsetX = cf[i].offsetX;
+                            ctx.shadowOffsetY = cf[i].offsetY;
+                            break;
+                        }
+                    }
+                }
+                else {
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = "#0";
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+                ////////////////////
+                s._prepContext(ctx);
+                for (var i = 0; i < realLines.length; i++) {
+                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                }
+                //滤镜
+                var len = s.cFilters.length;
+                if (len > 0) {
+                    var imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
+                    for (var i = 0; i < len; i++) {
+                        var f = s.cFilters[i];
+                        f.drawFilter(imageData);
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                }
+                s._cacheX = -10;
+                s._cacheY = -10;
+                s._isNeedUpdate = false;
+                //给webgl更新新
+                s._cacheImg.updateTexture = true;
+                s._bounds.height = maxH;
+                s._bounds.width = maxW;
             }
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
+            s._updateInfo.UF = false;
         };
         /**
          * 重写 getBounds
@@ -6128,7 +6195,7 @@ var annie;
                     e.preventDefault();
                 }
                 if (s._uae) {
-                    s.update(true, true, true);
+                    s.update();
                     s._uae = false;
                 }
             };
@@ -6297,10 +6364,11 @@ var annie;
          * 刷新函数
          * @method update
          */
-        Stage.prototype.update = function (um, ua, uf) {
+        Stage.prototype.update = function () {
             var s = this;
             if (!s.pause) {
-                _super.prototype.update.call(this, um, ua, uf);
+                var su = s._updateInfo;
+                _super.prototype.update.call(this, su.UM, su.UA, su.UF);
             }
         };
         /**
@@ -6327,15 +6395,14 @@ var annie;
          */
         Stage.prototype.flush = function () {
             var s = this;
-            var su = s._updateInfo;
             if (s._flush == 0) {
-                s.update(su.UM, su.UA, su.UF);
+                s.update();
                 s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(su.UM, su.UA, su.UF);
+                    s.update();
                     s._currentFlush = s._flush;
                 }
                 else {
@@ -9476,10 +9543,11 @@ var annie;
             if (delay <= 0) {
                 delay = 1;
             }
-            this._delay = delay;
-            this._frameDelay = Math.ceil(delay * 0.001 * 60);
-            this._repeatCount = repeatCount;
-            Timer._timerList.push(this);
+            var s = this;
+            s._delay = delay;
+            s._frameDelay = Math.ceil(delay * 0.001 * 60);
+            s._repeatCount = repeatCount;
+            Timer._timerList.push(s);
         }
         /**
          * 重置定时器
@@ -9488,9 +9556,10 @@ var annie;
          * @since 1.0.9
          */
         Timer.prototype.reset = function () {
-            this._running = false;
-            this._currentCount = 0;
-            this._currentFrameDelay = 0;
+            var s = this;
+            s._running = false;
+            s._currentCount = 0;
+            s._currentFrameDelay = 0;
         };
         /**
          * 开始执行定时器
@@ -9499,9 +9568,10 @@ var annie;
          * @since 1.0.9
          */
         Timer.prototype.start = function () {
-            this._running = true;
-            if (this._currentCount == this._repeatCount) {
-                this._currentCount = 0;
+            var s = this;
+            s._running = true;
+            if (s._currentCount == s._repeatCount) {
+                s._currentCount = 0;
             }
         };
         /**
@@ -9595,19 +9665,20 @@ var annie;
             }
         };
         Timer.prototype.update = function () {
-            if (this._running) {
-                this._currentFrameDelay++;
-                if (this._currentFrameDelay == this._frameDelay) {
-                    if (this._repeatCount) {
-                        this._currentCount++;
+            var s = this;
+            if (s._running) {
+                s._currentFrameDelay++;
+                if (s._currentFrameDelay == s._frameDelay) {
+                    if (s._repeatCount) {
+                        s._currentCount++;
                     }
-                    this._currentFrameDelay = 0;
+                    s._currentFrameDelay = 0;
                     //触发事件
-                    this.dispatchEvent("onTimer");
-                    if (this._repeatCount && this._currentCount == this._repeatCount) {
+                    s.dispatchEvent("onTimer");
+                    if (s._repeatCount && s._currentCount == s._repeatCount) {
                         //触发完成时事件
-                        this._running = false;
-                        this.dispatchEvent("onTimerComplete");
+                        s._running = false;
+                        s.dispatchEvent("onTimerComplete");
                     }
                 }
             }

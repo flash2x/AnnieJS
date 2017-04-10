@@ -22,18 +22,20 @@ namespace annie {
          * @type {any}
          * @default null
          */
-      
-        public get bitmapData():any{return this._bitmapData};
-        public set bitmapData(value:any){
-            this._bitmapData=value;
-            this._isNeedUpdate=true;
-            if(!value){
-                this._bounds.width=this._bounds.height=0;
+
+        public get bitmapData(): any {
+            return this._bitmapData
+        };
+
+        public set bitmapData(value: any) {
+            this._setProperty("_bitmapData",value,3);
+            if (!value) {
+                this._bounds.width = this._bounds.height = 0;
             }
         }
-        private _bitmapData:any = null;
-        private _realCacheImg:any=null;
-        private _isNeedUpdate:boolean=true;
+
+        private _bitmapData: any = null;
+        private _realCacheImg: any = null;
         /**
          * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
          * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
@@ -43,7 +45,7 @@ namespace annie {
          * @type {annie.Rectangle}
          * @default null
          */
-        public rect:Rectangle=null;
+        public rect: Rectangle = null;
         /**
          * @property _isCache
          * @private
@@ -109,88 +111,86 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
-            if (s.visible){
-                super.update(um, ua, uf);
-                //滤镜
-                let bitmapData=s._bitmapData;
-                if ((s._isNeedUpdate || uf || s._updateInfo.UF)&&bitmapData) {
-                    s._isNeedUpdate = false;
-                    if (s.cFilters.length > 0) {
-                        if (!s._realCacheImg) {
-                            s._realCacheImg = window.document.createElement("canvas");
+            super.update(um, ua, uf);
+            //滤镜
+            let bitmapData = s._bitmapData;
+            if ((s._isNeedUpdate || uf || s._updateInfo.UF) && bitmapData) {
+                s._isNeedUpdate = false;
+                if (s.cFilters.length > 0) {
+                    if (!s._realCacheImg) {
+                        s._realCacheImg = window.document.createElement("canvas");
+                    }
+                    let _canvas = s._realCacheImg;
+                    let tr = s.rect;
+                    let w = tr ? tr.width : bitmapData.width;
+                    let h = tr ? tr.height : bitmapData.height;
+                    let newW = w + 20;
+                    let newH = h + 20;
+                    _canvas.width = newW;
+                    _canvas.height = newH;
+                    _canvas.style.width = newW / devicePixelRatio + "px";
+                    _canvas.style.height = newH / devicePixelRatio + "px";
+                    let ctx = _canvas.getContext("2d");
+                    ctx.clearRect(0, 0, newW, newH);
+                    ctx.translate(10, 10);
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = "#0";
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    /////////////////////
+                    let cf = s.cFilters;
+                    let cfLen = cf.length;
+                    for (let i = 0; i < cfLen; i++) {
+                        if (s.cFilters[i].type == "Shadow") {
+                            ctx.shadowBlur = cf[i].blur;
+                            ctx.shadowColor = cf[i].color;
+                            ctx.shadowOffsetX = cf[i].offsetX;
+                            ctx.shadowOffsetY = cf[i].offsetY;
+                            break;
                         }
-                        let _canvas = s._realCacheImg;
-                        let tr = s.rect;
-                        let w = tr ? tr.width : bitmapData.width;
-                        let h = tr ? tr.height : bitmapData.height;
-                        let newW = w + 20;
-                        let newH = h + 20;
-                        _canvas.width = newW;
-                        _canvas.height = newH;
-                        _canvas.style.width = newW / devicePixelRatio + "px";
-                        _canvas.style.height = newH / devicePixelRatio + "px";
-                        let ctx = _canvas.getContext("2d");
-                        ctx.clearRect(0, 0, newW, newH);
-                        ctx.translate(10, 10);
-                        ctx.shadowBlur = 0;
-                        ctx.shadowColor = "#0";
-                        ctx.shadowOffsetX = 0;
-                        ctx.shadowOffsetY = 0;
-                        /////////////////////
-                        let cf = s.cFilters;
-                        let cfLen = cf.length;
-                        for (let i = 0; i < cfLen; i++) {
-                            if (s.cFilters[i].type == "Shadow") {
-                                ctx.shadowBlur = cf[i].blur;
-                                ctx.shadowColor = cf[i].color;
-                                ctx.shadowOffsetX = cf[i].offsetX;
-                                ctx.shadowOffsetY = cf[i].offsetY;
-                                break;
-                            }
-                        }
-                        ////////////////////
-                        if (tr) {
-                            ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                        } else {
-                            ctx.drawImage(s._bitmapData, 0, 0);
-                        }
-                        let len = s["cFilters"].length;
-                        let imageData = ctx.getImageData(0, 0, newW, newH);
-                        for (let i = 0; i < len; i++) {
-                            let f: any = s["cFilters"][i];
-                            f.drawFilter(imageData);
-                        }
-                        ctx.putImageData(imageData, 0, 0);
-                        //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                        s._cacheImg = s._realCacheImg;
-                        s._cacheX = -10;
-                        s._cacheY = -10;
-                        s._isCache = true;
+                    }
+                    ////////////////////
+                    if (tr) {
+                        ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
                     } else {
-                        s._isCache = false;
-                        s._cacheX = 0;
-                        s._cacheY = 0;
-                        s._cacheImg = bitmapData;
+                        ctx.drawImage(s._bitmapData, 0, 0);
                     }
-
-                    let bw:number;
-                    let bh:number;
-                    if(s.rect){
-                        bw=s.rect.width;
-                        bh=s.rect.height;
-                    }else{
-                        bw=s._cacheImg.width+s._cacheX*2;
-                        bh=s._cacheImg.height+s._cacheY*2;
+                    let len = s["cFilters"].length;
+                    let imageData = ctx.getImageData(0, 0, newW, newH);
+                    for (let i = 0; i < len; i++) {
+                        let f: any = s["cFilters"][i];
+                        f.drawFilter(imageData);
                     }
-                    s._bounds.width=bw;
-                    s._bounds.height=bh;
-                    //给webgl更新新
-                    s._cacheImg.updateTexture=true;
+                    ctx.putImageData(imageData, 0, 0);
+                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
+                    s._cacheImg = s._realCacheImg;
+                    s._cacheX = -10;
+                    s._cacheY = -10;
+                    s._isCache = true;
+                } else {
+                    s._isCache = false;
+                    s._cacheX = 0;
+                    s._cacheY = 0;
+                    s._cacheImg = bitmapData;
                 }
-                s._updateInfo.UF = false;
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
+
+                let bw: number;
+                let bh: number;
+                if (s.rect) {
+                    bw = s.rect.width;
+                    bh = s.rect.height;
+                } else {
+                    bw = s._cacheImg.width + s._cacheX * 2;
+                    bh = s._cacheImg.height + s._cacheY * 2;
+                }
+                s._bounds.width = bw;
+                s._bounds.height = bh;
+                //给webgl更新新
+                s._cacheImg.updateTexture = true;
             }
+            s._updateInfo.UF = false;
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
         }
 
         /**
@@ -228,7 +228,7 @@ namespace annie {
             if (!bitmap.rect) {
                 return bitmap.bitmapData;
             } else {
-                let _canvas =window.document.createElement("canvas");
+                let _canvas = window.document.createElement("canvas");
                 let w: number = bitmap.rect.width;
                 let h: number = bitmap.rect.height;
                 _canvas.width = w;
