@@ -4038,6 +4038,8 @@ declare namespace Flash2x {
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
     /**
      * 获取参数
+     * @method getQueryString
+     * @static
      * @param name
      * @returns {any}
      * @since 1.0.9

@@ -8679,6 +8679,8 @@ var Flash2x;
     Flash2x.jsonp = jsonp;
     /**
      * 获取参数
+     * @method getQueryString
+     * @static
      * @param name
      * @returns {any}
      * @since 1.0.9
