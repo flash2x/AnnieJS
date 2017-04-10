@@ -87,6 +87,7 @@
     新增了annie.Timer类
     新增了annie.MouseEvent和annie.TouchEvent的updateAfterEvent方法
     新增了annieUI.ScrollList类
+    新增Flash2x.getQueryString方法以获取url上的参数值
 ## AnnieJS 1.0.8 版本
     如果是老版本项目升级上来的，请将index.html头部样式表里加上'height:100%'
     支持引擎在多个流行APP中的Html5环境下运行
