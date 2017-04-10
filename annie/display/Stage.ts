@@ -303,7 +303,7 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
-            if (!s.pause && s.visible) {
+            if (!s.pause) {
                 super.update(um, ua, uf);
             }
         }

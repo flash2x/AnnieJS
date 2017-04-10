@@ -83,6 +83,7 @@
     修复annie.DisplayObject渲染刷新优化无效的bug
     修复annie.FloatDisplay，annie.InputText在横屏情况下旋转会失效的bug
     修复annieUI.SlidePage类设置横向滑动失效的问题
+    修复在子级里有FloatDisplay相关类对象时，设置父级的visible或者父级的alpha为0里，floatDisplay对象不能隐藏的bug
     优化按钮元件鼠标按下后的状态，以前是按下后固定跳到第二个状态。现在优化成如果有第三个状态，则跳到第三个，没有的话再跳到第二个
     新增了annie.Timer类
     新增了annie.MouseEvent和annie.TouchEvent的updateAfterEvent方法

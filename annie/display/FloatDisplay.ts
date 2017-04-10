@@ -124,6 +124,16 @@ namespace annie {
             if (o) {
                 let style = o.style;
                 let visible = s._visible;
+                if(visible){
+                    let parent = s.parent;
+                    while (parent) {
+                        if(!parent._visible){
+                            visible=false;
+                            break;
+                        }
+                        parent=parent.parent;
+                    }
+                }
                 let show = visible ? "block" : "none";
                 if (show != style.display) {
                     style.display = show;

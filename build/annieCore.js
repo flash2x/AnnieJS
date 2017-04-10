@@ -3483,41 +3483,39 @@ var annie;
          */
         Sprite.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (s.visible) {
-                _super.prototype.update.call(this, um, ua, uf);
-                if (s._updateInfo.UM) {
-                    um = true;
-                }
-                if (s._updateInfo.UA) {
-                    ua = true;
-                }
-                if (s._updateInfo.UF) {
-                    uf = true;
-                }
-                var len = s.children.length;
-                var child = void 0;
-                var maskObjIds = [];
-                for (var i = len - 1; i >= 0; i--) {
-                    child = s.children[i];
-                    //更新遮罩
-                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0) && child.visible && child.alpha) {
-                        child.mask.parent = s;
-                        if (s.totalFrames && child.mask.totalFrames) {
-                            child.mask.gotoAndStop(s.currentFrame);
-                            //一定要为true
-                            child.mask.update(true);
-                        }
-                        else {
-                            child.mask.update(um);
-                        }
-                        maskObjIds.push(child.mask.instanceId);
-                    }
-                    child.update(um, ua, uf);
-                }
-                s._updateInfo.UM = false;
-                s._updateInfo.UA = false;
-                s._updateInfo.UF = false;
+            _super.prototype.update.call(this, um, ua, uf);
+            if (s._updateInfo.UM) {
+                um = true;
             }
+            if (s._updateInfo.UA) {
+                ua = true;
+            }
+            if (s._updateInfo.UF) {
+                uf = true;
+            }
+            var len = s.children.length;
+            var child;
+            var maskObjIds = [];
+            for (var i = len - 1; i >= 0; i--) {
+                child = s.children[i];
+                //更新遮罩
+                if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
+                    child.mask.parent = s;
+                    if (s.totalFrames && child.mask.totalFrames) {
+                        child.mask.gotoAndStop(s.currentFrame);
+                        //一定要为true
+                        child.mask.update(true);
+                    }
+                    else {
+                        child.mask.update(um);
+                    }
+                    maskObjIds.push(child.mask.instanceId);
+                }
+                child.update(um, ua, uf);
+            }
+            s._updateInfo.UM = false;
+            s._updateInfo.UA = false;
+            s._updateInfo.UF = false;
         };
         /**
          * 重写碰撞测试
@@ -3587,36 +3585,38 @@ var annie;
          */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            var maskObj;
-            var child;
-            var len = s.children.length;
-            for (var i = 0; i < len; i++) {
-                child = s.children[i];
-                if (child.cAlpha > 0 && child.visible) {
-                    if (maskObj) {
-                        if (child.mask) {
-                            if (child.mask != maskObj) {
+            if (s.cAlpha > 0 && s._visible) {
+                var maskObj = void 0;
+                var child = void 0;
+                var len = s.children.length;
+                for (var i = 0; i < len; i++) {
+                    child = s.children[i];
+                    if (child.cAlpha > 0 && child._visible) {
+                        if (maskObj) {
+                            if (child.mask) {
+                                if (child.mask != maskObj) {
+                                    renderObj.endMask();
+                                    maskObj = child.mask;
+                                    renderObj.beginMask(maskObj);
+                                }
+                            }
+                            else {
                                 renderObj.endMask();
+                                maskObj = null;
+                            }
+                        }
+                        else {
+                            if (child.mask) {
                                 maskObj = child.mask;
                                 renderObj.beginMask(maskObj);
                             }
                         }
-                        else {
-                            renderObj.endMask();
-                            maskObj = null;
-                        }
+                        child.render(renderObj);
                     }
-                    else {
-                        if (child.mask) {
-                            maskObj = child.mask;
-                            renderObj.beginMask(maskObj);
-                        }
-                    }
-                    child.render(renderObj);
                 }
-            }
-            if (maskObj) {
-                renderObj.endMask();
+                if (maskObj) {
+                    renderObj.endMask();
+                }
             }
         };
         return Sprite;
@@ -4940,6 +4940,16 @@ var annie;
             if (o) {
                 var style = o.style;
                 var visible = s._visible;
+                if (visible) {
+                    var parent_1 = s.parent;
+                    while (parent_1) {
+                        if (!parent_1._visible) {
+                            visible = false;
+                            break;
+                        }
+                        parent_1 = parent_1.parent;
+                    }
+                }
                 var show = visible ? "block" : "none";
                 if (show != style.display) {
                     style.display = show;
@@ -6289,7 +6299,7 @@ var annie;
          */
         Stage.prototype.update = function (um, ua, uf) {
             var s = this;
-            if (!s.pause && s.visible) {
+            if (!s.pause) {
                 _super.prototype.update.call(this, um, ua, uf);
             }
         };
@@ -9435,24 +9445,24 @@ var annie;
      * @class annie.Timer
      * @public
      * @since 1.0.9
-     * @example
-     *      var timer=new annie.Timer(1000,10);
-     *      timer.addEventListener(annie.Event.TIMER,function (e) {
-     *          trace("once");
-     *      })
-     *      timer.addEventListener(annie.Event.TIMER_COMPLETE, function (e) {
-     *          trace("complete");
-     *          e.target.kill();
-     *      })
-     *      timer.start();
      */
     var Timer = (function (_super) {
         __extends(Timer, _super);
         /**
          * 构造函数，初始化
          * @method Timer
-         * @param delay
-         * @param repeatCount
+         * @param {number} delay
+         * @param {number} repeatCount
+         * @example
+         *      var timer=new annie.Timer(1000,10);
+         *      timer.addEventListener(annie.Event.TIMER,function (e) {
+         *          trace("once");
+         *      })
+         *      timer.addEventListener(annie.Event.TIMER_COMPLETE, function (e) {
+         *          trace("complete");
+         *          e.target.kill();
+         *      })
+         *      timer.start();
          */
         function Timer(delay, repeatCount) {
             if (repeatCount === void 0) { repeatCount = 0; }

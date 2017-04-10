@@ -71,7 +71,6 @@ namespace annie {
             });
             s.init(input);
         }
-
         public init(htmlElement: any): void {
             super.init(htmlElement);
             //默认设置
