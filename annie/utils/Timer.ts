@@ -7,6 +7,16 @@ namespace annie {
      * @class annie.Timer
      * @public
      * @since 1.0.9
+     * @example
+     *      var timer=new annie.Timer(1000,10);
+     *      timer.addEventListener(annie.Event.TIMER,function (e) {
+     *          trace("once");
+     *      })
+     *      timer.addEventListener(annie.Event.TIMER_COMPLETE, function (e) {
+     *          trace("complete");
+     *          e.target.kill();
+     *      })
+     *      timer.start();
      */
     export class Timer extends annie.EventDispatcher{
         /**
