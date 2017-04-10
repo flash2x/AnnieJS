@@ -218,8 +218,8 @@ namespace annie{
         public removeChildAt(index:number):void {
             let s = this;
             let child:any;
-            let len=s.children.length;
-            if(len==0)return;
+            let len=s.children.length-1;
+            if(len<0)return;
             if (index == len) {
                 child = s.children.pop();
             } else if (index == 0) {
@@ -240,7 +240,7 @@ namespace annie{
             let s = this;
             let len=s.children.length;
             for (let i = len- 1; i >= 0; i--) {
-                s.removeChildAt(i);
+                s.removeChildAt(0);
             }
         }
         /**

@@ -1829,13 +1829,6 @@ var annie;
          */
         DisplayObject.prototype.update = function (um, ua, uf) {
             var s = this;
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new annie.Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
-            }
             if (s._cp) {
                 s._updateInfo.UM = s._updateInfo.UA = s._updateInfo.UF = true;
                 s._cp = false;
@@ -1871,6 +1864,13 @@ var annie;
                         }
                     }
                 }
+            }
+            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new annie.Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
             }
         };
         /**
@@ -3429,8 +3429,8 @@ var annie;
         Sprite.prototype.removeChildAt = function (index) {
             var s = this;
             var child;
-            var len = s.children.length;
-            if (len == 0)
+            var len = s.children.length - 1;
+            if (len < 0)
                 return;
             if (index == len) {
                 child = s.children.pop();
@@ -3454,7 +3454,7 @@ var annie;
             var s = this;
             var len = s.children.length;
             for (var i = len - 1; i >= 0; i--) {
-                s.removeChildAt(i);
+                s.removeChildAt(0);
             }
         };
         /**

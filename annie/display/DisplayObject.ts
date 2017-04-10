@@ -490,13 +490,6 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void{
             let s = this;
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
-            }
             if(s._cp){
                 s._updateInfo.UM=s._updateInfo.UA=s._updateInfo.UF=true;
                 s._cp=false;
@@ -532,6 +525,13 @@ namespace annie {
                         }
                     }
                 }
+            }
+            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
             }
         }
         /**
