@@ -15,9 +15,9 @@ var annie;
      */
     var AObject = (function () {
         function AObject() {
-            this._id = 0;
+            this._instanceId = 0;
             this._instanceType = "AObject";
-            this._id = AObject._object_id++;
+            this._instanceId = AObject._object_id++;
         }
         Object.defineProperty(AObject.prototype, "instanceId", {
             /**
@@ -32,7 +32,7 @@ var annie;
              *      trace(this.instanceId);
              */
             get: function () {
-                return this._id;
+                return this._instanceId;
             },
             enumerable: true,
             configurable: true
@@ -438,6 +438,24 @@ var annie;
          * @since 1.0.0
          */
         Event.START = "onStart";
+        /**
+         * 定时器触发事件
+         * @property TIMER
+         * @static
+         * @since 1.0.9
+         * @public
+         * @type {string}
+         */
+        Event.TIMER = "onTimer";
+        /**
+         * 定时器完成事件
+         * @property TIMER_COMPLETE
+         * @since 1.0.9
+         * @static
+         * @public
+         * @type {string}
+         */
+        Event.TIMER_COMPLETE = "onTimerComplete";
         return Event;
     }(annie.AObject));
     annie.Event = Event;
@@ -9406,6 +9424,184 @@ var annie;
     annie.Tween = Tween;
 })(annie || (annie = {}));
 /**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * 定时器类
+     * @class annie.Timer
+     * @public
+     * @since 1.0.9
+     */
+    var Timer = (function (_super) {
+        __extends(Timer, _super);
+        /**
+         * 构造函数，初始化
+         * @method Timer
+         * @param delay
+         * @param repeatCount
+         */
+        function Timer(delay, repeatCount) {
+            if (repeatCount === void 0) { repeatCount = 0; }
+            _super.call(this);
+            this._currentCount = 0;
+            this._delay = 0;
+            this._frameDelay = 0;
+            this._currentFrameDelay = 0;
+            this._repeatCount = 0;
+            this._running = false;
+            if (delay <= 0) {
+                delay = 1;
+            }
+            this._delay = delay;
+            this._frameDelay = Math.ceil(delay * 0.001 * 60);
+            this._repeatCount = repeatCount;
+            Timer._timerList.push(this);
+        }
+        /**
+         * 重置定时器
+         * @method reset
+         * @public
+         * @since 1.0.9
+         */
+        Timer.prototype.reset = function () {
+            this._running = false;
+            this._currentCount = 0;
+            this._currentFrameDelay = 0;
+        };
+        /**
+         * 开始执行定时器
+         * @method start
+         * @public
+         * @since 1.0.9
+         */
+        Timer.prototype.start = function () {
+            this._running = true;
+            if (this._currentCount == this._repeatCount) {
+                this._currentCount = 0;
+            }
+        };
+        /**
+         * 停止执行定时器，通过再次调用start方法可以接着之前未完成的状态运行
+         * @method stop
+         * @public
+         * @since 1.0.9
+         */
+        Timer.prototype.stop = function () {
+            this._running = false;
+        };
+        Object.defineProperty(Timer.prototype, "currentCount", {
+            /**
+             * 当前触发了多少次Timer事件
+             * @property currentCount
+             * @readonly
+             * @public
+             * @since 1.0.9
+             * @returns {number}
+             */
+            get: function () {
+                return this._currentCount;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Timer.prototype, "delay", {
+            /**
+             * 设置或者获取当前定时器之间的执行间隔
+             * @property delay
+             * @since 1.0.9
+             * @public
+             * @returns {number}
+             */
+            get: function () {
+                return this._delay;
+            },
+            set: function (value) {
+                this._delay = value;
+                this._frameDelay = Math.ceil(value * 0.001 * 60);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Timer.prototype, "repeatCount", {
+            /**
+             * 执行触发Timer 的总次数
+             * @public
+             * @since 1.0.9
+             * @returns {number}
+             */
+            get: function () {
+                return this._repeatCount;
+            },
+            set: function (value) {
+                if (value < 0) {
+                    value = 0;
+                }
+                this._repeatCount = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Timer.prototype, "running", {
+            /**
+             * 当前是否在运行中
+             * @property running
+             * @since 1.0.9
+             * @returns {boolean}
+             */
+            get: function () {
+                return this._running;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
+         * @method kill
+         * @public
+         * @since 1.0.9
+         */
+        Timer.prototype.kill = function () {
+            var len = Timer._timerList.length;
+            var s = this;
+            for (var i = 0; i < len; i++) {
+                if (Timer._timerList[i]._instanceId == s._instanceId) {
+                    Timer._timerList.splice(i, 1);
+                    break;
+                }
+            }
+        };
+        Timer.prototype.update = function () {
+            if (this._running) {
+                this._currentFrameDelay++;
+                if (this._currentFrameDelay == this._frameDelay) {
+                    if (this._repeatCount) {
+                        this._currentCount++;
+                    }
+                    this._currentFrameDelay = 0;
+                    //触发事件
+                    this.dispatchEvent("onTimer");
+                    if (this._repeatCount && this._currentCount == this._repeatCount) {
+                        //触发完成时事件
+                        this._running = false;
+                        this.dispatchEvent("onTimerComplete");
+                    }
+                }
+            }
+        };
+        Timer.flush = function () {
+            var len = Timer._timerList.length;
+            for (var i = 0; i < len; i++) {
+                Timer._timerList[i].update();
+            }
+        };
+        Timer._timerList = [];
+        return Timer;
+    }(annie.EventDispatcher));
+    annie.Timer = Timer;
+})(annie || (annie = {}));
+/**
  * @class annie
  */
 var annie;
@@ -9670,4 +9866,5 @@ var F2xInputText = annie.InputText;
 var F2xBitmap = annie.Bitmap;
 var F2xShape = annie.Shape;
 annie.Stage["addUpdateObj"](annie.Tween);
+annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();

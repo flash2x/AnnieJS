@@ -131,6 +131,24 @@ namespace annie {
          */
         public static START:string = "onStart";
         /**
+         * 定时器触发事件
+         * @property TIMER
+         * @static
+         * @since 1.0.9
+         * @public
+         * @type {string}
+         */
+        public static TIMER:string="onTimer";
+        /**
+         * 定时器完成事件
+         * @property TIMER_COMPLETE
+         * @since 1.0.9
+         * @static
+         * @public
+         * @type {string}
+         */
+        public static TIMER_COMPLETE:string="onTimerComplete";
+        /**
          * 事件类型名
          * @property type
          * @type {string}

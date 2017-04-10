@@ -35,6 +35,7 @@ var coreList =[
     "annie/net/URLLoader.ts",
     "annie/utils/Flash2x.ts",
     "annie/utils/Tween.ts",
+    "annie/utils/Timer.ts",
     "annie/Annie.ts",
     "annie/GlobalFunction.ts"
 ];

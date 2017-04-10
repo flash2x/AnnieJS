@@ -8,7 +8,7 @@ declare namespace annie {
      * @since 1.0.0
      */
     class AObject {
-        private _id;
+        private _instanceId;
         protected _instanceType: string;
         private static _object_id;
         constructor();
@@ -259,6 +259,24 @@ declare namespace annie {
          * @since 1.0.0
          */
         static START: string;
+        /**
+         * 定时器触发事件
+         * @property TIMER
+         * @static
+         * @since 1.0.9
+         * @public
+         * @type {string}
+         */
+        static TIMER: string;
+        /**
+         * 定时器完成事件
+         * @property TIMER_COMPLETE
+         * @since 1.0.9
+         * @static
+         * @public
+         * @type {string}
+         */
+        static TIMER_COMPLETE: string;
         /**
          * 事件类型名
          * @property type
@@ -4401,6 +4419,94 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          */
+        private static flush();
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 定时器类
+     * @class annie.Timer
+     * @public
+     * @since 1.0.9
+     */
+    class Timer extends annie.EventDispatcher {
+        /**
+         * 构造函数，初始化
+         * @method Timer
+         * @param delay
+         * @param repeatCount
+         */
+        constructor(delay: number, repeatCount?: number);
+        /**
+         * 重置定时器
+         * @method reset
+         * @public
+         * @since 1.0.9
+         */
+        reset(): void;
+        /**
+         * 开始执行定时器
+         * @method start
+         * @public
+         * @since 1.0.9
+         */
+        start(): void;
+        /**
+         * 停止执行定时器，通过再次调用start方法可以接着之前未完成的状态运行
+         * @method stop
+         * @public
+         * @since 1.0.9
+         */
+        stop(): void;
+        /**
+         * 当前触发了多少次Timer事件
+         * @property currentCount
+         * @readonly
+         * @public
+         * @since 1.0.9
+         * @returns {number}
+         */
+        currentCount: number;
+        private _currentCount;
+        /**
+         * 设置或者获取当前定时器之间的执行间隔
+         * @property delay
+         * @since 1.0.9
+         * @public
+         * @returns {number}
+         */
+        delay: number;
+        private _delay;
+        private _frameDelay;
+        private _currentFrameDelay;
+        /**
+         * 执行触发Timer 的总次数
+         * @public
+         * @since 1.0.9
+         * @returns {number}
+         */
+        repeatCount: number;
+        private _repeatCount;
+        /**
+         * 当前是否在运行中
+         * @property running
+         * @since 1.0.9
+         * @returns {boolean}
+         */
+        running: boolean;
+        private _running;
+        /**
+         * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
+         * @method kill
+         * @public
+         * @since 1.0.9
+         */
+        kill(): void;
+        private update();
+        private static _timerList;
         private static flush();
     }
 }

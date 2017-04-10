@@ -8,12 +8,12 @@ namespace annie {
      * @since 1.0.0
      */
     export class AObject {
-        private _id: number = 0;
+        private _instanceId: number = 0;
         protected _instanceType: string = "AObject";
         private static _object_id = 0;
 
         public constructor() {
-            this._id = AObject._object_id++;
+            this._instanceId = AObject._object_id++;
         }
 
         /**
@@ -28,7 +28,7 @@ namespace annie {
          *      trace(this.instanceId);
          */
         public get instanceId(): number {
-            return this._id;
+            return this._instanceId;
         }
 
         /**

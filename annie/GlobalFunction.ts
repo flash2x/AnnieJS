@@ -44,4 +44,5 @@ import F2xInputText=annie.InputText;
 import F2xBitmap=annie.Bitmap;
 import F2xShape=annie.Shape;
 annie.Stage["addUpdateObj"](annie.Tween);
+annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
