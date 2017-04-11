@@ -615,12 +615,18 @@ namespace Flash2x {
     }
 
     /**
-     * 获取参数
+     * 获取url地址中的get参数
      * @method getQueryString
      * @static
      * @param name
      * @returns {any}
      * @since 1.0.9
+     * @example
+     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
+     *      //通过此方法获取id和username的值
+     *      var id=Flash2x.getQueryString("id");
+     *      var userName=Flash2x.getQueryString("username");
+     *      trace(id,userName);
      */
     export function getQueryString(name:string) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");

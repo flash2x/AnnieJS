@@ -353,9 +353,6 @@ namespace annie {
          * @returns {annie.Point}
          */
         public globalToLocal(point: Point, bp: Point = null): Point {
-            if (!bp) {
-                bp = annie.DisplayObject._bp;
-            }
             return this.cMatrix.invert().transformPoint(point.x, point.y, bp);
         }
 
@@ -368,9 +365,6 @@ namespace annie {
          * @returns {annie.Point}
          */
         public localToGlobal(point: Point, bp: Point = null): Point {
-            if (!bp) {
-                bp = annie.DisplayObject._bp;
-            }
             return this.cMatrix.transformPoint(point.x, point.y, bp);
         }
 
@@ -395,7 +389,7 @@ namespace annie {
             let s = this;
             if (!s.visible)return null;
             if (isMouseEvent && !s.mouseEnable)return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))) {
+            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, isMouseEvent?DisplayObject._bp:null))) {
                 return s;
             }
             return null;
@@ -435,6 +429,13 @@ namespace annie {
          */
         public update(um: boolean, ua: boolean, uf: boolean): void{
             let s = this;
+            //enterFrame事件一定要放在这里，不要再移到其他地方了
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
+            }
             if(s._cp){
                 s._updateInfo.UM=s._updateInfo.UA=s._updateInfo.UF=true;
                 s._cp=false;
@@ -473,13 +474,6 @@ namespace annie {
                     }
                 }
             }
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
-            }
         }
         /**
          * 抽象方法
@@ -491,7 +485,6 @@ namespace annie {
          * @abstract
          */
         public abstract render(renderObj: IRender): void;
-
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递
          * @method _onDispatchBubbledEvent

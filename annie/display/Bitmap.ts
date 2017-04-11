@@ -26,7 +26,6 @@ namespace annie {
         public get bitmapData(): any {
             return this._bitmapData
         };
-
         public set bitmapData(value: any) {
             this._setProperty("_bitmapData",value,3);
             if (!value) {

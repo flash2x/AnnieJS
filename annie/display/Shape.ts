@@ -909,7 +909,7 @@ namespace annie {
             let s = this;
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            let p = s.globalToLocal(globalPoint, DisplayObject._bp);
+            let p = s.globalToLocal(globalPoint);
             if (s._cAb) {
                 let image = s._cacheImg;
                 if (!image || image.width == 0 || image.height == 0) {

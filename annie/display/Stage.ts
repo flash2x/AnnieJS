@@ -22,6 +22,14 @@ namespace annie {
          */
         public iosTouchendPreventDefault: boolean = true;
         /**
+         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
+         * @property isPreventDefaultEvent
+         * @since 1.0.9
+         * @default true
+         * @type {boolean}
+         */
+        public isPreventDefaultEvent:boolean=true;
+        /**
          * 整个引擎的最上层的div元素,
          * 承载canvas的那个div html元素
          * @property rootDiv
@@ -571,7 +579,7 @@ namespace annie {
                                     if (d.hasEventListener(events[j].type)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[len - 1];
-                                        lp = d.globalToLocal(cp);
+                                        lp = d.globalToLocal(cp,DisplayObject._bp);
                                         events[j].localX = lp.x;
                                         events[j].localY = lp.y;
                                         d.dispatchEvent(events[j]);
@@ -622,7 +630,7 @@ namespace annie {
                                                     if (d.hasEventListener("onMouseOut")) {
                                                         outEvent.currentTarget = d;
                                                         outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                        lp = d.globalToLocal(cp);
+                                                        lp = d.globalToLocal(cp,DisplayObject._bp);
                                                         outEvent.localX = lp.x;
                                                         outEvent.localY = lp.y;
                                                         d.dispatchEvent(outEvent);
@@ -636,7 +644,7 @@ namespace annie {
                                                     if (d.hasEventListener("onMouseOver")) {
                                                         overEvent.currentTarget = d;
                                                         overEvent.target = displayList[len2 - 1];
-                                                        lp = d.globalToLocal(cp);
+                                                        lp = d.globalToLocal(cp,DisplayObject._bp);
                                                         overEvent.localX = lp.x;
                                                         overEvent.localY = lp.y;
                                                         d.dispatchEvent(overEvent);
@@ -659,11 +667,13 @@ namespace annie {
                     }
                 }
             }
-            if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                e.preventDefault();
-            }
-            if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                e.preventDefault();
+            if(s.isPreventDefaultEvent) {
+                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                    e.preventDefault();
+                }
+                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                    e.preventDefault();
+                }
             }
             if(s._uae){
                 s.update();

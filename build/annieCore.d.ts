@@ -2868,6 +2868,14 @@ declare namespace annie {
          */
         iosTouchendPreventDefault: boolean;
         /**
+         * 是否禁止引擎所在的canvas的鼠标或触摸事件的默认形为，默认是静止的。
+         * @property isPreventDefaultEvent
+         * @since 1.0.9
+         * @default true
+         * @type {boolean}
+         */
+        isPreventDefaultEvent: boolean;
+        /**
          * 整个引擎的最上层的div元素,
          * 承载canvas的那个div html元素
          * @property rootDiv
@@ -4047,12 +4055,18 @@ declare namespace Flash2x {
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
     /**
-     * 获取参数
+     * 获取url地址中的get参数
      * @method getQueryString
      * @static
      * @param name
      * @returns {any}
      * @since 1.0.9
+     * @example
+     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
+     *      //通过此方法获取id和username的值
+     *      var id=Flash2x.getQueryString("id");
+     *      var userName=Flash2x.getQueryString("username");
+     *      trace(id,userName);
      */
     function getQueryString(name: string): string;
 }

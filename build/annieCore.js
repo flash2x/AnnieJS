@@ -1729,9 +1729,6 @@ var annie;
          */
         DisplayObject.prototype.globalToLocal = function (point, bp) {
             if (bp === void 0) { bp = null; }
-            if (!bp) {
-                bp = annie.DisplayObject._bp;
-            }
             return this.cMatrix.invert().transformPoint(point.x, point.y, bp);
         };
         /**
@@ -1744,9 +1741,6 @@ var annie;
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
-            if (!bp) {
-                bp = annie.DisplayObject._bp;
-            }
             return this.cMatrix.transformPoint(point.x, point.y, bp);
         };
         /**
@@ -1765,7 +1759,7 @@ var annie;
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))) {
+            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, isMouseEvent ? DisplayObject._bp : null))) {
                 return s;
             }
             return null;
@@ -1794,6 +1788,13 @@ var annie;
          */
         DisplayObject.prototype.update = function (um, ua, uf) {
             var s = this;
+            //enterFrame事件一定要放在这里，不要再移到其他地方了
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new annie.Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
+            }
             if (s._cp) {
                 s._updateInfo.UM = s._updateInfo.UA = s._updateInfo.UF = true;
                 s._cp = false;
@@ -1831,13 +1832,6 @@ var annie;
                         }
                     }
                 }
-            }
-            //enterFrame事件,因为enterFrame不会冒泡所以不需要调用s._enterFrameEvent._pd=false
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new annie.Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
             }
         };
         /**
@@ -3054,7 +3048,7 @@ var annie;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p = s.globalToLocal(globalPoint, annie.DisplayObject._bp);
+            var p = s.globalToLocal(globalPoint);
             if (s._cAb) {
                 var image = s._cacheImg;
                 if (!image || image.width == 0 || image.height == 0) {
@@ -5758,6 +5752,14 @@ var annie;
              */
             this.iosTouchendPreventDefault = true;
             /**
+             * 是否禁止引擎所在的canvas的鼠标或触摸事件的默认形为，默认是静止的。
+             * @property isPreventDefaultEvent
+             * @since 1.0.9
+             * @default true
+             * @type {boolean}
+             */
+            this.isPreventDefaultEvent = true;
+            /**
              * 整个引擎的最上层的div元素,
              * 承载canvas的那个div html元素
              * @property rootDiv
@@ -6097,7 +6099,7 @@ var annie;
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
                                             events[j].target = displayList[len - 1];
-                                            lp = d.globalToLocal(cp);
+                                            lp = d.globalToLocal(cp, annie.DisplayObject._bp);
                                             events[j].localX = lp.x;
                                             events[j].localY = lp.y;
                                             d.dispatchEvent(events[j]);
@@ -6150,7 +6152,7 @@ var annie;
                                                         if (d.hasEventListener("onMouseOut")) {
                                                             outEvent.currentTarget = d;
                                                             outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                            lp = d.globalToLocal(cp);
+                                                            lp = d.globalToLocal(cp, annie.DisplayObject._bp);
                                                             outEvent.localX = lp.x;
                                                             outEvent.localY = lp.y;
                                                             d.dispatchEvent(outEvent);
@@ -6164,7 +6166,7 @@ var annie;
                                                         if (d.hasEventListener("onMouseOver")) {
                                                             overEvent.currentTarget = d;
                                                             overEvent.target = displayList[len2 - 1];
-                                                            lp = d.globalToLocal(cp);
+                                                            lp = d.globalToLocal(cp, annie.DisplayObject._bp);
                                                             overEvent.localX = lp.x;
                                                             overEvent.localY = lp.y;
                                                             d.dispatchEvent(overEvent);
@@ -8755,12 +8757,18 @@ var Flash2x;
     }
     Flash2x.jsonp = jsonp;
     /**
-     * 获取参数
+     * 获取url地址中的get参数
      * @method getQueryString
      * @static
      * @param name
      * @returns {any}
      * @since 1.0.9
+     * @example
+     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
+     *      //通过此方法获取id和username的值
+     *      var id=Flash2x.getQueryString("id");
+     *      var userName=Flash2x.getQueryString("username");
+     *      trace(id,userName);
      */
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
