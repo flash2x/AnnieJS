@@ -2868,7 +2868,7 @@ declare namespace annie {
          */
         iosTouchendPreventDefault: boolean;
         /**
-         * 是否禁止引擎所在的canvas的鼠标或触摸事件的默认形为，默认是静止的。
+         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
          * @property isPreventDefaultEvent
          * @since 1.0.9
          * @default true

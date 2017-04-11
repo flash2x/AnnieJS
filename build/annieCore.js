@@ -1759,7 +1759,7 @@ var annie;
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, isMouseEvent ? DisplayObject._bp : null))) {
+            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))) {
                 return s;
             }
             return null;
@@ -5752,7 +5752,7 @@ var annie;
              */
             this.iosTouchendPreventDefault = true;
             /**
-             * 是否禁止引擎所在的canvas的鼠标或触摸事件的默认形为，默认是静止的。
+             * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
              * @property isPreventDefaultEvent
              * @since 1.0.9
              * @default true
@@ -6190,11 +6190,13 @@ var annie;
                         }
                     }
                 }
-                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                    e.preventDefault();
-                }
-                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                    e.preventDefault();
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
                 }
                 if (s._uae) {
                     s.update();

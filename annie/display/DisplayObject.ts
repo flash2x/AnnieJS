@@ -385,11 +385,11 @@ namespace annie {
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
          * @returns {annie.DisplayObject}
          */
-        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
+        public hitTestPoint(globalPoint: Point,isMouseEvent: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible)return null;
             if (isMouseEvent && !s.mouseEnable)return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, isMouseEvent?DisplayObject._bp:null))) {
+            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))){
                 return s;
             }
             return null;
