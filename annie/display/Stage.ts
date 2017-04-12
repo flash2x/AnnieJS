@@ -242,10 +242,6 @@ namespace annie {
             this._instanceType = "annie.Stage";
             s.stage = this;
             let resizeEvent = "resize";
-            if (annie.osType == "pc") {
-                s.autoSteering = false;
-                //resizeEvent="resize";
-            }
             s.name = "stageInstance_" + s.instanceId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;

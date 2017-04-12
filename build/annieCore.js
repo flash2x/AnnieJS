@@ -6289,9 +6289,6 @@ var annie;
             this._instanceType = "annie.Stage";
             s.stage = this;
             var resizeEvent = "resize";
-            if (annie.osType == "pc") {
-                s.autoSteering = false;
-            }
             s.name = "stageInstance_" + s.instanceId;
             var div = document.getElementById(rootDivId);
             s.renderType = renderType;
