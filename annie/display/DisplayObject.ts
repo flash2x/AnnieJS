@@ -436,26 +436,27 @@ namespace annie {
                 }
                 s.dispatchEvent(s._enterFrameEvent);
             }
+            let UI=s._updateInfo;
             if(s._cp){
-                s._updateInfo.UM=s._updateInfo.UA=s._updateInfo.UF=true;
+                UI.UM=UI.UA=UI.UF=true;
                 s._cp=false;
             }
-            if (s._updateInfo.UM) {
+            if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
             }
-            if (um || s._updateInfo.UM) {
+            if (um || UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (ua || s._updateInfo.UA){
+            if (ua || UI.UA){
                 s.cAlpha = s._alpha;
                 if (s.parent) {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-            if (uf || s._updateInfo.UF){
+            if (uf || UI.UF){
                 s.cFilters.length = 0;
                 let sf = s._filters;
                 if(sf) {
@@ -596,12 +597,13 @@ namespace annie {
             let s:any=this;
             if(s[property]!=value){
                 s[property]=value;
+                let UI=s._updateInfo;
                 if(type==0){
-                    s._updateInfo.UM = true;
+                    UI.UM = true;
                 }else if(type==1){
-                    s._updateInfo.UA = true;
+                    UI.UA = true;
                 }else if(type==2){
-                    s._updateInfo.UF = true;
+                    UI.UF = true;
                 }else if(type==3){
                     s._isNeedUpdate = true;
                 }else if(type==4){

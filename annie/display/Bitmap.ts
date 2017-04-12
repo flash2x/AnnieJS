@@ -113,7 +113,7 @@ namespace annie {
             super.update(um, ua, uf);
             //滤镜
             let bitmapData = s._bitmapData;
-            if ((s._isNeedUpdate || uf || s._updateInfo.UF) && bitmapData) {
+            if ((s._isNeedUpdate||uf||s._updateInfo.UF) && bitmapData) {
                 s._isNeedUpdate = false;
                 if (s.cFilters.length > 0) {
                     if (!s._realCacheImg) {

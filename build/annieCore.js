@@ -1795,26 +1795,27 @@ var annie;
                 }
                 s.dispatchEvent(s._enterFrameEvent);
             }
+            var UI = s._updateInfo;
             if (s._cp) {
-                s._updateInfo.UM = s._updateInfo.UA = s._updateInfo.UF = true;
+                UI.UM = UI.UA = UI.UF = true;
                 s._cp = false;
             }
-            if (s._updateInfo.UM) {
+            if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
             }
-            if (um || s._updateInfo.UM) {
+            if (um || UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (ua || s._updateInfo.UA) {
+            if (ua || UI.UA) {
                 s.cAlpha = s._alpha;
                 if (s.parent) {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-            if (uf || s._updateInfo.UF) {
+            if (uf || UI.UF) {
                 s.cFilters.length = 0;
                 var sf = s._filters;
                 if (sf) {
@@ -1916,14 +1917,15 @@ var annie;
             var s = this;
             if (s[property] != value) {
                 s[property] = value;
+                var UI = s._updateInfo;
                 if (type == 0) {
-                    s._updateInfo.UM = true;
+                    UI.UM = true;
                 }
                 else if (type == 1) {
-                    s._updateInfo.UA = true;
+                    UI.UA = true;
                 }
                 else if (type == 2) {
-                    s._updateInfo.UF = true;
+                    UI.UF = true;
                 }
                 else if (type == 3) {
                     s._isNeedUpdate = true;
@@ -4815,14 +4817,6 @@ var annie;
              */
             this.htmlElement = null;
             /**
-             * 上一交刷新时保留的数据
-             * @property _oldProps
-             * @private
-             * @since 1.0.0
-             * @type {{alpha: number, matrix: {a: number, b: number, c: number, d: number, tx: number, ty: number}}}
-             */
-            this._oldProps = { alpha: 1, matrix: { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 } };
-            /**
              * 是否已经添加了舞台事件
              * @property _isAdded
              * @since 1.0.0
@@ -4894,7 +4888,6 @@ var annie;
          * @since 1.0.0
          */
         FloatDisplay.prototype.update = function (um, ua, uf) {
-            _super.prototype.update.call(this, um, ua, uf);
             var s = this;
             var o = s.htmlElement;
             if (o) {
@@ -4914,19 +4907,15 @@ var annie;
                 if (show != style.display) {
                     style.display = show;
                 }
-                if (visible && (um || s._updateInfo.UM)) {
-                    var props = {};
-                    props.alpha = s.cAlpha;
-                    var mtx = s.cMatrix;
-                    var oldProps = s._oldProps;
-                    var d = annie.devicePixelRatio;
-                    if (!annie.Matrix.isEqual(oldProps.matrix, mtx)) {
+                if (visible) {
+                    _super.prototype.update.call(this, um, ua, uf);
+                    if (um || s._updateInfo.UM) {
+                        var mtx = s.cMatrix;
+                        var d = annie.devicePixelRatio;
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
-                        oldProps.matrix = { tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d };
                     }
-                    if (oldProps.alpha != props.alpha) {
-                        style.opacity = props.alpha;
-                        oldProps.alpha = props.alpha;
+                    if (ua || s._updateInfo.UA) {
+                        style.opacity = s.cAlpha;
                     }
                     s._updateInfo.UF = false;
                     s._updateInfo.UM = false;

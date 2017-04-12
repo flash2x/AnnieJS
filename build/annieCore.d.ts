@@ -2472,14 +2472,6 @@ declare namespace annie {
          */
         htmlElement: any;
         /**
-         * 上一交刷新时保留的数据
-         * @property _oldProps
-         * @private
-         * @since 1.0.0
-         * @type {{alpha: number, matrix: {a: number, b: number, c: number, d: number, tx: number, ty: number}}}
-         */
-        private _oldProps;
-        /**
          * 是否已经添加了舞台事件
          * @property _isAdded
          * @since 1.0.0

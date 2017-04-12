@@ -24,14 +24,6 @@ namespace annie {
         public htmlElement: any = null;
 
         /**
-         * 上一交刷新时保留的数据
-         * @property _oldProps
-         * @private
-         * @since 1.0.0
-         * @type {{alpha: number, matrix: {a: number, b: number, c: number, d: number, tx: number, ty: number}}}
-         */
-        private _oldProps: Object = {alpha: 1, matrix: {a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0}};
-        /**
          * 是否已经添加了舞台事件
          * @property _isAdded
          * @since 1.0.0
@@ -118,7 +110,6 @@ namespace annie {
          * @since 1.0.0
          */
         public update(um: boolean, ua: boolean, uf: boolean): void {
-            super.update(um, ua, uf);
             let s = this;
             let o = s.htmlElement;
             if (o) {
@@ -138,19 +129,15 @@ namespace annie {
                 if (show != style.display) {
                     style.display = show;
                 }
-                if (visible && (um || s._updateInfo.UM)) {
-                    let props: any = {};
-                    props.alpha = s.cAlpha;
-                    let mtx = s.cMatrix;
-                    let oldProps: any = s._oldProps;
-                    let d = annie.devicePixelRatio;
-                    if (!Matrix.isEqual(oldProps.matrix, mtx)) {
+                if(visible) {
+                    super.update(um, ua, uf);
+                    if(um||s._updateInfo.UM) {
+                        let mtx = s.cMatrix;
+                        let d = annie.devicePixelRatio;
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
-                        oldProps.matrix = {tx: mtx.tx, ty: mtx.ty, a: mtx.a, b: mtx.b, c: mtx.c, d: mtx.d};
                     }
-                    if (oldProps.alpha != props.alpha) {
-                        style.opacity = props.alpha;
-                        oldProps.alpha = props.alpha;
+                    if (ua||s._updateInfo.UA){
+                        style.opacity = s.cAlpha;
                     }
                     s._updateInfo.UF = false;
                     s._updateInfo.UM = false;

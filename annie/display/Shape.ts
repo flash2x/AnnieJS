@@ -675,7 +675,7 @@ namespace annie {
         public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
             super.update(um, ua, uf);
-            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+            if (s._isNeedUpdate||uf|| s._updateInfo.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
