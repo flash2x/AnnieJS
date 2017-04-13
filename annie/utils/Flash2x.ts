@@ -467,7 +467,7 @@ namespace Flash2x {
             if (bitmap) {
                 if (bitmap.rect) {
                     //从SpriteSheet中取出Image单独存放
-                    bitmapData = annie.Bitmap.convertToImage(bitmap);
+                    bitmapData = annie.Bitmap.convertToImage(bitmap,false);
                 } else {
                     bitmapData = bitmap.bitmapData;
                 }

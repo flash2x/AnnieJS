@@ -22,7 +22,6 @@ namespace annie {
          * @type {any}
          * @default null
          */
-
         public get bitmapData(): any {
             return this._bitmapData
         };
@@ -212,6 +211,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
+         * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
          * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
@@ -223,7 +223,7 @@ namespace annie {
          *       }
          *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
          */
-        public static convertToImage(bitmap: annie.Bitmap): any {
+        public static convertToImage(bitmap: annie.Bitmap,isNeedImage:boolean=true): any {
             if (!bitmap.rect) {
                 return bitmap.bitmapData;
             } else {
@@ -232,13 +232,18 @@ namespace annie {
                 let h: number = bitmap.rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
-                _canvas.style.width = w / devicePixelRatio + "px";
-                _canvas.style.height = h / devicePixelRatio + "px";
+                // _canvas.style.width = w / devicePixelRatio + "px";
+                // _canvas.style.height = h / devicePixelRatio + "px";
                 let ctx = _canvas.getContext("2d");
                 let tr = bitmap.rect;
-                ctx.clearRect(0, 0, w, h);
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                return _canvas;
+                if(isNeedImage){
+                    var img=new Image();
+                    img.src=_canvas.toDataURL();
+                    return img;
+                }else {
+                    return _canvas;
+                }
             }
         }
     }

@@ -255,10 +255,10 @@ namespace annie {
             super.update(um, ua, uf);
             let s: any = this;
             if (s._isNeedUpdate || uf || s._updateInfo.UF) {
-                s.text += "";
+                s._text += "";
                 let can = s._cacheImg;
                 let ctx = can.getContext("2d");
-                let hardLines: any = s.text.toString().split(/(?:\r\n|\r|\n)/);
+                let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
                 s._prepContext(ctx);
                 let lineH: number;
@@ -274,7 +274,7 @@ namespace annie {
                         s.lineWidth = lineH;
                     }
                 }
-                if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
+                if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines.push(hardLines[0]);
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);

@@ -1345,7 +1345,7 @@ var annie;
              * @property _updateInfo
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              */
-            this._updateInfo = { UM: true, UA: true, UF: false };
+            this._updateInfo = { UM: false, UA: false, UF: false };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -2173,6 +2173,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
+         * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
          * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
@@ -2184,7 +2185,8 @@ var annie;
          *       }
          *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
          */
-        Bitmap.convertToImage = function (bitmap) {
+        Bitmap.convertToImage = function (bitmap, isNeedImage) {
+            if (isNeedImage === void 0) { isNeedImage = true; }
             if (!bitmap.rect) {
                 return bitmap.bitmapData;
             }
@@ -2194,13 +2196,19 @@ var annie;
                 var h = bitmap.rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
-                _canvas.style.width = w / annie.devicePixelRatio + "px";
-                _canvas.style.height = h / annie.devicePixelRatio + "px";
+                // _canvas.style.width = w / devicePixelRatio + "px";
+                // _canvas.style.height = h / devicePixelRatio + "px";
                 var ctx = _canvas.getContext("2d");
                 var tr = bitmap.rect;
-                ctx.clearRect(0, 0, w, h);
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                return _canvas;
+                if (isNeedImage) {
+                    var img = new Image();
+                    img.src = _canvas.toDataURL();
+                    return img;
+                }
+                else {
+                    return _canvas;
+                }
             }
         };
         return Bitmap;
@@ -5314,10 +5322,10 @@ var annie;
             _super.prototype.update.call(this, um, ua, uf);
             var s = this;
             if (s._isNeedUpdate || uf || s._updateInfo.UF) {
-                s.text += "";
+                s._text += "";
                 var can = s._cacheImg;
                 var ctx = can.getContext("2d");
-                var hardLines = s.text.toString().split(/(?:\r\n|\r|\n)/);
+                var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
                 s._prepContext(ctx);
                 var lineH = void 0;
@@ -5335,7 +5343,7 @@ var annie;
                         s.lineWidth = lineH;
                     }
                 }
-                if (s.text.indexOf("\n") < 0 && s.lineType == "single") {
+                if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines.push(hardLines[0]);
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
@@ -6278,7 +6286,6 @@ var annie;
              */
             this.resize = function () {
                 var s = this;
-                s._updateInfo.UM = true;
                 var whObj = s.getRootDivWH(s.rootDiv);
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
@@ -8587,7 +8594,7 @@ var Flash2x;
             if (bitmap) {
                 if (bitmap.rect) {
                     //从SpriteSheet中取出Image单独存放
-                    bitmapData = annie.Bitmap.convertToImage(bitmap);
+                    bitmapData = annie.Bitmap.convertToImage(bitmap, false);
                 }
                 else {
                     bitmapData = bitmap.bitmapData;
