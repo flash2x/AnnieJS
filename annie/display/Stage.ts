@@ -758,6 +758,7 @@ namespace annie {
         public resize = function ():void {
             let s: Stage = this;
             let whObj = s.getRootDivWH(s.rootDiv);
+            s._updateInfo.UM=true;
             s.divHeight = whObj.h;
             s.divWidth = whObj.w;
             s.renderObj.reSize();
