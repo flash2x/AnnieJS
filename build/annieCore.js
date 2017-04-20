@@ -9495,7 +9495,12 @@ var annie;
             if (isUpdateTween) {
                 var len = Tween._tweenList.length;
                 for (var i = len - 1; i >= 0; i--) {
-                    Tween._tweenList[i].update();
+                    if (Tween._tweenList[i]) {
+                        Tween._tweenList[i].update();
+                    }
+                    else {
+                        Tween._tweenList.splice(i, 1);
+                    }
                 }
             }
             isUpdateTween = !isUpdateTween;

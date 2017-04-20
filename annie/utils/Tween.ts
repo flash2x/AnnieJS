@@ -755,7 +755,11 @@ namespace annie {
             if(isUpdateTween){
                 let len:number = Tween._tweenList.length;
                 for (let i = len-1; i>=0; i--) {
-                    Tween._tweenList[i].update();
+                    if(Tween._tweenList[i]) {
+                        Tween._tweenList[i].update();
+                    }else{
+                        Tween._tweenList.splice(i,1);
+                    }
                 }
             }
             isUpdateTween=!isUpdateTween;
