@@ -150,6 +150,70 @@ declare namespace annie {
          */
         static RESIZE: string;
         /**
+         * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_UPDATE
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_PLAY_UPDATE: string;
+        /**
+         * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_PLAY_END: string;
+        /**
+         * annieUI.FlipBook组件翻页开始事件
+         * @property ON_FLIP_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_FLIP_START: string;
+        /**
+         * annieUI.FlipBook组件翻页结束事件
+         * @property ON_FLIP_End
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_FLIP_End: string;
+        /**
+         * annieUI.ScrollPage组件滑动到开始位置事件
+         * @property ON_SCROLL_TO_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_SCROLL_TO_START: string;
+        /**
+         * annieUI.ScrollPage组件滑动到结束位置事件
+         * @property ON_SCROLL_TO_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_SCROLL_TO_END: string;
+        /**
+         * annieUI.Slide 组件开始滑动事件
+         * @property ON_SLIDE_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_SLIDE_START: string;
+        /**
+         * annieUI.Slide 组件结束滑动事件
+         * @property ON_SLIDE_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_SLIDE_END: string;
+        /**
          * 舞台初始化完成后会触发的事件
          * @Event
          * @property ON_STAGE_INIT
@@ -569,12 +633,10 @@ declare namespace annie {
         /**
          * 求两点之间的距离
          * @method distance
-         * @static
-         * @param p1
-         * @param p2
+         * @param args 可变参数 传两个参数的话就是两个annie.Point类型 传四个参数的话分别是两个点的x y x y
          * @returns {number}
          */
-        static distance(p1: Point, p2: Point): number;
+        static distance(...args: any[]): number;
     }
 }
 /**
@@ -1962,10 +2024,17 @@ declare namespace annie {
          * 暂停播放,或者恢复播放
          * @method pause
          * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
          * @since 1.0.4
          */
         pause(isPause?: boolean): void;
+        /**
+         * 设置或者获取音量 从0-1
+         * @since 1.1.0
+         * @property volume
+         * @returns {number}
+         */
+        volume: number;
     }
 }
 /**
@@ -2517,6 +2586,7 @@ declare namespace annie {
         update(um: boolean, ua: boolean, uf: boolean): void;
         /**
          * 重写getBounds
+         * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -2835,6 +2905,14 @@ declare namespace annie {
          * @returns {string}
          */
         text: string;
+        /**
+         * 输入文本的最大输入字数
+         * @public
+         * @since 1.1.0
+         * @property maxCharacters
+         * @returns {number}
+         */
+        maxCharacters: number;
     }
 }
 /**
@@ -4087,7 +4165,7 @@ declare namespace annie {
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位,默认以秒为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0

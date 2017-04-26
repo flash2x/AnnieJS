@@ -41,11 +41,11 @@ namespace annieUI {
         /**
          * 构造函数
          * @method ScrollList
-         * @param itemClassName 可以做为Item的类
-         * @param itemDis 各个Item的间隔
-         * @param vW 列表的宽
-         * @param vH 列表的高
-         * @param isVertical 是横向滚动还是纵向滚动
+         * @param {Class} itemClassName 可以做为Item的类
+         * @param {number} itemDis 各个Item的间隔
+         * @param {number} vW 列表的宽
+         * @param {number} vH 列表的高
+         * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
          * @since 1.0.9
          */
         constructor(itemClassName:any,itemDis:number,vW: number, vH: number, isVertical: boolean = true) {
@@ -90,6 +90,7 @@ namespace annieUI {
                     }else{
                         newId=item.id-s._itemCount;
                         if(lp[s.paramXY]>(s._itemCount-2)*s._itemsDis&&newId>=0){
+                            //向上求数据
                             item.initData(newId,s._data[newId]);
                             item[s.paramXY]=item.id*s._itemsDis;
                             s._items.unshift(s._items.pop());
@@ -102,12 +103,13 @@ namespace annieUI {
         /**
          * 更新列表数据
          * @method updateData
-         * @param data
+         * @param {Array} data
+         * @param {boolean} isReset 是否重围数据列表。
          * @since 1.0.9
          */
-        public updateData(data:Array<any>):void{
+        public updateData(data:Array<any>,isReset:boolean=false):void{
             let s:any=this;
-            if(!s._isInit){
+            if(!s._isInit||isReset){
                 s._data=data;
                 for(let i=0;i<data.length&&i<s._itemCount;i++){
                     s._items[i].initData(i,data[i]);
@@ -129,7 +131,7 @@ namespace annieUI {
          * 设置加载数据时显示的loading对象
          * @since 1.0.9
          * @method setLoading
-         * @param downLoading
+         * @param {annie.DisplayObject} downLoading
          */
         public setLoading(downLoading:DisplayObject):void{
             let s:any=this;

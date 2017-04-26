@@ -104,7 +104,7 @@ namespace Flash2x {
         if (typeof(sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
                 _loadSceneNames.push(sceneName);
-                res[sceneName] = new Object();
+                res[sceneName] = {};
             }else{
                 info.sceneName = sceneName;
                 info.sceneId = 1;
@@ -116,7 +116,7 @@ namespace Flash2x {
             let len = sceneName.length;
             for (let i = 0; i < len; i++) {
                 if (!isLoadedScene(sceneName[i])) {
-                    res[sceneName[i]] = new Object();
+                    res[sceneName[i]] = {};
                     _loadSceneNames.push(sceneName[i]);
                 }else{
                     info.sceneName = sceneName[i];
@@ -257,7 +257,7 @@ namespace Flash2x {
      * @returns {boolean}
      */
     export function isLoadedScene(sceneName: string): Boolean {
-        if (res[sceneName] != undefined && res[sceneName] != null) {
+        if (res[sceneName] != undefined && res[sceneName] != null){
             return true;
         } else {
             return false;

@@ -329,6 +329,70 @@ var annie;
          */
         Event.RESIZE = "onResize";
         /**
+         * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_UPDATE
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_PLAY_UPDATE = "onPlayUpdate";
+        /**
+         * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_PLAY_END = "onPlayEnd";
+        /**
+         * annieUI.FlipBook组件翻页开始事件
+         * @property ON_FLIP_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_FLIP_START = "onFlipStart";
+        /**
+         * annieUI.FlipBook组件翻页结束事件
+         * @property ON_FLIP_End
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_FLIP_End = "onFlipEnd";
+        /**
+         * annieUI.ScrollPage组件滑动到开始位置事件
+         * @property ON_SCROLL_TO_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_SCROLL_TO_START = "onScrollToStart";
+        /**
+         * annieUI.ScrollPage组件滑动到结束位置事件
+         * @property ON_SCROLL_TO_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_SCROLL_TO_END = "onScrollToEnd";
+        /**
+         * annieUI.Slide 组件开始滑动事件
+         * @property ON_SLIDE_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_SLIDE_START = "onSlideStart";
+        /**
+         * annieUI.Slide 组件结束滑动事件
+         * @property ON_SLIDE_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_SLIDE_END = "onSlideEnd";
+        /**
          * 舞台初始化完成后会触发的事件
          * @Event
          * @property ON_STAGE_INIT
@@ -732,13 +796,21 @@ var annie;
         /**
          * 求两点之间的距离
          * @method distance
-         * @static
-         * @param p1
-         * @param p2
+         * @param args 可变参数 传两个参数的话就是两个annie.Point类型 传四个参数的话分别是两个点的x y x y
          * @returns {number}
          */
-        Point.distance = function (p1, p2) {
-            return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+        Point.distance = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
+            }
+            var len = args.length;
+            if (len == 4) {
+                return Math.sqrt((args[0] - args[2]) * (args[0] - args[2]) + (args[1] - args[3]) * (args[1] - args[3]));
+            }
+            else if (len == 2) {
+                return Math.sqrt((args[0].x - args[1].x) * (args[0].x - args[1].x) + (args[0].y - args[1].y) * (args[0].y - args[1].y));
+            }
         };
         return Point;
     }(annie.AObject));
@@ -2163,8 +2235,7 @@ var annie;
          * @returns {annie.Rectangle}
          */
         Bitmap.prototype.getBounds = function () {
-            var s = this;
-            return s._bounds;
+            return this._bounds;
         };
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
@@ -3713,7 +3784,7 @@ var annie;
          * 暂停播放,或者恢复播放
          * @method pause
          * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
          * @since 1.0.4
          */
         Media.prototype.pause = function (isPause) {
@@ -3725,6 +3796,22 @@ var annie;
                 this.media.play();
             }
         };
+        Object.defineProperty(Media.prototype, "volume", {
+            /**
+             * 设置或者获取音量 从0-1
+             * @since 1.1.0
+             * @property volume
+             * @returns {number}
+             */
+            get: function () {
+                return this.media.volume;
+            },
+            set: function (value) {
+                this.media.volume = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return Media;
     }(annie.EventDispatcher));
     annie.Media = Media;
@@ -3801,6 +3888,7 @@ var annie;
             s.media.setAttribute("webkit-playsinline", "true");
             s.media.setAttribute("x-webkit-airplay", "true");
             s.media.setAttribute("x5-video-player-type", "h5");
+            s.media.type = "video/mp4";
             s.media.poster = "";
             s.media.preload = "auto";
             s.media.controls = false;
@@ -4933,20 +5021,14 @@ var annie;
         };
         /**
          * 重写getBounds
+         * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public
          * @since 1.0.0
          * @returns {annie.Rectangle}
          */
         FloatDisplay.prototype.getBounds = function () {
-            var s = this;
-            var r = new annie.Rectangle();
-            if (s.htmlElement) {
-                var hs = s.htmlElement.style;
-                r.width = parseInt(hs.width);
-                r.height = parseInt(hs.height);
-            }
-            return r;
+            return this._bounds;
         };
         FloatDisplay.prototype.render = function (renderObj) {
         };
@@ -4978,6 +5060,13 @@ var annie;
         function VideoPlayer(src, type, width, height) {
             if (type === void 0) { type = 0; }
             _super.call(this);
+            /**
+             * 视频的引用
+             * @property video
+             * @public
+             * @since 1.0.0
+             */
+            this.video = null;
             /**
              * 播放的视频类型 值为0是序列图,1是视频 只读
              * @property videoType
@@ -5698,6 +5787,23 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(InputText.prototype, "maxCharacters", {
+            /**
+             * 输入文本的最大输入字数
+             * @public
+             * @since 1.1.0
+             * @property maxCharacters
+             * @returns {number}
+             */
+            get: function () {
+                return this.htmlElement.maxlength;
+            },
+            set: function (value) {
+                this.htmlElement.maxlength = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return InputText;
     }(annie.FloatDisplay));
     annie.InputText = InputText;
@@ -5975,7 +6081,7 @@ var annie;
             this.onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
-                if (s.isMultiTouch) {
+                if (s.isMultiTouch && annie.osType != "pc") {
                     if (e.targetTouches.length == 2) {
                         //求角度和距离
                         var p1 = new annie.Point(e.targetTouches[0].clientX - e.target.offsetLeft, e.targetTouches[0].clientY - e.target.offsetTop);
@@ -7804,6 +7910,7 @@ var annie;
          */
         function URLLoader() {
             _super.call(this);
+            this._req = new XMLHttpRequest();
             this.headers = [];
             /**
              * 后台返回来的数据类弄
@@ -7898,7 +8005,6 @@ var annie;
             var s = this;
             if (s._req) {
                 s._req.abort();
-                s._req = null;
             }
         };
         /**
@@ -7949,7 +8055,7 @@ var annie;
                     s.responseType = "unKnow";
                 }
             }
-            var req = new XMLHttpRequest();
+            var req = s._req;
             req.withCredentials = false;
             req.onprogress = function (event) {
                 if (!event || event.loaded > 0 && event.total == 0) {
@@ -8096,7 +8202,7 @@ var annie;
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
-            s._req = req;
+            // s._req = req;
         };
         /**
          * 添加自定义头
@@ -8218,7 +8324,7 @@ var Flash2x;
         if (typeof (sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
                 _loadSceneNames.push(sceneName);
-                res[sceneName] = new Object();
+                res[sceneName] = {};
             }
             else {
                 info.sceneName = sceneName;
@@ -8231,7 +8337,7 @@ var Flash2x;
             var len = sceneName.length;
             for (var i = 0; i < len; i++) {
                 if (!isLoadedScene(sceneName[i])) {
-                    res[sceneName[i]] = new Object();
+                    res[sceneName[i]] = {};
                     _loadSceneNames.push(sceneName[i]);
                 }
                 else {
@@ -8810,7 +8916,7 @@ var annie;
             }
             var s = this;
             s._currentFrame = 1;
-            s._totalFrames = times * 30 >> 0;
+            s._totalFrames = times * 60 >> 0;
             s.target = target;
             s._isTo = isTo;
             s._isLoop = 0;
@@ -8842,7 +8948,12 @@ var annie;
                         }
                         break;
                     case "delay":
-                        s._delay = data[item];
+                        if (data.useFrame) {
+                            s._delay = data[item];
+                        }
+                        else {
+                            s._delay = data[item] * 60 >> 0;
+                        }
                         break;
                     case "ease":
                         s._ease = data[item];
@@ -8959,7 +9070,7 @@ var annie;
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位,默认以秒为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
@@ -9694,8 +9805,13 @@ var annie;
         };
         Timer.flush = function () {
             var len = Timer._timerList.length;
-            for (var i = 0; i < len; i++) {
-                Timer._timerList[i].update();
+            for (var i = len - 1; i >= 0; i--) {
+                if (Timer._timerList[i]) {
+                    Timer._timerList[i].update();
+                }
+                else {
+                    Timer._timerList.splice(i, 1);
+                }
             }
         };
         Timer._timerList = [];
@@ -9730,7 +9846,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.0.9";
+    annie.version = "1.1.0";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

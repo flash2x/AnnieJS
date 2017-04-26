@@ -459,7 +459,7 @@ namespace annie {
         private onMouseEvent = function (e: any): void {
             //检查是否有
             let s: any = this;
-            if (s.isMultiTouch) {
+            if (s.isMultiTouch&&osType != "pc") {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
                     let p1 = new Point(e.targetTouches[0].clientX - e.target.offsetLeft, e.targetTouches[0].clientY - e.target.offsetTop);

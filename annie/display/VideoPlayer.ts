@@ -46,7 +46,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public video:any;
+        public video:any=null;
         /**
          * 播放的视频类型 值为0是序列图,1是视频 只读
          * @property videoType

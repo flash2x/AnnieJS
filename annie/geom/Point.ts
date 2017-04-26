@@ -40,18 +40,19 @@ namespace annie {
          * @type {number}
          */
         public y:number=0;
-
         /**
          * 求两点之间的距离
          * @method distance
-         * @static
-         * @param p1
-         * @param p2
+         * @param args 可变参数 传两个参数的话就是两个annie.Point类型 传四个参数的话分别是两个点的x y x y
          * @returns {number}
          */
-        public static distance(p1:Point,p2:Point):number{
-            return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));
+        public static distance(...args:any[]):number{
+            let len=args.length;
+            if(len==4){
+                return Math.sqrt((args[0]-args[2])*(args[0]-args[2])+(args[1]-args[3])*(args[1]-args[3]));
+            }else if(len==2){
+                return Math.sqrt((args[0].x-args[1].x)*(args[0].x-args[1].x)+(args[0].y-args[1].y)*(args[0].y-args[1].y));
+            }
         }
-
     }
 }

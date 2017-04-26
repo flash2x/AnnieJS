@@ -41,11 +41,11 @@ namespace annie {
             let s = this;
             if (s._req) {
                 s._req.abort();
-                s._req = null;
+                // s._req = null;
             }
         }
 
-        private _req: XMLHttpRequest;
+        private _req: XMLHttpRequest=new XMLHttpRequest();
         private headers: Array<string> = [];
 
         /**
@@ -86,7 +86,7 @@ namespace annie {
                     s.responseType = "unKnow";
                 }
             }
-            let req: any = new XMLHttpRequest();
+            let req: any = s._req;
             req.withCredentials = false;
             req.onprogress = function (event: any): void {
                 if (!event || event.loaded > 0 && event.total == 0) {
@@ -222,7 +222,7 @@ namespace annie {
             /*req.onloadstart = function (e) {
              s.dispatchEvent("onStart");
              };*/
-            s._req = req;
+            // s._req = req;
         }
 
         /**

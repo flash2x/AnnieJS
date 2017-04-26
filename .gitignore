@@ -44,4 +44,14 @@ out
 *.swf
 demo
 test
-
+.DS_Store
+annie/.DS_Store
+annie/display/.DS_Store
+annie/events/.DS_Store
+annie/filters/.DS_Store
+annie/geom/.DS_Store
+annie/media/.DS_Store
+annie/net/.DS_Store
+annie/render/.DS_Store
+annie/ui/.DS_Store
+annie/utils/.DS_Store

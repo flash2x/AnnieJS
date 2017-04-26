@@ -211,5 +211,19 @@ namespace annie {
                 s.htmlElement.value = value;
             }
         }
+
+        /**
+         * 输入文本的最大输入字数
+         * @public
+         * @since 1.1.0
+         * @property maxCharacters
+         * @returns {number}
+         */
+        public get maxCharacters():number{
+            return this.htmlElement.maxlength;
+        }
+        public set maxCharacters(value:number){
+            this.htmlElement.maxlength=value;
+        }
     }
 }

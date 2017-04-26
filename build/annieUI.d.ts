@@ -145,10 +145,10 @@ declare namespace annieUI {
         /**
          * 构造函数
          * @method  ScrollPage
-         * @param {number}vW 可视区域宽
-         * @param {number}vH 可视区域高
-         * @param {number}maxDistance 最大滚动的长度
-         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @param {number} vW 可视区域宽
+         * @param {number} vH 可视区域高
+         * @param {number} maxDistance 最大滚动的长度
+         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
          *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
@@ -161,7 +161,7 @@ declare namespace annieUI {
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
-         * @param {boolean}isVertical 是纵向还是横向,不传值则默认为纵向
+         * @param {boolean}isVertical 是纵向还是横向,默认为纵向
          * @since 1.0.0
          * @public
          */
@@ -179,8 +179,8 @@ declare namespace annieUI {
         /**
          * 滚到指定的坐标位置
          * @method
-         * @param dis 坐标位置
-         * @param time 滚动需要的时间
+         * @param {number} dis 坐标位置
+         * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
          * @since 1.0.2
          * @public
          */
@@ -232,9 +232,9 @@ declare namespace annieUI {
         /**
          * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
          * @method init
-         * @param src 头像的地址
-         * @param radio 指定头像的长宽或者直径
-         * @param maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形
+         * @param {string} src 头像的地址
+         * @param {number} radio 指定头像的长宽或者直径
+         * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
          */
         init(src: string, radio?: number, maskType?: number): void;
     }
@@ -267,22 +267,11 @@ declare namespace annieUI {
          * 页面滑动容器
          * @property view
          * @type {annie.Sprite}
-         * @private
+         * @since 1.1.0
+         * @public
          */
-        private view;
-        /**
-         * 滑动完成回调函数
-         * @method callback
-         * @type {function}
-         * @private
-         */
-        private callback;
-        /**
-         * @method onMoveStart
-         * @type {function}
-         * @private
-         */
-        private onMoveStart;
+        view: Sprite;
+        maskObj: annie.Shape;
         /**
          * 滑动方向
          * @property isVertical
@@ -294,10 +283,10 @@ declare namespace annieUI {
          * 容器活动速度
          * @property slideSpeed
          * @type {number}
-         * @private
+         * @public
          * @default 0
          */
-        private slideSpeed;
+        slideSpeed: number;
         /**
          * 触摸点开始点X
          * @property touchStartX
@@ -312,6 +301,14 @@ declare namespace annieUI {
          * @private
          */
         private touchStartY;
+        /**
+         * @property 滚动距离
+         * @type {number}
+         * @protected
+         * @default 0
+         * @since 1.0.0
+         */
+        protected distance: number;
         /**
          * 触摸点结束点X
          * @property touchEndX
@@ -332,7 +329,7 @@ declare namespace annieUI {
          */
         private touchEndY;
         /**
-         * 当前页面索引ID
+         * 当前页面索引ID 默认从0开始
          * @property currentPageIndex
          * @type {number}
          * @public
@@ -350,19 +347,19 @@ declare namespace annieUI {
          */
         isMoving: boolean;
         /**
-         * 舞台宽
-         * @property stageW
+         * 页面宽
+         * @property viewWidth
          * @type {number}
          * @private
          */
-        private stageW;
+        viewWidth: number;
         /**
-         * 舞台高
-         * @property stageH
+         * 页面高
+         * @property viewHeight
          * @type {number}
          * @private
          */
-        private stageH;
+        viewHeight: number;
         /**
          * 页面列表
          * @property pageList
@@ -370,13 +367,7 @@ declare namespace annieUI {
          * @private
          */
         private pageList;
-        /**
-         * 两点距离
-         * @property distance
-         * @type {number}
-         * @private
-         */
-        private distance;
+        private pageClassList;
         /**
          *
          * @property fSpeed
@@ -408,85 +399,45 @@ declare namespace annieUI {
          * @default true
          */
         canSlidePrev: boolean;
-        /**
-         * @property slideDirection
-         * @type {string}
-         * @since 1.0.3
-         * @public
-         * @default "next"
-         */
-        slideDirection: string;
-        /**
-         * 是否为数组
-         * @param obj
-         * @returns {boolean}
-         * @private
-         */
-        private isArray;
-        /**
-         * 是否为函数
-         * @param fn
-         * @returns {boolean}
-         * @private
-         */
-        private isFunction(fn);
+        paramXY: string;
         /**
          * 构造函数
          * @method SlidePage
-         * @public
-         * @since 1.0.2
-         * @param option      配置对象{pageList:pageList,callback:Fun,isVertical:true}
-         * @param{array}pageList     页面数组
-         * @param{method}callback    回调函数
-         * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
-         * @param{number}slideSpeed  页面滑动速度
-         * @example
-         *      var slideBox = new annieUI.SlidePage({
-         *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *      isVertical: true,//默认值为true,true为纵向,false为横向
-         *      slideSpeed: .32,//默认值为.4，滑动速度
-         *      callback:callback//滑动完成回调函数
-         *       });
-         *       slideBox.slideToIndex(2);//滑动到第2屏
-         *       slideBox.addPageList(new Page5());//添加一屏内容
-         * <p><a href="https://github.com/flash2x/demo5" target="_blank">测试链接</a></p>
+         * @param {number} vW 宽
+         * @param {number} vH 高
+         * @param {boolean} isVertical 是横向还是纵向 默认纵向
          */
-        constructor(option: any);
+        constructor(vW: number, vH: number, isVertical?: boolean);
         /**
-         * 添加到舞台
-         * @param e
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setMask
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
+         * @public
+         * @since 1.0.0
          */
-        private onAddToStage(e);
+        private setMask(w, h);
         /**
          * 触摸事件
          * @param e
          */
-        private onMouseEventHandler(e);
+        private onMouseEvent(e);
         /**
          * 滑动到指定页
-         * @method slideToIndex
+         * @method slideTo
          * @public
          * @since 1.0.3
-         * @param index 页面索引
+         * @param {number} index 页面索引
          */
-        slideToIndex(index: any): void;
+        slideTo(isNext: boolean): void;
         /**
          * 用于插入分页
          * @method addPageList
-         * @param list 页面数组对象
+         * @param {Array} classList  每个页面的类，注意是类，不是对象
          * @since 1.0.3
          * @public
          */
-        addPageList(list: any): void;
-        /**
-         * 平面中两点距离公式
-         * @param x1
-         * @param y1
-         * @param x2
-         * @param y2
-         * @returns {number}
-         */
-        private getDistance(x1, y1, x2, y2);
+        addPageList(classList: any): void;
     }
 }
 /**
@@ -559,10 +510,10 @@ declare namespace annieUI {
         /**
          * 初始化电子杂志
          * @method init
-         * @param width 单页宽
-         * @param height 单页高
-         * @param pageCount 总页数，一般为偶数
-         * @param getPageCallBack，通过此回调获取指定页的内容的显示对象
+         * @param {number} width 单页宽
+         * @param {number} height 单页高
+         * @param {number} pageCount 总页数，一般为偶数
+         * @param {Function} getPageCallBack，通过此回调获取指定页的内容的显示对象
          * @since 1.0.3
          */
         init(width: number, height: number, pageCount: any, getPageCallBack: Function): void;
@@ -582,7 +533,7 @@ declare namespace annieUI {
         /**
          * 跳到指定的页数
          * @method flipTo
-         * @param index
+         * @param {number} index 跳到指定的页数
          * @since 1.0.3
          */
         flipTo(index: number): void;
@@ -632,26 +583,27 @@ declare namespace annieUI {
         /**
          * 构造函数
          * @method ScrollList
-         * @param itemClassName 可以做为Item的类
-         * @param itemDis 各个Item的间隔
-         * @param vW 列表的宽
-         * @param vH 列表的高
-         * @param isVertical 是横向滚动还是纵向滚动
+         * @param {Class} itemClassName 可以做为Item的类
+         * @param {number} itemDis 各个Item的间隔
+         * @param {number} vW 列表的宽
+         * @param {number} vH 列表的高
+         * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
          * @since 1.0.9
          */
         constructor(itemClassName: any, itemDis: number, vW: number, vH: number, isVertical?: boolean);
         /**
          * 更新列表数据
          * @method updateData
-         * @param data
+         * @param {Array} data
+         * @param {boolean} isReset 是否重围数据列表。
          * @since 1.0.9
          */
-        updateData(data: Array<any>): void;
+        updateData(data: Array<any>, isReset?: boolean): void;
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9
          * @method setLoading
-         * @param downLoading
+         * @param {annie.DisplayObject} downLoading
          */
         setLoading(downLoading: DisplayObject): void;
     }

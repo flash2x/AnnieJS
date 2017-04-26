@@ -71,7 +71,7 @@ namespace annieUI {
          * @private
          * @type {annie.Shape}
          */
-        private maskObj: Shape = null;
+        private maskObj: Shape = new Shape();
         /**
          * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
          * @property view
@@ -79,7 +79,7 @@ namespace annieUI {
          * @since 1.0.0
          * @type {annie.Sprite}
          */
-        public view: Sprite = null;
+        public view: Sprite = new Sprite();
         /**
          * 最后鼠标经过的坐标值
          * @property lastValue
@@ -146,10 +146,10 @@ namespace annieUI {
         /**
          * 构造函数
          * @method  ScrollPage
-         * @param {number}vW 可视区域宽
-         * @param {number}vH 可视区域高
-         * @param {number}maxDistance 最大滚动的长度
-         * @param {boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @param {number} vW 可视区域宽
+         * @param {number} vH 可视区域高
+         * @param {number} maxDistance 最大滚动的长度
+         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
          *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
@@ -163,8 +163,6 @@ namespace annieUI {
             let s = this;
             s._instanceType = "annieUI.ScrollPage";
             s.isVertical = isVertical;
-            s.view = new Sprite();
-            s.maskObj = new Shape();
             s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
@@ -200,14 +198,14 @@ namespace annieUI {
                                 if (Math.abs(view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     //trace("上回弹");
-                                    s.dispatchEvent("onScrollHead");
+                                    s.dispatchEvent("onScrollToStart");
                                 }
                             } else {
                                 view[s.paramXY] += 0.4 * (s.distance - s.maxDistance - view[s.paramXY]);
                                 if (Math.abs(s.distance - s.maxDistance - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
-                                    //trace("上回弹");
-                                    s.dispatchEvent("onScrollEnd");
+                                    //trace("下回弹");
+                                    s.dispatchEvent("onScrollToEnd");
                                 }
                             }
                         } else {
@@ -232,7 +230,7 @@ namespace annieUI {
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
-         * @param {boolean}isVertical 是纵向还是横向,不传值则默认为纵向
+         * @param {boolean}isVertical 是纵向还是横向,默认为纵向
          * @since 1.0.0
          * @public
          */
@@ -328,8 +326,8 @@ namespace annieUI {
         /**
          * 滚到指定的坐标位置
          * @method
-         * @param dis 坐标位置
-         * @param time 滚动需要的时间
+         * @param {number} dis 坐标位置
+         * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
          * @since 1.0.2
          * @public
          */

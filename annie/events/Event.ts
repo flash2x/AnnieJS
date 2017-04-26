@@ -21,6 +21,70 @@ namespace annie {
          */
         public static RESIZE:string = "onResize";
         /**
+         * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_UPDATE
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_PLAY_UPDATE="onPlayUpdate";
+        /**
+         * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_PLAY_END="onPlayEnd";
+        /**
+         * annieUI.FlipBook组件翻页开始事件
+         * @property ON_FLIP_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_FLIP_START="onFlipStart";
+        /**
+         * annieUI.FlipBook组件翻页结束事件
+         * @property ON_FLIP_End
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_FLIP_End="onFlipEnd";
+        /**
+         * annieUI.ScrollPage组件滑动到开始位置事件
+         * @property ON_SCROLL_TO_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_SCROLL_TO_START="onScrollToStart";
+        /**
+         * annieUI.ScrollPage组件滑动到结束位置事件
+         * @property ON_SCROLL_TO_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_SCROLL_TO_END="onScrollToEnd";
+        /**
+         * annieUI.Slide 组件开始滑动事件
+         * @property ON_SLIDE_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_SLIDE_START="onSlideStart";
+        /**
+         * annieUI.Slide 组件结束滑动事件
+         * @property ON_SLIDE_END
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_SLIDE_END="onSlideEnd";
+        /**
          * 舞台初始化完成后会触发的事件
          * @Event
          * @property ON_STAGE_INIT

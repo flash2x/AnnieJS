@@ -38,7 +38,7 @@ namespace annie {
             }
             let s = this;
             s._currentFrame = 1;
-            s._totalFrames = times*30>>0;
+            s._totalFrames = times*60>>0;
             s.target = target;
             s._isTo = isTo;
             s._isLoop = 0;
@@ -68,7 +68,11 @@ namespace annie {
                         }
                         break;
                     case "delay":
-                        s._delay = data[item];
+                        if(data.useFrame) {
+                            s._delay = data[item];
+                        }else{
+                            s._delay = data[item]*60>>0;
+                        }
                         break;
                     case "ease":
                         s._ease = data[item];
@@ -178,7 +182,7 @@ namespace annie {
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位,默认以秒为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0

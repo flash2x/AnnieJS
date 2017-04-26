@@ -112,7 +112,7 @@ namespace annie {
          * 暂停播放,或者恢复播放
          * @method pause
          * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放 1.0.4新增的参数
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
          * @since 1.0.4
          */
         public pause(isPause:boolean=true): void {
@@ -121,6 +121,19 @@ namespace annie {
             }else{
                 this.media.play();
             }
+        }
+
+        /**
+         * 设置或者获取音量 从0-1
+         * @since 1.1.0
+         * @property volume
+         * @returns {number}
+         */
+        public get volume():number{
+            return this.media.volume
+        }
+        public set volume(value:number){
+            this.media.volume=value;
         }
     }
 }

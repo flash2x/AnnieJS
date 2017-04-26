@@ -129,7 +129,7 @@ namespace annie {
                 if (show != style.display) {
                     style.display = show;
                 }
-                if(visible) {
+                if(visible){
                     super.update(um, ua, uf);
                     if(um||s._updateInfo.UM) {
                         let mtx = s.cMatrix;
@@ -149,22 +149,15 @@ namespace annie {
 
         /**
          * 重写getBounds
+         * 获取Bitmap对象的Bounds
          * @method getBounds
          * @public
          * @since 1.0.0
          * @returns {annie.Rectangle}
          */
         public getBounds(): Rectangle {
-            let s = this;
-            let r = new Rectangle();
-            if (s.htmlElement) {
-                let hs = s.htmlElement.style;
-                r.width = parseInt(hs.width);
-                r.height = parseInt(hs.height);
-            }
-            return r;
+            return this._bounds;
         }
-
         public render(renderObj: IRender): void {
 
         }

@@ -57,6 +57,7 @@ namespace annieUI {
                     s.maskObj.drawRect(0, 0, s.radio, s.radio);
                 }
                 s.maskObj.endFill();
+                s.dispatchEvent("onComplete");
             };
             s.addChild(s.bitmap);
             s.bitmap.mask = s.maskObj;
@@ -71,9 +72,9 @@ namespace annieUI {
         /**
          * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
          * @method init
-         * @param src 头像的地址
-         * @param radio 指定头像的长宽或者直径
-         * @param maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形
+         * @param {string} src 头像的地址
+         * @param {number} radio 指定头像的长宽或者直径
+         * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
          */
         public init(src: string, radio: number = 0, maskType: number = 0): void {
             let s = this;

@@ -26,22 +26,11 @@ namespace annieUI {
          * 页面滑动容器
          * @property view
          * @type {annie.Sprite}
-         * @private
+         * @since 1.1.0
+         * @public
          */
-        private view: any;
-        /**
-         * 滑动完成回调函数
-         * @method callback
-         * @type {function}
-         * @private
-         */
-        private callback: any;
-        /**
-         * @method onMoveStart
-         * @type {function}
-         * @private
-         */
-        private onMoveStart: any;
+        public view: Sprite = new annie.Sprite();
+        public maskObj: annie.Shape = new annie.Shape();
         /**
          * 滑动方向
          * @property isVertical
@@ -53,10 +42,10 @@ namespace annieUI {
          * 容器活动速度
          * @property slideSpeed
          * @type {number}
-         * @private
+         * @public
          * @default 0
          */
-        private slideSpeed: number = 0;
+        public slideSpeed: number = 0.4;
         /**
          * 触摸点开始点X
          * @property touchStartX
@@ -72,14 +61,22 @@ namespace annieUI {
          */
         private touchStartY: number = 0;
         /**
+         * @property 滚动距离
+         * @type {number}
+         * @protected
+         * @default 0
+         * @since 1.0.0
+         */
+        protected distance: number = 0;
+        /**
          * 触摸点结束点X
          * @property touchEndX
          * @type {number}
          * @private
          */
         private touchEndX: number = 0;
-        private movingX:number=0;
-        private movingY:number=0;
+        private movingX: number = 0;
+        private movingY: number = 0;
         /**
          * 触摸点结束点Y
          * @property touchEndY
@@ -91,7 +88,7 @@ namespace annieUI {
          */
         private touchEndY: number = 0;
         /**
-         * 当前页面索引ID
+         * 当前页面索引ID 默认从0开始
          * @property currentPageIndex
          * @type {number}
          * @public
@@ -109,33 +106,27 @@ namespace annieUI {
          */
         public isMoving = false;
         /**
-         * 舞台宽
-         * @property stageW
+         * 页面宽
+         * @property viewWidth
          * @type {number}
          * @private
          */
-        private stageW: number = 0;
+        public viewWidth: number = 0;
         /**
-         * 舞台高
-         * @property stageH
+         * 页面高
+         * @property viewHeight
          * @type {number}
          * @private
          */
-        private stageH: number = 0;
+        public viewHeight: number = 0;
         /**
          * 页面列表
          * @property pageList
          * @type {Array}
          * @private
          */
-        private pageList: any;
-        /**
-         * 两点距离
-         * @property distance
-         * @type {number}
-         * @private
-         */
-        private distance: number = 0;
+        private pageList: Array<any> = [];
+        private pageClassList: Array<any> = [];
         /**
          *
          * @property fSpeed
@@ -167,203 +158,122 @@ namespace annieUI {
          * @default true
          */
         public canSlidePrev: boolean = true;
-
-        /**
-         * @property slideDirection
-         * @type {string}
-         * @since 1.0.3
-         * @public
-         * @default "next"
-         */
-        public slideDirection: string = 'next';
-        /**
-         * 是否为数组
-         * @param obj
-         * @returns {boolean}
-         * @private
-         */
-        private isArray = function (obj: any) {
-            return Object.prototype.toString.call(obj) === '[object Array]';
-        };
-
-        /**
-         * 是否为函数
-         * @param fn
-         * @returns {boolean}
-         * @private
-         */
-        private isFunction(fn: any) {
-            return typeof fn === 'function';
-        }
+        public paramXY: string = "y";
 
         /**
          * 构造函数
          * @method SlidePage
-         * @public
-         * @since 1.0.2
-         * @param option      配置对象{pageList:pageList,callback:Fun,isVertical:true}
-         * @param{array}pageList     页面数组
-         * @param{method}callback    回调函数
-         * @param{boolean}isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
-         * @param{number}slideSpeed  页面滑动速度
-         * @example
-         *      var slideBox = new annieUI.SlidePage({
-         *      pageList: [new Page1(), new Page2(), new Page3(), new Page4()],//页面数组集
-         *      isVertical: true,//默认值为true,true为纵向,false为横向
-         *      slideSpeed: .32,//默认值为.4，滑动速度
-         *      callback:callback//滑动完成回调函数
-         *       });
-         *       slideBox.slideToIndex(2);//滑动到第2屏
-         *       slideBox.addPageList(new Page5());//添加一屏内容
-         * <p><a href="https://github.com/flash2x/demo5" target="_blank">测试链接</a></p>
+         * @param {number} vW 宽
+         * @param {number} vH 高
+         * @param {boolean} isVertical 是横向还是纵向 默认纵向
          */
-        constructor(option: any) {
+        constructor(vW: number, vH: number, isVertical: boolean = true) {
             super();
             var s = this;
-            if (!s.isArray(option.pageList)) {
-                throw 'pageList参数数据格式不对！pageList应为页面对象列表数组';
+            s.isVertical = isVertical;
+            if (isVertical) {
+                s.paramXY = "y";
+                s.distance = vH;
+            } else {
+                s.paramXY = "x";
+                s.distance = vW;
             }
-            if (!s.isFunction(option['callback'])) {
-                throw 'callback参数数据格式不对！callback应为函数';
-            }
-            s.pageList = option.pageList;
-            s.onMoveStart = option.onMoveStart;
-            s.callback = option.callback;
-            s.isVertical = option.isVertical!=undefined ? option.isVertical : true;
-            s.canSlidePrev = option.canSlidePrev!=undefined ? option.canSlidePrev : true;
-            s.canSlideNext = option.canSlideNext!=undefined ? option.canSlideNext : true;
-            s.slideSpeed = option.slideSpeed!=undefined ? option.slideSpeed : .4;
-            s.addEventListener(annie.Event.ADD_TO_STAGE, s.onAddToStage.bind(s));
-            // console.log(s);
+            s.maskObj.alpha = 0;
+            s.addChild(s.maskObj);
+            s.addChild(s.view);
+            s.view.mask = s.maskObj;
+            s.setMask(vW, vH);
+            var me=s.onMouseEvent.bind(s);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
         }
 
         /**
-         * 添加到舞台
-         * @param e
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setMask
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
+         * @public
+         * @since 1.0.0
          */
-        private onAddToStage(e: annie.Event): void {
-            var s = this;
-            s.stageW = s.stage.desWidth;
-            s.stageH = s.stage.desHeight;
-            s.listLen = s.pageList.length;//页面个数
-            s.view = new annie.Sprite();
-            for (var i = 0; i < s.listLen; i++) {
-                s.pageList[i].pageId = i;
-                s.pageList[i].canSlidePrev = true;
-                s.pageList[i].canSlideNext = true;
-                if (s.isVertical) {
-                    s.pageList[i].y = i * s.stageH;
-                } else {
-                    s.pageList[i].x = i * s.stageW;
-                }
-                s.view.addChild(s.pageList[i]);
-            }
-            if (s.isMoving) {
-                s.view.mouseEnable = false;
-                s.view.mouseChildren = false;
-            }
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEventHandler.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEventHandler.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEventHandler.bind(s));
-            s.addChild(s.view);
+        private setMask(w: number, h: number): void {
+            let s: any = this;
+            s.maskObj.clear();
+            s.maskObj.beginFill("#000000");
+            s.maskObj.drawRect(0, 0, w, h);
+            s.viewWidth = w;
+            s.viewHeight = h;
+            s.maskObj.endFill();
         }
 
         /**
          * 触摸事件
          * @param e
          */
-        private onMouseEventHandler(e: annie.MouseEvent): void {
-            var s = this;
-            if (s.isMoving) {
-                return;
-            }
+        private onMouseEvent(e: annie.MouseEvent): void {
+            var s:any = this;
+            if(s.isMoving)return;
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchStartX=s.touchEndX= e.localX;
-                s.touchStartY=s.touchEndY= e.localY;
-                s.movingX=s.movingY=0;
+                s.touchStartX = s.touchEndX = e.localX;
+                s.touchStartY = s.touchEndY = e.localY;
+                s.movingX = s.movingY = 0;
                 s.isMouseDown = true;
             } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown) {
-                    return;
-                }
-                let movingX = e.localX-s.touchEndX;
-                let movingY = e.localY-s.touchEndY;
-                if(s.movingX!=0&&s.movingY!=0){
-                    if((s.movingX>0&&movingX<0)||(s.movingX<0&&movingX>0)||(s.movingY>0&&movingY<0)||(s.movingY<0&&movingY>0)){
-                        s.isMouseDown=false;
+                let movingX = e.localX - s.touchEndX;
+                let movingY = e.localY - s.touchEndY;
+                if (s.movingX != 0 && s.movingY != 0) {
+                    if ((s.movingX > 0 && movingX < 0) || (s.movingX < 0 && movingX > 0) || (s.movingY > 0 && movingY < 0) || (s.movingY < 0 && movingY > 0)) {
+                        s.isMouseDown = false;
                     }
                 }
                 s.touchEndX = e.localX;
                 s.touchEndY = e.localY;
-                s.movingX=movingX;
-                s.movingY=movingY;
-                // s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
-                if (s.isVertical) {
-                    if (s.currentPageIndex == 0) {
-                        if (s.touchStartY < s.touchEndY) {
-                            s.view.y += Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
-                        }
-                    }
-                    if (s.currentPageIndex == s.listLen - 1) {
-                        if (s.touchStartY > s.touchEndY) {
-                            s.view.y -= Math.abs(s.touchStartY - s.touchEndY) / s.stageH * s.fSpeed * 0.6;
-                        }
-                    }
-                } else {
-                    if (s.currentPageIndex == 0) {
-                        if (s.touchStartX < s.touchEndX) {
-                            s.view.x += Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
-                        }
-                    }
-                    if (s.currentPageIndex == s.listLen - 1) {
-                        if (s.touchStartX > s.touchEndX) {
-                            s.view.x -= Math.abs(s.touchStartX - s.touchEndX) / s.stageW * s.fSpeed * 0.6;
-                        }
-                    }
+                s.movingX = movingX;
+                s.movingY = movingY;
+                let ts:number=s.touchStartY;
+                let te:number=s.touchEndY;
+                if (!s.isVertical) {
+                    ts=s.touchStartX;
+                    te=s.touchEndX;
+                }
+                if (((s.currentPageIndex == 0)&&(ts < te))||((s.currentPageIndex == s.listLen - 1)&&(ts > te))) {
+                    s.view[s.paramXY] += (te-ts) / s.distance * s.fSpeed * 0.6;
                 }
             } else if (e.type == annie.MouseEvent.MOUSE_UP) {
-                if (s.isMoving||!s.isMouseDown) {
-                    return;
-                }
+                if(!s.isMouseDown)return;
                 s.isMouseDown = false;
-                s.distance = s.getDistance(s.touchStartX, s.touchStartY, s.touchEndX, s.touchEndY);
-                if (s.distance > 50) {
-                    if (s.isVertical) {
-                        s.slideDirection = s.touchStartY > s.touchEndY ? 'next' : 'prev';
+                s.touchEndX = e.localX;
+                s.touchEndY = e.localY;
+                let isNext:boolean=true;
+                let ts:number=s.touchStartY;
+                let te:number=s.touchEndY;
+                if (!s.isVertical) {
+                    ts=s.touchStartX;
+                    te=s.touchEndX;
+                }
+                let distance = Math.abs(ts-te);
+                if (distance > s.distance*0.2) {
+                    isNext = ts > te;
+                    let xyValue=0;
+                    let isNeedSlide=true;
+                    if (isNext) {
+                        if (s.currentPageIndex >= s.listLen - 1) {
+                            xyValue=-s.distance * (s.listLen - 1);
+                            isNeedSlide=false;
+                        }
                     } else {
-                        s.slideDirection = s.touchStartX > s.touchEndX ? 'next' : 'prev';
+                        if (s.currentPageIndex <=0) {
+                            isNeedSlide=false;
+                        }
                     }
-                    if (s.slideDirection == 'next') {
-                        s.dispatchEvent(new annie.Event('onSlideNextEvent'));
-                        if (s.currentPageIndex < s.listLen - 1) {
-                            if (!s.canSlideNext || !s.pageList[s.currentPageIndex].canSlideNext) {
-                                return;
-                            }
-                            s.currentPageIndex++;
-                            s.slideToIndex(s.currentPageIndex);
-                        } else {
-                            s.isVertical == true ? annie.Tween.to(s.view, .2, {
-                                    y: -s.stageH * (s.listLen - 1),
-                                    ease: annie.Tween.backOut
-                                }) : annie.Tween.to(s.view, .2, {
-                                    x: -s.stageW * (s.listLen - 1),
-                                    ease: annie.Tween.backOut
-                                });
-                        }
-                    } else {
-                        s.dispatchEvent(new annie.Event('onSlidePrevEvent'));
-                        if (s.currentPageIndex > 0) {
-                            if (!s.canSlidePrev || !s.pageList[s.currentPageIndex].canSlidePrev) {
-                                return;
-                            }
-                            s.currentPageIndex--;
-                            s.slideToIndex(s.currentPageIndex);
-                        } else {
-                            s.isVertical == true ? annie.Tween.to(s.view, .2, {
-                                    y: 0,
-                                    ease: annie.Tween.backOut
-                                }) : annie.Tween.to(s.view, .2, {x: 0, ease: annie.Tween.backOut});
-                        }
+                    if(isNeedSlide){
+                        s.slideTo(isNext);
+                    }else{
+                        let tweenData:any={};
+                        tweenData[s.paramXY]=xyValue;
+                        tweenData.ease= annie.Tween.backOut;
+                        annie.Tween.to(s.view, s.slideSpeed * 0.5, tweenData);
                     }
                 }
             }
@@ -371,99 +281,60 @@ namespace annieUI {
 
         /**
          * 滑动到指定页
-         * @method slideToIndex
+         * @method slideTo
          * @public
          * @since 1.0.3
-         * @param index 页面索引
+         * @param {number} index 页面索引
          */
-        public slideToIndex(index: any): void {
+        public slideTo(isNext: boolean): void {
             var s = this;
-            if (s.isMoving) {
+            if (s.isMoving||s.isMouseDown) {
                 return;
             }
-            if (s.isVertical) {
-                annie.Tween.to(s.view, s.slideSpeed, {
-                    y: -index * s.stageH, onComplete: function () {
-                        s.isFunction(s.callback) && s.callback(index);
-                        // setTimeout(function () {
-                        //     for (var i = 0; i < s.listLen; i++) {
-                        //         if (s.currentPageIndex != s.pageList[i].pageId)
-                        //             s.pageList[i].visible = false;
-                        //     }
-                        // }, 200);
-                        s.view.mouseEnable = true;
-                        s.view.mouseChildren = true;
-                        s.isMoving = false;
-                    }
-                });
-                s.isMoving = true;
+            if (isNext) {
+                s.currentPageIndex++;
             } else {
-                annie.Tween.to(s.view, s.slideSpeed, {
-                    x: -index * s.stageW, onComplete: function () {
-                        s.isFunction(s.callback) && s.callback(index);
-                        // setTimeout(function () {
-                        //     for (var i = 0; i < s.listLen; i++) {
-                        //         if (s.currentPageIndex != s.pageList[i].pageId)
-                        //             s.pageList[i].visible = false;
-                        //     }
-                        // }, 200);
-                        s.view.mouseEnable = true;
-                        s.view.mouseChildren = true;
-                        s.isMoving = false;
-                    }
-                });
-                s.isMoving = true;
+                s.currentPageIndex--;
             }
-            s.currentPageIndex = index;
-            s.isFunction(s.onMoveStart) && s.onMoveStart(index);//开始滑动动画
+            if (s.currentPageIndex < 0 || s.currentPageIndex >= s.listLen)return;
+            if (!s.pageList[s.currentPageIndex]) {
+                s.pageList[s.currentPageIndex] = new s.pageClassList[s.currentPageIndex]();
+                s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
+            }
+            s.view.addChild(s.pageList[s.currentPageIndex]);
+            s.view.mouseEnable = false;
+            s.isMoving = true;
+            let tweenData: any = {};
+            tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
+            tweenData.onComplete = function () {
+                s.view.mouseEnable = true;
+                s.isMoving = false;
+                if (isNext) {
+                    s.view.removeChild(s.pageList[s.currentPageIndex - 1]);
+                } else {
+                    s.view.removeChild(s.pageList[s.currentPageIndex + 1]);
+                }
+                s.dispatchEvent("onSlideEnd");
+            };
+            annie.Tween.to(s.view, s.slideSpeed, tweenData);
+            s.dispatchEvent("onSlideStart", {isNext: isNext});
         }
-
         /**
          * 用于插入分页
          * @method addPageList
-         * @param list 页面数组对象
+         * @param {Array} classList  每个页面的类，注意是类，不是对象
          * @since 1.0.3
          * @public
          */
-        public addPageList(list: any): void {
+        public addPageList(classList:any): void {
             var s = this;
-            if (!s.isArray(list)) {
-                throw 'list应为页面对象列表数组';
+            s.pageClassList = s.pageClassList.concat(classList);
+            if (s.listLen == 0 && s.pageClassList.length > 0) {
+                let pageFirst = new s.pageClassList[0]();
+                s.pageList.push(pageFirst);
+                s.view.addChild(pageFirst);
             }
-            var addListLen = list.length;
-            // console.log('addLisLen:'+addListLen);
-            for (var i = 0; i < addListLen; i++) {
-                list[i].pageId = s.listLen;
-                list[i].canSlidePrev = true;
-                list[i].canSlideNext = true;
-                if (s.isVertical) {
-                    list[i].y = s.listLen * s.stageH;
-                } else {
-                    list[i].x = s.listLen * s.stageW;
-                }
-                s.pageList.push(list[i]);
-                s.listLen = s.pageList.length;
-                // console.log('加长度后：'+s.listLen);
-                s.view.addChildAt(list[i], s.listLen);
-            }
-        }
-        /**
-         * 平面中两点距离公式
-         * @param x1
-         * @param y1
-         * @param x2
-         * @param y2
-         * @returns {number}
-         */
-        private getDistance(x1: number, y1: number, x2: number, y2: number): number {
-            var x1 = x1;
-            var y1 = y1;
-            var x2 = x2;
-            var y2 = y2;
-            var xdiff = x2 - x1;
-            var ydiff = y2 - y1;
-            var dis = Math.pow((xdiff * xdiff + ydiff * ydiff), 0.5);
-            return dis;
+            s.listLen = s.pageClassList.length;
         }
     }
 }

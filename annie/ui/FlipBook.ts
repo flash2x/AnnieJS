@@ -79,10 +79,10 @@ namespace annieUI {
         /**
          * 初始化电子杂志
          * @method init
-         * @param width 单页宽
-         * @param height 单页高
-         * @param pageCount 总页数，一般为偶数
-         * @param getPageCallBack，通过此回调获取指定页的内容的显示对象
+         * @param {number} width 单页宽
+         * @param {number} height 单页高
+         * @param {number} pageCount 总页数，一般为偶数
+         * @param {Function} getPageCallBack，通过此回调获取指定页的内容的显示对象
          * @since 1.0.3
          */
         public init(width: number, height: number, pageCount: any,getPageCallBack:Function): void {
@@ -311,10 +311,10 @@ namespace annieUI {
                 if((s.timerArg0<3&&s.currPage>0)||(s.timerArg0>2&&s.currPage<=s.totalPage-2)){
                     s.state = "start";
                     s.flushPage();
+                    e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart")
                 }
             }
-            e.updateAfterEvent();
         }
         private onMouseUp(e: MouseEvent): void {
             let s = this;
@@ -365,7 +365,7 @@ namespace annieUI {
         /**
          * 跳到指定的页数
          * @method flipTo
-         * @param index
+         * @param {number} index 跳到指定的页数
          * @since 1.0.3
          */
         public flipTo(index: number): void {

@@ -200,8 +200,7 @@ namespace annie {
          * @returns {annie.Rectangle}
          */
         public getBounds(): Rectangle {
-            let s = this;
-            return s._bounds;
+            return this._bounds;
         }
 
         /**

@@ -57,9 +57,7 @@ namespace annie {
             super();
             this._instanceType = "annie.EventDispatcher";
             this.eventTypes = {};
-
         }
-
         /**
          * 全局的鼠标事件的监听数对象表
          * @property _MECO
