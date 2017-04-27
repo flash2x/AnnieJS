@@ -19,7 +19,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @example
-         *      //切记在微信里视频地址一定要带上完整域名，否则后果很严重
+         *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
          *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
          *          videoPlayer.play();//播放视频
          *          //videoPlayer.pause();//暂停视频
