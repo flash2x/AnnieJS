@@ -134,6 +134,7 @@ namespace annie {
          * @since 1.0.0
          */
         public addChildAt(child: DisplayObject, index: number): void {
+            if(!child)return;
             let s = this;
             let sameParent = (s == child.parent);
             let len: number;
@@ -362,6 +363,7 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s: any = this;
+            if(s._cp)return;
             if(s.cAlpha > 0 && s._visible) {
                 let maskObj: any;
                 let child: any;

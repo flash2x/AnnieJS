@@ -1411,6 +1411,14 @@ declare namespace annie {
          */
         render(renderObj: IRender): void;
         /**
+         * 是否对矢量使用像素碰撞 默认开启
+         * @property hitTestWidthPixel
+         * @type {boolean}
+         * @default false
+         * @since 1.1.0
+         */
+        hitTestWidthPixel: boolean;
+        /**
          * 重写刷新
          * @method update
          * @public
@@ -1446,6 +1454,16 @@ declare namespace annie {
          *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
          */
         static convertToImage(bitmap: annie.Bitmap, isNeedImage?: boolean): any;
+        /**
+         * 重写hitTestPoint
+         * @method  hitTestPoint
+         * @param {annie.Point} globalPoint
+         * @param {boolean} isMouseEvent
+         * @returns {any}
+         * @public
+         * @since 1.0.0
+         */
+        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
     }
 }
 /**
@@ -1494,17 +1512,6 @@ declare namespace annie {
          */
         static getBitmapStyle(image: any): any;
         /**
-         * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
-         * 默认将不开启
-         * @property cacheAsBitmap
-         * @public
-         * @since 1.0.4
-         * @type {boolean}
-         * @default false
-         */
-        private cacheAsBitmap;
-        private _cAb;
-        /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
          * @static
@@ -1517,6 +1524,14 @@ declare namespace annie {
         static getRGBA(color: string, alpha: number): string;
         private _isBitmapStroke;
         private _isBitmapFill;
+        /**
+         * 是否对矢量使用像素碰撞 默认开启
+         * @property hitTestWidthPixel
+         * @type {boolean}
+         * @default true
+         * @since 1.1.0
+         */
+        hitTestWidthPixel: boolean;
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
          * @method addDraw
@@ -1802,7 +1817,7 @@ declare namespace annie {
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor
          * @param {Object} infoObj
-         * @param {string} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {string|any} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)"或者是annie.Shape.getGradientColor()方法返回的渐变对象;
          * @param {string} infoObj.strokeColor 线条颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
          * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
          * @public
@@ -3974,6 +3989,12 @@ declare namespace Flash2x {
     import Shape = annie.Shape;
     import Bitmap = annie.Bitmap;
     let _isReleased: boolean;
+    let _shareSceneList: any;
+    /**
+     * 存储加载资源的总对象
+     * @type {Object}
+     */
+    let res: any;
     /**
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
      * @method loadScene

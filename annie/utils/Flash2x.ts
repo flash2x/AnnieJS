@@ -12,12 +12,15 @@ namespace Flash2x {
     import BlurFilter=annie.BlurFilter;
     import ShadowFilter=annie.ShadowFilter;
     import ColorMatrixFilter=annie.ColorMatrixFilter;
+    //打包swf用
     export let _isReleased = false;
+    //打包swf用
+    export let _shareSceneList: any = [];
     /**
      * 存储加载资源的总对象
      * @type {Object}
      */
-    let res: any = {};
+    export let res: any = {};
     /**
      * 加载器是否正在加载中
      */
@@ -105,10 +108,10 @@ namespace Flash2x {
             if (!isLoadedScene(sceneName)) {
                 _loadSceneNames.push(sceneName);
                 res[sceneName] = {};
-            }else{
+            } else {
                 info.sceneName = sceneName;
                 info.sceneId = 1;
-                info.sceneTotal =1;
+                info.sceneTotal = 1;
                 completeFun(info);
             }
         }
@@ -118,10 +121,10 @@ namespace Flash2x {
                 if (!isLoadedScene(sceneName[i])) {
                     res[sceneName[i]] = {};
                     _loadSceneNames.push(sceneName[i]);
-                }else{
+                } else {
                     info.sceneName = sceneName[i];
-                    info.sceneId = i+1;
-                    info.sceneTotal =len;
+                    info.sceneId = i + 1;
+                    info.sceneTotal = len;
                     completeFun(info);
                 }
             }
@@ -150,6 +153,15 @@ namespace Flash2x {
             _loadConfig();
         } else {
             //加载正式的单个文件
+            //看看是否需要加载共享资源
+            if (_shareSceneList.length > 0 && (!isLoadedScene("f2xShare"))) {
+                for (let i = 0; i < _loadSceneNames.length; i++) {
+                    if (_shareSceneList.indexOf(_loadSceneNames[i]) >= 0) {
+                        _loadSceneNames.unshift("f2xShare");
+                        break;
+                    }
+                }
+            }
             _loadIndex = 0;
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
@@ -180,13 +192,11 @@ namespace Flash2x {
             _loadRes();
         }
     }
-
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
-
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
         if (!_isReleased) {
@@ -194,21 +204,28 @@ namespace Flash2x {
                 res[scene][_currentConfig[_loadIndex][0].id] = e.data.response;
             }
         } else {
-            var F2x: any = Flash2x;
-            var JSResItem: any = F2x[scene + "Res"];
-            for (var item in JSResItem) {
-                var resItem: any;
-                if (JSResItem[item].indexOf("audio/") > 0) {
-                    resItem = new annie.Sound(JSResItem[item]);
-                } else if (JSResItem[item].indexOf("image/") > 0) {
-                    resItem = new Image();
-                    resItem.src = JSResItem[item];
-                } else {
-                    resItem = JSON.parse(JSResItem[item]);
+            if (scene != "f2xShare") {
+                var F2x: any = Flash2x;
+                var JSResItem: any = F2x[scene + "Res"];
+                for (var item in JSResItem) {
+                    var resItem: any;
+                    if (JSResItem[item].indexOf("audio/") > 0) {
+                        resItem = new annie.Sound(JSResItem[item]);
+                    } else if (JSResItem[item].indexOf("image/") > 0) {
+                        resItem = new Image();
+                        resItem.src = JSResItem[item];
+                    } else {
+                        resItem = JSON.parse(JSResItem[item]);
+                    }
+                    res[scene][item] = resItem;
                 }
-                res[scene][item] = resItem;
+                delete F2x[scene + "Res"];
+            }else{
+                _currentConfig.shift();
+                _loadSceneNames.shift();
+                _loadRes();
+                return;
             }
-            delete F2x[scene + "Res"];
         }
         _checkComplete();
     }
@@ -219,7 +236,7 @@ namespace Flash2x {
         _currentConfig[_loadIndex].shift();
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
-        } else {
+        } else{
             var info: any = {};
             info.sceneName = _loadSceneNames[_loadIndex];
             _loadIndex++;
@@ -237,7 +254,6 @@ namespace Flash2x {
             }
         }
     }
-
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
         if (_isReleased) {
@@ -257,7 +273,7 @@ namespace Flash2x {
      * @returns {boolean}
      */
     export function isLoadedScene(sceneName: string): Boolean {
-        if (res[sceneName] != undefined && res[sceneName] != null){
+        if (res[sceneName] != undefined && res[sceneName] != null) {
             return true;
         } else {
             return false;
@@ -467,7 +483,7 @@ namespace Flash2x {
             if (bitmap) {
                 if (bitmap.rect) {
                     //从SpriteSheet中取出Image单独存放
-                    bitmapData = annie.Bitmap.convertToImage(bitmap,false);
+                    bitmapData = annie.Bitmap.convertToImage(bitmap, false);
                 } else {
                     bitmapData = bitmap.bitmapData;
                 }
@@ -492,7 +508,7 @@ namespace Flash2x {
      * @returns {annie.Shape}
      */
     export function s(pathObj: any, fillObj: any, strokeObj: any): Shape {
-        let shape = new annie.Shape();
+        let shape:annie.Shape = new annie.Shape();
         if (fillObj) {
             if (fillObj.type == 0) {
                 shape.beginFill(fillObj.color);
@@ -594,8 +610,8 @@ namespace Flash2x {
             w[callbackName] = callbackFun;
         }
         let jsonpScript: any = document.createElement('script');
-        let head:any=document.getElementsByTagName('head')[0];
-        jsonpScript.onload = function (e:any) {
+        let head: any = document.getElementsByTagName('head')[0];
+        jsonpScript.onload = function (e: any) {
             if (type == 0) {
                 callbackFun(w[callbackName]);
             }
@@ -628,9 +644,10 @@ namespace Flash2x {
      *      var userName=Flash2x.getQueryString("username");
      *      trace(id,userName);
      */
-    export function getQueryString(name:string) {
+    export function getQueryString(name: string) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
         var r = window.location.search.substr(1).match(reg);
-        if (r != null) return decodeURIComponent(r[2]); return null;
+        if (r != null) return decodeURIComponent(r[2]);
+        return null;
     }
 }

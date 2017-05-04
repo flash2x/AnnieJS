@@ -70,11 +70,15 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
 ## AnnieJS 1.1.0 版本
+    修复矢量元素加滤镜无效的bug
     修复annie.Tween中以秒为计算单位时,delay参数仍然以帧为单位的bug
     修复annie.Timer使用时用户不使用kill杀死Timer对象导致内存泄漏报错的bug
+    修复首次添加显示对象到舞台时，偶尔会出现残影的bug
     修复开启多点手势后，在pc端打开时报错而需要刷新后才正常的bug
     新增annie.TextInput的maxCharacters最长字段属性
     新增annie.Event中一些静态事件常量
+    新增annie.Shape的像素碰撞，默认开启.属性名为:hitTestWidthPixel
+    新增annie.Bitmap的像素碰撞，默认未开启.属性名为:hitTestWidthPixel
     重写annieUI.SlidePage类，使其更加完善和优化
 ## AnnieJS 1.0.9 版本
     修复annie.Shape画线在手机端会报错的bug
@@ -200,7 +204,10 @@
     支持flash2x 管理类
 # Flash2x 版本更新列表
 ## Flash2x 3.1.0
-    支持导出输入文本的maxCharacters属性，以限制最大输入字符数
+    支持AnnieJS导出输入文本的maxCharacters属性，以限制最大输入字符数
+    修复fla文件命名为main.fla后gulp打包成swf报错的bug
+    修复f2xShare资源gulp打包成swf后并不重复里利用的bug
+    增加在导出时将矢量对象转换为图片的功能选择
 ## Flash2x 3.0.8
     修复导出复杂矢量时报错的bug
     修复导出特殊字符时报错的bug

@@ -116,7 +116,7 @@ namespace annie {
                 s.eventTypes[type] = [];
             }
             if (s.eventTypes[type].indexOf(listener) < 0) {
-                s.eventTypes[type].push(listener);
+                s.eventTypes[type].unshift(listener);
                 if (type.indexOf("onMouse") == 0) {
                     s._changeMouseCount(type, true);
                 }
@@ -174,8 +174,12 @@ namespace annie {
                 if (data != null) {
                     event.data = data;
                 }
-                for (let i = 0; i < len; i++) {
-                    listeners[i](event);
+                for (let i = len - 1; i >= 0; i--) {
+                    if(listeners[i]){
+                        listeners[i](event);
+                    }else{
+                        listeners.splice(i, 1);
+                    }
                 }
                 return true;
             } else {
@@ -221,7 +225,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 移除对象中所有的侦听
          * @method removeAllEventListener

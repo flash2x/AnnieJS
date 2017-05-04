@@ -220,6 +220,7 @@ namespace annie {
          */
         public draw(target: any, type: number): void {
             let s = this;
+            if(target._cp)return;
             let img = target._cacheImg;
             if(img&&img.width>0&&img.height>0) {
                 let gl = s._gl;

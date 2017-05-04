@@ -100,7 +100,14 @@ namespace annie {
             renderObj.draw(s, 0);
             //super.render();
         }
-
+        /**
+         * 是否对矢量使用像素碰撞 默认开启
+         * @property hitTestWidthPixel
+         * @type {boolean}
+         * @default false
+         * @since 1.1.0
+         */
+        public hitTestWidthPixel:boolean=false;
         /**
          * 重写刷新
          * @method update
@@ -244,6 +251,47 @@ namespace annie {
                     return _canvas;
                 }
             }
+        }
+        /**
+         * 重写hitTestPoint
+         * @method  hitTestPoint
+         * @param {annie.Point} globalPoint
+         * @param {boolean} isMouseEvent
+         * @returns {any}
+         * @public
+         * @since 1.0.0
+         */
+        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
+            let s = this;
+            if (isMouseEvent && !s.mouseEnable)return null;
+            let p = s.globalToLocal(globalPoint);
+            p.x += s._cacheX;
+            p.y += s._cacheY;
+            if (s.getBounds().isPointIn(p)) {
+                if (s.hitTestWidthPixel) {
+                    let image = s._cacheImg;
+                    if (!image || image.width == 0 || image.height == 0) {
+                        return null;
+                    }
+                    let _canvas = DisplayObject["_canvas"];
+                    _canvas.width = 1;
+                    _canvas.height = 1;
+                    let ctx = _canvas["getContext"]('2d');
+                    ctx.clearRect(0, 0, 1, 1);
+                    if(s.rect){
+                        p.x+=s.rect.x;
+                        p.y+=s.rect.y;
+                    }
+                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
+                    ctx.drawImage(image, 0, 0);
+                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                        return s;
+                    }
+                }else {
+                    return s;
+                }
+            }
+            return null;
         }
     }
 }

@@ -341,7 +341,7 @@ namespace annie {
          * @type {boolean}
          * @private
          */
-        protected _cp:boolean=false;
+        protected _cp:boolean=true;
         /**
          *将全局坐标转换到本地坐标值
          * @method globalToLocal

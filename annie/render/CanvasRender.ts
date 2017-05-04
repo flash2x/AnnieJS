@@ -102,7 +102,8 @@ namespace annie {
          */
         public draw(target: any, type: number): void {
             let s = this;
-            //不可见的视觉不渲染
+            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
+            if(target._cp)return;
             let ctx = s._ctx;
             ctx.globalAlpha = target.cAlpha;
             let tm = target.cMatrix;
@@ -122,7 +123,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 初始化渲染器
          * @public

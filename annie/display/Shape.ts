@@ -63,26 +63,6 @@ namespace annie {
             let ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         }
-
-        /**
-         * 是否将矢量缓存为位图，如果矢量有用到滤镜什么的话，则一定要缓存为位图无效.
-         * 默认将不开启
-         * @property cacheAsBitmap
-         * @public
-         * @since 1.0.4
-         * @type {boolean}
-         * @default false
-         */
-        private set cacheAsBitmap(value: boolean) {
-            this._setProperty("_cAb",value,3);
-        }
-
-        private get cacheAsBitmap() {
-            return this._cAb;
-        }
-
-        private _cAb: boolean = false;
-
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -111,7 +91,14 @@ namespace annie {
 
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
-
+        /**
+         * 是否对矢量使用像素碰撞 默认开启
+         * @property hitTestWidthPixel
+         * @type {boolean}
+         * @default true
+         * @since 1.1.0
+         */
+        public hitTestWidthPixel:boolean=true;
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
          * @method addDraw
@@ -401,7 +388,6 @@ namespace annie {
                 s._isBitmapFill = matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
-            s.cacheAsBitmap = true;
         }
 
         private _fill(fillStyle: any): void {
@@ -475,7 +461,6 @@ namespace annie {
                 s._isBitmapStroke = matrix;
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
-            s.cacheAsBitmap = true;
         }
 
         private _stroke(strokeStyle: any, width: number, cap: string, join: string, miter: number): void {
@@ -792,7 +777,6 @@ namespace annie {
                         s._cacheY = leftY;
                         s._bounds.width = w - 10;
                         s._bounds.height = h - 10;
-                        if (s._cAb) {
                             ///////////////////////////
                             if (!s._cacheImg) {
                                 s._cacheImg = window.document.createElement("canvas");
@@ -839,7 +823,6 @@ namespace annie {
                                 }
                                 ctx.putImageData(imageData, 0, 0);
                             }
-                        }
                     }
                 }
                 s._isNeedUpdate = false;
@@ -848,7 +831,6 @@ namespace annie {
             s._updateInfo.UA = false;
             s._updateInfo.UF = false;
         }
-
         private _drawShape(ctx: any, isMask: boolean = false): void {
             let s = this;
             let com = s._command;
@@ -910,25 +892,25 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint);
-            if (s._cAb) {
-                let image = s._cacheImg;
-                if (!image || image.width == 0 || image.height == 0) {
-                    return null;
-                }
-                let _canvas = DisplayObject["_canvas"];
-                _canvas.width = 1;
-                _canvas.height = 1;
-                let ctx = _canvas["getContext"]('2d');
-                ctx.clearRect(0, 0, 1, 1);
-                ctx.setTransform(1, 0, 0, 1, s._cacheX - p.x, s._cacheY - p.y);
-                ctx.drawImage(image, 0, 0);
-                if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                    return s;
-                }
-            } else {
-                p.x -= s._cacheX;
-                p.y -= s._cacheY;
-                if (s.getBounds().isPointIn(p)) {
+            p.x -= s._cacheX;
+            p.y -= s._cacheY;
+            if (s.getBounds().isPointIn(p)){
+                if (s.hitTestWidthPixel) {
+                    let image = s._cacheImg;
+                    if (!image || image.width == 0 || image.height == 0) {
+                        return null;
+                    }
+                    let _canvas = DisplayObject["_canvas"];
+                    _canvas.width = 1;
+                    _canvas.height = 1;
+                    let ctx = _canvas["getContext"]('2d');
+                    ctx.clearRect(0, 0, 1, 1);
+                    ctx.setTransform(1, 0, 0, 1, - p.x, - p.y);
+                    ctx.drawImage(image, 0, 0);
+                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                        return s;
+                    }
+                }else {
                     return s;
                 }
             }
@@ -939,7 +921,7 @@ namespace annie {
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor
          * @param {Object} infoObj
-         * @param {string} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {string|any} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)"或者是annie.Shape.getGradientColor()方法返回的渐变对象;
          * @param {string} infoObj.strokeColor 线条颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
          * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
          * @public
