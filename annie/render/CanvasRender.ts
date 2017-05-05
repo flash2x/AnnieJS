@@ -108,7 +108,7 @@ namespace annie {
             ctx.globalAlpha = target.cAlpha;
             let tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if ((type == 1) && (!target._cAb)) {
+            if (type == 1) {
                 target._drawShape(ctx);
             } else {
                 let texture = target._cacheImg;
