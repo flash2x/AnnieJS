@@ -152,7 +152,7 @@ namespace annie {
      *               width: 441,
      *               height: 694
      *       }, {
-     *               type: "jpg"//数据类型jpg/png
+     *               type: "jpeg"//数据类型jpg/png
      *               quality: 90//图片质量值1-100,png格式不需要设置quality
      *       }, '#CDDBEB');
      *

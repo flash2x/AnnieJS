@@ -97,16 +97,14 @@ namespace annie {
          * 被始化一个序列图视频
          * @method ImageFrames 构架函数
          * @param src
-         * @param width
-         * @param height
          * @since 1.0.0
          */
-        public constructor(src:string,width:number,height:number) {
+        public constructor(src:string) {
             super();
             let s = this;
             s._instanceType="annie.ImageFrames";
             s.src=src;
-            s.rect = new Rectangle(0,0,width,height);
+            s.rect = new Rectangle();
             s.list = [];
             s._urlLoader = new URLLoader();
             s._urlLoader.addEventListener(annie.Event.COMPLETE, s.success.bind(s));

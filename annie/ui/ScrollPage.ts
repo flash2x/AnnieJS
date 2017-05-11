@@ -186,7 +186,7 @@ namespace annieUI {
                             s.speed += s.addSpeed;
                         }
                         //说明超过了界线,准备回弹
-                        if (s.speed * s.addSpeed > 0) {
+                        if (s.speed * s.addSpeed > 0){
                             // trace("回弹");
                             s.speed = 0;
                         }

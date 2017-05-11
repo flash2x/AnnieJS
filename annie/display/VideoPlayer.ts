@@ -13,11 +13,11 @@ namespace annie {
         /**
          * @method VideoPlayer
          * @param {string} src
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
+         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图,值为1时全部使用序列图,值为2时全部使用mp4
          * @param {number} width
          * @param {number} height
          */
-        public constructor(src:any,type:number=0,width:number,height:number){
+        public constructor(src:any,type:number,width:number,height:number){
             super();
             let s=this;
             s._instanceType="annie.VideoPlayer";
@@ -34,11 +34,13 @@ namespace annie {
                 isUseVideo=false;
             }
             if(isUseVideo){
-                s.video=new Video(src+".mp4",width,height);
+                s.video=new Video(src+".mp4",1,1);
             }else{
-                s.video=new ImageFrames(src,width,height);
+                s.video=new ImageFrames(src);
             }
             s.videoType=isUseVideo?1:0;
+            s._bounds.width=width;
+            s._bounds.height=height;
         }
         /**
          * 视频的引用

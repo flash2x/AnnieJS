@@ -14,24 +14,6 @@ namespace annie {
      * @since 1.0.0
      */
     export class Bitmap extends DisplayObject {
-        /**
-         * HTML的一个Image对象或者是canvas对象或者是video对象
-         * @property bitmapData
-         * @public
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        public get bitmapData(): any {
-            return this._bitmapData
-        };
-        public set bitmapData(value: any) {
-            this._setProperty("_bitmapData",value,3);
-            if (!value) {
-                this._bounds.width = this._bounds.height = 0;
-            }
-        }
-
         private _bitmapData: any = null;
         private _realCacheImg: any = null;
         /**
@@ -84,8 +66,29 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s.bitmapData = bitmapData;
             s.rect = rect;
+            s.bitmapData = bitmapData;
+        }
+        /**
+         * HTML的一个Image对象或者是canvas对象或者是video对象
+         * @property bitmapData
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        public get bitmapData(): any {
+            return this._bitmapData
+        };
+        public set bitmapData(value: any) {
+            let s=this;
+            s._setProperty("_bitmapData",value,3);
+            if (!value) {
+                s._bounds.width = s._bounds.height = 0;
+            }else{
+                s._bounds.width=s.rect?s.rect.width:value.width;
+                s._bounds.height=s.rect?s.rect.height:value.height;
+            }
         }
 
         /**
@@ -191,7 +194,7 @@ namespace annie {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 //给webgl更新新
-                s._cacheImg.updateTexture = true;
+                // s._cacheImg.updateTexture = true;
             }
             s._updateInfo.UF = false;
             s._updateInfo.UM = false;

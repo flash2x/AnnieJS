@@ -271,7 +271,6 @@ namespace annie {
             let s = this;
             s._graphicInfo = graphicInfo;
         }
-
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码
          * @method initButton

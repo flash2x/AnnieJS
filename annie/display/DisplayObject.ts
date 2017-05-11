@@ -549,9 +549,11 @@ namespace annie {
          */
         public getWH():{width:number,height:number}{
             let s = this;
-            s.update(false,false,false);
+            if(s._instanceType=="annie.MovieClip") {
+                s.update(false, false, false);
+                s._updateInfo.UM = true;
+            }
             let dr = s.getDrawRect();
-            s._updateInfo.UM = true;
             return {width:dr.width,height:dr.height};
         }
         /**

@@ -350,6 +350,14 @@ var annie;
          */
         Event.ON_PLAY_END = "onPlayEnd";
         /**
+         * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_PLAY_START = "onPlayStart";
+        /**
          * annieUI.FlipBook组件翻页开始事件
          * @property ON_FLIP_START
          * @static
@@ -1985,9 +1993,11 @@ var annie;
          */
         DisplayObject.prototype.getWH = function () {
             var s = this;
-            s.update(false, false, false);
+            if (s._instanceType == "annie.MovieClip") {
+                s.update(false, false, false);
+                s._updateInfo.UM = true;
+            }
             var dr = s.getDrawRect();
-            s._updateInfo.UM = true;
             return { width: dr.width, height: dr.height };
         };
         DisplayObject.prototype._setProperty = function (property, value, type) {
@@ -2111,8 +2121,8 @@ var annie;
             this.hitTestWidthPixel = false;
             var s = this;
             s._instanceType = "annie.Bitmap";
-            s.bitmapData = bitmapData;
             s.rect = rect;
+            s.bitmapData = bitmapData;
         }
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
             /**
@@ -2127,9 +2137,14 @@ var annie;
                 return this._bitmapData;
             },
             set: function (value) {
-                this._setProperty("_bitmapData", value, 3);
+                var s = this;
+                s._setProperty("_bitmapData", value, 3);
                 if (!value) {
-                    this._bounds.width = this._bounds.height = 0;
+                    s._bounds.width = s._bounds.height = 0;
+                }
+                else {
+                    s._bounds.width = s.rect ? s.rect.width : value.width;
+                    s._bounds.height = s.rect ? s.rect.height : value.height;
                 }
             },
             enumerable: true,
@@ -2232,8 +2247,6 @@ var annie;
                 }
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                //给webgl更新新
-                s._cacheImg.updateTexture = true;
             }
             s._updateInfo.UF = false;
             s._updateInfo.UM = false;
@@ -3054,8 +3067,6 @@ var annie;
                             s._cacheImg = window.document.createElement("canvas");
                         }
                         var _canvas = s._cacheImg;
-                        //给webgl更新新
-                        _canvas.updateTexture = true;
                         var ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
                         _canvas.height = h;
@@ -3777,6 +3788,9 @@ var annie;
             s.media.addEventListener("timeupdate", function () {
                 s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
             });
+            s.media.addEventListener("play", function () {
+                s.dispatchEvent("onPlayStart");
+            });
         }
         /**
          * 开始播放媒体
@@ -3967,11 +3981,9 @@ var annie;
          * 被始化一个序列图视频
          * @method ImageFrames 构架函数
          * @param src
-         * @param width
-         * @param height
          * @since 1.0.0
          */
-        function ImageFrames(src, width, height) {
+        function ImageFrames(src) {
             _super.call(this);
             /**
              * img文件所在的文件夹路径
@@ -4052,7 +4064,7 @@ var annie;
             var s = this;
             s._instanceType = "annie.ImageFrames";
             s.src = src;
-            s.rect = new annie.Rectangle(0, 0, width, height);
+            s.rect = new annie.Rectangle();
             s.list = [];
             s._urlLoader = new annie.URLLoader();
             s._urlLoader.addEventListener(annie.Event.COMPLETE, s.success.bind(s));
@@ -5098,12 +5110,11 @@ var annie;
         /**
          * @method VideoPlayer
          * @param {string} src
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
+         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图,值为1时全部使用序列图,值为2时全部使用mp4
          * @param {number} width
          * @param {number} height
          */
         function VideoPlayer(src, type, width, height) {
-            if (type === void 0) { type = 0; }
             _super.call(this);
             /**
              * 视频的引用
@@ -5138,12 +5149,14 @@ var annie;
                 isUseVideo = false;
             }
             if (isUseVideo) {
-                s.video = new annie.Video(src + ".mp4", width, height);
+                s.video = new annie.Video(src + ".mp4", 1, 1);
             }
             else {
-                s.video = new annie.ImageFrames(src, width, height);
+                s.video = new annie.ImageFrames(src);
             }
             s.videoType = isUseVideo ? 1 : 0;
+            s._bounds.width = width;
+            s._bounds.height = height;
         }
         /**
          * 重写update
@@ -5584,7 +5597,7 @@ var annie;
                 s._cacheY = -10;
                 s._isNeedUpdate = false;
                 //给webgl更新新
-                s._cacheImg.updateTexture = true;
+                // s._cacheImg.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }
@@ -5970,24 +5983,24 @@ var annie;
              */
             this.isMultiTouch = false;
             /**
-             * 当设备尺寸更新，或者旋转后是否自动更新方向
+             * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
              * 端默认不开启
              * @property autoSteering
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default true
+             * @default false
              */
-            this.autoSteering = true;
+            this.autoSteering = false;
             /**
-             * 当设备尺寸更新，或者旋转后是否自动更新尺寸。
+             * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
              * @property autoResize
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default true
+             * @default false
              */
-            this.autoResize = true;
+            this.autoResize = false;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -6464,7 +6477,7 @@ var annie;
             }
             else {
                 //webgl
-                s.renderObj = new annie.WGRender(s);
+                trace("noSupport");
             }
             s.renderObj.init();
             window.addEventListener(resizeEvent, function (e) {
@@ -7545,7 +7558,7 @@ var annie;
             ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if ((type == 1) && (!target._cAb)) {
+            if (type == 1) {
                 target._drawShape(ctx);
             }
             else {
@@ -7594,338 +7607,6 @@ var annie;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * WebGl 渲染器
-     * @class annie.WGRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.2
-     */
-    var WGRender = (function (_super) {
-        __extends(WGRender, _super);
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.2
-         */
-        function WGRender(stage) {
-            _super.call(this);
-            /**
-             * 渲染器所在最上层的对象
-             * @property rootContainer
-             * @public
-             * @since 1.0.2
-             * @type {any}
-             * @default null
-             */
-            this.rootContainer = null;
-            this._maxTextureCount = 0;
-            this._uniformTexture = 0;
-            this._posAttr = 0;
-            this._textAttr = 0;
-            this._textures = [];
-            this._instanceType = "annie.WGRender";
-            this._stage = stage;
-        }
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.2
-         * @public
-         */
-        WGRender.prototype.begin = function () {
-            var s = this;
-            var gl = s._gl;
-            if (s._stage.bgColor != "") {
-                var color = s._stage.bgColor;
-                var r = parseInt("0x" + color.substr(1, 2));
-                var g = parseInt("0x" + color.substr(3, 2));
-                var b = parseInt("0x" + color.substr(5, 2));
-                gl.clearColor(r / 255, g / 255, b / 255, 1.0);
-            }
-            else {
-                gl.clearColor(0.0, 0.0, 0.0, 0.0);
-            }
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            s._textures.length = 0;
-        };
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.2
-         */
-        WGRender.prototype.beginMask = function (target) {
-            //更新缓冲模板
-        };
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.2
-         */
-        WGRender.prototype.endMask = function () {
-        };
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.2
-         * @method reSize
-         */
-        WGRender.prototype.reSize = function () {
-            var s = this;
-            var c = s.rootContainer;
-            c.width = s._stage.divWidth * annie.devicePixelRatio;
-            c.height = s._stage.divHeight * annie.devicePixelRatio;
-            c.style.width = s._stage.divWidth + "px";
-            c.style.height = s._stage.divHeight + "px";
-            s._gl.viewport(0, 0, c.width, c.height);
-            s._dW = c.width;
-            s._dH = c.height;
-            s._pMatrix = new Float32Array([
-                1 / s._dW * 2, 0.0, 0.0,
-                0.0, -1 / s._dH * 2, 0.0,
-                -1.0, 1.0, 1.0
-            ]);
-        };
-        WGRender.prototype._getShader = function (id) {
-            var s = this;
-            var gl = s._gl;
-            // Find the shader script element
-            var shaderText = "";
-            // Create the shader object instance
-            var shader = null;
-            if (id == 0) {
-                shaderText = 'precision highp float;' +
-                    'varying vec2 v_TC;' +
-                    'uniform sampler2D u_texture;' +
-                    'uniform float u_A;' +
-                    'void main() {' +
-                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
-                    '}';
-                shader = gl.createShader(gl.FRAGMENT_SHADER);
-            }
-            else {
-                shaderText = 'precision highp float;' +
-                    'attribute vec2 a_P;' +
-                    'attribute vec2 a_TC;' +
-                    'varying vec2 v_TC;' +
-                    'uniform mat3 vMatrix;' +
-                    'uniform mat3 pMatrix;' +
-                    'void main() {' +
-                    'gl_Position =vec4((pMatrix*vMatrix*vec3(a_P, 1.0)).xy, 1.0, 1.0);' +
-                    'v_TC = a_TC;' +
-                    '}';
-                shader = gl.createShader(gl.VERTEX_SHADER);
-            }
-            // Set the shader source code in the shader object instance and compile the shader
-            gl.shaderSource(shader, shaderText);
-            gl.compileShader(shader);
-            // Attach the shaders to the shader program
-            gl.attachShader(s._program, shader);
-            return shader;
-        };
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.2
-         * @method init
-         */
-        WGRender.prototype.init = function () {
-            var s = this;
-            if (!s.rootContainer) {
-                s.rootContainer = document.createElement("canvas");
-                s._stage.rootDiv.appendChild(s.rootContainer);
-            }
-            var c = s.rootContainer;
-            var gl = c.getContext("webgl") || c.getContext('experimental-webgl');
-            s._gl = gl;
-            s._program = gl.createProgram();
-            var _program = s._program;
-            //初始化顶点着色器和片元着色器
-            s._getShader(0);
-            s._getShader(1);
-            //链接到gpu
-            gl.linkProgram(_program);
-            //使用当前编译的程序
-            gl.useProgram(_program);
-            //改变y轴方向,以对应纹理坐标
-            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-            //设置支持有透明度纹理
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            //取消深度检测
-            gl.disable(gl.DEPTH_TEST);
-            //开启混合模式
-            gl.enable(gl.BLEND);
-            gl.disable(gl.CULL_FACE);
-            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-            // 新建缓存
-            s._buffer = gl.createBuffer();
-            //
-            s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
-            s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
-            s._uA = gl.getUniformLocation(s._program, 'u_A');
-            //
-            s._cM = new annie.Matrix();
-            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) + 1;
-            s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
-            s._posAttr = gl.getAttribLocation(s._program, "a_P");
-            s._textAttr = gl.getAttribLocation(s._program, "a_TC");
-            gl.enableVertexAttribArray(s._posAttr);
-            gl.enableVertexAttribArray(s._textAttr);
-        };
-        WGRender.prototype.setBuffer = function (buffer, data) {
-            var s = this;
-            var gl = s._gl;
-            //绑定buffer
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-            //将buffer赋值给一变量
-            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
-            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
-        };
-        /**
-         *  调用渲染
-         * @public
-         * @since 1.0.2
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
-         */
-        WGRender.prototype.draw = function (target, type) {
-            var s = this;
-            if (target._cp)
-                return;
-            var img = target._cacheImg;
-            if (img && img.width > 0 && img.height > 0) {
-                var gl = s._gl;
-                var gi = void 0;
-                if (img.updateTexture && target._glInfo) {
-                    gi = target._glInfo;
-                }
-                else {
-                    gi = {};
-                    var tc = target.rect;
-                    if (type == 0 && tc) {
-                        gi.x = tc.x / img.width;
-                        gi.y = tc.y / img.height;
-                        gi.w = (tc.x + tc.width) / img.width;
-                        gi.h = (tc.y + tc.height) / img.height;
-                        gi.pw = tc.width;
-                        gi.ph = tc.height;
-                    }
-                    else {
-                        var cX = target._cacheX;
-                        var cY = target._cacheY;
-                        gi.x = cX / img.width;
-                        gi.y = cY / img.height;
-                        gi.w = (img.width - cX) / img.width;
-                        gi.h = (img.height - cY) / img.height;
-                        gi.pw = (img.width - cX * 2);
-                        gi.ph = (img.height - cY * 2);
-                    }
-                    target._glInfo = gi;
-                }
-                ////////////////////////////////////////////
-                var vertices = [
-                    //x,y,textureX,textureY
-                    0.0, 0.0, gi.x, gi.y,
-                    gi.pw, 0.0, gi.w, gi.y,
-                    0.0, gi.ph, gi.x, gi.h,
-                    gi.pw, gi.ph, gi.w, gi.h
-                ];
-                var m = void 0;
-                if (type > 0) {
-                    m = s._cM;
-                    m.identity();
-                    if (type == 2) {
-                        m.tx = target._cacheX * 2;
-                        m.ty = target._cacheY * 2;
-                    }
-                    else {
-                        m.tx = -img.width;
-                        m.ty = -img.height;
-                    }
-                    m.prepend(target.cMatrix);
-                }
-                else {
-                    m = target.cMatrix;
-                }
-                var vMatrix = new Float32Array([
-                    m.a, m.b, 0,
-                    m.c, m.d, 0,
-                    m.tx, m.ty, 1
-                ]);
-                gl.uniform1i(s._uniformTexture, s.createTexture(img));
-                s.setBuffer(s._buffer, new Float32Array(vertices));
-                gl.uniform1f(s._uA, target.cAlpha);
-                gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
-                gl.uniformMatrix3fv(s._vMI, false, vMatrix);
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            }
-        };
-        WGRender.prototype.getActiveId = function () {
-            for (var i = 0; i < this._maxTextureCount; i++) {
-                if (!this._textures[i]) {
-                    return i;
-                }
-            }
-            return 0;
-        };
-        WGRender.prototype.createTexture = function (bitmapData) {
-            var s = this;
-            var gl = s._gl;
-            var tid = 0;
-            var needUpdate = true;
-            var isChanged = false;
-            if (bitmapData._texture) {
-                tid = bitmapData._tid;
-                //如果被占用则需要重新申请
-                if (s._textures[tid] != bitmapData) {
-                    //更新tid
-                    tid = s.getActiveId();
-                    isChanged = true;
-                }
-                if (!bitmapData.updateTexture) {
-                    needUpdate = false;
-                }
-            }
-            else {
-                tid = s.getActiveId();
-            }
-            gl.activeTexture(gl["TEXTURE" + tid]);
-            if (needUpdate) {
-                var texture = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                bitmapData._texture = texture;
-            }
-            else {
-                if (isChanged) {
-                    gl.bindTexture(gl.TEXTURE_2D, bitmapData._texture);
-                }
-            }
-            bitmapData.updateTexture = false;
-            bitmapData._tid = tid;
-            s._textures[tid] = bitmapData;
-            return tid;
-        };
-        return WGRender;
-    }(annie.AObject));
-    annie.WGRender = WGRender;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -8353,15 +8034,15 @@ var Flash2x;
      */
     var _loadSinglePer;
     /**
-     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
+     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
      * @method loadScene
      * @public
      * @static
      * @since 1.0.0
      * @param {string} sceneName fla通过flash2x转换时设置的包名
-     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
+     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100
      * @param {Function} completeFun 加载完成回高,无回调参数
-     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
+     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
      */
     Flash2x.loadScene = function (sceneName, progressFun, completeFun, domain) {
         if (domain === void 0) { domain = ""; }
@@ -8371,17 +8052,14 @@ var Flash2x;
         //     _loaderQueue.loadCancel();
         // }
         _loadSceneNames = [];
-        if (domain == undefined) {
-            domain = "";
-        }
         _domain = domain;
-        var info = {};
         if (typeof (sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
-                _loadSceneNames.push(sceneName);
                 Flash2x.res[sceneName] = {};
+                _loadSceneNames.push(sceneName);
             }
             else {
+                var info = {};
                 info.sceneName = sceneName;
                 info.sceneId = 1;
                 info.sceneTotal = 1;
@@ -8390,14 +8068,16 @@ var Flash2x;
         }
         else {
             var len = sceneName.length;
+            var index = 0;
             for (var i = 0; i < len; i++) {
                 if (!isLoadedScene(sceneName[i])) {
                     Flash2x.res[sceneName[i]] = {};
                     _loadSceneNames.push(sceneName[i]);
                 }
                 else {
+                    var info = {};
                     info.sceneName = sceneName[i];
-                    info.sceneId = i + 1;
+                    info.sceneId = ++index;
                     info.sceneTotal = len;
                     completeFun(info);
                 }
@@ -8592,6 +8272,18 @@ var Flash2x;
         return null;
     }
     Flash2x.getMediaByName = getMediaByName;
+    function stopAllSounds() {
+        for (var scene in Flash2x.res) {
+            if (Flash2x.res[scene]) {
+                for (var item in Flash2x.res[scene]) {
+                    if (Flash2x.res[scene][item].instanceType == "annie.Sounc") {
+                        Flash2x.res[scene][item].stop();
+                    }
+                }
+            }
+        }
+    }
+    Flash2x.stopAllSounds = stopAllSounds;
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b
@@ -10046,7 +9738,7 @@ var annie;
      *               width: 441,
      *               height: 694
      *       }, {
-     *               type: "jpg"//数据类型jpg/png
+     *               type: "jpeg"//数据类型jpg/png
      *               quality: 90//图片质量值1-100,png格式不需要设置quality
      *       }, '#CDDBEB');
      *

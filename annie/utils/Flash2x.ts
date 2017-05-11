@@ -82,15 +82,15 @@ namespace Flash2x {
      */
     let _loadSinglePer: number;
     /**
-     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
+     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
      * @method loadScene
      * @public
      * @static
      * @since 1.0.0
      * @param {string} sceneName fla通过flash2x转换时设置的包名
-     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
+     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100
      * @param {Function} completeFun 加载完成回高,无回调参数
-     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
+     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
      */
     export let loadScene = function (sceneName: any, progressFun: Function, completeFun: Function, domain: string = ""): void {
         //加载资源配置文件
@@ -99,16 +99,13 @@ namespace Flash2x {
         //     _loaderQueue.loadCancel();
         // }
         _loadSceneNames = [];
-        if (domain == undefined) {
-            domain = "";
-        }
         _domain = domain;
-        let info: any = {};
         if (typeof(sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
-                _loadSceneNames.push(sceneName);
                 res[sceneName] = {};
-            } else {
+                _loadSceneNames.push(sceneName);
+            }else{
+                let info: any = {};
                 info.sceneName = sceneName;
                 info.sceneId = 1;
                 info.sceneTotal = 1;
@@ -117,13 +114,15 @@ namespace Flash2x {
         }
         else {
             let len = sceneName.length;
+            let index=0;
             for (let i = 0; i < len; i++) {
                 if (!isLoadedScene(sceneName[i])) {
                     res[sceneName[i]] = {};
                     _loadSceneNames.push(sceneName[i]);
-                } else {
+                } else{
+                    let info: any = {};
                     info.sceneName = sceneName[i];
-                    info.sceneId = i + 1;
+                    info.sceneId = ++index;
                     info.sceneTotal = len;
                     completeFun(info);
                 }
@@ -314,7 +313,17 @@ namespace Flash2x {
         }
         return null;
     }
-
+    export function stopAllSounds(){
+        for(var scene in res){
+            if(res[scene]){
+                for(var item in res[scene]){
+                    if(res[scene][item].instanceType=="annie.Sounc"){
+                        res[scene][item].stop();
+                    }
+                }
+            }
+        }
+    }
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b

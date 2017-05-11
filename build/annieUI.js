@@ -1333,7 +1333,7 @@ var annieUI;
             this.downL = null;
             var s = this;
             s._instanceType = "annieUI.ScrollList";
-            s._itemCount = Math.ceil(s.distance / itemDis) + 2;
+            s._itemCount = Math.ceil(s.distance / itemDis);
             s._items = [];
             s._itemsDis = itemDis;
             s.maxSpeed = itemDis * 0.8;
@@ -1372,7 +1372,7 @@ var annieUI;
                     }
                     else {
                         newId = item.id - s._itemCount;
-                        if (lp[s.paramXY] > (s._itemCount - 2) * s._itemsDis && newId >= 0) {
+                        if (lp[s.paramXY] > s.distance && newId >= 0) {
                             //向上求数据
                             item.initData(newId, s._data[newId]);
                             item[s.paramXY] = item.id * s._itemsDis;

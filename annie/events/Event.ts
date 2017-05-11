@@ -37,6 +37,14 @@ namespace annie {
          */
         public static ON_PLAY_END="onPlayEnd";
         /**
+         * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_PLAY_START="onPlayStart";
+        /**
          * annieUI.FlipBook组件翻页开始事件
          * @property ON_FLIP_START
          * @static

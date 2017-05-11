@@ -50,6 +50,7 @@ namespace annie {
             }
             return colorObj;
         }
+
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -63,6 +64,7 @@ namespace annie {
             let ctx = DisplayObject["_canvas"].getContext("2d");
             return ctx.createPattern(image, "repeat");
         }
+
         /**
          * 通过24位颜色值和一个透明度值生成RGBA值
          * @method getRGBA
@@ -98,7 +100,8 @@ namespace annie {
          * @default true
          * @since 1.1.0
          */
-        public hitTestWidthPixel:boolean=true;
+        public hitTestWidthPixel: boolean = true;
+
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
          * @method addDraw
@@ -660,7 +663,7 @@ namespace annie {
         public update(um: boolean, ua: boolean, uf: boolean): void {
             let s = this;
             super.update(um, ua, uf);
-            if (s._isNeedUpdate||uf|| s._updateInfo.UF) {
+            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -777,52 +780,52 @@ namespace annie {
                         s._cacheY = leftY;
                         s._bounds.width = w - 10;
                         s._bounds.height = h - 10;
-                            ///////////////////////////
-                            if (!s._cacheImg) {
-                                s._cacheImg = window.document.createElement("canvas");
-                            }
-                            let _canvas = s._cacheImg;
-                            //给webgl更新新
-                            _canvas.updateTexture = true;
-                            let ctx = _canvas["getContext"]('2d');
-                            _canvas.width = w;
-                            _canvas.height = h;
-                            _canvas.style.width = w / devicePixelRatio + "px";
-                            _canvas.style.height = h / devicePixelRatio + "px";
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                            /////////////////////
-                            let cf = s.cFilters;
-                            let cfLen = cf.length;
-                            if (cfLen > 0) {
-                                for (let i = 0; i < cfLen; i++) {
-                                    if (s.cFilters[i].type == "Shadow") {
-                                        ctx.shadowBlur += cf[i].blur;
-                                        ctx.shadowColor += cf[i].color;
-                                        ctx.shadowOffsetX += cf[i].offsetX;
-                                        ctx.shadowOffsetY += cf[i].offsetY;
-                                        break;
-                                    }
+                        ///////////////////////////
+                        if (!s._cacheImg) {
+                            s._cacheImg = window.document.createElement("canvas");
+                        }
+                        let _canvas = s._cacheImg;
+                        let ctx = _canvas["getContext"]('2d');
+                        _canvas.width = w;
+                        _canvas.height = h;
+                        _canvas.style.width = w / devicePixelRatio + "px";
+                        _canvas.style.height = h / devicePixelRatio + "px";
+                        ctx.clearRect(0, 0, w, h);
+                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                        /////////////////////
+                        let cf = s.cFilters;
+                        let cfLen = cf.length;
+                        if (cfLen > 0) {
+                            for (let i = 0; i < cfLen; i++) {
+                                if (s.cFilters[i].type == "Shadow") {
+                                    ctx.shadowBlur += cf[i].blur;
+                                    ctx.shadowColor += cf[i].color;
+                                    ctx.shadowOffsetX += cf[i].offsetX;
+                                    ctx.shadowOffsetY += cf[i].offsetY;
+                                    break;
                                 }
-                            } else {
-                                ctx.shadowBlur = 0;
-                                ctx.shadowColor = "#0";
-                                ctx.shadowOffsetX = 0;
-                                ctx.shadowOffsetY = 0;
                             }
-                            ////////////////////
-                            s._drawShape(ctx);
-                            ///////////////////////////
-                            //滤镜
-                            let len = s.cFilters.length;
-                            if (len > 0) {
-                                let imageData = ctx.getImageData(0, 0, w, h);
-                                for (let i = 0; i < len; i++) {
-                                    let f: any = s.cFilters[i];
-                                    f.drawFilter(imageData);
-                                }
-                                ctx.putImageData(imageData, 0, 0);
+                        } else {
+                            ctx.shadowBlur = 0;
+                            ctx.shadowColor = "#0";
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
+                        }
+                        ////////////////////
+                        s._drawShape(ctx);
+                        ///////////////////////////
+                        //滤镜
+                        let len = s.cFilters.length;
+                        if (len > 0) {
+                            let imageData = ctx.getImageData(0, 0, w, h);
+                            for (let i = 0; i < len; i++) {
+                                let f: any = s.cFilters[i];
+                                f.drawFilter(imageData);
                             }
+                            ctx.putImageData(imageData, 0, 0);
+                        }
+                        //给webgl更新新
+                        // _canvas.updateTexture = true;
                     }
                 }
                 s._isNeedUpdate = false;
@@ -831,6 +834,7 @@ namespace annie {
             s._updateInfo.UA = false;
             s._updateInfo.UF = false;
         }
+
         private _drawShape(ctx: any, isMask: boolean = false): void {
             let s = this;
             let com = s._command;
@@ -894,7 +898,7 @@ namespace annie {
             let p = s.globalToLocal(globalPoint);
             p.x -= s._cacheX;
             p.y -= s._cacheY;
-            if (s.getBounds().isPointIn(p)){
+            if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
                     let image = s._cacheImg;
                     if (!image || image.width == 0 || image.height == 0) {
@@ -905,12 +909,12 @@ namespace annie {
                     _canvas.height = 1;
                     let ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, - p.x, - p.y);
+                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
                     ctx.drawImage(image, 0, 0);
                     if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                         return s;
                     }
-                }else {
+                } else {
                     return s;
                 }
             }

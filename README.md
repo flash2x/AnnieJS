@@ -75,11 +75,13 @@
     修复annie.Timer使用时用户不使用kill杀死Timer对象导致内存泄漏报错的bug
     修复首次添加显示对象到舞台时，偶尔会出现残影的bug
     修复开启多点手势后，在pc端打开时报错而需要刷新后才正常的bug
+    修复初始化annie.Bitmap时设置宽高无效的bug
     新增annie.TextInput的maxCharacters最长字段属性
     新增annie.Event中一些静态事件常量
     新增annie.Shape的像素碰撞，默认开启.属性名为:hitTestWidthPixel
     新增annie.Bitmap的像素碰撞，默认未开启.属性名为:hitTestWidthPixel
     重写annieUI.SlidePage类，使其更加完善和优化
+    更改默认关闭旋转和默认禁止调整stage尺寸
 ## AnnieJS 1.0.9 版本
     修复annie.Shape画线在手机端会报错的bug
     修复annie.Shape在不缓存成位置下的点击区域失效的bug

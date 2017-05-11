@@ -146,7 +146,6 @@ namespace annie {
             }
 
         }
-
         /**
          * 重写getBounds
          * 获取Bitmap对象的Bounds

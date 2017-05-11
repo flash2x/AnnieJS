@@ -60,8 +60,12 @@ namespace annie {
                 s.dispatchEvent("onPlayEnd");
             }.bind(s));
             s.type = type.toLocaleUpperCase();
-            s.media.addEventListener("timeupdate", function () {
+            s.media.addEventListener("timeupdate",function(){
                 s.dispatchEvent("onPlayUpdate", {currentTime: s.media.currentTime});
+            });
+            s.media.addEventListener("play",function()
+            {
+                s.dispatchEvent("onPlayStart");
             });
         }
         /**

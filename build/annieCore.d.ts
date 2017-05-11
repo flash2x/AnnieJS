@@ -166,6 +166,14 @@ declare namespace annie {
          */
         static ON_PLAY_END: string;
         /**
+         * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @property ON_PLAY_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_PLAY_START: string;
+        /**
          * annieUI.FlipBook组件翻页开始事件
          * @property ON_FLIP_START
          * @static
@@ -1345,15 +1353,6 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Bitmap extends DisplayObject {
-        /**
-         * HTML的一个Image对象或者是canvas对象或者是video对象
-         * @property bitmapData
-         * @public
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        bitmapData: any;
         private _bitmapData;
         private _realCacheImg;
         /**
@@ -1402,6 +1401,15 @@ declare namespace annie {
          * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
          */
         constructor(bitmapData?: any, rect?: Rectangle);
+        /**
+         * HTML的一个Image对象或者是canvas对象或者是video对象
+         * @property bitmapData
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        bitmapData: any;
         /**
          * 重写渲染
          * @method render
@@ -2208,11 +2216,9 @@ declare namespace annie {
          * 被始化一个序列图视频
          * @method ImageFrames 构架函数
          * @param src
-         * @param width
-         * @param height
          * @since 1.0.0
          */
-        constructor(src: string, width: number, height: number);
+        constructor(src: string);
         /**
          * 资源加载成功
          * @private
@@ -2627,7 +2633,7 @@ declare namespace annie {
         /**
          * @method VideoPlayer
          * @param {string} src
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图\n,值为1时全部使用序列图,值为2时全部使用mp4
+         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图,值为1时全部使用序列图,值为2时全部使用mp4
          * @param {number} width
          * @param {number} height
          */
@@ -3025,22 +3031,22 @@ declare namespace annie {
          */
         isMultiTouch: boolean;
         /**
-         * 当设备尺寸更新，或者旋转后是否自动更新方向
+         * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
          * 端默认不开启
          * @property autoSteering
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default true
+         * @default false
          */
         autoSteering: boolean;
         /**
-         * 当设备尺寸更新，或者旋转后是否自动更新尺寸。
+         * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
          * @property autoResize
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default true
+         * @default false
          */
         autoResize: boolean;
         /**
@@ -3778,102 +3784,6 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
-    /**
-     * WebGl 渲染器
-     * @class annie.WGRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.2
-     */
-    class WGRender extends AObject implements IRender {
-        /**
-         * 渲染器所在最上层的对象
-         * @property rootContainer
-         * @public
-         * @since 1.0.2
-         * @type {any}
-         * @default null
-         */
-        rootContainer: any;
-        private _gl;
-        private _stage;
-        private _program;
-        private _buffer;
-        private _dW;
-        private _dH;
-        private _pMatrix;
-        private _pMI;
-        private _vMI;
-        private _uA;
-        private _cM;
-        private _maxTextureCount;
-        private _uniformTexture;
-        private _posAttr;
-        private _textAttr;
-        private _textures;
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.2
-         */
-        constructor(stage: Stage);
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.2
-         * @public
-         */
-        begin(): void;
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.2
-         */
-        beginMask(target: any): void;
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.2
-         */
-        endMask(): void;
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.2
-         * @method reSize
-         */
-        reSize(): void;
-        private _getShader(id);
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.2
-         * @method init
-         */
-        init(): void;
-        private setBuffer(buffer, data);
-        /**
-         *  调用渲染
-         * @public
-         * @since 1.0.2
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
-         */
-        draw(target: any, type: number): void;
-        private getActiveId();
-        createTexture(bitmapData: any): number;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
     let Eval: any;
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
@@ -3996,15 +3906,15 @@ declare namespace Flash2x {
      */
     let res: any;
     /**
-     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源!
+     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
      * @method loadScene
      * @public
      * @static
      * @since 1.0.0
      * @param {string} sceneName fla通过flash2x转换时设置的包名
-     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100.
+     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100
      * @param {Function} completeFun 加载完成回高,无回调参数
-     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径。
+     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
      */
     let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
     /**
@@ -4037,6 +3947,7 @@ declare namespace Flash2x {
      * @returns {any}
      */
     function getMediaByName(sceneName: string, mediaName: string): any;
+    function stopAllSounds(): void;
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b
@@ -4770,7 +4681,7 @@ declare namespace annie {
      *               width: 441,
      *               height: 694
      *       }, {
-     *               type: "jpg"//数据类型jpg/png
+     *               type: "jpeg"//数据类型jpg/png
      *               quality: 90//图片质量值1-100,png格式不需要设置quality
      *       }, '#CDDBEB');
      *

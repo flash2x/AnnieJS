@@ -92,24 +92,24 @@ namespace annie {
          */
         public isMultiTouch: boolean = false;
         /**
-         * 当设备尺寸更新，或者旋转后是否自动更新方向
+         * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
          * 端默认不开启
          * @property autoSteering
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default true
+         * @default false
          */
-        public autoSteering: boolean = true;
+        public autoSteering: boolean = false;
         /**
-         * 当设备尺寸更新，或者旋转后是否自动更新尺寸。
+         * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
          * @property autoResize
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default true
+         * @default false
          */
-        public autoResize: boolean = true;
+        public autoResize: boolean = false;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
          * @property desWidth
@@ -257,7 +257,8 @@ namespace annie {
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                s.renderObj = new WGRender(s);
+                trace("noSupport");
+                // s.renderObj = new WGRender(s);
             }
             s.renderObj.init();
             window.addEventListener(resizeEvent, function (e: any) {
