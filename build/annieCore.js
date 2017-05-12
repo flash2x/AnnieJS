@@ -5854,10 +5854,16 @@ var annie;
              * @returns {number}
              */
             get: function () {
-                return this.htmlElement.maxlength;
+                var l = this.htmlElement.getAttribute("maxlength");
+                if (l === null) {
+                    return 0;
+                }
+                else {
+                    return l;
+                }
             },
             set: function (value) {
-                this.htmlElement.maxlength = value;
+                this.htmlElement.setAttribute("maxlength", value);
             },
             enumerable: true,
             configurable: true
@@ -8569,6 +8575,7 @@ var Flash2x;
      */
     function ajax(info) {
         var urlLoader = new URLLoader();
+        urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
         urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;

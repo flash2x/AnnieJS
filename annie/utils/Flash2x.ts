@@ -587,6 +587,7 @@ namespace Flash2x {
      */
     export function ajax(info: any): void {
         let urlLoader = new URLLoader();
+        urlLoader.addHeader("X-Requested-With","XMLHttpRequest");
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
         urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;

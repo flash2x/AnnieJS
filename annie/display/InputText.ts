@@ -220,10 +220,15 @@ namespace annie {
          * @returns {number}
          */
         public get maxCharacters():number{
-            return this.htmlElement.maxlength;
+            let l:any=this.htmlElement.getAttribute("maxlength");
+            if(l===null){
+                return 0;
+            }else{
+                return l;
+            }
         }
         public set maxCharacters(value:number){
-            this.htmlElement.maxlength=value;
+            this.htmlElement.setAttribute("maxlength",value);
         }
     }
 }
