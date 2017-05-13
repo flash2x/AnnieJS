@@ -9,8 +9,8 @@ namespace annie {
         }
         private _currentFrame:number = 0;
         private _totalFrames:number = 0;
-        private _startData:any;
-        private _disData:any;
+        protected _startData:any;
+        protected _disData:any;
         public target:any;
         private _isTo:boolean;
         private _isLoop:number = 0;
@@ -120,8 +120,15 @@ namespace annie {
             if (s._ease) {
                 per = s._ease(per);
             }
-            for (let item in s._disData) {
+            var isHave:boolean=false;
+            for (let item in s._disData){
+                isHave=true;
                 s.target[item] = s._startData[item] + s._disData[item] * per;
+            }
+            if(!isHave){
+                //如果发现tween被全新的tween全部给替换了，那就直接回收这个
+                Tween.kill(s.instanceId);
+                return;
             }
             if (s._update){
                 s._update(per);
@@ -213,26 +220,29 @@ namespace annie {
             return Tween.createTween(target, totalFrame, data, false);
         }
         private static createTween(target:any, totalFrame:number, data:any, isTo:boolean):number{
-            let tweenOjb:TweenObj;
+            let tweenObj:any;
             let len=Tween._tweenList.length;
             for(let i=0;i<len;i++){
-                if (target == Tween._tweenList[i].target) {
-                    tweenOjb = Tween._tweenList[i];
-                    break;
+                tweenObj= Tween._tweenList[i];
+                if (target == tweenObj.target){
+                    for(let item in tweenObj._startData){
+                        if(data[item]!=undefined){
+                            delete tweenObj._startData[item];
+                            delete tweenObj._disData[item];
+                        }
+                    }
                 }
             }
-            if(!tweenOjb) {
-                len = Tween._tweenPool.length;
-                if (len > 0) {
-                    tweenOjb = Tween._tweenPool[0];
-                    Tween._tweenPool.shift();
-                } else {
-                    tweenOjb = new TweenObj();
-                }
-                Tween._tweenList.push(tweenOjb);
+            len = Tween._tweenPool.length;
+            if (len > 0) {
+                tweenObj = Tween._tweenPool[0];
+                Tween._tweenPool.shift();
+            } else {
+                tweenObj = new TweenObj();
             }
-            tweenOjb.init(target, totalFrame, data, isTo);
-            return tweenOjb.instanceId;
+            Tween._tweenList.push(tweenObj);
+            tweenObj.init(target, totalFrame, data, isTo);
+            return tweenObj.instanceId;
         }
         /**
          * 销毁所有正在运行的Tween对象
