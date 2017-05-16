@@ -1932,6 +1932,8 @@ var annie;
         DisplayObject.prototype._onDispatchBubbledEvent = function (type, updateMc) {
             if (updateMc === void 0) { updateMc = false; }
             var s = this;
+            if (type == "onRemoveToStage" && !s.stage)
+                return;
             s.stage = s.parent.stage;
             s.dispatchEvent(type);
             if (type == "onRemoveToStage") {
@@ -3107,6 +3109,8 @@ var annie;
                             }
                             ctx.putImageData(imageData, 0, 0);
                         }
+                        ctx.drawImage(_canvas, 0, 0);
+                        trace("s");
                     }
                 }
                 s._isNeedUpdate = false;
@@ -3526,6 +3530,8 @@ var annie;
             if (updateMc === void 0) { updateMc = false; }
             var s = this;
             var len = s.children.length;
+            if (type == "onRemoveToStage" && !s.stage)
+                return;
             s.stage = s.parent.stage;
             for (var i = 0; i < len; i++) {
                 s.children[i]._onDispatchBubbledEvent(type, updateMc);
@@ -6220,21 +6226,23 @@ var annie;
                             s._mouseDownPoint[identifier] = cp;
                         }
                         else if (item == "onMouseUp") {
-                            if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
-                                //click事件
-                                //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                                if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                    if (!s._ml[eLen]) {
-                                        event_3 = new annie.MouseEvent("onMouseClick");
-                                        s._ml[eLen] = event_3;
+                            if (s._mouseDownPoint[identifier]) {
+                                if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
+                                    //click事件
+                                    //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                                    if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
+                                        if (!s._ml[eLen]) {
+                                            event_3 = new annie.MouseEvent("onMouseClick");
+                                            s._ml[eLen] = event_3;
+                                        }
+                                        else {
+                                            event_3 = s._ml[eLen];
+                                            event_3.type = "onMouseClick";
+                                        }
+                                        events.push(event_3);
+                                        s._initMouseEvent(event_3, cp, sp);
+                                        eLen++;
                                     }
-                                    else {
-                                        event_3 = s._ml[eLen];
-                                        event_3.type = "onMouseClick";
-                                    }
-                                    events.push(event_3);
-                                    s._initMouseEvent(event_3, cp, sp);
-                                    eLen++;
                                 }
                             }
                         }
@@ -7865,7 +7873,7 @@ var annie;
                                         itemObj_1 = document.createElement("AUDIO");
                                         itemObj_1.preload = true;
                                         itemObj_1.src = s.url;
-                                        item = new annie.Sound(itemObj_1);
+                                        item = new annie.Sound(s.url);
                                     }
                                     else if (s.responseType == "video") {
                                         itemObj_1 = document.createElement("VIDEO");
@@ -8553,7 +8561,7 @@ var Flash2x;
      * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"json"
+     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
      * @example
      *      //get
      *      Flash2x.ajax({
@@ -9627,7 +9635,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.1.0";
+    annie.version = "1.1.1";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

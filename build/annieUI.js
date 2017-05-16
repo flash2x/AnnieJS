@@ -175,8 +175,8 @@ var annieUI;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.setMask(vW, vH);
             s.maxDistance = maxDistance;
+            s.setViewRect(vW, vH);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
@@ -203,21 +203,24 @@ var annieUI;
                     }
                     else {
                         //检测是否超出了边界,如果超出了边界则回弹
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                            if (s.addSpeed < 0) {
-                                view[s.paramXY] += 0.4 * (0 - view[s.paramXY]);
-                                if (Math.abs(view[s.paramXY]) < 0.1) {
+                        if (s.addSpeed != 0) {
+                            if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                var tarP = 0;
+                                if (s.addSpeed > 0) {
+                                    if (s.distance < s.maxDistance) {
+                                        tarP = s.distance - s.maxDistance;
+                                    }
+                                }
+                                view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
+                                if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     //trace("上回弹");
-                                    s.dispatchEvent("onScrollToStart");
-                                }
-                            }
-                            else {
-                                view[s.paramXY] += 0.4 * (s.distance - s.maxDistance - view[s.paramXY]);
-                                if (Math.abs(s.distance - s.maxDistance - view[s.paramXY]) < 0.1) {
-                                    s.isStop = true;
-                                    //trace("下回弹");
-                                    s.dispatchEvent("onScrollToEnd");
+                                    if (s.addSpeed > 0) {
+                                        s.dispatchEvent("onScrollToEnd");
+                                    }
+                                    else {
+                                        s.dispatchEvent("onScrollToStart");
+                                    }
                                 }
                             }
                         }
@@ -262,13 +265,13 @@ var annieUI;
         };
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
-         * @method setMask
+         * @method setViewRect
          * @param {number}w 设置可见区域的宽
          * @param {number}h 设置可见区域的高
          * @public
-         * @since 1.0.0
+         * @since 1.1.1
          */
-        ScrollPage.prototype.setMask = function (w, h) {
+        ScrollPage.prototype.setViewRect = function (w, h) {
             var s = this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
@@ -290,62 +293,62 @@ var annieUI;
             if (s.autoScroll)
                 return;
             var view = s.view;
-            if (s.distance < s.maxDistance) {
-                if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                    if (!s.isStop) {
-                        s.isStop = true;
-                    }
-                    if (s.isVertical) {
-                        s.lastValue = e.localY;
-                    }
-                    else {
-                        s.lastValue = e.localX;
-                    }
-                    s.speed = 0;
-                    s.isMouseDown = true;
+            // if (s.distance < s.maxDistance) {
+            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                if (!s.isStop) {
+                    s.isStop = true;
                 }
-                else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                    if (!s.isMouseDown)
-                        return;
-                    var currentValue = void 0;
-                    if (s.isVertical) {
-                        currentValue = e.localY;
-                    }
-                    else {
-                        currentValue = e.localX;
-                    }
-                    s.speed = currentValue - s.lastValue;
-                    if (s.speed > s.minDis) {
-                        s.addSpeed = -2;
-                        if (s.speed > s.maxSpeed) {
-                            s.speed = s.maxSpeed;
-                        }
-                    }
-                    else if (s.speed < -s.minDis) {
-                        if (s.speed < -s.maxSpeed) {
-                            s.speed = -s.maxSpeed;
-                        }
-                        s.addSpeed = 2;
-                    }
-                    else {
-                        s.speed = 0;
-                    }
-                    if (s.speed != 0) {
-                        var speedPer = 1;
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                            speedPer = 0.2;
-                        }
-                        view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
-                    }
-                    s.lastValue = currentValue;
-                    s.stopTimes = 0;
+                if (s.isVertical) {
+                    s.lastValue = e.localY;
                 }
                 else {
-                    s.isMouseDown = false;
-                    s.isStop = false;
-                    s.stopTimes = -1;
+                    s.lastValue = e.localX;
                 }
+                s.speed = 0;
+                s.isMouseDown = true;
             }
+            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (!s.isMouseDown)
+                    return;
+                var currentValue = void 0;
+                if (s.isVertical) {
+                    currentValue = e.localY;
+                }
+                else {
+                    currentValue = e.localX;
+                }
+                s.speed = currentValue - s.lastValue;
+                if (s.speed > s.minDis) {
+                    s.addSpeed = -2;
+                    if (s.speed > s.maxSpeed) {
+                        s.speed = s.maxSpeed;
+                    }
+                }
+                else if (s.speed < -s.minDis) {
+                    if (s.speed < -s.maxSpeed) {
+                        s.speed = -s.maxSpeed;
+                    }
+                    s.addSpeed = 2;
+                }
+                else {
+                    s.speed = 0;
+                }
+                if (s.speed != 0) {
+                    var speedPer = 1;
+                    if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                        speedPer = 0.2;
+                    }
+                    view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
+                }
+                s.lastValue = currentValue;
+                s.stopTimes = 0;
+            }
+            else {
+                s.isMouseDown = false;
+                s.isStop = false;
+                s.stopTimes = -1;
+            }
+            // }
         };
         /**
          * 滚到指定的坐标位置
@@ -1326,6 +1329,7 @@ var annieUI;
             if (isVertical === void 0) { isVertical = true; }
             _super.call(this, vW, vH, 0, isVertical);
             this._items = null;
+            this._itemCount = 0;
             this._isInit = false;
             this._data = [];
             this.gp = new annie.Point();
@@ -1333,17 +1337,11 @@ var annieUI;
             this.downL = null;
             var s = this;
             s._instanceType = "annieUI.ScrollList";
-            s._itemCount = Math.ceil(s.distance / itemDis);
+            s._itemDis = itemDis;
             s._items = [];
-            s._itemsDis = itemDis;
-            s.maxSpeed = itemDis * 0.8;
-            for (var i = 0; i < s._itemCount; i++) {
-                var item = new itemClassName();
-                item.visible = false;
-                item[s.paramXY] = i * itemDis;
-                s._items.push(item);
-                s.view.addChild(item);
-            }
+            s._itemClass = itemClassName;
+            s.maxSpeed = 50;
+            s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME, function (e) {
                 if (s.speed != 0) {
                     var item = null;
@@ -1361,12 +1359,12 @@ var annieUI;
                     s.globalToLocal(gp, lp);
                     var newId = 0;
                     if (s.speed < 0) {
-                        lp[s.paramXY] += s._itemsDis;
+                        lp[s.paramXY] += s._itemDis;
                         newId = item.id + s._itemCount;
                         if (lp[s.paramXY] < 0 && newId < s._data.length) {
                             //向上求数据
                             item.initData(newId, s._data[newId]);
-                            item[s.paramXY] = item.id * s._itemsDis;
+                            item[s.paramXY] = item.id * s._itemDis;
                             s._items.push(s._items.shift());
                         }
                     }
@@ -1375,7 +1373,7 @@ var annieUI;
                         if (lp[s.paramXY] > s.distance && newId >= 0) {
                             //向上求数据
                             item.initData(newId, s._data[newId]);
-                            item[s.paramXY] = item.id * s._itemsDis;
+                            item[s.paramXY] = item.id * s._itemDis;
                             s._items.unshift(s._items.pop());
                         }
                     }
@@ -1407,20 +1405,70 @@ var annieUI;
             var s = this;
             if (!s._isInit || isReset) {
                 s._data = data;
-                for (var i = 0; i < data.length && i < s._itemCount; i++) {
-                    s._items[i].initData(i, data[i]);
-                    s._items[i]._visible = true;
-                }
                 s._isInit = true;
             }
             else {
                 s._data = s._data.concat(data);
             }
-            s.maxDistance = s._data.length * s._itemsDis;
+            this.flushData();
+            s.maxDistance = s._data.length * s._itemDis;
             if (s.downL) {
                 s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
                 var wh = s.downL.getWH();
                 s.maxDistance += (s.paramXY == "x" ? wh.width : wh.height);
+            }
+        };
+        ScrollList.prototype.flushData = function () {
+            var s = this;
+            var id = 0;
+            if (s._items.length > 0) {
+                id = Math.abs(Math.ceil(s.view[s.paramXY] / s._itemDis));
+            }
+            for (var i = 0; i < s._itemCount; i++) {
+                var item = s._items[i];
+                item.initData(id, s._data[id]);
+                item[s.paramXY] = id * s._itemDis;
+                id++;
+            }
+            trace("flushData");
+        };
+        /**
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setViewRect
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
+         * @public
+         * @since 1.1.1
+         */
+        ScrollList.prototype.setViewRect = function (w, h) {
+            _super.prototype.setViewRect.call(this, w, h);
+            if (this._itemDis > 0) {
+                this._updateViewRect();
+            }
+        };
+        ScrollList.prototype._updateViewRect = function () {
+            var s = this;
+            var newCount = Math.ceil(s.distance / s._itemDis) + 4;
+            if (newCount != s._itemCount) {
+                if (newCount > s._itemCount) {
+                    var id = 0;
+                    if (s._itemCount > 0) {
+                        id = s._items[s._itemCount - 1].id + 1;
+                    }
+                    for (var i = s._itemCount; i < newCount; i++) {
+                        var item = new s._itemClass();
+                        s._items.push(item);
+                        s.view.addChild(item);
+                        id++;
+                    }
+                }
+                else {
+                    for (var i = 0; i < s._itemCount - newCount; i++) {
+                        s.view.removeChild(s._items.pop());
+                    }
+                }
+                s._itemCount = newCount;
+                this.flushData();
             }
         };
         /**

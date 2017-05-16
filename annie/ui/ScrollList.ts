@@ -20,8 +20,9 @@ namespace annieUI {
      */
     export class ScrollList extends ScrollPage {
         private _items:Array<IScrollListItem>=null;
-        private _itemsDis:number;
-        private _itemCount:number;
+        private _itemDis:number;
+        private _itemCount:number=0;
+        private _itemClass:any;
         private _isInit:boolean=false;
         private _data:Array<any>=[];
         private gp:any=new annie.Point();
@@ -52,17 +53,11 @@ namespace annieUI {
             super(vW, vH, 0, isVertical);
             let s=this;
             s._instanceType = "annieUI.ScrollList";
-            s._itemCount =Math.ceil(s.distance/itemDis);
+            s._itemDis=itemDis;
             s._items=[];
-            s._itemsDis=itemDis;
-            s.maxSpeed=itemDis*0.8;
-            for(let i=0;i<s._itemCount;i++){
-                let item=new itemClassName();
-                item.visible=false;
-                item[s.paramXY]=i*itemDis;
-                s._items.push(item);
-                s.view.addChild(item);
-            }
+            s._itemClass=itemClassName;
+            s.maxSpeed=50;
+            s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME,function (e:annie.Event) {
                 if (s.speed!=0){
                     let item:any=null;
@@ -79,12 +74,12 @@ namespace annieUI {
                     s.globalToLocal(gp,lp);
                     let newId:number=0;
                     if(s.speed<0){
-                        lp[s.paramXY]+=s._itemsDis;
+                        lp[s.paramXY]+=s._itemDis;
                         newId=item.id+s._itemCount;
                         if(lp[s.paramXY]<0&&newId<s._data.length){
                             //向上求数据
                             item.initData(newId,s._data[newId]);
-                            item[s.paramXY]=item.id*s._itemsDis;
+                            item[s.paramXY]=item.id*s._itemDis;
                             s._items.push(s._items.shift());
                         }
                     }else{
@@ -92,7 +87,7 @@ namespace annieUI {
                         if(lp[s.paramXY]>s.distance&&newId>=0){
                             //向上求数据
                             item.initData(newId,s._data[newId]);
-                            item[s.paramXY]=item.id*s._itemsDis;
+                            item[s.paramXY]=item.id*s._itemDis;
                             s._items.unshift(s._items.pop());
                         }
                     }
@@ -110,22 +105,69 @@ namespace annieUI {
             let s:any=this;
             if(!s._isInit||isReset){
                 s._data=data;
-                for(let i=0;i<data.length&&i<s._itemCount;i++){
-                    s._items[i].initData(i,data[i]);
-                    s._items[i]._visible=true;
-                }
                 s._isInit=true;
             }else{
                 s._data=s._data.concat(data);
             }
-            s.maxDistance=s._data.length*s._itemsDis;
+            this.flushData();
+            s.maxDistance=s._data.length*s._itemDis;
             if(s.downL){
                 s.downL[s.paramXY]=Math.max(s.distance,s.maxDistance);
                 var wh=s.downL.getWH();
                 s.maxDistance+=(s.paramXY=="x"?wh.width:wh.height);
             }
         }
-
+        private flushData(){
+            let s:any=this;
+            let id:number=0;
+            if(s._items.length>0){
+                id=Math.abs(Math.ceil(s.view[s.paramXY]/s._itemDis));
+            }
+            for(let i=0;i<s._itemCount;i++){
+                let item:any=s._items[i];
+                item.initData(id,s._data[id]);
+                item[s.paramXY]=id*s._itemDis;
+                id++;
+            }
+        }
+        /**
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setViewRect
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
+         * @public
+         * @since 1.1.1
+         */
+         public setViewRect(w: number, h: number): void {
+             super.setViewRect(w,h);
+             if(this._itemDis>0){
+                 this._updateViewRect();
+             }
+        }
+        private _updateViewRect(){
+            let s:any=this;
+            let newCount:number=Math.ceil(s.distance/s._itemDis)+4;
+            if(newCount!=s._itemCount){
+                if(newCount>s._itemCount){
+                    let id:number=0;
+                    if(s._itemCount>0){
+                        id=s._items[s._itemCount-1].id+1;
+                    }
+                    for(let i=s._itemCount;i<newCount;i++){
+                        let item=new s._itemClass();
+                        s._items.push(item);
+                        s.view.addChild(item);
+                        id++;
+                    }
+                }else{
+                    for(let i=0;i<s._itemCount-newCount;i++){
+                        s.view.removeChild(s._items.pop());
+                    }
+                }
+                s._itemCount=newCount;
+                this.flushData();
+            }
+        }
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9

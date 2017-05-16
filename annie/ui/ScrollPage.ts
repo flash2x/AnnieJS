@@ -143,6 +143,7 @@ namespace annieUI {
          * @default false
          */
         private autoScroll: boolean = false;
+
         /**
          * 构造函数
          * @method  ScrollPage
@@ -167,45 +168,48 @@ namespace annieUI {
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.setMask(vW, vH);
             s.maxDistance = maxDistance;
+            s.setViewRect(vW, vH);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.Event.ENTER_FRAME, function (){
+            s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 let view: any = s.view;
                 if (s.autoScroll)return;
-                if (!s.isStop){
+                if (!s.isStop) {
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
                         //是否超过了边界,如果超过了,则加快加速度,让其停止
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance){
+                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
                             s.speed += s.addSpeed * s.fSpeed;
                         } else {
                             s.speed += s.addSpeed;
                         }
                         //说明超过了界线,准备回弹
-                        if (s.speed * s.addSpeed > 0){
+                        if (s.speed * s.addSpeed > 0) {
                             // trace("回弹");
                             s.speed = 0;
                         }
                     } else {
                         //检测是否超出了边界,如果超出了边界则回弹
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                            if (s.addSpeed < 0) {
-                                view[s.paramXY] += 0.4 * (0 - view[s.paramXY]);
-                                if (Math.abs(view[s.paramXY]) < 0.1) {
+                        if (s.addSpeed != 0) {
+                            if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                let tarP: number = 0;
+                                if (s.addSpeed >0) {
+                                    if (s.distance < s.maxDistance) {
+                                        tarP = s.distance - s.maxDistance;
+                                    }
+                                }
+                                view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
+                                if (Math.abs(tarP-view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     //trace("上回弹");
-                                    s.dispatchEvent("onScrollToStart");
-                                }
-                            } else {
-                                view[s.paramXY] += 0.4 * (s.distance - s.maxDistance - view[s.paramXY]);
-                                if (Math.abs(s.distance - s.maxDistance - view[s.paramXY]) < 0.1) {
-                                    s.isStop = true;
-                                    //trace("下回弹");
-                                    s.dispatchEvent("onScrollToEnd");
+                                    if(s.addSpeed>0){
+                                        s.dispatchEvent("onScrollToEnd");
+                                    }else{
+                                        s.dispatchEvent("onScrollToStart");
+                                    }
                                 }
                             }
                         } else {
@@ -227,6 +231,7 @@ namespace annieUI {
                 }
             })
         }
+
         /**
          * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
          * @method changeDirection
@@ -245,15 +250,16 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
+
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
-         * @method setMask
+         * @method setViewRect
          * @param {number}w 设置可见区域的宽
          * @param {number}h 设置可见区域的高
          * @public
-         * @since 1.0.0
+         * @since 1.1.1
          */
-        private setMask(w: number, h: number): void {
+        public setViewRect(w: number, h: number): void {
             let s: any = this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
@@ -269,59 +275,60 @@ namespace annieUI {
                 s.paramXY = "x";
             }
         }
+
         private onMouseEvent(e: annie.MouseEvent): void {
             let s = this;
             if (s.autoScroll)return;
             let view: any = s.view;
-            if (s.distance < s.maxDistance) {
-                if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                    if (!s.isStop) {
-                        s.isStop = true;
-                    }
-                    if (s.isVertical) {
-                        s.lastValue = e.localY;
-                    } else {
-                        s.lastValue = e.localX;
-                    }
-                    s.speed = 0;
-                    s.isMouseDown = true;
-                } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                    if (!s.isMouseDown)return;
-                    let currentValue: number;
-                    if (s.isVertical) {
-                        currentValue = e.localY;
-                    } else {
-                        currentValue = e.localX;
-                    }
-                    s.speed = currentValue - s.lastValue;
-                    if (s.speed > s.minDis) {
-                        s.addSpeed = -2;
-                        if (s.speed > s.maxSpeed) {
-                            s.speed = s.maxSpeed;
-                        }
-                    } else if (s.speed < -s.minDis) {
-                        if (s.speed < -s.maxSpeed) {
-                            s.speed = -s.maxSpeed;
-                        }
-                        s.addSpeed = 2;
-                    } else {
-                        s.speed = 0;
-                    }
-                    if (s.speed != 0) {
-                        let speedPer: number = 1;
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                            speedPer = 0.2;
-                        }
-                        view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
-                    }
-                    s.lastValue = currentValue;
-                    s.stopTimes = 0;
-                } else {
-                    s.isMouseDown = false;
-                    s.isStop = false;
-                    s.stopTimes = -1;
+            // if (s.distance < s.maxDistance) {
+            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                if (!s.isStop) {
+                    s.isStop = true;
                 }
+                if (s.isVertical) {
+                    s.lastValue = e.localY;
+                } else {
+                    s.lastValue = e.localX;
+                }
+                s.speed = 0;
+                s.isMouseDown = true;
+            } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (!s.isMouseDown)return;
+                let currentValue: number;
+                if (s.isVertical) {
+                    currentValue = e.localY;
+                } else {
+                    currentValue = e.localX;
+                }
+                s.speed = currentValue - s.lastValue;
+                if (s.speed > s.minDis) {
+                    s.addSpeed = -2;
+                    if (s.speed > s.maxSpeed) {
+                        s.speed = s.maxSpeed;
+                    }
+                } else if (s.speed < -s.minDis) {
+                    if (s.speed < -s.maxSpeed) {
+                        s.speed = -s.maxSpeed;
+                    }
+                    s.addSpeed = 2;
+                } else {
+                    s.speed = 0;
+                }
+                if (s.speed != 0) {
+                    let speedPer: number = 1;
+                    if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                        speedPer = 0.2;
+                    }
+                    view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
+                }
+                s.lastValue = currentValue;
+                s.stopTimes = 0;
+            } else {
+                s.isMouseDown = false;
+                s.isStop = false;
+                s.stopTimes = -1;
             }
+            // }
         }
         /**
          * 滚到指定的坐标位置

@@ -565,7 +565,7 @@ namespace Flash2x {
      * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"json"
+     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
      * @example
      *      //get
      *      Flash2x.ajax({

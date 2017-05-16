@@ -168,13 +168,13 @@ declare namespace annieUI {
         changeDirection(isVertical?: boolean): void;
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
-         * @method setMask
+         * @method setViewRect
          * @param {number}w 设置可见区域的宽
          * @param {number}h 设置可见区域的高
          * @public
-         * @since 1.0.0
+         * @since 1.1.1
          */
-        private setMask(w, h);
+        setViewRect(w: number, h: number): void;
         private onMouseEvent(e);
         /**
          * 滚到指定的坐标位置
@@ -566,8 +566,9 @@ declare namespace annieUI {
      */
     class ScrollList extends ScrollPage {
         private _items;
-        private _itemsDis;
+        private _itemDis;
         private _itemCount;
+        private _itemClass;
         private _isInit;
         private _data;
         private gp;
@@ -599,6 +600,17 @@ declare namespace annieUI {
          * @since 1.0.9
          */
         updateData(data: Array<any>, isReset?: boolean): void;
+        private flushData();
+        /**
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setViewRect
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
+         * @public
+         * @since 1.1.1
+         */
+        setViewRect(w: number, h: number): void;
+        private _updateViewRect();
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9

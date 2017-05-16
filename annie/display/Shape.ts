@@ -90,7 +90,6 @@ namespace annie {
             }
             return color;
         }
-
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
         /**
@@ -920,7 +919,6 @@ namespace annie {
             }
             return null;
         }
-
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor

@@ -1,7 +1,7 @@
 {
     "name": "Annie API文档",
     "description": "一款和AdobeFlash工具流结合最紧密的国产引擎",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "url": "http://api.annie2x.com",
     "options": {
         "linkNatives": "true",

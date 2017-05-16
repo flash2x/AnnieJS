@@ -495,9 +495,10 @@ namespace annie {
          */
         public _onDispatchBubbledEvent(type: string, updateMc: boolean = false): void {
             let s = this;
+            if (type == "onRemoveToStage"&&!s.stage)return;
             s.stage = s.parent.stage;
             s.dispatchEvent(type);
-            if (type == "onRemoveToStage") {
+            if (type == "onRemoveToStage"){
                 s.stage = null;
             }
         }

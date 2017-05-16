@@ -211,6 +211,7 @@ namespace annie {
         public _onDispatchBubbledEvent(type: string, updateMc: boolean = false): void {
             let s = this;
             let len = s.children.length;
+            if (type == "onRemoveToStage"&&!s.stage)return;
             s.stage = s.parent.stage;
             for (let i = 0; i < len; i++) {
                 s.children[i]._onDispatchBubbledEvent(type, updateMc);

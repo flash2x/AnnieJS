@@ -155,7 +155,7 @@ namespace annie {
                                         itemObj = document.createElement("AUDIO");
                                         itemObj.preload = true;
                                         itemObj.src = s.url;
-                                        item = new Sound(itemObj);
+                                        item = new Sound(s.url);
                                     } else if (s.responseType == "video") {
                                         itemObj = document.createElement("VIDEO");
                                         itemObj.preload = true;

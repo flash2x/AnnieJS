@@ -70,6 +70,8 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
 ## AnnieJS 1.1.1 版本
+    修复在父级和子级都侦听了REMOVE_TO_STAGE事件时，并在事件回调里都执行了removeChild的相关方法会导致子级的REMOVE_TO_STAGE事件被多次调用的bug
+    优化annieUI.ScrollPage和annieUI.ScorllList
     优化annie.Tween在对同一对象多次执行annie.Tween效果时，最新的tween只会替换掉与之前tween中对象相同的属性，而不是全部覆盖
 ## AnnieJS 1.1.0 版本
     修复矢量元素加滤镜无效的bug

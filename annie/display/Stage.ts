@@ -532,20 +532,22 @@ namespace annie {
                         s._mouseDownPoint[identifier] = cp;
                         //清空上次存在的显示列表
                     } else if (item == "onMouseUp") {
-                        if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
-                            //click事件
-                            //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                            if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                if (!s._ml[eLen]) {
-                                    event = new MouseEvent("onMouseClick");
-                                    s._ml[eLen] = event;
-                                } else {
-                                    event = s._ml[eLen];
-                                    event.type = "onMouseClick";
+                        if(s._mouseDownPoint[identifier]) {
+                            if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
+                                //click事件
+                                //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                                if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
+                                    if (!s._ml[eLen]) {
+                                        event = new MouseEvent("onMouseClick");
+                                        s._ml[eLen] = event;
+                                    } else {
+                                        event = s._ml[eLen];
+                                        event.type = "onMouseClick";
+                                    }
+                                    events.push(event);
+                                    s._initMouseEvent(event, cp, sp);
+                                    eLen++;
                                 }
-                                events.push(event);
-                                s._initMouseEvent(event, cp, sp);
-                                eLen++;
                             }
                         }
                     }
