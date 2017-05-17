@@ -1249,7 +1249,6 @@ declare namespace annie {
          */
         update(um: boolean, ua: boolean, uf: boolean): void;
         /**
-         * 抽象方法
          * 调用此方法将显示对象渲染到屏幕
          * @method render
          * @public
@@ -1257,7 +1256,7 @@ declare namespace annie {
          * @param {annie.IRender} renderObj
          * @abstract
          */
-        abstract render(renderObj: IRender): void;
+        render(renderObj: IRender | any): void;
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递
          * @method _onDispatchBubbledEvent
@@ -1410,14 +1409,6 @@ declare namespace annie {
          * @default null
          */
         bitmapData: any;
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
-        render(renderObj: IRender): void;
         /**
          * 是否对矢量使用像素碰撞 默认开启
          * @property hitTestWidthPixel
@@ -1787,14 +1778,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         decodePath: (data: string) => void;
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
-        render(renderObj: IRender): void;
         /**
          * 重写刷新
          * @method update
@@ -2802,14 +2785,6 @@ declare namespace annie {
          */
         private _getMeasuredWidth(text);
         /**
-         * 重写 render
-         * @method render
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        render(renderObj: IRender): void;
-        /**
          * 重写 update
          * @method update
          * @return {annie.Rectangle}
@@ -3671,9 +3646,8 @@ declare namespace annie {
         /**
          * 渲染循环
          * @param target
-         * @param type
          */
-        draw(target: any, type: number): void;
+        draw(target: any): void;
         /**
          * 初始化事件
          * @param stage
@@ -3724,7 +3698,7 @@ declare namespace annie {
          * @default null
          */
         rootContainer: any;
-        private _ctx;
+        protected _ctx: any;
         private _stage;
         /**
          * @CanvasRender
@@ -3761,9 +3735,8 @@ declare namespace annie {
          * @since 1.0.0
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
          */
-        draw(target: any, type: number): void;
+        draw(target: any): void;
         /**
          * 初始化渲染器
          * @public
@@ -3778,6 +3751,102 @@ declare namespace annie {
          * @method reSize
          */
         reSize(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * WebGl 渲染器
+     * @class annie.WGRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.2
+     */
+    class WGRender extends AObject implements IRender {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.2
+         * @type {any}
+         * @default null
+         */
+        rootContainer: any;
+        private _ctx;
+        private _stage;
+        private _program;
+        private _buffer;
+        private _dW;
+        private _dH;
+        private _pMatrix;
+        private _pMI;
+        private _vMI;
+        private _uA;
+        private _cM;
+        private _maxTextureCount;
+        private _uniformTexture;
+        private _posAttr;
+        private _textAttr;
+        private _textures;
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.2
+         */
+        constructor(stage: Stage);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.2
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.2
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.2
+         */
+        endMask(): void;
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.2
+         * @method reSize
+         */
+        reSize(): void;
+        private _getShader(id);
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.2
+         * @method init
+         */
+        init(): void;
+        private setBuffer(buffer, data);
+        /**
+         *  调用渲染
+         * @public
+         * @since 1.0.2
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
+         */
+        draw(target: any): void;
+        private getActiveId();
+        createTexture(bitmapData: any): number;
     }
 }
 /**

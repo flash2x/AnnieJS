@@ -20,7 +20,7 @@ namespace annie {
          * @default null
          */
         public rootContainer: any = null;
-        private _gl: any;
+        private _ctx: any;
         private _stage: Stage;
         private _program: any;
         private _buffer: any;
@@ -35,7 +35,8 @@ namespace annie {
         private _uniformTexture: number = 0;
         private _posAttr: number = 0;
         private _textAttr: number = 0;
-        private _textures:WebGLTexture[]=[];
+        private _textures: WebGLTexture[] = [];
+
         /**
          * @CanvasRender
          * @param {annie.Stage} stage
@@ -47,6 +48,7 @@ namespace annie {
             this._instanceType = "annie.WGRender";
             this._stage = stage;
         }
+
         /**
          * 开始渲染时执行
          * @method begin
@@ -55,7 +57,7 @@ namespace annie {
          */
         public begin(): void {
             let s = this;
-            let gl = s._gl;
+            let gl = s._ctx;
             if (s._stage.bgColor != "") {
                 let color = s._stage.bgColor;
                 let r = parseInt("0x" + color.substr(1, 2));
@@ -66,8 +68,9 @@ namespace annie {
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
             }
             gl.clear(gl.COLOR_BUFFER_BIT);
-            s._textures.length=0;
+            s._textures.length = 0;
         }
+
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -78,6 +81,7 @@ namespace annie {
         public beginMask(target: any): void {
             //更新缓冲模板
         }
+
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -100,7 +104,7 @@ namespace annie {
             c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
-            s._gl.viewport(0, 0, c.width, c.height);
+            s._ctx.viewport(0, 0, c.width, c.height);
             s._dW = c.width;
             s._dH = c.height;
             s._pMatrix = new Float32Array(
@@ -114,7 +118,7 @@ namespace annie {
 
         private _getShader(id: number) {
             let s = this;
-            let gl = s._gl;
+            let gl = s._ctx;
             // Find the shader script element
             let shaderText = "";
             // Create the shader object instance
@@ -164,7 +168,7 @@ namespace annie {
             }
             let c: any = s.rootContainer;
             let gl = c.getContext("webgl") || c.getContext('experimental-webgl');
-            s._gl = gl;
+            s._ctx = gl;
             s._program = gl.createProgram();
             let _program = s._program;
             //初始化顶点着色器和片元着色器
@@ -192,7 +196,7 @@ namespace annie {
             s._uA = gl.getUniformLocation(s._program, 'u_A');
             //
             s._cM = new annie.Matrix();
-            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)+1;
+            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) + 1;
             s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
             s._posAttr = gl.getAttribLocation(s._program, "a_P");
             s._textAttr = gl.getAttribLocation(s._program, "a_TC");
@@ -202,7 +206,7 @@ namespace annie {
 
         private setBuffer(buffer: any, data: any): void {
             let s = this;
-            let gl = s._gl;
+            let gl = s._ctx;
             //绑定buffer
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
@@ -210,6 +214,7 @@ namespace annie {
             gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
             gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
         }
+
         /**
          *  调用渲染
          * @public
@@ -218,34 +223,35 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          * @param {number} type 0图片 1矢量 2文字 3容器
          */
-        public draw(target: any, type: number): void {
+        public draw(target: any): void {
             let s = this;
-            if(target._cp)return;
-            let img = target._cacheImg;
-            if(img&&img.width>0&&img.height>0) {
-                let gl = s._gl;
+            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
+            if (target._cp)return;
+            let texture = target._cacheImg;
+            if (texture && texture.width > 0 && texture.height > 0) {
+                let gl = s._ctx;
                 let gi: any;
-                if (img.updateTexture && target._glInfo) {
+                if (texture.updateTexture && target._glInfo) {
                     gi = target._glInfo;
                 } else {
                     gi = {};
-                    let tc: any = target.rect;
-                    if (type == 0 && tc) {
-                        gi.x = tc.x / img.width;
-                        gi.y = tc.y / img.height;
-                        gi.w = (tc.x + tc.width) / img.width;
-                        gi.h = (tc.y + tc.height) / img.height;
+                    if (target.rect && !target._isCache) {
+                        let tc: any = target.rect;
+                        gi.x = tc.x / texture.width;
+                        gi.y = tc.y / texture.height;
+                        gi.w = (tc.x + tc.width) / texture.width;
+                        gi.h = (tc.y + tc.height) / texture.height;
                         gi.pw = tc.width;
                         gi.ph = tc.height;
                     } else {
                         let cX: number = target._cacheX;
                         let cY: number = target._cacheY;
-                        gi.x = cX / img.width;
-                        gi.y = cY / img.height;
-                        gi.w = (img.width - cX) / img.width;
-                        gi.h = (img.height - cY) / img.height;
-                        gi.pw = (img.width - cX * 2);
-                        gi.ph = (img.height - cY * 2);
+                        gi.x = cX / texture.width;
+                        gi.y = cY / texture.height;
+                        gi.w = (texture.width - cX) / texture.width;
+                        gi.h = (texture.height - cY) / texture.height;
+                        gi.pw = (texture.width - cX * 2);
+                        gi.ph = (texture.height - cY * 2);
                     }
                     target._glInfo = gi;
                 }
@@ -258,28 +264,16 @@ namespace annie {
                         0.0, gi.ph, gi.x, gi.h,
                         gi.pw, gi.ph, gi.w, gi.h
                     ];
-                let m: any;
-                if (type > 0) {
-                    m = s._cM;
-                    m.identity();
-                    if (type == 2) {
-                        m.tx = target._cacheX * 2;
-                        m.ty = target._cacheY * 2;
-                    } else {
-                        m.tx = -img.width;
-                        m.ty = -img.height;
-                    }
-                    m.prepend(target.cMatrix);
-                } else {
-                    m = target.cMatrix;
-                }
+                let m: any = s._cM;
+                m.identity();
+                m.prepend(target.cMatrix);
                 let vMatrix: any = new Float32Array(
                     [
                         m.a, m.b, 0,
                         m.c, m.d, 0,
                         m.tx, m.ty, 1
                     ]);
-                gl.uniform1i(s._uniformTexture, s.createTexture(img));
+                gl.uniform1i(s._uniformTexture, s.createTexture(texture));
                 s.setBuffer(s._buffer, new Float32Array(vertices));
                 gl.uniform1f(s._uA, target.cAlpha);
                 gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
@@ -287,52 +281,54 @@ namespace annie {
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             }
         }
-        private getActiveId():number{
-            for(let i=0;i<this._maxTextureCount;i++){
-                if(!this._textures[i]){
+
+        private getActiveId(): number {
+            for (let i = 0; i < this._maxTextureCount; i++) {
+                if (!this._textures[i]) {
                     return i;
                 }
             }
             return 0;
         }
-        public createTexture(bitmapData: any):number{
-            let s=this;
-            let gl = s._gl;
-            let tid:number=0;
-            let needUpdate:boolean=true;
-            let isChanged:boolean=false;
-            if(bitmapData._texture){
-                tid=bitmapData._tid;
+
+        public createTexture(bitmapData: any): number {
+            let s = this;
+            let gl = s._ctx;
+            let tid: number = 0;
+            let needUpdate: boolean = true;
+            let isChanged: boolean = false;
+            if (bitmapData._texture) {
+                tid = bitmapData._tid;
                 //如果被占用则需要重新申请
-                if(s._textures[tid]!=bitmapData){
+                if (s._textures[tid] != bitmapData) {
                     //更新tid
-                    tid=s.getActiveId();
-                    isChanged=true;
+                    tid = s.getActiveId();
+                    isChanged = true;
                 }
-                if(!bitmapData.updateTexture){
-                    needUpdate=false;
+                if (!bitmapData.updateTexture) {
+                    needUpdate = false;
                 }
-            }else {
-                tid=s.getActiveId();
+            } else {
+                tid = s.getActiveId();
             }
             gl.activeTexture(gl["TEXTURE" + tid]);
-            if(needUpdate){
-                let texture: any =gl.createTexture();
+            if (needUpdate) {
+                let texture: any = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                bitmapData._texture=texture;
-            }else {
-                if(isChanged){
+                bitmapData._texture = texture;
+            } else {
+                if (isChanged) {
                     gl.bindTexture(gl.TEXTURE_2D, bitmapData._texture);
                 }
             }
-            bitmapData.updateTexture=false;
-            bitmapData._tid=tid;
-            s._textures[tid]=bitmapData;
+            bitmapData.updateTexture = false;
+            bitmapData._tid = tid;
+            s._textures[tid] = bitmapData;
             return tid;
         }
     }

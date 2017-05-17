@@ -474,7 +474,6 @@ namespace annie {
             }
         }
         /**
-         * 抽象方法
          * 调用此方法将显示对象渲染到屏幕
          * @method render
          * @public
@@ -482,7 +481,33 @@ namespace annie {
          * @param {annie.IRender} renderObj
          * @abstract
          */
-        public abstract render(renderObj: IRender): void;
+        public render(renderObj: IRender|any): void{
+            let s = this;
+            let cf = s.cFilters;
+            let cfLen = cf.length;
+            let fId=-1;
+            if(cfLen) {
+                for (let i = 0; i < cfLen; i++) {
+                    if (s.cFilters[i].type == "Shadow") {
+                        fId=i;
+                        break;
+                    }
+                }
+            }
+            if(fId>=0){
+                let ctx: any = renderObj["_ctx"];
+                ctx.shadowBlur = cf[fId].blur;
+                ctx.shadowColor = cf[fId].color;
+                ctx.shadowOffsetX = cf[fId].offsetX;
+                ctx.shadowOffsetY = cf[fId].offsetY;
+                renderObj.draw(s);
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+            }else {
+                renderObj.draw(s);
+            }
+        }
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递
          * @method _onDispatchBubbledEvent

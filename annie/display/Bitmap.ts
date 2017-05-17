@@ -90,19 +90,7 @@ namespace annie {
                 s._bounds.height=s.rect?s.rect.height:value.height;
             }
         }
-
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
-        public render(renderObj: IRender): void {
-            let s = this;
-            renderObj.draw(s, 0);
-            //super.render();
-        }
+        
         /**
          * 是否对矢量使用像素碰撞 默认开启
          * @property hitTestWidthPixel

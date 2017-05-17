@@ -20,7 +20,7 @@ namespace annie {
          * @default null
          */
         public rootContainer: any = null;
-        private _ctx: any;
+        protected _ctx: any;
         private _stage: Stage;
 
         /**
@@ -98,19 +98,18 @@ namespace annie {
          * @since 1.0.0
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
          */
-        public draw(target: any, type: number): void {
+        public draw(target: any): void {
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)return;
-            let ctx = s._ctx;
-            ctx.globalAlpha = target.cAlpha;
-            let tm = target.cMatrix;
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             let texture = target._cacheImg;
             if (texture && texture.width > 0 && texture.height > 0) {
-                if (type == 0 && target.rect && !target._isCache) {
+                let ctx = s._ctx;
+                ctx.globalAlpha = target.cAlpha;
+                let tm = target.cMatrix;
+                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                if (target.rect && !target._isCache){
                     let tr = target.rect;
                     ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
                 } else {

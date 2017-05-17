@@ -232,18 +232,6 @@ namespace annie {
             //ctx.restore();
             return w;
         }
-
-        /**
-         * 重写 render
-         * @method render
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        public render(renderObj: IRender): void {
-            renderObj.draw(this, 2);
-        }
-
         /**
          * 重写 update
          * @method update

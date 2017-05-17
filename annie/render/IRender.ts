@@ -6,9 +6,8 @@ namespace annie {
         /**
          * 渲染循环
          * @param target
-         * @param type
          */
-        draw(target:any, type:number):void;
+        draw(target:any):void;
         /**
          * 初始化事件
          * @param stage

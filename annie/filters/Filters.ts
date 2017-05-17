@@ -513,9 +513,9 @@ namespace annie{
             super();
             let s=this;
             s._instanceType="annie.BlurFilter";
-            s.blurX=blurX>8?8:blurX;
-            s.blurY=blurY>8?8:blurY;
-            s.quality=quality>3?3:quality;
+            s.blurX=blurX;
+            s.blurY=blurY;
+            s.quality=quality;
         }
         /**
          *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样

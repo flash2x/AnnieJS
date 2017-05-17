@@ -637,23 +637,6 @@ namespace annie {
                 s.addDraw(f, params);
             }
         };
-
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
-        public render(renderObj: IRender): void {
-            let s = this;
-            //不知道为什么，这里一定要用s._updateInfo.UM判读，经测试矢量会出现在六道之外，不跟着更新和渲染节奏走
-            if (!s._updateInfo.UM) {
-                renderObj.draw(s, 1);
-            }
-            //super.render();
-        }
-
         /**
          * 重写刷新
          * @method update
