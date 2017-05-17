@@ -145,31 +145,22 @@ namespace annie {
                     ctx.shadowColor = "#0";
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
-                    /////////////////////
-                    let cf = s.cFilters;
-                    let cfLen = cf.length;
-                    for (let i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
-                        }
-                    }
                     ////////////////////
                     if (tr) {
                         ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
                     } else {
                         ctx.drawImage(s._bitmapData, 0, 0);
                     }
-                    let len = s["cFilters"].length;
-                    let imageData = ctx.getImageData(0, 0, newW, newH);
-                    for (let i = 0; i < len; i++) {
-                        let f: any = s["cFilters"][i];
-                        f.drawFilter(imageData);
+                    /////////////////////
+                    let cf = s.cFilters;
+                    let cfLen = cf.length;
+                    if(cfLen>0) {
+                        let imageData = ctx.getImageData(0, 0, newW, newH);
+                        for (let i = 0; i < cfLen; i++) {
+                            cf[i].drawFilter(imageData);
+                        }
+                        ctx.putImageData(imageData, 0, 0);
                     }
-                    ctx.putImageData(imageData, 0, 0);
                     //s._realCacheImg.src = _canvas.toDataURL("image/png");
                     s._cacheImg = s._realCacheImg;
                     s._cacheX = -10;

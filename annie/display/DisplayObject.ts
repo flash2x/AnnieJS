@@ -321,7 +321,6 @@ namespace annie {
         public get filters(): any[] {
             return this._filters;
         }
-
         public set filters(value: any[]){
             this._setProperty("_filters",value,2);
         }

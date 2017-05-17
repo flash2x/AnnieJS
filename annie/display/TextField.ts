@@ -337,37 +337,17 @@ namespace annie {
                     ctx.closePath();
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                /////////////////////
-                if (s.cFilters.length > 0) {
-                    let cf = s.cFilters;
-                    let cfLen = cf.length;
-                    for (let i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
-                        }
-                    }
-                } else {
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = "#0";
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                }
-                ////////////////////
                 s._prepContext(ctx);
                 for (let i = 0; i < realLines.length; i++) {
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
-                //滤镜
-                let len = s.cFilters.length;
-                if (len > 0) {
-                    let imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
-                    for (let i = 0; i < len; i++) {
-                        let f: any = s.cFilters[i];
-                        f.drawFilter(imageData);
+                /////////////////////
+                let cf = s.cFilters;
+                let cfLen = cf.length;
+                if(cfLen>0) {
+                    let imageData = ctx.getImageData(0, 0, maxW, maxH);
+                    for (let i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }

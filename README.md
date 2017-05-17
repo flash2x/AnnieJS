@@ -71,8 +71,10 @@
 # AnnieJS 版本更新列表
 ## AnnieJS 1.1.1 版本
     修复在父级和子级都侦听了REMOVE_TO_STAGE事件时，并在事件回调里都执行了removeChild的相关方法会导致子级的REMOVE_TO_STAGE事件被多次调用的bug
+    优化矢量渲染
     优化annieUI.ScrollPage和annieUI.ScorllList
     优化annie.Tween在对同一对象多次执行annie.Tween效果时，最新的tween只会替换掉与之前tween中对象相同的属性，而不是全部覆盖
+    增加获取舞台区域的像素数据，注意舞台所在的canvas不得被污染
 ## AnnieJS 1.1.0 版本
     修复矢量元素加滤镜无效的bug
     修复annie.Tween中以秒为计算单位时,delay参数仍然以帧为单位的bug

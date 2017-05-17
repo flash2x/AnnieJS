@@ -4688,6 +4688,16 @@ declare namespace annie {
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
      */
     let toDisplayDataURL: (obj: DisplayObject, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
+    /**
+     * 获取显示区域的颜色值，会返回颜色值的数组
+     * @method getStagePixels
+     * @param {annie.Stage} stage
+     * @param {annie.Rectangle} rect
+     * @returns {Array}
+     * @public
+     * @since 1.1.1
+     */
+    let getStagePixels: (stage: Stage, rect: Rectangle) => number[];
 }
 /**
  * @class 全局

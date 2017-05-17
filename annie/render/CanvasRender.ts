@@ -103,26 +103,23 @@ namespace annie {
         public draw(target: any, type: number): void {
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if(target._cp)return;
+            if (target._cp)return;
             let ctx = s._ctx;
             ctx.globalAlpha = target.cAlpha;
             let tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (type == 1) {
-                target._drawShape(ctx);
-            } else {
-                let texture = target._cacheImg;
-                if (texture && texture.width > 0 && texture.height > 0) {
+            let texture = target._cacheImg;
+            if (texture && texture.width > 0 && texture.height > 0) {
+                if (type == 0 && target.rect && !target._isCache) {
                     let tr = target.rect;
-                    if (type == 0 && tr && !target._isCache) {
-                        ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
-                    } else {
-                        ctx.translate(target._cacheX, target._cacheY);
-                        ctx.drawImage(texture, 0, 0);
-                    }
+                    ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
+                } else {
+                    ctx.translate(target._cacheX, target._cacheY);
+                    ctx.drawImage(texture, 0, 0);
                 }
             }
         }
+
         /**
          * 初始化渲染器
          * @public

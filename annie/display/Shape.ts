@@ -13,6 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
+            this._cacheImg=window.document.createElement("canvas");
         }
 
         /**
@@ -780,10 +781,7 @@ namespace annie {
                         s._bounds.width = w - 10;
                         s._bounds.height = h - 10;
                         ///////////////////////////
-                        if (!s._cacheImg) {
-                            s._cacheImg = window.document.createElement("canvas");
-                        }
-                        let _canvas = s._cacheImg;
+                        let _canvas:any = s._cacheImg;
                         let ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
                         _canvas.height = h;
@@ -791,35 +789,16 @@ namespace annie {
                         _canvas.style.height = h / devicePixelRatio + "px";
                         ctx.clearRect(0, 0, w, h);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        /////////////////////
-                        let cf = s.cFilters;
-                        let cfLen = cf.length;
-                        if (cfLen > 0) {
-                            for (let i = 0; i < cfLen; i++) {
-                                if (s.cFilters[i].type == "Shadow") {
-                                    ctx.shadowBlur += cf[i].blur;
-                                    ctx.shadowColor += cf[i].color;
-                                    ctx.shadowOffsetX += cf[i].offsetX;
-                                    ctx.shadowOffsetY += cf[i].offsetY;
-                                    break;
-                                }
-                            }
-                        } else {
-                            ctx.shadowBlur = 0;
-                            ctx.shadowColor = "#0";
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
                         ////////////////////
                         s._drawShape(ctx);
                         ///////////////////////////
                         //滤镜
-                        let len = s.cFilters.length;
-                        if (len > 0) {
+                        let cf = s.cFilters;
+                        let cfLen = cf.length;
+                        if (cfLen > 0) {
                             let imageData = ctx.getImageData(0, 0, w, h);
-                            for (let i = 0; i < len; i++) {
-                                let f: any = s.cFilters[i];
-                                f.drawFilter(imageData);
+                            for (let i = 0; i < cfLen; i++) {
+                                cf[i].drawFilter(imageData);
                             }
                             ctx.putImageData(imageData, 0, 0);
                         }

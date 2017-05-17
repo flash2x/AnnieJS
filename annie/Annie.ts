@@ -133,7 +133,6 @@ namespace annie {
         req.open("get", url, true);
         req.send();
     }
-
     // 作为将显示对象导出成图片的render渲染器
     let _dRender: any = null;
     /**
@@ -207,4 +206,17 @@ namespace annie {
         }
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
+    /**
+     * 获取显示区域的颜色值，会返回颜色值的数组
+     * @method getStagePixels
+     * @param {annie.Stage} stage
+     * @param {annie.Rectangle} rect
+     * @returns {Array}
+     * @public
+     * @since 1.1.1
+     */
+    export let getStagePixels=function(stage:annie.Stage,rect:annie.Rectangle):Array<number>{
+        var newPoint:Point=stage.localToGlobal(new Point(rect.x,rect.y));
+        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x,newPoint.y,rect.width,rect.height);
+    }
 }

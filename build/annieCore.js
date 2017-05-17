@@ -2199,18 +2199,6 @@ var annie;
                     ctx.shadowColor = "#0";
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
-                    /////////////////////
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    for (var i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
-                        }
-                    }
                     ////////////////////
                     if (tr) {
                         ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
@@ -2218,13 +2206,16 @@ var annie;
                     else {
                         ctx.drawImage(s._bitmapData, 0, 0);
                     }
-                    var len = s["cFilters"].length;
-                    var imageData = ctx.getImageData(0, 0, newW, newH);
-                    for (var i = 0; i < len; i++) {
-                        var f = s["cFilters"][i];
-                        f.drawFilter(imageData);
+                    /////////////////////
+                    var cf = s.cFilters;
+                    var cfLen = cf.length;
+                    if (cfLen > 0) {
+                        var imageData = ctx.getImageData(0, 0, newW, newH);
+                        for (var i = 0; i < cfLen; i++) {
+                            cf[i].drawFilter(imageData);
+                        }
+                        ctx.putImageData(imageData, 0, 0);
                     }
-                    ctx.putImageData(imageData, 0, 0);
                     //s._realCacheImg.src = _canvas.toDataURL("image/png");
                     s._cacheImg = s._realCacheImg;
                     s._cacheX = -10;
@@ -2475,6 +2466,7 @@ var annie;
                 }
             };
             this._instanceType = "annie.Shape";
+            this._cacheImg = window.document.createElement("canvas");
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
@@ -3065,9 +3057,6 @@ var annie;
                         s._bounds.width = w - 10;
                         s._bounds.height = h - 10;
                         ///////////////////////////
-                        if (!s._cacheImg) {
-                            s._cacheImg = window.document.createElement("canvas");
-                        }
                         var _canvas = s._cacheImg;
                         var ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
@@ -3076,41 +3065,19 @@ var annie;
                         _canvas.style.height = h / annie.devicePixelRatio + "px";
                         ctx.clearRect(0, 0, w, h);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        /////////////////////
-                        var cf = s.cFilters;
-                        var cfLen = cf.length;
-                        if (cfLen > 0) {
-                            for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                if (s.cFilters[i_1].type == "Shadow") {
-                                    ctx.shadowBlur += cf[i_1].blur;
-                                    ctx.shadowColor += cf[i_1].color;
-                                    ctx.shadowOffsetX += cf[i_1].offsetX;
-                                    ctx.shadowOffsetY += cf[i_1].offsetY;
-                                    break;
-                                }
-                            }
-                        }
-                        else {
-                            ctx.shadowBlur = 0;
-                            ctx.shadowColor = "#0";
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
                         ////////////////////
                         s._drawShape(ctx);
                         ///////////////////////////
                         //滤镜
-                        var len = s.cFilters.length;
-                        if (len > 0) {
+                        var cf = s.cFilters;
+                        var cfLen = cf.length;
+                        if (cfLen > 0) {
                             var imageData = ctx.getImageData(0, 0, w, h);
-                            for (var i_2 = 0; i_2 < len; i_2++) {
-                                var f = s.cFilters[i_2];
-                                f.drawFilter(imageData);
+                            for (var i_1 = 0; i_1 < cfLen; i_1++) {
+                                cf[i_1].drawFilter(imageData);
                             }
                             ctx.putImageData(imageData, 0, 0);
                         }
-                        ctx.drawImage(_canvas, 0, 0);
-                        trace("s");
                     }
                 }
                 s._isNeedUpdate = false;
@@ -5564,38 +5531,17 @@ var annie;
                     ctx.closePath();
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                /////////////////////
-                if (s.cFilters.length > 0) {
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    for (var i = 0; i < cfLen; i++) {
-                        if (s.cFilters[i].type == "Shadow") {
-                            ctx.shadowBlur = cf[i].blur;
-                            ctx.shadowColor = cf[i].color;
-                            ctx.shadowOffsetX = cf[i].offsetX;
-                            ctx.shadowOffsetY = cf[i].offsetY;
-                            break;
-                        }
-                    }
-                }
-                else {
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = "#0";
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                }
-                ////////////////////
                 s._prepContext(ctx);
                 for (var i = 0; i < realLines.length; i++) {
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
-                //滤镜
-                var len = s.cFilters.length;
-                if (len > 0) {
-                    var imageData = ctx.getImageData(0, 0, maxW + 20, maxH + 20);
-                    for (var i = 0; i < len; i++) {
-                        var f = s.cFilters[i];
-                        f.drawFilter(imageData);
+                /////////////////////
+                var cf = s.cFilters;
+                var cfLen = cf.length;
+                if (cfLen > 0) {
+                    var imageData = ctx.getImageData(0, 0, maxW, maxH);
+                    for (var i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
@@ -7572,20 +7518,15 @@ var annie;
             ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (type == 1) {
-                target._drawShape(ctx);
-            }
-            else {
-                var texture = target._cacheImg;
-                if (texture && texture.width > 0 && texture.height > 0) {
+            var texture = target._cacheImg;
+            if (texture && texture.width > 0 && texture.height > 0) {
+                if (type == 0 && target.rect && !target._isCache) {
                     var tr = target.rect;
-                    if (type == 0 && tr && !target._isCache) {
-                        ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
-                    }
-                    else {
-                        ctx.translate(target._cacheX, target._cacheY);
-                        ctx.drawImage(texture, 0, 0);
-                    }
+                    ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
+                }
+                else {
+                    ctx.translate(target._cacheX, target._cacheY);
+                    ctx.drawImage(texture, 0, 0);
                 }
             }
         };
@@ -9821,6 +9762,19 @@ var annie;
             typeInfo = { type: "png" };
         }
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+    };
+    /**
+     * 获取显示区域的颜色值，会返回颜色值的数组
+     * @method getStagePixels
+     * @param {annie.Stage} stage
+     * @param {annie.Rectangle} rect
+     * @returns {Array}
+     * @public
+     * @since 1.1.1
+     */
+    annie.getStagePixels = function (stage, rect) {
+        var newPoint = stage.localToGlobal(new annie.Point(rect.x, rect.y));
+        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
     };
 })(annie || (annie = {}));
 /**
