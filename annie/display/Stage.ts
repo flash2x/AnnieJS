@@ -258,7 +258,7 @@ namespace annie {
             } else {
                 //webgl
                 trace("noSupport");
-                s.renderObj = new WGRender(s);
+                // s.renderObj = new WGRender(s);
             }
             s.renderObj.init();
             window.addEventListener(resizeEvent, function (e: any) {

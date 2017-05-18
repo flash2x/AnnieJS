@@ -266,6 +266,8 @@ namespace annie {
                     ];
                 let m: any = s._cM;
                 m.identity();
+                m.tx = target._cacheX * 2;
+                m.ty = target._cacheY * 2;
                 m.prepend(target.cMatrix);
                 let vMatrix: any = new Float32Array(
                     [
