@@ -514,21 +514,14 @@ var annieUI;
              * @public
              * @default 0
              */
-            this.slideSpeed = 0.4;
+            this.slideSpeed = 0.3;
             /**
-             * 触摸点开始点X
-             * @property touchStartX
-             * @type {number}
+             * 是否滑动中断
+             * @property _isBreak
              * @private
+             * @type {boolean}
              */
-            this.touchStartX = 0;
-            /**
-             * 触摸点开始点Y
-             * @property touchStartY
-             * @type {number}
-             * @private
-             */
-            this.touchStartY = 0;
+            this._isBreak = false;
             /**
              * @property 滚动距离
              * @type {number}
@@ -674,70 +667,55 @@ var annieUI;
             if (s.isMoving)
                 return;
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchStartX = s.touchEndX = e.localX;
-                s.touchStartY = s.touchEndY = e.localY;
-                s.movingX = s.movingY = 0;
-                s.isMouseDown = true;
-            }
-            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                var movingX = e.localX - s.touchEndX;
-                var movingY = e.localY - s.touchEndY;
-                if (s.movingX != 0 && s.movingY != 0) {
-                    if ((s.movingX > 0 && movingX < 0) || (s.movingX < 0 && movingX > 0) || (s.movingY > 0 && movingY < 0) || (s.movingY < 0 && movingY > 0)) {
-                        s.isMouseDown = false;
-                    }
-                }
                 s.touchEndX = e.localX;
                 s.touchEndY = e.localY;
-                s.movingX = movingX;
-                s.movingY = movingY;
-                var ts = s.touchStartY;
-                var te = s.touchEndY;
+                s.movingX = s.movingY = 0;
+                s.isMouseDown = true;
+                s._isBreak = false;
+            }
+            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (!s.isMouseDown)
+                    return;
+                var mx = e.localX - s.touchEndX;
+                var my = e.localY - s.touchEndY;
+                // s.touchEndX = e.localX;
+                // s.touchEndY = e.localY;
+                var ts = my;
+                var lts = s.movingY;
                 if (!s.isVertical) {
-                    ts = s.touchStartX;
-                    te = s.touchEndX;
+                    ts = mx;
+                    lts = s.movingX;
                 }
-                if (((s.currentPageIndex == 0) && (ts < te)) || ((s.currentPageIndex == s.listLen - 1) && (ts > te))) {
-                    s.view[s.paramXY] += (te - ts) / s.distance * s.fSpeed * 0.6;
+                if (Math.abs(ts) - Math.abs(lts) < 1) {
+                    s._isBreak = true;
+                }
+                trace(Math.abs(ts) - Math.abs(lts));
+                s.movingX = mx;
+                s.movingY = my;
+                if (ts > 0 && s.currentPageIndex == 0) {
+                    s.view[s.paramXY] = ts * 0.3;
+                }
+                else if (ts < 0 && (s.currentPageIndex == s.listLen - 1)) {
+                    s.view[s.paramXY] = -s.currentPageIndex * s.distance + ts * 0.3;
                 }
             }
             else if (e.type == annie.MouseEvent.MOUSE_UP) {
                 if (!s.isMouseDown)
                     return;
                 s.isMouseDown = false;
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
-                var isNext = true;
-                var ts = s.touchStartY;
-                var te = s.touchEndY;
+                var ts = s.movingY;
                 if (!s.isVertical) {
-                    ts = s.touchStartX;
-                    te = s.touchEndX;
+                    ts = s.movingX;
                 }
-                var distance = Math.abs(ts - te);
-                if (distance > s.distance * 0.2) {
-                    isNext = ts > te;
-                    var xyValue = 0;
-                    var isNeedSlide = true;
-                    if (isNext) {
-                        if (s.currentPageIndex >= s.listLen - 1) {
-                            xyValue = -s.distance * (s.listLen - 1);
-                            isNeedSlide = false;
-                        }
-                    }
-                    else {
-                        if (s.currentPageIndex <= 0) {
-                            isNeedSlide = false;
-                        }
-                    }
-                    if (isNeedSlide) {
-                        s.slideTo(isNext);
-                    }
-                    else {
-                        var tweenData = {};
-                        tweenData[s.paramXY] = xyValue;
-                        tweenData.ease = annie.Tween.backOut;
-                        annie.Tween.to(s.view, s.slideSpeed * 0.5, tweenData);
+                if ((s.currentPageIndex == 0 && s.view[s.paramXY] > 0) || (s.currentPageIndex == (s.listLen - 1) && s.view[s.paramXY] < -s.currentPageIndex * s.distance)) {
+                    var tweenData = {};
+                    tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
+                    tweenData.ease = annie.Tween.backOut;
+                    annie.Tween.to(s.view, 0.2, tweenData);
+                }
+                else {
+                    if (Math.abs(ts) > 100 && !s._isBreak) {
+                        s.slideTo(ts < 0);
                     }
                 }
             }
@@ -755,13 +733,21 @@ var annieUI;
                 return;
             }
             if (isNext) {
-                s.currentPageIndex++;
+                if (s.currentPageIndex < s.listLen - 1) {
+                    s.currentPageIndex++;
+                }
+                else {
+                    return;
+                }
             }
             else {
-                s.currentPageIndex--;
+                if (s.currentPageIndex > 0) {
+                    s.currentPageIndex--;
+                }
+                else {
+                    return;
+                }
             }
-            if (s.currentPageIndex < 0 || s.currentPageIndex >= s.listLen)
-                return;
             if (!s.pageList[s.currentPageIndex]) {
                 s.pageList[s.currentPageIndex] = new s.pageClassList[s.currentPageIndex]();
                 s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
@@ -1430,7 +1416,6 @@ var annieUI;
                 item[s.paramXY] = id * s._itemDis;
                 id++;
             }
-            trace("flushData");
         };
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置

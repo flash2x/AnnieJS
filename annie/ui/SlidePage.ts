@@ -46,21 +46,14 @@ namespace annieUI {
          * @public
          * @default 0
          */
-        public slideSpeed: number = 0.4;
+        public slideSpeed: number = 0.3;
         /**
-         * 触摸点开始点X
-         * @property touchStartX
-         * @type {number}
+         * 是否滑动中断
+         * @property _isBreak
          * @private
+         * @type {boolean}
          */
-        private touchStartX: number = 0;
-        /**
-         * 触摸点开始点Y
-         * @property touchStartY
-         * @type {number}
-         * @private
-         */
-        private touchStartY: number = 0;
+        private _isBreak:boolean=false;
         /**
          * @property 滚动距离
          * @type {number}
@@ -184,7 +177,7 @@ namespace annieUI {
             s.addChild(s.view);
             s.view.mask = s.maskObj;
             s.setMask(vW, vH);
-            var me=s.onMouseEvent.bind(s);
+            var me = s.onMouseEvent.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
@@ -213,68 +206,51 @@ namespace annieUI {
          * @param e
          */
         private onMouseEvent(e: annie.MouseEvent): void {
-            var s:any = this;
-            if(s.isMoving)return;
+            var s: any = this;
+            if (s.isMoving)return;
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchStartX = s.touchEndX = e.localX;
-                s.touchStartY = s.touchEndY = e.localY;
+                s.touchEndX = e.localX;
+                s.touchEndY = e.localY;
                 s.movingX = s.movingY = 0;
                 s.isMouseDown = true;
+                s._isBreak=false;
             } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                let movingX = e.localX - s.touchEndX;
-                let movingY = e.localY - s.touchEndY;
-                if (s.movingX != 0 && s.movingY != 0) {
-                    if ((s.movingX > 0 && movingX < 0) || (s.movingX < 0 && movingX > 0) || (s.movingY > 0 && movingY < 0) || (s.movingY < 0 && movingY > 0)) {
-                        s.isMouseDown = false;
-                    }
-                }
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
-                s.movingX = movingX;
-                s.movingY = movingY;
-                let ts:number=s.touchStartY;
-                let te:number=s.touchEndY;
+                if (!s.isMouseDown)return;
+                let mx:number= e.localX - s.touchEndX;
+                let my= e.localY - s.touchEndY;
+                // s.touchEndX = e.localX;
+                // s.touchEndY = e.localY;
+                let ts: number = my;
+                let lts:number=s.movingY;
                 if (!s.isVertical) {
-                    ts=s.touchStartX;
-                    te=s.touchEndX;
+                    ts = mx;
+                    lts=s.movingX;
                 }
-                if (((s.currentPageIndex == 0)&&(ts < te))||((s.currentPageIndex == s.listLen - 1)&&(ts > te))) {
-                    s.view[s.paramXY] += (te-ts) / s.distance * s.fSpeed * 0.6;
+                if(Math.abs(ts)-Math.abs(lts)<1){
+                    s._isBreak=true;
+                }
+                s.movingX=mx;
+                s.movingY=my;
+                if (ts > 0 && s.currentPageIndex == 0) {
+                    s.view[s.paramXY] = ts * 0.3;
+                } else if (ts < 0 && (s.currentPageIndex == s.listLen - 1)) {
+                    s.view[s.paramXY] = -s.currentPageIndex*s.distance+ts * 0.3;
                 }
             } else if (e.type == annie.MouseEvent.MOUSE_UP) {
-                if(!s.isMouseDown)return;
+                if (!s.isMouseDown)return;
                 s.isMouseDown = false;
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
-                let isNext:boolean=true;
-                let ts:number=s.touchStartY;
-                let te:number=s.touchEndY;
+                let ts: number = s.movingY;
                 if (!s.isVertical) {
-                    ts=s.touchStartX;
-                    te=s.touchEndX;
+                    ts = s.movingX;
                 }
-                let distance = Math.abs(ts-te);
-                if (distance > s.distance*0.2) {
-                    isNext = ts > te;
-                    let xyValue=0;
-                    let isNeedSlide=true;
-                    if (isNext) {
-                        if (s.currentPageIndex >= s.listLen - 1) {
-                            xyValue=-s.distance * (s.listLen - 1);
-                            isNeedSlide=false;
-                        }
-                    } else {
-                        if (s.currentPageIndex <=0) {
-                            isNeedSlide=false;
-                        }
-                    }
-                    if(isNeedSlide){
-                        s.slideTo(isNext);
-                    }else{
-                        let tweenData:any={};
-                        tweenData[s.paramXY]=xyValue;
+                if((s.currentPageIndex == 0&&s.view[s.paramXY]>0)||(s.currentPageIndex==(s.listLen-1)&&s.view[s.paramXY]<-s.currentPageIndex*s.distance)){
+                    let tweenData:any={};
+                        tweenData[s.paramXY]=-s.currentPageIndex*s.distance;
                         tweenData.ease= annie.Tween.backOut;
-                        annie.Tween.to(s.view, s.slideSpeed * 0.5, tweenData);
+                        annie.Tween.to(s.view, 0.2, tweenData);
+                }else{
+                    if (Math.abs(ts) > 100&&!s._isBreak) {
+                        s.slideTo(ts < 0);
                     }
                 }
             }
@@ -289,15 +265,22 @@ namespace annieUI {
          */
         public slideTo(isNext: boolean): void {
             var s = this;
-            if (s.isMoving||s.isMouseDown) {
+            if (s.isMoving || s.isMouseDown) {
                 return;
             }
             if (isNext) {
-                s.currentPageIndex++;
+                if (s.currentPageIndex <s.listLen - 1) {
+                    s.currentPageIndex++;
+                } else {
+                    return;
+                }
             } else {
-                s.currentPageIndex--;
+                if (s.currentPageIndex > 0) {
+                    s.currentPageIndex--;
+                } else {
+                    return;
+                }
             }
-            if (s.currentPageIndex < 0 || s.currentPageIndex >= s.listLen)return;
             if (!s.pageList[s.currentPageIndex]) {
                 s.pageList[s.currentPageIndex] = new s.pageClassList[s.currentPageIndex]();
                 s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
@@ -320,6 +303,7 @@ namespace annieUI {
             annie.Tween.to(s.view, s.slideSpeed, tweenData);
             s.dispatchEvent("onSlideStart", {isNext: isNext});
         }
+
         /**
          * 用于插入分页
          * @method addPageList
@@ -327,7 +311,7 @@ namespace annieUI {
          * @since 1.0.3
          * @public
          */
-        public addPageList(classList:any): void {
+        public addPageList(classList: any): void {
             var s = this;
             s.pageClassList = s.pageClassList.concat(classList);
             if (s.listLen == 0 && s.pageClassList.length > 0) {

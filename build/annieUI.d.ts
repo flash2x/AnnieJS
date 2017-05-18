@@ -288,19 +288,12 @@ declare namespace annieUI {
          */
         slideSpeed: number;
         /**
-         * 触摸点开始点X
-         * @property touchStartX
-         * @type {number}
+         * 是否滑动中断
+         * @property _isBreak
          * @private
+         * @type {boolean}
          */
-        private touchStartX;
-        /**
-         * 触摸点开始点Y
-         * @property touchStartY
-         * @type {number}
-         * @private
-         */
-        private touchStartY;
+        private _isBreak;
         /**
          * @property 滚动距离
          * @type {number}
