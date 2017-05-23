@@ -10,7 +10,7 @@ namespace annie {
     export class AObject {
         private _instanceId: number = 0;
         protected _instanceType: string = "AObject";
-        private static _object_id = 0;
+        protected static _object_id = 0;
 
         public constructor() {
             this._instanceId = AObject._object_id++;

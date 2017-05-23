@@ -10,7 +10,7 @@ declare namespace annie {
     class AObject {
         private _instanceId;
         protected _instanceType: string;
-        private static _object_id;
+        protected static _object_id: number;
         constructor();
         /**
          * 每一个annie引擎对象都会有一个唯一的id码。
@@ -3751,6 +3751,102 @@ declare namespace annie {
          * @method reSize
          */
         reSize(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * WebGl 渲染器
+     * @class annie.WGRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.2
+     */
+    class WGRender extends AObject implements IRender {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.2
+         * @type {any}
+         * @default null
+         */
+        rootContainer: any;
+        private _ctx;
+        private _stage;
+        private _program;
+        private _buffer;
+        private _dW;
+        private _dH;
+        private _pMatrix;
+        private _pMI;
+        private _vMI;
+        private _uA;
+        private _cM;
+        private _maxTextureCount;
+        private _uniformTexture;
+        private _posAttr;
+        private _textAttr;
+        private _textures;
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.2
+         */
+        constructor(stage: Stage);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.2
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.2
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.2
+         */
+        endMask(): void;
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.2
+         * @method reSize
+         */
+        reSize(): void;
+        private _getShader(id);
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.2
+         * @method init
+         */
+        init(): void;
+        private setBuffer(buffer, data);
+        /**
+         *  调用渲染
+         * @public
+         * @since 1.0.2
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         * @param {number} type 0图片 1矢量 2文字 3容器
+         */
+        draw(target: any): void;
+        private getActiveId();
+        createTexture(textureSource: any): number;
     }
 }
 /**

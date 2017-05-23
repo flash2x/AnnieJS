@@ -220,7 +220,7 @@ namespace annie {
             return Tween.createTween(target, totalFrame, data, false);
         }
         private static createTween(target:any, totalFrame:number, data:any, isTo:boolean):number{
-            let tweenObj:any;
+            let tweenObj:Tween|any;
             let len=Tween._tweenList.length;
             for(let i=0;i<len;i++){
                 tweenObj= Tween._tweenList[i];
@@ -235,8 +235,9 @@ namespace annie {
             }
             len = Tween._tweenPool.length;
             if (len > 0) {
-                tweenObj = Tween._tweenPool[0];
-                Tween._tweenPool.shift();
+                tweenObj = Tween._tweenPool.shift();
+                //考虑到对象池回收后需要变更id
+                tweenObj._instanceId = annie.AObject["_object_id"]++;
             } else {
                 tweenObj = new TweenObj();
             }

@@ -70,7 +70,6 @@ namespace annie {
             gl.clear(gl.COLOR_BUFFER_BIT);
             s._textures.length = 0;
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -227,31 +226,31 @@ namespace annie {
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)return;
-            let texture = target._cacheImg;
-            if (texture && texture.width > 0 && texture.height > 0) {
+            let textureSource = target._cacheImg;
+            if (textureSource && textureSource.width > 0 && textureSource.height > 0) {
                 let gl = s._ctx;
                 let gi: any;
-                if (texture.updateTexture && target._glInfo) {
+                if (textureSource.updateTexture && target._glInfo) {
                     gi = target._glInfo;
                 } else {
                     gi = {};
                     if (target.rect && !target._isCache) {
                         let tc: any = target.rect;
-                        gi.x = tc.x / texture.width;
-                        gi.y = tc.y / texture.height;
-                        gi.w = (tc.x + tc.width) / texture.width;
-                        gi.h = (tc.y + tc.height) / texture.height;
+                        gi.x = tc.x / textureSource.width;
+                        gi.y = tc.y / textureSource.height;
+                        gi.w = (tc.x + tc.width) / textureSource.width;
+                        gi.h = (tc.y + tc.height) / textureSource.height;
                         gi.pw = tc.width;
                         gi.ph = tc.height;
                     } else {
                         let cX: number = target._cacheX;
                         let cY: number = target._cacheY;
-                        gi.x = cX / texture.width;
-                        gi.y = cY / texture.height;
-                        gi.w = (texture.width - cX) / texture.width;
-                        gi.h = (texture.height - cY) / texture.height;
-                        gi.pw = (texture.width - cX * 2);
-                        gi.ph = (texture.height - cY * 2);
+                        gi.x = cX / textureSource.width;
+                        gi.y = cY / textureSource.height;
+                        gi.w = (textureSource.width - cX) / textureSource.width;
+                        gi.h = (textureSource.height - cY) / textureSource.height;
+                        gi.pw = (textureSource.width - cX * 2);
+                        gi.ph = (textureSource.height - cY * 2);
                     }
                     target._glInfo = gi;
                 }
@@ -275,7 +274,7 @@ namespace annie {
                         m.c, m.d, 0,
                         m.tx, m.ty, 1
                     ]);
-                gl.uniform1i(s._uniformTexture, s.createTexture(texture));
+                gl.uniform1i(s._uniformTexture, s.createTexture(textureSource));
                 s.setBuffer(s._buffer, new Float32Array(vertices));
                 gl.uniform1f(s._uA, target.cAlpha);
                 gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
@@ -293,21 +292,21 @@ namespace annie {
             return 0;
         }
 
-        public createTexture(bitmapData: any): number {
+        public createTexture(textureSource: any): number {
             let s = this;
             let gl = s._ctx;
             let tid: number = 0;
             let needUpdate: boolean = true;
             let isChanged: boolean = false;
-            if (bitmapData._texture) {
-                tid = bitmapData._tid;
+            if (textureSource._texture) {
+                tid = textureSource._tid;
                 //如果被占用则需要重新申请
-                if (s._textures[tid] != bitmapData) {
+                if (s._textures[tid] != textureSource) {
                     //更新tid
                     tid = s.getActiveId();
                     isChanged = true;
                 }
-                if (!bitmapData.updateTexture) {
+                if (!textureSource.updateTexture) {
                     needUpdate = false;
                 }
             } else {
@@ -317,20 +316,20 @@ namespace annie {
             if (needUpdate) {
                 let texture: any = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmapData);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureSource);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                bitmapData._texture = texture;
+                textureSource._texture = texture;
             } else {
                 if (isChanged) {
-                    gl.bindTexture(gl.TEXTURE_2D, bitmapData._texture);
+                    gl.bindTexture(gl.TEXTURE_2D, textureSource._texture);
                 }
             }
-            bitmapData.updateTexture = false;
-            bitmapData._tid = tid;
-            s._textures[tid] = bitmapData;
+            textureSource.updateTexture = false;
+            textureSource._tid = tid;
+            s._textures[tid] = textureSource;
             return tid;
         }
     }

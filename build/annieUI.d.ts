@@ -419,8 +419,8 @@ declare namespace annieUI {
          * 滑动到指定页
          * @method slideTo
          * @public
-         * @since 1.0.3
-         * @param {number} index 页面索引
+         * @since 1.1.1
+         * @param {boolean} isNext 是向上还是向下
          */
         slideTo(isNext: boolean): void;
         /**
@@ -611,5 +611,50 @@ declare namespace annieUI {
          * @param {annie.DisplayObject} downLoading
          */
         setLoading(downLoading: DisplayObject): void;
+    }
+}
+/**
+ * Created by anlun on 2017/5/24.
+ */
+/**
+ * @module annieUI
+ */
+declare namespace annieUI {
+    /**
+     * 画板类
+     * @class annieUI.DrawingBoard
+     * @public
+     * @extends annie.Bitmap
+     * @since 1.1.1
+     */
+    class DrawingBoard extends annie.Bitmap {
+        private _ctx;
+        private _isMouseDown;
+        /**
+         * 半径
+         * @type {number}
+         */
+        drawRadius: number;
+        /**
+         * 颜色
+         * @type {string}
+         */
+        drawColor: any;
+        /**
+         * 背景
+         * @type {string}
+         */
+        bgColor: string;
+        /**
+         * 构造函数
+         * @param width 画板宽
+         * @param height 画板高
+         * @param bgColor 背景 默认透明
+         */
+        constructor(width: number, height: number, bgColor?: string);
+        private onMouseDown(e);
+        private onMouseUp(e);
+        private onMouseMove(e);
+        clear(): void;
     }
 }

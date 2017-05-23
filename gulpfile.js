@@ -31,7 +31,7 @@ var coreList =[
     "annie/filters/Filters.ts",
     "annie/render/IRender.ts",
     "annie/render/CanvasRender.ts",
-    // "annie/render/WGRender.ts",
+    "annie/render/WGRender.ts",
     "annie/net/URLLoader.ts",
     "annie/utils/Flash2x.ts",
     "annie/utils/Tween.ts",
@@ -45,7 +45,8 @@ var uiList=[
     "annie/ui/FacePhoto.ts",
     "annie/ui/SlidePage.ts",
     "annie/ui/FlipBook.ts",
-    "annie/ui/ScrollList.ts"
+    "annie/ui/ScrollList.ts",
+    "annie/ui/DrawingBoard.ts"
 ];
 var onBuildCore = function(){
     var op = {

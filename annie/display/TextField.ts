@@ -343,7 +343,7 @@ namespace annie {
                 s._cacheY = -10;
                 s._isNeedUpdate = false;
                 //给webgl更新新
-                // s._cacheImg.updateTexture = true;
+                s._cacheImg.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }

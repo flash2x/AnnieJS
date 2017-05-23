@@ -47,9 +47,9 @@ namespace annie {
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
-                s._ctx.fillRect(0, 0, c.width + 1, c.height + 1);
+                s._ctx.fillRect(0, 0, c.width, c.height);
             } else {
-                s._ctx.clearRect(0, 0, c.width + 1, c.height + 1);
+                s._ctx.clearRect(0, 0, c.width, c.height);
             }
         }
 

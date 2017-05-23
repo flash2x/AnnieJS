@@ -686,10 +686,9 @@ var annieUI;
                     ts = mx;
                     lts = s.movingX;
                 }
-                if (Math.abs(ts) - Math.abs(lts) < 1) {
+                if (Math.abs(ts) - Math.abs(lts) < -1) {
                     s._isBreak = true;
                 }
-                trace(Math.abs(ts) - Math.abs(lts));
                 s.movingX = mx;
                 s.movingY = my;
                 if (ts > 0 && s.currentPageIndex == 0) {
@@ -724,16 +723,16 @@ var annieUI;
          * 滑动到指定页
          * @method slideTo
          * @public
-         * @since 1.0.3
-         * @param {number} index 页面索引
+         * @since 1.1.1
+         * @param {boolean} isNext 是向上还是向下
          */
         SlidePage.prototype.slideTo = function (isNext) {
             var s = this;
-            if (s.isMoving || s.isMouseDown) {
+            if (s.isMoving) {
                 return;
             }
             if (isNext) {
-                if (s.currentPageIndex < s.listLen - 1) {
+                if (s.currentPageIndex < s.listLen - 1 && s.canSlideNext) {
                     s.currentPageIndex++;
                 }
                 else {
@@ -741,7 +740,7 @@ var annieUI;
                 }
             }
             else {
-                if (s.currentPageIndex > 0) {
+                if (s.currentPageIndex > 0 && s.canSlidePrev) {
                     s.currentPageIndex--;
                 }
                 else {
@@ -1484,4 +1483,102 @@ var annieUI;
         return ScrollList;
     }(annieUI.ScrollPage));
     annieUI.ScrollList = ScrollList;
+})(annieUI || (annieUI = {}));
+/**
+ * Created by anlun on 2017/5/24.
+ */
+/**
+ * @module annieUI
+ */
+var annieUI;
+(function (annieUI) {
+    /**
+     * 画板类
+     * @class annieUI.DrawingBoard
+     * @public
+     * @extends annie.Bitmap
+     * @since 1.1.1
+     */
+    var DrawingBoard = (function (_super) {
+        __extends(DrawingBoard, _super);
+        /**
+         * 构造函数
+         * @param width 画板宽
+         * @param height 画板高
+         * @param bgColor 背景 默认透明
+         */
+        function DrawingBoard(width, height, bgColor) {
+            if (bgColor === void 0) { bgColor = ""; }
+            _super.call(this);
+            this._isMouseDown = false;
+            /**
+             * 半径
+             * @type {number}
+             */
+            this.drawRadius = 10;
+            /**
+             * 颜色
+             * @type {string}
+             */
+            this.drawColor = "#000";
+            /**
+             * 背景
+             * @type {string}
+             */
+            this.bgColor = "";
+            var s = this;
+            var bd = document.createElement("canvas");
+            bd.width = width;
+            bd.height = height;
+            s._ctx = bd.getContext("2d");
+            s.bgColor = bgColor;
+            s.clear();
+            s.bitmapData = bd;
+            var mouseDown = s.onMouseDown.bind(s);
+            var mouseMove = s.onMouseMove.bind(s);
+            var mouseUp = s.onMouseUp.bind(s);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseDown);
+            s.addEventListener(annie.MouseEvent.MOUSE_OVER, mouseDown);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseUp);
+        }
+        DrawingBoard.prototype.onMouseDown = function (e) {
+            var s = this;
+            var ctx = s._ctx;
+            ctx.beginPath();
+            ctx.strokeStyle = s.drawColor;
+            ctx.lineWidth = s.drawRadius;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.moveTo(e.localX >> 0, e.localY >> 0);
+            s._isMouseDown = true;
+        };
+        ;
+        DrawingBoard.prototype.onMouseUp = function (e) {
+            this._isMouseDown = false;
+        };
+        ;
+        DrawingBoard.prototype.onMouseMove = function (e) {
+            var s = this;
+            if (s._isMouseDown) {
+                var ctx = s._ctx;
+                ctx.lineTo(e.localX >> 0, e.localY >> 0);
+                ctx.stroke();
+            }
+        };
+        ;
+        DrawingBoard.prototype.clear = function () {
+            var s = this;
+            if (s.bgColor != "") {
+                s._ctx.fillStyle = s.bgColor;
+                s._ctx.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+            }
+            else {
+                s._ctx.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+            }
+        };
+        return DrawingBoard;
+    }(annie.Bitmap));
+    annieUI.DrawingBoard = DrawingBoard;
 })(annieUI || (annieUI = {}));

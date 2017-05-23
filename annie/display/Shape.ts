@@ -786,7 +786,7 @@ namespace annie {
                             ctx.putImageData(imageData, 0, 0);
                         }
                         //给webgl更新新
-                        // _canvas.updateTexture = true;
+                        _canvas.updateTexture = true;
                     }
                 }
                 s._isNeedUpdate = false;

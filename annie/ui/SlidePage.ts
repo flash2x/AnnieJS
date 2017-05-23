@@ -226,7 +226,7 @@ namespace annieUI {
                     ts = mx;
                     lts=s.movingX;
                 }
-                if(Math.abs(ts)-Math.abs(lts)<1){
+                if(Math.abs(ts)-Math.abs(lts)<-1){
                     s._isBreak=true;
                 }
                 s.movingX=mx;
@@ -260,22 +260,22 @@ namespace annieUI {
          * 滑动到指定页
          * @method slideTo
          * @public
-         * @since 1.0.3
-         * @param {number} index 页面索引
+         * @since 1.1.1
+         * @param {boolean} isNext 是向上还是向下
          */
-        public slideTo(isNext: boolean): void {
+        public slideTo(isNext: boolean):void{
             var s = this;
-            if (s.isMoving || s.isMouseDown) {
+            if (s.isMoving) {
                 return;
             }
             if (isNext) {
-                if (s.currentPageIndex <s.listLen - 1) {
+                if (s.currentPageIndex <s.listLen - 1&&s.canSlideNext) {
                     s.currentPageIndex++;
                 } else {
                     return;
                 }
             } else {
-                if (s.currentPageIndex > 0) {
+                if (s.currentPageIndex > 0&&s.canSlidePrev) {
                     s.currentPageIndex--;
                 } else {
                     return;

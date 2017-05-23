@@ -9,7 +9,7 @@
     AnnieJS 支持ts和js两种开发语言环境，使用你熟悉的语言开发事半功倍。
     AnnieJS 最大的优势就是短小精悍。全部核心代码压缩后不到70k，该有的功能都有了。
     AnnieJS 需要结合Adobe 及 Flash2x工具使用才能发挥它最大的优势。
-    Flash2x 是一款优秀的Adobe Flash插件。
+    Flash2x 是一款优秀的Adobe Flash插件,与AnnieJS无缝集成。
 # 相比Flash自带的CreateJs有什么区别和优势
     不得不承认CreateJs非常的优秀，但是它当初不是以移动优先的原则设计的，大量的逻辑和判断代码针对移动端没有任何意义。
     CreateJs鼠标穿透非常让人头疼，上层的显示对象无法阻断事件会一直往下冒泡，非常讨厌。
@@ -70,6 +70,8 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
 ## AnnieJS 1.1.1 版本
+    修复annie.Tween偶尔kill的时候会kill到其他tween对象的bug
+    修复annieUI.SlidePage在Android机上滑动困难的bug
     修复在父级和子级都侦听了REMOVE_TO_STAGE事件时，并在事件回调里都执行了removeChild的相关方法会导致子级的REMOVE_TO_STAGE事件被多次调用的bug
     优化矢量渲染
     优化annieUI.ScrollPage和annieUI.ScorllList
