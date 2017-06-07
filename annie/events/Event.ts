@@ -54,12 +54,12 @@ namespace annie {
         public static ON_FLIP_START="onFlipStart";
         /**
          * annieUI.FlipBook组件翻页结束事件
-         * @property ON_FLIP_End
+         * @property ON_FLIP_STOP
          * @static
          * @since 1.1.0
          * @type {string}
          */
-        public static ON_FLIP_End="onFlipEnd";
+        public static ON_FLIP_STOP="onFlipStop";
         /**
          * annieUI.ScrollPage组件滑动到开始位置事件
          * @property ON_SCROLL_TO_START

@@ -22,7 +22,7 @@ declare namespace annieUI {
          * @since 1.0.0
          * @default true
          */
-        private isVertical;
+        protected isVertical: boolean;
         /**
          * 可见区域的宽
          * @property viewWidth
@@ -159,29 +159,22 @@ declare namespace annieUI {
          */
         constructor(vW: number, vH: number, maxDistance: number, isVertical?: boolean);
         /**
-         * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
-         * @method changeDirection
-         * @param {boolean}isVertical 是纵向还是横向,默认为纵向
-         * @since 1.0.0
-         * @public
-         */
-        changeDirection(isVertical?: boolean): void;
-        /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
          * @method setViewRect
          * @param {number}w 设置可见区域的宽
          * @param {number}h 设置可见区域的高
+         * @param {boolean} isVertical 方向
          * @public
          * @since 1.1.1
          */
-        setViewRect(w: number, h: number): void;
+        setViewRect(w: number, h: number, isVertical: boolean): void;
         private onMouseEvent(e);
         /**
          * 滚到指定的坐标位置
-         * @method
+         * @method scrollTo
          * @param {number} dis 坐标位置
          * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
-         * @since 1.0.2
+         * @since 1.1.1
          * @public
          */
         scrollTo(dis: number, time?: number): void;
@@ -499,17 +492,16 @@ declare namespace annieUI {
          * @type {boolean}
          */
         canFlip: boolean;
-        constructor();
         /**
          * 初始化电子杂志
-         * @method init
+         * @method FlipBook
          * @param {number} width 单页宽
          * @param {number} height 单页高
          * @param {number} pageCount 总页数，一般为偶数
          * @param {Function} getPageCallBack，通过此回调获取指定页的内容的显示对象
          * @since 1.0.3
          */
-        init(width: number, height: number, pageCount: any, getPageCallBack: Function): void;
+        constructor(width: number, height: number, pageCount: any, getPageCallBack: Function);
         private drawPage(num, movePoint);
         private checkLimit(point, limitPoint, limitGap);
         private getPage(index);
@@ -530,6 +522,30 @@ declare namespace annieUI {
          * @since 1.0.3
          */
         flipTo(index: number): void;
+        /**
+         * @method nextPage
+         * @public
+         * @since 1.1.1
+         */
+        nextPage(): void;
+        /**
+         * @method prevPage
+         * @public
+         * @since 1.1.1
+         */
+        prevPage(): void;
+        /**
+         * @method startPage
+         * @public
+         * @since 1.1.1
+         */
+        startPage(): void;
+        /**
+         * @method endPage
+         * @public
+         * @since 1.1.1
+         */
+        endPage(): void;
         private flushPage();
         private onEnterFrame(e);
         private arc(argR, argN1, argN2);
@@ -559,7 +575,10 @@ declare namespace annieUI {
      */
     class ScrollList extends ScrollPage {
         private _items;
-        private _itemDis;
+        private _itemW;
+        private _itemH;
+        private _itemRow;
+        private _itemCol;
         private _itemCount;
         private _itemClass;
         private _isInit;
@@ -567,6 +586,9 @@ declare namespace annieUI {
         private gp;
         private lp;
         private downL;
+        private _cols;
+        private _colsDis;
+        private _disParam;
         /**
          * 获取下拉滚动的loadingView对象
          * @property loadingView
@@ -578,13 +600,16 @@ declare namespace annieUI {
          * 构造函数
          * @method ScrollList
          * @param {Class} itemClassName 可以做为Item的类
-         * @param {number} itemDis 各个Item的间隔
+         * @param {number} itemWidth item宽
+         * @param {number} itemHeight item宽
          * @param {number} vW 列表的宽
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
+         * @param {number} cols 分几列，默认是1列
+         * @param {number} colsDis 列之间的间隔，默认为0
          * @since 1.0.9
          */
-        constructor(itemClassName: any, itemDis: number, vW: number, vH: number, isVertical?: boolean);
+        constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical?: boolean, cols?: number, colsDis?: number);
         /**
          * 更新列表数据
          * @method updateData
@@ -599,10 +624,11 @@ declare namespace annieUI {
          * @method setViewRect
          * @param {number}w 设置可见区域的宽
          * @param {number}h 设置可见区域的高
+         * @param {boolean} isVertical 方向
          * @public
          * @since 1.1.1
          */
-        setViewRect(w: number, h: number): void;
+        setViewRect(w: number, h: number, isVertical: boolean): void;
         private _updateViewRect();
         /**
          * 设置加载数据时显示的loading对象
@@ -628,33 +654,134 @@ declare namespace annieUI {
      * @since 1.1.1
      */
     class DrawingBoard extends annie.Bitmap {
-        private _ctx;
+        protected context: CanvasRenderingContext2D;
         private _isMouseDown;
         /**
-         * 半径
+         * 绘画半径
+         * @property drawRadius
          * @type {number}
+         * @public
+         * @since 1.1.1
          */
         drawRadius: number;
+        protected _drawRadius: number;
         /**
-         * 颜色
+         * 绘画颜色, 可以是任何的颜色类型
+         * @property drawColor
          * @type {string}
+         * @public
+         * @since
+         * @type {any}
          */
         drawColor: any;
         /**
-         * 背景
-         * @type {string}
+         * 背景色 可以是任何的颜色类型
+         * @property bgColor
+         * @type {any}
+         * @public
+         * @since 1.1.1
          */
-        bgColor: string;
+        bgColor: any;
+        /**
+         * 画板宽
+         * @property drawWidth
+         * @type {number}
+         * @readonly
+         * @public
+         * @since 1.1.1
+         */
+        drawWidth: number;
+        /**
+         * 画板高
+         * @property drawHeight
+         * @type {number}
+         * @readonly
+         * @public
+         * @since 1.1.1
+         */
+        drawHeight: number;
+        protected totalStepList: any;
+        protected addStepObj: any;
+        protected currentStepId: number;
         /**
          * 构造函数
+         * @method DrawingBoard
          * @param width 画板宽
          * @param height 画板高
-         * @param bgColor 背景 默认透明
+         * @param bgColor 背景色 默认透明
+         * @since 1.1.1
          */
-        constructor(width: number, height: number, bgColor?: string);
+        constructor(width: number, height: number, bgColor?: any);
         private onMouseDown(e);
         private onMouseUp(e);
         private onMouseMove(e);
-        clear(): void;
+        /**
+         * 重置画板
+         * @method reset
+         * @param bgColor
+         * @public
+         * @since 1.1.1
+         */
+        reset(bgColor?: any): void;
+        /**
+         * 撤销步骤
+         * @method cancel
+         * @param {number} step 撤销几步 0则全部撤销,等同于reset
+         * @public
+         * @since 1.1.1
+         */
+        cancel(step?: number): boolean;
+    }
+}
+/**
+ * Created by anlun on 2017/5/24.
+ */
+/**
+ * Created by anlun on 2017/5/24.
+ */
+/**
+ * @module annieUI
+ */
+declare namespace annieUI {
+    /**
+     * 刮刮卡类
+     * @class annieUI.ScratchCard
+     * @public
+     * @extends annie.DrawingBoard
+     * @since 1.1.1
+     */
+    class ScratchCard extends DrawingBoard {
+        /**
+         * 构造函数
+         * 请监听 "onDrawTime"事件来判断刮完多少百分比了。
+         * @method ScratchCard
+         * @param width 宽
+         * @param height 高
+         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。一般是用位图填充，如果生成位图填充，请自行复习canvas位图填充
+         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。一般是用位图填充，如果生成位图填充，请自行复习canvas位图填充
+         * @param drawRadius 刮刮卡刮的时候的半径，默认为50
+         */
+        constructor(width: number, height: number, frontColorObj: any, backColorObj: any, drawRadius?: number);
+        private _drawList;
+        private _totalDraw;
+        private _currentDraw;
+        /**
+         * 重置刮刮卡
+         * @method reset
+         * @param backColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
+         * @since 1.1.1
+         * @public
+         */
+        reset(backColorObj?: any): void;
+        /**
+         * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
+         * method cancel
+         * @param step
+         * @public
+         * @since 1.1.1
+         * @returns {boolean}
+         */
+        cancel(step?: number): boolean;
+        drawRadius: number;
     }
 }

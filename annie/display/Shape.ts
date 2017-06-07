@@ -110,7 +110,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public addDraw(commandName: string, params: Array<any>): void {
+        public addDraw(commandName: string, params: Array<any>):void{
             let s = this;
             s._isNeedUpdate = true;
             s._command.push([1, commandName, params]);

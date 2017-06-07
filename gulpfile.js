@@ -46,7 +46,8 @@ var uiList=[
     "annie/ui/SlidePage.ts",
     "annie/ui/FlipBook.ts",
     "annie/ui/ScrollList.ts",
-    "annie/ui/DrawingBoard.ts"
+    "annie/ui/DrawingBoard.ts",
+    "annie/ui/ScratchCard.ts"
 ];
 var onBuildCore = function(){
     var op = {

@@ -23,7 +23,7 @@ namespace annieUI {
          * @since 1.0.0
          * @default true
          */
-        private isVertical: boolean = true;
+        protected isVertical: boolean = true;
         /**
          * 可见区域的宽
          * @property viewWidth
@@ -163,13 +163,12 @@ namespace annieUI {
             super();
             let s = this;
             s._instanceType = "annieUI.ScrollPage";
-            s.isVertical = isVertical;
             s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
             s.maxDistance = maxDistance;
-            s.setViewRect(vW, vH);
+            s.setViewRect(vW, vH,isVertical);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
@@ -231,16 +230,23 @@ namespace annieUI {
                 }
             })
         }
-
         /**
-         * 改可滚动的方向，比如之前是纵向滚动的,你可以横向的。或者反过来
-         * @method changeDirection
-         * @param {boolean}isVertical 是纵向还是横向,默认为纵向
-         * @since 1.0.0
+         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
+         * @method setViewRect
+         * @param {number}w 设置可见区域的宽
+         * @param {number}h 设置可见区域的高
+         * @param {boolean} isVertical 方向
          * @public
+         * @since 1.1.1
          */
-        public changeDirection(isVertical: boolean = true): void {
-            let s = this;
+        public setViewRect(w: number, h: number,isVertical:boolean): void {
+            let s: any = this;
+            s.maskObj.clear();
+            s.maskObj.beginFill("#000000");
+            s.maskObj.drawRect(0, 0, w, h);
+            s.viewWidth = w;
+            s.viewHeight = h;
+            s.maskObj.endFill();
             s.isVertical = isVertical;
             if (isVertical) {
                 s.distance = s.viewHeight;
@@ -249,31 +255,7 @@ namespace annieUI {
                 s.distance = s.viewWidth;
                 s.paramXY = "x";
             }
-        }
-
-        /**
-         * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
-         * @method setViewRect
-         * @param {number}w 设置可见区域的宽
-         * @param {number}h 设置可见区域的高
-         * @public
-         * @since 1.1.1
-         */
-        public setViewRect(w: number, h: number): void {
-            let s: any = this;
-            s.maskObj.clear();
-            s.maskObj.beginFill("#000000");
-            s.maskObj.drawRect(0, 0, w, h);
-            s.viewWidth = w;
-            s.viewHeight = h;
-            s.maskObj.endFill();
-            if (s.isVertical) {
-                s.distance = s.viewHeight;
-                s.paramXY = "y";
-            } else {
-                s.distance = s.viewWidth;
-                s.paramXY = "x";
-            }
+            s.isVertical=isVertical;
         }
 
         private onMouseEvent(e: annie.MouseEvent): void {
@@ -332,10 +314,10 @@ namespace annieUI {
         }
         /**
          * 滚到指定的坐标位置
-         * @method
+         * @method scrollTo
          * @param {number} dis 坐标位置
          * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
-         * @since 1.0.2
+         * @since 1.1.1
          * @public
          */
         public scrollTo(dis: number, time: number = 0): void {

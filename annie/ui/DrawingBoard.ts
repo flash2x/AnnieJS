@@ -14,78 +14,188 @@ namespace annieUI {
      * @since 1.1.1
      */
     export class DrawingBoard extends annie.Bitmap {
-        private _ctx:any;
+        protected context:CanvasRenderingContext2D=null;
         private _isMouseDown: boolean = false;
         /**
-         * 半径
+         * 绘画半径
+         * @property drawRadius
          * @type {number}
+         * @public
+         * @since 1.1.1
          */
-        public drawRadius:number=10;
+        public get drawRadius():number{
+            return this._drawRadius;
+        };
+        public set drawRadius(value:number){
+            this._drawRadius=value;
+        }
+        protected _drawRadius:number;
         /**
-         * 颜色
+         * 绘画颜色, 可以是任何的颜色类型
+         * @property drawColor
          * @type {string}
+         * @public
+         * @since
+         * @type {any}
          */
         public drawColor:any="#000";
         /**
-         * 背景
-         * @type {string}
+         * 背景色 可以是任何的颜色类型
+         * @property bgColor
+         * @type {any}
+         * @public
+         * @since 1.1.1
          */
-        public bgColor:string="";
+        public bgColor:any="";
+        /**
+         * 画板宽
+         * @property drawWidth
+         * @type {number}
+         * @readonly
+         * @public
+         * @since 1.1.1
+         */
+        public drawWidth:number=0;
+        /**
+         * 画板高
+         * @property drawHeight
+         * @type {number}
+         * @readonly
+         * @public
+         * @since 1.1.1
+         */
+        public drawHeight:number=0;
+        //总步数数据
+        protected totalStepList:any=[];
+        //单步数据
+        protected addStepObj:any;
+        //当前步数所在的id
+        protected currentStepId:number=0;
         /**
          * 构造函数
+         * @method DrawingBoard
          * @param width 画板宽
          * @param height 画板高
-         * @param bgColor 背景 默认透明
+         * @param bgColor 背景色 默认透明
+         * @since 1.1.1
          */
-        constructor(width: number, height: number,bgColor: string="") {
+        constructor(width: number, height: number,bgColor: any="") {
             super();
             var s = this;
             var bd=document.createElement("canvas");
             bd.width=width;
             bd.height=height;
-            s._ctx=bd.getContext("2d");
-            s.bgColor=bgColor;
-            s.clear();
+            s.context=bd.getContext("2d");
+            s.context.lineCap = "round";
+            s.context.lineJoin = "round";
             s.bitmapData=bd;
+            s.drawHeight=height;
+            s.drawWidth=width;
+            s.reset(bgColor);
             var mouseDown = s.onMouseDown.bind(s);
             var mouseMove = s.onMouseMove.bind(s);
             var mouseUp = s.onMouseUp.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseDown);
-            s.addEventListener(annie.MouseEvent.MOUSE_OVER, mouseDown);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseUp);
         }
         private onMouseDown(e:annie.MouseEvent): void {
             var s = this;
-            var ctx = s._ctx;
+            var ctx = s.context;
             ctx.beginPath();
             ctx.strokeStyle = s.drawColor;
-            ctx.lineWidth = s.drawRadius;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-            ctx.moveTo(e.localX >> 0, e.localY >> 0);
+            ctx.lineWidth = s._drawRadius;
+            let lx:number=e.localX >> 0;
+            let ly:number=e.localY >> 0;
+            ctx.moveTo(lx, ly);
             s._isMouseDown = true;
+            s.addStepObj={};
+            s.addStepObj.c=s.drawColor;
+            s.addStepObj.r=s._drawRadius;
+            s.addStepObj.sx=lx;
+            s.addStepObj.sy=ly;
+            s.addStepObj.ps=[];
         };
         private onMouseUp(e:annie.MouseEvent):void {
-            this._isMouseDown = false;
+            let s=this;
+            s._isMouseDown = false;
+            if(s.addStepObj.ps.length>0) {
+                s.currentStepId++;
+                s.totalStepList.push(s.addStepObj);
+            }
         };
         private onMouseMove(e:annie.MouseEvent):void{
             var s = this;
             if (s._isMouseDown) {
-                var ctx = s._ctx;
-                ctx.lineTo(e.localX >> 0, e.localY >> 0);
+                var ctx = s.context;
+                let lx:number=e.localX >> 0;
+                let ly:number=e.localY >> 0;
+                ctx.lineTo(lx, ly);
                 ctx.stroke();
+                s.addStepObj.ps.push(lx,ly);
             }
         };
-        public clear():void{
+        /**
+         * 重置画板
+         * @method reset
+         * @param bgColor
+         * @public
+         * @since 1.1.1
+         */
+        public reset(bgColor:any=""):void{
             let s=this;
-            if (s.bgColor != "") {
-                s._ctx.fillStyle = s.bgColor;
-                s._ctx.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
-            } else {
-                s._ctx.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+            if(bgColor!=""){
+                s.bgColor=bgColor;
             }
+            if (s.bgColor != "") {
+                s.context.fillStyle = s.bgColor;
+                s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+            } else {
+                s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+            }
+            s.currentStepId=0;
+            s.totalStepList=[];
+        }
+        /**
+         * 撤销步骤
+         * @method cancel
+         * @param {number} step 撤销几步 0则全部撤销,等同于reset
+         * @public
+         * @since 1.1.1
+         */
+        public cancel(step:number=0):boolean{
+            let s=this;
+            if(step==0){
+                s.reset();
+            }else{
+                if(s.currentStepId-step>=0){
+                    s.currentStepId-=step;
+                    s.totalStepList.splice(s.currentStepId,step);
+                    if (s.bgColor != "") {
+                        s.context.fillStyle = s.bgColor;
+                        s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                    } else {
+                        s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                    }
+                    let len:number=s.totalStepList.length;
+                    for(let i=0;i<len;i++){
+                        var ctx = s.context;
+                        ctx.beginPath();
+                        ctx.strokeStyle = s.totalStepList[i].c;
+                        ctx.lineWidth = s.totalStepList[i].r;
+                        ctx.moveTo(s.totalStepList[i].sx, s.totalStepList[i].sy);
+                        let ps:any=s.totalStepList.ps;
+                        let pLen:number=ps.length;
+                        for(let m=0;m<pLen;m+=2){
+                            ctx.lineTo(ps[m], ps[m+1]);
+                            ctx.stroke();
+                        }
+                    }
+                }else{
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

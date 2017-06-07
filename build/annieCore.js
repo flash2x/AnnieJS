@@ -367,12 +367,12 @@ var annie;
         Event.ON_FLIP_START = "onFlipStart";
         /**
          * annieUI.FlipBook组件翻页结束事件
-         * @property ON_FLIP_End
+         * @property ON_FLIP_STOP
          * @static
          * @since 1.1.0
          * @type {string}
          */
-        Event.ON_FLIP_End = "onFlipEnd";
+        Event.ON_FLIP_STOP = "onFlipStop";
         /**
          * annieUI.ScrollPage组件滑动到开始位置事件
          * @property ON_SCROLL_TO_START
@@ -3890,7 +3890,24 @@ var annie;
         function Sound(src) {
             _super.call(this, src, "Audio");
             this._instanceType = "annie.Sound";
+            annie.Sound._soundList.push(this);
         }
+        /**
+         * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
+         * @method destory
+         * @public
+         * @since 1.1.1
+         */
+        Sound.prototype.destory = function () {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        };
+        //声音对象池,停止所有声音时使用
+        Sound._soundList = [];
         return Sound;
     }(annie.Media));
     annie.Sound = Sound;
@@ -7461,10 +7478,10 @@ var annie;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != "") {
                 s._ctx.fillStyle = s._stage.bgColor;
-                s._ctx.fillRect(0, 0, c.width + 1, c.height + 1);
+                s._ctx.fillRect(0, 0, c.width, c.height);
             }
             else {
-                s._ctx.clearRect(0, 0, c.width + 1, c.height + 1);
+                s._ctx.clearRect(0, 0, c.width, c.height);
             }
         };
         /**
@@ -8550,18 +8567,45 @@ var Flash2x;
         return null;
     }
     Flash2x.getMediaByName = getMediaByName;
+    /**
+     * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+     * @method stopAllSounds
+     * @since 1.1.1
+     * @static
+     * @public
+     */
     function stopAllSounds() {
-        for (var scene in Flash2x.res) {
-            if (Flash2x.res[scene]) {
-                for (var item in Flash2x.res[scene]) {
-                    if (Flash2x.res[scene][item].instanceType == "annie.Sounc") {
-                        Flash2x.res[scene][item].stop();
-                    }
-                }
+        var len = annie.Sound._soundList.length;
+        for (var i = len - 1; i >= 0; i--) {
+            if (annie.Sound._soundList[i]) {
+                annie.Sound._soundList[i].stop();
+            }
+            else {
+                annie.Sound._soundList.splice(i, 1);
             }
         }
     }
     Flash2x.stopAllSounds = stopAllSounds;
+    /**
+     * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+     * @method setAllSoundsVolume
+     * @since 1.1.1
+     * @static
+     * @public
+     * @param {number} volume 音量大小，从0-1
+     */
+    function setAllSoundsVolume(volume) {
+        var len = annie.Sound._soundList.length;
+        for (var i = len - 1; i >= 0; i--) {
+            if (annie.Sound._soundList[i]) {
+                annie.Sound._soundList[i].volume = volume;
+            }
+            else {
+                annie.Sound._soundList.splice(i, 1);
+            }
+        }
+    }
+    Flash2x.setAllSoundsVolume = setAllSoundsVolume;
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b
@@ -9166,6 +9210,7 @@ var annie;
             len = Tween._tweenPool.length;
             if (len > 0) {
                 tweenObj = Tween._tweenPool.shift();
+                //考虑到对象池回收后需要变更id
                 tweenObj._instanceId = annie.AObject["_object_id"]++;
             }
             else {

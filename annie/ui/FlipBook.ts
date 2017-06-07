@@ -71,22 +71,19 @@ namespace annieUI {
          * @type {boolean}
          */
         public canFlip:boolean=true;
-        public constructor() {
-            super();
-            this._instanceType = "annieUI.FlipBook";
-        }
-
         /**
          * 初始化电子杂志
-         * @method init
+         * @method FlipBook
          * @param {number} width 单页宽
          * @param {number} height 单页高
          * @param {number} pageCount 总页数，一般为偶数
          * @param {Function} getPageCallBack，通过此回调获取指定页的内容的显示对象
          * @since 1.0.3
          */
-        public init(width: number, height: number, pageCount: any,getPageCallBack:Function): void {
+        public constructor(width: number, height: number, pageCount: any,getPageCallBack:Function) {
+            super();
             let s = this;
+            s._instanceType = "annieUI.FlipBook";
             s.getPageCallback=getPageCallBack;
             s.bW = width;
             s.bH = height;
@@ -106,6 +103,10 @@ namespace annieUI {
             s.addChild(s.shadow0);
             s.addChild(s.rPage1);
             s.addChild(s.shadow1);
+            s.rPage0.mouseEnable=false;
+            s.rPage1.mouseEnable=false;
+            s.shadow0.mouseEnable=false;
+            s.shadow1.mouseEnable=false;
             s.setShadowMask(s.shadow0,s.sMask0, s.bW * 1.5, s.bH * 3);
             s.setShadowMask(s.shadow1,s.sMask1, s.bW * 1.5, s.bH * 3);
             s.shadow0.visible = false;
@@ -113,10 +114,22 @@ namespace annieUI {
             s.rPage1.mask=s.rMask1;
             s.rPage0.mask=s.rMask0;
             s.setPage(s.currPage);
-            s.stage.addEventListener(MouseEvent.MOUSE_DOWN, s.onMouseDown.bind(s));
-            s.stage.addEventListener(MouseEvent.MOUSE_UP, s.onMouseUp.bind(s));
-            s.stage.addEventListener(MouseEvent.MOUSE_MOVE, s.onMouseMove.bind(s));
-            s.addEventListener(Event.ENTER_FRAME, s.onEnterFrame.bind(s));
+            let md=s.onMouseDown.bind(s);
+            let mu=s.onMouseUp.bind(s);
+            let mm=s.onMouseMove.bind(s);
+            let em=s.onEnterFrame.bind(s);
+            s.addEventListener(annie.Event.ADD_TO_STAGE,function(e:annie.Event){
+                s.stage.addEventListener(MouseEvent.MOUSE_DOWN, md);
+                s.stage.addEventListener(MouseEvent.MOUSE_UP, mu);
+                s.stage.addEventListener(MouseEvent.MOUSE_MOVE, mm);
+                s.addEventListener(Event.ENTER_FRAME, em);
+            });
+            s.addEventListener(annie.Event.REMOVE_TO_STAGE,function(e:annie.Event){
+                s.stage.removeEventListener(MouseEvent.MOUSE_DOWN, md);
+                s.stage.removeEventListener(MouseEvent.MOUSE_UP, mu);
+                s.stage.removeEventListener(MouseEvent.MOUSE_MOVE, mm);
+                s.removeEventListener(Event.ENTER_FRAME, em);
+            })
         }
         private drawPage(num: number, movePoint: Point): void {
             let s = this;
@@ -311,8 +324,8 @@ namespace annieUI {
                 if((s.timerArg0<3&&s.currPage>0)||(s.timerArg0>2&&s.currPage<=s.totalPage-2)){
                     s.state = "start";
                     s.flushPage();
-                    e.updateAfterEvent();
-                    s.dispatchEvent("onFlipStart")
+                    // e.updateAfterEvent();
+                    s.dispatchEvent("onFlipStart");
                 }
             }
         }
@@ -373,13 +386,46 @@ namespace annieUI {
             let s = this;
             index = index % 2 == 1 ? index - 1 : index;
             n = index - s.currPage;
-            if (s.state == "stop" && index >= 0 && index < s.totalPage && n != 0) {
+            if (s.state == "stop" && index >= 0 && index <= s.totalPage && n != 0) {
                 s.timerArg0 = n < 0 ? 1 : 3;
                 s.timerArg1 = -1;
                 s.toPage = index > s.totalPage ? s.totalPage : index;
                 s.state = "auto";
                 s.flushPage();
             }
+        }
+
+        /**
+         * @method nextPage
+         * @public
+         * @since 1.1.1
+         */
+        public nextPage():void{
+            this.flipTo(this.currPage+2);
+        }
+        /**
+         * @method prevPage
+         * @public
+         * @since 1.1.1
+         */
+        public prevPage():void{
+            this.flipTo(this.currPage-1);
+        }
+        /**
+         * @method startPage
+         * @public
+         * @since 1.1.1
+         */
+        public startPage():void{
+            this.flipTo(0);
+        }
+        /**
+         * @method endPage
+         * @public
+         * @since 1.1.1
+         */
+        public endPage():void{
+            this.flipTo(this.totalPage);
         }
         private flushPage(): void {
             let s = this;
@@ -391,23 +437,23 @@ namespace annieUI {
                 s.toPage = s.toPage == s.currPage ? s.currPage - 2 : s.toPage;
                 page0 = s.currPage;
                 page1 = s.toPage + 1;
-                this.pageMC.removeChild(this.leftPage);
-                if (s.currPage - 2 > 0) {
+                this.pageMC.removeChild(s.leftPage);
+                if (s.toPage> 0) {
                     p = s.getPage(s.currPage - 2);
                     p.x = 0;
-                    this.leftPage = p;
-                    this.pageMC.addChild(p);
+                    s.leftPage = p;
+                    s.pageMC.addChild(p);
                 }
             } else if (s.timerArg0 == 3 || s.timerArg0 == 4) {
                 s.toPage = s.toPage == s.currPage ? s.currPage + 2 : s.toPage;
                 page0 = s.currPage + 1;
                 page1 = s.toPage;
-                this.pageMC.removeChild(this.rightPage);
-                if (s.currPage + 3 < this.totalPage) {
+                s.pageMC.removeChild(s.rightPage);
+                if (s.toPage+1 < s.totalPage) {
                     p = s.getPage(s.currPage +3);
-                    p.x = this.bW;
-                    this.rightPage = p;
-                    this.pageMC.addChild(p);
+                    p.x = s.bW;
+                    s.rightPage = p;
+                    s.pageMC.addChild(p);
                 }
             }
             s.px = myPos.x;
