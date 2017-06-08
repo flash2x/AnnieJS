@@ -265,7 +265,6 @@ namespace annie {
         public preventDefault(){
             this._pd=true;
         }
-
         /**
          * 是否阻止事件向下冒泡
          * @property _pd

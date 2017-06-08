@@ -1379,23 +1379,39 @@ var annieUI;
                     s.view.localToGlobal(lp, gp);
                     s.globalToLocal(gp, lp);
                     var newId = 0;
+                    //TODO 要把这里实现多行多列就行了
                     if (s.speed < 0) {
                         lp[s.paramXY] += s._itemRow;
                         newId = item.id + s._itemCount;
-                        if (lp[s.paramXY] < 0 && newId < s._data.length) {
+                        newId -= newId % s._cols;
+                        if (lp[s.paramXY] < 0) {
                             //向上求数据
-                            item.initData(newId, s._data[newId]);
-                            item[s.paramXY] = item.id * s._itemRow;
-                            s._items.push(s._items.shift());
+                            var len = s._data.length;
+                            for (var i = 0; i < s._cols; i++) {
+                                if (newId < len) {
+                                    item = s._items[0];
+                                    item.initData(newId, s._data[newId]);
+                                    item[s.paramXY] = Math.floor(newId / s._cols) * s._itemRow;
+                                    item[s._disParam] = (newId % s._cols) * s._itemCol;
+                                    s._items.push(s._items.shift());
+                                }
+                                newId++;
+                            }
                         }
                     }
                     else {
                         newId = item.id - s._itemCount;
+                        newId -= newId % s._cols;
                         if (lp[s.paramXY] > s.distance && newId >= 0) {
                             //向上求数据
-                            item.initData(newId, s._data[newId]);
-                            item[s.paramXY] = item.id * s._itemRow;
-                            s._items.unshift(s._items.pop());
+                            for (var i = 0; i < s._cols; i++) {
+                                item = s._items[s._itemCount - 1];
+                                item.initData(newId, s._data[newId]);
+                                item[s.paramXY] = Math.floor(newId / s._cols) * s._itemRow;
+                                item[s._disParam] = (newId % s._cols) * s._itemCol;
+                                s._items.unshift(s._items.pop());
+                                newId++;
+                            }
                         }
                     }
                 }
@@ -1443,12 +1459,14 @@ var annieUI;
             var s = this;
             var id = 0;
             if (s._items.length > 0) {
-                id = Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow));
+                id = Math.abs(Math.ceil(s.view[s.paramXY] / s._itemRow)) * s._cols;
+                trace(id);
             }
             for (var i = 0; i < s._itemCount; i++) {
                 var item = s._items[i];
                 item.initData(id, s._data[id]);
                 item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                item[s._disParam] = (id % s._cols) * s._itemCol;
                 id++;
             }
         };
@@ -1480,7 +1498,7 @@ var annieUI;
                 s._itemRow = s._itemW;
                 s._itemCol = s._itemH;
             }
-            var newCount = Math.ceil(s.distance / s._itemRow) + s._cols;
+            var newCount = Math.ceil(s.distance / s._itemRow) + s._cols * 2;
             if (newCount != s._itemCount) {
                 if (newCount > s._itemCount) {
                     var id = 0;

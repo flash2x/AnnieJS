@@ -132,7 +132,6 @@ namespace annie {
             super(type);
             this._instanceType="annie.MouseEvent";
         }
-
         /**
          * 事件后立即更新显示列表状态
          * @method updateAfterEvent

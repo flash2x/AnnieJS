@@ -91,19 +91,34 @@ namespace annieUI {
                     if(s.speed<0){
                         lp[s.paramXY]+=s._itemRow;
                         newId=item.id+s._itemCount;
-                        if(lp[s.paramXY]<0&&newId<s._data.length){
+                        newId-=newId%s._cols;
+                        if(lp[s.paramXY]<0){
                             //向上求数据
-                            item.initData(newId,s._data[newId]);
-                            item[s.paramXY]=item.id*s._itemRow;
-                            s._items.push(s._items.shift());
+                            let len=s._data.length;
+                            for(var i=0;i<s._cols;i++){
+                                if(newId<len) {
+                                    item=s._items[0];
+                                    item.initData(newId, s._data[newId]);
+                                    item[s.paramXY]=Math.floor(newId/s._cols)*s._itemRow;
+                                    item[s._disParam]=(newId%s._cols)*s._itemCol;
+                                    s._items.push(s._items.shift());
+                                }
+                                newId++;
+                            }
                         }
                     }else{
                         newId=item.id-s._itemCount;
+                        newId-=newId%s._cols;
                         if(lp[s.paramXY]>s.distance&&newId>=0){
                             //向上求数据
-                            item.initData(newId,s._data[newId]);
-                            item[s.paramXY]=item.id*s._itemRow;
-                            s._items.unshift(s._items.pop());
+                            for(var i=0;i<s._cols;i++) {
+                                item=s._items[s._itemCount-1];
+                                item.initData(newId, s._data[newId]);
+                                item[s.paramXY]=Math.floor(newId/s._cols)*s._itemRow;
+                                item[s._disParam]=(newId%s._cols)*s._itemCol;
+                                s._items.unshift(s._items.pop());
+                                newId++;
+                            }
                         }
                     }
                 }
@@ -136,7 +151,8 @@ namespace annieUI {
             let s:any=this;
             let id:number=0;
             if(s._items.length>0){
-                id=Math.abs(Math.floor(s.view[s.paramXY]/s._itemRow));
+                id=Math.abs(Math.ceil(s.view[s.paramXY]/s._itemRow))*s._cols;
+                trace(id);
             }
             for(let i=0;i<s._itemCount;i++){
                 let item:any=s._items[i];
@@ -173,7 +189,7 @@ namespace annieUI {
                 s._itemRow=s._itemW;
                 s._itemCol=s._itemH;
             }
-            let newCount:number=Math.ceil(s.distance/s._itemRow)+s._cols;
+            let newCount:number=Math.ceil(s.distance/s._itemRow)+s._cols*2;
             if(newCount!=s._itemCount){
                 if(newCount>s._itemCount){
                     let id:number=0;

@@ -316,7 +316,6 @@ namespace annie {
             let child: any;
             //这里特别注意是从上往下遍历
             for (let i = len - 1; i >= 0; i--) {
-                //TODO 这里要考虑遮罩
                 child = s.children[i];
                 if (child.mask) {
                     //看看点是否在遮罩内
