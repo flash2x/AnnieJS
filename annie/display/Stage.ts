@@ -268,7 +268,7 @@ namespace annie {
                     }
                     let event = new Event("onResize");
                     s.dispatchEvent(event);
-                }, 200);
+                }, 300);
             });
             setTimeout(function () {
                 s.resize();

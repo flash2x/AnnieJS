@@ -29,7 +29,7 @@ namespace annieUI {
         public set drawRadius(value:number){
             this._drawRadius=value;
         }
-        protected _drawRadius:number;
+        protected _drawRadius:number=50;
         /**
          * 绘画颜色, 可以是任何的颜色类型
          * @property drawColor

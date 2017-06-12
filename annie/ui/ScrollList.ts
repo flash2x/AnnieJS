@@ -189,7 +189,7 @@ namespace annieUI {
                 s._itemRow=s._itemW;
                 s._itemCol=s._itemH;
             }
-            let newCount:number=Math.ceil(s.distance/s._itemRow)+s._cols*2;
+            let newCount:number=(Math.ceil(s.distance/s._itemRow)+1)*s._cols;
             if(newCount!=s._itemCount){
                 if(newCount>s._itemCount){
                     let id:number=0;

@@ -761,8 +761,8 @@ namespace annie {
                         let h = buttonRightY - leftY;
                         s._cacheX = leftX;
                         s._cacheY = leftY;
-                        s._bounds.width = w - 10;
-                        s._bounds.height = h - 10;
+                        s._bounds.width = w - 20;
+                        s._bounds.height = h - 20;
                         ///////////////////////////
                         let _canvas:any = s._cacheImg;
                         let ctx = _canvas["getContext"]('2d');

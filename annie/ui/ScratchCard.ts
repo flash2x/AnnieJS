@@ -31,11 +31,11 @@ namespace annieUI {
             let s = this;
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
-            this.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e: annie.MouseEvent) {
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e: annie.MouseEvent) {
                 //通过移动，计算刮开的面积
                 let dw: number = Math.floor(e.localX / s._drawRadius);
                 let dh: number = Math.floor(e.localY / s._drawRadius);
-                if (s._drawList[dw]&&s._drawList[dw][dh]) {
+                if (s._drawList[dw] && s._drawList[dw][dh]) {
                     s._drawList[dw][dh] = false;
                     s._currentDraw++;
                     //抛事件
@@ -44,9 +44,11 @@ namespace annieUI {
                 }
             })
         }
-        private _drawList: any=[];
+
+        private _drawList: any = [];
         private _totalDraw: number = 1;
         private _currentDraw: number = 0;
+
         /**
          * 重置刮刮卡
          * @method reset
@@ -56,9 +58,9 @@ namespace annieUI {
          */
         public reset(backColorObj: any = ""): void {
             super.reset(backColorObj);
-            let s=this;
-            if(s._drawList) {
-                if(backColorObj!=""){
+            let s = this;
+            if (s._drawList) {
+                if (backColorObj != "") {
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
@@ -82,26 +84,21 @@ namespace annieUI {
          * @since 1.1.1
          * @returns {boolean}
          */
-        public cancel(step:number=0):boolean{
+        public cancel(step: number = 0): boolean {
             trace("no support");
             return false;
         }
-        public set drawRadius(value:number){
-            let s=this;
-            if(s._currentDraw==0){
-                trace("已经开始刮了,无法重新设置绘画半径");
-                return;
-            }
-            if(s._drawRadius!=value) {
-                s._drawRadius = value;
-                let dw: number = Math.floor(s.drawWidth / value);
-                let dh: number = Math.floor(s.drawHeight / value);
-                s._totalDraw = dw * dh;
-                for (let i = 0; i < dw; i++) {
-                    s._drawList[i] = [];
-                    for (let j = 0; j < dh; j++) {
-                        s._drawList[i][j] = true;
-                    }
+
+        public set drawRadius(value: number) {
+            let s = this;
+            s._drawRadius = value;
+            let dw: number = Math.floor(s.drawWidth / value);
+            let dh: number = Math.floor(s.drawHeight / value);
+            s._totalDraw = dw * dh;
+            for (let i = 0; i < dw; i++) {
+                s._drawList[i] = [];
+                for (let j = 0; j < dh; j++) {
+                    s._drawList[i][j] = true;
                 }
             }
         }
