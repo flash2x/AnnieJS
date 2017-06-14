@@ -32,7 +32,7 @@ namespace annieUI {
         private _cols: number;
         private _colsDis: number;
         private _disParam: string;
-        private _lastFirstId:number=-1;
+        private _lastFirstId: number = -1;
 
         /**
          * 获取下拉滚动的loadingView对象
@@ -70,8 +70,9 @@ namespace annieUI {
             s._cols = cols;
             s._colsDis = colsDis;
             s._updateViewRect();
-            s.addEventListener(annie.Event.ENTER_FRAME,s.flushData.bind(s));
+            s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }
+
         /**
          * 更新列表数据
          * @method updateData
@@ -86,7 +87,7 @@ namespace annieUI {
                 s._isInit = true;
             } else {
                 s._data = s._data.concat(data);
-                s._lastFirstId=-1;
+                s._lastFirstId = -1;
             }
             s.maxDistance = Math.ceil(s._data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -98,18 +99,29 @@ namespace annieUI {
 
         private flushData() {
             let s: any = this;
-            if(s._isInit){
+            if (s._isInit) {
                 let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                 id = id < 0 ? 0 : id;
-                if(id!=s._lastFirstId) {
+                if (id != s._lastFirstId) {
+                    s._lastFirstId = id;
+                    if (id != s._items[0].id) {
+                        for (let r = 0; r < s._cols; r++) {
+                            if (s.speed > 0) {
+                                s._items.unshift(s._items.pop());
+                            } else {
+                                s._items.push(s._items.shift());
+                            }
+                        }
+                    }
                     for (let i = 0; i < s._itemCount; i++) {
                         let item: any = s._items[i];
-                        item.initData(id, s._data[id]);
-                        item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
-                        item[s._disParam] = (id % s._cols) * s._itemCol;
+                        if(item.id!=id){
+                            item.initData(s._data[id]?id:-1, s._data[id]);
+                            item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                            item[s._disParam] = (id % s._cols) * s._itemCol;
+                        }
                         id++;
                     }
-                    s._lastFirstId=id;
                 }
             }
         }
@@ -145,15 +157,12 @@ namespace annieUI {
             let newCount: number = (Math.ceil(s.distance / s._itemRow) + 1) * s._cols;
             if (newCount != s._itemCount) {
                 if (newCount > s._itemCount) {
-                    let id: number = 0;
-                    if (s._itemCount > 0) {
-                        id = s._items[s._itemCount - 1].id + 1;
-                    }
                     for (let i = s._itemCount; i < newCount; i++) {
                         let item = new s._itemClass();
+                        item.id=-1;
+                        item.data=null;
                         s._items.push(item);
                         s.view.addChild(item);
-                        id++;
                     }
                 } else {
                     for (let i = 0; i < s._itemCount - newCount; i++) {
@@ -161,7 +170,7 @@ namespace annieUI {
                     }
                 }
                 s._itemCount = newCount;
-                s._lastFirstId=-1;
+                s._lastFirstId = -1;
             }
         }
 
