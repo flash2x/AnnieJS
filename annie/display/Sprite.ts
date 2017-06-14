@@ -199,7 +199,6 @@ namespace annie {
             }
             return -1;
         }
-
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent

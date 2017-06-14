@@ -1348,9 +1348,8 @@ var annieUI;
             _super.call(this, vW, vH, 0, isVertical);
             this._items = null;
             this._data = [];
-            this.gp = new annie.Point();
-            this.lp = new annie.Point();
             this.downL = null;
+            this._lastFirstId = -1;
             var s = this;
             s._isInit = false;
             s._instanceType = "annieUI.ScrollList";
@@ -1358,64 +1357,11 @@ var annieUI;
             s._itemH = itemHeight;
             s._items = [];
             s._itemClass = itemClassName;
-            s.maxSpeed = 50;
             s._itemCount = 0;
             s._cols = cols;
             s._colsDis = colsDis;
             s._updateViewRect();
-            s.addEventListener(annie.Event.ENTER_FRAME, function (e) {
-                if (s.speed != 0) {
-                    var item = null;
-                    if (s.speed < 0) {
-                        item = s._items[0];
-                    }
-                    else {
-                        item = s._items[s._items.length - 1];
-                    }
-                    var lp = s.lp;
-                    var gp = s.gp;
-                    lp.x = item.x;
-                    lp.y = item.y;
-                    s.view.localToGlobal(lp, gp);
-                    s.globalToLocal(gp, lp);
-                    var newId = 0;
-                    //TODO 要把这里实现多行多列就行了
-                    if (s.speed < 0) {
-                        lp[s.paramXY] += s._itemRow;
-                        newId = item.id + s._itemCount;
-                        newId -= newId % s._cols;
-                        if (lp[s.paramXY] < 0) {
-                            //向上求数据
-                            var len = s._data.length;
-                            for (var i = 0; i < s._cols; i++) {
-                                if (newId < len) {
-                                    item = s._items[0];
-                                    item.initData(newId, s._data[newId]);
-                                    item[s.paramXY] = Math.floor(newId / s._cols) * s._itemRow;
-                                    item[s._disParam] = (newId % s._cols) * s._itemCol;
-                                    s._items.push(s._items.shift());
-                                }
-                                newId++;
-                            }
-                        }
-                    }
-                    else {
-                        newId = item.id - s._itemCount;
-                        newId -= newId % s._cols;
-                        if (lp[s.paramXY] > s.distance && newId >= 0) {
-                            //向上求数据
-                            for (var i = 0; i < s._cols; i++) {
-                                item = s._items[s._itemCount - 1];
-                                item.initData(newId, s._data[newId]);
-                                item[s.paramXY] = Math.floor(newId / s._cols) * s._itemRow;
-                                item[s._disParam] = (newId % s._cols) * s._itemCol;
-                                s._items.unshift(s._items.pop());
-                                newId++;
-                            }
-                        }
-                    }
-                }
-            });
+            s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }
         Object.defineProperty(ScrollList.prototype, "loadingView", {
             /**
@@ -1446,8 +1392,8 @@ var annieUI;
             }
             else {
                 s._data = s._data.concat(data);
+                s._lastFirstId = -1;
             }
-            s.flushData();
             s.maxDistance = Math.ceil(s._data.length / s._cols) * s._itemRow;
             if (s.downL) {
                 s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
@@ -1457,17 +1403,19 @@ var annieUI;
         };
         ScrollList.prototype.flushData = function () {
             var s = this;
-            var id = 0;
-            if (s._items.length > 0) {
-                id = Math.abs(Math.ceil(s.view[s.paramXY] / s._itemRow)) * s._cols;
-                trace(id);
-            }
-            for (var i = 0; i < s._itemCount; i++) {
-                var item = s._items[i];
-                item.initData(id, s._data[id]);
-                item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
-                item[s._disParam] = (id % s._cols) * s._itemCol;
-                id++;
+            if (s._isInit) {
+                var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
+                id = id < 0 ? 0 : id;
+                if (id != s._lastFirstId) {
+                    for (var i = 0; i < s._itemCount; i++) {
+                        var item = s._items[i];
+                        item.initData(id, s._data[id]);
+                        item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                        item[s._disParam] = (id % s._cols) * s._itemCol;
+                        id++;
+                    }
+                    s._lastFirstId = id;
+                }
             }
         };
         /**
@@ -1518,7 +1466,7 @@ var annieUI;
                     }
                 }
                 s._itemCount = newCount;
-                this.flushData();
+                s._lastFirstId = -1;
             }
         };
         /**

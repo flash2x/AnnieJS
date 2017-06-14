@@ -583,12 +583,11 @@ declare namespace annieUI {
         private _itemClass;
         private _isInit;
         private _data;
-        private gp;
-        private lp;
         private downL;
         private _cols;
         private _colsDis;
         private _disParam;
+        private _lastFirstId;
         /**
          * 获取下拉滚动的loadingView对象
          * @property loadingView
