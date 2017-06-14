@@ -4033,15 +4033,6 @@ declare namespace Flash2x {
      */
     function stopAllSounds(): void;
     /**
-     * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-     * @method setAllSoundsVolume
-     * @since 1.1.1
-     * @static
-     * @public
-     * @param {number} volume 音量大小，从0-1
-     */
-    function setAllSoundsVolume(volume: number): void;
-    /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b
      * @public

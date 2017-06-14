@@ -1498,7 +1498,7 @@ var annieUI;
                 s._itemRow = s._itemW;
                 s._itemCol = s._itemH;
             }
-            var newCount = Math.ceil(s.distance / s._itemRow) + s._cols * 2;
+            var newCount = (Math.ceil(s.distance / s._itemRow) + 1) * s._cols;
             if (newCount != s._itemCount) {
                 if (newCount > s._itemCount) {
                     var id = 0;
@@ -1580,6 +1580,7 @@ var annieUI;
             _super.call(this);
             this.context = null;
             this._isMouseDown = false;
+            this._drawRadius = 50;
             /**
              * 绘画颜色, 可以是任何的颜色类型
              * @property drawColor
@@ -1805,7 +1806,7 @@ var annieUI;
             var s = this;
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
-            this.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e) {
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e) {
                 //通过移动，计算刮开的面积
                 var dw = Math.floor(e.localX / s._drawRadius);
                 var dh = Math.floor(e.localY / s._drawRadius);
@@ -1861,20 +1862,14 @@ var annieUI;
         Object.defineProperty(ScratchCard.prototype, "drawRadius", {
             set: function (value) {
                 var s = this;
-                if (s._currentDraw == 0) {
-                    trace("已经开始刮了,无法重新设置绘画半径");
-                    return;
-                }
-                if (s._drawRadius != value) {
-                    s._drawRadius = value;
-                    var dw = Math.floor(s.drawWidth / value);
-                    var dh = Math.floor(s.drawHeight / value);
-                    s._totalDraw = dw * dh;
-                    for (var i = 0; i < dw; i++) {
-                        s._drawList[i] = [];
-                        for (var j = 0; j < dh; j++) {
-                            s._drawList[i][j] = true;
-                        }
+                s._drawRadius = value;
+                var dw = Math.floor(s.drawWidth / value);
+                var dh = Math.floor(s.drawHeight / value);
+                s._totalDraw = dw * dh;
+                for (var i = 0; i < dw; i++) {
+                    s._drawList[i] = [];
+                    for (var j = 0; j < dh; j++) {
+                        s._drawList[i][j] = true;
                     }
                 }
             },

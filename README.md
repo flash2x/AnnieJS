@@ -78,8 +78,8 @@
     优化annieUI.ScrollPage和annieUI.ScorllList
     优化annie.Tween在对同一对象多次执行annie.Tween效果时，最新的tween只会替换掉与之前tween中对象相同的属性，而不是全部覆盖
     增加获取舞台区域的像素数据，注意舞台所在的canvas不得被污染
-    增加Flash2x.stopAllSounds()方法来停止当前播放的声音。
-    增加Flash2x.setAllSoundsVolume()方法来设置所有播放或未播放的已经被加载到项目中的声音音量
+    增加annie.Sound.stopAllSounds()方法来停止当前播放的声音。
+    增加annie.Sound.setAllSoundsVolume()方法来设置所有播放或未播放的已经被加载到项目中的声音音量
 ## AnnieJS 1.1.0 版本
     修复矢量元素加滤镜无效的bug
     修复annie.Tween中以秒为计算单位时,delay参数仍然以帧为单位的bug

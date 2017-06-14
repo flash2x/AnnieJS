@@ -138,6 +138,11 @@ namespace annie {
         }
         public set volume(value:number){
             this.media.volume=value;
+            if(value==0){
+                this.media.muted=true;
+            }else{
+                this.media.muted=false;
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ namespace annie {
      * @public
      * @since 1.0.0
      */
-    export class Video extends Media {
+    export class Video extends Media{
         /**
          * 构造函数
          * @method Video

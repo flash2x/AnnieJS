@@ -313,42 +313,6 @@ namespace Flash2x {
         }
         return null;
     }
-
-    /**
-     * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-     * @method stopAllSounds
-     * @since 1.1.1
-     * @static
-     * @public
-     */
-    export function stopAllSounds(){
-        let len:number=annie.Sound._soundList.length;
-        for(var i=len-1;i>=0;i--){
-            if(annie.Sound._soundList[i]){
-                annie.Sound._soundList[i].stop();
-            }else{
-                annie.Sound._soundList.splice(i,1);
-            }
-        }
-    }
-    // /**
-    //  * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音，好像在ios里无效，等有效了再支持
-    //  * @method setAllSoundsVolume
-    //  * @since 1.1.1
-    //  * @static
-    //  * @public
-    //  * @param {number} volume 音量大小，从0-1
-    //  */
-    // export function setAllSoundsVolume(volume:number){
-    //     let len:number=annie.Sound._soundList.length;
-    //     for(var i=len-1;i>=0;i--){
-    //         if(annie.Sound._soundList[i]){
-    //             annie.Sound._soundList[i].volume=volume;
-    //         }else{
-    //             annie.Sound._soundList.splice(i,1);
-    //         }
-    //     }
-    // }
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b

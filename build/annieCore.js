@@ -3065,8 +3065,8 @@ var annie;
                         var h = buttonRightY - leftY;
                         s._cacheX = leftX;
                         s._cacheY = leftY;
-                        s._bounds.width = w - 10;
-                        s._bounds.height = h - 10;
+                        s._bounds.width = w - 20;
+                        s._bounds.height = h - 20;
                         ///////////////////////////
                         var _canvas = s._cacheImg;
                         var ctx = _canvas["getContext"]('2d');
@@ -3619,7 +3619,6 @@ var annie;
             var child;
             //这里特别注意是从上往下遍历
             for (var i = len - 1; i >= 0; i--) {
-                //TODO 这里要考虑遮罩
                 child = s.children[i];
                 if (child.mask) {
                     //看看点是否在遮罩内
@@ -3853,6 +3852,12 @@ var annie;
             },
             set: function (value) {
                 this.media.volume = value;
+                if (value == 0) {
+                    this.media.muted = true;
+                }
+                else {
+                    this.media.muted = false;
+                }
             },
             enumerable: true,
             configurable: true
@@ -6468,7 +6473,7 @@ var annie;
                     }
                     var event = new annie.Event("onResize");
                     s.dispatchEvent(event);
-                }, 200);
+                }, 300);
             });
             setTimeout(function () {
                 s.resize();
@@ -8586,26 +8591,24 @@ var Flash2x;
         }
     }
     Flash2x.stopAllSounds = stopAllSounds;
-    /**
-     * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-     * @method setAllSoundsVolume
-     * @since 1.1.1
-     * @static
-     * @public
-     * @param {number} volume 音量大小，从0-1
-     */
-    function setAllSoundsVolume(volume) {
-        var len = annie.Sound._soundList.length;
-        for (var i = len - 1; i >= 0; i--) {
-            if (annie.Sound._soundList[i]) {
-                annie.Sound._soundList[i].volume = volume;
-            }
-            else {
-                annie.Sound._soundList.splice(i, 1);
-            }
-        }
-    }
-    Flash2x.setAllSoundsVolume = setAllSoundsVolume;
+    // /**
+    //  * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音，好像在ios里无效，等有效了再支持
+    //  * @method setAllSoundsVolume
+    //  * @since 1.1.1
+    //  * @static
+    //  * @public
+    //  * @param {number} volume 音量大小，从0-1
+    //  */
+    // export function setAllSoundsVolume(volume:number){
+    //     let len:number=annie.Sound._soundList.length;
+    //     for(var i=len-1;i>=0;i--){
+    //         if(annie.Sound._soundList[i]){
+    //             annie.Sound._soundList[i].volume=volume;
+    //         }else{
+    //             annie.Sound._soundList.splice(i,1);
+    //         }
+    //     }
+    // }
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b
