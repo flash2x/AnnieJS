@@ -133,7 +133,7 @@ namespace annieUI {
         public fSpeed: number = 20;
         protected paramXY: string = "y";
         private stopTimes: number = -1;
-        private isMouseDown: boolean = false;
+        private isMouseDownState: number = 0;
         /**
          * 是否是通过scrollTo方法在滑动中
          * @property autoScroll
@@ -204,15 +204,17 @@ namespace annieUI {
                                 if (Math.abs(tarP-view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     //trace("上回弹");
+                                    s.dispatchEvent("onScrollStop");
                                     if(s.addSpeed>0){
                                         s.dispatchEvent("onScrollToEnd");
                                     }else{
-                                        s.dispatchEvent("onScrollToStart");
+                                        s.dispatchEvent("onScrollToHead");
                                     }
                                 }
                             }
-                        } else {
+                        }else {
                             s.isStop = true;
+                            s.dispatchEvent("onScrollStop");
                         }
                     }
                 } else {
@@ -263,7 +265,7 @@ namespace annieUI {
             if (s.autoScroll)return;
             let view: any = s.view;
             // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+            if (e.type == annie.MouseEvent.MOUSE_DOWN){
                 if (!s.isStop) {
                     s.isStop = true;
                 }
@@ -273,9 +275,13 @@ namespace annieUI {
                     s.lastValue = e.localX;
                 }
                 s.speed = 0;
-                s.isMouseDown = true;
+                s.isMouseDownState = 1;
             } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown)return;
+                if (s.isMouseDownState<1)return;
+                if(s.isMouseDownState==1){
+                    s.dispatchEvent("onScrollStart");
+                }
+                s.isMouseDownState=2;
                 let currentValue: number;
                 if (s.isVertical) {
                     currentValue = e.localY;
@@ -306,7 +312,7 @@ namespace annieUI {
                 s.lastValue = currentValue;
                 s.stopTimes = 0;
             } else {
-                s.isMouseDown = false;
+                s.isMouseDownState = 0;
                 s.isStop = false;
                 s.stopTimes = -1;
             }
@@ -315,22 +321,27 @@ namespace annieUI {
         /**
          * 滚到指定的坐标位置
          * @method scrollTo
-         * @param {number} dis 坐标位置
+         * @param {number} dis 需要去到的位置
          * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
          * @since 1.1.1
          * @public
          */
         public scrollTo(dis: number, time: number = 0): void {
-            let s = this;
-            s.autoScroll = true;
-            s.isStop = true;
-            s.isMouseDown = false;
-            let obj: any = {};
-            obj.onComplete = function () {
-                s.autoScroll = false;
-            };
-            obj[s.paramXY] = dis;
-            annie.Tween.to(s.view, time, obj);
+            let s:any = this;
+            if(Math.abs(s.view[s.paramXY]+dis)>1) {
+                s.autoScroll = true;
+                s.isStop = true;
+                s.isMouseDownState = 0;
+                let obj: any = {};
+                obj.onComplete = function () {
+                    s.autoScroll = false;
+                };
+                obj[s.paramXY] = -dis;
+                annie.Tween.to(s.view, time, obj);
+                if(s.speed==0){
+                    s.dispatchEvent("onScrollStart");
+                }
+            }
         }
     }
 }

@@ -375,12 +375,28 @@ var annie;
         Event.ON_FLIP_STOP = "onFlipStop";
         /**
          * annieUI.ScrollPage组件滑动到开始位置事件
-         * @property ON_SCROLL_TO_START
+         * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
          */
-        Event.ON_SCROLL_TO_START = "onScrollToStart";
+        Event.ON_SCROLL_TO_HEAD = "onScrollToHead";
+        /**
+         * annieUI.ScrollPage组件停止滑动事件
+         * @property ON_SCROLL_STOP
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_SCROLL_STOP = "onScrollStop";
+        /**
+         * annieUI.ScrollPage组件开始滑动事件
+         * @property ON_SCROLL_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        Event.ON_SCROLL_START = "onScrollStart";
         /**
          * annieUI.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
@@ -3911,7 +3927,44 @@ var annie;
                 }
             }
         };
-        //声音对象池,停止所有声音时使用
+        /**
+         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method stopAllSounds
+         * @since 1.1.1
+         * @static
+         * @public
+         */
+        Sound.stopAllSounds = function () {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].stop();
+                }
+                else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        };
+        /**
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method setAllSoundsVolume
+         * @since 1.1.1
+         * @static
+         * @public
+         * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
+         */
+        Sound.setAllSoundsVolume = function (volume) {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].volume = volume;
+                }
+                else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        };
+        //声音对象池
         Sound._soundList = [];
         return Sound;
     }(annie.Media));
@@ -8572,43 +8625,6 @@ var Flash2x;
         return null;
     }
     Flash2x.getMediaByName = getMediaByName;
-    /**
-     * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-     * @method stopAllSounds
-     * @since 1.1.1
-     * @static
-     * @public
-     */
-    function stopAllSounds() {
-        var len = annie.Sound._soundList.length;
-        for (var i = len - 1; i >= 0; i--) {
-            if (annie.Sound._soundList[i]) {
-                annie.Sound._soundList[i].stop();
-            }
-            else {
-                annie.Sound._soundList.splice(i, 1);
-            }
-        }
-    }
-    Flash2x.stopAllSounds = stopAllSounds;
-    // /**
-    //  * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音，好像在ios里无效，等有效了再支持
-    //  * @method setAllSoundsVolume
-    //  * @since 1.1.1
-    //  * @static
-    //  * @public
-    //  * @param {number} volume 音量大小，从0-1
-    //  */
-    // export function setAllSoundsVolume(volume:number){
-    //     let len:number=annie.Sound._soundList.length;
-    //     for(var i=len-1;i>=0;i--){
-    //         if(annie.Sound._soundList[i]){
-    //             annie.Sound._soundList[i].volume=volume;
-    //         }else{
-    //             annie.Sound._soundList.splice(i,1);
-    //         }
-    //     }
-    // }
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b

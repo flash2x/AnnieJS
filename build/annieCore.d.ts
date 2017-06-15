@@ -191,12 +191,28 @@ declare namespace annie {
         static ON_FLIP_STOP: string;
         /**
          * annieUI.ScrollPage组件滑动到开始位置事件
-         * @property ON_SCROLL_TO_START
+         * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
          */
-        static ON_SCROLL_TO_START: string;
+        static ON_SCROLL_TO_HEAD: string;
+        /**
+         * annieUI.ScrollPage组件停止滑动事件
+         * @property ON_SCROLL_STOP
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_SCROLL_STOP: string;
+        /**
+         * annieUI.ScrollPage组件开始滑动事件
+         * @property ON_SCROLL_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        static ON_SCROLL_START: string;
         /**
          * annieUI.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
@@ -2075,7 +2091,24 @@ declare namespace annie {
          * @since 1.1.1
          */
         destory(): void;
-        static _soundList: any;
+        private static _soundList;
+        /**
+         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method stopAllSounds
+         * @since 1.1.1
+         * @static
+         * @public
+         */
+        static stopAllSounds(): void;
+        /**
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method setAllSoundsVolume
+         * @since 1.1.1
+         * @static
+         * @public
+         * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
+         */
+        static setAllSoundsVolume(volume: number): void;
     }
 }
 /**
@@ -4024,14 +4057,6 @@ declare namespace Flash2x {
      * @returns {any}
      */
     function getMediaByName(sceneName: string, mediaName: string): any;
-    /**
-     * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-     * @method stopAllSounds
-     * @since 1.1.1
-     * @static
-     * @public
-     */
-    function stopAllSounds(): void;
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b

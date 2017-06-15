@@ -62,12 +62,28 @@ namespace annie {
         public static ON_FLIP_STOP="onFlipStop";
         /**
          * annieUI.ScrollPage组件滑动到开始位置事件
-         * @property ON_SCROLL_TO_START
+         * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
          */
-        public static ON_SCROLL_TO_START="onScrollToStart";
+        public static ON_SCROLL_TO_HEAD="onScrollToHead";
+        /**
+         * annieUI.ScrollPage组件停止滑动事件
+         * @property ON_SCROLL_STOP
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_SCROLL_STOP="onScrollStop";
+        /**
+         * annieUI.ScrollPage组件开始滑动事件
+         * @property ON_SCROLL_START
+         * @static
+         * @since 1.1.0
+         * @type {string}
+         */
+        public static ON_SCROLL_START="onScrollStart";
         /**
          * annieUI.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END

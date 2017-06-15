@@ -132,7 +132,7 @@ declare namespace annieUI {
         fSpeed: number;
         protected paramXY: string;
         private stopTimes;
-        private isMouseDown;
+        private isMouseDownState;
         /**
          * 是否是通过scrollTo方法在滑动中
          * @property autoScroll
@@ -172,7 +172,7 @@ declare namespace annieUI {
         /**
          * 滚到指定的坐标位置
          * @method scrollTo
-         * @param {number} dis 坐标位置
+         * @param {number} dis 需要去到的位置
          * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
          * @since 1.1.1
          * @public

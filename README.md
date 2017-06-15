@@ -73,13 +73,18 @@
     修复annie.Tween偶尔kill的时候会kill到其他tween对象的bug
     修复annieUI.SlidePage在Android机上滑动困难的bug
     修复在父级和子级都侦听了REMOVE_TO_STAGE事件时，并在事件回调里都执行了removeChild的相关方法会导致子级的REMOVE_TO_STAGE事件被多次调用的bug
-    修复并优化annieUI.FilpBook类的相关方法及用法
+    优化annieUI.FilpBook类的相关方法及用法
     优化annie.Shape类的矢量渲染
     优化annieUI.ScrollPage和annieUI.ScorllList
     优化annie.Tween在对同一对象多次执行annie.Tween效果时，最新的tween只会替换掉与之前tween中对象相同的属性，而不是全部覆盖
     增加获取舞台区域的像素数据，注意舞台所在的canvas不得被污染
     增加annie.Sound.stopAllSounds()方法来停止当前播放的声音。
     增加annie.Sound.setAllSoundsVolume()方法来设置所有播放或未播放的已经被加载到项目中的声音音量
+    增加annieUI.ScorllPage2个事件annie.Event.ON_SCROOL_START annie.Event.ON_SCROOL_TO_STOP
+    增加了annieUI.ScrollList类列表类，支持多列
+    增加了annieUI.DrawingBoard画板类，支持撤销
+    增加了annieUI.ScratchCard刮刮卡类，支持获取刮取面积的百分比
+    修改annieUI.ScorllPage中annie.Event.ON_SCROOL_TO_START事件为annie.Event.ON_SCROOL_TO_HEAD
 ## AnnieJS 1.1.0 版本
     修复矢量元素加滤镜无效的bug
     修复annie.Tween中以秒为计算单位时,delay参数仍然以帧为单位的bug

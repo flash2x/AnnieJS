@@ -158,7 +158,7 @@ var annieUI;
             this.fSpeed = 20;
             this.paramXY = "y";
             this.stopTimes = -1;
-            this.isMouseDown = false;
+            this.isMouseDownState = 0;
             /**
              * 是否是通过scrollTo方法在滑动中
              * @property autoScroll
@@ -214,17 +214,19 @@ var annieUI;
                                 if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     //trace("上回弹");
+                                    s.dispatchEvent("onScrollStop");
                                     if (s.addSpeed > 0) {
                                         s.dispatchEvent("onScrollToEnd");
                                     }
                                     else {
-                                        s.dispatchEvent("onScrollToStart");
+                                        s.dispatchEvent("onScrollToHead");
                                     }
                                 }
                             }
                         }
                         else {
                             s.isStop = true;
+                            s.dispatchEvent("onScrollStop");
                         }
                     }
                 }
@@ -287,11 +289,15 @@ var annieUI;
                     s.lastValue = e.localX;
                 }
                 s.speed = 0;
-                s.isMouseDown = true;
+                s.isMouseDownState = 1;
             }
             else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown)
+                if (s.isMouseDownState < 1)
                     return;
+                if (s.isMouseDownState == 1) {
+                    s.dispatchEvent("onScrollStart");
+                }
+                s.isMouseDownState = 2;
                 var currentValue = void 0;
                 if (s.isVertical) {
                     currentValue = e.localY;
@@ -326,7 +332,7 @@ var annieUI;
                 s.stopTimes = 0;
             }
             else {
-                s.isMouseDown = false;
+                s.isMouseDownState = 0;
                 s.isStop = false;
                 s.stopTimes = -1;
             }
@@ -335,7 +341,7 @@ var annieUI;
         /**
          * 滚到指定的坐标位置
          * @method scrollTo
-         * @param {number} dis 坐标位置
+         * @param {number} dis 需要去到的位置
          * @param {number} time 滚动需要的时间 默认为0 即没有动画效果直接跳到指定页
          * @since 1.1.1
          * @public
@@ -343,15 +349,20 @@ var annieUI;
         ScrollPage.prototype.scrollTo = function (dis, time) {
             if (time === void 0) { time = 0; }
             var s = this;
-            s.autoScroll = true;
-            s.isStop = true;
-            s.isMouseDown = false;
-            var obj = {};
-            obj.onComplete = function () {
-                s.autoScroll = false;
-            };
-            obj[s.paramXY] = dis;
-            annie.Tween.to(s.view, time, obj);
+            if (Math.abs(s.view[s.paramXY] + dis) > 1) {
+                s.autoScroll = true;
+                s.isStop = true;
+                s.isMouseDownState = 0;
+                var obj = {};
+                obj.onComplete = function () {
+                    s.autoScroll = false;
+                };
+                obj[s.paramXY] = -dis;
+                annie.Tween.to(s.view, time, obj);
+                if (s.speed == 0) {
+                    s.dispatchEvent("onScrollStart");
+                }
+            }
         };
         return ScrollPage;
     }(Sprite));
@@ -1407,14 +1418,26 @@ var annieUI;
                 var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                 id = id < 0 ? 0 : id;
                 if (id != s._lastFirstId) {
+                    s._lastFirstId = id;
+                    if (id != s._items[0].id) {
+                        for (var r = 0; r < s._cols; r++) {
+                            if (s.speed > 0) {
+                                s._items.unshift(s._items.pop());
+                            }
+                            else {
+                                s._items.push(s._items.shift());
+                            }
+                        }
+                    }
                     for (var i = 0; i < s._itemCount; i++) {
                         var item = s._items[i];
-                        item.initData(id, s._data[id]);
-                        item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
-                        item[s._disParam] = (id % s._cols) * s._itemCol;
+                        if (item.id != id) {
+                            item.initData(s._data[id] ? id : -1, s._data[id]);
+                            item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                            item[s._disParam] = (id % s._cols) * s._itemCol;
+                        }
                         id++;
                     }
-                    s._lastFirstId = id;
                 }
             }
         };
@@ -1449,15 +1472,12 @@ var annieUI;
             var newCount = (Math.ceil(s.distance / s._itemRow) + 1) * s._cols;
             if (newCount != s._itemCount) {
                 if (newCount > s._itemCount) {
-                    var id = 0;
-                    if (s._itemCount > 0) {
-                        id = s._items[s._itemCount - 1].id + 1;
-                    }
                     for (var i = s._itemCount; i < newCount; i++) {
                         var item = new s._itemClass();
+                        item.id = -1;
+                        item.data = null;
                         s._items.push(item);
                         s.view.addChild(item);
-                        id++;
                     }
                 }
                 else {
