@@ -324,7 +324,7 @@ namespace annieUI {
                 if((s.timerArg0<3&&s.currPage>0)||(s.timerArg0>2&&s.currPage<=s.totalPage-2)){
                     s.state = "start";
                     s.flushPage();
-                    // e.updateAfterEvent();
+                    e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart");
                 }
             }

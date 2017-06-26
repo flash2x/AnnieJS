@@ -14,8 +14,9 @@ namespace annieUI {
      * @since 1.1.1
      */
     export class DrawingBoard extends annie.Bitmap {
-        protected context:CanvasRenderingContext2D=null;
+        protected context: CanvasRenderingContext2D = null;
         private _isMouseDown: boolean = false;
+
         /**
          * 绘画半径
          * @property drawRadius
@@ -23,13 +24,15 @@ namespace annieUI {
          * @public
          * @since 1.1.1
          */
-        public get drawRadius():number{
+        public get drawRadius(): number {
             return this._drawRadius;
         };
-        public set drawRadius(value:number){
-            this._drawRadius=value;
+
+        public set drawRadius(value: number) {
+            this._drawRadius = value;
         }
-        protected _drawRadius:number=50;
+
+        protected _drawRadius: number = 50;
         /**
          * 绘画颜色, 可以是任何的颜色类型
          * @property drawColor
@@ -38,7 +41,7 @@ namespace annieUI {
          * @since
          * @type {any}
          */
-        public drawColor:any="#000";
+        public drawColor: any = "#ffffff";
         /**
          * 背景色 可以是任何的颜色类型
          * @property bgColor
@@ -46,7 +49,7 @@ namespace annieUI {
          * @public
          * @since 1.1.1
          */
-        public bgColor:any="";
+        public bgColor: any = "";
         /**
          * 画板宽
          * @property drawWidth
@@ -55,7 +58,7 @@ namespace annieUI {
          * @public
          * @since 1.1.1
          */
-        public drawWidth:number=0;
+        public drawWidth: number = 0;
         /**
          * 画板高
          * @property drawHeight
@@ -64,13 +67,14 @@ namespace annieUI {
          * @public
          * @since 1.1.1
          */
-        public drawHeight:number=0;
+        public drawHeight: number = 0;
         //总步数数据
-        protected totalStepList:any=[];
+        protected totalStepList: any = [];
         //单步数据
-        protected addStepObj:any;
+        protected addStepObj: any;
         //当前步数所在的id
-        protected currentStepId:number=0;
+        protected currentStepId: number = 0;
+
         /**
          * 构造函数
          * @method DrawingBoard
@@ -79,18 +83,18 @@ namespace annieUI {
          * @param bgColor 背景色 默认透明
          * @since 1.1.1
          */
-        constructor(width: number, height: number,bgColor: any="") {
+        constructor(width: number, height: number, bgColor: any = "") {
             super();
             var s = this;
-            var bd=document.createElement("canvas");
-            bd.width=width;
-            bd.height=height;
-            s.context=bd.getContext("2d");
+            var bd = document.createElement("canvas");
+            bd.width = width;
+            bd.height = height;
+            s.context = bd.getContext("2d");
             s.context.lineCap = "round";
             s.context.lineJoin = "round";
-            s.bitmapData=bd;
-            s.drawHeight=height;
-            s.drawWidth=width;
+            s.bitmapData = bd;
+            s.drawHeight = height;
+            s.drawWidth = width;
             s.reset(bgColor);
             var mouseDown = s.onMouseDown.bind(s);
             var mouseMove = s.onMouseMove.bind(s);
@@ -99,42 +103,46 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
         }
-        private onMouseDown(e:annie.MouseEvent): void {
+
+        private onMouseDown(e: annie.MouseEvent): void {
             var s = this;
             var ctx = s.context;
             ctx.beginPath();
             ctx.strokeStyle = s.drawColor;
             ctx.lineWidth = s._drawRadius;
-            let lx:number=e.localX >> 0;
-            let ly:number=e.localY >> 0;
+            let lx: number = e.localX >> 0;
+            let ly: number = e.localY >> 0;
             ctx.moveTo(lx, ly);
             s._isMouseDown = true;
-            s.addStepObj={};
-            s.addStepObj.c=s.drawColor;
-            s.addStepObj.r=s._drawRadius;
-            s.addStepObj.sx=lx;
-            s.addStepObj.sy=ly;
-            s.addStepObj.ps=[];
+            s.addStepObj = {};
+            s.addStepObj.c = s.drawColor;
+            s.addStepObj.r = s._drawRadius;
+            s.addStepObj.sx = lx;
+            s.addStepObj.sy = ly;
+            s.addStepObj.ps = [];
         };
-        private onMouseUp(e:annie.MouseEvent):void {
-            let s=this;
+
+        private onMouseUp(e: annie.MouseEvent): void {
+            let s = this;
             s._isMouseDown = false;
-            if(s.addStepObj.ps.length>0) {
+            if (s.addStepObj.ps.length > 0) {
                 s.currentStepId++;
                 s.totalStepList.push(s.addStepObj);
             }
         };
-        private onMouseMove(e:annie.MouseEvent):void{
+
+        private onMouseMove(e: annie.MouseEvent): void {
             var s = this;
             if (s._isMouseDown) {
                 var ctx = s.context;
-                let lx:number=e.localX >> 0;
-                let ly:number=e.localY >> 0;
+                let lx: number = e.localX >> 0;
+                let ly: number = e.localY >> 0;
                 ctx.lineTo(lx, ly);
                 ctx.stroke();
-                s.addStepObj.ps.push(lx,ly);
+                s.addStepObj.ps.push(lx, ly);
             }
         };
+
         /**
          * 重置画板
          * @method reset
@@ -142,10 +150,10 @@ namespace annieUI {
          * @public
          * @since 1.1.1
          */
-        public reset(bgColor:any=""):void{
-            let s=this;
-            if(bgColor!=""){
-                s.bgColor=bgColor;
+        public reset(bgColor: any = ""): void {
+            let s = this;
+            if (bgColor != "") {
+                s.bgColor = bgColor;
             }
             if (s.bgColor != "") {
                 s.context.fillStyle = s.bgColor;
@@ -153,9 +161,10 @@ namespace annieUI {
             } else {
                 s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
             }
-            s.currentStepId=0;
-            s.totalStepList=[];
+            s.currentStepId = 0;
+            s.totalStepList = [];
         }
+
         /**
          * 撤销步骤
          * @method cancel
@@ -163,35 +172,35 @@ namespace annieUI {
          * @public
          * @since 1.1.1
          */
-        public cancel(step:number=0):boolean{
-            let s=this;
-            if(step==0){
+        public cancel(step: number = 0): boolean {
+            let s = this;
+            if (step == 0) {
                 s.reset();
-            }else{
-                if(s.currentStepId-step>=0){
-                    s.currentStepId-=step;
-                    s.totalStepList.splice(s.currentStepId,step);
+            } else {
+                if (s.currentStepId - step >= 0) {
+                    s.currentStepId -= step;
+                    s.totalStepList.splice(s.currentStepId, step);
                     if (s.bgColor != "") {
                         s.context.fillStyle = s.bgColor;
                         s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
                     } else {
                         s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
                     }
-                    let len:number=s.totalStepList.length;
-                    for(let i=0;i<len;i++){
+                    let len: number = s.totalStepList.length;
+                    for (let i = 0; i < len; i++) {
                         var ctx = s.context;
                         ctx.beginPath();
                         ctx.strokeStyle = s.totalStepList[i].c;
                         ctx.lineWidth = s.totalStepList[i].r;
                         ctx.moveTo(s.totalStepList[i].sx, s.totalStepList[i].sy);
-                        let ps:any=s.totalStepList.ps;
-                        let pLen:number=ps.length;
-                        for(let m=0;m<pLen;m+=2){
-                            ctx.lineTo(ps[m], ps[m+1]);
+                        let ps: any = s.totalStepList[i].ps;
+                        let pLen: number = ps.length;
+                        for (let m = 0; m < pLen; m += 2) {
+                            ctx.lineTo(ps[m], ps[m + 1]);
                             ctx.stroke();
                         }
                     }
-                }else{
+                } else {
                     return false;
                 }
             }

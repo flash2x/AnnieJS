@@ -38,7 +38,8 @@ namespace annie {
             }
             let s = this;
             s._currentFrame = 1;
-            s._totalFrames = times*60>>0;
+            let tTime:number=times*60>>0;
+            s._totalFrames = tTime>0?tTime:1;
             s.target = target;
             s._isTo = isTo;
             s._isLoop = 0;

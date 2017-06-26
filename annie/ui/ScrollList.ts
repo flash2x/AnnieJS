@@ -117,6 +117,7 @@ namespace annieUI {
                         let item: any = s._items[i];
                         if(item.id!=id){
                             item.initData(s._data[id]?id:-1, s._data[id]);
+                            item.visible=s._data[id]?true:false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
                         }

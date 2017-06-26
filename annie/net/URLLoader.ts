@@ -41,7 +41,7 @@ namespace annie {
             let s = this;
             if (s._req) {
                 s._req.abort();
-                s._req = null;
+                // s._req = null;
             }
         }
 

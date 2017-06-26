@@ -386,14 +386,16 @@ declare namespace annieUI {
          */
         canSlidePrev: boolean;
         paramXY: string;
+        private _ease;
         /**
          * 构造函数
          * @method SlidePage
          * @param {number} vW 宽
          * @param {number} vH 高
          * @param {boolean} isVertical 是横向还是纵向 默认纵向
+         * @param {Function} ease annie.Tween的缓存函数，也可以是自定义的缓动函数，自定义的话,请尊守annie.Tween缓动函数接口
          */
-        constructor(vW: number, vH: number, isVertical?: boolean);
+        constructor(vW: number, vH: number, isVertical?: boolean, ease?: Function);
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
          * @method setMask

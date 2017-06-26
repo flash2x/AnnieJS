@@ -196,7 +196,7 @@ var annieUI;
                         }
                         //说明超过了界线,准备回弹
                         if (s.speed * s.addSpeed > 0) {
-                            // trace("回弹");
+                            s.dispatchEvent("onScrollStop");
                             s.speed = 0;
                         }
                     }
@@ -213,8 +213,6 @@ var annieUI;
                                 view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
                                 if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
-                                    //trace("上回弹");
-                                    s.dispatchEvent("onScrollStop");
                                     if (s.addSpeed > 0) {
                                         s.dispatchEvent("onScrollToEnd");
                                     }
@@ -226,7 +224,6 @@ var annieUI;
                         }
                         else {
                             s.isStop = true;
-                            s.dispatchEvent("onScrollStop");
                         }
                     }
                 }
@@ -332,9 +329,12 @@ var annieUI;
                 s.stopTimes = 0;
             }
             else {
-                s.isMouseDownState = 0;
                 s.isStop = false;
                 s.stopTimes = -1;
+                if (s.speed == 0 && s.isMouseDownState == 2) {
+                    s.dispatchEvent("onScrollStop");
+                }
+                s.isMouseDownState = 0;
             }
             // }
         };
@@ -479,9 +479,11 @@ var annieUI;
          * @param {number} vW 宽
          * @param {number} vH 高
          * @param {boolean} isVertical 是横向还是纵向 默认纵向
+         * @param {Function} ease annie.Tween的缓存函数，也可以是自定义的缓动函数，自定义的话,请尊守annie.Tween缓动函数接口
          */
-        function SlidePage(vW, vH, isVertical) {
+        function SlidePage(vW, vH, isVertical, ease) {
             if (isVertical === void 0) { isVertical = true; }
+            if (ease === void 0) { ease = null; }
             _super.call(this);
             /**
              * 页面个数
@@ -616,6 +618,7 @@ var annieUI;
             this.paramXY = "y";
             var s = this;
             s.isVertical = isVertical;
+            s._ease = ease;
             if (isVertical) {
                 s.paramXY = "y";
                 s.distance = vH;
@@ -749,6 +752,9 @@ var annieUI;
             s.isMoving = true;
             var tweenData = {};
             tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
+            if (s._ease) {
+                tweenData.ease = s._ease;
+            }
             tweenData.onComplete = function () {
                 s.view.mouseEnable = true;
                 s.isMoving = false;
@@ -1099,7 +1105,7 @@ var annieUI;
                 if ((s.timerArg0 < 3 && s.currPage > 0) || (s.timerArg0 > 2 && s.currPage <= s.totalPage - 2)) {
                     s.state = "start";
                     s.flushPage();
-                    // e.updateAfterEvent();
+                    e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart");
                 }
             }
@@ -1433,6 +1439,7 @@ var annieUI;
                         var item = s._items[i];
                         if (item.id != id) {
                             item.initData(s._data[id] ? id : -1, s._data[id]);
+                            item.visible = s._data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
                         }
@@ -1557,7 +1564,7 @@ var annieUI;
              * @since
              * @type {any}
              */
-            this.drawColor = "#000";
+            this.drawColor = "#ffffff";
             /**
              * 背景色 可以是任何的颜色类型
              * @property bgColor
@@ -1717,7 +1724,7 @@ var annieUI;
                         ctx.strokeStyle = s.totalStepList[i].c;
                         ctx.lineWidth = s.totalStepList[i].r;
                         ctx.moveTo(s.totalStepList[i].sx, s.totalStepList[i].sy);
-                        var ps = s.totalStepList.ps;
+                        var ps = s.totalStepList[i].ps;
                         var pLen = ps.length;
                         for (var m = 0; m < pLen; m += 2) {
                             ctx.lineTo(ps[m], ps[m + 1]);

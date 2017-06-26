@@ -153,18 +153,20 @@ namespace annieUI {
          */
         public canSlidePrev: boolean = true;
         public paramXY: string = "y";
-
+        private _ease:Function;
         /**
          * 构造函数
          * @method SlidePage
          * @param {number} vW 宽
          * @param {number} vH 高
          * @param {boolean} isVertical 是横向还是纵向 默认纵向
+         * @param {Function} ease annie.Tween的缓存函数，也可以是自定义的缓动函数，自定义的话,请尊守annie.Tween缓动函数接口
          */
-        constructor(vW: number, vH: number, isVertical: boolean = true) {
+        constructor(vW: number, vH: number, isVertical: boolean = true,ease:Function=null) {
             super();
             var s = this;
             s.isVertical = isVertical;
+            s._ease=ease;
             if (isVertical) {
                 s.paramXY = "y";
                 s.distance = vH;
@@ -290,6 +292,9 @@ namespace annieUI {
             s.isMoving = true;
             let tweenData: any = {};
             tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
+            if(s._ease){
+                tweenData.ease=s._ease;
+            }
             tweenData.onComplete = function () {
                 s.view.mouseEnable = true;
                 s.isMoving = false;

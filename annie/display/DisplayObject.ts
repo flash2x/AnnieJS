@@ -527,8 +527,8 @@ namespace annie {
             }
         }
         /**
-         * 获取或者设置显示对象在父级里的x方向的宽,如果你要同时获取款高
-         * 之前需要使用getWH或者setWH 现已废弃
+         * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
+         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
          * @property  width
          * @public
          * @since 1.0.3
@@ -547,8 +547,8 @@ namespace annie {
             }
         }
         /**
-         * 获取或者设置显示对象在父级里的y方向的高
-         * 之前需要使用getWH或者setWH 现已废弃
+         * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
+         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
          * @property  height
          * @public
          * @since 1.0.3
@@ -574,10 +574,7 @@ namespace annie {
          */
         public getWH():{width:number,height:number}{
             let s = this;
-            if(s._instanceType=="annie.MovieClip") {
-                s.update(false, false, false);
-                s._updateInfo.UM = true;
-            }
+            s.update(true, false, false);
             let dr = s.getDrawRect();
             return {width:dr.width,height:dr.height};
         }

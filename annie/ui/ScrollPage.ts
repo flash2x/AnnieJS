@@ -187,7 +187,7 @@ namespace annieUI {
                         }
                         //说明超过了界线,准备回弹
                         if (s.speed * s.addSpeed > 0) {
-                            // trace("回弹");
+                            s.dispatchEvent("onScrollStop");
                             s.speed = 0;
                         }
                     } else {
@@ -203,8 +203,6 @@ namespace annieUI {
                                 view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
                                 if (Math.abs(tarP-view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
-                                    //trace("上回弹");
-                                    s.dispatchEvent("onScrollStop");
                                     if(s.addSpeed>0){
                                         s.dispatchEvent("onScrollToEnd");
                                     }else{
@@ -214,7 +212,6 @@ namespace annieUI {
                             }
                         }else {
                             s.isStop = true;
-                            s.dispatchEvent("onScrollStop");
                         }
                     }
                 } else {
@@ -225,7 +222,6 @@ namespace annieUI {
                             if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
                                 s.isStop = false;
                                 s.stopTimes = -1;
-                                // trace("回弹2");
                             }
                         }
                     }
@@ -312,9 +308,12 @@ namespace annieUI {
                 s.lastValue = currentValue;
                 s.stopTimes = 0;
             } else {
-                s.isMouseDownState = 0;
                 s.isStop = false;
                 s.stopTimes = -1;
+                if(s.speed==0&&s.isMouseDownState==2){
+                    s.dispatchEvent("onScrollStop");
+                }
+                s.isMouseDownState = 0;
             }
             // }
         }

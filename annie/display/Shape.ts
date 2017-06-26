@@ -891,7 +891,7 @@ namespace annie {
          * @public
          * @since 1.0.2
          */
-        public changeColor(infoObj: any): void {
+        public changeColor(infoObj: any): void{
             let s = this;
             let cLen: number = s._command.length;
             let c = s._command;
