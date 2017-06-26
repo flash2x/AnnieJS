@@ -8176,7 +8176,7 @@ var annie;
             req.onreadystatechange = function (event) {
                 var t = event.target;
                 if (t["readyState"] == 4) {
-                    if (req.status == 200) {
+                    if (req.status == 200 || req.status == 0) {
                         var isImage = false;
                         var e_1 = new annie.Event("onComplete");
                         var result = t["response"];
