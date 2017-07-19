@@ -30,7 +30,6 @@ namespace annieUI {
         private _data: Array<any> = [];
         private downL: DisplayObject = null;
         private _cols: number;
-        private _colsDis: number;
         private _disParam: string;
         private _lastFirstId: number = -1;
 
@@ -54,10 +53,9 @@ namespace annieUI {
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
          * @param {number} cols 分几列，默认是1列
-         * @param {number} colsDis 列之间的间隔，默认为0
          * @since 1.0.9
          */
-        constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical: boolean = true, cols: number = 1, colsDis: number = 0) {
+        constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical: boolean = true, cols: number = 1) {
             super(vW, vH, 0, isVertical);
             let s = this;
             s._isInit = false;
@@ -68,7 +66,6 @@ namespace annieUI {
             s._itemClass = itemClassName;
             s._itemCount = 0;
             s._cols = cols;
-            s._colsDis = colsDis;
             s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }

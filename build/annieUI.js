@@ -1355,13 +1355,11 @@ var annieUI;
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
          * @param {number} cols 分几列，默认是1列
-         * @param {number} colsDis 列之间的间隔，默认为0
          * @since 1.0.9
          */
-        function ScrollList(itemClassName, itemWidth, itemHeight, vW, vH, isVertical, cols, colsDis) {
+        function ScrollList(itemClassName, itemWidth, itemHeight, vW, vH, isVertical, cols) {
             if (isVertical === void 0) { isVertical = true; }
             if (cols === void 0) { cols = 1; }
-            if (colsDis === void 0) { colsDis = 0; }
             _super.call(this, vW, vH, 0, isVertical);
             this._items = null;
             this._data = [];
@@ -1376,7 +1374,6 @@ var annieUI;
             s._itemClass = itemClassName;
             s._itemCount = 0;
             s._cols = cols;
-            s._colsDis = colsDis;
             s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }

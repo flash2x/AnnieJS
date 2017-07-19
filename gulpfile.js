@@ -73,7 +73,7 @@ var onBuildUI = function(){
         tsResult.dts.pipe(gulp.dest(outDir));
         tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
-var onBuildDoc = function (){
+var onBuildDoc = function(){
     del([
         'libs'
     ]);

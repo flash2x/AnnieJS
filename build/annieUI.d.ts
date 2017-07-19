@@ -587,7 +587,6 @@ declare namespace annieUI {
         private _data;
         private downL;
         private _cols;
-        private _colsDis;
         private _disParam;
         private _lastFirstId;
         /**
@@ -607,10 +606,9 @@ declare namespace annieUI {
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
          * @param {number} cols 分几列，默认是1列
-         * @param {number} colsDis 列之间的间隔，默认为0
          * @since 1.0.9
          */
-        constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical?: boolean, cols?: number, colsDis?: number);
+        constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical?: boolean, cols?: number);
         /**
          * 更新列表数据
          * @method updateData

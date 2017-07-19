@@ -1,21 +1,18 @@
 {
   "name": "annie",
-  "version": "1.0.3",
+  "version": "1.1.2",
   "description": "annie is powerful js Engine!",
   "main": "gulpfile.js",
   "directories": {
     "test": "test"
   },
-  "dependencies": {
-    "gulp": "^3.9.1"
-  },
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
-    "gulp-typescript": "^3.0.2",
+    "gulp-typescript": "^2.14.1",
     "gulp-uglify": "^2.0.0",
-    "merge2": "*"
+    "merge2": "^1.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

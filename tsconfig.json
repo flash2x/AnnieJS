@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "target": "ES5",
-        "module": "commonjs",
+        "module": "amd",
         "sourceMap": true,
-        "outDir": "build",
+        "outFile": "build/build.js",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "removeComments": false,
@@ -12,9 +12,10 @@
     "exclude": [
         "node_modules",
         "build",
-        "demo",
+        "example",
         "docRes",
         "libs",
-        "out"
+        "out",
+        "docRes"
     ]
 }
