@@ -55,7 +55,8 @@ namespace annieUI {
          */
         private _isBreak:boolean=false;
         /**
-         * @property 滚动距离
+         * 滚动距离
+         * @property distance
          * @type {number}
          * @protected
          * @default 0
@@ -92,7 +93,7 @@ namespace annieUI {
         public currentPageIndex = 0;
         /**
          * 页面是否移动
-         * @property currentPageIndex
+         * @property isMoving
          * @type {boolean}
          * @public
          * @default false

@@ -121,7 +121,15 @@ namespace annie {
          * @default null
          */
         public currentTarget:DisplayObject=null;
-
+        /**
+         * 触摸或者鼠标事件的手指唯一标识
+         * @property identifier
+         * @type {number}
+         * @since 1.1.2
+         * @public
+         * @type{number}
+         */
+        public identifier:any=0;
         /**
          * @method MouseEvent
          * @public

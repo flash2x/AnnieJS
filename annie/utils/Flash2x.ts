@@ -94,10 +94,10 @@ namespace Flash2x {
      */
     export let loadScene = function (sceneName: any, progressFun: Function, completeFun: Function, domain: string = ""): void {
         //加载资源配置文件
-        // if (_isLoading) {
-        //     _JSONQueue.loadCancel();
-        //     _loaderQueue.loadCancel();
-        // }
+        if (_isLoading) {
+            _JSONQueue.loadCancel();
+            _loaderQueue.loadCancel();
+        }
         _loadSceneNames = [];
         _domain = domain;
         if (typeof(sceneName) == "string") {
@@ -251,6 +251,7 @@ namespace Flash2x {
                 _completeCallback(info);
                 _loadRes();
             }
+            res[info.sceneName]._f2x_had_loaded_scene=true;
         }
     }
     function _loadRes(): void {
@@ -272,7 +273,7 @@ namespace Flash2x {
      * @returns {boolean}
      */
     export function isLoadedScene(sceneName: string): Boolean {
-        if (res[sceneName] != undefined && res[sceneName] != null) {
+        if (res[sceneName] != undefined && res[sceneName] != null&&res[sceneName]._f2x_had_loaded_scene) {
             return true;
         } else {
             return false;
@@ -446,7 +447,7 @@ namespace Flash2x {
             textObj.text = text;
             textObj.font = face;
             textObj.size = size;
-            textObj.lineWidth = width;
+            textObj.lineWidth = width+left*2;
             textObj.lineHeight = lineSpacing;
             textObj.textAlign = align;
             textObj.italic = italic;
@@ -456,7 +457,7 @@ namespace Flash2x {
             textObj.border = showBorder;
         } else {
             textObj = new annie.InputText(lineType);
-            textObj.initInfo(text, width, height, color, align, size, face, showBorder, lineSpacing / size);
+            textObj.initInfo(text, width+left*2, height+top*2, color, align, size, face, showBorder, lineSpacing / size);
             if (italic) {
                 textObj.italic = true;
             }

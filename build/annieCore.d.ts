@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        instanceId: number;
+        readonly instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        instanceType: string;
+        readonly instanceType: string;
     }
     /**
      * 事件触发基类
@@ -537,6 +537,15 @@ declare namespace annie {
          */
         currentTarget: DisplayObject;
         /**
+         * 触摸或者鼠标事件的手指唯一标识
+         * @property identifier
+         * @type {number}
+         * @since 1.1.2
+         * @public
+         * @type{number}
+         */
+        identifier: any;
+        /**
          * @method MouseEvent
          * @public
          * @since 1.0.0
@@ -950,7 +959,7 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 显示对象抽奖类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
+     * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
      * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
      * 上呈现内容的 API 的子类，如 Shape、Sprite、Bitmap、TextField 或 MovieClip 类。
@@ -1167,7 +1176,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        matrix: Matrix;
+        readonly matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1511,6 +1520,7 @@ declare namespace annie {
          * @param {string} colors
          * @param {number}ratios
          * @param {annie.Point} points
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @returns {any}
          * @since 1.0.0
          * @pubic
@@ -1696,6 +1706,7 @@ declare namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -1706,6 +1717,7 @@ declare namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+        * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -3214,7 +3226,7 @@ declare namespace annie {
          * @private
          */
         private _mouseDownPoint;
-        private _initMouseEvent(event, cp, sp);
+        private _initMouseEvent(event, cp, sp, identifier);
         /**
          * 循环刷新页面的函数
          */
@@ -3894,7 +3906,6 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
-    let Eval: any;
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -4618,7 +4629,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {number}
          */
-        currentCount: number;
+        readonly currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -4645,7 +4656,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {boolean}
          */
-        running: boolean;
+        readonly running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
@@ -4663,6 +4674,15 @@ declare namespace annie {
  * @class annie
  */
 declare namespace annie {
+    /**
+     * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
+     * @public
+     * @property annie.Eval
+     * @since 1.0.3
+     * @public
+     * @type {any}
+     */
+    let Eval: any;
     /**
      * 是否开启调试模式
      * @public

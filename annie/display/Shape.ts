@@ -34,6 +34,7 @@ namespace annie {
          * @param {string} colors
          * @param {number}ratios
          * @param {annie.Point} points
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @returns {any}
          * @since 1.0.0
          * @pubic
@@ -357,6 +358,7 @@ namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -370,6 +372,7 @@ namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+        * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -425,7 +428,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10): void {
+        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap: string = "butt", join: string = "miter", miter: number = 10): void {
             this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
         }
 
@@ -761,8 +764,8 @@ namespace annie {
                         let h = buttonRightY - leftY;
                         s._cacheX = leftX;
                         s._cacheY = leftY;
-                        s._bounds.width = w - 20;
-                        s._bounds.height = h - 20;
+                        s._bounds.width = w;
+                        s._bounds.height = h;
                         ///////////////////////////
                         let _canvas:any = s._cacheImg;
                         let ctx = _canvas["getContext"]('2d');

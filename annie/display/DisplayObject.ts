@@ -3,7 +3,7 @@
  */
 namespace annie {
     /**
-     * 显示对象抽奖类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
+     * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
      * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
      * 上呈现内容的 API 的子类，如 Shape、Sprite、Bitmap、TextField 或 MovieClip 类。
@@ -574,7 +574,7 @@ namespace annie {
          */
         public getWH():{width:number,height:number}{
             let s = this;
-            s.update(true, false, false);
+            // s.update(true, false, false);
             let dr = s.getDrawRect();
             return {width:dr.width,height:dr.height};
         }

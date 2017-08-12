@@ -341,12 +341,13 @@ namespace annie {
          */
         private _mouseDownPoint:any={};
 
-        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point): void {
+        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point,identifier:number): void {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
+            event.identifier=identifier;
         }
 
         /**
@@ -503,7 +504,7 @@ namespace annie {
                 let eLen: number;
                 let identifier:any;
                 if (osType == "pc") {
-                    e.identifier="pc";
+                    e.identifier=0;
                     points = [e];
                 } else {
                     points = e.changedTouches;
@@ -524,7 +525,7 @@ namespace annie {
                             event.type = item;
                         }
                         events.push(event);
-                        s._initMouseEvent(event, cp, sp);
+                        s._initMouseEvent(event, cp, sp,identifier);
                         eLen++;
                     }
                     if (item == "onMouseDown") {
@@ -544,7 +545,7 @@ namespace annie {
                                         event.type = "onMouseClick";
                                     }
                                     events.push(event);
-                                    s._initMouseEvent(event, cp, sp);
+                                    s._initMouseEvent(event, cp, sp,identifier);
                                     eLen++;
                                 }
                             }
@@ -608,7 +609,7 @@ namespace annie {
                                                     overEvent = s._ml[eLen];
                                                     overEvent.type = "onMouseOver";
                                                 }
-                                                s._initMouseEvent(overEvent, cp, sp);
+                                                s._initMouseEvent(overEvent, cp, sp,identifier);
                                                 eLen++;
                                                 if (!s._ml[eLen]) {
                                                     outEvent = new MouseEvent("onMouseOut");
@@ -617,7 +618,7 @@ namespace annie {
                                                     outEvent = s._ml[eLen];
                                                     outEvent.type = "onMouseOut";
                                                 }
-                                                s._initMouseEvent(outEvent, cp, sp);
+                                                s._initMouseEvent(outEvent, cp, sp,identifier);
                                             }
                                         }
                                         if (isDiff) {
@@ -765,6 +766,7 @@ namespace annie {
             s.divWidth = whObj.w;
             s.renderObj.reSize();
             s.setAlign();
+            s.update();
         };
         public getBounds(): Rectangle {
             return this.viewRect;

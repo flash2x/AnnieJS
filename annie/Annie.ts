@@ -3,6 +3,15 @@
  */
 namespace annie {
     /**
+     * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
+     * @public
+     * @property annie.Eval
+     * @since 1.0.3
+     * @public
+     * @type {any}
+     */
+    export let Eval: any = eval.bind(window);
+    /**
      * 是否开启调试模式
      * @public
      * @since 1.0.1
@@ -25,7 +34,7 @@ namespace annie {
      *      trace(annie.version);
      */
 
-    export let version:string="1.1.1";
+    export let version:string="1.1.2";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio

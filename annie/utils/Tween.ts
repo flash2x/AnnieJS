@@ -34,7 +34,7 @@ namespace annie {
          */
         public init(target:any, times:number, data:any, isTo:boolean = true):void {
             if(times<=0||typeof(times)!="number"){
-                throw new Error("annie.Tween.to()或者annie.Tween.form()方法的第二个参数一定要是大于0的数字");
+                throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
             let s = this;
             s._currentFrame = 1;
@@ -97,7 +97,8 @@ namespace annie {
                                 s._disData[item] = data[item] - target[item];
                             } else {
                                 s._startData[item] = data[item];
-                                s._disData[item] = target[item] - data[item];
+                                s._disData[item] =target[item] - data[item];
+                                target[item]=data[item];
                             }
                         }
                 }

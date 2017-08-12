@@ -2,7 +2,6 @@
  * @module annie
  */
 namespace annie {
-    export let Eval: any = eval.bind(window);
     /**
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -30,7 +29,6 @@ namespace annie {
             super();
             this._instanceType = "annie.URLLoader";
         }
-
         /**
          * 取消加载
          * @method loadCancel
