@@ -103,15 +103,16 @@ namespace annie {
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean): void {
+        public update(isDrawUpdate:boolean=false): void {
             let s = this;
-            super.update(um, ua, uf);
+            super.update(isDrawUpdate);
             //滤镜
             let bitmapData = s._bitmapData;
-            if ((s._isNeedUpdate||uf||s._updateInfo.UF) && bitmapData) {
-                s._isNeedUpdate = false;
+            if ((s._UI.UD||s._UI.UF) && bitmapData) {
+                s._UI.UD = false;
                 if (s.cFilters.length > 0) {
                     if (!s._realCacheImg) {
                         s._realCacheImg = window.document.createElement("canvas");
@@ -150,48 +151,34 @@ namespace annie {
                         ctx.putImageData(imageData, 0, 0);
                     }
                     //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                    s._cacheImg = s._realCacheImg;
-                    s._cacheX = -10;
-                    s._cacheY = -10;
+                    s._texture = s._realCacheImg;
+                    s._offsetX = -10;
+                    s._offsetY = -10;
                     s._isCache = true;
                 } else {
                     s._isCache = false;
-                    s._cacheX = 0;
-                    s._cacheY = 0;
-                    s._cacheImg = bitmapData;
+                    s._offsetX = 0;
+                    s._offsetY = 0;
+                    s._texture = bitmapData;
                 }
-
                 let bw: number;
                 let bh: number;
                 if (s.rect) {
                     bw = s.rect.width;
                     bh = s.rect.height;
                 } else {
-                    bw = s._cacheImg.width + s._cacheX * 2;
-                    bh = s._cacheImg.height + s._cacheY * 2;
+                    bw = s._texture.width + s._offsetX * 2;
+                    bh = s._texture.height + s._offsetY * 2;
                 }
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 //给webgl更新新
-                s._cacheImg.updateTexture = true;
+                s._texture.updateTexture = true;
             }
-            s._updateInfo.UF = false;
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
+            s._UI.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
         }
-
-        /**
-         * 重写getBounds
-         * 获取Bitmap对象的Bounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        public getBounds(): Rectangle {
-            return this._bounds;
-        }
-
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
          * @method convertToImage
@@ -247,11 +234,11 @@ namespace annie {
             let s = this;
             if (isMouseEvent && !s.mouseEnable)return null;
             let p = s.globalToLocal(globalPoint);
-            p.x += s._cacheX;
-            p.y += s._cacheY;
+            p.x += s._offsetX;
+            p.y += s._offsetY;
             if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
-                    let image = s._cacheImg;
+                    let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
                     }

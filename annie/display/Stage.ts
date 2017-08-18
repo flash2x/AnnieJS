@@ -288,7 +288,8 @@ namespace annie {
                     s.dispatchEvent(new annie.Event("onInitStage"));
                 }
             }, 100);
-            let rc = s.renderObj.rootContainer;
+            // let rc = s.renderObj.rootContainer;
+            let rc = s.rootDiv;
             let mouseEvent = s.onMouseEvent.bind(s);
             if (osType != "pc") {
                 rc.addEventListener("touchstart", mouseEvent, false);
@@ -302,14 +303,16 @@ namespace annie {
         }
 
         /**
-         * 刷新函数
+         * 重写刷新
          * @method update
+         * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @since 1.0.0
          */
-        public update(): void {
+        public update(isDrawUpdate:boolean=false): void {
             let s = this;
             if (!s.pause) {
-                let su=s._updateInfo;
-                super.update(su.UM,su.UA,su.UF);
+                super.update(isDrawUpdate);
             }
         }
 
@@ -356,17 +359,18 @@ namespace annie {
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
-                s.update();
+                s.update(true);
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update();
+                    s.update(true);
+                    s.render(s.renderObj);
                     s._currentFlush = s._flush;
                 } else {
-                    if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
-                    }
+                    // if (s._currentFlush == s._flush) {
+                    //     s.render(s.renderObj);
+                    // }
                     s._currentFlush--;
                 }
             }
@@ -666,12 +670,14 @@ namespace annie {
                     }
                 }
             }
-            if(s.isPreventDefaultEvent) {
-                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                    e.preventDefault();
-                }
-                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                    e.preventDefault();
+            if(e.target.id=="_a2x_canvas") {
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
                 }
             }
             if(s._uae){
@@ -761,7 +767,7 @@ namespace annie {
         public resize = function ():void {
             let s: Stage = this;
             let whObj = s.getRootDivWH(s.rootDiv);
-            s._updateInfo.UM=true;
+            s._UI.UM=true;
             s.divHeight = whObj.h;
             s.divWidth = whObj.w;
             s.renderObj.reSize();

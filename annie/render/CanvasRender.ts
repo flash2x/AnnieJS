@@ -103,7 +103,7 @@ namespace annie {
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)return;
-            let texture = target._cacheImg;
+            let texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 let ctx = s._ctx;
                 ctx.globalAlpha = target.cAlpha;
@@ -113,7 +113,7 @@ namespace annie {
                     let tr = target.rect;
                     ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
                 } else {
-                    ctx.translate(target._cacheX, target._cacheY);
+                    ctx.translate(target._offsetX, target._offsetY);
                     ctx.drawImage(texture, 0, 0);
                 }
             }
@@ -130,6 +130,7 @@ namespace annie {
             if (!s.rootContainer) {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
+                s.rootContainer.id="_a2x_canvas";
             }
             let c = s.rootContainer;
             s._ctx = c["getContext"]('2d');

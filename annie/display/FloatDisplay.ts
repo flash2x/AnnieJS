@@ -21,8 +21,7 @@ namespace annie {
          * @since 1.0.0
          * @type{HtmlElement}
          */
-        public htmlElement: any = null;
-
+        public htmlElement:any=null;
         /**
          * 是否已经添加了舞台事件
          * @property _isAdded
@@ -46,20 +45,23 @@ namespace annie {
          */
         public constructor() {
             super();
-            this._instanceType = "annie.FloatDisplay";
             let s = this;
+            s._instanceType = "annie.FloatDisplay";
             s.addEventListener(Event.REMOVE_TO_STAGE, function (e: Event) {
                 if (s.htmlElement) {
                     s.htmlElement.style.display = "none";
                 }
             });
             s.addEventListener(Event.ADD_TO_STAGE, function (e: Event) {
-                if (!s._isAdded) {
-                    s._isAdded = true;
-                    s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
-                } else {
-                    if (s.htmlElement && s.visible) {
-                        s.htmlElement.style.display = "block";
+                if(s.htmlElement) {
+                    let style=s.htmlElement.style;
+                    if (!s._isAdded) {
+                        s._isAdded = true;
+                        s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
+                    } else {
+                        if (s.htmlElement && s.visible) {
+                            style.display = "block";
+                        }
                     }
                 }
             });
@@ -73,19 +75,20 @@ namespace annie {
          * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
          */
         public init(htmlElement: any): void {
-            let s = this;
+            let s=this;
             if (typeof(htmlElement) == "string") {
-                htmlElement = document.getElementById(htmlElement);
+                s.htmlElement = document.getElementById(htmlElement);
             } else if (htmlElement._instanceType == "annie.Video") {
-                htmlElement = htmlElement.media;
+                s.htmlElement = htmlElement.media;
+            }else{
+                s.htmlElement=htmlElement;
             }
             let style = htmlElement.style;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            s.htmlElement = htmlElement;
-        }
 
+        }
         /**
          * 删除html元素,这样就等于解了封装
          * @method delElement
@@ -103,13 +106,35 @@ namespace annie {
                 this.htmlElement = null;
             }
         }
+        public getBounds():Rectangle{
+            let s=this;
+            s._bounds.width=0;
+            s._bounds.height=0;
+            if(s.htmlElement){
+                let sh=s.htmlElement;
+                let ss=sh.style;
+                if(sh.width&&sh.height){
+                    s._bounds.width=sh.width;
+                    s._bounds.height=sh.height;
+                }else{
+                    if(ss.width.indexOf("px")<0||ss.height.indexOf("px")<0){
+                        trace("htmlElement must set style.width and style.height with 'px'");
+                    }else{
+                        s._bounds.width=parseInt(ss.width);
+                        s._bounds.height=parseInt(ss.height);
+                    }
+                }
+            }
+            return s._bounds;
+        }
         /**
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean): void {
+        public update(isDrawUpdate:boolean=false): void {
             let s = this;
             let o = s.htmlElement;
             if (o) {
@@ -130,35 +155,20 @@ namespace annie {
                     style.display = show;
                 }
                 if(visible){
-                    super.update(um, ua, uf);
-                    if(um||s._updateInfo.UM) {
+                    super.update(isDrawUpdate);
+                    if(s._UI.UM) {
                         let mtx = s.cMatrix;
                         let d = annie.devicePixelRatio;
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                     }
-                    if (ua||s._updateInfo.UA){
+                    if (s._UI.UA){
                         style.opacity = s.cAlpha;
                     }
-                    s._updateInfo.UF = false;
-                    s._updateInfo.UM = false;
-                    s._updateInfo.UA = false;
+                    s._UI.UF = false;
+                    s._UI.UM = false;
+                    s._UI.UA = false;
                 }
             }
-
-        }
-        /**
-         * 重写getBounds
-         * 获取Bitmap对象的Bounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        public getBounds(): Rectangle {
-            return this._bounds;
-        }
-        public render(renderObj: IRender): void {
-
         }
     }
 }

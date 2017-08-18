@@ -166,7 +166,7 @@ namespace annie {
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
      */
-    export let toDisplayDataURL = function (obj: DisplayObject, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
+    export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
             _dRender = new CanvasRender(null);
         }
@@ -183,17 +183,21 @@ namespace annie {
             skY: obj.skewY
         };
         obj.parent = null;
-        obj.x = rect ? -rect.x : 0;
-        obj.y = rect ? -rect.y : 0;
+        obj.x=obj.y=0;
         obj.scaleX = obj.scaleY = 1;
         obj.rotation = obj.skewX = obj.skewY = 0;
-        obj.update(false, false, false);
         //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
         let whObj: any = obj.getBounds();
         let w: number = rect ? rect.width : whObj.width;
         let h: number = rect ? rect.height : whObj.height;
+        obj.x = rect ? -rect.x : -whObj.x;
+        obj.y = rect ? -rect.y : -whObj.y;
+        obj._offsetX = rect ? rect.x : whObj.x;
+        obj._offsetY = rect ? rect.y : whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
+        _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
@@ -201,7 +205,10 @@ namespace annie {
             _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
+        obj._cp=true;
+        obj.update();
         obj.render(_dRender);
+        obj._cp=true;
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
@@ -210,6 +217,7 @@ namespace annie {
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
+        obj.update();
         if (!typeInfo) {
             typeInfo = {type: "png"};
         }

@@ -13,7 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._cacheImg=window.document.createElement("canvas");
+            this._texture=window.document.createElement("canvas");
         }
 
         /**
@@ -113,7 +113,7 @@ namespace annie {
          */
         public addDraw(commandName: string, params: Array<any>):void{
             let s = this;
-            s._isNeedUpdate = true;
+            s._UI.UD = true;
             s._command.push([1, commandName, params]);
         }
 
@@ -330,13 +330,13 @@ namespace annie {
         public clear(): void {
             let s = this;
             s._command = [];
-            s._isNeedUpdate = true;
-            if (s._cacheImg) {
-                s._cacheImg.width = 0;
-                s._cacheImg.height = 0;
+            s._UI.UD = true;
+            if (s._texture) {
+                s._texture.width = 0;
+                s._texture.height = 0;
             }
-            s._cacheX = 0;
-            s._cacheY = 0;
+            s._offsetX = 0;
+            s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
         }
@@ -400,7 +400,7 @@ namespace annie {
             let c = this._command;
             c.push([0, "fillStyle", fillStyle]);
             c.push([1, "beginPath", []]);
-            this._isNeedUpdate = true;
+            this._UI.UD = true;
         }
 
         /**
@@ -477,7 +477,7 @@ namespace annie {
             c.push([0, "miterLimit", miter]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
-            this._isNeedUpdate = true;
+            this._UI.UD = true;
         }
 
         /**
@@ -644,12 +644,13 @@ namespace annie {
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean): void {
+        public update(isDrawUpdate:boolean=false): void {
             let s = this;
-            super.update(um, ua, uf);
-            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+            super.update(isDrawUpdate);
+            if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -679,6 +680,7 @@ namespace annie {
                                 if (buttonRightY == undefined) {
                                     buttonRightY = data[2][1];
                                 }
+
                                 if (data[1] == "bezierCurveTo") {
                                     leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
                                     leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
@@ -762,12 +764,14 @@ namespace annie {
                         buttonRightY += 20 + lineWidth >> 1;
                         let w = buttonRightX - leftX;
                         let h = buttonRightY - leftY;
-                        s._cacheX = leftX;
-                        s._cacheY = leftY;
+                        s._offsetX = leftX;
+                        s._offsetY = leftY;
+                        s._bounds.x=leftX;
+                        s._bounds.y=leftY;
                         s._bounds.width = w;
                         s._bounds.height = h;
                         ///////////////////////////
-                        let _canvas:any = s._cacheImg;
+                        let _canvas:any = s._texture;
                         let ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
                         _canvas.height = h;
@@ -792,11 +796,11 @@ namespace annie {
                         _canvas.updateTexture = true;
                     }
                 }
-                s._isNeedUpdate = false;
+                s._UI.UD = false;
             }
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-            s._updateInfo.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         }
 
         private _drawShape(ctx: any, isMask: boolean = false): void {
@@ -804,8 +808,8 @@ namespace annie {
             let com = s._command;
             let cLen = com.length;
             let data: any;
-            let leftX: number = s._cacheX;
-            let leftY: number = s._cacheY;
+            let leftX: number = s._offsetX;
+            let leftY: number = s._offsetY;
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
@@ -836,17 +840,6 @@ namespace annie {
         }
 
         /**
-         * 重写getBounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        public getBounds(): Rectangle {
-            return this._bounds;
-        }
-
-        /**
          * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
@@ -860,17 +853,17 @@ namespace annie {
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             let p = s.globalToLocal(globalPoint);
-            p.x -= s._cacheX;
-            p.y -= s._cacheY;
-            if (s.getBounds().isPointIn(p)) {
+            if (s.getBounds().isPointIn(p)){
                 if (s.hitTestWidthPixel) {
-                    let image = s._cacheImg;
+                    let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
                     }
                     let _canvas = DisplayObject["_canvas"];
                     _canvas.width = 1;
                     _canvas.height = 1;
+                    p.x -= s._offsetX;
+                    p.y -= s._offsetY;
                     let ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
@@ -902,15 +895,15 @@ namespace annie {
                 if (c[i][0] == 0) {
                     if (c[i][1] == "fillStyle" && infoObj.fillColor && c[i][2] != infoObj.fillColor) {
                         c[i][2] = infoObj.fillColor;
-                        s._isNeedUpdate = true;
+                        s._UI.UD = true;
                     }
                     if (c[i][1] == "strokeStyle" && infoObj.strokeColor && c[i][2] != infoObj.strokeColor) {
                         c[i][2] = infoObj.strokeColor;
-                        s._isNeedUpdate = true;
+                        s._UI.UD = true;
                     }
                     if (c[i][1] == "lineWidth" && infoObj.lineWidth && c[i][2] != infoObj.lineWidth) {
                         c[i][2] = infoObj.lineWidth;
-                        s._isNeedUpdate = true;
+                        s._UI.UD = true;
                     }
                 }
             }

@@ -70,12 +70,16 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
 ## AnnieJS 1.1.2 版本
+    修复获取宽高不准的bug
     修复的annie.Shape类的鼠标或者触摸区域有误差导致明明点到边界上了确没有触发鼠标或者触摸事件的bug
     修复导出静态，动态，输入文本会前后上下少2像素导致单行变多行的bug
     修复Flash2x.LoadScene()加载一个场景中断后再次加载报错的bug
     修复在annie.Event.ADD_TO_STAGE事件里调整stage.scaleMode后调用stage.resize()无效的bug
     修复使用annie.Tween.from方法时,被tween对象开始转换属性时会跳跃的Bug
     增加MouseEvent.identifier属性以方便在多手指触摸时更精准获取相关MouseEvent事件
+    增加将Sprite类缓存为位图功能
+    增加直接对FloatDisplay元素使用annie.MouseEvent鼠标事件
+    优化渲染结构
 ## AnnieJS 1.1.1 版本
     修复annie.Tween偶尔kill的时候会kill到其他tween对象的bug
     修复annieUI.SlidePage在Android机上滑动困难的bug

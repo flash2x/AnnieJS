@@ -13,7 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.TextField";
-            this._cacheImg = window.document.createElement("canvas");
+            this._texture = window.document.createElement("canvas");
         }
 
         /**
@@ -226,7 +226,7 @@ namespace annie {
          * @since 1.0.0
          */
         private _getMeasuredWidth(text: string): number {
-            let ctx = this._cacheImg.getContext("2d");
+            let ctx = this._texture.getContext("2d");
             //ctx.save();
             let w = ctx.measureText(text).width;
             //ctx.restore();
@@ -239,12 +239,12 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean): void {
-            super.update(um, ua, uf);
+        public update(isDrawUpdate:boolean=false): void {
+            super.update(isDrawUpdate);
             let s: any = this;
-            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+            if (s._UI.UD || s._UI.UF) {
                 s._text += "";
-                let can = s._cacheImg;
+                let can = s._texture;
                 let ctx = can.getContext("2d");
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
@@ -339,17 +339,17 @@ namespace annie {
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
-                s._cacheX = -10;
-                s._cacheY = -10;
-                s._isNeedUpdate = false;
+                s._offsetX = -10;
+                s._offsetY = -10;
+                s._UI.UD = false;
                 //给webgl更新新
-                s._cacheImg.updateTexture = true;
+                s._texture.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-            s._updateInfo.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         }
         /**
          * 重写 getBounds

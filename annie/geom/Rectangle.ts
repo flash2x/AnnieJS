@@ -87,28 +87,39 @@ namespace annie {
          * @since 1.0.0
          * @static
          */
-        public static createFromRects(rect:Rectangle,...arg:Rectangle[]):Rectangle{
-            let x=rect.x,y=rect.y,w=rect.width,h=rect.height,wx1:number,wx2:number,hy1:number,hy2:number
-            for(let i:number=0;i<arg.length;i++){
-                if(arg[i]==null)continue;
-                wx1=x+w;
-                hy1=y+h;
-                wx2=arg[i].x+arg[i].width;
-                hy2=arg[i].y+arg[i].height;
-                if(x>arg[i].x){
-                    x=arg[i].x;
-                }
-                if(y>arg[i].y){
-                    y=arg[i].y;
-                }
-                if(wx1<wx2){
-                    wx1=wx2;
-                }
-                if(hy1<hy2){
-                    hy1=hy2;
+        public static createFromRects(...arg:Rectangle[]):Rectangle{
+            for(let i=arg.length-1;i>=0;i--){
+                if(arg[i].width*arg[i].height==0){
+                    arg.splice(i,1);
                 }
             }
-            return new Rectangle(x,y,wx1-x,hy1-y);
+            if(arg.length==0){
+                return new Rectangle();
+            }else if(arg.length==1){
+                return new Rectangle(arg[0].x,arg[0].y,arg[0].width,arg[0].height);
+            }else{
+                let x=arg[0].x,y=arg[0].y,w=arg[0].width,h=arg[0].height,wx1:number,wx2:number,hy1:number,hy2:number;
+                for(let i:number=1;i<arg.length;i++){
+                    if(arg[i]==null)continue;
+                    wx1=x+w;
+                    hy1=y+h;
+                    wx2=arg[i].x+arg[i].width;
+                    hy2=arg[i].y+arg[i].height;
+                    if(x>arg[i].x){
+                        x=arg[i].x;
+                    }
+                    if(y>arg[i].y){
+                        y=arg[i].y;
+                    }
+                    if(wx1<wx2){
+                        wx1=wx2;
+                    }
+                    if(hy1<hy2){
+                        hy1=hy2;
+                    }
+                }
+                return new Rectangle(x,y,wx1-x,hy1-y);
+            }
         }
         /**
          * 通过一系列点来生成一个矩形
@@ -121,9 +132,9 @@ namespace annie {
          * @param {..arg} ary
          * @returns {annie.Rectangle}
          */
-        public static createFromPoints(p1:Point,...arg:Point[]):Rectangle{
-           let x=p1.x,y=p1.y,w=p1.x,h=p1.y;
-            for(let i:number=0;i<arg.length;i++){
+        public static createFromPoints(rect:Rectangle,...arg:Point[]):Rectangle{
+           let x=arg[0].x,y=arg[0].y,w=arg[0].x,h=arg[0].y;
+            for(let i:number=1;i<arg.length;i++){
                 if(arg[i]==null)continue;
                 if(x>arg[i].x){
                     x=arg[i].x;
@@ -138,7 +149,11 @@ namespace annie {
                     h=arg[i].y;
                 }
             }
-            return new Rectangle(x,y,w-x,h-y);
+            rect.x=x;
+            rect.y=y;
+            rect.width=w-x;
+            rect.height=h-y;
+            return rect;
         }
 
         /**

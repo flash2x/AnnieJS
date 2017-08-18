@@ -140,7 +140,6 @@ namespace annieUI {
                 s._updateViewRect();
             }
         }
-
         private _updateViewRect() {
             let s: any = this;
             if (s.isVertical) {

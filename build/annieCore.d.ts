@@ -922,7 +922,7 @@ declare namespace annie {
          * @since 1.0.0
          * @static
          */
-        static createFromRects(rect: Rectangle, ...arg: Rectangle[]): Rectangle;
+        static createFromRects(...arg: Rectangle[]): Rectangle;
         /**
          * 通过一系列点来生成一个矩形
          * 返回包含所有给定的点的最小矩形
@@ -934,7 +934,7 @@ declare namespace annie {
          * @param {..arg} ary
          * @returns {annie.Rectangle}
          */
-        static createFromPoints(p1: Point, ...arg: Point[]): Rectangle;
+        static createFromPoints(rect: Rectangle, ...arg: Point[]): Rectangle;
         /**
          * 通过两个点来确定一个矩形
          * @param rect
@@ -976,10 +976,11 @@ declare namespace annie {
         constructor();
         /**
          * 更新信息
-         * @property _updateInfo
+         * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
          */
-        protected _updateInfo: {
+        protected _UI: {
+            UD: boolean;
             UM: boolean;
             UA: boolean;
             UF: boolean;
@@ -994,6 +995,16 @@ declare namespace annie {
          * @readonly
          * */
         stage: Stage;
+        /**
+         * 显示对象的父级
+         * @property parent
+         * @since 1.0.0
+         * @public
+         * @type {annie.Sprite}
+         * @default null
+         * @readonly
+         */
+        parent: Sprite;
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
@@ -1198,16 +1209,6 @@ declare namespace annie {
         filters: any[];
         private _filters;
         /**
-         * 显示对象的父级
-         * @property parent
-         * @since 1.0.0
-         * @public
-         * @type {annie.Sprite}
-         * @default null
-         * @readonly
-         */
-        parent: Sprite;
-        /**
          * 是否自己的父级发生的改变
          * @type {boolean}
          * @private
@@ -1238,6 +1239,10 @@ declare namespace annie {
          * @static
          */
         static _bp: Point;
+        static _p1: Point;
+        static _p2: Point;
+        static _p3: Point;
+        static _p4: Point;
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -1256,7 +1261,7 @@ declare namespace annie {
          * @returns {annie.Rectangle}
          * @abstract
          */
-        abstract getBounds(): Rectangle;
+        getBounds(): Rectangle;
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
@@ -1270,9 +1275,10 @@ declare namespace annie {
          * 更新函数
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        protected update(isDrawUpdate?: boolean): void;
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -1332,32 +1338,31 @@ declare namespace annie {
         static _canvas: any;
         /**
          * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _cacheImg
+         * @property _texture
          * @protected
          * @since 1.0.0
          * @type {any}
          * @default null
          */
-        protected _cacheImg: any;
+        protected _texture: any;
         /**
-         * @property _cacheX
+         * @property _offsetX
          * @protected
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        protected _cacheX: number;
+        protected _offsetX: number;
         /**
-         * @property _cacheY
+         * @property _offsetY
          * @protected
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        protected _cacheY: number;
+        protected _offsetY: number;
         protected _bounds: Rectangle;
         protected _drawRect: Rectangle;
-        protected _isNeedUpdate: boolean;
         protected _setProperty(property: string, value: any, type: number): void;
     }
 }
@@ -1446,18 +1451,10 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
-        /**
-         * 重写getBounds
-         * 获取Bitmap对象的Bounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        getBounds(): Rectangle;
+        update(isDrawUpdate?: boolean): void;
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
          * @method convertToImage
@@ -1810,18 +1807,11 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        update(isDrawUpdate?: boolean): void;
         private _drawShape(ctx, isMask?);
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        getBounds(): Rectangle;
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -1881,6 +1871,8 @@ declare namespace annie {
          * @readonly
          */
         children: DisplayObject[];
+        cacheAsBitmap: boolean;
+        _cacheAsBitmap: boolean;
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -1964,9 +1956,10 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        update(isDrawUpdate?: boolean): void;
         /**
          * 重写碰撞测试
          * @method hitTestPoint
@@ -2562,9 +2555,10 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        update(isDrawUpdate?: boolean): void;
         /**
          * 触发显示列表上相关的事件
          * @method _onDispatchBubbledEvent
@@ -2635,23 +2629,15 @@ declare namespace annie {
          * @public
          */
         delElement(): void;
+        getBounds(): Rectangle;
         /**
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
-        /**
-         * 重写getBounds
-         * 获取Bitmap对象的Bounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        getBounds(): Rectangle;
-        render(renderObj: IRender): void;
+        update(isDrawUpdate?: boolean): void;
     }
 }
 /**
@@ -2696,7 +2682,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        update(isDrawUpdate?: boolean): void;
     }
 }
 /**
@@ -2844,7 +2830,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        update(um: boolean, ua: boolean, uf: boolean): void;
+        update(isDrawUpdate?: boolean): void;
         /**
          * 重写 getBounds
          * @method getBounds
@@ -3204,10 +3190,13 @@ declare namespace annie {
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
         /**
-         * 刷新函数
+         * 重写刷新
          * @method update
+         * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @since 1.0.0
          */
-        update(): void;
+        update(isDrawUpdate?: boolean): void;
         private _touchEvent;
         /**
          * 渲染函数
@@ -4816,7 +4805,7 @@ declare namespace annie {
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
      */
-    let toDisplayDataURL: (obj: DisplayObject, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
+    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
     /**
      * 获取显示区域的颜色值，会返回颜色值的数组
      * @method getStagePixels

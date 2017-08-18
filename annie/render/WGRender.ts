@@ -226,7 +226,7 @@ namespace annie {
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)return;
-            let textureSource = target._cacheImg;
+            let textureSource = target._texture;
             if (textureSource && textureSource.width > 0 && textureSource.height > 0) {
                 let gl = s._ctx;
                 let gi: any;
@@ -243,8 +243,8 @@ namespace annie {
                         gi.pw = tc.width;
                         gi.ph = tc.height;
                     } else {
-                        let cX: number = target._cacheX;
-                        let cY: number = target._cacheY;
+                        let cX: number = target._offsetX;
+                        let cY: number = target._offsetY;
                         gi.x = cX / textureSource.width;
                         gi.y = cY / textureSource.height;
                         gi.w = (textureSource.width - cX) / textureSource.width;
@@ -265,8 +265,8 @@ namespace annie {
                     ];
                 let m: any = s._cM;
                 m.identity();
-                m.tx = target._cacheX * 2;
-                m.ty = target._cacheY * 2;
+                m.tx = target._offsetX * 2;
+                m.ty = target._offsetY * 2;
                 m.prepend(target.cMatrix);
                 let vMatrix: any = new Float32Array(
                     [

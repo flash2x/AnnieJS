@@ -1332,33 +1332,46 @@ var annie;
          * @since 1.0.0
          * @static
          */
-        Rectangle.createFromRects = function (rect) {
+        Rectangle.createFromRects = function () {
             var arg = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                arg[_i - 1] = arguments[_i];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                arg[_i] = arguments[_i];
             }
-            var x = rect.x, y = rect.y, w = rect.width, h = rect.height, wx1, wx2, hy1, hy2;
-            for (var i = 0; i < arg.length; i++) {
-                if (arg[i] == null)
-                    continue;
-                wx1 = x + w;
-                hy1 = y + h;
-                wx2 = arg[i].x + arg[i].width;
-                hy2 = arg[i].y + arg[i].height;
-                if (x > arg[i].x) {
-                    x = arg[i].x;
-                }
-                if (y > arg[i].y) {
-                    y = arg[i].y;
-                }
-                if (wx1 < wx2) {
-                    wx1 = wx2;
-                }
-                if (hy1 < hy2) {
-                    hy1 = hy2;
+            for (var i = arg.length - 1; i >= 0; i--) {
+                if (arg[i].width * arg[i].height == 0) {
+                    arg.splice(i, 1);
                 }
             }
-            return new Rectangle(x, y, wx1 - x, hy1 - y);
+            if (arg.length == 0) {
+                return new Rectangle();
+            }
+            else if (arg.length == 1) {
+                return new Rectangle(arg[0].x, arg[0].y, arg[0].width, arg[0].height);
+            }
+            else {
+                var x = arg[0].x, y = arg[0].y, w = arg[0].width, h = arg[0].height, wx1 = void 0, wx2 = void 0, hy1 = void 0, hy2 = void 0;
+                for (var i = 1; i < arg.length; i++) {
+                    if (arg[i] == null)
+                        continue;
+                    wx1 = x + w;
+                    hy1 = y + h;
+                    wx2 = arg[i].x + arg[i].width;
+                    hy2 = arg[i].y + arg[i].height;
+                    if (x > arg[i].x) {
+                        x = arg[i].x;
+                    }
+                    if (y > arg[i].y) {
+                        y = arg[i].y;
+                    }
+                    if (wx1 < wx2) {
+                        wx1 = wx2;
+                    }
+                    if (hy1 < hy2) {
+                        hy1 = hy2;
+                    }
+                }
+                return new Rectangle(x, y, wx1 - x, hy1 - y);
+            }
         };
         /**
          * 通过一系列点来生成一个矩形
@@ -1371,13 +1384,13 @@ var annie;
          * @param {..arg} ary
          * @returns {annie.Rectangle}
          */
-        Rectangle.createFromPoints = function (p1) {
+        Rectangle.createFromPoints = function (rect) {
             var arg = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 arg[_i - 1] = arguments[_i];
             }
-            var x = p1.x, y = p1.y, w = p1.x, h = p1.y;
-            for (var i = 0; i < arg.length; i++) {
+            var x = arg[0].x, y = arg[0].y, w = arg[0].x, h = arg[0].y;
+            for (var i = 1; i < arg.length; i++) {
                 if (arg[i] == null)
                     continue;
                 if (x > arg[i].x) {
@@ -1393,7 +1406,11 @@ var annie;
                     h = arg[i].y;
                 }
             }
-            return new Rectangle(x, y, w - x, h - y);
+            rect.x = x;
+            rect.y = y;
+            rect.width = w - x;
+            rect.height = h - y;
+            return rect;
         };
         /**
          * 通过两个点来确定一个矩形
@@ -1464,10 +1481,10 @@ var annie;
             var _this = _super.call(this) || this;
             /**
              * 更新信息
-             * @property _updateInfo
+             * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              */
-            _this._updateInfo = { UM: false, UA: false, UF: false };
+            _this._UI = { UD: false, UM: true, UA: true, UF: false };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -1478,6 +1495,16 @@ var annie;
              * @readonly
              * */
             _this.stage = null;
+            /**
+             * 显示对象的父级
+             * @property parent
+             * @since 1.0.0
+             * @public
+             * @type {annie.Sprite}
+             * @default null
+             * @readonly
+             */
+            _this.parent = null;
             /**
              * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
              * @property cAlpha
@@ -1565,16 +1592,6 @@ var annie;
             _this.mask = null;
             _this._filters = [];
             /**
-             * 显示对象的父级
-             * @property parent
-             * @since 1.0.0
-             * @public
-             * @type {annie.Sprite}
-             * @default null
-             * @readonly
-             */
-            _this.parent = null;
-            /**
              * 是否自己的父级发生的改变
              * @type {boolean}
              * @private
@@ -1582,32 +1599,31 @@ var annie;
             _this._cp = true;
             /**
              * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-             * @property _cacheImg
+             * @property _texture
              * @protected
              * @since 1.0.0
              * @type {any}
              * @default null
              */
-            _this._cacheImg = null;
+            _this._texture = null;
             /**
-             * @property _cacheX
+             * @property _offsetX
              * @protected
              * @since 1.0.0
              * @type {number}
              * @default 0
              */
-            _this._cacheX = 0;
+            _this._offsetX = 0;
             /**
-             * @property _cacheY
+             * @property _offsetY
              * @protected
              * @since 1.0.0
              * @type {number}
              * @default 0
              */
-            _this._cacheY = 0;
+            _this._offsetY = 0;
             _this._bounds = new annie.Rectangle();
             _this._drawRect = new annie.Rectangle();
-            _this._isNeedUpdate = true;
             _this._instanceType = "annie.DisplayObject";
             return _this;
         }
@@ -1888,6 +1904,18 @@ var annie;
             return null;
         };
         /**
+         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
+         * @method getBounds
+         * @public
+         * @since 1.0.0
+         * @returns {annie.Rectangle}
+         * @abstract
+         */
+        DisplayObject.prototype.getBounds = function () {
+            return this._bounds;
+        };
+        ;
+        /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
          * @method getDrawRect
@@ -1898,27 +1926,46 @@ var annie;
         DisplayObject.prototype.getDrawRect = function () {
             var s = this;
             var rect = s.getBounds();
-            var p1 = s.matrix.transformPoint(rect.x, rect.y);
-            var p2 = s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height);
-            annie.Rectangle.createRectform2Point(s._drawRect, p1, p2);
+            if (s.mask) {
+                var maskRect = s.mask.getDrawRect();
+                if (rect.x < maskRect.x) {
+                    rect.x = maskRect.x;
+                }
+                if (rect.y < maskRect.y) {
+                    rect.y = maskRect.y;
+                }
+                if (rect.width > maskRect.width) {
+                    rect.width = maskRect.width;
+                }
+                if (rect.height > maskRect.height) {
+                    rect.height = maskRect.height;
+                }
+            }
+            s.matrix.transformPoint(rect.x, rect.y, DisplayObject._p1);
+            s.matrix.transformPoint(rect.x + rect.width, rect.y, DisplayObject._p2);
+            s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height, DisplayObject._p3);
+            s.matrix.transformPoint(rect.x, rect.y + rect.height, DisplayObject._p4);
+            annie.Rectangle.createFromPoints(s._drawRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
             return s._drawRect;
         };
         /**
          * 更新函数
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        DisplayObject.prototype.update = function (um, ua, uf) {
+        DisplayObject.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
-            //enterFrame事件一定要放在这里，不要再移到其他地方了
+            //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
                 if (!s._enterFrameEvent) {
                     s._enterFrameEvent = new annie.Event("onEnterFrame");
                 }
                 s.dispatchEvent(s._enterFrameEvent);
             }
-            var UI = s._updateInfo;
+            var UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
                 s._cp = false;
@@ -1926,19 +1973,28 @@ var annie;
             if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
             }
-            if (um || UI.UM) {
+            if (s.parent) {
+                var PUI = s.parent._UI;
+                if (PUI.UM)
+                    UI.UM = true;
+                if (PUI.UA)
+                    UI.UA = true;
+                if (PUI.UF)
+                    UI.UF = true;
+            }
+            if (UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (ua || UI.UA) {
+            if (UI.UA) {
                 s.cAlpha = s._alpha;
                 if (s.parent) {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-            if (uf || UI.UF) {
+            if (UI.UF) {
                 s.cFilters.length = 0;
                 var sf = s._filters;
                 if (sf) {
@@ -2069,15 +2125,16 @@ var annie;
          */
         DisplayObject.prototype.getWH = function () {
             var s = this;
-            // s.update(true, false, false);
-            var dr = s.getDrawRect();
+            s.update();
+            var dr = s._drawRect;
             return { width: dr.width, height: dr.height };
         };
+        //protected _isNeedUpdate: boolean = true;
         DisplayObject.prototype._setProperty = function (property, value, type) {
             var s = this;
             if (s[property] != value) {
                 s[property] = value;
-                var UI = s._updateInfo;
+                var UI = s._UI;
                 if (type == 0) {
                     UI.UM = true;
                 }
@@ -2088,10 +2145,7 @@ var annie;
                     UI.UF = true;
                 }
                 else if (type == 3) {
-                    s._isNeedUpdate = true;
-                }
-                else if (type == 4) {
-                    s._cp = true;
+                    UI.UD = true;
                 }
             }
         };
@@ -2102,6 +2156,10 @@ var annie;
          * @static
          */
         DisplayObject._bp = new annie.Point();
+        DisplayObject._p1 = new annie.Point();
+        DisplayObject._p2 = new annie.Point();
+        DisplayObject._p3 = new annie.Point();
+        DisplayObject._p4 = new annie.Point();
         /**
          * 画缓存位图的时候需要使用
          * @property _bitmapCanvas
@@ -2229,15 +2287,17 @@ var annie;
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        Bitmap.prototype.update = function (um, ua, uf) {
+        Bitmap.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
-            _super.prototype.update.call(this, um, ua, uf);
+            _super.prototype.update.call(this, isDrawUpdate);
             //滤镜
             var bitmapData = s._bitmapData;
-            if ((s._isNeedUpdate || uf || s._updateInfo.UF) && bitmapData) {
-                s._isNeedUpdate = false;
+            if ((s._UI.UD || s._UI.UF) && bitmapData) {
+                s._UI.UD = false;
                 if (s.cFilters.length > 0) {
                     if (!s._realCacheImg) {
                         s._realCacheImg = window.document.createElement("canvas");
@@ -2277,16 +2337,16 @@ var annie;
                         ctx.putImageData(imageData, 0, 0);
                     }
                     //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                    s._cacheImg = s._realCacheImg;
-                    s._cacheX = -10;
-                    s._cacheY = -10;
+                    s._texture = s._realCacheImg;
+                    s._offsetX = -10;
+                    s._offsetY = -10;
                     s._isCache = true;
                 }
                 else {
                     s._isCache = false;
-                    s._cacheX = 0;
-                    s._cacheY = 0;
-                    s._cacheImg = bitmapData;
+                    s._offsetX = 0;
+                    s._offsetY = 0;
+                    s._texture = bitmapData;
                 }
                 var bw = void 0;
                 var bh = void 0;
@@ -2295,28 +2355,17 @@ var annie;
                     bh = s.rect.height;
                 }
                 else {
-                    bw = s._cacheImg.width + s._cacheX * 2;
-                    bh = s._cacheImg.height + s._cacheY * 2;
+                    bw = s._texture.width + s._offsetX * 2;
+                    bh = s._texture.height + s._offsetY * 2;
                 }
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 //给webgl更新新
-                s._cacheImg.updateTexture = true;
+                s._texture.updateTexture = true;
             }
-            s._updateInfo.UF = false;
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-        };
-        /**
-         * 重写getBounds
-         * 获取Bitmap对象的Bounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        Bitmap.prototype.getBounds = function () {
-            return this._bounds;
+            s._UI.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
         };
         /**
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
@@ -2378,11 +2427,11 @@ var annie;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
             var p = s.globalToLocal(globalPoint);
-            p.x += s._cacheX;
-            p.y += s._cacheY;
+            p.x += s._offsetX;
+            p.y += s._offsetY;
             if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
-                    var image = s._cacheImg;
+                    var image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
                     }
@@ -2529,7 +2578,7 @@ var annie;
                 }
             };
             _this._instanceType = "annie.Shape";
-            _this._cacheImg = window.document.createElement("canvas");
+            _this._texture = window.document.createElement("canvas");
             return _this;
         }
         /**
@@ -2607,7 +2656,7 @@ var annie;
          */
         Shape.prototype.addDraw = function (commandName, params) {
             var s = this;
-            s._isNeedUpdate = true;
+            s._UI.UD = true;
             s._command.push([1, commandName, params]);
         };
         /**
@@ -2816,13 +2865,13 @@ var annie;
         Shape.prototype.clear = function () {
             var s = this;
             s._command = [];
-            s._isNeedUpdate = true;
-            if (s._cacheImg) {
-                s._cacheImg.width = 0;
-                s._cacheImg.height = 0;
+            s._UI.UD = true;
+            if (s._texture) {
+                s._texture.width = 0;
+                s._texture.height = 0;
             }
-            s._cacheX = 0;
-            s._cacheY = 0;
+            s._offsetX = 0;
+            s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
         };
@@ -2868,7 +2917,7 @@ var annie;
             var c = this._command;
             c.push([0, "fillStyle", fillStyle]);
             c.push([1, "beginPath", []]);
-            this._isNeedUpdate = true;
+            this._UI.UD = true;
         };
         /**
          * 给线条着色
@@ -2936,7 +2985,7 @@ var annie;
             c.push([0, "miterLimit", miter]);
             c.push([0, "strokeStyle", strokeStyle]);
             c.push([1, "beginPath", []]);
-            this._isNeedUpdate = true;
+            this._UI.UD = true;
         };
         /**
          * 结束填充
@@ -2983,12 +3032,14 @@ var annie;
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        Shape.prototype.update = function (um, ua, uf) {
+        Shape.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
-            _super.prototype.update.call(this, um, ua, uf);
-            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+            _super.prototype.update.call(this, isDrawUpdate);
+            if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 var cLen = s._command.length;
                 var leftX = void 0;
@@ -3105,12 +3156,14 @@ var annie;
                         buttonRightY += 20 + lineWidth >> 1;
                         var w = buttonRightX - leftX;
                         var h = buttonRightY - leftY;
-                        s._cacheX = leftX;
-                        s._cacheY = leftY;
+                        s._offsetX = leftX;
+                        s._offsetY = leftY;
+                        s._bounds.x = leftX;
+                        s._bounds.y = leftY;
                         s._bounds.width = w;
                         s._bounds.height = h;
                         ///////////////////////////
-                        var _canvas = s._cacheImg;
+                        var _canvas = s._texture;
                         var ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
                         _canvas.height = h;
@@ -3135,11 +3188,11 @@ var annie;
                         _canvas.updateTexture = true;
                     }
                 }
-                s._isNeedUpdate = false;
+                s._UI.UD = false;
             }
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-            s._updateInfo.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         };
         Shape.prototype._drawShape = function (ctx, isMask) {
             if (isMask === void 0) { isMask = false; }
@@ -3147,8 +3200,8 @@ var annie;
             var com = s._command;
             var cLen = com.length;
             var data;
-            var leftX = s._cacheX;
-            var leftY = s._cacheY;
+            var leftX = s._offsetX;
+            var leftY = s._offsetY;
             for (var i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
@@ -3183,16 +3236,6 @@ var annie;
             }
         };
         /**
-         * 重写getBounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        Shape.prototype.getBounds = function () {
-            return this._bounds;
-        };
-        /**
          * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
@@ -3208,17 +3251,17 @@ var annie;
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
             var p = s.globalToLocal(globalPoint);
-            p.x -= s._cacheX;
-            p.y -= s._cacheY;
             if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
-                    var image = s._cacheImg;
+                    var image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
                     }
                     var _canvas = annie.DisplayObject["_canvas"];
                     _canvas.width = 1;
                     _canvas.height = 1;
+                    p.x -= s._offsetX;
+                    p.y -= s._offsetY;
                     var ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
@@ -3251,15 +3294,15 @@ var annie;
                 if (c[i][0] == 0) {
                     if (c[i][1] == "fillStyle" && infoObj.fillColor && c[i][2] != infoObj.fillColor) {
                         c[i][2] = infoObj.fillColor;
-                        s._isNeedUpdate = true;
+                        s._UI.UD = true;
                     }
                     if (c[i][1] == "strokeStyle" && infoObj.strokeColor && c[i][2] != infoObj.strokeColor) {
                         c[i][2] = infoObj.strokeColor;
-                        s._isNeedUpdate = true;
+                        s._UI.UD = true;
                     }
                     if (c[i][1] == "lineWidth" && infoObj.lineWidth && c[i][2] != infoObj.lineWidth) {
                         c[i][2] = infoObj.lineWidth;
-                        s._isNeedUpdate = true;
+                        s._UI.UD = true;
                     }
                 }
             }
@@ -3376,6 +3419,27 @@ var annie;
             _this._instanceType = "annie.Sprite";
             return _this;
         }
+        Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
+            get: function () {
+                return this._cacheAsBitmap;
+            },
+            set: function (value) {
+                var s = this;
+                if (!s._texture) {
+                    //截图
+                    s._texture = new Image();
+                }
+                if (value) {
+                    s._texture.src = annie.toDisplayDataURL(s);
+                }
+                else {
+                    s._texture.src = "";
+                }
+                s._cacheAsBitmap = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -3603,43 +3667,36 @@ var annie;
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        Sprite.prototype.update = function (um, ua, uf) {
+        Sprite.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
-            _super.prototype.update.call(this, um, ua, uf);
-            if (s._updateInfo.UM) {
-                um = true;
-            }
-            if (s._updateInfo.UA) {
-                ua = true;
-            }
-            if (s._updateInfo.UF) {
-                uf = true;
-            }
-            var len = s.children.length;
-            var child;
-            var maskObjIds = [];
-            for (var i = len - 1; i >= 0; i--) {
-                child = s.children[i];
-                //更新遮罩
-                if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
-                    child.mask.parent = s;
-                    if (s.totalFrames && child.mask.totalFrames) {
-                        child.mask.gotoAndStop(s.currentFrame);
-                        //一定要为true
-                        child.mask.update(true);
+            _super.prototype.update.call(this, isDrawUpdate);
+            if (!s._cacheAsBitmap) {
+                var len = s.children.length;
+                var child = void 0;
+                var maskObjIds = [];
+                for (var i = len - 1; i >= 0; i--) {
+                    child = s.children[i];
+                    //更新遮罩
+                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
+                        child.mask.parent = s;
+                        if (s.totalFrames && child.mask.totalFrames) {
+                            child.mask.gotoAndStop(s.currentFrame);
+                            //一定要为true
+                        }
+                        child.mask._UI.UM = true;
+                        child.mask.update(isDrawUpdate);
+                        maskObjIds.push(child.mask.instanceId);
                     }
-                    else {
-                        child.mask.update(um);
-                    }
-                    maskObjIds.push(child.mask.instanceId);
+                    child.update(isDrawUpdate);
                 }
-                child.update(um, ua, uf);
             }
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-            s._updateInfo.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         };
         /**
          * 重写碰撞测试
@@ -3657,22 +3714,44 @@ var annie;
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            var len = s.children.length;
-            var hitDisplayObject;
-            var child;
-            //这里特别注意是从上往下遍历
-            for (var i = len - 1; i >= 0; i--) {
-                child = s.children[i];
-                if (child.mask) {
-                    //看看点是否在遮罩内
-                    if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
-                        //如果都不在遮罩里面,那还检测什么直接检测下一个
-                        continue;
+            if (!s._cacheAsBitmap) {
+                var len = s.children.length;
+                var hitDisplayObject = void 0;
+                var child = void 0;
+                //这里特别注意是从上往下遍历
+                for (var i = len - 1; i >= 0; i--) {
+                    child = s.children[i];
+                    if (child.mask) {
+                        //看看点是否在遮罩内
+                        if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                            //如果都不在遮罩里面,那还检测什么直接检测下一个
+                            continue;
+                        }
+                    }
+                    hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                    if (hitDisplayObject) {
+                        return hitDisplayObject;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
-                if (hitDisplayObject) {
-                    return hitDisplayObject;
+            }
+            else {
+                //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
+                var p = s.globalToLocal(globalPoint);
+                var image = s._texture;
+                if (!image || image.width == 0 || image.height == 0) {
+                    return null;
+                }
+                var _canvas = annie.DisplayObject["_canvas"];
+                _canvas.width = 1;
+                _canvas.height = 1;
+                p.x -= s._offsetX;
+                p.y -= s._offsetY;
+                var ctx = _canvas["getContext"]('2d');
+                ctx.clearRect(0, 0, 1, 1);
+                ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
+                ctx.drawImage(image, 0, 0);
+                if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                    return s;
                 }
             }
             return null;
@@ -3686,15 +3765,37 @@ var annie;
          */
         Sprite.prototype.getBounds = function () {
             var s = this;
-            var len = s.children.length;
-            var rect;
-            if (len == 0) {
-                rect = new annie.Rectangle();
+            var rect = s._bounds;
+            rect.x = s._offsetX;
+            rect.y = s._offsetY;
+            rect.width = 0;
+            rect.height = 0;
+            if (!s._cacheAsBitmap) {
+                var len = s.children.length;
+                for (var i = 0; i < len; i++) {
+                    if (s.children[i].visible)
+                        rect = annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+                }
+                if (s.mask) {
+                    var maskRect = s.mask.getDrawRect();
+                    if (rect.x < maskRect.x) {
+                        rect.x = maskRect.x;
+                    }
+                    if (rect.y < maskRect.y) {
+                        rect.y = maskRect.y;
+                    }
+                    if (rect.width > maskRect.width) {
+                        rect.width = maskRect.width;
+                    }
+                    if (rect.height > maskRect.height) {
+                        rect.height = maskRect.height;
+                    }
+                }
             }
             else {
-                rect = s.children[0].getDrawRect();
-                for (var i = 1; i < len; i++) {
-                    rect = annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+                if (s._texture) {
+                    rect.width = s._texture.width;
+                    rect.height = s._texture.height;
                 }
             }
             return rect;
@@ -3710,37 +3811,42 @@ var annie;
             var s = this;
             if (s._cp)
                 return;
-            if (s.cAlpha > 0 && s._visible) {
-                var maskObj = void 0;
-                var child = void 0;
-                var len = s.children.length;
-                for (var i = 0; i < len; i++) {
-                    child = s.children[i];
-                    if (child.cAlpha > 0 && child._visible) {
-                        if (maskObj) {
-                            if (child.mask) {
-                                if (child.mask != maskObj) {
+            if (s._cacheAsBitmap) {
+                _super.prototype.render.call(this, renderObj);
+            }
+            else {
+                if (s.cAlpha > 0 && s._visible) {
+                    var maskObj = void 0;
+                    var child = void 0;
+                    var len = s.children.length;
+                    for (var i = 0; i < len; i++) {
+                        child = s.children[i];
+                        if (child.cAlpha > 0 && child._visible) {
+                            if (maskObj) {
+                                if (child.mask) {
+                                    if (child.mask != maskObj) {
+                                        renderObj.endMask();
+                                        maskObj = child.mask;
+                                        renderObj.beginMask(maskObj);
+                                    }
+                                }
+                                else {
                                     renderObj.endMask();
+                                    maskObj = null;
+                                }
+                            }
+                            else {
+                                if (child.mask) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }
                             }
-                            else {
-                                renderObj.endMask();
-                                maskObj = null;
-                            }
+                            child.render(renderObj);
                         }
-                        else {
-                            if (child.mask) {
-                                maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
-                            }
-                        }
-                        child.render(renderObj);
                     }
-                }
-                if (maskObj) {
-                    renderObj.endMask();
+                    if (maskObj) {
+                        renderObj.endMask();
+                    }
                 }
             }
         };
@@ -3834,7 +3940,6 @@ var annie;
             if (loop === void 0) { loop = 1; }
             var s = this;
             s._loop = loop;
-            //TODO 好像设置了也没什么用，后期再看看
             try {
                 s.media.currentTime = start;
             }
@@ -4612,9 +4717,9 @@ var annie;
                 s._scriptLayer[0] = function () {
                     s.stop();
                 };
-                s.addEventListener("onMouseDown", this._mouseEvent.bind(this));
-                s.addEventListener("onMouseUp", this._mouseEvent.bind(this));
-                s.addEventListener("onMouseOut", this._mouseEvent.bind(this));
+                s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
+                s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
+                s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
             }
         };
         //setLabelFrame;
@@ -4829,174 +4934,178 @@ var annie;
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        MovieClip.prototype.update = function (um, ua, uf) {
+        MovieClip.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
-            if (s._graphicInfo) {
-                //核心代码
-                //loopType,firstFrame,parentFrameIndex
-                var curParentFrameIndex = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
-                var tempCurrentFrame = 1;
-                var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
-                var cStartFrame = s._graphicInfo.firstFrame + 1;
-                if (s._graphicInfo.loopType == "play once") {
-                    if (curParentFrameIndex - pStartFrame >= 0) {
-                        tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
-                        if (tempCurrentFrame > s.totalFrames) {
+            if (!s._cacheAsBitmap && isDrawUpdate) {
+                if (s._graphicInfo) {
+                    //核心代码
+                    //loopType,firstFrame,parentFrameIndex
+                    var curParentFrameIndex = s.parent["currentFrame"] ? s.parent["currentFrame"] : 1;
+                    var tempCurrentFrame = 1;
+                    var pStartFrame = s._graphicInfo.parentFrameIndex + 1;
+                    var cStartFrame = s._graphicInfo.firstFrame + 1;
+                    if (s._graphicInfo.loopType == "play once") {
+                        if (curParentFrameIndex - pStartFrame >= 0) {
+                            tempCurrentFrame = curParentFrameIndex - pStartFrame + cStartFrame;
+                            if (tempCurrentFrame > s.totalFrames) {
+                                tempCurrentFrame = s.totalFrames;
+                            }
+                        }
+                    }
+                    else if (s._graphicInfo.loopType == "loop") {
+                        if (curParentFrameIndex - pStartFrame >= 0) {
+                            tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
+                        }
+                        if (tempCurrentFrame == 0) {
                             tempCurrentFrame = s.totalFrames;
                         }
                     }
-                }
-                else if (s._graphicInfo.loopType == "loop") {
-                    if (curParentFrameIndex - pStartFrame >= 0) {
-                        tempCurrentFrame = (curParentFrameIndex - pStartFrame + cStartFrame) % s.totalFrames;
+                    else {
+                        tempCurrentFrame = cStartFrame;
                     }
-                    if (tempCurrentFrame == 0) {
-                        tempCurrentFrame = s.totalFrames;
+                    if (s._goFrame != tempCurrentFrame) {
+                        s._goFrame = tempCurrentFrame;
+                        s._isNeedUpdateChildren = true;
                     }
+                    s.isPlaying = false;
                 }
                 else {
-                    tempCurrentFrame = cStartFrame;
-                }
-                if (s._goFrame != tempCurrentFrame) {
-                    s._goFrame = tempCurrentFrame;
-                    s._isNeedUpdateChildren = true;
-                }
-                s.isPlaying = false;
-            }
-            else {
-                if (s.isPlaying && s._isUpdateFrame) {
-                    //核心代码
-                    if (s.isFront) {
-                        s._goFrame++;
-                        if (s._goFrame > s.totalFrames) {
-                            s._goFrame = 1;
-                        }
-                    }
-                    else {
-                        s._goFrame--;
-                        if (s._goFrame < 1) {
-                            s._goFrame = s.totalFrames;
-                        }
-                    }
-                    s._isNeedUpdateChildren = true;
-                }
-            }
-            var currentFrame = s.currentFrame = s._goFrame;
-            s._isUpdateFrame = true;
-            if (s._isNeedUpdateChildren) {
-                var t = -1;
-                var layerCount = s._timeline.length;
-                var frameCount = 0;
-                var frame = null;
-                var displayObject = null;
-                var infoObject = null;
-                var frameChildrenCount = 0;
-                var lastFrameChildren = s.children;
-                var i = void 0;
-                var frameEvents = [];
-                for (i = 0; i < s.children.length - 1; i++) {
-                    lastFrameChildren[i].parent = null;
-                }
-                s.children = [];
-                for (i = 0; i < layerCount; i++) {
-                    frameCount = s._timeline[i].length;
-                    if (currentFrame <= frameCount) {
-                        frame = s._timeline[i][currentFrame - 1];
-                        if (frame == undefined)
-                            continue;
-                        if (frame.keyIndex == (currentFrame - 1)) {
-                            if (frame.soundName != "") {
-                                Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
-                            }
-                            if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
-                                var event_1 = new annie.Event(annie.Event.CALL_FRAME);
-                                event_1.data = { frameIndex: currentFrame, frameName: frame.eventName };
-                                frameEvents.push(event_1);
+                    if (s.isPlaying && s._isUpdateFrame) {
+                        //核心代码
+                        if (s.isFront) {
+                            s._goFrame++;
+                            if (s._goFrame > s.totalFrames) {
+                                s._goFrame = 1;
                             }
                         }
-                        frameChildrenCount = frame.frameChildList.length;
-                        for (var j = 0; j < frameChildrenCount; j++) {
-                            infoObject = frame.frameChildList[j];
-                            displayObject = infoObject.display;
-                            displayObject.x = infoObject.x;
-                            displayObject.y = infoObject.y;
-                            displayObject.scaleX = infoObject.scaleX;
-                            displayObject.scaleY = infoObject.scaleY;
-                            displayObject.rotation = infoObject.rotation;
-                            displayObject.skewX = infoObject.skewX;
-                            displayObject.skewY = infoObject.skewY;
-                            displayObject.alpha = infoObject.alpha;
-                            if (infoObject.filters) {
-                                displayObject.filters = infoObject.filters;
-                            }
-                            else {
-                                displayObject.filters = null;
-                            }
-                            if (infoObject.graphicInfo) {
-                                displayObject["_graphicInfo"] = infoObject.graphicInfo;
-                            }
-                            else {
-                                if (displayObject["_graphicInfo"]) {
-                                    displayObject["_graphicInfo"] = null;
-                                }
-                            }
-                            if (displayObject["_donotUpdateinMC"] != undefined) {
-                                for (var o in displayObject["_donotUpdateinMC"]) {
-                                    if (displayObject["_donotUpdateinMC"][o] != undefined) {
-                                        displayObject[o] = displayObject["_donotUpdateinMC"][o];
-                                    }
-                                }
-                            }
-                            displayObject.parent = s;
-                            s.children.push(displayObject);
-                            t = lastFrameChildren.indexOf(displayObject);
-                            if (t < 0) {
-                                displayObject._onDispatchBubbledEvent("onAddToStage");
-                                displayObject._cp = true;
-                            }
-                            else {
-                                lastFrameChildren.splice(t, 1);
+                        else {
+                            s._goFrame--;
+                            if (s._goFrame < 1) {
+                                s._goFrame = s.totalFrames;
                             }
                         }
+                        s._isNeedUpdateChildren = true;
                     }
                 }
-                s._isNeedUpdateChildren = false;
-                //update一定要放在事件处理之前
-                var len = lastFrameChildren.length;
-                for (i = 0; i < len; i++) {
-                    //不加这个判读在removeAllChildren时会报错
-                    if (!lastFrameChildren[i].parent) {
-                        lastFrameChildren[i].parent = s;
-                        lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
-                        lastFrameChildren[i]._cp = true;
+                var currentFrame = s.currentFrame = s._goFrame;
+                s._isUpdateFrame = true;
+                if (s._isNeedUpdateChildren) {
+                    var t = -1;
+                    var layerCount = s._timeline.length;
+                    var frameCount = 0;
+                    var frame = null;
+                    var displayObject = null;
+                    var infoObject = null;
+                    var frameChildrenCount = 0;
+                    var lastFrameChildren = s.children;
+                    var i = void 0;
+                    var frameEvents = [];
+                    for (i = 0; i < s.children.length - 1; i++) {
                         lastFrameChildren[i].parent = null;
                     }
-                }
-                s.children.push(s.floatView);
-                //看看是否到了第一帧，或是最后一帧,如果是准备事件
-                if ((currentFrame == 1 && !s.isFront) || (currentFrame == s.totalFrames && s.isFront)) {
-                    if (s.hasEventListener(annie.Event.END_FRAME)) {
-                        var event_2 = new annie.Event(annie.Event.END_FRAME);
-                        event_2.data = {
-                            frameIndex: currentFrame,
-                            frameName: currentFrame == 1 ? "firstFrame" : "endFrame"
-                        };
-                        frameEvents.push(event_2);
+                    s.children = [];
+                    for (i = 0; i < layerCount; i++) {
+                        frameCount = s._timeline[i].length;
+                        if (currentFrame <= frameCount) {
+                            frame = s._timeline[i][currentFrame - 1];
+                            if (frame == undefined)
+                                continue;
+                            if (frame.keyIndex == (currentFrame - 1)) {
+                                if (frame.soundName != "") {
+                                    Flash2x.getMediaByName(frame.soundScene, frame.soundName).play(0, frame.soundTimes);
+                                }
+                                if (frame.eventName != "" && s.hasEventListener(annie.Event.CALL_FRAME)) {
+                                    var event_1 = new annie.Event(annie.Event.CALL_FRAME);
+                                    event_1.data = { frameIndex: currentFrame, frameName: frame.eventName };
+                                    frameEvents.push(event_1);
+                                }
+                            }
+                            frameChildrenCount = frame.frameChildList.length;
+                            for (var j = 0; j < frameChildrenCount; j++) {
+                                infoObject = frame.frameChildList[j];
+                                displayObject = infoObject.display;
+                                displayObject.x = infoObject.x;
+                                displayObject.y = infoObject.y;
+                                displayObject.scaleX = infoObject.scaleX;
+                                displayObject.scaleY = infoObject.scaleY;
+                                displayObject.rotation = infoObject.rotation;
+                                displayObject.skewX = infoObject.skewX;
+                                displayObject.skewY = infoObject.skewY;
+                                displayObject.alpha = infoObject.alpha;
+                                if (infoObject.filters) {
+                                    displayObject.filters = infoObject.filters;
+                                }
+                                else {
+                                    displayObject.filters = null;
+                                }
+                                if (infoObject.graphicInfo) {
+                                    displayObject["_graphicInfo"] = infoObject.graphicInfo;
+                                }
+                                else {
+                                    if (displayObject["_graphicInfo"]) {
+                                        displayObject["_graphicInfo"] = null;
+                                    }
+                                }
+                                if (displayObject["_donotUpdateinMC"] != undefined) {
+                                    for (var o in displayObject["_donotUpdateinMC"]) {
+                                        if (displayObject["_donotUpdateinMC"][o] != undefined) {
+                                            displayObject[o] = displayObject["_donotUpdateinMC"][o];
+                                        }
+                                    }
+                                }
+                                displayObject.parent = s;
+                                s.children.push(displayObject);
+                                t = lastFrameChildren.indexOf(displayObject);
+                                if (t < 0) {
+                                    displayObject._onDispatchBubbledEvent("onAddToStage");
+                                    displayObject._cp = true;
+                                }
+                                else {
+                                    lastFrameChildren.splice(t, 1);
+                                }
+                            }
+                        }
+                    }
+                    s._isNeedUpdateChildren = false;
+                    //update一定要放在事件处理之前
+                    var len = lastFrameChildren.length;
+                    for (i = 0; i < len; i++) {
+                        //不加这个判读在removeAllChildren时会报错
+                        if (!lastFrameChildren[i].parent) {
+                            lastFrameChildren[i].parent = s;
+                            lastFrameChildren[i]._onDispatchBubbledEvent("onRemoveToStage", true);
+                            lastFrameChildren[i]._cp = true;
+                            lastFrameChildren[i].parent = null;
+                        }
+                    }
+                    s.children.push(s.floatView);
+                    //看看是否到了第一帧，或是最后一帧,如果是准备事件
+                    if ((currentFrame == 1 && !s.isFront) || (currentFrame == s.totalFrames && s.isFront)) {
+                        if (s.hasEventListener(annie.Event.END_FRAME)) {
+                            var event_2 = new annie.Event(annie.Event.END_FRAME);
+                            event_2.data = {
+                                frameIndex: currentFrame,
+                                frameName: currentFrame == 1 ? "firstFrame" : "endFrame"
+                            };
+                            frameEvents.push(event_2);
+                        }
+                    }
+                    //看看是否有帧事件,有则派发
+                    len = frameEvents.length;
+                    for (i = 0; i < len; i++) {
+                        s.dispatchEvent(frameEvents[i]);
+                    }
+                    //看看是否有回调,有则调用
+                    if (s._scriptLayer[currentFrame - 1] != undefined) {
+                        s._scriptLayer[currentFrame - 1]();
                     }
                 }
-                //看看是否有帧事件,有则派发
-                len = frameEvents.length;
-                for (i = 0; i < len; i++) {
-                    s.dispatchEvent(frameEvents[i]);
-                }
-                //看看是否有回调,有则调用
-                if (s._scriptLayer[currentFrame - 1] != undefined) {
-                    s._scriptLayer[currentFrame - 1]();
-                }
             }
-            _super.prototype.update.call(this, um, ua, uf);
+            _super.prototype.update.call(this, isDrawUpdate);
         };
         /**
          * 触发显示列表上相关的事件
@@ -5070,21 +5179,24 @@ var annie;
              * @private
              */
             _this._isAdded = false;
-            _this._instanceType = "annie.FloatDisplay";
             var s = _this;
+            s._instanceType = "annie.FloatDisplay";
             s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
                 if (s.htmlElement) {
                     s.htmlElement.style.display = "none";
                 }
             });
             s.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
-                if (!s._isAdded) {
-                    s._isAdded = true;
-                    s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
-                }
-                else {
-                    if (s.htmlElement && s.visible) {
-                        s.htmlElement.style.display = "block";
+                if (s.htmlElement) {
+                    var style = s.htmlElement.style;
+                    if (!s._isAdded) {
+                        s._isAdded = true;
+                        s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
+                    }
+                    else {
+                        if (s.htmlElement && s.visible) {
+                            style.display = "block";
+                        }
                     }
                 }
             });
@@ -5100,16 +5212,18 @@ var annie;
         FloatDisplay.prototype.init = function (htmlElement) {
             var s = this;
             if (typeof (htmlElement) == "string") {
-                htmlElement = document.getElementById(htmlElement);
+                s.htmlElement = document.getElementById(htmlElement);
             }
             else if (htmlElement._instanceType == "annie.Video") {
-                htmlElement = htmlElement.media;
+                s.htmlElement = htmlElement.media;
+            }
+            else {
+                s.htmlElement = htmlElement;
             }
             var style = htmlElement.style;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            s.htmlElement = htmlElement;
         };
         /**
          * 删除html元素,这样就等于解了封装
@@ -5128,13 +5242,38 @@ var annie;
                 this.htmlElement = null;
             }
         };
+        FloatDisplay.prototype.getBounds = function () {
+            var s = this;
+            s._bounds.width = 0;
+            s._bounds.height = 0;
+            if (s.htmlElement) {
+                var sh = s.htmlElement;
+                var ss = sh.style;
+                if (sh.width && sh.height) {
+                    s._bounds.width = sh.width;
+                    s._bounds.height = sh.height;
+                }
+                else {
+                    if (ss.width.indexOf("px") < 0 || ss.height.indexOf("px") < 0) {
+                        trace("htmlElement must set style.width and style.height with 'px'");
+                    }
+                    else {
+                        s._bounds.width = parseInt(ss.width);
+                        s._bounds.height = parseInt(ss.height);
+                    }
+                }
+            }
+            return s._bounds;
+        };
         /**
          * 重写刷新
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        FloatDisplay.prototype.update = function (um, ua, uf) {
+        FloatDisplay.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
             var o = s.htmlElement;
             if (o) {
@@ -5155,33 +5294,20 @@ var annie;
                     style.display = show;
                 }
                 if (visible) {
-                    _super.prototype.update.call(this, um, ua, uf);
-                    if (um || s._updateInfo.UM) {
+                    _super.prototype.update.call(this, isDrawUpdate);
+                    if (s._UI.UM) {
                         var mtx = s.cMatrix;
                         var d = annie.devicePixelRatio;
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                     }
-                    if (ua || s._updateInfo.UA) {
+                    if (s._UI.UA) {
                         style.opacity = s.cAlpha;
                     }
-                    s._updateInfo.UF = false;
-                    s._updateInfo.UM = false;
-                    s._updateInfo.UA = false;
+                    s._UI.UF = false;
+                    s._UI.UM = false;
+                    s._UI.UA = false;
                 }
             }
-        };
-        /**
-         * 重写getBounds
-         * 获取Bitmap对象的Bounds
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        FloatDisplay.prototype.getBounds = function () {
-            return this._bounds;
-        };
-        FloatDisplay.prototype.render = function (renderObj) {
         };
         return FloatDisplay;
     }(annie.DisplayObject));
@@ -5259,19 +5385,20 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        VideoPlayer.prototype.update = function (um, ua, uf) {
+        VideoPlayer.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
             if (s.visible) {
                 //刷新视频
                 if (s.videoType == 0) {
-                    s.video.update(um, ua, uf);
+                    s.video.update(isDrawUpdate);
                     s.rect = this.video.rect;
-                    s["_cacheImg"] = s.bitmapData = s.video.currentBitmap;
+                    s["_texture"] = s.bitmapData = s.video.currentBitmap;
                 }
                 else {
-                    s["_cacheImg"] = s.bitmapData = s.video.media;
+                    s["_texture"] = s.bitmapData = s.video.media;
                 }
-                _super.prototype.update.call(this, um, ua, uf);
+                _super.prototype.update.call(this, isDrawUpdate);
             }
         };
         return VideoPlayer;
@@ -5306,7 +5433,7 @@ var annie;
             _this._bold = false;
             _this._border = false;
             _this._instanceType = "annie.TextField";
-            _this._cacheImg = window.document.createElement("canvas");
+            _this._texture = window.document.createElement("canvas");
             return _this;
         }
         Object.defineProperty(TextField.prototype, "textAlign", {
@@ -5538,7 +5665,7 @@ var annie;
          * @since 1.0.0
          */
         TextField.prototype._getMeasuredWidth = function (text) {
-            var ctx = this._cacheImg.getContext("2d");
+            var ctx = this._texture.getContext("2d");
             //ctx.save();
             var w = ctx.measureText(text).width;
             //ctx.restore();
@@ -5551,12 +5678,13 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        TextField.prototype.update = function (um, ua, uf) {
-            _super.prototype.update.call(this, um, ua, uf);
+        TextField.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
+            _super.prototype.update.call(this, isDrawUpdate);
             var s = this;
-            if (s._isNeedUpdate || uf || s._updateInfo.UF) {
+            if (s._UI.UD || s._UI.UF) {
                 s._text += "";
-                var can = s._cacheImg;
+                var can = s._texture;
                 var ctx = can.getContext("2d");
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
@@ -5658,17 +5786,17 @@ var annie;
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
-                s._cacheX = -10;
-                s._cacheY = -10;
-                s._isNeedUpdate = false;
+                s._offsetX = -10;
+                s._offsetY = -10;
+                s._UI.UD = false;
                 //给webgl更新新
-                s._cacheImg.updateTexture = true;
+                s._texture.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }
-            s._updateInfo.UM = false;
-            s._updateInfo.UA = false;
-            s._updateInfo.UF = false;
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         };
         /**
          * 重写 getBounds
@@ -6426,12 +6554,14 @@ var annie;
                         }
                     }
                 }
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
+                if (e.target.id == "_a2x_canvas") {
+                    if (s.isPreventDefaultEvent) {
+                        if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                            e.preventDefault();
+                        }
+                        if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                            e.preventDefault();
+                        }
                     }
                 }
                 if (s._uae) {
@@ -6526,7 +6656,7 @@ var annie;
             _this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                s._updateInfo.UM = true;
+                s._UI.UM = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
@@ -6585,7 +6715,8 @@ var annie;
                     s.dispatchEvent(new annie.Event("onInitStage"));
                 }
             }, 100);
-            var rc = s.renderObj.rootContainer;
+            // let rc = s.renderObj.rootContainer;
+            var rc = s.rootDiv;
             var mouseEvent = s.onMouseEvent.bind(s);
             if (annie.osType != "pc") {
                 rc.addEventListener("touchstart", mouseEvent, false);
@@ -6600,14 +6731,17 @@ var annie;
             return _this;
         }
         /**
-         * 刷新函数
+         * 重写刷新
          * @method update
+         * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @since 1.0.0
          */
-        Stage.prototype.update = function () {
+        Stage.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
             if (!s.pause) {
-                var su = s._updateInfo;
-                _super.prototype.update.call(this, su.UM, su.UA, su.UF);
+                _super.prototype.update.call(this, isDrawUpdate);
             }
         };
         /**
@@ -6636,19 +6770,20 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
-                s.update();
+                s.update(true);
                 s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update();
+                    s.update(true);
+                    s.render(s.renderObj);
                     s._currentFlush = s._flush;
                 }
                 else {
-                    if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
-                    }
+                    // if (s._currentFlush == s._flush) {
+                    //     s.render(s.renderObj);
+                    // }
                     s._currentFlush--;
                 }
             }
@@ -7636,7 +7771,7 @@ var annie;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)
                 return;
-            var texture = target._cacheImg;
+            var texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 var ctx = s._ctx;
                 ctx.globalAlpha = target.cAlpha;
@@ -7647,7 +7782,7 @@ var annie;
                     ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
                 }
                 else {
-                    ctx.translate(target._cacheX, target._cacheY);
+                    ctx.translate(target._offsetX, target._offsetY);
                     ctx.drawImage(texture, 0, 0);
                 }
             }
@@ -7663,6 +7798,7 @@ var annie;
             if (!s.rootContainer) {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
+                s.rootContainer.id = "_a2x_canvas";
             }
             var c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
@@ -7897,7 +8033,7 @@ var annie;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)
                 return;
-            var textureSource = target._cacheImg;
+            var textureSource = target._texture;
             if (textureSource && textureSource.width > 0 && textureSource.height > 0) {
                 var gl = s._ctx;
                 var gi = void 0;
@@ -7916,8 +8052,8 @@ var annie;
                         gi.ph = tc.height;
                     }
                     else {
-                        var cX = target._cacheX;
-                        var cY = target._cacheY;
+                        var cX = target._offsetX;
+                        var cY = target._offsetY;
                         gi.x = cX / textureSource.width;
                         gi.y = cY / textureSource.height;
                         gi.w = (textureSource.width - cX) / textureSource.width;
@@ -7937,8 +8073,8 @@ var annie;
                 ];
                 var m = s._cM;
                 m.identity();
-                m.tx = target._cacheX * 2;
-                m.ty = target._cacheY * 2;
+                m.tx = target._offsetX * 2;
+                m.ty = target._offsetY * 2;
                 m.prepend(target.cMatrix);
                 var vMatrix = new Float32Array([
                     m.a, m.b, 0,
@@ -10177,17 +10313,21 @@ var annie;
             skY: obj.skewY
         };
         obj.parent = null;
-        obj.x = rect ? -rect.x : 0;
-        obj.y = rect ? -rect.y : 0;
+        obj.x = obj.y = 0;
         obj.scaleX = obj.scaleY = 1;
         obj.rotation = obj.skewX = obj.skewY = 0;
-        obj.update(false, false, false);
         //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
         var whObj = obj.getBounds();
         var w = rect ? rect.width : whObj.width;
         var h = rect ? rect.height : whObj.height;
+        obj.x = rect ? -rect.x : -whObj.x;
+        obj.y = rect ? -rect.y : -whObj.y;
+        obj._offsetX = rect ? rect.x : whObj.x;
+        obj._offsetY = rect ? rect.y : whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
+        _dRender.rootContainer.style.width = w / annie.devicePixelRatio + "px";
+        _dRender.rootContainer.style.height = h / annie.devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
@@ -10196,7 +10336,10 @@ var annie;
             _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
+        obj._cp = true;
+        obj.update();
         obj.render(_dRender);
+        obj._cp = true;
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
@@ -10205,6 +10348,7 @@ var annie;
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
+        obj.update();
         if (!typeInfo) {
             typeInfo = { type: "png" };
         }

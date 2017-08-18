@@ -64,18 +64,18 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean){
+        public update(isDrawUpdate:boolean=false){
             let  s=this;
             if(s.visible) {
                 //刷新视频
                 if (s.videoType == 0) {
-                    s.video.update(um,ua,uf);
+                    s.video.update(isDrawUpdate);
                     s.rect = this.video.rect;
-                    s["_cacheImg"] = s.bitmapData = s.video.currentBitmap;
+                    s["_texture"] = s.bitmapData = s.video.currentBitmap;
                 } else {
-                    s["_cacheImg"] = s.bitmapData = s.video.media;
+                    s["_texture"] = s.bitmapData = s.video.media;
                 }
-                super.update(um, ua, uf);
+                super.update(isDrawUpdate);
             }
         }
     }

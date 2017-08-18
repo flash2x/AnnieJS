@@ -24,10 +24,10 @@ namespace annie {
 
         /**
          * 更新信息
-         * @property _updateInfo
+         * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
          */
-        protected _updateInfo: {UM: boolean, UA: boolean, UF: boolean} = {UM: false, UA: false, UF: false};
+        protected _UI:{UD:boolean,UM: boolean, UA: boolean, UF: boolean} = {UD:false,UM: true, UA: true, UF: false};
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
@@ -38,6 +38,16 @@ namespace annie {
          * @readonly
          * */
         public stage: Stage = null;
+        /**
+         * 显示对象的父级
+         * @property parent
+         * @since 1.0.0
+         * @public
+         * @type {annie.Sprite}
+         * @default null
+         * @readonly
+         */
+        public parent: Sprite = null;
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
@@ -325,16 +335,7 @@ namespace annie {
             this._setProperty("_filters",value,2);
         }
         private _filters: any[] = [];
-        /**
-         * 显示对象的父级
-         * @property parent
-         * @since 1.0.0
-         * @public
-         * @type {annie.Sprite}
-         * @default null
-         * @readonly
-         */
-        public parent: Sprite = null;
+
         /**
          * 是否自己的父级发生的改变
          * @type {boolean}
@@ -372,6 +373,10 @@ namespace annie {
          * @static
          */
         public static _bp: Point = new Point();
+        public static _p1: Point = new Point();
+        public static _p2: Point = new Point();
+        public static _p3: Point = new Point();
+        public static _p4: Point = new Point();
 
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
@@ -391,7 +396,6 @@ namespace annie {
             }
             return null;
         }
-
         /**
          * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
          * @method getBounds
@@ -400,8 +404,9 @@ namespace annie {
          * @returns {annie.Rectangle}
          * @abstract
          */
-        public abstract getBounds(): Rectangle;
-
+        public getBounds(): Rectangle{
+            return this._bounds;
+        };
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
@@ -413,27 +418,45 @@ namespace annie {
         public getDrawRect(): Rectangle {
             let s = this;
             let rect = s.getBounds();
-            let p1: Point = s.matrix.transformPoint(rect.x, rect.y);
-            let p2: Point = s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height);
-            Rectangle.createRectform2Point(s._drawRect,p1, p2);
+            if(s.mask){
+                let maskRect=s.mask.getDrawRect();
+                if(rect.x<maskRect.x){
+                    rect.x=maskRect.x;
+                }
+                if(rect.y<maskRect.y){
+                    rect.y=maskRect.y;
+                }
+                if(rect.width>maskRect.width){
+                    rect.width=maskRect.width
+                }
+                if(rect.height>maskRect.height){
+                    rect.height=maskRect.height
+                }
+            }
+            s.matrix.transformPoint(rect.x, rect.y,DisplayObject._p1);
+            s.matrix.transformPoint(rect.x + rect.width, rect.y,DisplayObject._p2);
+            s.matrix.transformPoint(rect.x + rect.width, rect.y + rect.height,DisplayObject._p3);
+            s.matrix.transformPoint(rect.x, rect.y + rect.height,DisplayObject._p4);
+            Rectangle.createFromPoints(s._drawRect,DisplayObject._p1,DisplayObject._p2,DisplayObject._p3,DisplayObject._p4);
             return s._drawRect;
         }
         /**
          * 更新函数
          * @method update
          * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(um: boolean, ua: boolean, uf: boolean): void{
+        protected update(isDrawUpdate:boolean=false): void{
             let s = this;
-            //enterFrame事件一定要放在这里，不要再移到其他地方了
+            //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
                 if (!s._enterFrameEvent) {
                     s._enterFrameEvent = new Event("onEnterFrame");
                 }
                 s.dispatchEvent(s._enterFrameEvent);
             }
-            let UI=s._updateInfo;
+            let UI=s._UI;
             if(s._cp){
                 UI.UM=UI.UA=UI.UF=true;
                 s._cp=false;
@@ -441,19 +464,25 @@ namespace annie {
             if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
             }
-            if (um || UI.UM) {
+            if(s.parent) {
+                let PUI = s.parent._UI;
+                if (PUI.UM) UI.UM = true;
+                if (PUI.UA) UI.UA = true;
+                if (PUI.UF) UI.UF = true;
+            }
+            if (UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (ua || UI.UA){
+            if (UI.UA){
                 s.cAlpha = s._alpha;
                 if (s.parent) {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-            if (uf || UI.UF){
+            if (UI.UF){
                 s.cFilters.length = 0;
                 let sf = s._filters;
                 if(sf) {
@@ -574,8 +603,8 @@ namespace annie {
          */
         public getWH():{width:number,height:number}{
             let s = this;
-            // s.update(true, false, false);
-            let dr = s.getDrawRect();
+            s.update();
+            let dr = s._drawRect;
             return {width:dr.width,height:dr.height};
         }
         /**
@@ -589,37 +618,37 @@ namespace annie {
         public static _canvas: any = window.document.createElement("canvas");
         /**
          * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _cacheImg
+         * @property _texture
          * @protected
          * @since 1.0.0
          * @type {any}
          * @default null
          */
-        protected _cacheImg:any=null;
+        protected _texture:any=null;
         /**
-         * @property _cacheX
+         * @property _offsetX
          * @protected
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        protected _cacheX:number = 0;
+        protected _offsetX:number = 0;
         /**
-         * @property _cacheY
+         * @property _offsetY
          * @protected
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        protected _cacheY:number = 0;
+        protected _offsetY:number = 0;
         protected _bounds:Rectangle=new Rectangle();
         protected _drawRect:Rectangle=new Rectangle();
-        protected _isNeedUpdate: boolean = true;
+        //protected _isNeedUpdate: boolean = true;
         protected _setProperty(property:string,value:any,type:number){
             let s:any=this;
             if(s[property]!=value){
                 s[property]=value;
-                let UI=s._updateInfo;
+                let UI=s._UI;
                 if(type==0){
                     UI.UM = true;
                 }else if(type==1){
@@ -627,9 +656,7 @@ namespace annie {
                 }else if(type==2){
                     UI.UF = true;
                 }else if(type==3){
-                    s._isNeedUpdate = true;
-                }else if(type==4){
-                    s._cp=true;
+                    UI.UD = true;
                 }
             }
         }
