@@ -217,13 +217,6 @@ namespace annie {
         private _lastDpList: any = {};
         private _rid = -1;
         /**
-         * 鼠标事件后强制更新
-         * @type {boolean}
-         * @private
-         */
-        private _uae=false;
-
-        /**
          * 显示对象入口函数
          * @method Stage
          * @param {string} rootDivId
@@ -252,13 +245,16 @@ namespace annie {
             s.scaleMode = scaleMode;
             s.anchorX = desW / 2;
             s.anchorY = desH / 2;
+            //目前具支持canvas
+            s.renderObj = new CanvasRender(s);
+            /* webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
                 s.renderObj = new WGRender(s);
-            }
+            }*/
             s.renderObj.init();
             window.addEventListener(resizeEvent, function (e: any) {
                 clearTimeout(s._rid);
@@ -333,17 +329,21 @@ namespace annie {
         }
 
         /**
-         * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
          * @type {Array}
          * @private
          */
         private _ml: any = [];
         /**
+         * 这个是事件中用到的Point对象池,以提高性能
+         * @type {Array}
+         * @private
+         */
+        private _mp:any=[];
+        /**
          * 刷新mouse或者touch事件
          * @private
          */
-        private _mouseDownPoint:any={};
-
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point,identifier:number): void {
             event["_pd"] = false;
             event.clientX = cp.x;
@@ -352,7 +352,8 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier=identifier;
         }
-
+       //每一个手指事件的对象池
+        private _mouseDownPoint:any={};
         /**
          * 循环刷新页面的函数
          */
@@ -461,17 +462,21 @@ namespace annie {
          * 当document有鼠标或触摸事件时调用
          * @param e
          */
+        private _mP1:Point=new Point();
+        private _mP2:Point=new Point();
         private onMouseEvent = function (e: any): void {
             //检查是否有
             let s: any = this;
             if (s.isMultiTouch&&e.targetTouches) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    let p1 = new Point(e.targetTouches[0].clientX - e.target.offsetLeft, e.targetTouches[0].clientY - e.target.offsetTop);
-                    let p2 = new Point(e.targetTouches[1].clientX - e.target.offsetLeft, e.targetTouches[1].clientY - e.target.offsetTop);
-                    let angle = Math.atan2(p1.y - p2.y, p1.x - p2.x) / Math.PI * 180;
-                    let dis = annie.Point.distance(p1, p2);
-                    s.muliPoints.push({p1: p1, p2: p2, angle: angle, dis: dis});
+                    s._mP1.x=e.targetTouches[0].clientX - e.target.offsetLeft;
+                    s._mP1.y=e.targetTouches[0].clientY - e.target.offsetTop;
+                    s._mP2.x=e.targetTouches[1].clientX - e.target.offsetLeft;
+                    s._mP2.y=e.targetTouches[1].clientY - e.target.offsetTop;
+                    let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
+                    let dis = annie.Point.distance(s._mP1, s._mP2);
+                    s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
                     if (s.muliPoints.length >= 2) {
                         //如果有事件，抛事件
                         if (!s._touchEvent) {
@@ -517,7 +522,13 @@ namespace annie {
                     eLen=0;
                     events=[];
                     identifier="m"+points[o].identifier;
-                    cp=new Point((points[o].clientX - points[o].target.offsetLeft) * devicePixelRatio,(points[o].clientY - points[o].target.offsetTop) * devicePixelRatio);
+                    if(s._mp.length>0){
+                        cp=s._mp.shift();
+                    }else{
+                        cp=new Point();
+                    }
+                    cp.x=(points[o].clientX - points[o].target.offsetLeft) * devicePixelRatio;
+                    cp.y=(points[o].clientY - points[o].target.offsetTop) * devicePixelRatio;
                     //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                     sp = s.globalToLocal(cp, DisplayObject._bp);
                     if (EventDispatcher.getMouseEventCount() > 0) {
@@ -659,14 +670,19 @@ namespace annie {
                                 }
                             }
                         }
+                        if(item!="onMouseDown"){
+                            s._mp.push(cp);
+                        }
                         if(item=="onMouseUp"){
-                            s._mouseDownPoint[identifier]=null;
-                            s._lastDpList[identifier] = null;
+                            s._mp.push(s._mouseDownPoint[identifier]);
+                            // s._mouseDownPoint[identifier]=null;
+                            // s._lastDpList[identifier]=null;
                             delete s._mouseDownPoint[identifier];
                             delete s._lastDpList[identifier];
                         }else {
                             s._lastDpList[identifier] = displayList;
                         }
+
                     }
                 }
             }
@@ -680,9 +696,8 @@ namespace annie {
                     }
                 }
             }
-            if(s._uae){
+            if(s._cp){
                 s.update();
-                s._uae=false;
             }
         };
         /**

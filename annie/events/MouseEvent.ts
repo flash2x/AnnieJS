@@ -147,7 +147,7 @@ namespace annie {
          * @public
          */
         public updateAfterEvent(){
-            this.target.stage._uae=true;
+            this.target.stage._cp=true;
         }
     }
 }

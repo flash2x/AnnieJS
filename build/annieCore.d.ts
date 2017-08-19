@@ -913,8 +913,7 @@ declare namespace annie {
          */
         isPointIn(point: Point): boolean;
         /**
-         * 将多个矩形合成为一个大的矩形
-         * 返回包含所有给定的矩阵拼合之后的一个最小矩形
+         * 将多个矩形合成为一个矩形,并将结果存到第一个矩形参数，并返回
          * @method createFromRects
          * @param {annie.Rectangle} rect
          * @param {..arg} arg
@@ -2139,153 +2138,15 @@ declare namespace annie {
          * @example
          *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
          *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
-         *          videoPlayer.play();//播放视频
-         *          //videoPlayer.pause();//暂停视频
-         *          //videoPlayer.stop();//停止播放
+         *      videoPlayer.play();//播放视频
+         *      //videoPlayer.pause();//暂停视频
+         *      //videoPlayer.stop();//停止播放
+         *      var floatDisplay=new annie.FloatDisplay();
+         *      floatDisplay.init(videoPlayer);
+         *      //这里的spriteObj是任何一个Sprite类或者其扩展类的实例对象
+         *      spriteObj.addChild(floatDisplay);
          */
         constructor(src: any, width?: number, height?: number);
-    }
-}
-/**
- * Created by anlun on 16/8/8.
- */
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 将img序列的内容画到canvas里
-     * @class annie.ImageFrames
-     * @extends annie.Bitmap
-     * @public
-     * @since 1.0.0
-     */
-    class ImageFrames extends EventDispatcher {
-        private list;
-        /**
-         * img文件所在的文件夹路径
-         * @property src
-         * @type {string}
-         * @public
-         * @since 1.0.0
-         */
-        src: string;
-        private _lastSrc;
-        private _urlLoader;
-        private _configInfo;
-        private _startTime;
-        private _needBufferFrame;
-        private _currentLoadIndex;
-        /**
-         * 当前播放到序列的哪一帧
-         * @property currentFrame
-         * @public
-         * @since 1.0.0
-         * @type{number}
-         * @default 0
-         */
-        currentFrame: number;
-        /**
-         * 当前播放的序列所在的spriteSheet大图引用
-         * @property currentBitmap
-         * @since 1.0.0
-         * @public
-         * @default null
-         * @type {number}
-         */
-        currentBitmap: HTMLImageElement;
-        /**
-         * 序列的总帧数
-         * @property totalsFrame
-         * @since 1.0.0
-         * @public
-         * @type{number}
-         * @default 1;
-         */
-        totalsFrame: number;
-        /**
-         * 当前帧所在的spriteSheet里的位置区域
-         * @property rect
-         * @public
-         * @since 1.0.0
-         * @type {annie.Rectangle}
-         */
-        rect: Rectangle;
-        /**
-         * 是否循环播放
-         * @property loop
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         */
-        loop: boolean;
-        private _isLoaded;
-        /**
-         * 是否能播放状态
-         * @type {boolean}
-         */
-        private canPlay;
-        /**
-         * 是否在播放中
-         * @property isPlaying
-         * @type {boolean}
-         * @public
-         * @since 1.0.0
-         */
-        isPlaying: boolean;
-        /**
-         * 是否在自动播放
-         * @property autoplay
-         * @type {boolean}
-         * @public
-         * @since 1.0.0
-         */
-        autoplay: boolean;
-        /**
-         * 被始化一个序列图视频
-         * @method ImageFrames 构架函数
-         * @param src
-         * @since 1.0.0
-         */
-        constructor(src: string);
-        /**
-         * 资源加载成功
-         * @private
-         * @since 1.0.0
-         * @param e
-         */
-        private success(e);
-        /**
-         * 如果需要单独使用ImageFrames的话,你需要时间调用update来刷新视频的播放进度,使用VideoPlayer的类将无需考虑
-         * @method update
-         * @since 1.0.0
-         * @public
-         */
-        update(): void;
-        private checkChange();
-        private loadImage();
-        /**
-         * 播放视频,如果autoplay为true则会加载好后自动播放
-         * @method play
-         * @public
-         * @since 1.0.0
-         */
-        play(): void;
-        /**
-         * 停止播放,如果需要继续播放请再次调用play()方法
-         * @method pause
-         * @public
-         * @since 1.0.0
-         */
-        pause(): void;
-        /**
-         *如果播放了视频后不已不再需要的话,这个时候可以调用这个方法进行资源清理,以方便垃圾回收。
-         * 调用此方法后,此对象一样可以再次设置src重新使用。或者直接进行src的更换,系统会自动调用此方法以清除先前的序列在内存的资源
-         * @method clear
-         * @public
-         * @since 1.0.0
-         */
-        clear(): void;
     }
 }
 /**
@@ -2635,51 +2496,6 @@ declare namespace annie {
          * @method update
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 将video的内容或者是序列图画到canvas里形成连续播放的效果,以方便做交互
-     * @class annie.VideoPlayer
-     * @extends annie.Bitmap
-     * @public
-     * @since 1.0.0
-     */
-    class VideoPlayer extends Bitmap {
-        /**
-         * @method VideoPlayer
-         * @param {string} src
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图,值为1时全部使用序列图,值为2时全部使用mp4
-         * @param {number} width
-         * @param {number} height
-         */
-        constructor(src: any, type: number, width: number, height: number);
-        /**
-         * 视频的引用
-         * @property video
-         * @public
-         * @since 1.0.0
-         */
-        video: any;
-        /**
-         * 播放的视频类型 值为0是序列图,1是视频 只读
-         * @property videoType
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        videoType: number;
-        /**
-         * 重写update
-         * @method update
-         * @public
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
@@ -3170,12 +2986,6 @@ declare namespace annie {
         private _lastDpList;
         private _rid;
         /**
-         * 鼠标事件后强制更新
-         * @type {boolean}
-         * @private
-         */
-        private _uae;
-        /**
          * 显示对象入口函数
          * @method Stage
          * @param {string} rootDivId
@@ -3205,17 +3015,23 @@ declare namespace annie {
          */
         render(renderObj: IRender): void;
         /**
-         * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
          * @type {Array}
          * @private
          */
         private _ml;
         /**
+         * 这个是事件中用到的Point对象池,以提高性能
+         * @type {Array}
+         * @private
+         */
+        private _mp;
+        /**
          * 刷新mouse或者touch事件
          * @private
          */
-        private _mouseDownPoint;
         private _initMouseEvent(event, cp, sp, identifier);
+        private _mouseDownPoint;
         /**
          * 循环刷新页面的函数
          */
@@ -3265,6 +3081,8 @@ declare namespace annie {
          * 当document有鼠标或触摸事件时调用
          * @param e
          */
+        private _mP1;
+        private _mP2;
         private onMouseEvent;
         /**
          * 设置舞台的对齐模式
@@ -3793,102 +3611,6 @@ declare namespace annie {
          * @method reSize
          */
         reSize(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * WebGl 渲染器
-     * @class annie.WGRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.2
-     */
-    class WGRender extends AObject implements IRender {
-        /**
-         * 渲染器所在最上层的对象
-         * @property rootContainer
-         * @public
-         * @since 1.0.2
-         * @type {any}
-         * @default null
-         */
-        rootContainer: any;
-        private _ctx;
-        private _stage;
-        private _program;
-        private _buffer;
-        private _dW;
-        private _dH;
-        private _pMatrix;
-        private _pMI;
-        private _vMI;
-        private _uA;
-        private _cM;
-        private _maxTextureCount;
-        private _uniformTexture;
-        private _posAttr;
-        private _textAttr;
-        private _textures;
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.2
-         */
-        constructor(stage: Stage);
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.2
-         * @public
-         */
-        begin(): void;
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.2
-         */
-        beginMask(target: any): void;
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.2
-         */
-        endMask(): void;
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.2
-         * @method reSize
-         */
-        reSize(): void;
-        private _getShader(id);
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.2
-         * @method init
-         */
-        init(): void;
-        private setBuffer(buffer, data);
-        /**
-         *  调用渲染
-         * @public
-         * @since 1.0.2
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
-         */
-        draw(target: any): void;
-        private getActiveId();
-        createTexture(textureSource: any): number;
     }
 }
 /**

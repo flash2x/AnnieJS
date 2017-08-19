@@ -78,8 +78,7 @@ namespace annie {
             return point.x>=s.x&&point.x<=(s.x+s.width)&&point.y>=s.y&&point.y<=(s.y+s.height);
         }
         /**
-         * 将多个矩形合成为一个大的矩形
-         * 返回包含所有给定的矩阵拼合之后的一个最小矩形
+         * 将多个矩形合成为一个矩形,并将结果存到第一个矩形参数，并返回
          * @method createFromRects
          * @param {annie.Rectangle} rect
          * @param {..arg} arg
@@ -88,16 +87,17 @@ namespace annie {
          * @static
          */
         public static createFromRects(...arg:Rectangle[]):Rectangle{
-            for(let i=arg.length-1;i>=0;i--){
-                if(arg[i].width*arg[i].height==0){
-                    arg.splice(i,1);
-                }
-            }
             if(arg.length==0){
-                return new Rectangle();
+                return null;
             }else if(arg.length==1){
-                return new Rectangle(arg[0].x,arg[0].y,arg[0].width,arg[0].height);
+                return arg[0];
             }else{
+                let rect=arg[0];
+                for(let i=arg.length-1;i>=0;i--){
+                    if(arg[i].width*arg[i].height==0){
+                        arg.splice(i,1);
+                    }
+                }
                 let x=arg[0].x,y=arg[0].y,w=arg[0].width,h=arg[0].height,wx1:number,wx2:number,hy1:number,hy2:number;
                 for(let i:number=1;i<arg.length;i++){
                     if(arg[i]==null)continue;
@@ -118,7 +118,11 @@ namespace annie {
                         hy1=hy2;
                     }
                 }
-                return new Rectangle(x,y,wx1-x,hy1-y);
+                rect.x=x;
+                rect.y=y;
+                rect.width=wx1-x;
+                rect.height=hy1-y;
+                return rect;
             }
         }
         /**

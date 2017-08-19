@@ -385,7 +385,7 @@ namespace annie {
 
                 for (let i = 0; i < len; i++) {
                     if (s.children[i].visible)
-                        rect = Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+                        Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                 }
                 if (s.mask) {
                     let maskRect = s.mask.getDrawRect();

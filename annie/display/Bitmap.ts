@@ -78,7 +78,7 @@ namespace annie {
          * @default null
          */
         public get bitmapData(): any {
-            return this._bitmapData
+            return this._bitmapData;
         };
         public set bitmapData(value: any) {
             let s=this;
@@ -173,7 +173,7 @@ namespace annie {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 //给webgl更新新
-                s._texture.updateTexture = true;
+                // s._texture.updateTexture = true;
             }
             s._UI.UF = false;
             s._UI.UM = false;

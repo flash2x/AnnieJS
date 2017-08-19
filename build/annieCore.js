@@ -658,7 +658,7 @@ var annie;
          * @public
          */
         MouseEvent.prototype.updateAfterEvent = function () {
-            this.target.stage._uae = true;
+            this.target.stage._cp = true;
         };
         /**
          * 鼠标或者手指按下事件
@@ -780,7 +780,7 @@ var annie;
          * @public
          */
         TouchEvent.prototype.updateAfterEvent = function () {
-            this.target.stage._uae = true;
+            this.target.stage._cp = true;
         };
         /**
          * @property TOUCH_BEGIN
@@ -1323,8 +1323,7 @@ var annie;
             return point.x >= s.x && point.x <= (s.x + s.width) && point.y >= s.y && point.y <= (s.y + s.height);
         };
         /**
-         * 将多个矩形合成为一个大的矩形
-         * 返回包含所有给定的矩阵拼合之后的一个最小矩形
+         * 将多个矩形合成为一个矩形,并将结果存到第一个矩形参数，并返回
          * @method createFromRects
          * @param {annie.Rectangle} rect
          * @param {..arg} arg
@@ -1337,18 +1336,19 @@ var annie;
             for (var _i = 0; _i < arguments.length; _i++) {
                 arg[_i] = arguments[_i];
             }
-            for (var i = arg.length - 1; i >= 0; i--) {
-                if (arg[i].width * arg[i].height == 0) {
-                    arg.splice(i, 1);
-                }
-            }
             if (arg.length == 0) {
-                return new Rectangle();
+                return null;
             }
             else if (arg.length == 1) {
-                return new Rectangle(arg[0].x, arg[0].y, arg[0].width, arg[0].height);
+                return arg[0];
             }
             else {
+                var rect = arg[0];
+                for (var i = arg.length - 1; i >= 0; i--) {
+                    if (arg[i].width * arg[i].height == 0) {
+                        arg.splice(i, 1);
+                    }
+                }
                 var x = arg[0].x, y = arg[0].y, w = arg[0].width, h = arg[0].height, wx1 = void 0, wx2 = void 0, hy1 = void 0, hy2 = void 0;
                 for (var i = 1; i < arg.length; i++) {
                     if (arg[i] == null)
@@ -1370,7 +1370,11 @@ var annie;
                         hy1 = hy2;
                     }
                 }
-                return new Rectangle(x, y, wx1 - x, hy1 - y);
+                rect.x = x;
+                rect.y = y;
+                rect.width = wx1 - x;
+                rect.height = hy1 - y;
+                return rect;
             }
         };
         /**
@@ -2361,7 +2365,7 @@ var annie;
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 //给webgl更新新
-                s._texture.updateTexture = true;
+                // s._texture.updateTexture = true;
             }
             s._UI.UF = false;
             s._UI.UM = false;
@@ -3185,7 +3189,7 @@ var annie;
                             ctx.putImageData(imageData, 0, 0);
                         }
                         //给webgl更新新
-                        _canvas.updateTexture = true;
+                        //_canvas.updateTexture = true;
                     }
                 }
                 s._UI.UD = false;
@@ -3774,7 +3778,7 @@ var annie;
                 var len = s.children.length;
                 for (var i = 0; i < len; i++) {
                     if (s.children[i].visible)
-                        rect = annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
+                        annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                 }
                 if (s.mask) {
                     var maskRect = s.mask.getDrawRect();
@@ -4129,9 +4133,13 @@ var annie;
          * @example
          *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
          *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
-         *          videoPlayer.play();//播放视频
-         *          //videoPlayer.pause();//暂停视频
-         *          //videoPlayer.stop();//停止播放
+         *      videoPlayer.play();//播放视频
+         *      //videoPlayer.pause();//暂停视频
+         *      //videoPlayer.stop();//停止播放
+         *      var floatDisplay=new annie.FloatDisplay();
+         *      floatDisplay.init(videoPlayer);
+         *      //这里的spriteObj是任何一个Sprite类或者其扩展类的实例对象
+         *      spriteObj.addChild(floatDisplay);
          */
         function Video(src, width, height) {
             if (width === void 0) { width = 0; }
@@ -4155,282 +4163,6 @@ var annie;
         return Video;
     }(annie.Media));
     annie.Video = Video;
-})(annie || (annie = {}));
-/**
- * Created by anlun on 16/8/8.
- */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 将img序列的内容画到canvas里
-     * @class annie.ImageFrames
-     * @extends annie.Bitmap
-     * @public
-     * @since 1.0.0
-     */
-    var ImageFrames = (function (_super) {
-        __extends(ImageFrames, _super);
-        /**
-         * 被始化一个序列图视频
-         * @method ImageFrames 构架函数
-         * @param src
-         * @since 1.0.0
-         */
-        function ImageFrames(src) {
-            var _this = _super.call(this) || this;
-            /**
-             * img文件所在的文件夹路径
-             * @property src
-             * @type {string}
-             * @public
-             * @since 1.0.0
-             */
-            _this.src = "";
-            _this._lastSrc = "";
-            _this._needBufferFrame = 0;
-            _this._currentLoadIndex = 0;
-            /**
-             * 当前播放到序列的哪一帧
-             * @property currentFrame
-             * @public
-             * @since 1.0.0
-             * @type{number}
-             * @default 0
-             */
-            _this.currentFrame = 0;
-            /**
-             * 当前播放的序列所在的spriteSheet大图引用
-             * @property currentBitmap
-             * @since 1.0.0
-             * @public
-             * @default null
-             * @type {number}
-             */
-            _this.currentBitmap = null;
-            /**
-             * 序列的总帧数
-             * @property totalsFrame
-             * @since 1.0.0
-             * @public
-             * @type{number}
-             * @default 1;
-             */
-            _this.totalsFrame = 1;
-            /**
-             * 当前帧所在的spriteSheet里的位置区域
-             * @property rect
-             * @public
-             * @since 1.0.0
-             * @type {annie.Rectangle}
-             */
-            _this.rect = null;
-            /**
-             * 是否循环播放
-             * @property loop
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             */
-            _this.loop = false;
-            _this._isLoaded = false;
-            /**
-             * 是否能播放状态
-             * @type {boolean}
-             */
-            _this.canPlay = false;
-            /**
-             * 是否在播放中
-             * @property isPlaying
-             * @type {boolean}
-             * @public
-             * @since 1.0.0
-             */
-            _this.isPlaying = true;
-            /**
-             * 是否在自动播放
-             * @property autoplay
-             * @type {boolean}
-             * @public
-             * @since 1.0.0
-             */
-            _this.autoplay = false;
-            var s = _this;
-            s._instanceType = "annie.ImageFrames";
-            s.src = src;
-            s.rect = new annie.Rectangle();
-            s.list = [];
-            s._urlLoader = new annie.URLLoader();
-            s._urlLoader.addEventListener(annie.Event.COMPLETE, s.success.bind(s));
-            return _this;
-        }
-        /**
-         * 资源加载成功
-         * @private
-         * @since 1.0.0
-         * @param e
-         */
-        ImageFrames.prototype.success = function (e) {
-            var s = this;
-            if (e.data.type == "json") {
-                //加载到了配置文件
-                s._configInfo = {};
-                for (var item in e.data.response) {
-                    s._configInfo[item] = e.data.response[item];
-                }
-                s._startTime = Date.now();
-                s._urlLoader.responseType = "image";
-                s.loadImage();
-            }
-            else {
-                //加载到了图片
-                s.list.push(e.data.response);
-                s._currentLoadIndex = s.list.length;
-                if (s._currentLoadIndex == s._configInfo.totalsPage) {
-                    //加载结束,抛出结束事件
-                    if (!s.canPlay) {
-                        s.canPlay = true;
-                    }
-                    s._isLoaded = true;
-                    s.dispatchEvent("onload");
-                }
-                else {
-                    s.loadImage();
-                    var bufferFrame = s._currentLoadIndex * s._configInfo.pageCount;
-                    if (bufferFrame > 30) {
-                        if (s._needBufferFrame == 0) {
-                            //判断网速
-                            var _endTime = Date.now();
-                            var time = _endTime - s._startTime;
-                            if (time < 1000) {
-                                s._needBufferFrame = 60;
-                            }
-                            else if (time < 1500) {
-                                s._needBufferFrame = 90;
-                            }
-                            else if (time < 2000) {
-                                s._needBufferFrame = 120;
-                            }
-                            else if (time < 2500) {
-                                s._needBufferFrame = 150;
-                            }
-                            else {
-                                s._needBufferFrame = 180;
-                            }
-                        }
-                        if (bufferFrame >= s._needBufferFrame && !s.canPlay) {
-                            s.canPlay = true;
-                            s.dispatchEvent("oncanplay");
-                        }
-                    }
-                }
-            }
-        };
-        /**
-         * 如果需要单独使用ImageFrames的话,你需要时间调用update来刷新视频的播放进度,使用VideoPlayer的类将无需考虑
-         * @method update
-         * @since 1.0.0
-         * @public
-         */
-        ImageFrames.prototype.update = function () {
-            var s = this;
-            if (s.canPlay && s.autoplay) {
-                if (s.currentFrame == s._configInfo.totalsFrame) {
-                    //播放结束事件
-                    s.currentFrame = 0;
-                    if (!s.loop) {
-                        s.autoplay = false;
-                        s.isPlaying = false;
-                    }
-                    s.dispatchEvent("onPlayEnd");
-                }
-                else {
-                    if (s.currentFrame < (s._currentLoadIndex * s._configInfo.pageCount - 1) || s._isLoaded) {
-                        //////////////////////////////渲染//////////////////////////////////
-                        var pageIndex = Math.floor(s.currentFrame / s._configInfo.pageCount);
-                        var rowIndex = s.currentFrame % s._configInfo.pageCount;
-                        var x = Math.floor(rowIndex / s._configInfo.rowCount);
-                        var y = rowIndex % s._configInfo.rowCount;
-                        s.rect.x = y * (s._configInfo.dis + s._configInfo.width) + s._configInfo.dis;
-                        s.rect.y = x * (s._configInfo.dis + s._configInfo.height) + s._configInfo.dis;
-                        s.rect.width = s._configInfo.width;
-                        s.rect.height = s._configInfo.height;
-                        s.currentBitmap = s.list[pageIndex];
-                        s.currentFrame++;
-                        if (!s.isPlaying) {
-                            s.isPlaying = true;
-                        }
-                    }
-                    else {
-                        s.canPlay = false;
-                        s.isPlaying = false;
-                    }
-                }
-                s.dispatchEvent("onPlayUpdate", { currentTime: s._currentLoadIndex });
-            }
-            s.checkChange();
-        };
-        ImageFrames.prototype.checkChange = function () {
-            var s = this;
-            if (s._lastSrc != s.src) {
-                //开始初始化
-                if (s.src != "") {
-                    //加载配置文件
-                    s._urlLoader.responseType = "json";
-                    s._urlLoader.load(s.src + "/config.json");
-                    s.canPlay = false;
-                    s._currentLoadIndex = 0;
-                    s.currentFrame = 0;
-                    s._needBufferFrame = 0;
-                    s._isLoaded = false;
-                    s._lastSrc = s.src;
-                }
-                else {
-                    s.clear();
-                }
-            }
-        };
-        ImageFrames.prototype.loadImage = function () {
-            var s = this;
-            s._urlLoader.load(s.src + "/" + s._configInfo.name + s._currentLoadIndex + s._configInfo.type);
-        };
-        /**
-         * 播放视频,如果autoplay为true则会加载好后自动播放
-         * @method play
-         * @public
-         * @since 1.0.0
-         */
-        ImageFrames.prototype.play = function () {
-            this.autoplay = true;
-        };
-        /**
-         * 停止播放,如果需要继续播放请再次调用play()方法
-         * @method pause
-         * @public
-         * @since 1.0.0
-         */
-        ImageFrames.prototype.pause = function () {
-            this.autoplay = false;
-        };
-        /**
-         *如果播放了视频后不已不再需要的话,这个时候可以调用这个方法进行资源清理,以方便垃圾回收。
-         * 调用此方法后,此对象一样可以再次设置src重新使用。或者直接进行src的更换,系统会自动调用此方法以清除先前的序列在内存的资源
-         * @method clear
-         * @public
-         * @since 1.0.0
-         */
-        ImageFrames.prototype.clear = function () {
-            var s = this;
-            s._urlLoader.loadCancel();
-            s.list = [];
-            s.src = "";
-            s._lastSrc = "";
-        };
-        return ImageFrames;
-    }(annie.EventDispatcher));
-    annie.ImageFrames = ImageFrames;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -5319,98 +5051,6 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * 将video的内容或者是序列图画到canvas里形成连续播放的效果,以方便做交互
-     * @class annie.VideoPlayer
-     * @extends annie.Bitmap
-     * @public
-     * @since 1.0.0
-     */
-    var VideoPlayer = (function (_super) {
-        __extends(VideoPlayer, _super);
-        /**
-         * @method VideoPlayer
-         * @param {string} src
-         * @param {number} type 视频类型 值为0则会自动检测android下用序列图,其他系统下支持mp4的用mp4,不支持mp4的用序列图,值为1时全部使用序列图,值为2时全部使用mp4
-         * @param {number} width
-         * @param {number} height
-         */
-        function VideoPlayer(src, type, width, height) {
-            var _this = _super.call(this) || this;
-            /**
-             * 视频的引用
-             * @property video
-             * @public
-             * @since 1.0.0
-             */
-            _this.video = null;
-            /**
-             * 播放的视频类型 值为0是序列图,1是视频 只读
-             * @property videoType
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            _this.videoType = 0;
-            var s = _this;
-            s._instanceType = "annie.VideoPlayer";
-            var isUseVideo = true;
-            if (type == 0) {
-                if (annie.osType == "android") {
-                    isUseVideo = false;
-                }
-                else {
-                    //检测是否支持mp4,如果不支持,也将用序列
-                    var testVideo = document.createElement("video");
-                    isUseVideo = testVideo.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"') == "probably";
-                }
-            }
-            else if (type == 1) {
-                isUseVideo = false;
-            }
-            if (isUseVideo) {
-                s.video = new annie.Video(src + ".mp4", 1, 1);
-            }
-            else {
-                s.video = new annie.ImageFrames(src);
-            }
-            s.videoType = isUseVideo ? 1 : 0;
-            s._bounds.width = width;
-            s._bounds.height = height;
-            return _this;
-        }
-        /**
-         * 重写update
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        VideoPlayer.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
-            var s = this;
-            if (s.visible) {
-                //刷新视频
-                if (s.videoType == 0) {
-                    s.video.update(isDrawUpdate);
-                    s.rect = this.video.rect;
-                    s["_texture"] = s.bitmapData = s.video.currentBitmap;
-                }
-                else {
-                    s["_texture"] = s.bitmapData = s.video.media;
-                }
-                _super.prototype.update.call(this, isDrawUpdate);
-            }
-        };
-        return VideoPlayer;
-    }(annie.Bitmap));
-    annie.VideoPlayer = VideoPlayer;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
      * 动态文本类,有时需要在canvas里有一个动态文本,能根据我们的显示内容来改变
      * @class annie.TextField
      * @extends annie.DisplayObject
@@ -5790,7 +5430,7 @@ var annie;
                 s._offsetY = -10;
                 s._UI.UD = false;
                 //给webgl更新新
-                s._texture.updateTexture = true;
+                //s._texture.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }
@@ -6302,21 +5942,18 @@ var annie;
             _this._lastDpList = {};
             _this._rid = -1;
             /**
-             * 鼠标事件后强制更新
-             * @type {boolean}
-             * @private
-             */
-            _this._uae = false;
-            /**
-             * 这个是鼠标事件的对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+             * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
              * @private
              */
             _this._ml = [];
             /**
-             * 刷新mouse或者touch事件
+             * 这个是事件中用到的Point对象池,以提高性能
+             * @type {Array}
              * @private
              */
+            _this._mp = [];
+            //每一个手指事件的对象池
             _this._mouseDownPoint = {};
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
@@ -6336,17 +5973,21 @@ var annie;
              * 当document有鼠标或触摸事件时调用
              * @param e
              */
+            _this._mP1 = new annie.Point();
+            _this._mP2 = new annie.Point();
             _this.onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
                 if (s.isMultiTouch && e.targetTouches) {
                     if (e.targetTouches.length == 2) {
                         //求角度和距离
-                        var p1 = new annie.Point(e.targetTouches[0].clientX - e.target.offsetLeft, e.targetTouches[0].clientY - e.target.offsetTop);
-                        var p2 = new annie.Point(e.targetTouches[1].clientX - e.target.offsetLeft, e.targetTouches[1].clientY - e.target.offsetTop);
-                        var angle = Math.atan2(p1.y - p2.y, p1.x - p2.x) / Math.PI * 180;
-                        var dis = annie.Point.distance(p1, p2);
-                        s.muliPoints.push({ p1: p1, p2: p2, angle: angle, dis: dis });
+                        s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
+                        s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
+                        s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
+                        s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                        var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
+                        var dis = annie.Point.distance(s._mP1, s._mP2);
+                        s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
                         if (s.muliPoints.length >= 2) {
                             //如果有事件，抛事件
                             if (!s._touchEvent) {
@@ -6394,7 +6035,14 @@ var annie;
                         eLen = 0;
                         events = [];
                         identifier = "m" + points[o].identifier;
-                        cp = new annie.Point((points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio, (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio);
+                        if (s._mp.length > 0) {
+                            cp = s._mp.shift();
+                        }
+                        else {
+                            cp = new annie.Point();
+                        }
+                        cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                         if (annie.EventDispatcher.getMouseEventCount() > 0) {
@@ -6542,9 +6190,13 @@ var annie;
                                     }
                                 }
                             }
+                            if (item != "onMouseDown") {
+                                s._mp.push(cp);
+                            }
                             if (item == "onMouseUp") {
-                                s._mouseDownPoint[identifier] = null;
-                                s._lastDpList[identifier] = null;
+                                s._mp.push(s._mouseDownPoint[identifier]);
+                                // s._mouseDownPoint[identifier]=null;
+                                // s._lastDpList[identifier]=null;
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
                             }
@@ -6564,9 +6216,8 @@ var annie;
                         }
                     }
                 }
-                if (s._uae) {
+                if (s._cp) {
                     s.update();
-                    s._uae = false;
                 }
             };
             /**
@@ -6677,14 +6328,16 @@ var annie;
             s.scaleMode = scaleMode;
             s.anchorX = desW / 2;
             s.anchorY = desH / 2;
+            //目前具支持canvas
+            s.renderObj = new annie.CanvasRender(s);
+            /* webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                s.renderObj = new annie.CanvasRender(s);
-            }
-            else {
+                s.renderObj = new CanvasRender(s);
+            } else {
                 //webgl
-                s.renderObj = new annie.WGRender(s);
-            }
+                s.renderObj = new WGRender(s);
+            }*/
             s.renderObj.init();
             window.addEventListener(resizeEvent, function (e) {
                 clearTimeout(s._rid);
@@ -6756,6 +6409,10 @@ var annie;
                 _super.prototype.render.call(this, renderObj);
             }
         };
+        /**
+         * 刷新mouse或者touch事件
+         * @private
+         */
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
             event["_pd"] = false;
             event.clientX = cp.x;
@@ -7820,328 +7477,6 @@ var annie;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * WebGl 渲染器
-     * @class annie.WGRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.2
-     */
-    var WGRender = (function (_super) {
-        __extends(WGRender, _super);
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.2
-         */
-        function WGRender(stage) {
-            var _this = _super.call(this) || this;
-            /**
-             * 渲染器所在最上层的对象
-             * @property rootContainer
-             * @public
-             * @since 1.0.2
-             * @type {any}
-             * @default null
-             */
-            _this.rootContainer = null;
-            _this._maxTextureCount = 0;
-            _this._uniformTexture = 0;
-            _this._posAttr = 0;
-            _this._textAttr = 0;
-            _this._textures = [];
-            _this._instanceType = "annie.WGRender";
-            _this._stage = stage;
-            return _this;
-        }
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.2
-         * @public
-         */
-        WGRender.prototype.begin = function () {
-            var s = this;
-            var gl = s._ctx;
-            if (s._stage.bgColor != "") {
-                var color = s._stage.bgColor;
-                var r = parseInt("0x" + color.substr(1, 2));
-                var g = parseInt("0x" + color.substr(3, 2));
-                var b = parseInt("0x" + color.substr(5, 2));
-                gl.clearColor(r / 255, g / 255, b / 255, 1.0);
-            }
-            else {
-                gl.clearColor(0.0, 0.0, 0.0, 0.0);
-            }
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            s._textures.length = 0;
-        };
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.2
-         */
-        WGRender.prototype.beginMask = function (target) {
-            //更新缓冲模板
-        };
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.2
-         */
-        WGRender.prototype.endMask = function () {
-        };
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.2
-         * @method reSize
-         */
-        WGRender.prototype.reSize = function () {
-            var s = this;
-            var c = s.rootContainer;
-            c.width = s._stage.divWidth * annie.devicePixelRatio;
-            c.height = s._stage.divHeight * annie.devicePixelRatio;
-            c.style.width = s._stage.divWidth + "px";
-            c.style.height = s._stage.divHeight + "px";
-            s._ctx.viewport(0, 0, c.width, c.height);
-            s._dW = c.width;
-            s._dH = c.height;
-            s._pMatrix = new Float32Array([
-                1 / s._dW * 2, 0.0, 0.0,
-                0.0, -1 / s._dH * 2, 0.0,
-                -1.0, 1.0, 1.0
-            ]);
-        };
-        WGRender.prototype._getShader = function (id) {
-            var s = this;
-            var gl = s._ctx;
-            // Find the shader script element
-            var shaderText = "";
-            // Create the shader object instance
-            var shader = null;
-            if (id == 0) {
-                shaderText = 'precision highp float;' +
-                    'varying vec2 v_TC;' +
-                    'uniform sampler2D u_texture;' +
-                    'uniform float u_A;' +
-                    'void main() {' +
-                    'gl_FragColor = texture2D(u_texture, v_TC)*u_A;' +
-                    '}';
-                shader = gl.createShader(gl.FRAGMENT_SHADER);
-            }
-            else {
-                shaderText = 'precision highp float;' +
-                    'attribute vec2 a_P;' +
-                    'attribute vec2 a_TC;' +
-                    'varying vec2 v_TC;' +
-                    'uniform mat3 vMatrix;' +
-                    'uniform mat3 pMatrix;' +
-                    'void main() {' +
-                    'gl_Position =vec4((pMatrix*vMatrix*vec3(a_P, 1.0)).xy, 1.0, 1.0);' +
-                    'v_TC = a_TC;' +
-                    '}';
-                shader = gl.createShader(gl.VERTEX_SHADER);
-            }
-            // Set the shader source code in the shader object instance and compile the shader
-            gl.shaderSource(shader, shaderText);
-            gl.compileShader(shader);
-            // Attach the shaders to the shader program
-            gl.attachShader(s._program, shader);
-            return shader;
-        };
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.2
-         * @method init
-         */
-        WGRender.prototype.init = function () {
-            var s = this;
-            if (!s.rootContainer) {
-                s.rootContainer = document.createElement("canvas");
-                s._stage.rootDiv.appendChild(s.rootContainer);
-            }
-            var c = s.rootContainer;
-            var gl = c.getContext("webgl") || c.getContext('experimental-webgl');
-            s._ctx = gl;
-            s._program = gl.createProgram();
-            var _program = s._program;
-            //初始化顶点着色器和片元着色器
-            s._getShader(0);
-            s._getShader(1);
-            //链接到gpu
-            gl.linkProgram(_program);
-            //使用当前编译的程序
-            gl.useProgram(_program);
-            //改变y轴方向,以对应纹理坐标
-            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-            //设置支持有透明度纹理
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            //取消深度检测
-            gl.disable(gl.DEPTH_TEST);
-            //开启混合模式
-            gl.enable(gl.BLEND);
-            gl.disable(gl.CULL_FACE);
-            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-            // 新建缓存
-            s._buffer = gl.createBuffer();
-            //
-            s._pMI = gl.getUniformLocation(s._program, 'pMatrix');
-            s._vMI = gl.getUniformLocation(s._program, 'vMatrix');
-            s._uA = gl.getUniformLocation(s._program, 'u_A');
-            //
-            s._cM = new annie.Matrix();
-            s._maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) + 1;
-            s._uniformTexture = gl.getUniformLocation(s._program, "u_texture");
-            s._posAttr = gl.getAttribLocation(s._program, "a_P");
-            s._textAttr = gl.getAttribLocation(s._program, "a_TC");
-            gl.enableVertexAttribArray(s._posAttr);
-            gl.enableVertexAttribArray(s._textAttr);
-        };
-        WGRender.prototype.setBuffer = function (buffer, data) {
-            var s = this;
-            var gl = s._ctx;
-            //绑定buffer
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-            //将buffer赋值给一变量
-            gl.vertexAttribPointer(s._posAttr, 2, gl.FLOAT, false, 4 * 4, 0);
-            gl.vertexAttribPointer(s._textAttr, 2, gl.FLOAT, false, 4 * 4, 4 * 2);
-        };
-        /**
-         *  调用渲染
-         * @public
-         * @since 1.0.2
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         * @param {number} type 0图片 1矢量 2文字 3容器
-         */
-        WGRender.prototype.draw = function (target) {
-            var s = this;
-            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp)
-                return;
-            var textureSource = target._texture;
-            if (textureSource && textureSource.width > 0 && textureSource.height > 0) {
-                var gl = s._ctx;
-                var gi = void 0;
-                if (textureSource.updateTexture && target._glInfo) {
-                    gi = target._glInfo;
-                }
-                else {
-                    gi = {};
-                    if (target.rect && !target._isCache) {
-                        var tc = target.rect;
-                        gi.x = tc.x / textureSource.width;
-                        gi.y = tc.y / textureSource.height;
-                        gi.w = (tc.x + tc.width) / textureSource.width;
-                        gi.h = (tc.y + tc.height) / textureSource.height;
-                        gi.pw = tc.width;
-                        gi.ph = tc.height;
-                    }
-                    else {
-                        var cX = target._offsetX;
-                        var cY = target._offsetY;
-                        gi.x = cX / textureSource.width;
-                        gi.y = cY / textureSource.height;
-                        gi.w = (textureSource.width - cX) / textureSource.width;
-                        gi.h = (textureSource.height - cY) / textureSource.height;
-                        gi.pw = (textureSource.width - cX * 2);
-                        gi.ph = (textureSource.height - cY * 2);
-                    }
-                    target._glInfo = gi;
-                }
-                ////////////////////////////////////////////
-                var vertices = [
-                    //x,y,textureX,textureY
-                    0.0, 0.0, gi.x, gi.y,
-                    gi.pw, 0.0, gi.w, gi.y,
-                    0.0, gi.ph, gi.x, gi.h,
-                    gi.pw, gi.ph, gi.w, gi.h
-                ];
-                var m = s._cM;
-                m.identity();
-                m.tx = target._offsetX * 2;
-                m.ty = target._offsetY * 2;
-                m.prepend(target.cMatrix);
-                var vMatrix = new Float32Array([
-                    m.a, m.b, 0,
-                    m.c, m.d, 0,
-                    m.tx, m.ty, 1
-                ]);
-                gl.uniform1i(s._uniformTexture, s.createTexture(textureSource));
-                s.setBuffer(s._buffer, new Float32Array(vertices));
-                gl.uniform1f(s._uA, target.cAlpha);
-                gl.uniformMatrix3fv(s._pMI, false, s._pMatrix);
-                gl.uniformMatrix3fv(s._vMI, false, vMatrix);
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            }
-        };
-        WGRender.prototype.getActiveId = function () {
-            for (var i = 0; i < this._maxTextureCount; i++) {
-                if (!this._textures[i]) {
-                    return i;
-                }
-            }
-            return 0;
-        };
-        WGRender.prototype.createTexture = function (textureSource) {
-            var s = this;
-            var gl = s._ctx;
-            var tid = 0;
-            var needUpdate = true;
-            var isChanged = false;
-            if (textureSource._texture) {
-                tid = textureSource._tid;
-                //如果被占用则需要重新申请
-                if (s._textures[tid] != textureSource) {
-                    //更新tid
-                    tid = s.getActiveId();
-                    isChanged = true;
-                }
-                if (!textureSource.updateTexture) {
-                    needUpdate = false;
-                }
-            }
-            else {
-                tid = s.getActiveId();
-            }
-            gl.activeTexture(gl["TEXTURE" + tid]);
-            if (needUpdate) {
-                var texture = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureSource);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                textureSource._texture = texture;
-            }
-            else {
-                if (isChanged) {
-                    gl.bindTexture(gl.TEXTURE_2D, textureSource._texture);
-                }
-            }
-            textureSource.updateTexture = false;
-            textureSource._tid = tid;
-            s._textures[tid] = textureSource;
-            return tid;
-        };
-        return WGRender;
-    }(annie.AObject));
-    annie.WGRender = WGRender;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -10171,7 +9506,7 @@ var annie;
      *      //打印当前设备的retina值
      *      trace(annie.devicePixelRatio);
      */
-    annie.devicePixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+    annie.devicePixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 2;
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType

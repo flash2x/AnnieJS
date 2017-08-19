@@ -21,9 +21,13 @@ namespace annie {
          * @example
          *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
          *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
-         *          videoPlayer.play();//播放视频
-         *          //videoPlayer.pause();//暂停视频
-         *          //videoPlayer.stop();//停止播放
+         *      videoPlayer.play();//播放视频
+         *      //videoPlayer.pause();//暂停视频
+         *      //videoPlayer.stop();//停止播放
+         *      var floatDisplay=new annie.FloatDisplay();
+         *      floatDisplay.init(videoPlayer);
+         *      //这里的spriteObj是任何一个Sprite类或者其扩展类的实例对象
+         *      spriteObj.addChild(floatDisplay);
          */
         public constructor(src: any, width: number=0, height: number=0) {
             super(src, "Video");
