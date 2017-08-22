@@ -1013,6 +1013,7 @@ declare namespace annie {
          * @default 1
          */
         protected cAlpha: number;
+        isUseToMask: boolean;
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix

@@ -286,7 +286,7 @@ namespace annie {
         public update(isDrawUpdate: boolean = false): void {
             let s: any = this;
             super.update(isDrawUpdate);
-            if (!s._cacheAsBitmap) {
+            if (!s._cacheAsBitmap){
                 let len = s.children.length;
                 let child: any;
                 let maskObjIds: any = [];
@@ -299,8 +299,10 @@ namespace annie {
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
                         }
+                        child.mask.isUseToMask=true;
                         child.mask._UI.UM = true;
                         child.mask.update(isDrawUpdate);
+                        child.mask.isUseToMask=false;
                         maskObjIds.push(child.mask.instanceId);
                     }
                     child.update(isDrawUpdate);

@@ -52,7 +52,6 @@ namespace annie {
             }
             return colorObj;
         }
-
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -650,7 +649,7 @@ namespace annie {
         public update(isDrawUpdate:boolean=false): void {
             let s = this;
             super.update(isDrawUpdate);
-            if (s._UI.UD || s._UI.UF) {
+            if (s._UI.UD || s._UI.UF){
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -658,7 +657,7 @@ namespace annie {
                 let buttonRightX: number;
                 let buttonRightY: number;
                 let i: number;
-                if (cLen > 0) {
+                if (cLen > 0){
                     //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
                     let data: any;
                     let lastX = 0;
@@ -746,8 +745,8 @@ namespace annie {
                                 buttonRightY = Math.max(buttonRightY, yuanBRY);
                             }
                         } else {
-                            if (data[1] == "lineWidth") {
-                                if (lineWidth < data[2]) {
+                            if (data[1] == "lineWidth"){
+                                if (lineWidth < data[2]){
                                     lineWidth = data[2];
                                 }
                             }
@@ -770,30 +769,32 @@ namespace annie {
                         s._bounds.y=leftY;
                         s._bounds.width = w;
                         s._bounds.height = h;
-                        ///////////////////////////
-                        let _canvas:any = s._texture;
-                        let ctx = _canvas["getContext"]('2d');
-                        _canvas.width = w;
-                        _canvas.height = h;
-                        _canvas.style.width = w / devicePixelRatio + "px";
-                        _canvas.style.height = h / devicePixelRatio + "px";
-                        ctx.clearRect(0, 0, w, h);
-                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        ////////////////////
-                        s._drawShape(ctx);
-                        ///////////////////////////
-                        //滤镜
-                        let cf = s.cFilters;
-                        let cfLen = cf.length;
-                        if (cfLen > 0) {
-                            let imageData = ctx.getImageData(0, 0, w, h);
-                            for (let i = 0; i < cfLen; i++) {
-                                cf[i].drawFilter(imageData);
+                        ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
+                        if(!s.isUseToMask&&!s.parent.isUseToMask){
+                            let _canvas: any = s._texture;
+                            let ctx = _canvas["getContext"]('2d');
+                            _canvas.width = w;
+                            _canvas.height = h;
+                            _canvas.style.width = w / devicePixelRatio + "px";
+                            _canvas.style.height = h / devicePixelRatio + "px";
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                            ////////////////////
+                            s._drawShape(ctx);
+                            ///////////////////////////
+                            //滤镜
+                            let cf = s.cFilters;
+                            let cfLen = cf.length;
+                            if (cfLen > 0) {
+                                let imageData = ctx.getImageData(0, 0, w, h);
+                                for (let i = 0; i < cfLen; i++) {
+                                    cf[i].drawFilter(imageData);
+                                }
+                                ctx.putImageData(imageData, 0, 0);
                             }
-                            ctx.putImageData(imageData, 0, 0);
+                            //给webgl更新新
+                            //_canvas.updateTexture = true;
                         }
-                        //给webgl更新新
-                        //_canvas.updateTexture = true;
                     }
                 }
                 s._UI.UD = false;

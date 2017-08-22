@@ -602,6 +602,7 @@ namespace annie {
                             }
                         }
                         //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
+                        trace(s._ml.length);
                         if(item!="onMouseDown"){
                             if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                 if (s._lastDpList[identifier]) {

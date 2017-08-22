@@ -1518,6 +1518,7 @@ var annie;
              * @default 1
              */
             _this.cAlpha = 1;
+            _this.isUseToMask = false;
             /**
              * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
@@ -3166,30 +3167,32 @@ var annie;
                         s._bounds.y = leftY;
                         s._bounds.width = w;
                         s._bounds.height = h;
-                        ///////////////////////////
-                        var _canvas = s._texture;
-                        var ctx = _canvas["getContext"]('2d');
-                        _canvas.width = w;
-                        _canvas.height = h;
-                        _canvas.style.width = w / annie.devicePixelRatio + "px";
-                        _canvas.style.height = h / annie.devicePixelRatio + "px";
-                        ctx.clearRect(0, 0, w, h);
-                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        ////////////////////
-                        s._drawShape(ctx);
-                        ///////////////////////////
-                        //滤镜
-                        var cf = s.cFilters;
-                        var cfLen = cf.length;
-                        if (cfLen > 0) {
-                            var imageData = ctx.getImageData(0, 0, w, h);
-                            for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                cf[i_1].drawFilter(imageData);
+                        ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
+                        if (!s.isUseToMask && !s.parent.isUseToMask) {
+                            var _canvas = s._texture;
+                            var ctx = _canvas["getContext"]('2d');
+                            _canvas.width = w;
+                            _canvas.height = h;
+                            _canvas.style.width = w / annie.devicePixelRatio + "px";
+                            _canvas.style.height = h / annie.devicePixelRatio + "px";
+                            ctx.clearRect(0, 0, w, h);
+                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                            ////////////////////
+                            s._drawShape(ctx);
+                            ///////////////////////////
+                            //滤镜
+                            var cf = s.cFilters;
+                            var cfLen = cf.length;
+                            if (cfLen > 0) {
+                                var imageData = ctx.getImageData(0, 0, w, h);
+                                for (var i_1 = 0; i_1 < cfLen; i_1++) {
+                                    cf[i_1].drawFilter(imageData);
+                                }
+                                ctx.putImageData(imageData, 0, 0);
                             }
-                            ctx.putImageData(imageData, 0, 0);
+                            //给webgl更新新
+                            //_canvas.updateTexture = true;
                         }
-                        //给webgl更新新
-                        //_canvas.updateTexture = true;
                     }
                 }
                 s._UI.UD = false;
@@ -3691,8 +3694,10 @@ var annie;
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
                         }
+                        child.mask.isUseToMask = true;
                         child.mask._UI.UM = true;
                         child.mask.update(isDrawUpdate);
+                        child.mask.isUseToMask = false;
                         maskObjIds.push(child.mask.instanceId);
                     }
                     child.update(isDrawUpdate);
@@ -6120,6 +6125,7 @@ var annie;
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
+                            trace(s._ml.length);
                             if (item != "onMouseDown") {
                                 if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                     if (s._lastDpList[identifier]) {
@@ -9506,7 +9512,7 @@ var annie;
      *      //打印当前设备的retina值
      *      trace(annie.devicePixelRatio);
      */
-    annie.devicePixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 2;
+    annie.devicePixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1;
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
