@@ -288,7 +288,8 @@ declare namespace annieUI {
          */
         private _isBreak;
         /**
-         * @property 滚动距离
+         * 滚动距离
+         * @property distance
          * @type {number}
          * @protected
          * @default 0
@@ -325,7 +326,7 @@ declare namespace annieUI {
         currentPageIndex: number;
         /**
          * 页面是否移动
-         * @property currentPageIndex
+         * @property isMoving
          * @type {boolean}
          * @public
          * @default false
@@ -363,7 +364,7 @@ declare namespace annieUI {
         private fSpeed;
         /**
          * 是否点击了鼠标
-         * @property fSpeed
+         * @property isMouseDown
          * @type {boolean}
          * @private
          */
@@ -415,9 +416,9 @@ declare namespace annieUI {
          * @method slideTo
          * @public
          * @since 1.1.1
-         * @param {boolean} isNext 是向上还是向下
+         * @param {number} index 是向上还是向下
          */
-        slideTo(isNext: boolean): void;
+        slideTo(index: number): void;
         /**
          * 用于插入分页
          * @method addPageList

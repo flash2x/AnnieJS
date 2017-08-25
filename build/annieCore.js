@@ -1602,6 +1602,9 @@ var annie;
              * @private
              */
             _this._cp = true;
+            _this._dragBounds = new annie.Rectangle();
+            _this._isDragCenter = false;
+            _this._lastDragPoint = new annie.Point();
             /**
              * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
              * @property _texture
@@ -1886,6 +1889,46 @@ var annie;
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
             return this.cMatrix.transformPoint(point.x, point.y, bp);
+        };
+        /**
+         * 启动鼠标或者触摸拖动
+         * @method startDrag
+         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
+         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @since 1.1.2
+         * @public
+         */
+        DisplayObject.prototype.startDrag = function (isCenter, bounds) {
+            if (isCenter === void 0) { isCenter = false; }
+            if (bounds === void 0) { bounds = null; }
+            var s = this;
+            annie.Stage._dragDisplay = s;
+            s._isDragCenter = isCenter;
+            s._lastDragPoint.x = Number.MAX_VALUE;
+            s._lastDragPoint.y = Number.MAX_VALUE;
+            if (bounds) {
+                s._dragBounds.x = bounds.x;
+                s._dragBounds.y = bounds.y;
+                s._dragBounds.width = bounds.width;
+                s._dragBounds.height = bounds.height;
+            }
+            else {
+                s._dragBounds.x = 0;
+                s._dragBounds.y = 0;
+                s._dragBounds.width = 0;
+                s._dragBounds.height = 0;
+            }
+        };
+        /**
+         * 停止鼠标或者触摸拖动
+         * @method stopDrag
+         * @public
+         * @since 1.1.2
+         */
+        DisplayObject.prototype.stopDrag = function () {
+            if (annie.Stage._dragDisplay == this) {
+                annie.Stage._dragDisplay = null;
+            }
         };
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
@@ -6125,7 +6168,6 @@ var annie;
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                            trace(s._ml.length);
                             if (item != "onMouseDown") {
                                 if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                     if (s._lastDpList[identifier]) {
@@ -6195,11 +6237,51 @@ var annie;
                                         }
                                     }
                                 }
-                            }
-                            if (item != "onMouseDown") {
                                 s._mp.push(cp);
                             }
+                            //判断是否有drag的显示对象
+                            var sd = Stage._dragDisplay;
+                            if (sd && sd.stage && sd.parent) {
+                                var x1 = sd.x, y1 = sd.y;
+                                lp = sd.parent.globalToLocal(cp, annie.DisplayObject._bp);
+                                if (!sd._isDragCenter) {
+                                    if (sd._lastDragPoint.x != Number.MAX_VALUE) {
+                                        x1 += lp.x - sd._lastDragPoint.x;
+                                        y1 += lp.y - sd._lastDragPoint.y;
+                                    }
+                                    sd._lastDragPoint.x = lp.x;
+                                    sd._lastDragPoint.y = lp.y;
+                                }
+                                else {
+                                    x1 = lp.x;
+                                    y1 = lp.y;
+                                }
+                                lp.x = x1;
+                                lp.y = y1;
+                                if (sd._dragBounds.width != 0) {
+                                    if (!sd._dragBounds.isPointIn(lp)) {
+                                        if (x1 < sd._dragBounds.x) {
+                                            x1 = sd._dragBounds.x;
+                                        }
+                                        else if (x1 > sd._dragBounds.x + sd._dragBounds.width) {
+                                            x1 = sd._dragBounds.x + sd._dragBounds.width;
+                                        }
+                                        if (y1 < sd._dragBounds.y) {
+                                            y1 = sd._dragBounds.y;
+                                        }
+                                        else if (y1 > sd._dragBounds.y + sd._dragBounds.height) {
+                                            y1 = sd._dragBounds.y + sd._dragBounds.height;
+                                        }
+                                    }
+                                }
+                                sd.x = x1;
+                                sd.y = y1;
+                            }
                             if (item == "onMouseUp") {
+                                if (sd) {
+                                    sd._lastDragPoint.x = Number.MAX_VALUE;
+                                    sd._lastDragPoint.y = Number.MAX_VALUE;
+                                }
                                 s._mp.push(s._mouseDownPoint[identifier]);
                                 // s._mouseDownPoint[identifier]=null;
                                 // s._lastDpList[identifier]=null;
@@ -6573,6 +6655,7 @@ var annie;
                 }
             }
         };
+        Stage._dragDisplay = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}

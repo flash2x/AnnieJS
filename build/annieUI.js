@@ -525,7 +525,8 @@ var annieUI;
              */
             _this._isBreak = false;
             /**
-             * @property 滚动距离
+             * 滚动距离
+             * @property distance
              * @type {number}
              * @protected
              * @default 0
@@ -562,7 +563,7 @@ var annieUI;
             _this.currentPageIndex = 0;
             /**
              * 页面是否移动
-             * @property currentPageIndex
+             * @property isMoving
              * @type {boolean}
              * @public
              * @default false
@@ -600,7 +601,7 @@ var annieUI;
             _this.fSpeed = 10;
             /**
              * 是否点击了鼠标
-             * @property fSpeed
+             * @property isMouseDown
              * @type {boolean}
              * @private
              */
@@ -718,7 +719,8 @@ var annieUI;
                 }
                 else {
                     if (Math.abs(ts) > 100 && !s._isBreak) {
-                        s.slideTo(ts < 0);
+                        var id = s.currentPageIndex;
+                        s.slideTo(ts < 0 ? id + 1 : id - 1);
                     }
                 }
             }
@@ -728,24 +730,26 @@ var annieUI;
          * @method slideTo
          * @public
          * @since 1.1.1
-         * @param {boolean} isNext 是向上还是向下
+         * @param {number} index 是向上还是向下
          */
-        SlidePage.prototype.slideTo = function (isNext) {
+        SlidePage.prototype.slideTo = function (index) {
             var s = this;
-            if (s.isMoving) {
+            if (s.isMoving || s.currentPageIndex == index) {
                 return;
             }
+            var lastId = s.currentPageIndex;
+            var isNext = s.currentPageIndex < index ? true : false;
             if (isNext) {
-                if (s.currentPageIndex < s.listLen - 1 && s.canSlideNext) {
-                    s.currentPageIndex++;
+                if (index < s.listLen && s.canSlideNext) {
+                    s.currentPageIndex = index;
                 }
                 else {
                     return;
                 }
             }
             else {
-                if (s.currentPageIndex > 0 && s.canSlidePrev) {
-                    s.currentPageIndex--;
+                if (index >= 0 && s.canSlidePrev) {
+                    s.currentPageIndex = index;
                 }
                 else {
                     return;
@@ -753,8 +757,15 @@ var annieUI;
             }
             if (!s.pageList[s.currentPageIndex]) {
                 s.pageList[s.currentPageIndex] = new s.pageClassList[s.currentPageIndex]();
-                s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
             }
+            s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
+            if (isNext) {
+                s.pageList[lastId][s.paramXY] = (s.currentPageIndex - 1) * s.distance;
+            }
+            else {
+                s.pageList[lastId][s.paramXY] = (s.currentPageIndex + 1) * s.distance;
+            }
+            s.view[s.paramXY] = -s.pageList[lastId][s.paramXY];
             s.view.addChild(s.pageList[s.currentPageIndex]);
             s.view.mouseEnable = false;
             s.isMoving = true;
@@ -766,16 +777,11 @@ var annieUI;
             tweenData.onComplete = function () {
                 s.view.mouseEnable = true;
                 s.isMoving = false;
-                if (isNext) {
-                    s.view.removeChild(s.pageList[s.currentPageIndex - 1]);
-                }
-                else {
-                    s.view.removeChild(s.pageList[s.currentPageIndex + 1]);
-                }
+                s.view.removeChild(s.pageList[lastId]);
                 s.dispatchEvent("onSlideEnd");
             };
             annie.Tween.to(s.view, s.slideSpeed, tweenData);
-            s.dispatchEvent("onSlideStart", { isNext: isNext });
+            s.dispatchEvent("onSlideStart", { currentPage: s.currentPageIndex, lastPage: lastId });
         };
         /**
          * 用于插入分页
@@ -1660,7 +1666,7 @@ var annieUI;
         DrawingBoard.prototype.onMouseUp = function (e) {
             var s = this;
             s._isMouseDown = false;
-            if (s.addStepObj.ps.length > 0) {
+            if (s.addStepObj.ps && s.addStepObj.ps.length > 0) {
                 s.currentStepId++;
                 s.totalStepList.push(s.addStepObj);
             }

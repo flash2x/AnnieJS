@@ -378,7 +378,47 @@ namespace annie {
         public static _p2: Point = new Point();
         public static _p3: Point = new Point();
         public static _p4: Point = new Point();
+        protected _dragBounds:Rectangle=new Rectangle();
+        protected _isDragCenter:boolean=false;
+        protected _lastDragPoint:Point=new Point();
+        /**
+         * 启动鼠标或者触摸拖动
+         * @method startDrag
+         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
+         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @since 1.1.2
+         * @public
+         */
+        public startDrag(isCenter:boolean=false,bounds:Rectangle=null):void{
+            let s=this;
+            Stage._dragDisplay=s;
+            s._isDragCenter = isCenter;
+            s._lastDragPoint.x=Number.MAX_VALUE;
+            s._lastDragPoint.y=Number.MAX_VALUE;
+            if(bounds) {
+                s._dragBounds.x = bounds.x;
+                s._dragBounds.y = bounds.y;
+                s._dragBounds.width = bounds.width;
+                s._dragBounds.height = bounds.height;
+            }else{
+                s._dragBounds.x=0;
+                s._dragBounds.y=0;
+                s._dragBounds.width=0;
+                s._dragBounds.height=0;
+            }
+        }
 
+        /**
+         * 停止鼠标或者触摸拖动
+         * @method stopDrag
+         * @public
+         * @since 1.1.2
+         */
+        public stopDrag():void{
+            if(Stage._dragDisplay==this) {
+                Stage._dragDisplay = null;
+            }
+        }
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint

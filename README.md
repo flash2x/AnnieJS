@@ -73,15 +73,17 @@
     无限期去掉webGl的支持，对2d交互支持不成熟，反正我是这么认为了
     删除annie.ImageFrame类,使用有缺陷
     删除annie.VideoPlayer类,使用有缺陷
-    修复获取宽高不准的bug
+    更改了annieUI.SlidePage.slideTo()方法的参数类型,现在是传页数后跳到指定页数,不再像之前那样只能上一页下一页
+    修复annie.DisplayObject获取宽高不准的bug
     修复的annie.Shape类的鼠标或者触摸区域有误差导致明明点到边界上了确没有触发鼠标或者触摸事件的bug
     修复导出静态，动态，输入文本会前后上下少2像素导致单行变多行的bug
     修复Flash2x.LoadScene()加载一个场景中断后再次加载报错的bug
     修复在annie.Event.ADD_TO_STAGE事件里调整stage.scaleMode后调用stage.resize()无效的bug
     修复使用annie.Tween.from方法时,被tween对象开始转换属性时会跳跃的Bug
-    增加MouseEvent.identifier属性以方便在多手指触摸时更精准获取相关MouseEvent事件
-    增加将Sprite类缓存为位图功能
-    增加直接对FloatDisplay元素使用annie.MouseEvent鼠标事件
+    增加annie.MouseEvent.identifier属性以方便在多手指触摸时更精准获取相关MouseEvent事件
+    增加将annie.Sprite类缓存为位图功能
+    增加直接对annie.FloatDisplay元素使用annie.MouseEvent鼠标事件
+    增加了annie.DisplayObject 的startDrag()方法和stopDrag()方法
     优化渲染结构
 ## AnnieJS 1.1.1 版本
     修复annie.Tween偶尔kill的时候会kill到其他tween对象的bug

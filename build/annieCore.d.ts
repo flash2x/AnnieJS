@@ -1243,6 +1243,25 @@ declare namespace annie {
         static _p2: Point;
         static _p3: Point;
         static _p4: Point;
+        protected _dragBounds: Rectangle;
+        protected _isDragCenter: boolean;
+        protected _lastDragPoint: Point;
+        /**
+         * 启动鼠标或者触摸拖动
+         * @method startDrag
+         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
+         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @since 1.1.2
+         * @public
+         */
+        startDrag(isCenter?: boolean, bounds?: Rectangle): void;
+        /**
+         * 停止鼠标或者触摸拖动
+         * @method stopDrag
+         * @public
+         * @since 1.1.2
+         */
+        stopDrag(): void;
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -2978,6 +2997,7 @@ declare namespace annie {
          * @type {number}
          */
         private _currentFlush;
+        static _dragDisplay: DisplayObject;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
          * @type {Array}

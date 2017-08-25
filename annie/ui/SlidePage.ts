@@ -131,7 +131,7 @@ namespace annieUI {
         private fSpeed: number = 10;
         /**
          * 是否点击了鼠标
-         * @property fSpeed
+         * @property isMouseDown
          * @type {boolean}
          * @private
          */
@@ -253,7 +253,8 @@ namespace annieUI {
                         annie.Tween.to(s.view, 0.2, tweenData);
                 }else{
                     if (Math.abs(ts) > 100&&!s._isBreak) {
-                        s.slideTo(ts < 0);
+                        let id=s.currentPageIndex;
+                        s.slideTo(ts<0?id+1:id-1);
                     }
                 }
             }
@@ -264,30 +265,38 @@ namespace annieUI {
          * @method slideTo
          * @public
          * @since 1.1.1
-         * @param {boolean} isNext 是向上还是向下
+         * @param {number} index 是向上还是向下
          */
-        public slideTo(isNext: boolean):void{
-            var s = this;
-            if (s.isMoving) {
+        public slideTo(index: number):void{
+            let s:any = this;
+            if (s.isMoving||s.currentPageIndex==index) {
                 return;
             }
+            let lastId=s.currentPageIndex;
+            let isNext=s.currentPageIndex<index?true:false;
             if (isNext) {
-                if (s.currentPageIndex <s.listLen - 1&&s.canSlideNext) {
-                    s.currentPageIndex++;
+                if (index<s.listLen&&s.canSlideNext) {
+                    s.currentPageIndex=index;
                 } else {
                     return;
                 }
             } else {
-                if (s.currentPageIndex > 0&&s.canSlidePrev) {
-                    s.currentPageIndex--;
+                if (index >=0&&s.canSlidePrev) {
+                    s.currentPageIndex=index;
                 } else {
                     return;
                 }
             }
             if (!s.pageList[s.currentPageIndex]) {
                 s.pageList[s.currentPageIndex] = new s.pageClassList[s.currentPageIndex]();
-                s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
             }
+            s.pageList[s.currentPageIndex][s.paramXY] = s.currentPageIndex * s.distance;
+            if(isNext) {
+                s.pageList[lastId][s.paramXY]=(s.currentPageIndex-1)*s.distance;
+            }else{
+                s.pageList[lastId][s.paramXY]=(s.currentPageIndex+1)*s.distance;
+            }
+            s.view[s.paramXY]=-s.pageList[lastId][s.paramXY];
             s.view.addChild(s.pageList[s.currentPageIndex]);
             s.view.mouseEnable = false;
             s.isMoving = true;
@@ -299,15 +308,11 @@ namespace annieUI {
             tweenData.onComplete = function () {
                 s.view.mouseEnable = true;
                 s.isMoving = false;
-                if (isNext) {
-                    s.view.removeChild(s.pageList[s.currentPageIndex - 1]);
-                } else {
-                    s.view.removeChild(s.pageList[s.currentPageIndex + 1]);
-                }
+                s.view.removeChild(s.pageList[lastId]);
                 s.dispatchEvent("onSlideEnd");
             };
             annie.Tween.to(s.view, s.slideSpeed, tweenData);
-            s.dispatchEvent("onSlideStart", {isNext: isNext});
+            s.dispatchEvent("onSlideStart", {currentPage:s.currentPageIndex,lastPage:lastId});
         }
 
         /**
