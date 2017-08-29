@@ -4095,8 +4095,10 @@ var annie;
          */
         function Sound(src) {
             var _this = _super.call(this, src, "Audio") || this;
-            _this._instanceType = "annie.Sound";
-            annie.Sound._soundList.push(_this);
+            var s = _this;
+            s._instanceType = "annie.Sound";
+            annie.Sound._soundList.push(s);
+            s.volume = Sound._volume;
             return _this;
         }
         /**
@@ -4149,9 +4151,11 @@ var annie;
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
+            Sound._volume = volume;
         };
         //声音对象池
         Sound._soundList = [];
+        Sound._volume = 1;
         return Sound;
     }(annie.Media));
     annie.Sound = Sound;

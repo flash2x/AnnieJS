@@ -24,8 +24,10 @@ namespace annie {
          */
         public constructor(src: any) {
             super(src, "Audio");
-            this._instanceType = "annie.Sound";
-            annie.Sound._soundList.push(this);
+            let s=this;
+            s._instanceType = "annie.Sound";
+            annie.Sound._soundList.push(s);
+            s.volume=Sound._volume;
         }
 
         /**
@@ -70,7 +72,7 @@ namespace annie {
          * @public
          * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
          */
-        public static setAllSoundsVolume(volume: number) {
+        public static setAllSoundsVolume(volume: number){
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
@@ -79,6 +81,8 @@ namespace annie {
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
+            Sound._volume=volume;
         }
+        private static _volume:number=1;
     }
 }

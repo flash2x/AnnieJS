@@ -2133,6 +2133,7 @@ declare namespace annie {
          * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
          */
         static setAllSoundsVolume(volume: number): void;
+        private static _volume;
     }
 }
 /**
