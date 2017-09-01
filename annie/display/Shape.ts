@@ -698,7 +698,7 @@ namespace annie {
                             } else if (data[1] == "quadraticCurveTo") {
                                 //求中点
                                 let mid1X = (lastX + data[2][0]) * 0.5;
-                                let mid1Y = (lastX + data[2][1]) * 0.5;
+                                let mid1Y = (lastY + data[2][1]) * 0.5;
                                 let mid2X = (data[2][0] + data[2][2]) * 0.5;
                                 let mid2Y = (data[2][1] + data[2][3]) * 0.5;
                                 if (leftX == undefined) {

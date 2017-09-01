@@ -2497,7 +2497,7 @@ declare namespace annie {
          */
         constructor();
         /**
-         * 初始化方法
+         * 初始化方法,htmlElement 一定要设置width和height样式,并且一定要用px单位
          * @method init
          * @public
          * @since 1.0.0
@@ -2511,7 +2511,7 @@ declare namespace annie {
          * @public
          */
         delElement(): void;
-        getBounds(): Rectangle;
+        private getStyle(elem, cssName);
         /**
          * 重写刷新
          * @method update

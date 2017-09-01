@@ -152,7 +152,7 @@ namespace annie {
                         }
                     }
                     if(cf){
-                        cf.apply(null,pm);
+                        cf(pm);
                     }
                 }
             } else {
@@ -165,7 +165,7 @@ namespace annie {
                         Tween.kill(s.instanceId);
                     }
                     if(cf){
-                        cf.apply(null,pm);
+                        cf(pm);
                     }
                 }
             }

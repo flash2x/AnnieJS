@@ -68,7 +68,7 @@ namespace annie {
         }
 
         /**
-         * 初始化方法
+         * 初始化方法,htmlElement 一定要设置width和height样式,并且一定要用px单位
          * @method init
          * @public
          * @since 1.0.0
@@ -87,7 +87,17 @@ namespace annie {
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-
+            let ws=s.getStyle(htmlElement,"width");
+            let hs=s.getStyle(htmlElement,"height");
+            let w=0,h=0;
+            if(ws.indexOf("px")){
+                w=parseInt(ws);
+            }
+            if(hs.indexOf("px")){
+                h=parseInt(hs);
+            }
+            s._bounds.width=w;
+            s._bounds.height=h;
         }
         /**
          * 删除html元素,这样就等于解了封装
@@ -106,26 +116,23 @@ namespace annie {
                 this.htmlElement = null;
             }
         }
-        public getBounds():Rectangle{
-            let s=this;
-            s._bounds.width=0;
-            s._bounds.height=0;
-            if(s.htmlElement){
-                let sh=s.htmlElement;
-                let ss=sh.style;
-                if(sh.width&&sh.height){
-                    s._bounds.width=sh.width;
-                    s._bounds.height=sh.height;
-                }else{
-                    if(ss.width.indexOf("px")<0||ss.height.indexOf("px")<0){
-                        trace("htmlElement must set style.width and style.height with 'px'");
-                    }else{
-                        s._bounds.width=parseInt(ss.width);
-                        s._bounds.height=parseInt(ss.height);
-                    }
-                }
+        private getStyle(elem:HTMLElement, cssName:any ):any
+        {
+            //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
+            if (elem.style[cssName])
+            {
+                return elem.style[cssName];
             }
-            return s._bounds;
+            if (document.defaultView && document.defaultView.getComputedStyle)
+            {
+                //它使用传统的"text-Align"风格的规则书写方式，而不是"textAlign"
+                cssName = cssName.replace(/([A-Z])/g,"-$1");
+                cssName = cssName.toLowerCase();
+                //获取style对象并取得属性的值(如果存在的话)
+                let s = document.defaultView.getComputedStyle(elem,"");
+                return s && s.getPropertyValue(cssName);
+            }
+            return null;
         }
         /**
          * 重写刷新
