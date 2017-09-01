@@ -8170,7 +8170,7 @@ var Flash2x;
                 //全部资源加载完成
                 _isLoading = false;
                 //_progressCallback(100);
-                _completeCallback(info);
+                setTimeout(function () { _completeCallback(info); }, 100);
             }
             else {
                 _completeCallback(info);
