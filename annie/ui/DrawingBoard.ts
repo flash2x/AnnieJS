@@ -124,10 +124,12 @@ namespace annieUI {
 
         private onMouseUp(e: annie.MouseEvent): void {
             let s = this;
-            s._isMouseDown = false;
-            if (s.addStepObj.ps&&s.addStepObj.ps.length > 0) {
-                s.currentStepId++;
-                s.totalStepList.push(s.addStepObj);
+            if(s._isMouseDown) {
+                s._isMouseDown = false;
+                if (s.addStepObj.ps && s.addStepObj.ps.length > 0) {
+                    s.currentStepId++;
+                    s.totalStepList.push(s.addStepObj);
+                }
             }
         };
 
