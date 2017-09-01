@@ -2,9 +2,6 @@
  * Created by anlun on 2017/5/24.
  */
 /**
- * Created by anlun on 2017/5/24.
- */
-/**
  * @module annieUI
  */
 namespace annieUI {
@@ -32,19 +29,20 @@ namespace annieUI {
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e: annie.MouseEvent) {
-                //通过移动，计算刮开的面积
-                let dw: number = Math.floor(e.localX / s._drawRadius);
-                let dh: number = Math.floor(e.localY / s._drawRadius);
-                if (s._drawList[dw] && s._drawList[dw][dh]) {
-                    s._drawList[dw][dh] = false;
-                    s._currentDraw++;
-                    //抛事件
-                    let per = Math.floor(s._currentDraw / s._totalDraw * 100);
-                    s.dispatchEvent("onDrawTime", {per: per});
+                if(s._isMouseDown) {
+                    //通过移动，计算刮开的面积
+                    let dw: number = Math.floor(e.localX / s._drawRadius);
+                    let dh: number = Math.floor(e.localY / s._drawRadius);
+                    if (s._drawList[dw] && s._drawList[dw][dh]) {
+                        s._drawList[dw][dh] = false;
+                        s._currentDraw++;
+                        //抛事件
+                        let per = Math.floor(s._currentDraw / s._totalDraw * 100);
+                        s.dispatchEvent("onDrawTime", {per: per});
+                    }
                 }
             })
         }
-
         private _drawList: any = [];
         private _totalDraw: number = 1;
         private _currentDraw: number = 0;

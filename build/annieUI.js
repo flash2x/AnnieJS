@@ -1647,6 +1647,7 @@ var annieUI;
         ;
         DrawingBoard.prototype.onMouseDown = function (e) {
             var s = this;
+            s._isMouseDown = true;
             var ctx = s.context;
             ctx.beginPath();
             ctx.strokeStyle = s.drawColor;
@@ -1654,7 +1655,6 @@ var annieUI;
             var lx = e.localX >> 0;
             var ly = e.localY >> 0;
             ctx.moveTo(lx, ly);
-            s._isMouseDown = true;
             s.addStepObj = {};
             s.addStepObj.c = s.drawColor;
             s.addStepObj.r = s._drawRadius;
@@ -1760,9 +1760,6 @@ var annieUI;
  * Created by anlun on 2017/5/24.
  */
 /**
- * Created by anlun on 2017/5/24.
- */
-/**
  * @module annieUI
  */
 var annieUI;
@@ -1796,15 +1793,17 @@ var annieUI;
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e) {
-                //通过移动，计算刮开的面积
-                var dw = Math.floor(e.localX / s._drawRadius);
-                var dh = Math.floor(e.localY / s._drawRadius);
-                if (s._drawList[dw] && s._drawList[dw][dh]) {
-                    s._drawList[dw][dh] = false;
-                    s._currentDraw++;
-                    //抛事件
-                    var per = Math.floor(s._currentDraw / s._totalDraw * 100);
-                    s.dispatchEvent("onDrawTime", { per: per });
+                if (s._isMouseDown) {
+                    //通过移动，计算刮开的面积
+                    var dw = Math.floor(e.localX / s._drawRadius);
+                    var dh = Math.floor(e.localY / s._drawRadius);
+                    if (s._drawList[dw] && s._drawList[dw][dh]) {
+                        s._drawList[dw][dh] = false;
+                        s._currentDraw++;
+                        //抛事件
+                        var per = Math.floor(s._currentDraw / s._totalDraw * 100);
+                        s.dispatchEvent("onDrawTime", { per: per });
+                    }
                 }
             });
             return _this;

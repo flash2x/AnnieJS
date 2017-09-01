@@ -15,7 +15,7 @@ namespace annieUI {
      */
     export class DrawingBoard extends annie.Bitmap {
         protected context: CanvasRenderingContext2D = null;
-        private _isMouseDown: boolean = false;
+        protected _isMouseDown: boolean = false;
 
         /**
          * 绘画半径
@@ -105,15 +105,15 @@ namespace annieUI {
         }
 
         private onMouseDown(e: annie.MouseEvent): void {
-            var s = this;
-            var ctx = s.context;
+            let s = this;
+            s._isMouseDown = true;
+            let ctx = s.context;
             ctx.beginPath();
             ctx.strokeStyle = s.drawColor;
             ctx.lineWidth = s._drawRadius;
             let lx: number = e.localX >> 0;
             let ly: number = e.localY >> 0;
             ctx.moveTo(lx, ly);
-            s._isMouseDown = true;
             s.addStepObj = {};
             s.addStepObj.c = s.drawColor;
             s.addStepObj.r = s._drawRadius;
@@ -132,9 +132,9 @@ namespace annieUI {
         };
 
         private onMouseMove(e: annie.MouseEvent): void {
-            var s = this;
+            let s = this;
             if (s._isMouseDown) {
-                var ctx = s.context;
+                let ctx = s.context;
                 let lx: number = e.localX >> 0;
                 let ly: number = e.localY >> 0;
                 ctx.lineTo(lx, ly);
@@ -188,7 +188,7 @@ namespace annieUI {
                     }
                     let len: number = s.totalStepList.length;
                     for (let i = 0; i < len; i++) {
-                        var ctx = s.context;
+                        let ctx = s.context;
                         ctx.beginPath();
                         ctx.strokeStyle = s.totalStepList[i].c;
                         ctx.lineWidth = s.totalStepList[i].r;

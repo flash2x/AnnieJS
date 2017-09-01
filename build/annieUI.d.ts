@@ -655,7 +655,7 @@ declare namespace annieUI {
      */
     class DrawingBoard extends annie.Bitmap {
         protected context: CanvasRenderingContext2D;
-        private _isMouseDown;
+        protected _isMouseDown: boolean;
         /**
          * 绘画半径
          * @property drawRadius
@@ -733,9 +733,6 @@ declare namespace annieUI {
         cancel(step?: number): boolean;
     }
 }
-/**
- * Created by anlun on 2017/5/24.
- */
 /**
  * Created by anlun on 2017/5/24.
  */
