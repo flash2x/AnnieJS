@@ -2174,7 +2174,7 @@ var annie;
         DisplayObject.prototype.getWH = function () {
             var s = this;
             s.update();
-            var dr = s._drawRect;
+            var dr = s.getDrawRect();
             return { width: dr.width, height: dr.height };
         };
         //protected _isNeedUpdate: boolean = true;

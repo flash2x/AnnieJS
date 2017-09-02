@@ -645,7 +645,7 @@ namespace annie {
         public getWH():{width:number,height:number}{
             let s = this;
             s.update();
-            let dr = s._drawRect;
+            let dr = s.getDrawRect();
             return {width:dr.width,height:dr.height};
         }
         /**
