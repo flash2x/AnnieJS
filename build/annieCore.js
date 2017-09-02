@@ -2133,7 +2133,7 @@ var annie;
             set: function (value) {
                 var s = this;
                 var w = s.width;
-                if (value != 0) {
+                if (value > 0 && w > 0) {
                     var sx = value / w;
                     s.scaleX *= sx;
                 }
@@ -2156,7 +2156,7 @@ var annie;
             set: function (value) {
                 var s = this;
                 var h = s.height;
-                if (value != 0) {
+                if (value > 0 && h > 0) {
                     var sy = value / h;
                     s.scaleY *= sy;
                 }
@@ -2345,6 +2345,8 @@ var annie;
             //滤镜
             var bitmapData = s._bitmapData;
             if ((s._UI.UD || s._UI.UF) && bitmapData) {
+                if (bitmapData.width == 0 || bitmapData.height == 0)
+                    return;
                 s._UI.UD = false;
                 if (s.cFilters.length > 0) {
                     if (!s._realCacheImg) {

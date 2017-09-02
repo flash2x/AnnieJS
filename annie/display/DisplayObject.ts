@@ -607,11 +607,10 @@ namespace annie {
         public get width(): number {
             return this.getWH().width;
         }
-
         public set width(value: number){
             let s = this;
             let w = s.width;
-            if (value != 0) {
+            if (value > 0&&w>0) {
                 let sx = value / w;
                 s.scaleX *= sx;
             }
@@ -630,7 +629,7 @@ namespace annie {
         public set height(value: number) {
             let s = this;
             let h = s.height;
-            if (value != 0) {
+            if (value > 0&&h>0) {
                 let sy = value / h;
                 s.scaleY *= sy;
             }

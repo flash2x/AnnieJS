@@ -90,7 +90,6 @@ namespace annie {
                 s._bounds.height=s.rect?s.rect.height:value.height;
             }
         }
-        
         /**
          * 是否对矢量使用像素碰撞 默认开启
          * @property hitTestWidthPixel
@@ -112,6 +111,7 @@ namespace annie {
             //滤镜
             let bitmapData = s._bitmapData;
             if ((s._UI.UD||s._UI.UF) && bitmapData) {
+                if(bitmapData.width==0||bitmapData.height==0)return;
                 s._UI.UD = false;
                 if (s.cFilters.length > 0) {
                     if (!s._realCacheImg) {
