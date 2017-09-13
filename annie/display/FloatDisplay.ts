@@ -76,19 +76,20 @@ namespace annie {
          */
         public init(htmlElement: any): void {
             let s=this;
+            let she:any;
             if (typeof(htmlElement) == "string") {
-                s.htmlElement = document.getElementById(htmlElement);
+                she = document.getElementById(htmlElement);
             } else if (htmlElement._instanceType == "annie.Video") {
-                s.htmlElement = htmlElement.media;
+                she = htmlElement.media;
             }else{
-                s.htmlElement=htmlElement;
+                she=htmlElement;
             }
-            let style = htmlElement.style;
+            let style = she.style;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            let ws=s.getStyle(htmlElement,"width");
-            let hs=s.getStyle(htmlElement,"height");
+            let ws=s.getStyle(she,"width");
+            let hs=s.getStyle(she,"height");
             let w=0,h=0;
             if(ws.indexOf("px")){
                 w=parseInt(ws);
@@ -98,6 +99,7 @@ namespace annie {
             }
             s._bounds.width=w;
             s._bounds.height=h;
+            s.htmlElement=she;
         }
         /**
          * 删除html元素,这样就等于解了封装

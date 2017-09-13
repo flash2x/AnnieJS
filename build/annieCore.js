@@ -3736,11 +3736,12 @@ var annie;
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
                         child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames) {
+                            child.mask.isUseToMask = true;
+                            child.mask.hitTestWidthPixel = false;
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
                         }
-                        child.mask.isUseToMask = true;
-                        child.mask._UI.UM = true;
+                        child.mask._cp = true;
                         child.mask.update(isDrawUpdate);
                         child.mask.isUseToMask = false;
                         maskObjIds.push(child.mask.instanceId);
@@ -4998,21 +4999,22 @@ var annie;
          */
         FloatDisplay.prototype.init = function (htmlElement) {
             var s = this;
+            var she;
             if (typeof (htmlElement) == "string") {
-                s.htmlElement = document.getElementById(htmlElement);
+                she = document.getElementById(htmlElement);
             }
             else if (htmlElement._instanceType == "annie.Video") {
-                s.htmlElement = htmlElement.media;
+                she = htmlElement.media;
             }
             else {
-                s.htmlElement = htmlElement;
+                she = htmlElement;
             }
-            var style = htmlElement.style;
+            var style = she.style;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            var ws = s.getStyle(htmlElement, "width");
-            var hs = s.getStyle(htmlElement, "height");
+            var ws = s.getStyle(she, "width");
+            var hs = s.getStyle(she, "height");
             var w = 0, h = 0;
             if (ws.indexOf("px")) {
                 w = parseInt(ws);
@@ -5022,6 +5024,7 @@ var annie;
             }
             s._bounds.width = w;
             s._bounds.height = h;
+            s.htmlElement = she;
         };
         /**
          * 删除html元素,这样就等于解了封装
@@ -8482,8 +8485,11 @@ var Flash2x;
         if (pathObj.type == 0) {
             shape.decodePath(pathObj.data);
         }
-        else {
+        else if (pathObj.type == 1) {
             shape.drawRoundRect(pathObj.data.x, pathObj.data.y, pathObj.data.w, pathObj.data.h, pathObj.data.topLeftRadius, pathObj.data.topRightRadius, pathObj.data.bottomLeftRadius, pathObj.data.bottomRightRadius);
+        }
+        else {
+            shape.drawEllipse(pathObj.data.x, pathObj.data.y, pathObj.data.w, pathObj.data.h);
         }
         if (fillObj) {
             shape.endFill();
@@ -9595,18 +9601,6 @@ var annie;
      */
     annie.version = "1.1.2";
     /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     * @example
-     *      //打印当前设备的retina值
-     *      trace(annie.devicePixelRatio);
-     */
-    annie.devicePixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1;
-    /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
      * @since 1.0.0
@@ -9631,6 +9625,18 @@ var annie;
             return "pc";
         }
     })();
+    /**
+     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
+     * @property annie.devicePixelRatio
+     * @type {number}
+     * @since 1.0.0
+     * @public
+     * @static
+     * @example
+     *      //打印当前设备的retina值
+     *      trace(annie.devicePixelRatio);
+     */
+    annie.devicePixelRatio = annie.osType == "ios" ? window.devicePixelRatio : 1;
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。

@@ -532,8 +532,10 @@ namespace Flash2x {
         }
         if (pathObj.type == 0) {
             shape.decodePath(pathObj.data);
-        } else {
+        } else if(pathObj.type==1) {
             shape.drawRoundRect(pathObj.data.x, pathObj.data.y, pathObj.data.w, pathObj.data.h, pathObj.data.topLeftRadius, pathObj.data.topRightRadius, pathObj.data.bottomLeftRadius, pathObj.data.bottomRightRadius);
+        }else{
+            shape.drawEllipse(pathObj.data.x, pathObj.data.y, pathObj.data.w, pathObj.data.h);
         }
         if (fillObj) {
             shape.endFill();

@@ -295,12 +295,13 @@ namespace annie {
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
                         child.mask.parent = s;
-                        if (s.totalFrames && child.mask.totalFrames) {
+                        if (s.totalFrames && child.mask.totalFrames){
+                            child.mask.isUseToMask=true;
+                            child.mask.hitTestWidthPixel=false;
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
                         }
-                        child.mask.isUseToMask=true;
-                        child.mask._UI.UM = true;
+                        child.mask._cp=true;
                         child.mask.update(isDrawUpdate);
                         child.mask.isUseToMask=false;
                         maskObjIds.push(child.mask.instanceId);

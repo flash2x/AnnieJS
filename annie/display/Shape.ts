@@ -839,7 +839,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
