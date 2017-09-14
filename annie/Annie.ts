@@ -70,7 +70,7 @@ namespace annie {
      *      //打印当前设备的retina值
      *      trace(annie.devicePixelRatio);
      */
-    export let devicePixelRatio: number = osType=="ios" ? window.devicePixelRatio : 1;
+    export let devicePixelRatio: number = window.devicePixelRatio ? window.devicePixelRatio : 1;
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
