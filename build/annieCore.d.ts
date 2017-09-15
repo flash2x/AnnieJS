@@ -1890,6 +1890,14 @@ declare namespace annie {
          * @readonly
          */
         children: DisplayObject[];
+        /**
+         * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+         * @property  cacheAsBitmap
+         * @public
+         * @since 1.1.2
+         * @return {boolean}
+         * @default false
+         */
         cacheAsBitmap: boolean;
         _cacheAsBitmap: boolean;
         /**

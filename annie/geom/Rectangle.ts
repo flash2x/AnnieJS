@@ -93,22 +93,16 @@ namespace annie {
                 return arg[0];
             }else{
                 let rect=arg[0];
-                for(let i=arg.length-1;i>=0;i--){
-                    if(arg[i].width*arg[i].height==0){
-                        arg.splice(i,1);
-                    }
-                }
-                let x=arg[0].x,y=arg[0].y,w=arg[0].width,h=arg[0].height,wx1:number,wx2:number,hy1:number,hy2:number;
+                let x=rect.x,y=rect.y,w=rect.width,h=rect.height,wx1:number,wx2:number,hy1:number,hy2:number;
                 for(let i:number=1;i<arg.length;i++){
-                    if(arg[i]==null)continue;
                     wx1=x+w;
                     hy1=y+h;
                     wx2=arg[i].x+arg[i].width;
                     hy2=arg[i].y+arg[i].height;
-                    if(x>arg[i].x){
+                    if(x>arg[i].x||wx1==0){
                         x=arg[i].x;
                     }
-                    if(y>arg[i].y){
+                    if(y>arg[i].y||hy1==0){
                         y=arg[i].y;
                     }
                     if(wx1<wx2){
@@ -117,11 +111,11 @@ namespace annie {
                     if(hy1<hy2){
                         hy1=hy2;
                     }
+                    rect.x=x;
+                    rect.y=y;
+                    rect.width=wx1-x;
+                    rect.height=hy1-y;
                 }
-                rect.x=x;
-                rect.y=y;
-                rect.width=wx1-x;
-                rect.height=hy1-y;
                 return rect;
             }
         }

@@ -1344,23 +1344,16 @@ var annie;
             }
             else {
                 var rect = arg[0];
-                for (var i = arg.length - 1; i >= 0; i--) {
-                    if (arg[i].width * arg[i].height == 0) {
-                        arg.splice(i, 1);
-                    }
-                }
-                var x = arg[0].x, y = arg[0].y, w = arg[0].width, h = arg[0].height, wx1 = void 0, wx2 = void 0, hy1 = void 0, hy2 = void 0;
+                var x = rect.x, y = rect.y, w = rect.width, h = rect.height, wx1 = void 0, wx2 = void 0, hy1 = void 0, hy2 = void 0;
                 for (var i = 1; i < arg.length; i++) {
-                    if (arg[i] == null)
-                        continue;
                     wx1 = x + w;
                     hy1 = y + h;
                     wx2 = arg[i].x + arg[i].width;
                     hy2 = arg[i].y + arg[i].height;
-                    if (x > arg[i].x) {
+                    if (x > arg[i].x || wx1 == 0) {
                         x = arg[i].x;
                     }
-                    if (y > arg[i].y) {
+                    if (y > arg[i].y || hy1 == 0) {
                         y = arg[i].y;
                     }
                     if (wx1 < wx2) {
@@ -1369,11 +1362,11 @@ var annie;
                     if (hy1 < hy2) {
                         hy1 = hy2;
                     }
+                    rect.x = x;
+                    rect.y = y;
+                    rect.width = wx1 - x;
+                    rect.height = hy1 - y;
                 }
-                rect.x = x;
-                rect.y = y;
-                rect.width = wx1 - x;
-                rect.height = hy1 - y;
                 return rect;
             }
         };
@@ -3472,6 +3465,14 @@ var annie;
             return _this;
         }
         Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
+            /**
+             * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+             * @property  cacheAsBitmap
+             * @public
+             * @since 1.1.2
+             * @return {boolean}
+             * @default false
+             */
             get: function () {
                 return this._cacheAsBitmap;
             },
@@ -3486,6 +3487,8 @@ var annie;
                 }
                 else {
                     s._texture.src = "";
+                    s._offsetX = 0;
+                    s._offsetY = 0;
                 }
                 s._cacheAsBitmap = value;
             },
@@ -3821,34 +3824,38 @@ var annie;
         Sprite.prototype.getBounds = function () {
             var s = this;
             var rect = s._bounds;
-            rect.x = s._offsetX;
-            rect.y = s._offsetY;
+            rect.x = 0;
+            rect.y = 0;
             rect.width = 0;
             rect.height = 0;
             if (!s._cacheAsBitmap) {
                 var len = s.children.length;
-                for (var i = 0; i < len; i++) {
-                    if (s.children[i].visible)
-                        annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
-                }
-                if (s.mask) {
-                    var maskRect = s.mask.getDrawRect();
-                    if (rect.x < maskRect.x) {
-                        rect.x = maskRect.x;
+                if (len > 0) {
+                    for (var i = 0; i < len; i++) {
+                        if (s.children[i].visible)
+                            annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                     }
-                    if (rect.y < maskRect.y) {
-                        rect.y = maskRect.y;
-                    }
-                    if (rect.width > maskRect.width) {
-                        rect.width = maskRect.width;
-                    }
-                    if (rect.height > maskRect.height) {
-                        rect.height = maskRect.height;
+                    if (s.mask) {
+                        var maskRect = s.mask.getDrawRect();
+                        if (rect.x < maskRect.x) {
+                            rect.x = maskRect.x;
+                        }
+                        if (rect.y < maskRect.y) {
+                            rect.y = maskRect.y;
+                        }
+                        if (rect.width > maskRect.width) {
+                            rect.width = maskRect.width;
+                        }
+                        if (rect.height > maskRect.height) {
+                            rect.height = maskRect.height;
+                        }
                     }
                 }
             }
             else {
                 if (s._texture) {
+                    rect.x = s._offsetX;
+                    rect.y = s._offsetY;
                     rect.width = s._texture.width;
                     rect.height = s._texture.height;
                 }

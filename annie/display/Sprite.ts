@@ -38,7 +38,14 @@ namespace annie {
          * @readonly
          */
         public children: DisplayObject[] = [];
-
+        /**
+         * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+         * @property  cacheAsBitmap
+         * @public
+         * @since 1.1.2
+         * @return {boolean}
+         * @default false
+         */
         public get cacheAsBitmap(): boolean {
             return this._cacheAsBitmap;
         }
@@ -53,6 +60,8 @@ namespace annie {
                 s._texture.src = annie.toDisplayDataURL(s);
             } else {
                 s._texture.src = "";
+                s._offsetX=0;
+                s._offsetY=0;
             }
             s._cacheAsBitmap = value;
         }
@@ -379,34 +388,37 @@ namespace annie {
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
-            rect.x = s._offsetX;
-            rect.y = s._offsetY;
+            rect.x = 0;
+            rect.y = 0;
             rect.width = 0;
             rect.height = 0;
             if (!s._cacheAsBitmap) {
                 let len: number = s.children.length;
-
-                for (let i = 0; i < len; i++) {
-                    if (s.children[i].visible)
-                        Rectangle.createFromRects(rect, s.children[i].getDrawRect());
-                }
-                if (s.mask) {
-                    let maskRect = s.mask.getDrawRect();
-                    if (rect.x < maskRect.x) {
-                        rect.x = maskRect.x;
+                if(len>0) {
+                    for (let i = 0; i < len; i++) {
+                        if (s.children[i].visible)
+                            Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                     }
-                    if (rect.y < maskRect.y) {
-                        rect.y = maskRect.y;
-                    }
-                    if (rect.width > maskRect.width) {
-                        rect.width = maskRect.width
-                    }
-                    if (rect.height > maskRect.height) {
-                        rect.height = maskRect.height
+                    if (s.mask) {
+                        let maskRect = s.mask.getDrawRect();
+                        if (rect.x < maskRect.x) {
+                            rect.x = maskRect.x;
+                        }
+                        if (rect.y < maskRect.y) {
+                            rect.y = maskRect.y;
+                        }
+                        if (rect.width > maskRect.width) {
+                            rect.width = maskRect.width
+                        }
+                        if (rect.height > maskRect.height) {
+                            rect.height = maskRect.height
+                        }
                     }
                 }
             } else {
                 if (s._texture) {
+                    rect.x = s._offsetX;
+                    rect.y = s._offsetY;
                     rect.width = s._texture.width;
                     rect.height = s._texture.height;
                 }
