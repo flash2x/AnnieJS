@@ -41,6 +41,7 @@ declare namespace annieUI {
          * @default 0
          */
         private viewHeight;
+        private _tweenId;
         /**
          * 整个滚动的最大距离值
          * @property maxDistance
@@ -573,7 +574,7 @@ declare namespace annieUI {
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
      * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     class ScrollList extends ScrollPage {
@@ -602,7 +603,7 @@ declare namespace annieUI {
          * @method ScrollList
          * @param {Class} itemClassName 可以做为Item的类
          * @param {number} itemWidth item宽
-         * @param {number} itemHeight item宽
+         * @param {number} itemHeight item高
          * @param {number} vW 列表的宽
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
@@ -744,7 +745,7 @@ declare namespace annieUI {
      * 刮刮卡类
      * @class annieUI.ScratchCard
      * @public
-     * @extends annie.DrawingBoard
+     * @extends annieUI.DrawingBoard
      * @since 1.1.1
      */
     class ScratchCard extends DrawingBoard {

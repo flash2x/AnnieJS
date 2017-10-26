@@ -364,7 +364,13 @@ namespace annie {
          * @returns {annie.Point}
          */
         public localToGlobal(point: Point, bp: Point = null): Point {
-            return this.cMatrix.transformPoint(point.x, point.y, bp);
+            if(this.parent){
+                //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
+                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+            }else{
+                //没有父级
+                return this.cMatrix.transformPoint(point.x, point.y, bp);
+            }
         }
 
         /**
@@ -424,16 +430,23 @@ namespace annie {
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} globalPoint 全局坐标中的一个点
+         * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
          * @returns {annie.DisplayObject}
          */
-        public hitTestPoint(globalPoint: Point,isMouseEvent: boolean = false): DisplayObject {
+        public hitTestPoint(point: Point,isMouseEvent: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible)return null;
             if (isMouseEvent && !s.mouseEnable)return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))){
-                return s;
+            if(!isMouseEvent){
+                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
+                if (s.getBounds().isPointIn(point)){
+                    return s;
+                }
+            }else{
+                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))){
+                    return s;
+                }
             }
             return null;
         }

@@ -122,7 +122,7 @@ namespace annie {
             req.onreadystatechange = function (event: any): void {
                 let t = event.target;
                 if (t["readyState"] == 4) {
-                    if (req.status == 200||req.status == 0){
+                    if (req.status == 200){
                         let isImage: boolean = false;
                         let e: Event = new Event("onComplete");
                         let result = t["response"];

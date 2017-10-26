@@ -767,8 +767,8 @@ namespace annie {
                         s._offsetY = leftY;
                         s._bounds.x=leftX;
                         s._bounds.y=leftY;
-                        s._bounds.width = w;
-                        s._bounds.height = h;
+                        s._bounds.width = w-20;
+                        s._bounds.height = h-20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         if(!s.isUseToMask&&!s.parent.isUseToMask){
                             let _canvas: any = s._texture;
@@ -852,7 +852,10 @@ namespace annie {
             let s = this;
             if (isMouseEvent && !s.mouseEnable)return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            let p = s.globalToLocal(globalPoint);
+            let p:Point = globalPoint;
+            if(isMouseEvent) {
+                p=s.globalToLocal(globalPoint);
+            }
             if (s.getBounds().isPointIn(p)){
                 if (s.hitTestWidthPixel) {
                     let image = s._texture;

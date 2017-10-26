@@ -1267,11 +1267,11 @@ declare namespace annie {
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} globalPoint 全局坐标中的一个点
+         * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
          * @returns {annie.DisplayObject}
          */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
         /**
          * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
          * @method getBounds
@@ -1891,12 +1891,12 @@ declare namespace annie {
          */
         children: DisplayObject[];
         /**
-         * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+         * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
          * @property  cacheAsBitmap
          * @public
          * @since 1.1.2
-         * @return {boolean}
          * @default false
+         * @type boolean
          */
         cacheAsBitmap: boolean;
         _cacheAsBitmap: boolean;

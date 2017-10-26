@@ -750,6 +750,8 @@ namespace annie {
             let divW = s.divWidth * devicePixelRatio;
             let desH = s.desHeight;
             let desW = s.desWidth;
+            s.anchorX = desW / 2;
+            s.anchorY = desH / 2;
             //设备是否为竖屏
             let isDivH = divH > divW;
             //内容是否为竖屏内容
@@ -791,12 +793,15 @@ namespace annie {
                         break;
                 }
             }
+
             s.scaleX = scaleX;
             s.scaleY = scaleY;
+            // s.viewRect=new annie.Rectangle();
             s.viewRect.x = (desW - divW / scaleX) / 2;
             s.viewRect.y = (desH - divH / scaleY) / 2;
             s.viewRect.width = desW - s.viewRect.x * 2;
             s.viewRect.height = desH - s.viewRect.y * 2;
+
             if (s.autoSteering) {
                 if (isDesH == isDivH) {
                     s.rotation = 0;
@@ -882,7 +887,6 @@ namespace annie {
                 Stage.allUpdateObjList.unshift(target);
             }
         }
-
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj

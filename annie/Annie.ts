@@ -34,7 +34,7 @@ namespace annie {
      *      trace(annie.version);
      */
 
-    export let version:string="1.1.2";
+    export let version:string="1.1.3";
 
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

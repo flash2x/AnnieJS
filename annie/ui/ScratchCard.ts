@@ -9,7 +9,7 @@ namespace annieUI {
      * 刮刮卡类
      * @class annieUI.ScratchCard
      * @public
-     * @extends annie.DrawingBoard
+     * @extends annieUI.DrawingBoard
      * @since 1.1.1
      */
     export class ScratchCard extends DrawingBoard {

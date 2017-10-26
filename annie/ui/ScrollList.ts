@@ -15,7 +15,7 @@ namespace annieUI {
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
      * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     export class ScrollList extends ScrollPage {
@@ -48,7 +48,7 @@ namespace annieUI {
          * @method ScrollList
          * @param {Class} itemClassName 可以做为Item的类
          * @param {number} itemWidth item宽
-         * @param {number} itemHeight item宽
+         * @param {number} itemHeight item高
          * @param {number} vW 列表的宽
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
@@ -84,8 +84,8 @@ namespace annieUI {
                 s._isInit = true;
             } else {
                 s._data = s._data.concat(data);
-                s._lastFirstId = -1;
             }
+            s._lastFirstId = -1;
             s.maxDistance = Math.ceil(s._data.length / s._cols) * s._itemRow;
             if (s.downL) {
                 s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
@@ -100,6 +100,7 @@ namespace annieUI {
                 let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                 id = id < 0 ? 0 : id;
                 if (id != s._lastFirstId) {
+                    let isMustUpdate=s._lastFirstId==-1;
                     s._lastFirstId = id;
                     if (id != s._items[0].id) {
                         for (let r = 0; r < s._cols; r++) {
@@ -112,7 +113,7 @@ namespace annieUI {
                     }
                     for (let i = 0; i < s._itemCount; i++) {
                         let item: any = s._items[i];
-                        if(item.id!=id){
+                        if(item.id!=id||isMustUpdate){
                             item.initData(s._data[id]?id:-1, s._data[id]);
                             item.visible=s._data[id]?true:false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;

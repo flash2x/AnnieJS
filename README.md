@@ -69,6 +69,11 @@
 # 如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
+## AnnieJS 1.1.3 版本
+    修复动态更改舞台的设计尺寸后，调用了stage.resize()方法后,舞台对齐不正确的bug
+    修复如果一个MovieClip里有遮罩，导致被遮罩的mc点击会失效的bug
+    修复annieUI.ScrollList在一开始就切换其他数据而不是追加数据时列表不更新的bug
+    优化碰撞测试hitTestPoint方法使用
 ## AnnieJS 1.1.2 版本
     无限期去掉webGl的支持，对2d交互支持不成熟，反正我是这么认为了
     删除annie.ImageFrame类,使用有缺陷

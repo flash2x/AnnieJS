@@ -72,6 +72,7 @@ var annieUI;
              * @default 0
              */
             _this.viewHeight = 0;
+            _this._tweenId = 0;
             /**
              * 整个滚动的最大距离值
              * @property maxDistance
@@ -277,13 +278,15 @@ var annieUI;
         };
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
-            if (s.autoScroll)
-                return;
             var view = s.view;
             // if (s.distance < s.maxDistance) {
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                 if (!s.isStop) {
                     s.isStop = true;
+                }
+                if (s.autoScroll) {
+                    s.autoScroll = false;
+                    annie.Tween.kill(s._tweenId);
                 }
                 if (s.isVertical) {
                     s.lastValue = e.localY;
@@ -355,7 +358,14 @@ var annieUI;
         ScrollPage.prototype.scrollTo = function (dis, time) {
             if (time === void 0) { time = 0; }
             var s = this;
-            if (Math.abs(s.view[s.paramXY] + dis) > 1) {
+            var newDis = s.paramXY == "x" ? s.viewWidth : s.viewHeight;
+            if (dis < 0) {
+                dis = 0;
+            }
+            else if (dis > s.maxDistance - newDis) {
+                dis = s.maxDistance - newDis;
+            }
+            if (Math.abs(s.view[s.paramXY] + dis) > 2) {
                 s.autoScroll = true;
                 s.isStop = true;
                 s.isMouseDownState = 0;
@@ -364,7 +374,7 @@ var annieUI;
                     s.autoScroll = false;
                 };
                 obj[s.paramXY] = -dis;
-                annie.Tween.to(s.view, time, obj);
+                s._tweenId = annie.Tween.to(s.view, time, obj);
                 if (s.speed == 0) {
                     s.dispatchEvent("onScrollStart");
                 }
@@ -1355,7 +1365,7 @@ var annieUI;
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
      * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     var ScrollList = (function (_super) {
@@ -1365,7 +1375,7 @@ var annieUI;
          * @method ScrollList
          * @param {Class} itemClassName 可以做为Item的类
          * @param {number} itemWidth item宽
-         * @param {number} itemHeight item宽
+         * @param {number} itemHeight item高
          * @param {number} vW 列表的宽
          * @param {number} vH 列表的高
          * @param {boolean} isVertical 是横向滚动还是纵向滚动 默认是纵向
@@ -1422,8 +1432,8 @@ var annieUI;
             }
             else {
                 s._data = s._data.concat(data);
-                s._lastFirstId = -1;
             }
+            s._lastFirstId = -1;
             s.maxDistance = Math.ceil(s._data.length / s._cols) * s._itemRow;
             if (s.downL) {
                 s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
@@ -1437,6 +1447,7 @@ var annieUI;
                 var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                 id = id < 0 ? 0 : id;
                 if (id != s._lastFirstId) {
+                    var isMustUpdate = s._lastFirstId == -1;
                     s._lastFirstId = id;
                     if (id != s._items[0].id) {
                         for (var r = 0; r < s._cols; r++) {
@@ -1450,7 +1461,7 @@ var annieUI;
                     }
                     for (var i = 0; i < s._itemCount; i++) {
                         var item = s._items[i];
-                        if (item.id != id) {
+                        if (item.id != id || isMustUpdate) {
                             item.initData(s._data[id] ? id : -1, s._data[id]);
                             item.visible = s._data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
@@ -1770,7 +1781,7 @@ var annieUI;
      * 刮刮卡类
      * @class annieUI.ScratchCard
      * @public
-     * @extends annie.DrawingBoard
+     * @extends annieUI.DrawingBoard
      * @since 1.1.1
      */
     var ScratchCard = (function (_super) {

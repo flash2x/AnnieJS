@@ -39,12 +39,12 @@ namespace annie {
          */
         public children: DisplayObject[] = [];
         /**
-         * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+         * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
          * @property  cacheAsBitmap
          * @public
          * @since 1.1.2
-         * @return {boolean}
          * @default false
+         * @type boolean
          */
         public get cacheAsBitmap(): boolean {
             return this._cacheAsBitmap;
@@ -78,7 +78,6 @@ namespace annie {
         public addChild(child: DisplayObject): void {
             this.addChildAt(child, this.children.length);
         }
-
         /**
          * 从Sprite中移除一个child
          * @method removeChild
@@ -228,7 +227,6 @@ namespace annie {
             }
             return -1;
         }
-
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
@@ -303,16 +301,26 @@ namespace annie {
                     child = s.children[i];
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
+                        let childChild=null;
                         child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames){
-                            child.mask.isUseToMask=true;
-                            child.mask.hitTestWidthPixel=false;
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
+                            childChild=child.mask.getChildAt(0);
+                            if(childChild){
+                                childChild.isUseToMask=true;
+                                childChild.hitTestWidthPixel=false;
+                            }
+                        }else{
+                            child.mask.isUseToMask=true;
+                            child.mask.hitTestWidthPixel=false;
                         }
                         child.mask._cp=true;
                         child.mask.update(isDrawUpdate);
                         child.mask.isUseToMask=false;
+                        if(childChild) {
+                            childChild.isUseToMask = false;
+                        }
                         maskObjIds.push(child.mask.instanceId);
                     }
                     child.update(isDrawUpdate);

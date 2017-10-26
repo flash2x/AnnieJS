@@ -1881,7 +1881,14 @@ var annie;
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
-            return this.cMatrix.transformPoint(point.x, point.y, bp);
+            if (this.parent) {
+                //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
+                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+            }
+            else {
+                //没有父级
+                return this.cMatrix.transformPoint(point.x, point.y, bp);
+            }
         };
         /**
          * 启动鼠标或者触摸拖动
@@ -1928,19 +1935,27 @@ var annie;
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} globalPoint 全局坐标中的一个点
+         * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
          * @returns {annie.DisplayObject}
          */
-        DisplayObject.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
+        DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
             if (isMouseEvent === void 0) { isMouseEvent = false; }
             var s = this;
             if (!s.visible)
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))) {
-                return s;
+            if (!isMouseEvent) {
+                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
+                if (s.getBounds().isPointIn(point)) {
+                    return s;
+                }
+            }
+            else {
+                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))) {
+                    return s;
+                }
             }
             return null;
         };
@@ -3203,8 +3218,8 @@ var annie;
                         s._offsetY = leftY;
                         s._bounds.x = leftX;
                         s._bounds.y = leftY;
-                        s._bounds.width = w;
-                        s._bounds.height = h;
+                        s._bounds.width = w - 20;
+                        s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         if (!s.isUseToMask && !s.parent.isUseToMask) {
                             var _canvas = s._texture;
@@ -3295,7 +3310,10 @@ var annie;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p = s.globalToLocal(globalPoint);
+            var p = globalPoint;
+            if (isMouseEvent) {
+                p = s.globalToLocal(globalPoint);
+            }
             if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
                     var image = s._texture;
@@ -3466,12 +3484,12 @@ var annie;
         }
         Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
             /**
-             * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+             * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
              * @property  cacheAsBitmap
              * @public
              * @since 1.1.2
-             * @return {boolean}
              * @default false
+             * @type boolean
              */
             get: function () {
                 return this._cacheAsBitmap;
@@ -3737,16 +3755,27 @@ var annie;
                     child = s.children[i];
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
+                        var childChild = null;
                         child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames) {
-                            child.mask.isUseToMask = true;
-                            child.mask.hitTestWidthPixel = false;
                             child.mask.gotoAndStop(s.currentFrame);
                             //一定要为true
+                            childChild = child.mask.getChildAt(0);
+                            if (childChild) {
+                                childChild.isUseToMask = true;
+                                childChild.hitTestWidthPixel = false;
+                            }
+                        }
+                        else {
+                            child.mask.isUseToMask = true;
+                            child.mask.hitTestWidthPixel = false;
                         }
                         child.mask._cp = true;
                         child.mask.update(isDrawUpdate);
                         child.mask.isUseToMask = false;
+                        if (childChild) {
+                            childChild.isUseToMask = false;
+                        }
                         maskObjIds.push(child.mask.instanceId);
                     }
                     child.update(isDrawUpdate);
@@ -6337,6 +6366,8 @@ var annie;
                 var divW = s.divWidth * annie.devicePixelRatio;
                 var desH = s.desHeight;
                 var desW = s.desWidth;
+                s.anchorX = desW / 2;
+                s.anchorY = desH / 2;
                 //设备是否为竖屏
                 var isDivH = divH > divW;
                 //内容是否为竖屏内容
@@ -6382,6 +6413,7 @@ var annie;
                 }
                 s.scaleX = scaleX;
                 s.scaleY = scaleY;
+                // s.viewRect=new annie.Rectangle();
                 s.viewRect.x = (desW - divW / scaleX) / 2;
                 s.viewRect.y = (desH - divH / scaleY) / 2;
                 s.viewRect.width = desW - s.viewRect.x * 2;
@@ -7806,7 +7838,7 @@ var annie;
             req.onreadystatechange = function (event) {
                 var t = event.target;
                 if (t["readyState"] == 4) {
-                    if (req.status == 200 || req.status == 0) {
+                    if (req.status == 200) {
                         var isImage = false;
                         var e_1 = new annie.Event("onComplete");
                         var result = t["response"];
