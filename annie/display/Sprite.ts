@@ -282,7 +282,6 @@ namespace annie {
                 s.removeChildAt(0);
             }
         }
-
         /**
          * 重写刷新
          * @method update

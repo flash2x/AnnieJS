@@ -27,7 +27,7 @@ namespace annieUI {
         private _itemCount: number;
         private _itemClass: any;
         private _isInit: boolean;
-        private _data: Array<any> = [];
+        public data: Array<any> = [];
         private downL: DisplayObject = null;
         private _cols: number;
         private _disParam: string;
@@ -69,7 +69,6 @@ namespace annieUI {
             s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }
-
         /**
          * 更新列表数据
          * @method updateData
@@ -80,13 +79,13 @@ namespace annieUI {
         public updateData(data: Array<any>, isReset: boolean = false): void {
             let s: any = this;
             if (!s._isInit || isReset) {
-                s._data = data;
+                s.data = data;
                 s._isInit = true;
             } else {
-                s._data = s._data.concat(data);
+                s.data = s.data.concat(data);
             }
             s._lastFirstId = -1;
-            s.maxDistance = Math.ceil(s._data.length / s._cols) * s._itemRow;
+            s.maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
                 s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
                 var wh = s.downL.getWH();
@@ -94,7 +93,7 @@ namespace annieUI {
             }
         }
 
-        private flushData() {
+        private flushData(){
             let s: any = this;
             if (s._isInit) {
                 let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
@@ -114,8 +113,8 @@ namespace annieUI {
                     for (let i = 0; i < s._itemCount; i++) {
                         let item: any = s._items[i];
                         if(item.id!=id||isMustUpdate){
-                            item.initData(s._data[id]?id:-1, s._data[id]);
-                            item.visible=s._data[id]?true:false;
+                            item.initData(s.data[id]?id:-1, s.data[id]);
+                            item.visible=s.data[id]?true:false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
                         }

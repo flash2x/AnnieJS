@@ -397,6 +397,10 @@ namespace annie {
          */
         public startDrag(isCenter:boolean=false,bounds:Rectangle=null):void{
             let s=this;
+            if(!s.stage) {
+                trace("The DisplayObject is not on stage");
+                return;
+            }
             Stage._dragDisplay=s;
             s._isDragCenter = isCenter;
             s._lastDragPoint.x=Number.MAX_VALUE;

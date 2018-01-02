@@ -107,6 +107,7 @@ namespace annie {
          */
         public update(isDrawUpdate:boolean=false): void {
             let s = this;
+            if(!s._visible)return;
             super.update(isDrawUpdate);
             //滤镜
             let bitmapData = s._bitmapData;

@@ -278,7 +278,7 @@ declare namespace annieUI {
          * @property slideSpeed
          * @type {number}
          * @public
-         * @default 0
+         * @default 0.2
          */
         slideSpeed: number;
         /**
@@ -306,6 +306,7 @@ declare namespace annieUI {
         private touchEndX;
         private movingX;
         private movingY;
+        private _moveDis;
         /**
          * 触摸点结束点Y
          * @property touchEndY
@@ -325,6 +326,9 @@ declare namespace annieUI {
          * @default 0
          */
         currentPageIndex: number;
+        reBound: number;
+        isPageFollowToMove: boolean;
+        follow: number;
         /**
          * 页面是否移动
          * @property isMoving
@@ -356,13 +360,8 @@ declare namespace annieUI {
          */
         private pageList;
         private pageClassList;
-        /**
-         *
-         * @property fSpeed
-         * @type {number}
-         * @private
-         */
-        private fSpeed;
+        private lastX;
+        private lastY;
         /**
          * 是否点击了鼠标
          * @property isMouseDown
@@ -419,7 +418,7 @@ declare namespace annieUI {
          * @since 1.1.1
          * @param {number} index 是向上还是向下
          */
-        slideTo(index: number): void;
+        slideTo(index: number, noTween?: boolean): void;
         /**
          * 用于插入分页
          * @method addPageList
@@ -456,6 +455,13 @@ declare namespace annieUI {
          * @since 1.0.3
          */
         currPage: number;
+        /**
+         * 翻页速度，0-1之间，值越小，速度越快
+         * @property
+         * @since 1.1.3
+         * @type {number}
+         */
+        speed: number;
         private bW;
         private bH;
         private toPage;
@@ -586,7 +592,7 @@ declare namespace annieUI {
         private _itemCount;
         private _itemClass;
         private _isInit;
-        private _data;
+        data: Array<any>;
         private downL;
         private _cols;
         private _disParam;

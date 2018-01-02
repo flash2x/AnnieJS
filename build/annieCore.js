@@ -1902,6 +1902,10 @@ var annie;
             if (isCenter === void 0) { isCenter = false; }
             if (bounds === void 0) { bounds = null; }
             var s = this;
+            if (!s.stage) {
+                trace("The DisplayObject is not on stage");
+                return;
+            }
             annie.Stage._dragDisplay = s;
             s._isDragCenter = isCenter;
             s._lastDragPoint.x = Number.MAX_VALUE;
@@ -2349,6 +2353,8 @@ var annie;
         Bitmap.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
             //滤镜
             var bitmapData = s._bitmapData;
@@ -3096,6 +3102,8 @@ var annie;
         Shape.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
@@ -3991,7 +3999,6 @@ var annie;
             _this._loop = 0;
             var s = _this;
             s._instanceType = "annie.Media";
-            trace(typeof (src));
             if (typeof (src) == "string") {
                 s.media = document.createElement(type);
                 s.media.src = src;
@@ -5419,6 +5426,8 @@ var annie;
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             _super.prototype.update.call(this, isDrawUpdate);
             var s = this;
+            if (!s._visible)
+                return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 var can = s._texture;
@@ -7650,7 +7659,7 @@ var annie;
          */
         function URLLoader() {
             var _this = _super.call(this) || this;
-            _this._req = new XMLHttpRequest();
+            _this._req = null;
             _this.headers = [];
             /**
              * 后台返回来的数据类弄
@@ -7799,113 +7808,114 @@ var annie;
             }
             if (!s._req) {
                 s._req = new XMLHttpRequest();
-            }
-            var req = s._req;
-            req.withCredentials = false;
-            req.onprogress = function (event) {
-                if (!event || event.loaded > 0 && event.total == 0) {
-                    return; // Sometimes we get no "total", so just ignore the progress event.
-                }
-                s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
-            };
-            req.onerror = function (event) {
-                reSendTimes++;
-                if (reSendTimes > 2) {
-                    s.dispatchEvent("onError", { id: 2, msg: event["message"] });
-                }
-                else {
-                    //断线重连
-                    req.abort();
-                    if (!s.data) {
-                        req.send();
+                var req_1 = s._req;
+                req_1.withCredentials = false;
+                req_1.onprogress = function (event) {
+                    if (!event || event.loaded > 0 && event.total == 0) {
+                        return; // Sometimes we get no "total", so just ignore the progress event.
+                    }
+                    s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
+                };
+                req_1.onerror = function (event) {
+                    reSendTimes++;
+                    if (reSendTimes > 2) {
+                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
                     }
                     else {
-                        if (contentType == "form") {
-                            req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                            req.send(s._fqs(s.data, null));
+                        //断线重连
+                        req_1.abort();
+                        if (!s.data) {
+                            req_1.send();
                         }
                         else {
-                            var type = "application/json";
-                            if (contentType != "json") {
-                                type = "multipart/form-data";
+                            if (contentType == "form") {
+                                req_1.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                                req_1.send(s._fqs(s.data, null));
                             }
-                            req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                            req.send(s.data);
+                            else {
+                                var type = "application/json";
+                                if (contentType != "json") {
+                                    type = "multipart/form-data";
+                                }
+                                req_1.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                                req_1.send(s.data);
+                            }
                         }
                     }
-                }
-            };
-            req.onreadystatechange = function (event) {
-                var t = event.target;
-                if (t["readyState"] == 4) {
-                    if (req.status == 200) {
-                        var isImage = false;
-                        var e_1 = new annie.Event("onComplete");
-                        var result = t["response"];
-                        e_1.data = { type: s.responseType, response: null };
-                        var item = void 0;
-                        switch (s.responseType) {
-                            case "css":
-                                item = document.createElement("link");
-                                item.rel = "stylesheet";
-                                item.href = s.url;
-                                break;
-                            case "image":
-                            case "sound":
-                            case "video":
-                                var itemObj_1;
-                                if (s.responseType == "image") {
-                                    isImage = true;
-                                    itemObj_1 = document.createElement("img");
-                                    itemObj_1.onload = function () {
-                                        URL.revokeObjectURL(itemObj_1.src);
-                                        itemObj_1.onload = null;
-                                        s.dispatchEvent(e_1);
-                                    };
-                                    itemObj_1.src = URL.createObjectURL(result);
-                                    item = itemObj_1;
-                                }
-                                else {
-                                    if (s.responseType == "sound") {
-                                        itemObj_1 = document.createElement("AUDIO");
-                                        itemObj_1.preload = true;
-                                        itemObj_1.src = s.url;
-                                        item = new annie.Sound(s.url);
+                };
+                req_1.onreadystatechange = function (event) {
+                    var t = event.target;
+                    if (t["readyState"] == 4) {
+                        if (req_1.status == 200) {
+                            var isImage = false;
+                            var e_1 = new annie.Event("onComplete");
+                            var result = t["response"];
+                            e_1.data = { type: s.responseType, response: null };
+                            var item = void 0;
+                            switch (s.responseType) {
+                                case "css":
+                                    item = document.createElement("link");
+                                    item.rel = "stylesheet";
+                                    item.href = s.url;
+                                    break;
+                                case "image":
+                                case "sound":
+                                case "video":
+                                    var itemObj_1;
+                                    if (s.responseType == "image") {
+                                        isImage = true;
+                                        itemObj_1 = document.createElement("img");
+                                        itemObj_1.onload = function () {
+                                            URL.revokeObjectURL(itemObj_1.src);
+                                            itemObj_1.onload = null;
+                                            s.dispatchEvent(e_1);
+                                        };
+                                        itemObj_1.src = URL.createObjectURL(result);
+                                        item = itemObj_1;
                                     }
-                                    else if (s.responseType == "video") {
-                                        itemObj_1 = document.createElement("VIDEO");
-                                        itemObj_1.preload = true;
-                                        itemObj_1.src = s.url;
-                                        item = new annie.Video(itemObj_1);
+                                    else {
+                                        if (s.responseType == "sound") {
+                                            itemObj_1 = document.createElement("AUDIO");
+                                            itemObj_1.preload = true;
+                                            itemObj_1.src = s.url;
+                                            item = new annie.Sound(s.url);
+                                        }
+                                        else if (s.responseType == "video") {
+                                            itemObj_1 = document.createElement("VIDEO");
+                                            itemObj_1.preload = true;
+                                            itemObj_1.src = s.url;
+                                            item = new annie.Video(itemObj_1);
+                                        }
                                     }
-                                }
-                                break;
-                            case "json":
-                                item = JSON.parse(result);
-                                break;
-                            case "js":
-                                item = "JS_CODE";
-                                annie.Eval(result);
-                                break;
-                            case "text":
-                            case "unKnow":
-                            case "xml":
-                            default:
-                                item = result;
-                                break;
+                                    break;
+                                case "json":
+                                    item = JSON.parse(result);
+                                    break;
+                                case "js":
+                                    item = "JS_CODE";
+                                    annie.Eval(result);
+                                    break;
+                                case "text":
+                                case "unKnow":
+                                case "xml":
+                                default:
+                                    item = result;
+                                    break;
+                            }
+                            e_1.data["response"] = item;
+                            s.data = null;
+                            s.responseType = "";
+                            if (!isImage)
+                                s.dispatchEvent(e_1);
                         }
-                        e_1.data["response"] = item;
-                        s.data = null;
-                        s.responseType = "";
-                        if (!isImage)
-                            s.dispatchEvent(e_1);
+                        else {
+                            //服务器返回报错
+                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
+                        }
                     }
-                    else {
-                        //服务器返回报错
-                        s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
-                    }
-                }
-            };
+                };
+            }
+            var req = s._req;
             var reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
@@ -8659,8 +8669,8 @@ var annie;
         __extends(TweenObj, _super);
         function TweenObj() {
             var _this = _super.call(this) || this;
-            _this._currentFrame = 0;
-            _this._totalFrames = 0;
+            _this.currentFrame = 0;
+            _this.totalFrames = 0;
             _this._isLoop = 0;
             _this._delay = 0;
             _this._isFront = true;
@@ -8684,9 +8694,9 @@ var annie;
                 throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
             var s = this;
-            s._currentFrame = 1;
+            s.currentFrame = 1;
             var tTime = times * 60 >> 0;
-            s._totalFrames = tTime > 0 ? tTime : 1;
+            s.totalFrames = tTime > 0 ? tTime : 1;
             s.target = target;
             s._isTo = isTo;
             s._isLoop = 0;
@@ -8703,7 +8713,7 @@ var annie;
                 switch (item) {
                     case "useFrame":
                         if (data[item] == true) {
-                            s._totalFrames = times;
+                            s.totalFrames = times;
                         }
                         break;
                     case "yoyo":
@@ -8768,7 +8778,9 @@ var annie;
                 return;
             }
             //更新数据
-            var per = s._currentFrame / s._totalFrames;
+            var per = s.currentFrame / s.totalFrames;
+            if (per < 0 || per > 1)
+                return;
             if (s._ease) {
                 per = s._ease(per);
             }
@@ -8788,15 +8800,15 @@ var annie;
             var cf = s._completeFun;
             var pm = s._cParams;
             if (s._isFront) {
-                s._currentFrame++;
-                if (s._currentFrame > s._totalFrames) {
+                s.currentFrame++;
+                if (s.currentFrame > s.totalFrames) {
                     if (s._loop) {
-                        s._currentFrame = 1;
+                        s.currentFrame = 1;
                     }
                     else {
                         if (s._isLoop > 0) {
                             s._isFront = false;
-                            s._currentFrame = s._totalFrames;
+                            s.currentFrame = s.totalFrames;
                             s._isLoop--;
                         }
                         else {
@@ -8809,11 +8821,11 @@ var annie;
                 }
             }
             else {
-                s._currentFrame--;
-                if (s._currentFrame < 0) {
+                s.currentFrame--;
+                if (s.currentFrame < 0) {
                     if (s._isLoop > 0) {
                         s._isFront = true;
-                        s._currentFrame = 1;
+                        s.currentFrame = 1;
                     }
                     else {
                         Tween.kill(s.instanceId);
@@ -8826,6 +8838,7 @@ var annie;
         };
         return TweenObj;
     }(annie.AObject));
+    annie.TweenObj = TweenObj;
     /**
      * 全局静态单列类,不要实例化此类
      * @class annie.Tween
@@ -9638,7 +9651,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.1.2";
+    annie.version = "1.1.3";
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType

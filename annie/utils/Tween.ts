@@ -3,12 +3,12 @@
  */
 namespace annie {
     let isUpdateTween:boolean=true;
-    class TweenObj extends AObject {
+    export class TweenObj extends AObject {
         public constructor() {
             super();
         }
-        private _currentFrame:number = 0;
-        private _totalFrames:number = 0;
+        public currentFrame:number = 0;
+        public totalFrames:number = 0;
         protected _startData:any;
         protected _disData:any;
         public target:any;
@@ -21,7 +21,6 @@ namespace annie {
         private _isFront:boolean = true;
         private _cParams:any=null;
         private _loop:boolean=false;
-
         /**
          * 初始化数据
          * @method init
@@ -37,9 +36,9 @@ namespace annie {
                 throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
             let s = this;
-            s._currentFrame = 1;
+            s.currentFrame = 1;
             let tTime:number=times*60>>0;
-            s._totalFrames = tTime>0?tTime:1;
+            s.totalFrames = tTime>0?tTime:1;
             s.target = target;
             s._isTo = isTo;
             s._isLoop = 0;
@@ -56,7 +55,7 @@ namespace annie {
                 switch (item) {
                     case "useFrame":
                         if(data[item]==true){
-                            s._totalFrames=times;
+                            s.totalFrames=times;
                         }
                         break;
                     case "yoyo":
@@ -118,7 +117,8 @@ namespace annie {
                 return;
             }
             //更新数据
-            let per = s._currentFrame / s._totalFrames;
+            let per = s.currentFrame / s.totalFrames;
+            if(per<0||per>1)return;
             if (s._ease) {
                 per = s._ease(per);
             }
@@ -138,14 +138,14 @@ namespace annie {
             let cf=s._completeFun;
             let pm=s._cParams;
             if (s._isFront) {
-                s._currentFrame++;
-                if (s._currentFrame > s._totalFrames) {
+                s.currentFrame++;
+                if (s.currentFrame > s.totalFrames) {
                     if(s._loop){
-                        s._currentFrame=1;
+                        s.currentFrame=1;
                     }else {
                         if (s._isLoop > 0) {
                             s._isFront = false;
-                            s._currentFrame = s._totalFrames;
+                            s.currentFrame = s.totalFrames;
                             s._isLoop--;
                         } else {
                             Tween.kill(s.instanceId);
@@ -156,11 +156,11 @@ namespace annie {
                     }
                 }
             } else {
-                s._currentFrame--;
-                if (s._currentFrame <0) {
+                s.currentFrame--;
+                if (s.currentFrame <0) {
                     if (s._isLoop>0) {
                         s._isFront = true;
-                        s._currentFrame = 1;
+                        s.currentFrame = 1;
                     }else{
                         Tween.kill(s.instanceId);
                     }

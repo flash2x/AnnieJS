@@ -242,6 +242,7 @@ namespace annie {
         public update(isDrawUpdate:boolean=false): void {
             super.update(isDrawUpdate);
             let s: any = this;
+            if(!s._visible)return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 let can = s._texture;

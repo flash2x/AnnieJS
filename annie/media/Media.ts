@@ -43,7 +43,6 @@ namespace annie {
             super();
             let s = this;
             s._instanceType="annie.Media";
-            trace(typeof(src));
             if (typeof(src) == "string") {
                 s.media = document.createElement(type);
                 s.media.src = src;

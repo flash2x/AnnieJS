@@ -70,6 +70,7 @@
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
 ## AnnieJS 1.1.3 版本
+    修复有时获取Sprite的getWH()方法返回宽高为0的bug
     修复动态更改舞台的设计尺寸后，调用了stage.resize()方法后,舞台对齐不正确的bug
     修复如果一个MovieClip里有遮罩，导致被遮罩的mc点击会失效的bug
     修复annieUI.ScrollList在一开始就切换其他数据而不是追加数据时列表不更新的bug

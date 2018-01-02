@@ -524,9 +524,9 @@ var annieUI;
              * @property slideSpeed
              * @type {number}
              * @public
-             * @default 0
+             * @default 0.2
              */
-            _this.slideSpeed = 0.3;
+            _this.slideSpeed = 0.2;
             /**
              * 是否滑动中断
              * @property _isBreak
@@ -552,6 +552,7 @@ var annieUI;
             _this.touchEndX = 0;
             _this.movingX = 0;
             _this.movingY = 0;
+            _this._moveDis = 0;
             /**
              * 触摸点结束点Y
              * @property touchEndY
@@ -571,6 +572,12 @@ var annieUI;
              * @default 0
              */
             _this.currentPageIndex = 0;
+            //上下的回弹率
+            _this.reBound = 0.3;
+            //页面是否滑动跟随
+            _this.isPageFollowToMove = false;
+            //页面的跟率
+            _this.follow = 0.7;
             /**
              * 页面是否移动
              * @property isMoving
@@ -602,13 +609,8 @@ var annieUI;
              */
             _this.pageList = [];
             _this.pageClassList = [];
-            /**
-             *
-             * @property fSpeed
-             * @type {number}
-             * @private
-             */
-            _this.fSpeed = 10;
+            _this.lastX = 0;
+            _this.lastY = 0;
             /**
              * 是否点击了鼠标
              * @property isMouseDown
@@ -687,50 +689,128 @@ var annieUI;
                 s.movingX = s.movingY = 0;
                 s.isMouseDown = true;
                 s._isBreak = false;
+                s.lastX = e.localX;
+                s.lastY = e.localY;
+                s._moveDis = 0;
             }
             else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
                 if (!s.isMouseDown)
                     return;
                 var mx = e.localX - s.touchEndX;
                 var my = e.localY - s.touchEndY;
-                // s.touchEndX = e.localX;
-                // s.touchEndY = e.localY;
                 var ts = my;
+                var fts = mx;
                 var lts = s.movingY;
-                if (!s.isVertical) {
-                    ts = mx;
-                    lts = s.movingX;
-                }
-                if (Math.abs(ts) - Math.abs(lts) < -1) {
-                    s._isBreak = true;
-                }
+                s._moveDis = s.lastY - e.localY;
                 s.movingX = mx;
                 s.movingY = my;
-                if (ts > 0 && s.currentPageIndex == 0) {
-                    s.view[s.paramXY] = ts * 0.3;
+                if (!s.isVertical) {
+                    ts = mx;
+                    fts = my;
+                    lts = s.movingX;
+                    s._moveDis = s.lastX - e.localX;
                 }
-                else if (ts < 0 && (s.currentPageIndex == s.listLen - 1)) {
-                    s.view[s.paramXY] = -s.currentPageIndex * s.distance + ts * 0.3;
+                if (Math.abs(ts) > Math.abs(fts)) {
+                    if (!s.isPageFollowToMove) {
+                        if (Math.abs(ts) - Math.abs(lts) < -1) {
+                            s._isBreak = true;
+                        }
+                    }
+                    if (ts > 0) {
+                        if (s.currentPageIndex == 0) {
+                            s.view[s.paramXY] -= s._moveDis * s.reBound;
+                        }
+                        else {
+                            if (s.isPageFollowToMove) {
+                                s.view[s.paramXY] -= s._moveDis * s.follow;
+                                var nextId = s.currentPageIndex - 1;
+                                if (!s.pageList[nextId]) {
+                                    s.pageList[nextId] = new s.pageClassList[nextId]();
+                                }
+                                if (s.pageList[nextId].parent != s.view) {
+                                    s.view.addChild(s.pageList[nextId]);
+                                    s.pageList[nextId][s.paramXY] = nextId * s.distance;
+                                }
+                            }
+                        }
+                    }
+                    else if (ts < 0) {
+                        if (s.currentPageIndex == s.listLen - 1) {
+                            s.view[s.paramXY] -= s._moveDis * s.reBound;
+                        }
+                        else {
+                            if (s.isPageFollowToMove) {
+                                s.view[s.paramXY] -= s._moveDis * s.follow;
+                                var nextId = s.currentPageIndex + 1;
+                                if (!s.pageList[nextId]) {
+                                    s.pageList[nextId] = new s.pageClassList[nextId]();
+                                }
+                                if (s.pageList[nextId].parent != s.view) {
+                                    s.view.addChild(s.pageList[nextId]);
+                                    s.pageList[nextId][s.paramXY] = nextId * s.distance;
+                                }
+                            }
+                        }
+                    }
                 }
+                else {
+                    s.movingX = s.movingY = 0;
+                }
+                s.lastX = e.localX;
+                s.lastY = e.localY;
             }
             else if (e.type == annie.MouseEvent.MOUSE_UP) {
                 if (!s.isMouseDown)
                     return;
-                s.isMouseDown = false;
                 var ts = s.movingY;
+                var fts = s.movingX;
+                s.isMouseDown = false;
                 if (!s.isVertical) {
                     ts = s.movingX;
+                    fts = s.movingY;
                 }
                 if ((s.currentPageIndex == 0 && s.view[s.paramXY] > 0) || (s.currentPageIndex == (s.listLen - 1) && s.view[s.paramXY] < -s.currentPageIndex * s.distance)) {
                     var tweenData = {};
                     tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
-                    tweenData.ease = annie.Tween.backOut;
-                    annie.Tween.to(s.view, 0.2, tweenData);
+                    if (s._ease) {
+                        tweenData.ease = s._ease;
+                    }
+                    annie.Tween.to(s.view, s.slideSpeed * s.reBound, tweenData);
                 }
                 else {
-                    if (Math.abs(ts) > 100 && !s._isBreak) {
-                        var id = s.currentPageIndex;
-                        s.slideTo(ts < 0 ? id + 1 : id - 1);
+                    var id = s.currentPageIndex;
+                    if (!s.isPageFollowToMove) {
+                        if (Math.abs(ts) > 100 && !s._isBreak) {
+                            s.slideTo(ts < 0 ? id + 1 : id - 1);
+                        }
+                    }
+                    else {
+                        if (Math.abs(s._moveDis) > 5 || Math.abs(ts * s.follow << 1) >= s.distance) {
+                            s.slideTo(ts < 0 ? id + 1 : id - 1);
+                        }
+                        else {
+                            var where = -s.currentPageIndex * s.distance;
+                            if (where == s.view[s.paramXY])
+                                return;
+                            s.view.mouseEnable = false;
+                            s.isMoving = true;
+                            var tweenData = {};
+                            tweenData[s.paramXY] = where;
+                            if (s._ease) {
+                                tweenData.ease = s._ease;
+                            }
+                            tweenData.onComplete = function () {
+                                s.view.mouseEnable = true;
+                                s.isMoving = false;
+                                if (s.currentPageIndex > 0 && s.pageList[s.currentPageIndex - 1] && s.pageList[s.currentPageIndex - 1].parent == s.view) {
+                                    s.view.removeChild(s.pageList[s.currentPageIndex - 1]);
+                                }
+                                if (s.currentPageIndex < (s.listLen - 1) && s.pageList[s.currentPageIndex + 1] && s.pageList[s.currentPageIndex + 1].parent == s.view) {
+                                    s.view.removeChild(s.pageList[s.currentPageIndex + 1]);
+                                }
+                            };
+                            annie.Tween.to(s.view, s.slideSpeed * 0.5, tweenData);
+                        }
                     }
                 }
             }
@@ -742,7 +822,8 @@ var annieUI;
          * @since 1.1.1
          * @param {number} index 是向上还是向下
          */
-        SlidePage.prototype.slideTo = function (index) {
+        SlidePage.prototype.slideTo = function (index, noTween) {
+            if (noTween === void 0) { noTween = false; }
             var s = this;
             if (s.isMoving || s.currentPageIndex == index) {
                 return;
@@ -775,23 +856,35 @@ var annieUI;
             else {
                 s.pageList[lastId][s.paramXY] = (s.currentPageIndex + 1) * s.distance;
             }
-            s.view[s.paramXY] = -s.pageList[lastId][s.paramXY];
-            s.view.addChild(s.pageList[s.currentPageIndex]);
-            s.view.mouseEnable = false;
-            s.isMoving = true;
-            var tweenData = {};
-            tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
-            if (s._ease) {
-                tweenData.ease = s._ease;
+            if (!s.isPageFollowToMove) {
+                s.view[s.paramXY] = -s.pageList[lastId][s.paramXY];
             }
-            tweenData.onComplete = function () {
-                s.view.mouseEnable = true;
-                s.isMoving = false;
+            if (s.pageList[s.currentPageIndex] != s.view) {
+                s.view.addChild(s.pageList[s.currentPageIndex]);
+            }
+            if (noTween) {
+                s.dispatchEvent("onSlideStart", { currentPage: s.currentPageIndex, lastPage: lastId });
+                s.view[s.paramXY] = -s.currentPageIndex * s.distance;
                 s.view.removeChild(s.pageList[lastId]);
                 s.dispatchEvent("onSlideEnd");
-            };
-            annie.Tween.to(s.view, s.slideSpeed, tweenData);
-            s.dispatchEvent("onSlideStart", { currentPage: s.currentPageIndex, lastPage: lastId });
+            }
+            else {
+                s.view.mouseEnable = false;
+                s.isMoving = true;
+                var tweenData = {};
+                tweenData[s.paramXY] = -s.currentPageIndex * s.distance;
+                if (s._ease) {
+                    tweenData.ease = s._ease;
+                }
+                tweenData.onComplete = function () {
+                    s.view.mouseEnable = true;
+                    s.isMoving = false;
+                    s.view.removeChild(s.pageList[lastId]);
+                    s.dispatchEvent("onSlideEnd");
+                };
+                annie.Tween.to(s.view, s.slideSpeed, tweenData);
+                s.dispatchEvent("onSlideStart", { currentPage: s.currentPageIndex, lastPage: lastId });
+            }
         };
         /**
          * 用于插入分页
@@ -858,6 +951,13 @@ var annieUI;
              * @since 1.0.3
              */
             _this.currPage = 0;
+            /**
+             * 翻页速度，0-1之间，值越小，速度越快
+             * @property
+             * @since 1.1.3
+             * @type {number}
+             */
+            _this.speed = 0.4;
             _this.state = "stop";
             _this.timerArg0 = 0;
             _this.timerArg1 = 0;
@@ -1286,7 +1386,7 @@ var annieUI;
             var tmpY;
             var u;
             if (s.state == "start") {
-                u = 0.4;
+                u = s.speed;
                 var p = s.stageMP;
                 s.px += (p.x - s.px) * u >> 0;
                 s.py += (p.y - s.py) * u >> 0;
@@ -1308,11 +1408,11 @@ var annieUI;
                 tmpX = (tox - s.px) >> 0;
                 tmpY = (toy - s.py) >> 0;
                 if (s.timerArg1 < 0) {
-                    u = 0.3;
+                    u = s.speed * 0.7;
                     s.py = s.arc(s.bW, tmpX, toPos.y);
                 }
                 else {
-                    u = 0.4;
+                    u = s.speed;
                     s.py = tmpY * u + s.py;
                 }
                 s.px = tmpX * u + s.px;
@@ -1387,7 +1487,7 @@ var annieUI;
             if (cols === void 0) { cols = 1; }
             var _this = _super.call(this, vW, vH, 0, isVertical) || this;
             _this._items = null;
-            _this._data = [];
+            _this.data = [];
             _this.downL = null;
             _this._lastFirstId = -1;
             var s = _this;
@@ -1427,14 +1527,14 @@ var annieUI;
             if (isReset === void 0) { isReset = false; }
             var s = this;
             if (!s._isInit || isReset) {
-                s._data = data;
+                s.data = data;
                 s._isInit = true;
             }
             else {
-                s._data = s._data.concat(data);
+                s.data = s.data.concat(data);
             }
             s._lastFirstId = -1;
-            s.maxDistance = Math.ceil(s._data.length / s._cols) * s._itemRow;
+            s.maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
                 s.downL[s.paramXY] = Math.max(s.distance, s.maxDistance);
                 var wh = s.downL.getWH();
@@ -1462,8 +1562,8 @@ var annieUI;
                     for (var i = 0; i < s._itemCount; i++) {
                         var item = s._items[i];
                         if (item.id != id || isMustUpdate) {
-                            item.initData(s._data[id] ? id : -1, s._data[id]);
-                            item.visible = s._data[id] ? true : false;
+                            item.initData(s.data[id] ? id : -1, s.data[id]);
+                            item.visible = s.data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
                         }

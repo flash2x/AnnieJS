@@ -3939,6 +3939,41 @@ declare namespace Flash2x {
  * @module annie
  */
 declare namespace annie {
+    class TweenObj extends AObject {
+        constructor();
+        currentFrame: number;
+        totalFrames: number;
+        protected _startData: any;
+        protected _disData: any;
+        target: any;
+        private _isTo;
+        private _isLoop;
+        private _delay;
+        _update: Function;
+        _completeFun: Function;
+        _ease: Function;
+        private _isFront;
+        private _cParams;
+        private _loop;
+        /**
+         * 初始化数据
+         * @method init
+         * @param target
+         * @param times
+         * @param data
+         * @param isTo
+         * @public
+         * @since 1.0.0
+         */
+        init(target: any, times: number, data: any, isTo?: boolean): void;
+        /**
+         * 更新数据
+         * @method update
+         * @since 1.0.0
+         * @public
+         */
+        update(): void;
+    }
     /**
      * 全局静态单列类,不要实例化此类
      * @class annie.Tween

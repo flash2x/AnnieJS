@@ -648,6 +648,7 @@ namespace annie {
          */
         public update(isDrawUpdate:boolean=false): void {
             let s = this;
+            if(!s._visible)return;
             super.update(isDrawUpdate);
             if (s._UI.UD || s._UI.UF){
                 //更新缓存
