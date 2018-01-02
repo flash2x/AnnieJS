@@ -347,13 +347,14 @@ namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
+        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number,isMulti:boolean): void {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
+            event.isMultiTouch=isMulti;
         }
 
         //每一个手指事件的对象池
@@ -472,7 +473,9 @@ namespace annie {
         private onMouseEvent = function (e: any): void {
             //检查是否有
             let s: any = this;
+            let isMulti:boolean=false;
             if (s.isMultiTouch && e.targetTouches) {
+                isMulti=true;
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
                     s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
@@ -545,7 +548,7 @@ namespace annie {
                             event.type = item;
                         }
                         events.push(event);
-                        s._initMouseEvent(event, cp, sp, identifier);
+                        s._initMouseEvent(event, cp, sp, identifier,isMulti);
                         eLen++;
                     }
                     if (item == "onMouseDown") {
@@ -565,7 +568,7 @@ namespace annie {
                                         event.type = "onMouseClick";
                                     }
                                     events.push(event);
-                                    s._initMouseEvent(event, cp, sp, identifier);
+                                    s._initMouseEvent(event, cp, sp, identifier,isMulti);
                                     eLen++;
                                 }
                             }
@@ -629,7 +632,7 @@ namespace annie {
                                                     overEvent = s._ml[eLen];
                                                     overEvent.type = "onMouseOver";
                                                 }
-                                                s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                s._initMouseEvent(overEvent, cp, sp, identifier,isMulti);
                                                 eLen++;
                                                 if (!s._ml[eLen]) {
                                                     outEvent = new MouseEvent("onMouseOut");
@@ -638,7 +641,7 @@ namespace annie {
                                                     outEvent = s._ml[eLen];
                                                     outEvent.type = "onMouseOut";
                                                 }
-                                                s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                s._initMouseEvent(outEvent, cp, sp, identifier,isMulti);
                                             }
                                         }
                                         if (isDiff) {
