@@ -542,9 +542,16 @@ declare namespace annie {
          * @type {number}
          * @since 1.1.2
          * @public
-         * @type{number}
          */
         identifier: any;
+        /**
+         * 触摸或者鼠标事件的手指是否是多个
+         * @property isMultiTouch
+         * @type {boolean}
+         * @since 1.1.3
+         * @public
+         */
+        isMultiTouch: boolean;
         /**
          * @method MouseEvent
          * @public
@@ -1733,7 +1740,7 @@ declare namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
-        * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -1830,7 +1837,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        private _drawShape(ctx, isMask?);
+        private _drawShape(ctx);
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -3060,7 +3067,7 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event, cp, sp, identifier);
+        private _initMouseEvent(event, cp, sp, identifier, isMulti);
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数

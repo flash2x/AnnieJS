@@ -59,7 +59,7 @@ namespace annie {
             }
             s.inputType = inputType;
             var remove = function () {
-                if (s.isAutoDownKeyBoard) {
+                if (s.isAutoDownKeyBoard&&annie.osType!="pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
             }.bind(s);

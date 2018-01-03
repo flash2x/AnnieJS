@@ -315,8 +315,6 @@ namespace annie {
                 }
                 can.width = maxW + 20;
                 can.height = maxH + 20;
-                can.style.width = can.width / devicePixelRatio + "px";
-                can.style.height = can.height / devicePixelRatio + "px";
                 ctx.clearRect(0, 0, can.width, can.width);
                 if (s.border) {
                     ctx.beginPath();

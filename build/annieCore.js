@@ -645,9 +645,16 @@ var annie;
              * @type {number}
              * @since 1.1.2
              * @public
-             * @type{number}
              */
             _this.identifier = 0;
+            /**
+             * 触摸或者鼠标事件的手指是否是多个
+             * @property isMultiTouch
+             * @type {boolean}
+             * @since 1.1.3
+             * @public
+             */
+            _this.isMultiTouch = false;
             _this._instanceType = "annie.MouseEvent";
             return _this;
         }
@@ -2374,8 +2381,6 @@ var annie;
                     var newH = h + 20;
                     _canvas.width = newW;
                     _canvas.height = newH;
-                    _canvas.style.width = newW / annie.devicePixelRatio + "px";
-                    _canvas.style.height = newH / annie.devicePixelRatio + "px";
                     var ctx = _canvas.getContext("2d");
                     ctx.clearRect(0, 0, newW, newH);
                     ctx.translate(10, 10);
@@ -2563,7 +2568,7 @@ var annie;
              * @param {Array} colors 一组颜色值
              * @param {Array} ratios 一组范围比例值
              * @param {Array} points 一组点
-            * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+             * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
              * @public
              * @since 1.0.0
              */
@@ -3234,8 +3239,6 @@ var annie;
                             var ctx = _canvas["getContext"]('2d');
                             _canvas.width = w;
                             _canvas.height = h;
-                            _canvas.style.width = w / annie.devicePixelRatio + "px";
-                            _canvas.style.height = h / annie.devicePixelRatio + "px";
                             ctx.clearRect(0, 0, w, h);
                             ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                             ////////////////////
@@ -3262,8 +3265,7 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        Shape.prototype._drawShape = function (ctx, isMask) {
-            if (isMask === void 0) { isMask = false; }
+        Shape.prototype._drawShape = function (ctx) {
             var s = this;
             var com = s._command;
             var cLen = com.length;
@@ -3298,8 +3300,7 @@ var annie;
                     }
                 }
                 else {
-                    if (!isMask)
-                        ctx[data[1]] = data[2];
+                    ctx[data[1]] = data[2];
                 }
             }
         };
@@ -5507,8 +5508,6 @@ var annie;
                 }
                 can.width = maxW + 20;
                 can.height = maxH + 20;
-                can.style.width = can.width / annie.devicePixelRatio + "px";
-                can.style.height = can.height / annie.devicePixelRatio + "px";
                 ctx.clearRect(0, 0, can.width, can.width);
                 if (s.border) {
                     ctx.beginPath();
@@ -5602,7 +5601,7 @@ var annie;
              * @since 1.0.3
              * @default true
              */
-            _this.isAutoDownKeyBoard = true;
+            _this.isAutoDownKeyBoard = false;
             var input = null;
             var s = _this;
             s._instanceType = "annie.InputText";
@@ -6084,7 +6083,9 @@ var annie;
             _this.onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
+                var isMulti = false;
                 if (s.isMultiTouch && e.targetTouches) {
+                    isMulti = true;
                     if (e.targetTouches.length == 2) {
                         //求角度和距离
                         s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
@@ -6161,7 +6162,7 @@ var annie;
                                 event_3.type = item;
                             }
                             events.push(event_3);
-                            s._initMouseEvent(event_3, cp, sp, identifier);
+                            s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
                             eLen++;
                         }
                         if (item == "onMouseDown") {
@@ -6183,7 +6184,7 @@ var annie;
                                             event_3.type = "onMouseClick";
                                         }
                                         events.push(event_3);
-                                        s._initMouseEvent(event_3, cp, sp, identifier);
+                                        s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
                                         eLen++;
                                     }
                                 }
@@ -6249,7 +6250,7 @@ var annie;
                                                         overEvent = s._ml[eLen];
                                                         overEvent.type = "onMouseOver";
                                                     }
-                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(overEvent, cp, sp, identifier, isMulti);
                                                     eLen++;
                                                     if (!s._ml[eLen]) {
                                                         outEvent = new annie.MouseEvent("onMouseOut");
@@ -6259,7 +6260,7 @@ var annie;
                                                         outEvent = s._ml[eLen];
                                                         outEvent.type = "onMouseOut";
                                                     }
-                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(outEvent, cp, sp, identifier, isMulti);
                                                 }
                                             }
                                             if (isDiff) {
@@ -6562,13 +6563,14 @@ var annie;
          * 刷新mouse或者touch事件
          * @private
          */
-        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
+        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, isMulti) {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
+            event.isMultiTouch = isMulti;
         };
         /**
          * 循环刷新页面的函数
@@ -9818,8 +9820,8 @@ var annie;
         obj._offsetY = rect ? rect.y : whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        _dRender.rootContainer.style.width = w / annie.devicePixelRatio + "px";
-        _dRender.rootContainer.style.height = h / annie.devicePixelRatio + "px";
+        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);

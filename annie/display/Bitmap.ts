@@ -126,8 +126,6 @@ namespace annie {
                     let newH = h + 20;
                     _canvas.width = newW;
                     _canvas.height = newH;
-                    _canvas.style.width = newW / devicePixelRatio + "px";
-                    _canvas.style.height = newH / devicePixelRatio + "px";
                     let ctx = _canvas.getContext("2d");
                     ctx.clearRect(0, 0, newW, newH);
                     ctx.translate(10, 10);

@@ -13,7 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._texture=window.document.createElement("canvas");
+            this._texture = window.document.createElement("canvas");
         }
 
         /**
@@ -52,6 +52,7 @@ namespace annie {
             }
             return colorObj;
         }
+
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -91,6 +92,7 @@ namespace annie {
             }
             return color;
         }
+
         private _isBitmapStroke: Matrix;
         private _isBitmapFill: Matrix;
         /**
@@ -110,7 +112,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public addDraw(commandName: string, params: Array<any>):void{
+        public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
             s._UI.UD = true;
             s._command.push([1, commandName, params]);
@@ -371,7 +373,7 @@ namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
-        * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -427,7 +429,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1,cap: string = "butt", join: string = "miter", miter: number = 10): void {
+        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10): void {
             this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
         }
 
@@ -639,6 +641,7 @@ namespace annie {
                 s.addDraw(f, params);
             }
         };
+
         /**
          * 重写刷新
          * @method update
@@ -646,11 +649,11 @@ namespace annie {
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(isDrawUpdate:boolean=false): void {
+        public update(isDrawUpdate: boolean = false): void {
             let s = this;
-            if(!s._visible)return;
+            if (!s._visible) return;
             super.update(isDrawUpdate);
-            if (s._UI.UD || s._UI.UF){
+            if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -658,7 +661,7 @@ namespace annie {
                 let buttonRightX: number;
                 let buttonRightY: number;
                 let i: number;
-                if (cLen > 0){
+                if (cLen > 0) {
                     //确定是否有数据,如果有数据的话就计算出缓存图的宽和高
                     let data: any;
                     let lastX = 0;
@@ -746,8 +749,8 @@ namespace annie {
                                 buttonRightY = Math.max(buttonRightY, yuanBRY);
                             }
                         } else {
-                            if (data[1] == "lineWidth"){
-                                if (lineWidth < data[2]){
+                            if (data[1] == "lineWidth") {
+                                if (lineWidth < data[2]) {
                                     lineWidth = data[2];
                                 }
                             }
@@ -766,18 +769,16 @@ namespace annie {
                         let h = buttonRightY - leftY;
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x=leftX;
-                        s._bounds.y=leftY;
-                        s._bounds.width = w-20;
-                        s._bounds.height = h-20;
+                        s._bounds.x = leftX;
+                        s._bounds.y = leftY;
+                        s._bounds.width = w - 20;
+                        s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if(!s.isUseToMask&&!s.parent.isUseToMask){
+                        if (!s.isUseToMask && !s.parent.isUseToMask) {
                             let _canvas: any = s._texture;
                             let ctx = _canvas["getContext"]('2d');
                             _canvas.width = w;
                             _canvas.height = h;
-                            _canvas.style.width = w / devicePixelRatio + "px";
-                            _canvas.style.height = h / devicePixelRatio + "px";
                             ctx.clearRect(0, 0, w, h);
                             ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                             ////////////////////
@@ -805,7 +806,7 @@ namespace annie {
             s._UI.UF = false;
         }
 
-        private _drawShape(ctx: any, isMask: boolean = false): void {
+        private _drawShape(ctx: any): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;
@@ -835,11 +836,11 @@ namespace annie {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {
-                    if (!isMask)
-                        ctx[data[1]] = data[2];
+                    ctx[data[1]] = data[2];
                 }
             }
         }
+
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -851,13 +852,13 @@ namespace annie {
          */
         public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
             let s = this;
-            if (isMouseEvent && !s.mouseEnable)return null;
+            if (isMouseEvent && !s.mouseEnable) return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            let p:Point = globalPoint;
-            if(isMouseEvent) {
-                p=s.globalToLocal(globalPoint);
+            let p: Point = globalPoint;
+            if (isMouseEvent) {
+                p = s.globalToLocal(globalPoint);
             }
-            if (s.getBounds().isPointIn(p)){
+            if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
                     let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
@@ -881,6 +882,7 @@ namespace annie {
             }
             return null;
         }
+
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor
@@ -891,7 +893,7 @@ namespace annie {
          * @public
          * @since 1.0.2
          */
-        public changeColor(infoObj: any): void{
+        public changeColor(infoObj: any): void {
             let s = this;
             let cLen: number = s._command.length;
             let c = s._command;
