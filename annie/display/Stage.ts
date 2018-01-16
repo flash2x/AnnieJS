@@ -473,10 +473,8 @@ namespace annie {
         private onMouseEvent = function (e: any): void {
             //检查是否有
             let s: any = this;
-            let isMulti:boolean=false;
             if (s.isMultiTouch && e.targetTouches) {
-                isMulti=true;
-                if (e.targetTouches.length == 2) {
+                if (e.targetTouches.length == 2){
                     //求角度和距离
                     s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
                     s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
@@ -505,6 +503,7 @@ namespace annie {
                     s.muliPoints = [];
                 }
             }
+            let isMulti:boolean=(e.targetTouches&&e.targetTouches.length>1);
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
             if (EventDispatcher._totalMEC > 0) {
                 let item = s._mouseEventTypes[e.type];

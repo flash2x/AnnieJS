@@ -5601,7 +5601,7 @@ var annie;
              * @since 1.0.3
              * @default true
              */
-            _this.isAutoDownKeyBoard = false;
+            _this.isAutoDownKeyBoard = true;
             var input = null;
             var s = _this;
             s._instanceType = "annie.InputText";
@@ -5619,7 +5619,7 @@ var annie;
             }
             s.inputType = inputType;
             var remove = function () {
-                if (s.isAutoDownKeyBoard) {
+                if (s.isAutoDownKeyBoard && annie.osType != "pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
             }.bind(s);
@@ -6083,9 +6083,7 @@ var annie;
             _this.onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
-                var isMulti = false;
                 if (s.isMultiTouch && e.targetTouches) {
-                    isMulti = true;
                     if (e.targetTouches.length == 2) {
                         //求角度和距离
                         s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
@@ -6116,6 +6114,7 @@ var annie;
                         s.muliPoints = [];
                     }
                 }
+                var isMulti = (e.targetTouches && e.targetTouches.length > 1);
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
                 if (annie.EventDispatcher._totalMEC > 0) {
                     var item = s._mouseEventTypes[e.type];
