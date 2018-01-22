@@ -42,6 +42,7 @@ namespace annieUI {
          * @default 0
          */
         private viewHeight: number = 0;
+        private _tweenId:number=0;
         /**
          * 整个滚动的最大距离值
          * @property maxDistance
@@ -176,7 +177,7 @@ namespace annieUI {
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 let view: any = s.view;
                 if (s.autoScroll)return;
-                if (!s.isStop) {
+                if (!s.isStop){
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
                         //是否超过了边界,如果超过了,则加快加速度,让其停止
@@ -258,12 +259,15 @@ namespace annieUI {
 
         private onMouseEvent(e: annie.MouseEvent): void {
             let s = this;
-            if (s.autoScroll)return;
             let view: any = s.view;
             // if (s.distance < s.maxDistance) {
             if (e.type == annie.MouseEvent.MOUSE_DOWN){
                 if (!s.isStop) {
                     s.isStop = true;
+                }
+                if (s.autoScroll){
+                    s.autoScroll=false;
+                    annie.Tween.kill(s._tweenId);
                 }
                 if (s.isVertical) {
                     s.lastValue = e.localY;
@@ -327,7 +331,13 @@ namespace annieUI {
          */
         public scrollTo(dis: number, time: number = 0): void {
             let s:any = this;
-            if(Math.abs(s.view[s.paramXY]+dis)>1) {
+            let newDis=s.paramXY=="x"?s.viewWidth:s.viewHeight;
+            if(dis<0){
+                dis=0;
+            }else if(dis>s.maxDistance-newDis){
+                dis=s.maxDistance-newDis;
+            }
+            if(Math.abs(s.view[s.paramXY]+dis)>2) {
                 s.autoScroll = true;
                 s.isStop = true;
                 s.isMouseDownState = 0;
@@ -336,7 +346,7 @@ namespace annieUI {
                     s.autoScroll = false;
                 };
                 obj[s.paramXY] = -dis;
-                annie.Tween.to(s.view, time, obj);
+                s._tweenId=annie.Tween.to(s.view, time, obj);
                 if(s.speed==0){
                     s.dispatchEvent("onScrollStart");
                 }

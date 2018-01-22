@@ -66,7 +66,7 @@ namespace annie {
          */
         public update(isDrawUpdate:boolean=false){
             let  s=this;
-            if(s.visible) {
+            if(s._visible) {
                 //刷新视频
                 if (s.videoType == 0) {
                     s.video.update(isDrawUpdate);

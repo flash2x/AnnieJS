@@ -648,10 +648,23 @@ var annie;
              * @type {number}
              * @since 1.1.2
              * @public
-             * @type{number}
              */
+<<<<<<< HEAD
             this.identifier = 0;
             this._instanceType = "annie.MouseEvent";
+=======
+            _this.identifier = 0;
+            /**
+             * 触摸或者鼠标事件的手指是否是多个
+             * @property isMultiTouch
+             * @type {boolean}
+             * @since 1.1.3
+             * @public
+             */
+            _this.isMultiTouch = false;
+            _this._instanceType = "annie.MouseEvent";
+            return _this;
+>>>>>>> flash2x/master
         }
         /**
          * 事件后立即更新显示列表状态
@@ -1878,7 +1891,14 @@ var annie;
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
-            return this.cMatrix.transformPoint(point.x, point.y, bp);
+            if (this.parent) {
+                //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
+                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+            }
+            else {
+                //没有父级
+                return this.cMatrix.transformPoint(point.x, point.y, bp);
+            }
         };
         /**
          * 启动鼠标或者触摸拖动
@@ -1892,6 +1912,10 @@ var annie;
             if (isCenter === void 0) { isCenter = false; }
             if (bounds === void 0) { bounds = null; }
             var s = this;
+            if (!s.stage) {
+                trace("The DisplayObject is not on stage");
+                return;
+            }
             annie.Stage._dragDisplay = s;
             s._isDragCenter = isCenter;
             s._lastDragPoint.x = Number.MAX_VALUE;
@@ -1925,19 +1949,27 @@ var annie;
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} globalPoint 全局坐标中的一个点
+         * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
          * @returns {annie.DisplayObject}
          */
-        DisplayObject.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
+        DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
             if (isMouseEvent === void 0) { isMouseEvent = false; }
             var s = this;
             if (!s.visible)
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            if (s.getBounds().isPointIn(s.globalToLocal(globalPoint, DisplayObject._bp))) {
-                return s;
+            if (!isMouseEvent) {
+                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
+                if (s.getBounds().isPointIn(point)) {
+                    return s;
+                }
+            }
+            else {
+                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))) {
+                    return s;
+                }
             }
             return null;
         };
@@ -2330,6 +2362,8 @@ var annie;
         Bitmap.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
             //滤镜
             var bitmapData = s._bitmapData;
@@ -2349,8 +2383,6 @@ var annie;
                     var newH = h + 20;
                     _canvas.width = newW;
                     _canvas.height = newH;
-                    _canvas.style.width = newW / annie.devicePixelRatio + "px";
-                    _canvas.style.height = newH / annie.devicePixelRatio + "px";
                     var ctx = _canvas.getContext("2d");
                     ctx.clearRect(0, 0, newW, newH);
                     ctx.translate(10, 10);
@@ -2536,7 +2568,7 @@ var annie;
              * @param {Array} colors 一组颜色值
              * @param {Array} ratios 一组范围比例值
              * @param {Array} points 一组点
-            * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+             * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
              * @public
              * @since 1.0.0
              */
@@ -3072,6 +3104,8 @@ var annie;
         Shape.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
@@ -3194,16 +3228,14 @@ var annie;
                         s._offsetY = leftY;
                         s._bounds.x = leftX;
                         s._bounds.y = leftY;
-                        s._bounds.width = w;
-                        s._bounds.height = h;
+                        s._bounds.width = w - 20;
+                        s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         if (!s.isUseToMask && !s.parent.isUseToMask) {
                             var _canvas = s._texture;
                             var ctx = _canvas["getContext"]('2d');
                             _canvas.width = w;
                             _canvas.height = h;
-                            _canvas.style.width = w / annie.devicePixelRatio + "px";
-                            _canvas.style.height = h / annie.devicePixelRatio + "px";
                             ctx.clearRect(0, 0, w, h);
                             ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                             ////////////////////
@@ -3228,8 +3260,7 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        Shape.prototype._drawShape = function (ctx, isMask) {
-            if (isMask === void 0) { isMask = false; }
+        Shape.prototype._drawShape = function (ctx) {
             var s = this;
             var com = s._command;
             var cLen = com.length;
@@ -3264,8 +3295,7 @@ var annie;
                     }
                 }
                 else {
-                    if (!isMask)
-                        ctx[data[1]] = data[2];
+                    ctx[data[1]] = data[2];
                 }
             }
         };
@@ -3284,7 +3314,10 @@ var annie;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
             //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p = s.globalToLocal(globalPoint);
+            var p = globalPoint;
+            if (isMouseEvent) {
+                p = s.globalToLocal(globalPoint);
+            }
             if (s.getBounds().isPointIn(p)) {
                 if (s.hitTestWidthPixel) {
                     var image = s._texture;
@@ -3454,12 +3487,12 @@ var annie;
         }
         Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
             /**
-             * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+             * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
              * @property  cacheAsBitmap
              * @public
              * @since 1.1.2
-             * @return {boolean}
              * @default false
+             * @type boolean
              */
             get: function () {
                 return this._cacheAsBitmap;
@@ -3725,15 +3758,30 @@ var annie;
                     child = s.children[i];
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
+                        var childChild = null;
                         child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames) {
+                            child.mask.gotoAndStop(s.currentFrame);
+<<<<<<< HEAD
+=======
+                            //一定要为true
+                            childChild = child.mask.getChildAt(0);
+                            if (childChild) {
+                                childChild.isUseToMask = true;
+                                childChild.hitTestWidthPixel = false;
+                            }
+                        }
+                        else {
                             child.mask.isUseToMask = true;
                             child.mask.hitTestWidthPixel = false;
-                            child.mask.gotoAndStop(s.currentFrame);
+>>>>>>> flash2x/master
                         }
                         child.mask._cp = true;
                         child.mask.update(isDrawUpdate);
                         child.mask.isUseToMask = false;
+                        if (childChild) {
+                            childChild.isUseToMask = false;
+                        }
                         maskObjIds.push(child.mask.instanceId);
                     }
                     child.update(isDrawUpdate);
@@ -3949,7 +3997,6 @@ var annie;
             this._loop = 0;
             var s = this;
             s._instanceType = "annie.Media";
-            trace(typeof (src));
             if (typeof (src) == "string") {
                 s.media = document.createElement(type);
                 s.media.src = src;
@@ -5371,6 +5418,8 @@ var annie;
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             _super.prototype.update.call(this, isDrawUpdate);
             var s = this;
+            if (!s._visible)
+                return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 var can = s._texture;
@@ -5450,8 +5499,6 @@ var annie;
                 }
                 can.width = maxW + 20;
                 can.height = maxH + 20;
-                can.style.width = can.width / annie.devicePixelRatio + "px";
-                can.style.height = can.height / annie.devicePixelRatio + "px";
                 ctx.clearRect(0, 0, can.width, can.width);
                 if (s.border) {
                     ctx.beginPath();
@@ -5563,7 +5610,7 @@ var annie;
             }
             s.inputType = inputType;
             var remove = function () {
-                if (s.isAutoDownKeyBoard) {
+                if (s.isAutoDownKeyBoard && annie.osType != "pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
             }.bind(s);
@@ -6057,6 +6104,7 @@ var annie;
                         s.muliPoints = [];
                     }
                 }
+                var isMulti = (e.targetTouches && e.targetTouches.length > 1);
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
                 if (annie.EventDispatcher._totalMEC > 0) {
                     var item = s._mouseEventTypes[e.type];
@@ -6103,7 +6151,7 @@ var annie;
                                 event_3.type = item;
                             }
                             events.push(event_3);
-                            s._initMouseEvent(event_3, cp, sp, identifier);
+                            s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
                             eLen++;
                         }
                         if (item == "onMouseDown") {
@@ -6124,7 +6172,7 @@ var annie;
                                             event_3.type = "onMouseClick";
                                         }
                                         events.push(event_3);
-                                        s._initMouseEvent(event_3, cp, sp, identifier);
+                                        s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
                                         eLen++;
                                     }
                                 }
@@ -6190,7 +6238,7 @@ var annie;
                                                         overEvent = s._ml[eLen];
                                                         overEvent.type = "onMouseOver";
                                                     }
-                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(overEvent, cp, sp, identifier, isMulti);
                                                     eLen++;
                                                     if (!s._ml[eLen]) {
                                                         outEvent = new annie.MouseEvent("onMouseOut");
@@ -6200,7 +6248,7 @@ var annie;
                                                         outEvent = s._ml[eLen];
                                                         outEvent.type = "onMouseOut";
                                                     }
-                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(outEvent, cp, sp, identifier, isMulti);
                                                 }
                                             }
                                             if (isDiff) {
@@ -6316,6 +6364,8 @@ var annie;
                 var divW = s.divWidth * annie.devicePixelRatio;
                 var desH = s.desHeight;
                 var desW = s.desWidth;
+                s.anchorX = desW / 2;
+                s.anchorY = desH / 2;
                 //设备是否为竖屏
                 var isDivH = divH > divW;
                 //内容是否为竖屏内容
@@ -6361,6 +6411,7 @@ var annie;
                 }
                 s.scaleX = scaleX;
                 s.scaleY = scaleY;
+                // s.viewRect=new annie.Rectangle();
                 s.viewRect.x = (desW - divW / scaleX) / 2;
                 s.viewRect.y = (desH - divH / scaleY) / 2;
                 s.viewRect.width = desW - s.viewRect.x * 2;
@@ -6499,13 +6550,14 @@ var annie;
          * 刷新mouse或者touch事件
          * @private
          */
-        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
+        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, isMulti) {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
+            event.isMultiTouch = isMulti;
         };
         /**
          * 循环刷新页面的函数
@@ -7590,9 +7642,15 @@ var annie;
          * @param type text json js xml image sound css svg video unKnow
          */
         function URLLoader() {
+<<<<<<< HEAD
             _super.call(this);
             this._req = new XMLHttpRequest();
             this.headers = [];
+=======
+            var _this = _super.call(this) || this;
+            _this._req = null;
+            _this.headers = [];
+>>>>>>> flash2x/master
             /**
              * 后台返回来的数据类弄
              * @property responseType
@@ -7777,40 +7835,41 @@ var annie;
             }
             if (!s._req) {
                 s._req = new XMLHttpRequest();
-            }
-            var req = s._req;
-            req.withCredentials = false;
-            req.onprogress = function (event) {
-                if (!event || event.loaded > 0 && event.total == 0) {
-                    return; // Sometimes we get no "total", so just ignore the progress event.
-                }
-                s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
-            };
-            req.onerror = function (event) {
-                reSendTimes++;
-                if (reSendTimes > 2) {
-                    s.dispatchEvent("onError", { id: 2, msg: event["message"] });
-                }
-                else {
-                    //断线重连
-                    req.abort();
-                    if (!s.data) {
-                        req.send();
+                var req_1 = s._req;
+                req_1.withCredentials = false;
+                req_1.onprogress = function (event) {
+                    if (!event || event.loaded > 0 && event.total == 0) {
+                        return; // Sometimes we get no "total", so just ignore the progress event.
+                    }
+                    s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
+                };
+                req_1.onerror = function (event) {
+                    reSendTimes++;
+                    if (reSendTimes > 2) {
+                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
                     }
                     else {
-                        if (contentType == "form") {
-                            req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                            req.send(s._fqs(s.data, null));
+                        //断线重连
+                        req_1.abort();
+                        if (!s.data) {
+                            req_1.send();
                         }
                         else {
-                            var type = "application/json";
-                            if (contentType != "json") {
-                                type = "multipart/form-data";
+                            if (contentType == "form") {
+                                req_1.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                                req_1.send(s._fqs(s.data, null));
                             }
-                            req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                            req.send(s.data);
+                            else {
+                                var type = "application/json";
+                                if (contentType != "json") {
+                                    type = "multipart/form-data";
+                                }
+                                req_1.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                                req_1.send(s.data);
+                            }
                         }
                     }
+<<<<<<< HEAD
                 }
             };
             req.onreadystatechange = function (event) {
@@ -7879,9 +7938,82 @@ var annie;
                     else {
                         //服务器返回报错
                         s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
+=======
+                };
+                req_1.onreadystatechange = function (event) {
+                    var t = event.target;
+                    if (t["readyState"] == 4) {
+                        if (req_1.status == 200) {
+                            var isImage = false;
+                            var e_1 = new annie.Event("onComplete");
+                            var result = t["response"];
+                            e_1.data = { type: s.responseType, response: null };
+                            var item = void 0;
+                            switch (s.responseType) {
+                                case "css":
+                                    item = document.createElement("link");
+                                    item.rel = "stylesheet";
+                                    item.href = s.url;
+                                    break;
+                                case "image":
+                                case "sound":
+                                case "video":
+                                    var itemObj_1;
+                                    if (s.responseType == "image") {
+                                        isImage = true;
+                                        itemObj_1 = document.createElement("img");
+                                        itemObj_1.onload = function () {
+                                            URL.revokeObjectURL(itemObj_1.src);
+                                            itemObj_1.onload = null;
+                                            s.dispatchEvent(e_1);
+                                        };
+                                        itemObj_1.src = URL.createObjectURL(result);
+                                        item = itemObj_1;
+                                    }
+                                    else {
+                                        if (s.responseType == "sound") {
+                                            itemObj_1 = document.createElement("AUDIO");
+                                            itemObj_1.preload = true;
+                                            itemObj_1.src = s.url;
+                                            item = new annie.Sound(s.url);
+                                        }
+                                        else if (s.responseType == "video") {
+                                            itemObj_1 = document.createElement("VIDEO");
+                                            itemObj_1.preload = true;
+                                            itemObj_1.src = s.url;
+                                            item = new annie.Video(itemObj_1);
+                                        }
+                                    }
+                                    break;
+                                case "json":
+                                    item = JSON.parse(result);
+                                    break;
+                                case "js":
+                                    item = "JS_CODE";
+                                    annie.Eval(result);
+                                    break;
+                                case "text":
+                                case "unKnow":
+                                case "xml":
+                                default:
+                                    item = result;
+                                    break;
+                            }
+                            e_1.data["response"] = item;
+                            s.data = null;
+                            s.responseType = "";
+                            if (!isImage)
+                                s.dispatchEvent(e_1);
+                        }
+                        else {
+                            //服务器返回报错
+                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
+                        }
+>>>>>>> flash2x/master
                     }
-                }
-            };
+                };
+            }
+            var req = s._req;
             var reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
@@ -8647,6 +8779,7 @@ var annie;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
+<<<<<<< HEAD
             _super.call(this);
             this._currentFrame = 0;
             this._totalFrames = 0;
@@ -8655,6 +8788,17 @@ var annie;
             this._isFront = true;
             this._cParams = null;
             this._loop = false;
+=======
+            var _this = _super.call(this) || this;
+            _this.currentFrame = 0;
+            _this.totalFrames = 0;
+            _this._isLoop = 0;
+            _this._delay = 0;
+            _this._isFront = true;
+            _this._cParams = null;
+            _this._loop = false;
+            return _this;
+>>>>>>> flash2x/master
         }
         /**
          * 初始化数据
@@ -8672,9 +8816,9 @@ var annie;
                 throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
             var s = this;
-            s._currentFrame = 1;
+            s.currentFrame = 1;
             var tTime = times * 60 >> 0;
-            s._totalFrames = tTime > 0 ? tTime : 1;
+            s.totalFrames = tTime > 0 ? tTime : 1;
             s.target = target;
             s._isTo = isTo;
             s._isLoop = 0;
@@ -8691,7 +8835,7 @@ var annie;
                 switch (item) {
                     case "useFrame":
                         if (data[item] == true) {
-                            s._totalFrames = times;
+                            s.totalFrames = times;
                         }
                         break;
                     case "yoyo":
@@ -8756,7 +8900,9 @@ var annie;
                 return;
             }
             //更新数据
-            var per = s._currentFrame / s._totalFrames;
+            var per = s.currentFrame / s.totalFrames;
+            if (per < 0 || per > 1)
+                return;
             if (s._ease) {
                 per = s._ease(per);
             }
@@ -8776,15 +8922,15 @@ var annie;
             var cf = s._completeFun;
             var pm = s._cParams;
             if (s._isFront) {
-                s._currentFrame++;
-                if (s._currentFrame > s._totalFrames) {
+                s.currentFrame++;
+                if (s.currentFrame > s.totalFrames) {
                     if (s._loop) {
-                        s._currentFrame = 1;
+                        s.currentFrame = 1;
                     }
                     else {
                         if (s._isLoop > 0) {
                             s._isFront = false;
-                            s._currentFrame = s._totalFrames;
+                            s.currentFrame = s.totalFrames;
                             s._isLoop--;
                         }
                         else {
@@ -8797,11 +8943,11 @@ var annie;
                 }
             }
             else {
-                s._currentFrame--;
-                if (s._currentFrame < 0) {
+                s.currentFrame--;
+                if (s.currentFrame < 0) {
                     if (s._isLoop > 0) {
                         s._isFront = true;
-                        s._currentFrame = 1;
+                        s.currentFrame = 1;
                     }
                     else {
                         Tween.kill(s.instanceId);
@@ -8814,6 +8960,7 @@ var annie;
         };
         return TweenObj;
     }(annie.AObject));
+    annie.TweenObj = TweenObj;
     /**
      * 全局静态单列类,不要实例化此类
      * @class annie.Tween
@@ -9625,7 +9772,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.1.2";
+    annie.version = "1.1.3";
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
@@ -9792,8 +9939,8 @@ var annie;
         obj._offsetY = rect ? rect.y : whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        _dRender.rootContainer.style.width = w / annie.devicePixelRatio + "px";
-        _dRender.rootContainer.style.height = h / annie.devicePixelRatio + "px";
+        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);

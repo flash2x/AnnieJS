@@ -545,9 +545,16 @@ declare namespace annie {
          * @type {number}
          * @since 1.1.2
          * @public
-         * @type{number}
          */
         identifier: any;
+        /**
+         * 触摸或者鼠标事件的手指是否是多个
+         * @property isMultiTouch
+         * @type {boolean}
+         * @since 1.1.3
+         * @public
+         */
+        isMultiTouch: boolean;
         /**
          * @method MouseEvent
          * @public
@@ -1270,11 +1277,11 @@ declare namespace annie {
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} globalPoint 全局坐标中的一个点
+         * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
          * @returns {annie.DisplayObject}
          */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
         /**
          * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
          * @method getBounds
@@ -1736,7 +1743,7 @@ declare namespace annie {
          * @param {Array} colors 一组颜色值
          * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
-        * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
@@ -1833,7 +1840,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        private _drawShape(ctx, isMask?);
+        private _drawShape(ctx);
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -1894,12 +1901,12 @@ declare namespace annie {
          */
         children: DisplayObject[];
         /**
-         * 缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
+         * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
          * @property  cacheAsBitmap
          * @public
          * @since 1.1.2
-         * @return {boolean}
          * @default false
+         * @type boolean
          */
         cacheAsBitmap: boolean;
         _cacheAsBitmap: boolean;
@@ -3063,7 +3070,7 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event, cp, sp, identifier);
+        private _initMouseEvent(event, cp, sp, identifier, isMulti);
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数
@@ -3942,6 +3949,41 @@ declare namespace Flash2x {
  * @module annie
  */
 declare namespace annie {
+    class TweenObj extends AObject {
+        constructor();
+        currentFrame: number;
+        totalFrames: number;
+        protected _startData: any;
+        protected _disData: any;
+        target: any;
+        private _isTo;
+        private _isLoop;
+        private _delay;
+        _update: Function;
+        _completeFun: Function;
+        _ease: Function;
+        private _isFront;
+        private _cParams;
+        private _loop;
+        /**
+         * 初始化数据
+         * @method init
+         * @param target
+         * @param times
+         * @param data
+         * @param isTo
+         * @public
+         * @since 1.0.0
+         */
+        init(target: any, times: number, data: any, isTo?: boolean): void;
+        /**
+         * 更新数据
+         * @method update
+         * @since 1.0.0
+         * @public
+         */
+        update(): void;
+    }
     /**
      * 全局静态单列类,不要实例化此类
      * @class annie.Tween

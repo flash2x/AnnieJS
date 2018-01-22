@@ -42,8 +42,7 @@ namespace annie {
                 // s._req = null;
             }
         }
-
-        private _req: XMLHttpRequest=new XMLHttpRequest();
+        private _req: XMLHttpRequest=null;
         private headers: Array<string> = [];
 
         /**
@@ -125,6 +124,7 @@ namespace annie {
                 // itemObj.src = url;
                 return;
             }
+<<<<<<< HEAD
 
             if(!s._req){
                 s._req=new XMLHttpRequest();
@@ -146,19 +146,42 @@ namespace annie {
                     req.abort();
                     if (!s.data) {
                         req.send();
+=======
+            if(!s._req) {
+                s._req = new XMLHttpRequest();
+                let req = s._req;
+                req.withCredentials = false;
+                req.onprogress = function (event: any): void {
+                    if (!event || event.loaded > 0 && event.total == 0) {
+                        return; // Sometimes we get no "total", so just ignore the progress event.
+                    }
+                    s.dispatchEvent("onProgress", {loadedBytes: event.loaded, totalBytes: event.total});
+                };
+                req.onerror = function (event: any): void {
+                    reSendTimes++;
+                    if (reSendTimes > 2) {
+                        s.dispatchEvent("onError", {id: 2, msg: event["message"]});
+>>>>>>> flash2x/master
                     } else {
-                        if (contentType == "form") {
-                            req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                            req.send(s._fqs(s.data, null));
+                        //断线重连
+                        req.abort();
+                        if (!s.data) {
+                            req.send();
                         } else {
-                            var type = "application/json";
-                            if (contentType != "json") {
-                                type = "multipart/form-data";
+                            if (contentType == "form") {
+                                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                                req.send(s._fqs(s.data, null));
+                            } else {
+                                var type = "application/json";
+                                if (contentType != "json") {
+                                    type = "multipart/form-data";
+                                }
+                                req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                                req.send(s.data);
                             }
-                            req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                            req.send(s.data);
                         }
                     }
+<<<<<<< HEAD
                 }
             };
             req.onreadystatechange = function (event: any): void {
@@ -226,9 +249,78 @@ namespace annie {
                     } else {
                         //服务器返回报错
                         s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});
+=======
+                };
+                req.onreadystatechange = function (event: any): void {
+                    let t = event.target;
+                    if (t["readyState"] == 4) {
+                        if (req.status == 200) {
+                            let isImage: boolean = false;
+                            let e: Event = new Event("onComplete");
+                            let result = t["response"];
+                            e.data = {type: s.responseType, response: null};
+                            let item: any;
+                            switch (s.responseType) {
+                                case "css":
+                                    item = document.createElement("link");
+                                    item.rel = "stylesheet";
+                                    item.href = s.url;
+                                    break;
+                                case "image":
+                                case "sound":
+                                case "video":
+                                    let itemObj: any;
+                                    if (s.responseType == "image") {
+                                        isImage = true;
+                                        itemObj = document.createElement("img");
+                                        itemObj.onload = function () {
+                                            URL.revokeObjectURL(itemObj.src);
+                                            itemObj.onload = null;
+                                            s.dispatchEvent(e);
+                                        };
+                                        itemObj.src = URL.createObjectURL(result);
+                                        item = itemObj;
+                                    } else {
+                                        if (s.responseType == "sound") {
+                                            itemObj = document.createElement("AUDIO");
+                                            itemObj.preload = true;
+                                            itemObj.src = s.url;
+                                            item = new Sound(s.url);
+                                        } else if (s.responseType == "video") {
+                                            itemObj = document.createElement("VIDEO");
+                                            itemObj.preload = true;
+                                            itemObj.src = s.url;
+                                            item = new Video(itemObj);
+                                        }
+                                    }
+                                    break;
+                                case "json":
+                                    item = JSON.parse(result);
+                                    break;
+                                case "js":
+                                    item = "JS_CODE";
+                                    Eval(result);
+                                    break;
+                                case "text":
+                                case "unKnow":
+                                case "xml":
+                                default:
+                                    item = result;
+                                    break;
+                            }
+                            e.data["response"] = item;
+                            s.data = null;
+                            s.responseType = "";
+                            if (!isImage) s.dispatchEvent(e);
+                        } else {
+                            //服务器返回报错
+                            s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});
+                        }
+>>>>>>> flash2x/master
                     }
-                }
-            };
+                };
+            }
+            let req = s._req;
             let reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);

@@ -347,13 +347,14 @@ namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
+        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number,isMulti:boolean): void {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
+            event.isMultiTouch=isMulti;
         }
 
         //每一个手指事件的对象池
@@ -473,7 +474,7 @@ namespace annie {
             //检查是否有
             let s: any = this;
             if (s.isMultiTouch && e.targetTouches) {
-                if (e.targetTouches.length == 2) {
+                if (e.targetTouches.length == 2){
                     //求角度和距离
                     s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
                     s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
@@ -502,6 +503,7 @@ namespace annie {
                     s.muliPoints = [];
                 }
             }
+            let isMulti:boolean=(e.targetTouches&&e.targetTouches.length>1);
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
             if (EventDispatcher._totalMEC > 0) {
                 let item = s._mouseEventTypes[e.type];
@@ -545,7 +547,7 @@ namespace annie {
                             event.type = item;
                         }
                         events.push(event);
-                        s._initMouseEvent(event, cp, sp, identifier);
+                        s._initMouseEvent(event, cp, sp, identifier,isMulti);
                         eLen++;
                     }
                     if (item == "onMouseDown") {
@@ -565,7 +567,7 @@ namespace annie {
                                         event.type = "onMouseClick";
                                     }
                                     events.push(event);
-                                    s._initMouseEvent(event, cp, sp, identifier);
+                                    s._initMouseEvent(event, cp, sp, identifier,isMulti);
                                     eLen++;
                                 }
                             }
@@ -629,7 +631,7 @@ namespace annie {
                                                     overEvent = s._ml[eLen];
                                                     overEvent.type = "onMouseOver";
                                                 }
-                                                s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                s._initMouseEvent(overEvent, cp, sp, identifier,isMulti);
                                                 eLen++;
                                                 if (!s._ml[eLen]) {
                                                     outEvent = new MouseEvent("onMouseOut");
@@ -638,7 +640,7 @@ namespace annie {
                                                     outEvent = s._ml[eLen];
                                                     outEvent.type = "onMouseOut";
                                                 }
-                                                s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                s._initMouseEvent(outEvent, cp, sp, identifier,isMulti);
                                             }
                                         }
                                         if (isDiff) {
@@ -750,6 +752,8 @@ namespace annie {
             let divW = s.divWidth * devicePixelRatio;
             let desH = s.desHeight;
             let desW = s.desWidth;
+            s.anchorX = desW / 2;
+            s.anchorY = desH / 2;
             //设备是否为竖屏
             let isDivH = divH > divW;
             //内容是否为竖屏内容
@@ -791,12 +795,15 @@ namespace annie {
                         break;
                 }
             }
+
             s.scaleX = scaleX;
             s.scaleY = scaleY;
+            // s.viewRect=new annie.Rectangle();
             s.viewRect.x = (desW - divW / scaleX) / 2;
             s.viewRect.y = (desH - divH / scaleY) / 2;
             s.viewRect.width = desW - s.viewRect.x * 2;
             s.viewRect.height = desH - s.viewRect.y * 2;
+
             if (s.autoSteering) {
                 if (isDesH == isDivH) {
                     s.rotation = 0;
@@ -882,7 +889,6 @@ namespace annie {
                 Stage.allUpdateObjList.unshift(target);
             }
         }
-
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj

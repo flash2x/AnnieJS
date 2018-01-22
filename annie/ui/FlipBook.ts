@@ -31,6 +31,13 @@ namespace annieUI {
          * @since 1.0.3
          */
         public currPage: number = 0;
+        /**
+         * 翻页速度，0-1之间，值越小，速度越快
+         * @property
+         * @since 1.1.3
+         * @type {number}
+         */
+        public speed:number=0.4;
         private bW: number;
         private bH: number;
         private toPage: number;
@@ -482,7 +489,7 @@ namespace annieUI {
             let tmpY: number;
             let u: number;
             if (s.state == "start") {
-                u = 0.4;
+                u = s.speed;
                 var p:Point =s.stageMP;
                 s.px += (p.x - s.px) * u >> 0;
                 s.py += (p.y - s.py) * u >> 0;
@@ -502,10 +509,10 @@ namespace annieUI {
                 tmpX = (tox - s.px) >> 0;
                 tmpY = (toy - s.py) >> 0;
                 if (s.timerArg1 < 0) {
-                    u = 0.3;
+                    u = s.speed*0.7;
                     s.py = s.arc(s.bW, tmpX, toPos.y);
                 } else {
-                    u = 0.4;
+                    u = s.speed;
                     s.py = tmpY * u + s.py;
                 }
                 s.px = tmpX * u + s.px;

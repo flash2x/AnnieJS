@@ -545,7 +545,7 @@ namespace annie {
                     } else {
                         tempCurrentFrame = cStartFrame;
                     }
-                    if (s._goFrame != tempCurrentFrame) {
+                    if (s._goFrame != tempCurrentFrame){
                         s._goFrame = tempCurrentFrame;
                         s._isNeedUpdateChildren = true;
                     }

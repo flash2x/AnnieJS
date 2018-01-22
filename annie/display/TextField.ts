@@ -242,6 +242,7 @@ namespace annie {
         public update(isDrawUpdate:boolean=false): void {
             super.update(isDrawUpdate);
             let s: any = this;
+            if(!s._visible)return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 let can = s._texture;
@@ -314,8 +315,6 @@ namespace annie {
                 }
                 can.width = maxW + 20;
                 can.height = maxH + 20;
-                can.style.width = can.width / devicePixelRatio + "px";
-                can.style.height = can.height / devicePixelRatio + "px";
                 ctx.clearRect(0, 0, can.width, can.width);
                 if (s.border) {
                     ctx.beginPath();
