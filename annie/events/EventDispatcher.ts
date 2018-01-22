@@ -57,6 +57,7 @@ namespace annie {
             super();
             this._instanceType = "annie.EventDispatcher";
             this.eventTypes = {};
+            
         }
         /**
          * 全局的鼠标事件的监听数对象表
@@ -122,6 +123,9 @@ namespace annie {
                 }
             }
         }
+        public on(type: string, listener: Function): void {
+            this.addEventListener.apply(this,arguments);
+        }
 
         /**
          * 增加或删除相应mouse或touch侦听记数
@@ -186,6 +190,9 @@ namespace annie {
                 return false;
             }
         }
+        public trigger(event: any, data: any = null): boolean {
+            return this.dispatchEvent.apply(this, arguments);
+        }
 
         /**
          * 是否有添加过此类形的侦听
@@ -224,6 +231,9 @@ namespace annie {
                     }
                 }
             }
+        }
+        public off(type: string, listener: Function): void {
+            this.removeAllEventListener.apply(this, arguments);
         }
         /**
          * 移除对象中所有的侦听

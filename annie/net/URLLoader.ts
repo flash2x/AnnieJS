@@ -57,33 +57,75 @@ namespace annie {
         public load(url: string, contentType: string = "form"): void {
             let s = this;
             s.loadCancel();
-            if (s.responseType == null || s.responseType == "") {
+            // if (s.responseType == null || s.responseType == "") {
                 //看看是什么后缀
-                let urlSplit = url.split(".");
-                let extStr = urlSplit[urlSplit.length - 1];
-                let ext = extStr.split("?")[0].toLocaleLowerCase();
-                if (ext == "mp3" || ext == "ogg" || ext == "wav") {
-                    s.responseType = "sound";
-                } else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
-                    s.responseType = "image";
-                } else if (ext == "css") {
-                    s.responseType = "css";
-                } else if (ext == "mp4") {
-                    s.responseType = "video";
-                } else if (ext == "svg") {
-                    s.responseType = "svg";
-                } else if (ext == "xml") {
-                    s.responseType = "xml";
-                } else if (ext == "json") {
-                    s.responseType = "json";
-                } else if (ext == "txt") {
-                    s.responseType = "text";
-                } else if (ext == "js" || ext == "swf") {
-                    s.responseType = "js";
-                } else {
-                    s.responseType = "unKnow";
-                }
+            let urlSplit = url.split(".");
+            let extStr = urlSplit[urlSplit.length - 1];
+            let ext = extStr.split("?")[0].toLocaleLowerCase();
+            if (ext == "mp3" || ext == "ogg" || ext == "wav") {
+                s.responseType = "sound";
+            } else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
+                s.responseType = "image";
+            } else if (ext == "css") {
+                s.responseType = "css";
+            } else if (ext == "mp4") {
+                s.responseType = "video";
+            } else if (ext == "svg") {
+                s.responseType = "svg";
+            } else if (ext == "xml") {
+                s.responseType = "xml";
+            } else if (ext == "json") {
+                s.responseType = "json";
+            } else if (ext == "txt") {
+                s.responseType = "text";
+            } else if (ext == "js" || ext == "swf") {
+                s.responseType = "js";
+            } else {
+                s.responseType = "unKnow";
             }
+            // }
+            if (s.responseType == "image") {
+                let e: Event = new Event("onComplete");
+                e.data = { type: s.responseType, response: null };
+                s.dispatchEvent("onProgress", { loadedBytes: 1, totalBytes: 1 });
+
+                let tryTime:number = 0;
+                let loadImage = (imageUrl: string, callback: any) => {
+                    let itemObj: any;
+                    itemObj = document.createElement("img");
+                    itemObj.onload = function () {
+                        itemObj.onload = null;
+                        callback(itemObj);
+                    };
+                    itemObj.crossOrigin="Anonymous";
+                    itemObj.onerror = function(){
+                        if (tryTime>2) {
+                            // callback(itemObj);
+                            loadImage('data:image/gif;base64,R0lGODlhAwADAIABAL6+vv///yH5BAEAAAEALAAAAAADAAMAAAIDjA9WADs=', callback);
+                            return;
+                        };
+                        itemObj = null;
+                        tryTime++;
+                        loadImage(imageUrl,callback);
+                    };
+                    itemObj.src = imageUrl;
+                }
+
+                loadImage(url, function (itemObj:any){
+                    e.data.response = itemObj;
+                    s.dispatchEvent(e);
+                })
+                
+                // itemObj = document.createElement("img");
+                // itemObj.onload = function () {
+                //     e.data.response = itemObj;
+                //     itemObj.onload = null;
+                //     s.dispatchEvent(e);
+                // };
+                // itemObj.src = url;
+                return;
+            }
+
             if(!s._req){
                 s._req=new XMLHttpRequest();
             }
@@ -134,21 +176,21 @@ namespace annie {
                                 item.rel = "stylesheet";
                                 item.href = s.url;
                                 break;
-                            case "image":
+                            // case "image":
                             case "sound":
                             case "video":
                                 let itemObj: any;
-                                if (s.responseType == "image") {
-                                    isImage = true;
-                                    itemObj = document.createElement("img");
-                                    itemObj.onload = function () {
-                                        URL.revokeObjectURL(itemObj.src);
-                                        itemObj.onload = null;
-                                        s.dispatchEvent(e);
-                                    };
-                                    itemObj.src = URL.createObjectURL(result);
-                                    item = itemObj;
-                                } else {
+                                // if (s.responseType == "image") {
+                                //     isImage = true;
+                                //     itemObj = document.createElement("img");
+                                //     itemObj.onload = function () {
+                                //         URL.revokeObjectURL(itemObj.src);
+                                //         itemObj.onload = null;
+                                //         s.dispatchEvent(e);
+                                //     };
+                                //     itemObj.src = URL.createObjectURL(result);
+                                //     item = itemObj;
+                                // } else {
                                     if (s.responseType == "sound") {
                                         itemObj = document.createElement("AUDIO");
                                         itemObj.preload = true;
@@ -160,7 +202,7 @@ namespace annie {
                                         itemObj.src = s.url;
                                         item = new Video(itemObj);
                                     }
-                                }
+                                // }
                                 break;
                             case "json":
                                 item = JSON.parse(result);
@@ -179,7 +221,8 @@ namespace annie {
                         e.data["response"] = item;
                         s.data = null;
                         s.responseType = "";
-                        if (!isImage) s.dispatchEvent(e);
+                        s.dispatchEvent(e);
+                        // if (!isImage) s.dispatchEvent(e);
                     } else {
                         //服务器返回报错
                         s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});

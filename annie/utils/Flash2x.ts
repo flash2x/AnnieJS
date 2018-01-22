@@ -188,6 +188,19 @@ namespace Flash2x {
             //所有配置文件加载完成,那就开始加载资源
             _loadIndex = 0;
             _loadSinglePer = 1 / _totalLoadRes;
+            let theOnload = document.createElement('div');
+            theOnload.classList.add('hide');
+            document.querySelector('body').appendChild(theOnload);
+            _currentConfig.map(function (list: any) {
+                list.map(function (resource: any) {
+                    if (resource.type == 'image') {
+                        let _img: any = document.createElement('img');
+                        _img.setAttribute('crossorigin','anonymous');
+                        _img.src = _domain + resource.src;
+                        theOnload.appendChild(_img);
+                    }
+                });
+            })
             _loadRes();
         }
     }
