@@ -5,7 +5,6 @@
  * @module annieUI
  */
 namespace annieUI {
-    import Sprite = annie.Sprite;
     /**
      * 画板类
      * @class annieUI.DrawingBoard

@@ -6,6 +6,13 @@
  */
 namespace annieUI {
     import DisplayObject = annie.DisplayObject;
+    /**
+     * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
+     * @class annieUI.IScrollListItem
+     * @public
+     * @extends annie.DisplayObject
+     * @since 1.0.9
+     */
     export interface IScrollListItem extends DisplayObject {
         initData(id: number, data: Array<any>): void;
         id: number;

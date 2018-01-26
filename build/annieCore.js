@@ -3747,6 +3747,8 @@ var annie;
         Sprite.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
             if (!s._cacheAsBitmap) {
                 var len = s.children.length;
@@ -3754,6 +3756,8 @@ var annie;
                 var maskObjIds = [];
                 for (var i = len - 1; i >= 0; i--) {
                     child = s.children[i];
+                    if (!s._visible)
+                        continue;
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
                         var childChild = null;
@@ -5016,6 +5020,7 @@ var annie;
                     if (!s._isAdded) {
                         s._isAdded = true;
                         s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
+                        s.stage["_floatDisplayList"].push(s);
                     }
                     else {
                         if (s.htmlElement && s.visible) {
@@ -5069,14 +5074,23 @@ var annie;
          * @public
          */
         FloatDisplay.prototype.delElement = function () {
-            var elem = this.htmlElement;
+            var s = this;
+            var elem = s.htmlElement;
             if (elem) {
                 elem.style.display = "none";
                 if (elem.parentNode) {
                     elem.parentNode.removeChild(elem);
                 }
-                this._isAdded = false;
-                this.htmlElement = null;
+                s._isAdded = false;
+                s.htmlElement = null;
+            }
+            var sf = s.stage["_floatDisplayList"];
+            var len = sf.length;
+            for (var i = 0; i < len; i++) {
+                if (sf[i] == s) {
+                    sf.splice(i, 1);
+                    break;
+                }
             }
         };
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
@@ -5095,14 +5109,12 @@ var annie;
             return null;
         };
         /**
-         * 重写刷新
-         * @method update
+         * @method updateStyle
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        FloatDisplay.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
+        FloatDisplay.prototype.updateStyle = function () {
             var s = this;
             var o = s.htmlElement;
             if (o) {
@@ -5122,8 +5134,7 @@ var annie;
                 if (show != style.display) {
                     style.display = show;
                 }
-                if (visible) {
-                    _super.prototype.update.call(this, isDrawUpdate);
+                if (visible || s._UI.UM || s._UI.UA || s._UI.UF) {
                     if (s._UI.UM) {
                         var mtx = s.cMatrix;
                         var d = annie.devicePixelRatio;
@@ -5913,12 +5924,19 @@ var annie;
              */
             _this.viewRect = new annie.Rectangle();
             /**
-             * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+             * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
              * @property isMultiTouch
              * @since 1.0.3
              * @type {boolean}
              */
             _this.isMultiTouch = false;
+            /**
+             * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+             * @property isMultiMouse
+             * @since 1.1.3
+             * @type {boolean}
+             */
+            _this.isMultiMouse = false;
             /**
              * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
              * 端默认不开启
@@ -6038,6 +6056,7 @@ var annie;
             _this._currentFlush = 0;
             _this._lastDpList = {};
             _this._rid = -1;
+            _this._floatDisplayList = [];
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
@@ -6106,7 +6125,7 @@ var annie;
                         s.muliPoints = [];
                     }
                 }
-                var isMulti = (e.targetTouches && e.targetTouches.length > 1);
+                var isMulti = s.isMultiMouse || (e.targetTouches && e.targetTouches.length > 1);
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
                 if (!isMulti && annie.EventDispatcher._totalMEC > 0) {
                     var points = void 0;
@@ -6533,6 +6552,11 @@ var annie;
             var s = this;
             if (!s.pause) {
                 _super.prototype.update.call(this, isDrawUpdate);
+                var sf = s._floatDisplayList;
+                var len = sf.length;
+                for (var i = 0; i < len; i++) {
+                    sf[i].updateStyle();
+                }
             }
         };
         /**

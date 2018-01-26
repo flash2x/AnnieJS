@@ -2,12 +2,10 @@
  * @module annieUI
  */
 namespace annieUI {
-    import Bitmap=annie.Bitmap;
     import Sprite=annie.Sprite;
     import Shape=annie.Shape;
     import Event=annie.Event;
     import MouseEvent=annie.MouseEvent;
-    import Matrix=annie.Matrix;
     import Point=annie.Point;
     /**
      * 电子杂志组件类

@@ -224,7 +224,7 @@ namespace annie {
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
         private _rid = -1;
-
+        private _floatDisplayList:Array<FloatDisplay>=[];
         /**
          * 显示对象入口函数
          * @method Stage
@@ -318,6 +318,11 @@ namespace annie {
             let s = this;
             if (!s.pause) {
                 super.update(isDrawUpdate);
+                let sf:any=s._floatDisplayList;
+                let len=sf.length;
+                for(let i=0;i<len;i++){
+                    sf[i].updateStyle();
+                }
             }
         }
 
