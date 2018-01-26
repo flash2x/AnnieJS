@@ -94,7 +94,7 @@ namespace annie {
         /**
          * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
          * @property isMultiMouse
-         * @since 1.0.3
+         * @since 1.1.3
          * @type {boolean}
          */
         public isMultiMouse:boolean=false;
