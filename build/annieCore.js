@@ -647,14 +647,6 @@ var annie;
              * @public
              */
             _this.identifier = 0;
-            /**
-             * 触摸或者鼠标事件的手指是否是多个
-             * @property isMultiTouch
-             * @type {boolean}
-             * @since 1.1.3
-             * @public
-             */
-            _this.isMultiTouch = false;
             _this._instanceType = "annie.MouseEvent";
             return _this;
         }
@@ -6116,9 +6108,9 @@ var annie;
                 }
                 var isMulti = (e.targetTouches && e.targetTouches.length > 1);
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-                if (annie.EventDispatcher._totalMEC > 0) {
-                    var item = s._mouseEventTypes[e.type];
+                if (!isMulti && annie.EventDispatcher._totalMEC > 0) {
                     var points = void 0;
+                    var item = s._mouseEventTypes[e.type];
                     var events = void 0;
                     var event_3;
                     //stageMousePoint
@@ -6161,7 +6153,7 @@ var annie;
                                 event_3.type = item;
                             }
                             events.push(event_3);
-                            s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
+                            s._initMouseEvent(event_3, cp, sp, identifier);
                             eLen++;
                         }
                         if (item == "onMouseDown") {
@@ -6183,7 +6175,7 @@ var annie;
                                             event_3.type = "onMouseClick";
                                         }
                                         events.push(event_3);
-                                        s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
+                                        s._initMouseEvent(event_3, cp, sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -6249,7 +6241,7 @@ var annie;
                                                         overEvent = s._ml[eLen];
                                                         overEvent.type = "onMouseOver";
                                                     }
-                                                    s._initMouseEvent(overEvent, cp, sp, identifier, isMulti);
+                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
                                                     eLen++;
                                                     if (!s._ml[eLen]) {
                                                         outEvent = new annie.MouseEvent("onMouseOut");
@@ -6259,7 +6251,7 @@ var annie;
                                                         outEvent = s._ml[eLen];
                                                         outEvent.type = "onMouseOut";
                                                     }
-                                                    s._initMouseEvent(outEvent, cp, sp, identifier, isMulti);
+                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
                                                 }
                                             }
                                             if (isDiff) {
@@ -6340,9 +6332,6 @@ var annie;
                                     sd._lastDragPoint.x = Number.MAX_VALUE;
                                     sd._lastDragPoint.y = Number.MAX_VALUE;
                                 }
-                                s._mp.push(s._mouseDownPoint[identifier]);
-                                // s._mouseDownPoint[identifier]=null;
-                                // s._lastDpList[identifier]=null;
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
                             }
@@ -6562,14 +6551,13 @@ var annie;
          * 刷新mouse或者touch事件
          * @private
          */
-        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, isMulti) {
+        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
-            event.isMultiTouch = isMulti;
         };
         /**
          * 循环刷新页面的函数

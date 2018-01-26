@@ -545,14 +545,6 @@ declare namespace annie {
          */
         identifier: any;
         /**
-         * 触摸或者鼠标事件的手指是否是多个
-         * @property isMultiTouch
-         * @type {boolean}
-         * @since 1.1.3
-         * @public
-         */
-        isMultiTouch: boolean;
-        /**
          * @method MouseEvent
          * @public
          * @since 1.0.0
@@ -3067,7 +3059,7 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event, cp, sp, identifier, isMulti);
+        private _initMouseEvent(event, cp, sp, identifier);
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数
