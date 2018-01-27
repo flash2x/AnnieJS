@@ -300,7 +300,7 @@ namespace annie {
                     child = s.children[i];
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
-                        let childChild=null;
+                        let childChild:any;
                         child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames){
                             child.mask.gotoAndStop(s.currentFrame);

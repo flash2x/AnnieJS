@@ -649,11 +649,7 @@ var annie;
              * @since 1.1.2
              * @public
              */
-<<<<<<< HEAD
             this.identifier = 0;
-            this._instanceType = "annie.MouseEvent";
-=======
-            _this.identifier = 0;
             /**
              * 触摸或者鼠标事件的手指是否是多个
              * @property isMultiTouch
@@ -661,10 +657,8 @@ var annie;
              * @since 1.1.3
              * @public
              */
-            _this.isMultiTouch = false;
-            _this._instanceType = "annie.MouseEvent";
-            return _this;
->>>>>>> flash2x/master
+            this.isMultiTouch = false;
+            this._instanceType = "annie.MouseEvent";
         }
         /**
          * 事件后立即更新显示列表状态
@@ -3758,12 +3752,10 @@ var annie;
                     child = s.children[i];
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
-                        var childChild = null;
+                        var childChild = void 0;
                         child.mask.parent = s;
                         if (s.totalFrames && child.mask.totalFrames) {
                             child.mask.gotoAndStop(s.currentFrame);
-<<<<<<< HEAD
-=======
                             //一定要为true
                             childChild = child.mask.getChildAt(0);
                             if (childChild) {
@@ -3774,7 +3766,6 @@ var annie;
                         else {
                             child.mask.isUseToMask = true;
                             child.mask.hitTestWidthPixel = false;
->>>>>>> flash2x/master
                         }
                         child.mask._cp = true;
                         child.mask.update(isDrawUpdate);
@@ -7642,15 +7633,9 @@ var annie;
          * @param type text json js xml image sound css svg video unKnow
          */
         function URLLoader() {
-<<<<<<< HEAD
             _super.call(this);
-            this._req = new XMLHttpRequest();
+            this._req = null;
             this.headers = [];
-=======
-            var _this = _super.call(this) || this;
-            _this._req = null;
-            _this.headers = [];
->>>>>>> flash2x/master
             /**
              * 后台返回来的数据类弄
              * @property responseType
@@ -7835,41 +7820,47 @@ var annie;
             }
             if (!s._req) {
                 s._req = new XMLHttpRequest();
-                var req_1 = s._req;
-                req_1.withCredentials = false;
-                req_1.onprogress = function (event) {
-                    if (!event || event.loaded > 0 && event.total == 0) {
-                        return; // Sometimes we get no "total", so just ignore the progress event.
-                    }
-                    s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
-                };
-                req_1.onerror = function (event) {
-                    reSendTimes++;
-                    if (reSendTimes > 2) {
-                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
+            }
+            var req = s._req;
+            req.withCredentials = false;
+            req.onprogress = function (event) {
+                if (!event || event.loaded > 0 && event.total == 0) {
+                    return; // Sometimes we get no "total", so just ignore the progress event.
+                }
+                s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
+            };
+            req.onerror = function (event) {
+                reSendTimes++;
+                if (reSendTimes > 2) {
+                    s.dispatchEvent("onError", { id: 2, msg: event["message"] });
+                }
+                else {
+                    //断线重连
+                    req.abort();
+                    if (!s.data) {
+                        req.send();
                     }
                     else {
                         //断线重连
-                        req_1.abort();
+                        req.abort();
                         if (!s.data) {
-                            req_1.send();
+                            req.send();
                         }
                         else {
                             if (contentType == "form") {
-                                req_1.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                                req_1.send(s._fqs(s.data, null));
+                                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                                req.send(s._fqs(s.data, null));
                             }
                             else {
                                 var type = "application/json";
                                 if (contentType != "json") {
                                     type = "multipart/form-data";
                                 }
-                                req_1.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                                req_1.send(s.data);
+                                req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                                req.send(s.data);
                             }
                         }
                     }
-<<<<<<< HEAD
                 }
             };
             req.onreadystatechange = function (event) {
@@ -7938,82 +7929,10 @@ var annie;
                     else {
                         //服务器返回报错
                         s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
-=======
-                };
-                req_1.onreadystatechange = function (event) {
-                    var t = event.target;
-                    if (t["readyState"] == 4) {
-                        if (req_1.status == 200) {
-                            var isImage = false;
-                            var e_1 = new annie.Event("onComplete");
-                            var result = t["response"];
-                            e_1.data = { type: s.responseType, response: null };
-                            var item = void 0;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    var itemObj_1;
-                                    if (s.responseType == "image") {
-                                        isImage = true;
-                                        itemObj_1 = document.createElement("img");
-                                        itemObj_1.onload = function () {
-                                            URL.revokeObjectURL(itemObj_1.src);
-                                            itemObj_1.onload = null;
-                                            s.dispatchEvent(e_1);
-                                        };
-                                        itemObj_1.src = URL.createObjectURL(result);
-                                        item = itemObj_1;
-                                    }
-                                    else {
-                                        if (s.responseType == "sound") {
-                                            itemObj_1 = document.createElement("AUDIO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                            item = new annie.Sound(s.url);
-                                        }
-                                        else if (s.responseType == "video") {
-                                            itemObj_1 = document.createElement("VIDEO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                            item = new annie.Video(itemObj_1);
-                                        }
-                                    }
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                    item = "JS_CODE";
-                                    annie.Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e_1.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
-                            if (!isImage)
-                                s.dispatchEvent(e_1);
-                        }
-                        else {
-                            //服务器返回报错
-                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
-                        }
->>>>>>> flash2x/master
                     }
-                };
-            }
-            var req = s._req;
+                }
+                ;
+            };
             var reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
@@ -8779,26 +8698,14 @@ var annie;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
-<<<<<<< HEAD
             _super.call(this);
-            this._currentFrame = 0;
-            this._totalFrames = 0;
+            this.currentFrame = 0;
+            this.totalFrames = 0;
             this._isLoop = 0;
             this._delay = 0;
             this._isFront = true;
             this._cParams = null;
             this._loop = false;
-=======
-            var _this = _super.call(this) || this;
-            _this.currentFrame = 0;
-            _this.totalFrames = 0;
-            _this._isLoop = 0;
-            _this._delay = 0;
-            _this._isFront = true;
-            _this._cParams = null;
-            _this._loop = false;
-            return _this;
->>>>>>> flash2x/master
         }
         /**
          * 初始化数据
