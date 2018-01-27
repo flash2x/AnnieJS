@@ -130,14 +130,6 @@ namespace annie {
          */
         public identifier:any=0;
         /**
-         * 触摸或者鼠标事件的手指是否是多个
-         * @property isMultiTouch
-         * @type {boolean}
-         * @since 1.1.3
-         * @public
-         */
-        public isMultiTouch:boolean=false;
-        /**
          * @method MouseEvent
          * @public
          * @since 1.0.0

@@ -548,14 +548,6 @@ declare namespace annie {
          */
         identifier: any;
         /**
-         * 触摸或者鼠标事件的手指是否是多个
-         * @property isMultiTouch
-         * @type {boolean}
-         * @since 1.1.3
-         * @public
-         */
-        isMultiTouch: boolean;
-        /**
          * @method MouseEvent
          * @public
          * @since 1.0.0
@@ -2531,13 +2523,12 @@ declare namespace annie {
         delElement(): void;
         private getStyle(elem, cssName);
         /**
-         * 重写刷新
-         * @method update
+         * @method updateStyle
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        update(isDrawUpdate?: boolean): void;
+        protected updateStyle(): void;
     }
 }
 /**
@@ -2893,12 +2884,19 @@ declare namespace annie {
          */
         viewRect: Rectangle;
         /**
-         * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+         * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
          * @property isMultiTouch
          * @since 1.0.3
          * @type {boolean}
          */
         isMultiTouch: boolean;
+        /**
+         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * @property isMultiMouse
+         * @since 1.1.3
+         * @type {boolean}
+         */
+        isMultiMouse: boolean;
         /**
          * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
          * 端默认不开启
@@ -3025,6 +3023,7 @@ declare namespace annie {
         private static _isLoadedVConsole;
         private _lastDpList;
         private _rid;
+        private _floatDisplayList;
         /**
          * 显示对象入口函数
          * @method Stage
@@ -3070,7 +3069,7 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event, cp, sp, identifier, isMulti);
+        private _initMouseEvent(event, cp, sp, identifier);
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数

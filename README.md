@@ -76,7 +76,8 @@
     修复如果一个MovieClip里有遮罩，导致被遮罩的mc点击会失效的bug
     修复annieUI.ScrollList在一开始就切换其他数据而不是追加数据时列表不更新的bug
     优化annie.DisplayObject.hitTestPoint()方法的使用
-    新增annie.MouseEvent.isMultiTouch属性来判断当前到底是单个手指还是多手指
+    优化显示对象更新渲染
+    增加stage.isMultiMouse属性来设置是否允许同时有多个手指触发鼠标事件，现在默认为false
 ## AnnieJS 1.1.2 版本
     无限期去掉webGl的支持，对2d交互支持不成熟，反正我是这么认为了
     删除annie.ImageFrame类,使用有缺陷

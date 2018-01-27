@@ -53,11 +53,12 @@ namespace annie {
                 }
             });
             s.addEventListener(Event.ADD_TO_STAGE, function (e: Event) {
-                if(s.htmlElement) {
+                if(s.htmlElement){
                     let style=s.htmlElement.style;
                     if (!s._isAdded) {
                         s._isAdded = true;
                         s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
+                        s.stage["_floatDisplayList"].push(s);
                     } else {
                         if (s.htmlElement && s.visible) {
                             style.display = "block";
@@ -108,14 +109,23 @@ namespace annie {
          * @public
          */
         public delElement(): void {
-            let elem = this.htmlElement;
+            let s=this;
+            let elem = s.htmlElement;
             if (elem) {
                 elem.style.display = "none";
                 if (elem.parentNode) {
                     elem.parentNode.removeChild(elem);
                 }
-                this._isAdded = false;
-                this.htmlElement = null;
+                s._isAdded = false;
+                s.htmlElement = null;
+            }
+            let sf:any=s.stage["_floatDisplayList"];
+            let len=sf.length;
+            for(let i=0;i<len;i++){
+                if(sf[i]==s){
+                    sf.splice(i,1);
+                    break;
+                }
             }
         }
         private getStyle(elem:HTMLElement, cssName:any ):any
@@ -137,13 +147,12 @@ namespace annie {
             return null;
         }
         /**
-         * 重写刷新
-         * @method update
+         * @method updateStyle
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(isDrawUpdate:boolean=false): void {
+        protected updateStyle(): void {
             let s = this;
             let o = s.htmlElement;
             if (o) {
@@ -163,8 +172,7 @@ namespace annie {
                 if (show != style.display) {
                     style.display = show;
                 }
-                if(visible){
-                    super.update(isDrawUpdate);
+                if(visible||s._UI.UM||s._UI.UA||s._UI.UF){
                     if(s._UI.UM) {
                         let mtx = s.cMatrix;
                         let d = annie.devicePixelRatio;

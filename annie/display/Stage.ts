@@ -85,12 +85,19 @@ namespace annie {
          */
         public viewRect: Rectangle = new Rectangle();
         /**
-         * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+         * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
          * @property isMultiTouch
          * @since 1.0.3
          * @type {boolean}
          */
         public isMultiTouch: boolean = false;
+        /**
+         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * @property isMultiMouse
+         * @since 1.1.3
+         * @type {boolean}
+         */
+        public isMultiMouse:boolean=false;
         /**
          * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
          * 端默认不开启
@@ -217,7 +224,7 @@ namespace annie {
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
         private _rid = -1;
-
+        private _floatDisplayList:Array<FloatDisplay>=[];
         /**
          * 显示对象入口函数
          * @method Stage
@@ -311,6 +318,11 @@ namespace annie {
             let s = this;
             if (!s.pause) {
                 super.update(isDrawUpdate);
+                let sf:any=s._floatDisplayList;
+                let len=sf.length;
+                for(let i=0;i<len;i++){
+                    sf[i].updateStyle();
+                }
             }
         }
 
@@ -347,14 +359,13 @@ namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number,isMulti:boolean): void {
+        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
-            event.isMultiTouch=isMulti;
         }
 
         //每一个手指事件的对象池
@@ -503,11 +514,11 @@ namespace annie {
                     s.muliPoints = [];
                 }
             }
-            let isMulti:boolean=(e.targetTouches&&e.targetTouches.length>1);
+            let isMulti:boolean=s.isMultiMouse||(e.targetTouches&&e.targetTouches.length>1);
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-            if (EventDispatcher._totalMEC > 0) {
-                let item = s._mouseEventTypes[e.type];
+            if (!isMulti&&EventDispatcher._totalMEC > 0) {
                 let points: any;
+                let item = s._mouseEventTypes[e.type];
                 let events: any;
                 let event: any;
                 //stageMousePoint
@@ -547,7 +558,7 @@ namespace annie {
                             event.type = item;
                         }
                         events.push(event);
-                        s._initMouseEvent(event, cp, sp, identifier,isMulti);
+                        s._initMouseEvent(event, cp, sp, identifier);
                         eLen++;
                     }
                     if (item == "onMouseDown") {
@@ -567,7 +578,7 @@ namespace annie {
                                         event.type = "onMouseClick";
                                     }
                                     events.push(event);
-                                    s._initMouseEvent(event, cp, sp, identifier,isMulti);
+                                    s._initMouseEvent(event, cp, sp, identifier);
                                     eLen++;
                                 }
                             }
@@ -596,7 +607,7 @@ namespace annie {
                         for (let i = 0; i < len; i++) {
                             d = displayList[i];
                             for (let j = 0; j < eLen; j++) {
-                                if (events[j]["_pd"] === false) {
+                                if (events[j]["_pd"] === false){
                                     if (d.hasEventListener(events[j].type)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[len - 1];
@@ -631,7 +642,7 @@ namespace annie {
                                                     overEvent = s._ml[eLen];
                                                     overEvent.type = "onMouseOver";
                                                 }
-                                                s._initMouseEvent(overEvent, cp, sp, identifier,isMulti);
+                                                s._initMouseEvent(overEvent, cp, sp, identifier);
                                                 eLen++;
                                                 if (!s._ml[eLen]) {
                                                     outEvent = new MouseEvent("onMouseOut");
@@ -640,7 +651,7 @@ namespace annie {
                                                     outEvent = s._ml[eLen];
                                                     outEvent.type = "onMouseOut";
                                                 }
-                                                s._initMouseEvent(outEvent, cp, sp, identifier,isMulti);
+                                                s._initMouseEvent(outEvent, cp, sp, identifier);
                                             }
                                         }
                                         if (isDiff) {
@@ -713,14 +724,11 @@ namespace annie {
                             sd.x = x1;
                             sd.y = y1;
                         }
-                        if (item == "onMouseUp") {
+                        if (item == "onMouseUp"){
                             if (sd) {
                                 sd._lastDragPoint.x = Number.MAX_VALUE;
                                 sd._lastDragPoint.y = Number.MAX_VALUE;
                             }
-                            s._mp.push(s._mouseDownPoint[identifier]);
-                            // s._mouseDownPoint[identifier]=null;
-                            // s._lastDpList[identifier]=null;
                             delete s._mouseDownPoint[identifier];
                             delete s._lastDpList[identifier];
                         } else {

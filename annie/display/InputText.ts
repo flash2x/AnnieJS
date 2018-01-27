@@ -79,7 +79,6 @@ namespace annie {
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
         }
-
         /**
          * 被始化输入文件的一些属性
          * @method initInfo

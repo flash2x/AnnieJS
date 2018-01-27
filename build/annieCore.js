@@ -649,6 +649,7 @@ var annie;
              * @since 1.1.2
              * @public
              */
+<<<<<<< HEAD
             this.identifier = 0;
             /**
              * 触摸或者鼠标事件的手指是否是多个
@@ -659,6 +660,11 @@ var annie;
              */
             this.isMultiTouch = false;
             this._instanceType = "annie.MouseEvent";
+=======
+            _this.identifier = 0;
+            _this._instanceType = "annie.MouseEvent";
+            return _this;
+>>>>>>> flash2x/master
         }
         /**
          * 事件后立即更新显示列表状态
@@ -3743,6 +3749,8 @@ var annie;
         Sprite.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
             if (!s._cacheAsBitmap) {
                 var len = s.children.length;
@@ -3750,6 +3758,8 @@ var annie;
                 var maskObjIds = [];
                 for (var i = len - 1; i >= 0; i--) {
                     child = s.children[i];
+                    if (!s._visible)
+                        continue;
                     //更新遮罩
                     if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
                         var childChild = void 0;
@@ -5008,6 +5018,7 @@ var annie;
                     if (!s._isAdded) {
                         s._isAdded = true;
                         s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
+                        s.stage["_floatDisplayList"].push(s);
                     }
                     else {
                         if (s.htmlElement && s.visible) {
@@ -5060,14 +5071,23 @@ var annie;
          * @public
          */
         FloatDisplay.prototype.delElement = function () {
-            var elem = this.htmlElement;
+            var s = this;
+            var elem = s.htmlElement;
             if (elem) {
                 elem.style.display = "none";
                 if (elem.parentNode) {
                     elem.parentNode.removeChild(elem);
                 }
-                this._isAdded = false;
-                this.htmlElement = null;
+                s._isAdded = false;
+                s.htmlElement = null;
+            }
+            var sf = s.stage["_floatDisplayList"];
+            var len = sf.length;
+            for (var i = 0; i < len; i++) {
+                if (sf[i] == s) {
+                    sf.splice(i, 1);
+                    break;
+                }
             }
         };
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
@@ -5086,14 +5106,12 @@ var annie;
             return null;
         };
         /**
-         * 重写刷新
-         * @method update
+         * @method updateStyle
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        FloatDisplay.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
+        FloatDisplay.prototype.updateStyle = function () {
             var s = this;
             var o = s.htmlElement;
             if (o) {
@@ -5113,8 +5131,7 @@ var annie;
                 if (show != style.display) {
                     style.display = show;
                 }
-                if (visible) {
-                    _super.prototype.update.call(this, isDrawUpdate);
+                if (visible || s._UI.UM || s._UI.UA || s._UI.UF) {
                     if (s._UI.UM) {
                         var mtx = s.cMatrix;
                         var d = annie.devicePixelRatio;
@@ -5902,12 +5919,19 @@ var annie;
              */
             this.viewRect = new annie.Rectangle();
             /**
-             * 开启或关闭多点触碰 目前仅支持两点 旋转 缩放
+             * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
              * @property isMultiTouch
              * @since 1.0.3
              * @type {boolean}
              */
             this.isMultiTouch = false;
+            /**
+             * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+             * @property isMultiMouse
+             * @since 1.1.3
+             * @type {boolean}
+             */
+            _this.isMultiMouse = false;
             /**
              * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
              * 端默认不开启
@@ -6024,9 +6048,16 @@ var annie;
              * @default 0
              * @type {number}
              */
+<<<<<<< HEAD
             this._currentFlush = 0;
             this._lastDpList = {};
             this._rid = -1;
+=======
+            _this._currentFlush = 0;
+            _this._lastDpList = {};
+            _this._rid = -1;
+            _this._floatDisplayList = [];
+>>>>>>> flash2x/master
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
@@ -6095,11 +6126,11 @@ var annie;
                         s.muliPoints = [];
                     }
                 }
-                var isMulti = (e.targetTouches && e.targetTouches.length > 1);
+                var isMulti = s.isMultiMouse || (e.targetTouches && e.targetTouches.length > 1);
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-                if (annie.EventDispatcher._totalMEC > 0) {
-                    var item = s._mouseEventTypes[e.type];
+                if (!isMulti && annie.EventDispatcher._totalMEC > 0) {
                     var points = void 0;
+                    var item = s._mouseEventTypes[e.type];
                     var events = void 0;
                     var event_3;
                     //stageMousePoint
@@ -6142,7 +6173,7 @@ var annie;
                                 event_3.type = item;
                             }
                             events.push(event_3);
-                            s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
+                            s._initMouseEvent(event_3, cp, sp, identifier);
                             eLen++;
                         }
                         if (item == "onMouseDown") {
@@ -6163,7 +6194,7 @@ var annie;
                                             event_3.type = "onMouseClick";
                                         }
                                         events.push(event_3);
-                                        s._initMouseEvent(event_3, cp, sp, identifier, isMulti);
+                                        s._initMouseEvent(event_3, cp, sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -6229,7 +6260,7 @@ var annie;
                                                         overEvent = s._ml[eLen];
                                                         overEvent.type = "onMouseOver";
                                                     }
-                                                    s._initMouseEvent(overEvent, cp, sp, identifier, isMulti);
+                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
                                                     eLen++;
                                                     if (!s._ml[eLen]) {
                                                         outEvent = new annie.MouseEvent("onMouseOut");
@@ -6239,7 +6270,7 @@ var annie;
                                                         outEvent = s._ml[eLen];
                                                         outEvent.type = "onMouseOut";
                                                     }
-                                                    s._initMouseEvent(outEvent, cp, sp, identifier, isMulti);
+                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
                                                 }
                                             }
                                             if (isDiff) {
@@ -6320,9 +6351,6 @@ var annie;
                                     sd._lastDragPoint.x = Number.MAX_VALUE;
                                     sd._lastDragPoint.y = Number.MAX_VALUE;
                                 }
-                                s._mp.push(s._mouseDownPoint[identifier]);
-                                // s._mouseDownPoint[identifier]=null;
-                                // s._lastDpList[identifier]=null;
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
                             }
@@ -6523,6 +6551,11 @@ var annie;
             var s = this;
             if (!s.pause) {
                 _super.prototype.update.call(this, isDrawUpdate);
+                var sf = s._floatDisplayList;
+                var len = sf.length;
+                for (var i = 0; i < len; i++) {
+                    sf[i].updateStyle();
+                }
             }
         };
         /**
@@ -6541,14 +6574,13 @@ var annie;
          * 刷新mouse或者touch事件
          * @private
          */
-        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, isMulti) {
+        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
             event["_pd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
             event.identifier = identifier;
-            event.isMultiTouch = isMulti;
         };
         /**
          * 循环刷新页面的函数
