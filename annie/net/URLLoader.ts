@@ -29,6 +29,7 @@ namespace annie {
             super();
             this._instanceType = "annie.URLLoader";
         }
+
         /**
          * 取消加载
          * @method loadCancel
@@ -42,7 +43,8 @@ namespace annie {
                 // s._req = null;
             }
         }
-        private _req: XMLHttpRequest=null;
+
+        private _req: XMLHttpRequest = null;
         private headers: Array<string> = [];
 
         /**
@@ -83,7 +85,7 @@ namespace annie {
                     s.responseType = "unKnow";
                 }
             }
-            if(!s._req) {
+            if (!s._req) {
                 s._req = new XMLHttpRequest();
                 let req = s._req;
                 req.withCredentials = false;
@@ -120,7 +122,7 @@ namespace annie {
                 req.onreadystatechange = function (event: any): void {
                     let t = event.target;
                     if (t["readyState"] == 4) {
-                        if (req.status == 200) {
+                        if (req.status == 200||req.status==0) {
                             let isImage: boolean = false;
                             let e: Event = new Event("onComplete");
                             let result = t["response"];
@@ -145,20 +147,18 @@ namespace annie {
                                             s.dispatchEvent(e);
                                         };
                                         itemObj.src = URL.createObjectURL(result);
-                                        item = itemObj;
                                     } else {
                                         if (s.responseType == "sound") {
                                             itemObj = document.createElement("AUDIO");
                                             itemObj.preload = true;
                                             itemObj.src = s.url;
-                                            item = new Sound(s.url);
                                         } else if (s.responseType == "video") {
                                             itemObj = document.createElement("VIDEO");
                                             itemObj.preload = true;
                                             itemObj.src = s.url;
-                                            item = new Video(itemObj);
                                         }
                                     }
+                                    item = itemObj;
                                     break;
                                 case "json":
                                     item = JSON.parse(result);
@@ -305,7 +305,6 @@ namespace annie {
                 return src + "?" + s._fqs(data, query);
             }
         };
-
         /**
          * 添加自定义头
          * @addHeader
@@ -314,6 +313,13 @@ namespace annie {
          */
         public addHeader(name: string, value: string): void {
             this.headers.push(name, value);
+        }
+        public destroy(): void {
+            super.destroy();
+            let s=this;
+            s.loadCancel();
+            s.headers=null;
+            s.data=null;
         }
     }
 }

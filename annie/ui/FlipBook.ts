@@ -278,10 +278,10 @@ namespace annieUI {
             shape.endFill();
         }
         private setShadowMask(shape:Shape,maskShape:Shape,g_width: number, g_height: number):void{
-            shape.beginLinearGradientFill(["rgba(0,0,0,0)", "rgba(0,0,0,0.6)"], [0, 1], [-g_width * 0.5, 4, g_width * 0.5, 4]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4],[{o:0,c:"#000000",a:0}, {o:1,c:"#000000",a:0.6}]);
             shape.drawRect(-g_width * 0.5, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.beginLinearGradientFill(["rgba(0,0,0,0)", "rgba(0,0,0,0.6)"], [1, 0], [-g_width * 0.5, 4, g_width * 0.5, 4]);
+            shape.beginLinearGradientFill( [-g_width * 0.5, 4, g_width * 0.5, 4],[{o:1,c:"#000000",a:0}, {o:0,c:"#000000",a:0.6}]);
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.mask = maskShape;
@@ -546,6 +546,34 @@ namespace annieUI {
             let tmpY: number = target1.y - target2.y;
             let tmpS: number = Math.sqrt(tmpX * tmpX + tmpY * tmpY);
             return target1.x > target2.x ? tmpS : -tmpS;
+        }
+        public destroy(): void {
+            super.destroy();
+            let s=this;
+            s.layer0Arr=null;
+            s.layer1Arr=null;
+            s.toPosArr=null;
+            s.myPosArr=null;
+            s.rPage0=null;
+            s.rMask0=null;
+            s.rMask1=null;
+            s.sMask0=null;
+            s.sMask1=null;
+            s.leftPage=null;
+            s.rightPage=null;
+            s.pageMC=null;
+            s.rightPage=null;
+            s.shadow0=null;
+            s.shadow1=null;
+            s.p1=null;
+            s.p2 = null;
+            s.p3=null;
+            s.p4=null;
+            s.limitP1=null;
+            s.limitP2=null;
+            s.pages=null;
+            s.stageMP=null;
+            s.getPageCallback=null;
         }
     }
 }

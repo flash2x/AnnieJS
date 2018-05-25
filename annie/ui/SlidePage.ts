@@ -207,7 +207,6 @@ namespace annieUI {
             s.viewHeight = h;
             s.maskObj.endFill();
         }
-
         /**
          * 触摸事件
          * @param e
@@ -418,6 +417,12 @@ namespace annieUI {
                 s.view.addChild(pageFirst);
             }
             s.listLen = s.pageClassList.length;
+        }
+        public destroy(): void {
+            super.destroy();
+            let s=this;
+            s.pageList=null;
+            s.pageClassList=null;
         }
     }
 }

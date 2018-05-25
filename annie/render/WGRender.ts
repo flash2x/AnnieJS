@@ -332,5 +332,8 @@ namespace annie {
             s._textures[tid] = textureSource;
             return tid;
         }
+
+        destroy(): void {
+        }
     }
 }

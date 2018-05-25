@@ -1,3 +1,4 @@
+/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -514,9 +515,8 @@ namespace annie {
                     s.muliPoints = [];
                 }
             }
-            let isMulti:boolean=s.isMultiMouse||(e.targetTouches&&e.targetTouches.length>1);
             //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-            if (!isMulti&&EventDispatcher._totalMEC > 0) {
+            if (EventDispatcher._totalMEC > 0) {
                 let points: any;
                 let item = s._mouseEventTypes[e.type];
                 let events: any;
@@ -557,7 +557,7 @@ namespace annie {
                             event = s._ml[eLen];
                             event.type = item;
                         }
-                        events.push(event);
+                        events[events.length]=event;
                         s._initMouseEvent(event, cp, sp, identifier);
                         eLen++;
                     }
@@ -577,7 +577,7 @@ namespace annie {
                                         event = s._ml[eLen];
                                         event.type = "onMouseClick";
                                     }
-                                    events.push(event);
+                                    events[events.length]=event;
                                     s._initMouseEvent(event, cp, sp, identifier);
                                     eLen++;
                                 }
@@ -596,13 +596,28 @@ namespace annie {
                                     //丢掉之前的层级,因为根本没用了
                                     displayList.length = 0;
                                 }
-                                displayList.push(d);
+                                displayList[displayList.length]=d;
                                 d = d.parent;
                             }
                         } else {
-                            displayList.push(s);
+                            displayList[displayList.length]=s;
                         }
                         let len: number = displayList.length;
+                        for (let i = 0; i < len; i++) {
+                            d = displayList[i];
+                            for (let j = 0; j < eLen; j++) {
+                                if (events[j]["_pd"] === false){
+                                    if (d.hasEventListener(events[j].type)) {
+                                        events[j].currentTarget = d;
+                                        events[j].target = displayList[len - 1];
+                                        lp = d.globalToLocal(cp, DisplayObject._bp);
+                                        events[j].localX = lp.x;
+                                        events[j].localY = lp.y;
+                                        d.dispatchEvent(events[j]);
+                                    }
+                                }
+                            }
+                        }
                         displayList.reverse();
                         for (let i = 0; i < len; i++) {
                             d = displayList[i];
@@ -687,7 +702,7 @@ namespace annie {
                                     }
                                 }
                             }
-                            s._mp.push(cp);
+                            s._mp[s._mp.length]=cp;
                         }
                         //判断是否有drag的显示对象
                         let sd: any = Stage._dragDisplay;
@@ -913,6 +928,21 @@ namespace annie {
                     break;
                 }
             }
+        }
+        public destroy(): void {
+            let s=this;
+            Stage.removeUpdateObj(s);
+            s.pause=true;
+            s.rootDiv=null;
+            s._floatDisplayList=null;
+            s.renderObj=null;
+            s.viewRect=null;
+            s._lastDpList=null;
+            s._touchEvent=null;
+            s.muliPoints=null;
+            s._mP1=null;
+            s._mP2=null;
+            s._ml=null;
         }
     }
 }

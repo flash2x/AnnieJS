@@ -170,6 +170,10 @@ namespace annie {
                 }
             }
         }
+
+        destroy(): void {
+
+        }
     }
     /**
      * 全局静态单列类,不要实例化此类

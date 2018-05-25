@@ -53,7 +53,7 @@ namespace annie {
         let reg2 = /iphone|ipod|ipad/;
         if (reg1.test(n)) {
             return "android";
-        } else if (reg2.test(n)) {
+        } else if (reg2.test(n)){
             return "ios"
         } else {
             return "pc";

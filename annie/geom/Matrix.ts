@@ -371,5 +371,8 @@ namespace annie {
             s.tx += dx;
             s.ty += dy;
         }
+
+        destroy(): void {
+        }
     }
 }

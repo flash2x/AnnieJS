@@ -289,5 +289,10 @@ namespace annie {
          * @since 1.0.0
          */
         private _pd:boolean=false;
+        destroy(): void {
+            let s=this;
+            s.target=null;
+            s.data=null;
+        }
     }
 }

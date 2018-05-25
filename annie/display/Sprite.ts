@@ -1,3 +1,4 @@
+/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -13,11 +14,31 @@ namespace annie {
      * @since 1.0.0
      */
     export class Sprite extends DisplayObject {
+
         public constructor() {
             super();
-            this._instanceType = "annie.Sprite";
+            let s=this;
+            s._instanceType = "annie.Sprite";
+            if(s._resId) {
+                let resInfo=s._resId.split(".");
+                Annie2x._initRes(s, resInfo[0],resInfo[1]);
+            }
         }
-
+        protected _resId:string|null;
+        //sprite 和 moveClip的类资源信息
+        private _a2x_res_class:any=null;
+        private _a2x_res_children:any=[];
+        public destroy():void {
+            super.destroy();
+            let s=this;
+            //让子级也destroy
+            for(let i=0;i<s.children.length;i++){
+                s.children[i].destroy();
+            }
+            s._a2x_res_children=null;
+            s._a2x_res_class=null;
+            s.children=null;
+        }
         /**
          * 是否可以让children接收鼠标事件,如果为false
          * 鼠标事件将不会往下冒泡
@@ -107,7 +128,7 @@ namespace annie {
                     name = child.name;
                     if (name && name != "") {
                         if (rex.test(name)) {
-                            resultList.push(child);
+                            resultList[resultList.length]=child;
                             if (isOnlyOne) {
                                 return;
                             }
@@ -182,7 +203,7 @@ namespace annie {
             child.parent = s;
             len = s.children.length;
             if (index >= len) {
-                s.children.push(child);
+                s.children[s.children.length]=child;
             } else if (index == 0) {
                 s.children.unshift(child);
             } else {
@@ -235,15 +256,15 @@ namespace annie {
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
          */
-        public _onDispatchBubbledEvent(type: string, updateMc: boolean = false): void {
+        public _onDispatchBubbledEvent(type: string): void {
             let s = this;
             let len = s.children.length;
             if (type == "onRemoveToStage" && !s.stage) return;
             s.stage = s.parent.stage;
             for (let i = 0; i < len; i++) {
-                s.children[i]._onDispatchBubbledEvent(type, updateMc);
+                s.children[i]._onDispatchBubbledEvent(type);
             }
-            super._onDispatchBubbledEvent(type, updateMc);
+            super._onDispatchBubbledEvent(type);
         }
 
         /**
@@ -292,44 +313,16 @@ namespace annie {
         public update(isDrawUpdate: boolean = false): void {
             let s: any = this;
             if(!s._visible)return;
-            super.update(isDrawUpdate);
             if (!s._cacheAsBitmap){
+                super.update(isDrawUpdate);
                 let len = s.children.length;
-                let child: any;
-                let maskObjIds: any = [];
                 for (let i = len - 1; i >= 0; i--) {
-                    child = s.children[i];
-                    if(!s._visible) continue;
-                    //更新遮罩
-                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
-                        let childChild=null;
-                        child.mask.parent = s;
-                        if (s.totalFrames && child.mask.totalFrames){
-                            child.mask.gotoAndStop(s.currentFrame);
-                            //一定要为true
-                            childChild=child.mask.getChildAt(0);
-                            if(childChild){
-                                childChild.isUseToMask=true;
-                                childChild.hitTestWidthPixel=false;
-                            }
-                        }else{
-                            child.mask.isUseToMask=true;
-                            child.mask.hitTestWidthPixel=false;
-                        }
-                        child.mask._cp=true;
-                        child.mask.update(isDrawUpdate);
-                        child.mask.isUseToMask=false;
-                        if(childChild) {
-                            childChild.isUseToMask = false;
-                        }
-                        maskObjIds.push(child.mask.instanceId);
-                    }
-                    child.update(isDrawUpdate);
+                    s.children[i].update(isDrawUpdate);
                 }
+                s._UI.UM = false;
+                s._UI.UA = false;
+                s._UI.UF = false;
             }
-            s._UI.UM = false;
-            s._UI.UA = false;
-            s._UI.UF = false;
         }
 
         /**
@@ -352,7 +345,7 @@ namespace annie {
                 //这里特别注意是从上往下遍历
                 for (let i = len - 1; i >= 0; i--) {
                     child = s.children[i];
-                    if (child.mask) {
+                    if (child.mask&&child.mask.parent==child.parent) {
                         //看看点是否在遮罩内
                         if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
@@ -408,7 +401,7 @@ namespace annie {
                         if (s.children[i].visible)
                             Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                     }
-                    if (s.mask) {
+                    if (s.mask&&s.mask.parent==s.parent) {
                         let maskRect = s.mask.getDrawRect();
                         if (rect.x < maskRect.x) {
                             rect.x = maskRect.x;
@@ -456,7 +449,7 @@ namespace annie {
                         child = s.children[i];
                         if (child.cAlpha > 0 && child._visible) {
                             if (maskObj) {
-                                if (child.mask) {
+                                if (child.mask&&child.mask.parent==child.parent) {
                                     if (child.mask != maskObj) {
                                         renderObj.endMask();
                                         maskObj = child.mask;
@@ -467,7 +460,7 @@ namespace annie {
                                     maskObj = null;
                                 }
                             } else {
-                                if (child.mask) {
+                                if (child.mask&&child.mask.parent==child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }

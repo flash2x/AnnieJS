@@ -150,5 +150,12 @@ namespace annie {
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
         }
+
+        destroy(): void {
+            let s=this;
+            s.rootContainer=null;
+            s._stage=null;
+            s._ctx=null;
+        }
     }
 }

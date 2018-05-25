@@ -1,3 +1,4 @@
+/// <reference path="ScrollPage" />
 /**
  * Created by anlun on 16/8/14.
  */
@@ -201,6 +202,14 @@ namespace annieUI {
             } else {
                 s.isStop = false;
             }
+        }
+        public destroy(): void {
+            super.destroy();
+            let s=this;
+            s._items=null;
+            s._itemClass=null;
+            s.data=null;
+            s.downL=null;
         }
     }
 }

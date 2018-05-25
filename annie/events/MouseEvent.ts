@@ -148,5 +148,11 @@ namespace annie {
         public updateAfterEvent(){
             this.target.stage._cp=true;
         }
+        public destroy():void {
+            //清除相应的数据引用
+            let s = this;
+            s.currentTarget=null;
+            super.destroy();
+        }
     }
 }

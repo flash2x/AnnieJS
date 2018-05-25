@@ -7,15 +7,13 @@ namespace annie {
      * @class annie.AObject
      * @since 1.0.0
      */
-    export class AObject {
-        private _instanceId: number = 0;
-        protected _instanceType: string = "AObject";
+    export abstract class AObject {
+        protected  _instanceId: number = 0;
+        protected _instanceType: string = "annie.AObject";
         protected static _object_id = 0;
-
-        public constructor() {
+        protected constructor() {
             this._instanceId = AObject._object_id++;
         }
-
         /**
          * 每一个annie引擎对象都会有一个唯一的id码。
          * @property instanceId
@@ -42,6 +40,11 @@ namespace annie {
         public get instanceType(): string {
             return this._instanceType;
         }
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        abstract destroy(): void;
     }
     /**
      * 事件触发基类
@@ -51,8 +54,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class EventDispatcher extends AObject {
-        private eventTypes: any = null;
-
+        protected eventTypes: any = null;
         public constructor() {
             super();
             this._instanceType = "annie.EventDispatcher";
@@ -241,6 +243,11 @@ namespace annie {
                 }
             }
             s.eventTypes = {};
+        }
+        destroy(): void {
+            let s=this;
+            s.removeAllEventListener();
+            s.eventTypes=null;
         }
     }
 }

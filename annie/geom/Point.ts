@@ -8,7 +8,8 @@ namespace annie {
      * @since 1.0.0
      * @public
      */
-    export class Point extends annie.AObject {
+    export class Point extends annie.AObject{
+        public destroy(): void {}
         /**
          * 构造函数
          * @method Point
@@ -17,7 +18,7 @@ namespace annie {
          * @param x
          * @param y
          */
-        constructor(x:number=0, y:number=0) {
+        constructor(x:number=0, y:number=0){
             super();
             let s = this;
             s._instanceType="annie.Point";

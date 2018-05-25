@@ -380,6 +380,12 @@ var annieUI;
                 }
             }
         };
+        ScrollPage.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s.maskObj = null;
+            s.view = null;
+        };
         return ScrollPage;
     }(Sprite));
     annieUI.ScrollPage = ScrollPage;
@@ -467,6 +473,13 @@ var annieUI;
                 s.photo.src = src;
             if (s.maskType != maskType)
                 s.maskType = maskType;
+        };
+        FacePhoto.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s.bitmap = null;
+            s.photo = null;
+            s.maskObj = null;
         };
         return FacePhoto;
     }(Sprite));
@@ -903,6 +916,12 @@ var annieUI;
             }
             s.listLen = s.pageClassList.length;
         };
+        SlidePage.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s.pageList = null;
+            s.pageClassList = null;
+        };
         return SlidePage;
     }(Sprite));
     annieUI.SlidePage = SlidePage;
@@ -1179,10 +1198,10 @@ var annieUI;
             shape.endFill();
         };
         FlipBook.prototype.setShadowMask = function (shape, maskShape, g_width, g_height) {
-            shape.beginLinearGradientFill(["rgba(0,0,0,0)", "rgba(0,0,0,0.6)"], [0, 1], [-g_width * 0.5, 4, g_width * 0.5, 4]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [{ o: 0, c: "#000000", a: 0 }, { o: 1, c: "#000000", a: 0.6 }]);
             shape.drawRect(-g_width * 0.5, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.beginLinearGradientFill(["rgba(0,0,0,0)", "rgba(0,0,0,0.6)"], [1, 0], [-g_width * 0.5, 4, g_width * 0.5, 4]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [{ o: 1, c: "#000000", a: 0 }, { o: 0, c: "#000000", a: 0.6 }]);
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.mask = maskShape;
@@ -1449,10 +1468,39 @@ var annieUI;
             var tmpS = Math.sqrt(tmpX * tmpX + tmpY * tmpY);
             return target1.x > target2.x ? tmpS : -tmpS;
         };
+        FlipBook.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s.layer0Arr = null;
+            s.layer1Arr = null;
+            s.toPosArr = null;
+            s.myPosArr = null;
+            s.rPage0 = null;
+            s.rMask0 = null;
+            s.rMask1 = null;
+            s.sMask0 = null;
+            s.sMask1 = null;
+            s.leftPage = null;
+            s.rightPage = null;
+            s.pageMC = null;
+            s.rightPage = null;
+            s.shadow0 = null;
+            s.shadow1 = null;
+            s.p1 = null;
+            s.p2 = null;
+            s.p3 = null;
+            s.p4 = null;
+            s.limitP1 = null;
+            s.limitP2 = null;
+            s.pages = null;
+            s.stageMP = null;
+            s.getPageCallback = null;
+        };
         return FlipBook;
     }(Sprite));
     annieUI.FlipBook = FlipBook;
 })(annieUI || (annieUI = {}));
+/// <reference path="ScrollPage" />
 /**
  * Created by anlun on 16/8/14.
  */
@@ -1644,6 +1692,14 @@ var annieUI;
             else {
                 s.isStop = false;
             }
+        };
+        ScrollList.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s._items = null;
+            s._itemClass = null;
+            s.data = null;
+            s.downL = null;
         };
         return ScrollList;
     }(annieUI.ScrollPage));
@@ -1865,6 +1921,15 @@ var annieUI;
             }
             return true;
         };
+        DrawingBoard.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s.context = null;
+            s.totalStepList = null;
+            s.drawColor = null;
+            s.bgColor = null;
+            s.addStepObj = null;
+        };
         return DrawingBoard;
     }(annie.Bitmap));
     annieUI.DrawingBoard = DrawingBoard;
@@ -1978,6 +2043,11 @@ var annieUI;
             enumerable: true,
             configurable: true
         });
+        ScratchCard.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            var s = this;
+            s._drawList = null;
+        };
         return ScratchCard;
     }(annieUI.DrawingBoard));
     annieUI.ScratchCard = ScratchCard;
