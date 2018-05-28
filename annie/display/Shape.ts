@@ -665,8 +665,8 @@ namespace annie {
                         let h = buttonRightY - leftY;
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX;
-                        s._bounds.y = leftY;
+                        s._bounds.x = leftX+10;
+                        s._bounds.y = leftY+10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
@@ -754,8 +754,8 @@ namespace annie {
             if (isMouseEvent) {
                 p = s.globalToLocal(globalPoint);
             }
-            if (s.getBounds().isPointIn(p)) {
-                if (s.hitTestWidthPixel) {
+            if (s.getBounds().isPointIn(p)){
+                if (!s._isUseToMask&&s.hitTestWidthPixel) {
                     let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;

@@ -233,6 +233,8 @@ namespace annie {
             if (typeof(frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
+                }else{
+                    frameIndex=s._curFrame;
                 }
             } else if (typeof(frameIndex) == "number") {
                 if (frameIndex > timeLineObj.tf) {
@@ -254,11 +256,7 @@ namespace annie {
         public play(isFront: boolean = true): void {
             let s = this;
             s._isPlaying = true;
-            if (isFront == undefined) {
-                s._isFront = true;
-            } else {
-                s._isFront = isFront;
-            }
+            s._isFront = isFront;
         }
 
         /**
@@ -271,16 +269,14 @@ namespace annie {
          */
         public gotoAndPlay(frameIndex: number | string, isFront: boolean = true): void {
             let s: any = this;
-            if (isFront == undefined) {
-                s._isFront = true;
-            } else {
-                s._isFront = isFront;
-            }
+            s._isFront = isFront;
             s._isPlaying = true;
             let timeLineObj = s._a2x_res_class;
             if (typeof(frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
+                }else{
+                    frameIndex=s._curFrame;
                 }
             } else if (typeof(frameIndex) == "number") {
                 if (frameIndex > timeLineObj.tf) {
@@ -292,7 +288,6 @@ namespace annie {
             }
             s._curFrame = <number>frameIndex;
         }
-
         /**
          * 重写刷新
          * @method update
@@ -300,11 +295,11 @@ namespace annie {
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(isDrawUpdate: boolean = false): void {
+        public update(isDrawUpdate: boolean = true): void{
             let s: any = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
-                if (s._lastFrame != s._curFrame) {
+                if (s._lastFrame != s._curFrame){
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;
                 } else {

@@ -164,10 +164,11 @@ namespace annieUI {
             super();
             let s = this;
             s._instanceType = "annieUI.ScrollPage";
-            s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
+            s.maskObj["_isUseToMask"]=false;
+            s.maskObj.alpha=0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH,isVertical);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));

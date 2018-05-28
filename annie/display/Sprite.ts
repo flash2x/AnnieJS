@@ -310,7 +310,7 @@ namespace annie {
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(isDrawUpdate: boolean = false): void {
+        public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if(!s._visible)return;
             if (!s._cacheAsBitmap){
@@ -345,6 +345,9 @@ namespace annie {
                 //这里特别注意是从上往下遍历
                 for (let i = len - 1; i >= 0; i--) {
                     child = s.children[i];
+                    if(child._isUseToMask){
+                        continue;
+                    }
                     if (child.mask&&child.mask.parent==child.parent) {
                         //看看点是否在遮罩内
                         if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {

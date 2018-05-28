@@ -106,7 +106,7 @@ namespace annie {
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        public addEventListener(type: string, listener: Function): void {
+        public addEventListener(type: string, listener: Function,): void {
             if (!type) {
                 throw new Error("添加侦听的type值为undefined");
             }

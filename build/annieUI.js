@@ -176,10 +176,11 @@ var annieUI;
             _this.autoScroll = false;
             var s = _this;
             s._instanceType = "annieUI.ScrollPage";
-            s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
+            s.maskObj["_isUseToMask"] = false;
+            s.maskObj.alpha = 0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH, isVertical);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
@@ -660,10 +661,11 @@ var annieUI;
                 s.paramXY = "x";
                 s.distance = vW;
             }
-            s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
+            s.maskObj["_isUseToMask"] = false;
+            s.maskObj.alpha = 0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
@@ -1592,28 +1594,30 @@ var annieUI;
         ScrollList.prototype.flushData = function () {
             var s = this;
             if (s._isInit) {
-                var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
-                id = id < 0 ? 0 : id;
-                if (id != s._lastFirstId) {
-                    var isMustUpdate = s._lastFirstId == -1;
-                    s._lastFirstId = id;
-                    if (id != s._items[0].id) {
-                        for (var r = 0; r < s._cols; r++) {
-                            if (s.speed > 0) {
-                                s._items.unshift(s._items.pop());
-                            }
-                            else {
-                                s._items.push(s._items.shift());
+                if (s.view._UI.UM) {
+                    var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
+                    id = id < 0 ? 0 : id;
+                    if (id != s._lastFirstId) {
+                        s._lastFirstId = id;
+                        if (id != s._items[0].id) {
+                            for (var r = 0; r < s._cols; r++) {
+                                if (s.speed > 0) {
+                                    s._items.unshift(s._items.pop());
+                                }
+                                else {
+                                    s._items.push(s._items.shift());
+                                }
                             }
                         }
                     }
                     for (var i = 0; i < s._itemCount; i++) {
                         var item = s._items[i];
-                        if (item.id != id || isMustUpdate) {
+                        if (item._a2x_sl_id != id) {
                             item.initData(s.data[id] ? id : -1, s.data[id]);
                             item.visible = s.data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
+                            item._a2x_sl_id = id;
                         }
                         id++;
                     }

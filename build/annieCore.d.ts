@@ -1305,7 +1305,6 @@ declare namespace annie {
          * 更新函数
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
         protected update(isDrawUpdate?: boolean): void;
@@ -2979,7 +2978,6 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;

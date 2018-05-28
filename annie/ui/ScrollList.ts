@@ -7,6 +7,7 @@
  */
 namespace annieUI {
     import DisplayObject = annie.DisplayObject;
+
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
      * @class annieUI.IScrollListItem
@@ -16,9 +17,11 @@ namespace annieUI {
      */
     export interface IScrollListItem extends DisplayObject {
         initData(id: number, data: Array<any>): void;
+
         id: number;
         data: number;
     }
+
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
      * @class annieUI.ScrollList
@@ -77,6 +80,7 @@ namespace annieUI {
             s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }
+
         /**
          * 更新列表数据
          * @method updateData
@@ -101,30 +105,32 @@ namespace annieUI {
             }
         }
 
-        private flushData(){
+        private flushData() {
             let s: any = this;
             if (s._isInit) {
-                let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
-                id = id < 0 ? 0 : id;
-                if (id != s._lastFirstId) {
-                    let isMustUpdate=s._lastFirstId==-1;
-                    s._lastFirstId = id;
-                    if (id != s._items[0].id) {
-                        for (let r = 0; r < s._cols; r++) {
-                            if (s.speed > 0) {
-                                s._items.unshift(s._items.pop());
-                            } else {
-                                s._items.push(s._items.shift());
+                if(s.view._UI.UM) {
+                    let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
+                    id = id < 0 ? 0 : id;
+                    if (id != s._lastFirstId) {
+                        s._lastFirstId = id;
+                        if (id != s._items[0].id) {
+                            for (let r = 0; r < s._cols; r++) {
+                                if (s.speed > 0) {
+                                    s._items.unshift(s._items.pop());
+                                } else {
+                                    s._items.push(s._items.shift());
+                                }
                             }
                         }
                     }
                     for (let i = 0; i < s._itemCount; i++) {
                         let item: any = s._items[i];
-                        if(item.id!=id||isMustUpdate){
-                            item.initData(s.data[id]?id:-1, s.data[id]);
-                            item.visible=s.data[id]?true:false;
+                        if (item._a2x_sl_id != id) {
+                            item.initData(s.data[id] ? id : -1, s.data[id]);
+                            item.visible = s.data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
+                            item._a2x_sl_id = id;
                         }
                         id++;
                     }
@@ -148,6 +154,7 @@ namespace annieUI {
                 s._updateViewRect();
             }
         }
+
         private _updateViewRect() {
             let s: any = this;
             if (s.isVertical) {
@@ -164,8 +171,8 @@ namespace annieUI {
                 if (newCount > s._itemCount) {
                     for (let i = s._itemCount; i < newCount; i++) {
                         let item = new s._itemClass();
-                        item.id=-1;
-                        item.data=null;
+                        item.id = -1;
+                        item.data = null;
                         s._items.push(item);
                         s.view.addChild(item);
                     }
@@ -203,13 +210,14 @@ namespace annieUI {
                 s.isStop = false;
             }
         }
+
         public destroy(): void {
             super.destroy();
-            let s=this;
-            s._items=null;
-            s._itemClass=null;
-            s.data=null;
-            s.downL=null;
+            let s = this;
+            s._items = null;
+            s._itemClass = null;
+            s.data = null;
+            s.downL = null;
         }
     }
 }

@@ -138,7 +138,7 @@ namespace annie {
                     x=arg[i].x;
                 }
                 if(y>arg[i].y){
-                    x=arg[i].y;
+                    y=arg[i].y;
                 }
                 if(w<arg[i].x){
                     w=arg[i].x;
@@ -166,7 +166,7 @@ namespace annie {
                     x=p2.x;
                 }
                 if(y>p2.y){
-                    x=p2.y;
+                    y=p2.y;
                 }
                 if(w<p2.x){
                     w=p2.x;

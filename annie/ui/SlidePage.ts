@@ -179,10 +179,11 @@ namespace annieUI {
                 s.paramXY = "x";
                 s.distance = vW;
             }
-            s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
+            s.maskObj["_isUseToMask"]=false;
+            s.maskObj.alpha=0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);

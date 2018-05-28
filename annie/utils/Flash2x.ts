@@ -164,7 +164,7 @@ namespace Annie2x {
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
             for (let i = 0; i < _totalLoadRes; i++) {
-                _currentConfig.push([{src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + ".min.js"}]);
+                _currentConfig.push([{src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + ".swf"}]);
             }
             _loadRes();
         }
@@ -202,9 +202,14 @@ namespace Annie2x {
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         let mc: any = null;
         for (let item in loadContent) {
-            if (loadContent[item].t == 1) {
-                if(loadContent[item].tf > 1) {
-                    mc = loadContent[item];
+            mc = loadContent[item];
+            if (mc.t == 1) {
+                if(!mc.f){
+                    mc.f=[];
+                    mc.tf=1;
+                    continue;
+                }
+                if(mc.tf > 1) {
                     let frameList = mc.f;
                     let count = frameList.length;
                     let frameCon = null;
@@ -811,7 +816,6 @@ namespace Annie2x {
                     }
                 } else {
                     obj = new Root[sceneName][children[i]]();
-                    _initRes(obj, sceneName, children[i]);
                 }
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;

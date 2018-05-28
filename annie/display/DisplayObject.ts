@@ -325,8 +325,9 @@ namespace annie {
         public set mask(value:Shape){
             if(value!=this.mask) {
                 this._mask = value;
-                if (value)
+                if (value) {
                     value["_isUseToMask"] = true;
+                }
             }
         }
         private _mask:Shape=null;
@@ -494,10 +495,10 @@ namespace annie {
                     rect.y=maskRect.y;
                 }
                 if(rect.width>maskRect.width){
-                    rect.width=maskRect.width
+                    rect.width=maskRect.width;
                 }
                 if(rect.height>maskRect.height){
-                    rect.height=maskRect.height
+                    rect.height=maskRect.height;
                 }
             }
             s.matrix.transformPoint(rect.x, rect.y,DisplayObject._p1);
@@ -511,10 +512,9 @@ namespace annie {
          * 更新函数
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        protected update(isDrawUpdate:boolean=false): void{
+        protected update(isDrawUpdate:boolean=true): void{
             let s = this;
             //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
