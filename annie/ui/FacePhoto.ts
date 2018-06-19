@@ -85,11 +85,11 @@ namespace annieUI {
                 s.maskType = maskType;
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
            s.bitmap=null;
            s.photo=null;
            s.maskObj=null;
+            super.destroy();
         }
     }
 }

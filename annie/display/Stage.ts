@@ -61,6 +61,17 @@ namespace annie {
          * @readonly
          */
         public renderType = 0;
+
+        /**
+         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @param {string} stageName
+         * @returns {any}
+         * @since 2.0.0
+         */
+        public  static getStage(stageName:string="annieEngine"){
+            return annie.Stage._stageList[stageName];
+        }
+        private static _stageList:any={};
         /**
          * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -243,6 +254,8 @@ namespace annie {
             super();
             let s: Stage = this;
             this._instanceType = "annie.Stage";
+            s.name=rootDivId;
+            annie.Stage._stageList[rootDivId]=s;
             s.stage = this;
             let resizeEvent = "resize";
             s.name = "stageInstance_" + s.instanceId;
@@ -431,6 +444,7 @@ namespace annie {
             let sw = div.style.width;
             let sh = div.style.height;
             let iw = document.body.clientWidth;
+            // let ih = document.body.clientHeight-40;
             let ih = document.body.clientHeight;
             let vW = parseInt(sw);
             let vH = parseInt(sh);
@@ -551,7 +565,7 @@ namespace annie {
                         e.identifier = 0;
                         points = [e];
                     } else {
-                        if (s.isMultiMouse) {
+                        if (s.isMultiMouse){
                             points = e.changedTouches;
                         } else {
                             points = [e.changedTouches[0]];
@@ -655,6 +669,8 @@ namespace annie {
                                     }
                                 }
                             }*/
+                            //这里一定要反转一下，因为会影响mouseOut mouseOver
+                            displayList.reverse();
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                             if (item != "onMouseDown") {
                                 if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
@@ -725,7 +741,6 @@ namespace annie {
                                 }
                                 s._mp[s._mp.length] = cp;
                             }
-
                             if (sd && sd.stage && sd.parent) {
                                 let x1 = sd.x, y1 = sd.y;
                                 lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
@@ -964,6 +979,7 @@ namespace annie {
             s._mP1=null;
             s._mP2=null;
             s._ml=null;
+            super.destroy();
         }
     }
 }

@@ -212,12 +212,12 @@ namespace annieUI {
         }
 
         public destroy(): void {
-            super.destroy();
             let s = this;
             s._items = null;
             s._itemClass = null;
             s.data = null;
             s.downL = null;
+            super.destroy();
         }
     }
 }

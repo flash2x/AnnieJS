@@ -36,6 +36,10 @@ declare namespace annie {
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
+         * @method destroy
+         * @since 2.0.0
+         * @public
+         * @returns {void}
          */
         abstract destroy(): void;
     }
@@ -48,6 +52,7 @@ declare namespace annie {
      */
     class EventDispatcher extends AObject {
         protected eventTypes: any;
+        protected eventTypes1: any;
         constructor();
         /**
          * 全局的鼠标事件的监听数对象表
@@ -111,9 +116,10 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
+         * @param {number} state 0 查找所有 1 只找从事件对象本身向上冒泡的事件类型线路查找 2 只找从最上层向事件对象本身的线路事件类型查找
          * @returns {boolean} 如果有则返回true
          */
-        hasEventListener(type: string): boolean;
+        hasEventListener(type: string, state?: number): boolean;
         /**
          * 移除对应类型的侦听
          * @method removeEventListener
@@ -417,6 +423,12 @@ declare namespace annie {
          * @since 1.0.0
          */
         private _pd;
+        /**
+         * @method destroy
+         * @public
+         * @since 2.0.0
+         * @returns {void}
+         */
         destroy(): void;
     }
 }
@@ -1059,7 +1071,7 @@ declare namespace annie {
          * @since 1.0.0
          * @type {Array}
          */
-        protected cFilters: any[];
+        protected cFilters: any;
         /**
          * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -1994,6 +2006,13 @@ declare namespace annie {
          */
         getChildIndex(child: DisplayObject): number;
         /**
+         *
+         * @param child1 显示对象，或者显示对象的索引
+         * @param child2 显示对象，或者显示对象的索引
+         * @returns {boolean}
+         */
+        swapChild(child1: any, child2: any): boolean;
+        /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
          * @private
@@ -2158,11 +2177,11 @@ declare namespace annie {
         constructor(src: any);
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destory
+         * @method destroy
          * @public
          * @since 1.1.1
          */
-        destory(): void;
+        destroy(): void;
         private static _soundList;
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
@@ -2795,6 +2814,14 @@ declare namespace annie {
          * @readonly
          */
         renderType: number;
+        /**
+         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @param {string} stageName
+         * @returns {any}
+         * @since 2.0.0
+         */
+        static getStage(stageName?: string): any;
+        private static _stageList;
         /**
          * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>

@@ -315,11 +315,11 @@ namespace annie {
             this.headers.push(name, value);
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
             s.loadCancel();
             s.headers=null;
             s.data=null;
+            super.destroy();
         }
     }
 }

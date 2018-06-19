@@ -72,9 +72,9 @@ var annie;
         __extends(EventDispatcher, _super);
         function EventDispatcher() {
             var _this = _super.call(this) || this;
-            _this.eventTypes = null;
-            _this._instanceType = "annie.EventDispatcher";
             _this.eventTypes = {};
+            _this.eventTypes1 = {};
+            _this._instanceType = "annie.EventDispatcher";
             return _this;
         }
         /**
@@ -203,11 +203,20 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
+         * @param {number} state 0 查找所有 1 只找从事件对象本身向上冒泡的事件类型线路查找 2 只找从最上层向事件对象本身的线路事件类型查找
          * @returns {boolean} 如果有则返回true
          */
-        EventDispatcher.prototype.hasEventListener = function (type) {
-            if (this.eventTypes[type] && this.eventTypes[type].length > 0) {
-                return true;
+        EventDispatcher.prototype.hasEventListener = function (type, state) {
+            if (state === void 0) { state = 0; }
+            if (state == 0 || state == 1) {
+                if (this.eventTypes[type] && this.eventTypes[type].length > 0) {
+                    return true;
+                }
+            }
+            if (state == 0 || state == 2) {
+                if (this.eventTypes1[type] && this.eventTypes1[type].length > 0) {
+                    return true;
+                }
             }
             return false;
         };
@@ -335,6 +344,12 @@ var annie;
         Event.prototype.preventDefault = function () {
             this._pd = true;
         };
+        /**
+         * @method destroy
+         * @public
+         * @since 2.0.0
+         * @returns {void}
+         */
         Event.prototype.destroy = function () {
             var s = this;
             s.target = null;
@@ -799,10 +814,10 @@ var annie;
         };
         TouchEvent.prototype.destroy = function () {
             //清除相应的数据引用
-            _super.prototype.destroy.call(this);
             var s = this;
             s.clientPoint1 = null;
             s.clientPoint2 = null;
+            _super.prototype.destroy.call(this);
         };
         /**
          * @property ON_MULTI_TOUCH
@@ -2062,13 +2077,6 @@ var annie;
         DisplayObject.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            //enterFrame事件一定要放在这里，不要再移到其他地方
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new annie.Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
-            }
             var UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
@@ -2116,6 +2124,13 @@ var annie;
                         }
                     }
                 }
+            }
+            //enterFrame事件一定要放在这里，不要再移到其他地方
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new annie.Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
             }
         };
         /**
@@ -2310,7 +2325,6 @@ var annie;
         };
         DisplayObject.prototype.destroy = function () {
             //清除相应的数据引用
-            _super.prototype.destroy.call(this);
             var s = this;
             s._a2x_sounds = null;
             s._a2x_res_obj = null;
@@ -2328,6 +2342,7 @@ var annie;
             s.cMatrix = null;
             s._UI = null;
             s._texture = null;
+            _super.prototype.destroy.call(this);
         };
         /**
          * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
@@ -2645,11 +2660,11 @@ var annie;
          */
         Bitmap.prototype.destroy = function () {
             //清除相应的数据引用
-            _super.prototype.destroy.call(this);
             var s = this;
             s._bitmapData = null;
             s._realCacheImg = null;
             s.rect = null;
+            _super.prototype.destroy.call(this);
         };
         return Bitmap;
     }(annie.DisplayObject));
@@ -3480,11 +3495,11 @@ var annie;
          */
         Shape.prototype.destroy = function () {
             //清除相应的数据引用
-            _super.prototype.destroy.call(this);
             var s = this;
             s._command = null;
             s._isBitmapStroke = null;
             s._isBitmapFill = null;
+            _super.prototype.destroy.call(this);
         };
         Shape._caps = ["butt", "round", "square"];
         Shape._joins = ["miter", "round", "bevel"];
@@ -3544,7 +3559,6 @@ var annie;
             return _this;
         }
         Sprite.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             //让子级也destroy
             for (var i = 0; i < s.children.length; i++) {
@@ -3553,6 +3567,7 @@ var annie;
             s._a2x_res_children = null;
             s._a2x_res_class = null;
             s.children = null;
+            _super.prototype.destroy.call(this);
         };
         Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
             /**
@@ -3749,6 +3764,16 @@ var annie;
                 }
             }
             return -1;
+        };
+        /**
+         *
+         * @param child1 显示对象，或者显示对象的索引
+         * @param child2 显示对象，或者显示对象的索引
+         * @returns {boolean}
+         */
+        //TODO
+        Sprite.prototype.swapChild = function (child1, child2) {
+            return false;
         };
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
@@ -4163,10 +4188,10 @@ var annie;
             configurable: true
         });
         Media.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             this.media.pause();
             s.media = null;
+            _super.prototype.destroy.call(this);
         };
         return Media;
     }(annie.EventDispatcher));
@@ -4208,17 +4233,18 @@ var annie;
         }
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destory
+         * @method destroy
          * @public
          * @since 1.1.1
          */
-        Sound.prototype.destory = function () {
+        Sound.prototype.destroy = function () {
             var len = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
+            _super.prototype.destroy.call(this);
         };
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
@@ -6194,6 +6220,8 @@ var annie;
                                         }
                                     }
                                 }*/
+                                //这里一定要反转一下，因为会影响mouseOut mouseOver
+                                displayList.reverse();
                                 //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                                 if (item != "onMouseDown") {
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
@@ -6430,6 +6458,8 @@ var annie;
             };
             var s = _this;
             _this._instanceType = "annie.Stage";
+            s.name = rootDivId;
+            annie.Stage._stageList[rootDivId] = s;
             s.stage = _this;
             var resizeEvent = "resize";
             s.name = "stageInstance_" + s.instanceId;
@@ -6497,6 +6527,16 @@ var annie;
             }
             return _this;
         }
+        /**
+         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @param {string} stageName
+         * @returns {any}
+         * @since 2.0.0
+         */
+        Stage.getStage = function (stageName) {
+            if (stageName === void 0) { stageName = "annieEngine"; }
+            return annie.Stage._stageList[stageName];
+        };
         /**
          * 重写刷新
          * @method update
@@ -6598,6 +6638,7 @@ var annie;
             var sw = div.style.width;
             var sh = div.style.height;
             var iw = document.body.clientWidth;
+            // let ih = document.body.clientHeight-40;
             var ih = document.body.clientHeight;
             var vW = parseInt(sw);
             var vH = parseInt(sh);
@@ -6699,7 +6740,9 @@ var annie;
             s._mP1 = null;
             s._mP2 = null;
             s._ml = null;
+            _super.prototype.destroy.call(this);
         };
+        Stage._stageList = {};
         Stage._dragDisplay = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
@@ -7950,11 +7993,11 @@ var annie;
             this.headers.push(name, value);
         };
         URLLoader.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.loadCancel();
             s.headers = null;
             s.data = null;
+            _super.prototype.destroy.call(this);
         };
         return URLLoader;
     }(annie.EventDispatcher));
@@ -9018,6 +9061,10 @@ var annie;
             }
         };
         TweenObj.prototype.destroy = function () {
+            var s = this;
+            s._update = null;
+            s._completeFun = null;
+            s._ease = null;
         };
         return TweenObj;
     }(annie.AObject));
@@ -9794,9 +9841,9 @@ var annie;
             }
         };
         Timer.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.kill();
+            _super.prototype.destroy.call(this);
         };
         Timer._timerList = [];
         return Timer;

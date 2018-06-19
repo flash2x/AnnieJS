@@ -289,7 +289,14 @@ namespace annie {
          * @since 1.0.0
          */
         private _pd:boolean=false;
-        destroy(): void {
+
+        /**
+         * @method destroy
+         * @public
+         * @since 2.0.0
+         * @returns {void}
+         */
+        public destroy(): void {
             let s=this;
             s.target=null;
             s.data=null;

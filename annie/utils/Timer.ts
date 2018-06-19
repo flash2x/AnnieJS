@@ -177,9 +177,9 @@ namespace annie {
             }
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
             s.kill();
+            super.destroy();
         }
     }
 }

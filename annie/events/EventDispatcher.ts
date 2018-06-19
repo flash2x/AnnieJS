@@ -43,6 +43,10 @@ namespace annie {
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
+         * @method destroy
+         * @since 2.0.0
+         * @public
+         * @returns {void}
          */
         abstract destroy(): void;
     }
@@ -54,11 +58,11 @@ namespace annie {
      * @since 1.0.0
      */
     export class EventDispatcher extends AObject {
-        protected eventTypes: any = null;
+        protected eventTypes: any = {};
+        protected eventTypes1: any = {};
         public constructor() {
             super();
             this._instanceType = "annie.EventDispatcher";
-            this.eventTypes = {};
         }
         /**
          * 全局的鼠标事件的监听数对象表
@@ -195,11 +199,19 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
+         * @param {number} state 0 查找所有 1 只找从事件对象本身向上冒泡的事件类型线路查找 2 只找从最上层向事件对象本身的线路事件类型查找
          * @returns {boolean} 如果有则返回true
          */
-        public hasEventListener(type: string): boolean {
-            if (this.eventTypes[type]&&this.eventTypes[type].length>0) {
-                return true
+        public hasEventListener(type: string,state=0): boolean {
+            if(state==0||state==1){
+                if (this.eventTypes[type]&&this.eventTypes[type].length>0) {
+                    return true
+                }
+            }
+            if(state==0||state==2){
+                if (this.eventTypes1[type]&&this.eventTypes1[type].length>0) {
+                    return true
+                }
             }
             return false;
         }

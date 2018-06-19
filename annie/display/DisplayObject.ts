@@ -94,7 +94,7 @@ namespace annie {
          * @since 1.0.0
          * @type {Array}
          */
-        protected cFilters: any[] = [];
+        protected cFilters: any = [];
         /**
          * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -516,13 +516,6 @@ namespace annie {
          */
         protected update(isDrawUpdate:boolean=true): void{
             let s = this;
-            //enterFrame事件一定要放在这里，不要再移到其他地方
-            if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
-            }
             let UI=s._UI;
             if(s._cp){
                 UI.UM=UI.UA=UI.UF=true;
@@ -567,6 +560,13 @@ namespace annie {
                         }
                     }
                 }
+            }
+            //enterFrame事件一定要放在这里，不要再移到其他地方
+            if (s.hasEventListener("onEnterFrame")) {
+                if (!s._enterFrameEvent) {
+                    s._enterFrameEvent = new Event("onEnterFrame");
+                }
+                s.dispatchEvent(s._enterFrameEvent);
             }
         }
         /**
@@ -786,7 +786,6 @@ namespace annie {
         private _a2x_res_obj:any={};
         public destroy():void {
             //清除相应的数据引用
-            super.destroy();
             let s = this;
             s._a2x_sounds = null;
             s._a2x_res_obj = null;
@@ -804,6 +803,7 @@ namespace annie {
             s.cMatrix=null;
             s._UI=null;
             s._texture=null;
+            super.destroy();
         }
     }
 }

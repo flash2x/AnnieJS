@@ -29,7 +29,6 @@ namespace annie {
         private _a2x_res_class:any=null;
         private _a2x_res_children:any=[];
         public destroy():void {
-            super.destroy();
             let s=this;
             //让子级也destroy
             for(let i=0;i<s.children.length;i++){
@@ -38,6 +37,7 @@ namespace annie {
             s._a2x_res_children=null;
             s._a2x_res_class=null;
             s.children=null;
+            super.destroy();
         }
         /**
          * 是否可以让children接收鼠标事件,如果为false
@@ -247,6 +247,17 @@ namespace annie {
                 }
             }
             return -1;
+        }
+
+        /**
+         *
+         * @param child1 显示对象，或者显示对象的索引
+         * @param child2 显示对象，或者显示对象的索引
+         * @returns {boolean}
+         */
+        //TODO
+        public swapChild(child1:any,child2:any):boolean{
+            return false;
         }
         /**
          * 调用此方法对Sprite及其child触发一次指定事件

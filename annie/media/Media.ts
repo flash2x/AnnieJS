@@ -154,10 +154,10 @@ namespace annie {
             }
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
             this.media.pause();
             s.media=null;
+            super.destroy();
         }
     }
 }

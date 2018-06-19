@@ -265,12 +265,12 @@ namespace annie {
             s._lastSrc="";
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
             s._urlLoader=null;
             s._configInfo=null;
             s.currentBitmap=null;
             s.rect=null;
+            super.destroy();
         }
     }
 }

@@ -548,7 +548,6 @@ namespace annieUI {
             return target1.x > target2.x ? tmpS : -tmpS;
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
             s.layer0Arr=null;
             s.layer1Arr=null;
@@ -574,6 +573,7 @@ namespace annieUI {
             s.pages=null;
             s.stageMP=null;
             s.getPageCallback=null;
+            super.destroy();
         }
     }
 }

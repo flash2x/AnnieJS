@@ -172,7 +172,10 @@ namespace annie {
         }
 
         destroy(): void {
-
+            let s=this;
+            s._update=null;
+            s._completeFun=null;
+            s._ease=null;
         }
     }
     /**

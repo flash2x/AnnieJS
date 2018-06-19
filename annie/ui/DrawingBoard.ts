@@ -208,13 +208,13 @@ namespace annieUI {
             return true;
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
            s.context=null;
            s.totalStepList=null;
            s.drawColor=null;
            s.bgColor=null;
            s.addStepObj=null;
+            super.destroy();
         }
     }
 }

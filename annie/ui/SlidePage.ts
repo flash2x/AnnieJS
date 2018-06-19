@@ -420,10 +420,10 @@ namespace annieUI {
             s.listLen = s.pageClassList.length;
         }
         public destroy(): void {
-            super.destroy();
             let s=this;
             s.pageList=null;
             s.pageClassList=null;
+            super.destroy();
         }
     }
 }

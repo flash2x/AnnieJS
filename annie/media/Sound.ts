@@ -32,17 +32,18 @@ namespace annie {
 
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destory
+         * @method destroy
          * @public
          * @since 1.1.1
          */
-        public destory(): void {
+        public destroy(): void {
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
+            super.destroy();
         }
 
         //声音对象池

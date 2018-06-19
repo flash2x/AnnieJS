@@ -183,7 +183,7 @@ var annieUI;
             s.maskObj.alpha = 0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH, isVertical);
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
+            // s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
@@ -281,26 +281,26 @@ var annieUI;
             var s = this;
             var view = s.view;
             // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                if (!s.isStop) {
-                    s.isStop = true;
-                }
-                if (s.autoScroll) {
-                    s.autoScroll = false;
-                    annie.Tween.kill(s._tweenId);
-                }
-                if (s.isVertical) {
-                    s.lastValue = e.localY;
-                }
-                else {
-                    s.lastValue = e.localX;
-                }
-                s.speed = 0;
-                s.isMouseDownState = 1;
-            }
-            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState < 1)
+            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState < 1) {
+                    if (!s.isStop) {
+                        s.isStop = true;
+                    }
+                    if (s.autoScroll) {
+                        s.autoScroll = false;
+                        annie.Tween.kill(s._tweenId);
+                    }
+                    if (s.isVertical) {
+                        s.lastValue = e.localY;
+                    }
+                    else {
+                        s.lastValue = e.localX;
+                    }
+                    s.speed = 0;
+                    s.isMouseDownState = 1;
                     return;
+                }
+                ;
                 if (s.isMouseDownState == 1) {
                     s.dispatchEvent("onScrollStart");
                 }
@@ -382,10 +382,10 @@ var annieUI;
             }
         };
         ScrollPage.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.maskObj = null;
             s.view = null;
+            _super.prototype.destroy.call(this);
         };
         return ScrollPage;
     }(Sprite));
@@ -476,11 +476,11 @@ var annieUI;
                 s.maskType = maskType;
         };
         FacePhoto.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.bitmap = null;
             s.photo = null;
             s.maskObj = null;
+            _super.prototype.destroy.call(this);
         };
         return FacePhoto;
     }(Sprite));
@@ -919,10 +919,10 @@ var annieUI;
             s.listLen = s.pageClassList.length;
         };
         SlidePage.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.pageList = null;
             s.pageClassList = null;
+            _super.prototype.destroy.call(this);
         };
         return SlidePage;
     }(Sprite));
@@ -1471,7 +1471,6 @@ var annieUI;
             return target1.x > target2.x ? tmpS : -tmpS;
         };
         FlipBook.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.layer0Arr = null;
             s.layer1Arr = null;
@@ -1497,6 +1496,7 @@ var annieUI;
             s.pages = null;
             s.stageMP = null;
             s.getPageCallback = null;
+            _super.prototype.destroy.call(this);
         };
         return FlipBook;
     }(Sprite));
@@ -1698,12 +1698,12 @@ var annieUI;
             }
         };
         ScrollList.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s._items = null;
             s._itemClass = null;
             s.data = null;
             s.downL = null;
+            _super.prototype.destroy.call(this);
         };
         return ScrollList;
     }(annieUI.ScrollPage));
@@ -1926,13 +1926,13 @@ var annieUI;
             return true;
         };
         DrawingBoard.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s.context = null;
             s.totalStepList = null;
             s.drawColor = null;
             s.bgColor = null;
             s.addStepObj = null;
+            _super.prototype.destroy.call(this);
         };
         return DrawingBoard;
     }(annie.Bitmap));
@@ -2048,9 +2048,9 @@ var annieUI;
             configurable: true
         });
         ScratchCard.prototype.destroy = function () {
-            _super.prototype.destroy.call(this);
             var s = this;
             s._drawList = null;
+            _super.prototype.destroy.call(this);
         };
         return ScratchCard;
     }(annieUI.DrawingBoard));

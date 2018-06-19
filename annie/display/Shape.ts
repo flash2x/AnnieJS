@@ -821,11 +821,11 @@ namespace annie {
          */
         public destroy():void {
             //清除相应的数据引用
-            super.destroy();
             let s = this;
             s._command=null;
             s._isBitmapStroke=null;
             s._isBitmapFill=null;
+            super.destroy();
         }
     }
 }

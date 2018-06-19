@@ -69,10 +69,10 @@ namespace annie {
         }
         public destroy():void {
             //清除相应的数据引用
-            super.destroy();
             let s = this;
             s.clientPoint1=null;
             s.clientPoint2=null;
+            super.destroy();
         }
     }
 }
