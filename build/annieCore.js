@@ -7558,6 +7558,7 @@ var annie;
          */
         CanvasRender.prototype.beginMask = function (target) {
             var s = this;
+            s._ctx.save();
             s._ctx.globalAlpha = 0;
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
@@ -7571,6 +7572,7 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.endMask = function () {
+            this._ctx.restore();
         };
         /**
          * 调用渲染

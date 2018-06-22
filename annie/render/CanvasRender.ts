@@ -62,6 +62,7 @@ namespace annie {
          */
         public beginMask(target: any): void {
             let s: CanvasRender = this;
+            s._ctx.save();
             s._ctx.globalAlpha = 0;
             let tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
@@ -76,7 +77,7 @@ namespace annie {
          * @since 1.0.0
          */
         public endMask(): void {
-
+            this._ctx.restore();
         }
 
         /**
