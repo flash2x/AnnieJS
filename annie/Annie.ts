@@ -1,28 +1,7 @@
 /**
  * @class annie
  */
-namespace annie {
-    /**
-     * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
-     * @public
-     * @property annie.Eval
-     * @since 1.0.3
-     * @public
-     * @type {any}
-     */
-    export let Eval: any = eval.bind(window);
-    /**
-     * 是否开启调试模式
-     * @public
-     * @since 1.0.1
-     * @public
-     * @property annie.debug
-     * @type {boolean}
-     * @example
-     *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
-     *      annie.debug=true;
-     */
-    export let debug: boolean = false;
+namespace annie{
     /**
      * annie引擎的版本号
      * @public
@@ -33,44 +12,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-
-    export let version:string="1.1.3";
-
-    /**
-     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
-     * @property annie.osType
-     * @since 1.0.0
-     * @public
-     * @type {string|string}
-     * @static
-     * @example
-     *      //获取当前设备类型
-     *      trace(annie.osType);
-     */
-    export let osType: string = (function () {
-        let n = navigator.userAgent.toLocaleLowerCase();
-        let reg1 = /android/;
-        let reg2 = /iphone|ipod|ipad/;
-        if (reg1.test(n)) {
-            return "android";
-        } else if (reg2.test(n)){
-            return "ios"
-        } else {
-            return "pc";
-        }
-    })();
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     * @example
-     *      //打印当前设备的retina值
-     *      trace(annie.devicePixelRatio);
-     */
-    export let devicePixelRatio: number = window.devicePixelRatio ? window.devicePixelRatio : 1;
+    export let version: string = "2.0.0";
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -100,7 +42,7 @@ namespace annie {
      *      }
      *
      */
-    export let StageScaleMode: {EXACT_FIT: string,NO_BORDER: string,NO_SCALE: string,SHOW_ALL: string,FIXED_WIDTH: string,FIXED_HEIGHT: string} = {
+    export let StageScaleMode: { EXACT_FIT: string, NO_BORDER: string, NO_SCALE: string, SHOW_ALL: string, FIXED_WIDTH: string, FIXED_HEIGHT: string } = {
         EXACT_FIT: "exactFit",
         NO_BORDER: "noBorder",
         NO_SCALE: "noScale",
@@ -108,133 +50,370 @@ namespace annie {
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-
-    /**
-     * 跳转到指定网址
-     * @method annie.navigateToURL
-     * @public
-     * @since 1.0.0
-     * @param {string} url
-     * @static
-     * @example
-     *      displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *              annie.navigateToURL("http://www.annie2x.com");
-     *      })
-     *
-     */
-    export function navigateToURL(url: string): void {
-        window.location.href = url;
-    }
-
-    /**
-     * 向后台发送数据,但不会理会任何的后台反馈
-     * @method annie.sendToURL
-     * @public
-     * @since 1.0.0
-     * @param {string} url
-     * @static
-     * @example
-     *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
-     *      })
-     */
-    export function sendToURL(url: string): void {
-        let req = new XMLHttpRequest();
-        req.open("get", url, true);
-        req.send();
-    }
-    // 作为将显示对象导出成图片的render渲染器
-    let _dRender: any = null;
-    /**
-     * 将显示对象转成base64的图片数据
-     * @method annie.toDisplayDataURL
-     * @static
-     * @param {annie.DisplayObject} obj 显示对象
-     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
-     * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
-     * @return {string} base64格式数据
-     * @example
-     *      annie.toDisplayDataURL(DisplayObj, {
-     *               x: 0,
-     *               y: 32,
-     *               width: 441,
-     *               height: 694
-     *       }, {
-     *               type: "jpeg"//数据类型jpg/png
-     *               quality: 90//图片质量值1-100,png格式不需要设置quality
-     *       }, '#CDDBEB');
-     *
-     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
-     */
-    export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
-        if (!_dRender) {
-            _dRender = new CanvasRender(null);
+    export let res:any={};
+    export function loadScene(sceneName:string,sceneRes:any,sceneData: any){
+        res[sceneName]={};
+        res[sceneName]._a2x_con=sceneData;
+        for(let i=0;i<sceneRes.length;i++){
+            if(sceneRes[i].type=="image"||sceneRes[i].type=="sound"){
+                res[sceneName][sceneRes[i].id]=sceneRes[i].src;
+            }
         }
-        _dRender._stage = obj;
-        _dRender.rootContainer = DisplayObject["_canvas"];
-        let objInfo = {
-            p: obj.parent,
-            x: obj.x,
-            y: obj.y,
-            scX: obj.scaleX,
-            scY: obj.scaleY,
-            r: obj.rotation,
-            skX: obj.skewX,
-            skY: obj.skewY
-        };
-        obj.parent = null;
-        obj.x=obj.y=0;
-        obj.scaleX = obj.scaleY = 1;
-        obj.rotation = obj.skewX = obj.skewY = 0;
-        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        let whObj: any = obj.getBounds();
-        let w: number = rect ? rect.width : whObj.width;
-        let h: number = rect ? rect.height : whObj.height;
-        obj.x = rect ? -rect.x : -whObj.x;
-        obj.y = rect ? -rect.y : -whObj.y;
-        obj._offsetX = rect ? rect.x : whObj.x;
-        obj._offsetY = rect ? rect.y : whObj.y;
-        _dRender.rootContainer.width = w;
-        _dRender.rootContainer.height = h;
-        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
-        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if (bgColor == "") {
-            _dRender._ctx.clearRect(0, 0, w, h);
+        let mc: any;
+        for (let item in sceneData) {
+            mc = sceneData[item];
+            if (mc.t == 1) {
+                if (!mc.f) {
+                    mc.f = [];
+                    mc.tf = 1;
+                    continue;
+                }
+                if (mc.tf > 1) {
+                    let frameList = mc.f;
+                    let count = frameList.length;
+                    let frameCon = null;
+                    let children: any = {};
+                    let children2: any = {};
+                    for (let i = 0; i < count; i++) {
+                        frameCon = frameList[i].c;
+                        if (frameCon) {
+                            for (let j in frameCon) {
+                                if (i == 0) {
+                                    [children[j]] = [frameCon[j]];
+                                } else {
+                                    if (frameCon[j].a != 3) {
+                                        children2[j] = frameCon[j];
+                                    }
+                                    if (frameCon[j].a != 1) {
+                                        if (frameCon[j].a == 2) {
+                                            for (let o in children[j]) {
+                                                if (frameCon[j][o] == undefined) {
+                                                    frameCon[j][o] = children[j][o];
+                                                }
+                                            }
+                                        } else {
+                                            delete  frameCon[j];
+                                        }
+                                        children[j] = null;
+                                        delete  children[j];
+                                    }
+                                }
+                            }
+                            if (i > 0) {
+                                for (let o in children) {
+                                    frameCon[o] = children2[o] = children[o];
+                                }
+                                children = children2;
+                                children2 = {};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 获取已经加载场景中的资源
+     * @method getResource
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    export function getResource(sceneName: string, resName: string): any {
+        if (res[sceneName][resName]) {
+            return res[sceneName][resName];
+        }
+        return null;
+    }
+    /**
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+     * @method b
+     * @public
+     * @since 1.0.0
+     * @static
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function b(sceneName: string, resName: string): Bitmap {
+        return new annie.Bitmap(res[sceneName][resName]);
+    }
+
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} target
+     * @param {Object} info
+     */
+    export function d(target: any, info: any): void {
+        if (target._a2x_res_obj == info) {
+            return;
         } else {
-            _dRender._ctx.fillStyle = bgColor;
-            _dRender._ctx.fillRect(0, 0, w, h);
+            //是不是文本
+            let lastInfo = target._a2x_res_obj;
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+            }
+            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+            if (info.tr == undefined || info.tr.length == 1) {
+                info.tr = [0, 0, 1, 1, 0, 0];
+            }
+            if (lastInfo.tr != info.tr) {
+                [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
+            }
+            /*if (info.v == undefined) {
+                info.v = 1;
+            }*/
+            //target.visible = new Boolean(info.v);
+            target.alpha = info.al == undefined ? 1 : info.al;
+            //动画播放模式 图形 按钮 动画
+            if (info.t == 1) {
+                //initButton
+                if (target.initButton) {
+                    target.initButton();
+                }
+            }
+            target._a2x_res_obj = info;
         }
-        obj._cp=true;
-        obj.update();
-        obj.render(_dRender);
-        obj._cp=true;
-        obj.parent = objInfo.p;
-        obj.x = objInfo.x;
-        obj.y = objInfo.y;
-        obj.scaleX = objInfo.scX;
-        obj.scaleY = objInfo.scY;
-        obj.rotation = objInfo.r;
-        obj.skewX = objInfo.skX;
-        obj.skewY = objInfo.skY;
-        obj.update();
-        if (!typeInfo) {
-            typeInfo = {type: "png"};
-        }
-        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
-    };
+    }
+
+    let _textLineType: Array<string> = ["single", "multiline"];
+    let _textAlign: Array<string> = ["left", "center", "right"];
     /**
-     * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
-     * @param {annie.Stage} stage
-     * @param {annie.Rectangle} rect
-     * @returns {Array}
+     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+     * @method t
      * @public
-     * @since 1.1.1
+     * @static
+     * @since 1.0.0
+     * @returns {annie.TextFiled|annie.InputText}
      */
-    export let getStagePixels=function(stage:annie.Stage,rect:annie.Rectangle):Array<number>{
-        var newPoint:Point=stage.localToGlobal(new Point(rect.x,rect.y));
-        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x,newPoint.y,rect.width,rect.height);
+    function t(sceneName: string, resName: string): any {
+        let textDate = res[sceneName]._a2x_con[resName];
+        let textObj: any;
+        let text = decodeURIComponent(textDate[9]);
+        let font = decodeURIComponent(textDate[4]);
+        let size = textDate[5];
+        let textAlign = _textAlign[textDate[3]];
+        let lineType = _textLineType[textDate[2]];
+        let italic = textDate[11];
+        let bold = textDate[10];
+        let color = textDate[6];
+        let textAlpha = textDate[7];
+        let border = textDate[12];
+        let lineSpacing = textDate[8];
+        if (textDate[1] == 0 || textDate[1] == 1) {
+            textObj = new annie.TextField();
+            textObj.text = text;
+            textObj.font = text;
+            textObj.size = size;
+            textObj.textAlign = textAlign;
+            textObj.lineType = lineType;
+            textObj.italic = italic;
+            textObj.bold = bold;
+            textObj.color = color;
+            textObj.textAlpha = textAlpha;
+            textObj.border = border;
+            textObj.lineSpacing = lineSpacing;
+        } else {
+            /*textObj = new annie.InputText(textDate[2]);
+            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+            textObj.italic = italic;
+            textObj.bold = bold;*/
+            console.log("wxApp isn't support inputText");
+        }
+        return textObj;
+    }
+    /**
+     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+     * @method g
+     * @public
+     * @static
+     * @since 1.0.0
+     * @returns {annie.Shape}
+     */
+    function g(sceneName: string, resName: string): Shape {
+        let shapeDate = res[sceneName]._a2x_con[resName][1];
+        let shape: annie.Shape = new annie.Shape();
+        for (let i = 0; i < shapeDate.length; i++) {
+            if (shapeDate[i][0] == 1) {
+                if (shapeDate[i][1] == 0) {
+                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
+                } else if (shapeDate[i][1] == 1) {
+                    shape.beginLinearGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
+                } else if (shapeDate[i][1] == 2) {
+                    shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
+                } else {
+                    //shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
+                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
+                }
+                shape.decodePath(shapeDate[i][3]);
+                shape.endFill();
+            } else {
+                if (shapeDate[i][1] == 0) {
+                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                } else if (shapeDate[i][1] == 1) {
+                    shape.beginLinearGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                } else if (shapeDate[i][1] == 2) {
+                    shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                } else {
+                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                    //shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                }
+                shape.decodePath(shapeDate[i][3]);
+                shape.endStroke();
+            }
+        }
+        return shape;
+    }
+    function s(sceneName: string, resName: string): string {
+        return res[sceneName][resName];
+    }
+    /**
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
+     */
+    export function _initRes(target: any, sceneName: string, resName: string){
+        let Root: any = window;
+        //资源树最顶层
+        let resRoot: any = res[sceneName];
+        //资源树里类对象json数据
+        let classRoot: any = resRoot._a2x_con;
+        //资源树里类对象json数据里非资源类数据
+        let resClass: any = classRoot[resName];
+        //时间轴
+        target._a2x_res_class = resClass;
+        let isMc: boolean = false;
+        let i: number;
+        if (resClass.tf > 1) {
+            isMc = true;
+            if (resClass.timeLine == undefined) {
+                //将时间轴丰满,抽出脚本，抽出标签
+                let keyFrameCount = resClass.f.length;
+                let timeLine: Array<number> = [];
+                let curKeyFrame: number = keyFrameCount > 0 ? resClass.f[0].i : resClass.tf;
+                let nextFrame: number = 0;
+                if (curKeyFrame > 0) {
+                    let frameValue: number = -1;
+                    for (let j = 0; j < curKeyFrame; j++) {
+                        timeLine[timeLine.length] = frameValue;
+                    }
+                }
+                if (keyFrameCount > 0) {
+                    for (i = 0; i < keyFrameCount; i++) {
+                        if (i + 1 < keyFrameCount) {
+                            nextFrame = resClass.f[i + 1].i
+                        } else {
+                            nextFrame = resClass.tf;
+                        }
+                        curKeyFrame = resClass.f[i].i;
+                        //将时间线补齐
+                        for (let j = 0; j < nextFrame - curKeyFrame; j++) {
+                            timeLine[timeLine.length] = i;
+                        }
+                    }
+                }
+                resClass.timeLine = timeLine;
+                //初始化标签对象方便gotoAndStop gotoAndPlay
+                if (!resClass.f) resClass.f = [];
+                if (!resClass.c) resClass.c = [];
+                if (!resClass.a) resClass.a = {};
+                if (!resClass.s) resClass.s = {};
+                if (!resClass.e) resClass.e = {};
+                let label: any = {};
+                if (!resClass.l) {
+                    resClass.l = [];
+                } else {
+                    for (let index in resClass.l) {
+                        for (let n = 0; n < resClass.l[index].length; n++) {
+                            label[resClass.l[index][n]] = parseInt(index);
+                        }
+                    }
+                }
+                resClass.label = label;
+            }
+        }
+        if (resClass.c) {
+            let children = resClass.c;
+            let objCount = children.length;
+            let obj: any = null;
+            let objId: number = 0;
+            let maskObj = null;
+            let maskTillId = 0;
+            for (i = 0; i < objCount; i++) {
+                if (children[i].indexOf("_$") == 0) {
+                    if (Array.isArray(classRoot[children[i]])) {
+                        objId = classRoot[children[i]][0];
+                    } else {
+                        objId = classRoot[children[i]].t;
+                    }
+                    switch (objId) {
+                        case 1:
+                            //displayObject
+                            if (classRoot[children[i]].tf > 1) {
+                                obj = new annie.MovieClip();
+                            } else {
+                                obj = new annie.Sprite();
+                            }
+                            _initRes(obj, sceneName, children[i]);
+                            break;
+                        case 2:
+                            //bitmap
+                            obj = b(sceneName, children[i]);
+                            break;
+                        case 3:
+                            //shape
+                            obj = g(sceneName, children[i]);
+                            break;
+                        case 4:
+                            //text
+                            obj = t(sceneName, children[i]);
+                            break;
+                        case 5:
+                            //sound
+                            obj = s(sceneName, children[i]);
+                            target.addSound(obj);
+                    }
+                } else {
+                    obj = new Root[sceneName][children[i]]();
+                }
+                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                target._a2x_res_children[target._a2x_res_children.length] = obj;
+                if (!isMc) {
+                    let index: number = i + 1;
+                    if (objId == 5) {
+                        obj._repeate = resClass.s[0][index];
+                    } else {
+                        d(obj, resClass.f[0].c[index]);
+                        // 检查是否有遮罩
+                        if (resClass.f[0].c[index].ma != undefined) {
+                            maskObj = obj;
+                            maskTillId = resClass.f[0].c[index].ma - 1;
+                        } else {
+                            if (maskObj && i <= maskTillId) {
+                                obj.mask = maskObj;
+                                if (i == maskTillId) {
+                                    maskObj = null;
+                                }
+                            }
+                        }
+                        //检查是否有名字
+                        if (resClass.f[0].c[index].n != undefined) {
+                            target[resClass.f[0].c[index].n] = obj;
+                            obj.name = resClass.f[0].c[index].n;
+                        }
+                        target.addChildAt(obj, 0);
+                    }
+                }
+            }
+        }
     }
 }

@@ -13,34 +13,6 @@ namespace annie {
      */
     export class Stage extends Sprite {
         /**
-         * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
-         * 所以需要自己灵活设置,默认阻止.
-         * @property iosTouchendPreventDefault
-         * @type {boolean}
-         * @default true
-         * @since 1.0.4
-         * @public
-         */
-        public iosTouchendPreventDefault: boolean = true;
-        /**
-         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
-         * @property isPreventDefaultEvent
-         * @since 1.0.9
-         * @default true
-         * @type {boolean}
-         */
-        public isPreventDefaultEvent: boolean = true;
-        /**
-         * 整个引擎的最上层的div元素,
-         * 承载canvas的那个div html元素
-         * @property rootDiv
-         * @public
-         * @since 1.0.0
-         * @type {Html Div}
-         * @default null
-         */
-        public rootDiv: any = null;
-        /**
          * 当前stage所使用的渲染器
          * 渲染器有两种,一种是canvas 一种是webGl
          * @property renderObj
@@ -50,28 +22,6 @@ namespace annie {
          * @default null
          */
         public renderObj: IRender = null;
-        /**
-         * 渲染模式值 只读 CANVAS:0, webGl: 1
-         * @property renderType
-         * @readonly
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         * @readonly
-         */
-        public renderType = 0;
-
-        /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @param {string} stageName
-         * @returns {any}
-         * @since 2.0.0
-         */
-        public  static getStage(stageName:string="annieEngine"){
-            return annie.Stage._stageList[stageName];
-        }
-        private static _stageList:any={};
         /**
          * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -109,26 +59,7 @@ namespace annie {
          * @since 1.1.3
          * @type {boolean}
          */
-        public isMultiMouse:boolean=false;
-        /**
-         * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
-         * 端默认不开启
-         * @property autoSteering
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default false
-         */
-        public autoSteering: boolean = false;
-        /**
-         * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
-         * @property autoResize
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default false
-         */
-        public autoResize: boolean = false;
+        public isMultiMouse: boolean = false;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
          * @property desWidth
@@ -208,7 +139,19 @@ namespace annie {
          *      }
          *
          */
-        public scaleMode: string = "onScale";
+        get scaleMode(): string {
+            return this._scaleMode;
+        }
+
+        set scaleMode(value: string) {
+            let s = this;
+            if (value != s._scaleMode) {
+                s._scaleMode = value;
+                s.setAlign();
+            }
+        }
+
+        private _scaleMode: string = "onScale";
         /**
          * 原始为60的刷新速度时的计数器
          * @property _flush
@@ -233,92 +176,43 @@ namespace annie {
          * @type {Array}
          * @private
          */
-        private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
-        private _rid = -1;
-        private _floatDisplayList:Array<FloatDisplay>=[];
+        public onTouchEvent: any;
+
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {string} rootDivId
+         * @param {Canvas} ctx
+         * @param {number} desW canvas宽
+         * @param {number} desH canvas高
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
          * @param {string} scaleMode 缩放模式 StageScaleMode
          * @param {string} bgColor 背景颜色-1为透明
-         * @param {number} renderType 渲染模式0:canvas 1:webGl 2:dom
          * @public
          * @since 1.0.0
          */
-        public constructor(rootDivId: string = "annieEngine", desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight", renderType: number = 0) {
+        public constructor(ctx: any, canW: number = 640, canH: number = 960, desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight") {
             super();
             let s: Stage = this;
             this._instanceType = "annie.Stage";
-            s.name=rootDivId;
-            annie.Stage._stageList[rootDivId]=s;
             s.stage = this;
-            let resizeEvent = "resize";
-            s.name = "stageInstance_" + s.instanceId;
-            let div: any = document.getElementById(rootDivId);
-            s.renderType = renderType;
+            s.name = "stageInstance"+s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
-            s.rootDiv = div;
+            s.divWidth = canW;
+            s.divHeight = canH;
             s.setFrameRate(frameRate);
-            s.scaleMode = scaleMode;
-            s.anchorX = desW >>1;
-            s.anchorY = desH >>1;
+            s.anchorX = desW >> 1;
+            s.anchorY = desH >> 1;
             //目前具支持canvas
-            s.renderObj = new CanvasRender(s);
-            /* webgl 直到对2d的支持非常成熟了再考虑开启
-            if (renderType == 0) {
-                //canvas
-                s.renderObj = new CanvasRender(s);
-            } else {
-                //webgl
-                s.renderObj = new WGRender(s);
-            }*/
-            s.renderObj.init();
-            window.addEventListener(resizeEvent, function (e: any) {
-                clearTimeout(s._rid);
-                s._rid = setTimeout(function () {
-                    if (s.autoResize) {
-                        s.resize();
-                    }
-                    let event = new Event("onResize");
-                    s.dispatchEvent(event);
-                }, 300);
-            });
-            setTimeout(function () {
-                s.resize();
-                //同时添加到主更新循环中
-                Stage.addUpdateObj(s);
-                //告诉大家我初始化完成
-                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
-                if (debug && !Stage._isLoadedVConsole) {
-                    let script: HTMLScriptElement = document.createElement("script");
-                    script.onload = function () {
-                        s.dispatchEvent(new annie.Event("onInitStage"));
-                        script.onload = null;
-                    };
-                    document.head.appendChild(script);
-                    script.src = "libs/vConsole.min.js";
-                } else {
-                    s.dispatchEvent(new annie.Event("onInitStage"));
-                }
-            }, 100);
-            // let rc = s.renderObj.rootContainer;
-            let rc = s.rootDiv;
-            let mouseEvent = s.onMouseEvent.bind(s);
-            if (osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent, false);
-                rc.addEventListener('touchmove', mouseEvent, false);
-                rc.addEventListener('touchend', mouseEvent, false);
-            } else {
-                rc.addEventListener("mousedown", mouseEvent, false);
-                rc.addEventListener('mousemove', mouseEvent, false);
-                rc.addEventListener('mouseup', mouseEvent, false);
-            }
+            s.renderObj = new CanvasRender(s, ctx);
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
+            s.onTouchEvent = s._onMouseEvent.bind(s);
+            s._scaleMode = scaleMode;
+            s.setAlign();
         }
 
         /**
@@ -331,11 +225,6 @@ namespace annie {
             let s = this;
             if (!s.pause) {
                 super.update(isDrawUpdate);
-                let sf:any=s._floatDisplayList;
-                let len=sf.length;
-                for(let i=0;i<len;i++){
-                    sf[i].updateStyle();
-                }
             }
         }
 
@@ -351,6 +240,7 @@ namespace annie {
             if (!s.pause) {
                 renderObj.begin();
                 super.render(renderObj);
+                renderObj.end();
             }
 
         }
@@ -433,39 +323,6 @@ namespace annie {
         }
 
         /**
-         * 获取引擎所在的div宽高
-         * @method getRootDivWH
-         * @public
-         * @since 1.0.0
-         * @param {HTMLDivElement} div
-         * @returns {{w: number, h: number}}
-         */
-        public getRootDivWH(div: HTMLDivElement) {
-            let sw = div.style.width;
-            let sh = div.style.height;
-            let iw = document.body.clientWidth;
-            // let ih = document.body.clientHeight-40;
-            let ih = document.body.clientHeight;
-            let vW = parseInt(sw);
-            let vH = parseInt(sh);
-            if (vW.toString() == "NaN") {
-                vW = iw;
-            } else {
-                if (sw.indexOf("%") > 0) {
-                    vW *= iw / 100;
-                }
-            }
-            if (vH.toString() == "NaN") {
-                vH = ih;
-            } else {
-                if (sh.indexOf("%") > 0) {
-                    vH *= ih / 100;
-                }
-            }
-            return {w: vW, h: vH};
-        }
-
-        /**
          * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
          * @method kill
          * @since 1.0.0
@@ -495,18 +352,18 @@ namespace annie {
          */
         private _mP1: Point = new Point();
         private _mP2: Point = new Point();
-        private onMouseEvent = function (e: any): void {
+        private _onMouseEvent = function (e: any): void {
             //检查是否有
             let s: any = this;
             //判断是否有drag的显示对象
             let sd: any = Stage._dragDisplay;
-            if (s.isMultiTouch && e.targetTouches&&e.targetTouches.length>1) {
-                if (e.targetTouches.length == 2){
+            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
+                if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
-                    s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
-                    s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
-                    s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                    s._mP1.x = e.targetTouches[0].pageX - e.target.offsetLeft;
+                    s._mP1.y = e.targetTouches[0].pageY - e.target.offsetTop;
+                    s._mP2.x = e.targetTouches[1].pageX - e.target.offsetLeft;
+                    s._mP2.y = e.targetTouches[1].pageY - e.target.offsetTop;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -519,24 +376,24 @@ namespace annie {
                         let len = s.muliPoints.length;
                         s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
                         s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
-                        s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
-                        s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
-                        s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
-                        s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x;
+                        s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x;
+                        s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y;
+                        s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y;
                         s.dispatchEvent(s._touchEvent);
                         s.muliPoints.shift();
                     }
-                }else {
-                    s.muliPoints.length=0;
+                } else {
+                    s.muliPoints.length = 0;
                 }
                 if (sd) {
                     sd._lastDragPoint.x = Number.MAX_VALUE;
                     sd._lastDragPoint.y = Number.MAX_VALUE;
                 }
-                s._mouseDownPoint={};
-                s._lastDpList={};
-            }else {
-                if(s.muliPoints.length>0) {
+                s._mouseDownPoint = {};
+                s._lastDpList = {};
+            } else {
+                if (s.muliPoints.length > 0) {
                     s._touchEvent.rotate = 0;
                     s._touchEvent.scale = 0;
                     s._touchEvent.clientPoint1.x = 0;
@@ -561,27 +418,22 @@ namespace annie {
                     //事件个数
                     let eLen: number;
                     let identifier: any;
-                    if (osType == "pc") {
-                        e.identifier = 0;
-                        points = [e];
+                    if (s.isMultiMouse) {
+                        points = e.changedTouches;
                     } else {
-                        if (s.isMultiMouse){
-                            points = e.changedTouches;
-                        } else {
-                            points = [e.changedTouches[0]];
-                        }
+                        points = [e.changedTouches[0]];
                     }
                     for (let o = 0; o < points.length; o++) {
                         eLen = 0;
                         events = [];
-                        identifier = "m" + points[o].identifier;
+                        identifier = points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         } else {
                             cp = new Point();
                         }
-                        cp.x = (points[o].clientX - points[o].target.offsetLeft) * devicePixelRatio;
-                        cp.y = (points[o].clientY - points[o].target.offsetTop) * devicePixelRatio;
+                        cp.x = points[o].pageX;
+                        cp.y = points[o].pageY;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
                         if (EventDispatcher.getMouseEventCount() > 0) {
@@ -788,16 +640,6 @@ namespace annie {
                     }
                 }
             }
-            if (e.target.id == "_a2x_canvas") {
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
-            }
             if (s._cp) {
                 s.update();
             }
@@ -807,20 +649,20 @@ namespace annie {
          */
         private setAlign = function () {
             let s = this;
-            let divH = s.divHeight * devicePixelRatio;
-            let divW = s.divWidth * devicePixelRatio;
+            let divH = s.divHeight;
+            let divW = s.divWidth;
             let desH = s.desHeight;
             let desW = s.desWidth;
-            s.anchorX = desW>>1;
-            s.anchorY = desH>>1;
+            s.anchorX = desW >> 1;
+            s.anchorY = desH >> 1;
             //设备是否为竖屏
             let isDivH = divH > divW;
             //内容是否为竖屏内容
             let isDesH = desH > desW;
             let scaleY = 1;
             let scaleX = 1;
-            s.x = (divW - desW)>>1;
-            s.y = (divH - desH)>>1;
+            s.x = (divW - desW) >> 1;
+            s.y = (divH - desH) >> 1;
             if (s.autoSteering) {
                 if (isDesH != isDivH) {
                     let d = divH;
@@ -828,10 +670,10 @@ namespace annie {
                     divW = d;
                 }
             }
-            if (s.scaleMode != "noScale") {
+            if (s._scaleMode != "noScale") {
                 scaleY = divH / desH;
                 scaleX = divW / desW;
-                switch (s.scaleMode) {
+                switch (s._scaleMode) {
                     case "noBorder":
                         if (scaleX > scaleY) {
                             scaleY = scaleX;
@@ -854,47 +696,22 @@ namespace annie {
                         break;
                 }
             }
-
             s.scaleX = scaleX;
             s.scaleY = scaleY;
             // s.viewRect=new annie.Rectangle();
-            s.viewRect.x = (desW - divW / scaleX) >>1;
-            s.viewRect.y = (desH - divH / scaleY) >>1;
-            s.viewRect.width = desW - s.viewRect.x*2;
-            s.viewRect.height = desH - s.viewRect.y*2;
-
-            if (s.autoSteering) {
-                if (isDesH == isDivH) {
-                    s.rotation = 0;
-                } else {
-                    if (desH > desW) {
-                        s.rotation = -90;
-                    } else {
-                        s.rotation = 90;
-                    }
-                }
-            } else {
+            s.viewRect.x = (desW - divW / scaleX) >> 1;
+            s.viewRect.y = (desH - divH / scaleY) >> 1;
+            s.viewRect.width = desW - s.viewRect.x * 2;
+            s.viewRect.height = desH - s.viewRect.y * 2;
+            if (isDesH == isDivH) {
                 s.rotation = 0;
+            } else {
+                if (desH > desW) {
+                    s.rotation = -90;
+                } else {
+                    s.rotation = 90;
+                }
             }
-        };
-        /**
-         * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
-         * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
-         * 不管autoResize 的状态是什么，你只要侦听 了stage 的 annie.Event.RESIZE 事件
-         * 都可以接收到舞台变化的通知。
-         * @method resize
-         * @public
-         * @since 1.0.0
-         */
-        public resize = function (): void {
-            let s: Stage = this;
-            let whObj = s.getRootDivWH(s.rootDiv);
-            s._UI.UM = true;
-            s.divHeight = whObj.h;
-            s.divWidth = whObj.w;
-            s.renderObj.reSize();
-            s.setAlign();
-            s.update();
         };
 
         public getBounds(): Rectangle {
@@ -918,11 +735,13 @@ namespace annie {
          * @method flushAll
          */
         private static flushAll(): void {
-            let len = Stage.allUpdateObjList.length;
-            for (let i = 0; i < len; i++) {
-                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
-            }
-            requestAnimationFrame(Stage.flushAll);
+            setInterval(function(){
+                let len = Stage.allUpdateObjList.length;
+                for (let i = 0; i < len; i++) {
+                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                }
+            },20);
+            //requestAnimationFrame(Stage.flushAll);
         }
 
         /**
@@ -948,6 +767,7 @@ namespace annie {
                 Stage.allUpdateObjList.unshift(target);
             }
         }
+
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj
@@ -966,19 +786,17 @@ namespace annie {
             }
         }
         public destroy(): void {
-            let s=this;
+            let s = this;
             Stage.removeUpdateObj(s);
-            s.pause=true;
-            s.rootDiv=null;
-            s._floatDisplayList=null;
-            s.renderObj=null;
-            s.viewRect=null;
-            s._lastDpList=null;
-            s._touchEvent=null;
-            s.muliPoints=null;
-            s._mP1=null;
-            s._mP2=null;
-            s._ml=null;
+            s.pause = true;
+            s.renderObj = null;
+            s.viewRect = null;
+            s._lastDpList = null;
+            s._touchEvent = null;
+            s.muliPoints = null;
+            s._mP1 = null;
+            s._mP2 = null;
+            s._ml = null;
             super.destroy();
         }
     }

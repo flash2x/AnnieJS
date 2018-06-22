@@ -297,7 +297,7 @@ namespace annie {
          */
         public update(isDrawUpdate: boolean = true): void{
             let s: any = this;
-            if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
                 if (s._lastFrame != s._curFrame){
                     isNeedUpdate = true;
@@ -383,7 +383,7 @@ namespace annie {
                             let maskList = s._maskList;
                             if (curFrameObj.c) {
                                 for (let i in curFrameObj.c) {
-                                    Annie2x.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
+                                    annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
                                     //检查是否有遮罩
                                     if (curFrameObj.c[i].ma != undefined) {
                                         if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {

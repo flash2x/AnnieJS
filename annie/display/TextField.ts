@@ -13,9 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.TextField";
-            this._texture = window.document.createElement("canvas");
         }
-
         /**
          * 文本的对齐方式
          * @property textAlign
@@ -101,6 +99,7 @@ namespace annie {
             return this._lineType;
         }
         private _lineType: string = "single";
+        private  _textOffX:number=0;
         /**
          * 文本内容
          * @property text
@@ -206,36 +205,32 @@ namespace annie {
         public set border(value: boolean) {
             this._setProperty("_border",value,3);
         }
-
         public get border(): boolean {
             return this._border;
         }
         private _border: boolean = false;
-
+        private fontInfo: string;
+        private realLines: any;
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
          * @private
          * @since 1.0.0
          */
-        private _prepContext(ctx: any): void {
+        private _draw(ctx: any): void {
             let s = this;
-            let font: any = s.size || 12;
-            font += "px ";
-            font += s.font;
-            //font-weight:bold;font-style:italic;
-            if (s._bold) {
-                font = "bold " + font;
+            s._prepContext(ctx);
+            for (let i = 0; i < s.realLines.length; i++) {
+                ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
             }
-            if (s._italic) {
-                font = "italic " + font;
-            }
-            ctx.font = font;
-            ctx.textAlign = this._textAlign || "left";
-            ctx.textBaseline = "top";
-            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha)
         }
 
+        private _prepContext(ctx:any):void{
+            var s=this;
+            ctx.font = s.fontInfo;
+            ctx.textAlign = s._textAlign || "left";
+            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
+        }
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -245,7 +240,7 @@ namespace annie {
          * @since 1.0.0
          */
         private _getMeasuredWidth(text: string): number {
-            let ctx = this._texture.getContext("2d");
+            let ctx = CanvasRender.drawCtx;
             //ctx.save();
             let w = ctx.measureText(text).width;
             //ctx.restore();
@@ -264,14 +259,22 @@ namespace annie {
             if(!s._visible)return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
-                let can = s._texture;
-                let ctx = can.getContext("2d");
+                let ctx = CanvasRender.drawCtx;
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
-                let realLines: any = [];
+                s.realLines = [];
+                s.fontInfo = s.size || 12;
+                s.fontInfo  += "px ";
+                s.fontInfo  += s.font;
+                if (s._bold) {
+                    s.fontInfo  = "bold " + s.fontInfo ;
+                }
+                if (s._italic) {
+                    s.fontInfo  = "italic " + s.fontInfo ;
+                }
                 s._prepContext(ctx);
                 let lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines[realLines.length]=hardLines[0];
+                    s.realLines[s.realLines.length]=hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
                     if (lineW > s.textWidth) {
@@ -283,7 +286,7 @@ namespace annie {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s.textWidth) {
-                                realLines[0] = lineStr;
+                                s.realLines[0] = lineStr;
                                 break;
                             } else {
                                 lineStr += str[j];
@@ -302,54 +305,26 @@ namespace annie {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > this.textWidth) {
-                                realLines[realLines.length]=lineStr;
+                                s.realLines[s.realLines.length]=lineStr;
                                 lineStr = str[j];
                                 w = wordW;
                             } else {
                                 lineStr += str[j];
                             }
                         }
-                        realLines[realLines.length]=lineStr;
+                        s.realLines[s.realLines.length]=lineStr;
                     }
                 }
-                let maxH = lineH * realLines.length;
+                let maxH = lineH * s.realLines.length;
                 let maxW = s.textWidth;
-                let tx = 0;
                 if (s.textAlign == "center") {
-                    tx = maxW * 0.5;
+                    s._textOffX = maxW * 0.5;
                 } else if (s.textAlign == "right") {
-                    tx = maxW;
+                    s._textOffX = maxW;
+                }else{
+                    s._textOffX=0;
                 }
-                can.width = maxW + 20;
-                can.height = maxH + 20;
-                ctx.clearRect(0, 0, can.width, can.width);
-                if (s.border) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = "#000";
-                    ctx.textWidth = 1;
-                    ctx.strokeRect(10.5, 10.5, maxW, maxH);
-                    ctx.closePath();
-                }
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                }
-                /////////////////////
-                let cf = s.cFilters;
-                let cfLen = cf.length;
-                if(cfLen>0) {
-                    let imageData = ctx.getImageData(0, 0, maxW, maxH);
-                    for (let i = 0; i < cfLen; i++) {
-                        cf[i].drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-                }
-                s._offsetX = -10;
-                s._offsetY = -10;
                 s._UI.UD = false;
-                //给webgl更新新
-                //s._texture.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }

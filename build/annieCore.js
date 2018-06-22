@@ -1963,7 +1963,6 @@ var annie;
             if (bounds === void 0) { bounds = null; }
             var s = this;
             if (!s.stage) {
-                trace("The DisplayObject is not on stage");
                 return;
             }
             annie.Stage._dragDisplay = s;
@@ -2355,15 +2354,6 @@ var annie;
         DisplayObject._p2 = new annie.Point();
         DisplayObject._p3 = new annie.Point();
         DisplayObject._p4 = new annie.Point();
-        /**
-         * 画缓存位图的时候需要使用
-         * @property _bitmapCanvas
-         * @private
-         * @static
-         * @since 1.0.0
-         * @type {Canvas}
-         */
-        DisplayObject._canvas = window.document.createElement("canvas");
         return DisplayObject;
     }(annie.EventDispatcher));
     annie.DisplayObject = DisplayObject;
@@ -2392,224 +2382,15 @@ var annie;
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
-         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
-         * @example
-         *      var imgEle=new Image();
-         *      imgEle.onload=function (e) {
-         *          var bitmap = new annie.Bitmap(imgEle)
-         *          //居中对齐
-         *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-         *          s.addChild(bitmap);
-         *
-         *          //截取图片的某一部分显示
-         *          var rect = new annie.Rectangle(0, 0, 200, 200),
-         *          rectBitmap = new annie.Bitmap(imgEle, rect);
-         *          rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *          rectBitmap.y = 100;
-         *          s.addChild(rectBitmap);
-         *      }
-         *      imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
-         *
-         * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
-         */
-        function Bitmap(bitmapData, rect) {
-            if (bitmapData === void 0) { bitmapData = null; }
-            if (rect === void 0) { rect = null; }
+         * @param {string} imagePath 一个图片地址
+        */
+        function Bitmap(imagePath) {
             var _this = _super.call(this) || this;
-            _this._bitmapData = null;
-            _this._realCacheImg = null;
-            /**
-             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-             * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
-             * @property rect
-             * @public
-             * @since 1.0.0
-             * @type {annie.Rectangle}
-             * @default null
-             */
-            _this.rect = null;
-            /**
-             * @property _isCache
-             * @private
-             * @since 1.0.0
-             * @type {boolean}
-             * @default false
-             */
-            _this._isCache = false;
-            /**
-             * 是否对矢量使用像素碰撞 默认开启
-             * @property hitTestWidthPixel
-             * @type {boolean}
-             * @default false
-             * @since 1.1.0
-             */
-            _this.hitTestWidthPixel = false;
             var s = _this;
             s._instanceType = "annie.Bitmap";
-            s.rect = rect;
-            s.bitmapData = bitmapData;
+            s._texture = imagePath;
             return _this;
         }
-        Object.defineProperty(Bitmap.prototype, "bitmapData", {
-            /**
-             * HTML的一个Image对象或者是canvas对象或者是video对象
-             * @property bitmapData
-             * @public
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            get: function () {
-                return this._bitmapData;
-            },
-            set: function (value) {
-                var s = this;
-                s._setProperty("_bitmapData", value, 3);
-                if (!value) {
-                    s._bounds.width = s._bounds.height = 0;
-                }
-                else {
-                    s._bounds.width = s.rect ? s.rect.width : value.width;
-                    s._bounds.height = s.rect ? s.rect.height : value.height;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        Bitmap.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
-            var s = this;
-            if (!s._visible)
-                return;
-            _super.prototype.update.call(this, isDrawUpdate);
-            //滤镜
-            var bitmapData = s._bitmapData;
-            if ((s._UI.UD || s._UI.UF) && bitmapData) {
-                if (bitmapData.width == 0 || bitmapData.height == 0)
-                    return;
-                s._UI.UD = false;
-                if (s.cFilters.length > 0) {
-                    if (!s._realCacheImg) {
-                        s._realCacheImg = window.document.createElement("canvas");
-                    }
-                    var _canvas = s._realCacheImg;
-                    var tr = s.rect;
-                    var w = tr ? tr.width : bitmapData.width;
-                    var h = tr ? tr.height : bitmapData.height;
-                    var newW = w + 20;
-                    var newH = h + 20;
-                    _canvas.width = newW;
-                    _canvas.height = newH;
-                    var ctx = _canvas.getContext("2d");
-                    ctx.clearRect(0, 0, newW, newH);
-                    ctx.translate(10, 10);
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = "#0";
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
-                    ////////////////////
-                    if (tr) {
-                        ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                    }
-                    else {
-                        ctx.drawImage(s._bitmapData, 0, 0);
-                    }
-                    /////////////////////
-                    var cf = s.cFilters;
-                    var cfLen = cf.length;
-                    if (cfLen > 0) {
-                        var imageData = ctx.getImageData(0, 0, newW, newH);
-                        for (var i = 0; i < cfLen; i++) {
-                            cf[i].drawFilter(imageData);
-                        }
-                        ctx.putImageData(imageData, 0, 0);
-                    }
-                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                    s._texture = s._realCacheImg;
-                    s._offsetX = -10;
-                    s._offsetY = -10;
-                    s._isCache = true;
-                }
-                else {
-                    s._isCache = false;
-                    s._offsetX = 0;
-                    s._offsetY = 0;
-                    s._texture = bitmapData;
-                }
-                var bw = void 0;
-                var bh = void 0;
-                if (s.rect) {
-                    bw = s.rect.width;
-                    bh = s.rect.height;
-                }
-                else {
-                    bw = s._texture.width + s._offsetX * 2;
-                    bh = s._texture.height + s._offsetY * 2;
-                }
-                s._bounds.width = bw;
-                s._bounds.height = bh;
-                //给webgl更新新
-                // s._texture.updateTexture = true;
-            }
-            s._UI.UF = false;
-            s._UI.UM = false;
-            s._UI.UA = false;
-        };
-        /**
-         * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
-         * @method convertToImage
-         * @static
-         * @public
-         * @since 1.0.0
-         * @param {annie.Bitmap} bitmap
-         * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
-         * @return {Canvas|BitmapData}
-         * @example
-         *      var spriteSheetImg = new Image(),
-         *          rect = new annie.Rectangle(0, 0, 200, 200),
-         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
-         *       spriteSheetImg.onload=function(e){
-         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
-         *          trace(singleSmallImg);
-         *       }
-         *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
-         */
-        Bitmap.convertToImage = function (bitmap, isNeedImage) {
-            if (isNeedImage === void 0) { isNeedImage = true; }
-            if (!bitmap.rect) {
-                return bitmap.bitmapData;
-            }
-            else {
-                var _canvas = window.document.createElement("canvas");
-                var w = bitmap.rect.width;
-                var h = bitmap.rect.height;
-                _canvas.width = w;
-                _canvas.height = h;
-                // _canvas.style.width = w / devicePixelRatio + "px";
-                // _canvas.style.height = h / devicePixelRatio + "px";
-                var ctx = _canvas.getContext("2d");
-                var tr = bitmap.rect;
-                ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                if (isNeedImage) {
-                    var img = new Image();
-                    img.src = _canvas.toDataURL();
-                    return img;
-                }
-                else {
-                    return _canvas;
-                }
-            }
-        };
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -2625,32 +2406,8 @@ var annie;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
             var p = s.globalToLocal(globalPoint);
-            p.x += s._offsetX;
-            p.y += s._offsetY;
             if (s.getBounds().isPointIn(p)) {
-                if (s.hitTestWidthPixel) {
-                    var image = s._texture;
-                    if (!image || image.width == 0 || image.height == 0) {
-                        return null;
-                    }
-                    var _canvas = annie.DisplayObject["_canvas"];
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    var ctx = _canvas["getContext"]('2d');
-                    ctx.clearRect(0, 0, 1, 1);
-                    if (s.rect) {
-                        p.x += s.rect.x;
-                        p.y += s.rect.y;
-                    }
-                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-                    ctx.drawImage(image, 0, 0);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                }
-                else {
-                    return s;
-                }
+                return s;
             }
             return null;
         };
@@ -2661,9 +2418,7 @@ var annie;
         Bitmap.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
-            s._bitmapData = null;
-            s._realCacheImg = null;
-            s.rect = null;
+            s._texture = "";
             _super.prototype.destroy.call(this);
         };
         return Bitmap;
@@ -2758,7 +2513,6 @@ var annie;
                 }
             };
             _this._instanceType = "annie.Shape";
-            _this._texture = window.document.createElement("canvas");
             return _this;
         }
         /**
@@ -2774,7 +2528,7 @@ var annie;
          */
         Shape.getGradientColor = function (points, colors) {
             var colorObj;
-            var ctx = annie.DisplayObject["_canvas"].getContext("2d");
+            var ctx = annie.CanvasRender.drawCtx;
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             }
@@ -2796,7 +2550,7 @@ var annie;
          * @since 1.0.0
          */
         Shape.getBitmapStyle = function (image) {
-            var ctx = annie.DisplayObject["_canvas"].getContext("2d");
+            var ctx = annie.CanvasRender.drawCtx;
             return ctx.createPattern(image, "repeat");
         };
         /**
@@ -3338,30 +3092,6 @@ var annie;
                         s._bounds.y = leftY + 10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
-                        ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if (!s._isUseToMask) {
-                            var _canvas = s._texture;
-                            var ctx = _canvas["getContext"]('2d');
-                            _canvas.width = w;
-                            _canvas.height = h;
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                            ////////////////////
-                            s._drawShape(ctx);
-                            ///////////////////////////
-                            //滤镜
-                            var cf = s.cFilters;
-                            var cfLen = cf.length;
-                            if (cfLen > 0) {
-                                var imageData = ctx.getImageData(0, 0, w, h);
-                                for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                    cf[i_1].drawFilter(imageData);
-                                }
-                                ctx.putImageData(imageData, 0, 0);
-                            }
-                            //给webgl更新新
-                            //_canvas.updateTexture = true;
-                        }
                     }
                 }
                 s._UI.UD = false;
@@ -3370,7 +3100,7 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        Shape.prototype._drawShape = function (ctx) {
+        Shape.prototype._draw = function (ctx) {
             var s = this;
             var com = s._command;
             var cLen = com.length;
@@ -3429,27 +3159,7 @@ var annie;
                 p = s.globalToLocal(globalPoint);
             }
             if (s.getBounds().isPointIn(p)) {
-                if (!s._isUseToMask && s.hitTestWidthPixel) {
-                    var image = s._texture;
-                    if (!image || image.width == 0 || image.height == 0) {
-                        return null;
-                    }
-                    var _canvas = annie.DisplayObject["_canvas"];
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    p.x -= s._offsetX;
-                    p.y -= s._offsetY;
-                    var ctx = _canvas["getContext"]('2d');
-                    ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-                    ctx.drawImage(image, 0, 0);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                }
-                else {
-                    return s;
-                }
+                return s;
             }
             return null;
         };
@@ -3554,7 +3264,7 @@ var annie;
             s._instanceType = "annie.Sprite";
             if (s._resId) {
                 var resInfo = s._resId.split(".");
-                Annie2x._initRes(s, resInfo[0], resInfo[1]);
+                annie._initRes(s, resInfo[0], resInfo[1]);
             }
             return _this;
         }
@@ -3569,37 +3279,6 @@ var annie;
             s.children = null;
             _super.prototype.destroy.call(this);
         };
-        Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
-            /**
-             * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
-             * @property  cacheAsBitmap
-             * @public
-             * @since 1.1.2
-             * @default false
-             * @type boolean
-             */
-            get: function () {
-                return this._cacheAsBitmap;
-            },
-            set: function (value) {
-                var s = this;
-                if (!s._texture) {
-                    //截图
-                    s._texture = new Image();
-                }
-                if (value) {
-                    s._texture.src = annie.toDisplayDataURL(s);
-                }
-                else {
-                    s._texture.src = "";
-                    s._offsetX = 0;
-                    s._offsetY = 0;
-                }
-                s._cacheAsBitmap = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -3844,16 +3523,14 @@ var annie;
             var s = this;
             if (!s._visible)
                 return;
-            if (!s._cacheAsBitmap) {
-                _super.prototype.update.call(this, isDrawUpdate);
-                var len = s.children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    s.children[i].update(isDrawUpdate);
-                }
-                s._UI.UM = false;
-                s._UI.UA = false;
-                s._UI.UF = false;
+            _super.prototype.update.call(this, isDrawUpdate);
+            var len = s.children.length;
+            for (var i = len - 1; i >= 0; i--) {
+                s.children[i].update(isDrawUpdate);
             }
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         };
         /**
          * 重写碰撞测试
@@ -3871,47 +3548,25 @@ var annie;
                 return null;
             if (isMouseEvent && !s.mouseEnable)
                 return null;
-            if (!s._cacheAsBitmap) {
-                var len = s.children.length;
-                var hitDisplayObject = void 0;
-                var child = void 0;
-                //这里特别注意是从上往下遍历
-                for (var i = len - 1; i >= 0; i--) {
-                    child = s.children[i];
-                    if (child._isUseToMask) {
+            var len = s.children.length;
+            var hitDisplayObject;
+            var child;
+            //这里特别注意是从上往下遍历
+            for (var i = len - 1; i >= 0; i--) {
+                child = s.children[i];
+                if (child._isUseToMask) {
+                    continue;
+                }
+                if (child.mask && child.mask.parent == child.parent) {
+                    //看看点是否在遮罩内
+                    if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                        //如果都不在遮罩里面,那还检测什么直接检测下一个
                         continue;
                     }
-                    if (child.mask && child.mask.parent == child.parent) {
-                        //看看点是否在遮罩内
-                        if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
-                            //如果都不在遮罩里面,那还检测什么直接检测下一个
-                            continue;
-                        }
-                    }
-                    hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
-                    if (hitDisplayObject) {
-                        return hitDisplayObject;
-                    }
                 }
-            }
-            else {
-                //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-                var p = s.globalToLocal(globalPoint);
-                var image = s._texture;
-                if (!image || image.width == 0 || image.height == 0) {
-                    return null;
-                }
-                var _canvas = annie.DisplayObject["_canvas"];
-                _canvas.width = 1;
-                _canvas.height = 1;
-                p.x -= s._offsetX;
-                p.y -= s._offsetY;
-                var ctx = _canvas["getContext"]('2d');
-                ctx.clearRect(0, 0, 1, 1);
-                ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-                ctx.drawImage(image, 0, 0);
-                if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                    return s;
+                hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                if (hitDisplayObject) {
+                    return hitDisplayObject;
                 }
             }
             return null;
@@ -3930,36 +3585,26 @@ var annie;
             rect.y = 0;
             rect.width = 0;
             rect.height = 0;
-            if (!s._cacheAsBitmap) {
-                var len = s.children.length;
-                if (len > 0) {
-                    for (var i = 0; i < len; i++) {
-                        if (s.children[i].visible)
-                            annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
-                    }
-                    if (s.mask && s.mask.parent == s.parent) {
-                        var maskRect = s.mask.getDrawRect();
-                        if (rect.x < maskRect.x) {
-                            rect.x = maskRect.x;
-                        }
-                        if (rect.y < maskRect.y) {
-                            rect.y = maskRect.y;
-                        }
-                        if (rect.width > maskRect.width) {
-                            rect.width = maskRect.width;
-                        }
-                        if (rect.height > maskRect.height) {
-                            rect.height = maskRect.height;
-                        }
-                    }
+            var len = s.children.length;
+            if (len > 0) {
+                for (var i = 0; i < len; i++) {
+                    if (s.children[i].visible)
+                        annie.Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                 }
-            }
-            else {
-                if (s._texture) {
-                    rect.x = s._offsetX;
-                    rect.y = s._offsetY;
-                    rect.width = s._texture.width;
-                    rect.height = s._texture.height;
+                if (s.mask && s.mask.parent == s.parent) {
+                    var maskRect = s.mask.getDrawRect();
+                    if (rect.x < maskRect.x) {
+                        rect.x = maskRect.x;
+                    }
+                    if (rect.y < maskRect.y) {
+                        rect.y = maskRect.y;
+                    }
+                    if (rect.width > maskRect.width) {
+                        rect.width = maskRect.width;
+                    }
+                    if (rect.height > maskRect.height) {
+                        rect.height = maskRect.height;
+                    }
                 }
             }
             return rect;
@@ -3975,377 +3620,43 @@ var annie;
             var s = this;
             if (s._cp)
                 return;
-            if (s._cacheAsBitmap) {
-                _super.prototype.render.call(this, renderObj);
-            }
-            else {
-                if (s.cAlpha > 0 && s._visible) {
-                    var maskObj = void 0;
-                    var child = void 0;
-                    var len = s.children.length;
-                    for (var i = 0; i < len; i++) {
-                        child = s.children[i];
-                        if (child.cAlpha > 0 && child._visible) {
-                            if (maskObj) {
-                                if (child.mask && child.mask.parent == child.parent) {
-                                    if (child.mask != maskObj) {
-                                        renderObj.endMask();
-                                        maskObj = child.mask;
-                                        renderObj.beginMask(maskObj);
-                                    }
-                                }
-                                else {
+            if (s.cAlpha > 0 && s._visible) {
+                var maskObj = void 0;
+                var child = void 0;
+                var len = s.children.length;
+                for (var i = 0; i < len; i++) {
+                    child = s.children[i];
+                    if (child.cAlpha > 0 && child._visible) {
+                        if (maskObj) {
+                            if (child.mask && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
                                     renderObj.endMask();
-                                    maskObj = null;
-                                }
-                            }
-                            else {
-                                if (child.mask && child.mask.parent == child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }
                             }
-                            child.render(renderObj);
+                            else {
+                                renderObj.endMask();
+                                maskObj = null;
+                            }
                         }
+                        else {
+                            if (child.mask && child.mask.parent == child.parent) {
+                                maskObj = child.mask;
+                                renderObj.beginMask(maskObj);
+                            }
+                        }
+                        child.render(renderObj);
                     }
-                    if (maskObj) {
-                        renderObj.endMask();
-                    }
+                }
+                if (maskObj) {
+                    renderObj.endMask();
                 }
             }
         };
         return Sprite;
     }(annie.DisplayObject));
     annie.Sprite = Sprite;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 抽象类 一般不直接使用
-     * @class annie.Media
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     */
-    var Media = (function (_super) {
-        __extends(Media, _super);
-        /**
-         * 构造函数
-         * @method Media
-         * @param {string|HtmlElement} src
-         * @param {string} type
-         * @since 1.0.0
-         * @example
-         *      var media = new annie.Media('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3', 'Audio');
-         *          media.play();//媒体播放
-         *          //media.pause();//暂停播放
-         *          //media.stop();//停止播放
-         */
-        function Media(src, type) {
-            var _this = _super.call(this) || this;
-            /**
-             * html 标签 有可能是audio 或者 video
-             * @property media
-             * @type {Video|Audio}
-             * @public
-             * @since 1.0.0
-             */
-            _this.media = null;
-            /**
-             * 媒体类型 VIDEO 或者 AUDIO
-             * @type {string}
-             * @since 1.0.0
-             * @since 1.0.0
-             */
-            _this.type = "";
-            _this._loop = 1;
-            _this._repeate = 1;
-            var s = _this;
-            s._instanceType = "annie.Media";
-            if (typeof (src) == "string") {
-                s.media = document.createElement(type);
-                s.media.src = src;
-            }
-            else {
-                s.media = src;
-            }
-            s._SBWeixin = s._weixinSB.bind(s);
-            s.media.addEventListener('ended', function () {
-                if (s._loop = -1) {
-                    s.play(0);
-                }
-                else {
-                    s._loop--;
-                    if (s._loop > 0) {
-                        s.play(0, s._loop);
-                    }
-                    else {
-                        s.stop();
-                    }
-                }
-                s.dispatchEvent("onPlayEnd");
-            }.bind(s));
-            s.type = type.toLocaleUpperCase();
-            s.media.addEventListener("timeupdate", function () {
-                s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
-            });
-            s.media.addEventListener("play", function () {
-                s.dispatchEvent("onPlayStart");
-            });
-            return _this;
-        }
-        /**
-         * 开始播放媒体
-         * @method play
-         * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数 默认为1
-         * @public
-         * @since 1.0.0
-         */
-        Media.prototype.play = function (start, loop) {
-            if (start === void 0) { start = 0; }
-            if (loop === void 0) { loop = 0; }
-            var s = this;
-            if (loop == 0) {
-                s._loop = this._repeate;
-            }
-            else {
-                s._loop = loop;
-                s._repeate = loop;
-            }
-            try {
-                s.media.currentTime = start;
-            }
-            catch (e) {
-                trace(e);
-            }
-            //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            var wsb = window;
-            if (wsb.WeixinJSBridge) {
-                try {
-                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
-                }
-                catch (e) {
-                    s.media.play();
-                }
-            }
-            else {
-                s.media.play();
-            }
-        };
-        Media.prototype._weixinSB = function () {
-            this.media.play();
-        };
-        /**
-         * 停止播放
-         * @method stop
-         * @public
-         * @since 1.0.0
-         */
-        Media.prototype.stop = function () {
-            this.media.pause();
-            this.media.currentTime = 0;
-        };
-        /**
-         * 暂停播放,或者恢复播放
-         * @method pause
-         * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
-         * @since 1.0.4
-         */
-        Media.prototype.pause = function (isPause) {
-            if (isPause === void 0) { isPause = true; }
-            if (isPause) {
-                this.media.pause();
-            }
-            else {
-                this.media.play();
-            }
-        };
-        Object.defineProperty(Media.prototype, "volume", {
-            /**
-             * 设置或者获取音量 从0-1
-             * @since 1.1.0
-             * @property volume
-             * @returns {number}
-             */
-            get: function () {
-                return this.media.volume;
-            },
-            set: function (value) {
-                this.media.volume = value;
-                if (value == 0) {
-                    this.media.muted = true;
-                }
-                else {
-                    this.media.muted = false;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Media.prototype.destroy = function () {
-            var s = this;
-            this.media.pause();
-            s.media = null;
-            _super.prototype.destroy.call(this);
-        };
-        return Media;
-    }(annie.EventDispatcher));
-    annie.Media = Media;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 声音类
-     * @class annie.Sound
-     * @extends annie.Media
-     * @public
-     * @since 1.0.0
-     */
-    var Sound = (function (_super) {
-        __extends(Sound, _super);
-        /**
-         * 构造函数
-         * @method  Sound
-         * @since 1.0.0
-         * @public
-         * @param src
-         * @example
-         *      var soundPlayer = new annie.Sound('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3');
-         *          soundPlayer.play();//播放音乐
-         *          //soundPlayer.pause();//暂停音乐
-         *          //soundPlayer.stop();//停止音乐
-         */
-        function Sound(src) {
-            var _this = _super.call(this, src, "Audio") || this;
-            var s = _this;
-            s._instanceType = "annie.Sound";
-            annie.Sound._soundList.push(s);
-            s.volume = Sound._volume;
-            return _this;
-        }
-        /**
-         * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destroy
-         * @public
-         * @since 1.1.1
-         */
-        Sound.prototype.destroy = function () {
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
-                    annie.Sound._soundList.splice(i, 1);
-                }
-            }
-            _super.prototype.destroy.call(this);
-        };
-        /**
-         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method stopAllSounds
-         * @since 1.1.1
-         * @static
-         * @public
-         */
-        Sound.stopAllSounds = function () {
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].stop();
-                }
-                else {
-                    annie.Sound._soundList.splice(i, 1);
-                }
-            }
-        };
-        /**
-         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method setAllSoundsVolume
-         * @since 1.1.1
-         * @static
-         * @public
-         * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
-         */
-        Sound.setAllSoundsVolume = function (volume) {
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].volume = volume;
-                }
-                else {
-                    annie.Sound._soundList.splice(i, 1);
-                }
-            }
-            Sound._volume = volume;
-        };
-        //声音对象池
-        Sound._soundList = [];
-        Sound._volume = 1;
-        return Sound;
-    }(annie.Media));
-    annie.Sound = Sound;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 视频类
-     * @class annie.Video
-     * @extends annie.Media
-     * @public
-     * @since 1.0.0
-     */
-    var Video = (function (_super) {
-        __extends(Video, _super);
-        /**
-         * 构造函数
-         * @method Video
-         * @param src
-         * @param width
-         * @param height
-         * @public
-         * @since 1.0.0
-         * @example
-         *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
-         *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
-         *      videoPlayer.play();//播放视频
-         *      //videoPlayer.pause();//暂停视频
-         *      //videoPlayer.stop();//停止播放
-         *      var floatDisplay=new annie.FloatDisplay();
-         *      floatDisplay.init(videoPlayer);
-         *      //这里的spriteObj是任何一个Sprite类或者其扩展类的实例对象
-         *      spriteObj.addChild(floatDisplay);
-         */
-        function Video(src, width, height) {
-            if (width === void 0) { width = 0; }
-            if (height === void 0) { height = 0; }
-            var _this = _super.call(this, src, "Video") || this;
-            var s = _this;
-            s._instanceType = "annie.Video";
-            s.media.setAttribute("playsinline", "true");
-            s.media.setAttribute("webkit-playsinline", "true");
-            s.media.setAttribute("x-webkit-airplay", "true");
-            s.media.setAttribute("x5-video-player-type", "h5");
-            s.media.poster = "";
-            s.media.preload = "auto";
-            s.media.controls = false;
-            if (width && height) {
-                s.media.width = width;
-                s.media.height = height;
-            }
-            return _this;
-        }
-        return Video;
-    }(annie.Media));
-    annie.Video = Video;
 })(annie || (annie = {}));
 /// <reference path="Sprite.ts" />
 /**
@@ -4657,7 +3968,7 @@ var annie;
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
@@ -4750,7 +4061,7 @@ var annie;
                             var maskList = s._maskList;
                             if (curFrameObj.c) {
                                 for (var i in curFrameObj.c) {
-                                    Annie2x.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
+                                    annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
                                     //检查是否有遮罩
                                     if (curFrameObj.c[i].ma != undefined) {
                                         if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
@@ -4861,199 +4172,6 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * 此类对于需要在canvas上放置html其他类型元素的时候非常有用<br/>
-     * 比如有时候我们需要放置一个注册,登录或者其他的内容.这些内容包含了输入框<br/>
-     * 或者下拉框什么的,无法在canvas里实现,但这些元素又跟canvas里面的元素<br/>
-     * 位置,大小,缩放对应.就相当于是annie里的一个显示对象一样。可以随意设置他的<br/>
-     * 属性,那么将你的html元素通过此类封装成annie的显示对象再合适不过了
-     * @class annie.FloatDisplay
-     * @extends annie.DisplayObject
-     * @public
-     * @since 1.0.0
-     */
-    var FloatDisplay = (function (_super) {
-        __extends(FloatDisplay, _super);
-        /**
-         * 构造函数
-         * @method FloatDisplay
-         * @since 1.0.0
-         * @public
-         * @example
-         *      var floatDisplay = new annie.FloatDisplay();
-         *      floatDisplay.init(document.getElementById('Flash2x'));
-         *      s.addChild(floatDisplay);
-         *
-         * <p><a href="" target="_blank">测试链接</a></p>
-         */
-        function FloatDisplay() {
-            var _this = _super.call(this) || this;
-            /**
-             * 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
-             * @property htmlElement
-             * @public
-             * @since 1.0.0
-             * @type{HtmlElement}
-             */
-            _this.htmlElement = null;
-            /**
-             * 是否已经添加了舞台事件
-             * @property _isAdded
-             * @since 1.0.0
-             * @type {boolean}
-             * @private
-             */
-            _this._isAdded = false;
-            var s = _this;
-            s._instanceType = "annie.FloatDisplay";
-            s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
-                if (s.htmlElement) {
-                    s.htmlElement.style.display = "none";
-                }
-            });
-            s.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
-                if (s.htmlElement) {
-                    var style = s.htmlElement.style;
-                    if (!s._isAdded) {
-                        s._isAdded = true;
-                        s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
-                        s.stage["_floatDisplayList"].push(s);
-                    }
-                    else {
-                        if (s.htmlElement && s.visible) {
-                            style.display = "block";
-                        }
-                    }
-                }
-            });
-            return _this;
-        }
-        /**
-         * 初始化方法,htmlElement 一定要设置width和height样式,并且一定要用px单位
-         * @method init
-         * @public
-         * @since 1.0.0
-         * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
-         */
-        FloatDisplay.prototype.init = function (htmlElement) {
-            var s = this;
-            var she;
-            if (typeof (htmlElement) == "string") {
-                she = document.getElementById(htmlElement);
-            }
-            else if (htmlElement._instanceType == "annie.Video") {
-                she = htmlElement.media;
-            }
-            else {
-                she = htmlElement;
-            }
-            var style = she.style;
-            style.position = "absolute";
-            style.display = "none";
-            style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            var ws = s.getStyle(she, "width");
-            var hs = s.getStyle(she, "height");
-            var w = 0, h = 0;
-            if (ws.indexOf("px")) {
-                w = parseInt(ws);
-            }
-            if (hs.indexOf("px")) {
-                h = parseInt(hs);
-            }
-            s._bounds.width = w;
-            s._bounds.height = h;
-            s.htmlElement = she;
-        };
-        FloatDisplay.prototype.getStyle = function (elem, cssName) {
-            //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
-            if (elem.style[cssName]) {
-                return elem.style[cssName];
-            }
-            if (document.defaultView && document.defaultView.getComputedStyle) {
-                //它使用传统的"text-Align"风格的规则书写方式，而不是"textAlign"
-                cssName = cssName.replace(/([A-Z])/g, "-$1");
-                cssName = cssName.toLowerCase();
-                //获取style对象并取得属性的值(如果存在的话)
-                var s = document.defaultView.getComputedStyle(elem, "");
-                return s && s.getPropertyValue(cssName);
-            }
-            return null;
-        };
-        /**
-         * @method updateStyle
-         * @public
-         * @since 1.1.4
-         */
-        FloatDisplay.prototype.updateStyle = function () {
-            var s = this;
-            var o = s.htmlElement;
-            if (o) {
-                var style = o.style;
-                var visible = s._visible;
-                if (visible) {
-                    var parent_1 = s.parent;
-                    while (parent_1) {
-                        if (!parent_1._visible) {
-                            visible = false;
-                            break;
-                        }
-                        parent_1 = parent_1.parent;
-                    }
-                }
-                var show = visible ? "block" : "none";
-                if (show != style.display) {
-                    style.display = show;
-                }
-                if (visible || s._UI.UM || s._UI.UA || s._UI.UF) {
-                    if (s._UI.UM) {
-                        var mtx = s.cMatrix;
-                        var d = annie.devicePixelRatio;
-                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
-                    }
-                    if (s._UI.UA) {
-                        style.opacity = s.cAlpha;
-                    }
-                    s._UI.UF = false;
-                    s._UI.UM = false;
-                    s._UI.UA = false;
-                }
-            }
-        };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
-        FloatDisplay.prototype.destroy = function () {
-            //清除相应的数据引用
-            var s = this;
-            var elem = s.htmlElement;
-            if (elem) {
-                elem.style.display = "none";
-                if (elem.parentNode) {
-                    elem.parentNode.removeChild(elem);
-                }
-                s._isAdded = false;
-                s.htmlElement = null;
-            }
-            var sf = s.stage["_floatDisplayList"];
-            var len = sf.length;
-            for (var i = 0; i < len; i++) {
-                if (sf[i] == s) {
-                    sf.splice(i, 1);
-                    break;
-                }
-            }
-            _super.prototype.destroy.call(this);
-        };
-        return FloatDisplay;
-    }(annie.DisplayObject));
-    annie.FloatDisplay = FloatDisplay;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
      * 动态文本类,有时需要在canvas里有一个动态文本,能根据我们的显示内容来改变
      * @class annie.TextField
      * @extends annie.DisplayObject
@@ -5070,6 +4188,7 @@ var annie;
             _this._lineSpacing = 14;
             _this._textWidth = 0;
             _this._lineType = "single";
+            _this._textOffX = 0;
             _this._text = "";
             _this._font = "Arial";
             _this._size = 12;
@@ -5078,7 +4197,6 @@ var annie;
             _this._bold = false;
             _this._border = false;
             _this._instanceType = "annie.TextField";
-            _this._texture = window.document.createElement("canvas");
             return _this;
         }
         Object.defineProperty(TextField.prototype, "textAlign", {
@@ -5308,21 +4426,17 @@ var annie;
          * @private
          * @since 1.0.0
          */
+        TextField.prototype._draw = function (ctx) {
+            var s = this;
+            s._prepContext(ctx);
+            for (var i = 0; i < s.realLines.length; i++) {
+                ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+            }
+        };
         TextField.prototype._prepContext = function (ctx) {
             var s = this;
-            var font = s.size || 12;
-            font += "px ";
-            font += s.font;
-            //font-weight:bold;font-style:italic;
-            if (s._bold) {
-                font = "bold " + font;
-            }
-            if (s._italic) {
-                font = "italic " + font;
-            }
-            ctx.font = font;
-            ctx.textAlign = this._textAlign || "left";
-            ctx.textBaseline = "top";
+            ctx.font = s.fontInfo;
+            ctx.textAlign = s._textAlign || "left";
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
         };
         /**
@@ -5334,7 +4448,7 @@ var annie;
          * @since 1.0.0
          */
         TextField.prototype._getMeasuredWidth = function (text) {
-            var ctx = this._texture.getContext("2d");
+            var ctx = annie.CanvasRender.drawCtx;
             //ctx.save();
             var w = ctx.measureText(text).width;
             //ctx.restore();
@@ -5355,14 +4469,22 @@ var annie;
                 return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
-                var can = s._texture;
-                var ctx = can.getContext("2d");
+                var ctx = annie.CanvasRender.drawCtx;
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
-                var realLines = [];
+                s.realLines = [];
+                s.fontInfo = s.size || 12;
+                s.fontInfo += "px ";
+                s.fontInfo += s.font;
+                if (s._bold) {
+                    s.fontInfo = "bold " + s.fontInfo;
+                }
+                if (s._italic) {
+                    s.fontInfo = "italic " + s.fontInfo;
+                }
                 s._prepContext(ctx);
                 var lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines[realLines.length] = hardLines[0];
+                    s.realLines[s.realLines.length] = hardLines[0];
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
                     if (lineW > s.textWidth) {
@@ -5374,7 +4496,7 @@ var annie;
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s.textWidth) {
-                                realLines[0] = lineStr;
+                                s.realLines[0] = lineStr;
                                 break;
                             }
                             else {
@@ -5396,7 +4518,7 @@ var annie;
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > this.textWidth) {
-                                realLines[realLines.length] = lineStr;
+                                s.realLines[s.realLines.length] = lineStr;
                                 lineStr = str[j];
                                 w = wordW;
                             }
@@ -5404,48 +4526,21 @@ var annie;
                                 lineStr += str[j];
                             }
                         }
-                        realLines[realLines.length] = lineStr;
+                        s.realLines[s.realLines.length] = lineStr;
                     }
                 }
-                var maxH = lineH * realLines.length;
+                var maxH = lineH * s.realLines.length;
                 var maxW = s.textWidth;
-                var tx = 0;
                 if (s.textAlign == "center") {
-                    tx = maxW * 0.5;
+                    s._textOffX = maxW * 0.5;
                 }
                 else if (s.textAlign == "right") {
-                    tx = maxW;
+                    s._textOffX = maxW;
                 }
-                can.width = maxW + 20;
-                can.height = maxH + 20;
-                ctx.clearRect(0, 0, can.width, can.width);
-                if (s.border) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = "#000";
-                    ctx.textWidth = 1;
-                    ctx.strokeRect(10.5, 10.5, maxW, maxH);
-                    ctx.closePath();
+                else {
+                    s._textOffX = 0;
                 }
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                s._prepContext(ctx);
-                for (var i = 0; i < realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                }
-                /////////////////////
-                var cf = s.cFilters;
-                var cfLen = cf.length;
-                if (cfLen > 0) {
-                    var imageData = ctx.getImageData(0, 0, maxW, maxH);
-                    for (var i = 0; i < cfLen; i++) {
-                        cf[i].drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-                }
-                s._offsetX = -10;
-                s._offsetY = -10;
                 s._UI.UD = false;
-                //给webgl更新新
-                //s._texture.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }
@@ -5467,298 +4562,6 @@ var annie;
     }(annie.DisplayObject));
     annie.TextField = TextField;
 })(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 输入文本,此文本类是annie.FloatDisplay对象的典型代表
-     * @class annie.InputText
-     * @public
-     * @since 1.0.0
-     * @extends annie.FloatDisplay
-     */
-    var InputText = (function (_super) {
-        __extends(InputText, _super);
-        /**
-         * @method InputText
-         * @public
-         * @since 1.0.0
-         * @param {number} inputType 0 input 1 password 2 multiline
-         * @example
-         *      var inputText=new annie.InputText('singleline');
-         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
-         */
-        function InputText(inputType) {
-            if (inputType === void 0) { inputType = 0; }
-            var _this = _super.call(this) || this;
-            /**
-             * 输入文本的类型.
-             * @property inputType
-             * @public
-             * @since 1.0.0
-             * @type {number} 0 input 1 password 2 mulit
-             * @default 0
-             */
-            _this.inputType = 0;
-            /**
-             * 在手机端是否需要自动收回软键盘，在pc端此参数无效
-             * @property isAutoDownKeyBoard
-             * @type {boolean}
-             * @since 1.0.3
-             * @default true
-             */
-            _this.isAutoDownKeyBoard = true;
-            var input = null;
-            var s = _this;
-            s._instanceType = "annie.InputText";
-            if (inputType < 2) {
-                input = document.createElement("input");
-                input.type = InputText._inputTypeList[inputType];
-            }
-            else {
-                input = document.createElement("textarea");
-                input.style.resize = "none";
-                input.style.overflow = "hidden";
-            }
-            s.inputType = inputType;
-            var remove = function () {
-                if (s.isAutoDownKeyBoard && annie.osType != "pc") {
-                    s.htmlElement && s.htmlElement.blur();
-                }
-            }.bind(s);
-            s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
-                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP, remove);
-            });
-            s.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
-                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
-            });
-            s.init(input);
-            return _this;
-        }
-        InputText.prototype.init = function (htmlElement) {
-            _super.prototype.init.call(this, htmlElement);
-            //默认设置
-            var s = this;
-            s.htmlElement.style.outline = "none";
-            s.htmlElement.style.borderWidth = "thin";
-            s.htmlElement.style.borderColor = "#000";
-        };
-        /**
-         * 被始化输入文件的一些属性
-         * @method initInfo
-         * @public
-         * @since 1.0.0
-         * @param {string} text 默认文字
-         * @param {string}color 文字颜色
-         * @param {string}align 文字的对齐方式
-         * @param {number}size  文字大小
-         * @param {string}font  文字所使用的字体
-         * @param {boolean}showBorder 是否需要显示边框
-         * @param {number}lineSpacing 如果是多行,请设置行高
-         */
-        InputText.prototype.initInfo = function (text, color, align, size, font, showBorder, lineSpacing) {
-            var s = this;
-            s.htmlElement.placeholder = text;
-            //font包括字体和大小
-            s.htmlElement.style.font = size + "px " + font;
-            s.htmlElement.style.color = color;
-            s.htmlElement.style.textAlign = align;
-            /////////////////////设置边框//////////////
-            s.border = showBorder;
-            //color:blue; text-align:center"
-            if (s.inputType == 2) {
-                s.htmlElement.style.lineHeight = lineSpacing + "px";
-            }
-        };
-        Object.defineProperty(InputText.prototype, "lineSpacing", {
-            get: function () {
-                return parseInt(this.htmlElement.style.lineHeight);
-            },
-            set: function (value) {
-                this.htmlElement.style.lineHeight = value + "px";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "bold", {
-            get: function () {
-                return this.htmlElement.style.fontWeight == "bold";
-            },
-            /**
-             * 设置文本是否为粗体
-             * @property bold
-             * @param {boolean} bold true或false
-             * @public
-             * @since 1.0.3
-             */
-            set: function (bold) {
-                var ss = this.htmlElement.style;
-                if (bold) {
-                    ss.fontWeight = "bold";
-                }
-                else {
-                    ss.fontWeight = "normal";
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "italic", {
-            get: function () {
-                return this.htmlElement.style.fontStyle == "italic";
-            },
-            /**
-             * 设置文本是否倾斜
-             * @property italic
-             * @param {boolean} italic true或false
-             * @public
-             * @since 1.0.3
-             */
-            set: function (italic) {
-                var s = this.htmlElement.style;
-                if (italic) {
-                    s.fontStyle = "italic";
-                }
-                else {
-                    s.fontStyle = "normal";
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "textHeight", {
-            get: function () {
-                return parseInt(this.htmlElement.style.height);
-            },
-            /**
-             * 文本的行高
-             * @property textHeight
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            set: function (value) {
-                this.htmlElement.style.height = value + "px";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "textWidth", {
-            get: function () {
-                return parseInt(this.htmlElement.style.width);
-            },
-            /**
-             * 文本的宽
-             * @property textWidth
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            set: function (value) {
-                this.htmlElement.style.width = value + "px";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "color", {
-            get: function () {
-                return this.htmlElement.style.color;
-            },
-            /**
-             * 设置文本颜色
-             * @property color
-             * @param {boolean} italic true或false
-             * @public
-             * @since 1.0.3
-             */
-            set: function (value) {
-                var ss = this.htmlElement.style;
-                ss.color = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "border", {
-            get: function () {
-                return this.htmlElement.style.borderStyle != "none";
-            },
-            /**
-             * 设置或获取是否有边框
-             * @property property
-             * @param {boolean} show true或false
-             * @public
-             * @since 1.0.3
-             */
-            set: function (show) {
-                var s = this;
-                if (show) {
-                    s.htmlElement.style.borderStyle = "inset";
-                    s.htmlElement.style.backgroundColor = "#fff";
-                }
-                else {
-                    s.htmlElement.style.borderStyle = "none";
-                    s.htmlElement.style.backgroundColor = "transparent";
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "text", {
-            /**
-             * 获取或设置输入文本的值
-             * 之前的getText 和setText 已废弃
-             * @property text
-             * @public
-             * @since 1.0.3
-             * @returns {string}
-             */
-            get: function () {
-                var s = this;
-                if (s.htmlElement) {
-                    return s.htmlElement.value;
-                }
-            },
-            set: function (value) {
-                var s = this;
-                if (s.htmlElement) {
-                    s.htmlElement.value = value;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputText.prototype, "maxCharacters", {
-            /**
-             * 输入文本的最大输入字数
-             * @public
-             * @since 1.1.0
-             * @property maxCharacters
-             * @returns {number}
-             */
-            get: function () {
-                var l = this.htmlElement.getAttribute("maxlength");
-                if (l === null) {
-                    return 0;
-                }
-                else {
-                    return l;
-                }
-            },
-            set: function (value) {
-                this.htmlElement.setAttribute("maxlength", value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        InputText._inputTypeList = ["input", "password", "textarea"];
-        return InputText;
-    }(annie.FloatDisplay));
-    annie.InputText = InputText;
-})(annie || (annie = {}));
 /// <reference path="Sprite.ts" />
 /**
  * @module annie
@@ -5778,52 +4581,25 @@ var annie;
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {string} rootDivId
+         * @param {Canvas} ctx
+         * @param {number} desW canvas宽
+         * @param {number} desH canvas高
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
          * @param {string} scaleMode 缩放模式 StageScaleMode
          * @param {string} bgColor 背景颜色-1为透明
-         * @param {number} renderType 渲染模式0:canvas 1:webGl 2:dom
          * @public
          * @since 1.0.0
          */
-        function Stage(rootDivId, desW, desH, frameRate, scaleMode, renderType) {
-            if (rootDivId === void 0) { rootDivId = "annieEngine"; }
+        function Stage(ctx, canW, canH, desW, desH, frameRate, scaleMode) {
+            if (canW === void 0) { canW = 640; }
+            if (canH === void 0) { canH = 960; }
             if (desW === void 0) { desW = 640; }
             if (desH === void 0) { desH = 1040; }
             if (frameRate === void 0) { frameRate = 30; }
             if (scaleMode === void 0) { scaleMode = "fixedHeight"; }
-            if (renderType === void 0) { renderType = 0; }
             var _this = _super.call(this) || this;
-            /**
-             * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
-             * 所以需要自己灵活设置,默认阻止.
-             * @property iosTouchendPreventDefault
-             * @type {boolean}
-             * @default true
-             * @since 1.0.4
-             * @public
-             */
-            _this.iosTouchendPreventDefault = true;
-            /**
-             * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
-             * @property isPreventDefaultEvent
-             * @since 1.0.9
-             * @default true
-             * @type {boolean}
-             */
-            _this.isPreventDefaultEvent = true;
-            /**
-             * 整个引擎的最上层的div元素,
-             * 承载canvas的那个div html元素
-             * @property rootDiv
-             * @public
-             * @since 1.0.0
-             * @type {Html Div}
-             * @default null
-             */
-            _this.rootDiv = null;
             /**
              * 当前stage所使用的渲染器
              * 渲染器有两种,一种是canvas 一种是webGl
@@ -5834,17 +4610,6 @@ var annie;
              * @default null
              */
             _this.renderObj = null;
-            /**
-             * 渲染模式值 只读 CANVAS:0, webGl: 1
-             * @property renderType
-             * @readonly
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             * @readonly
-             */
-            _this.renderType = 0;
             /**
              * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
              * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -5883,25 +4648,6 @@ var annie;
              * @type {boolean}
              */
             _this.isMultiMouse = false;
-            /**
-             * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
-             * 端默认不开启
-             * @property autoSteering
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             * @default false
-             */
-            _this.autoSteering = false;
-            /**
-             * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
-             * @property autoResize
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             * @default false
-             */
-            _this.autoResize = false;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -5953,35 +4699,7 @@ var annie;
              * @default "";
              */
             _this.bgColor = "";
-            /**
-             * 舞台的缩放模式
-             * 默认为空就是无缩放的真实大小
-             * "noBorder" 无边框模式
-             * ”showAll" 显示所有内容
-             * “fixedWidth" 固定宽
-             * ”fixedHeight" 固定高
-             * @property scaleMode
-             * @public
-             * @since 1.0.0
-             * @default "onScale"
-             * @type {string}
-             * @example
-             *      //动态更改stage的对齐方式示例
-             *      //以下代码放到一个舞台的显示对象的构造函数中
-             *      let s=this;
-             *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-             *          let i=0;
-             *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-             *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-             *              let state=e.currentTarget;
-             *              state.scaleMode=aList[i];
-             *              state.resize();
-             *              if(i>5){i=0;}
-             *          }
-             *      }
-             *
-             */
-            _this.scaleMode = "onScale";
+            _this._scaleMode = "onScale";
             /**
              * 原始为60的刷新速度时的计数器
              * @property _flush
@@ -6000,9 +4718,12 @@ var annie;
              * @type {number}
              */
             _this._currentFlush = 0;
+            /**
+             * 上一次鼠标或触碰经过的显示对象列表
+             * @type {Array}
+             * @private
+             */
             _this._lastDpList = {};
-            _this._rid = -1;
-            _this._floatDisplayList = [];
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
@@ -6037,7 +4758,7 @@ var annie;
              */
             _this._mP1 = new annie.Point();
             _this._mP2 = new annie.Point();
-            _this.onMouseEvent = function (e) {
+            _this._onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
                 //判断是否有drag的显示对象
@@ -6045,10 +4766,10 @@ var annie;
                 if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                     if (e.targetTouches.length == 2) {
                         //求角度和距离
-                        s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
-                        s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
-                        s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
-                        s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                        s._mP1.x = e.targetTouches[0].pageX - e.target.offsetLeft;
+                        s._mP1.y = e.targetTouches[0].pageY - e.target.offsetTop;
+                        s._mP2.x = e.targetTouches[1].pageX - e.target.offsetLeft;
+                        s._mP2.y = e.targetTouches[1].pageY - e.target.offsetTop;
                         var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                         var dis = annie.Point.distance(s._mP1, s._mP2);
                         s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -6061,10 +4782,10 @@ var annie;
                             var len = s.muliPoints.length;
                             s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
                             s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
-                            s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
-                            s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
-                            s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
-                            s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
+                            s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x;
+                            s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x;
+                            s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y;
+                            s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y;
                             s.dispatchEvent(s._touchEvent);
                             s.muliPoints.shift();
                         }
@@ -6105,30 +4826,24 @@ var annie;
                         //事件个数
                         var eLen = void 0;
                         var identifier = void 0;
-                        if (annie.osType == "pc") {
-                            e.identifier = 0;
-                            points = [e];
+                        if (s.isMultiMouse) {
+                            points = e.changedTouches;
                         }
                         else {
-                            if (s.isMultiMouse) {
-                                points = e.changedTouches;
-                            }
-                            else {
-                                points = [e.changedTouches[0]];
-                            }
+                            points = [e.changedTouches[0]];
                         }
                         for (var o = 0; o < points.length; o++) {
                             eLen = 0;
                             events = [];
-                            identifier = "m" + points[o].identifier;
+                            identifier = points[o].identifier;
                             if (s._mp.length > 0) {
                                 cp = s._mp.shift();
                             }
                             else {
                                 cp = new annie.Point();
                             }
-                            cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
-                            cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
+                            cp.x = points[o].pageX;
+                            cp.y = points[o].pageY;
                             //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                             sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                             if (annie.EventDispatcher.getMouseEventCount() > 0) {
@@ -6171,18 +4886,18 @@ var annie;
                             }
                             if (eLen > 0) {
                                 //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                                var d = s.hitTestPoint(cp, true);
+                                var d_1 = s.hitTestPoint(cp, true);
                                 var displayList = [];
-                                if (d) {
+                                if (d_1) {
                                     //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
                                     //找出真正的target,因为有些父级可能会mouseChildren=false;
-                                    while (d) {
-                                        if (d["mouseChildren"] === false) {
+                                    while (d_1) {
+                                        if (d_1["mouseChildren"] === false) {
                                             //丢掉之前的层级,因为根本没用了
                                             displayList.length = 0;
                                         }
-                                        displayList[displayList.length] = d;
-                                        d = d.parent;
+                                        displayList[displayList.length] = d_1;
+                                        d_1 = d_1.parent;
                                     }
                                 }
                                 else {
@@ -6190,16 +4905,16 @@ var annie;
                                 }
                                 var len = displayList.length;
                                 for (var i = 0; i < len; i++) {
-                                    d = displayList[i];
+                                    d_1 = displayList[i];
                                     for (var j = eLen - 1; j >= 0; j--) {
                                         if (events[j]["_pd"] === false) {
-                                            if (d.hasEventListener(events[j].type)) {
-                                                events[j].currentTarget = d;
+                                            if (d_1.hasEventListener(events[j].type)) {
+                                                events[j].currentTarget = d_1;
                                                 events[j].target = displayList[0];
-                                                lp = d.globalToLocal(cp, annie.DisplayObject._bp);
+                                                lp = d_1.globalToLocal(cp, annie.DisplayObject._bp);
                                                 events[j].localX = lp.x;
                                                 events[j].localY = lp.y;
-                                                d.dispatchEvent(events[j]);
+                                                d_1.dispatchEvent(events[j]);
                                             }
                                         }
                                     }
@@ -6263,28 +4978,28 @@ var annie;
                                                     if (s._lastDpList[identifier][i]) {
                                                         //触发onMouseOut事件
                                                         if (outEvent["_pd"] === false) {
-                                                            d = s._lastDpList[identifier][i];
-                                                            if (d.hasEventListener("onMouseOut")) {
-                                                                outEvent.currentTarget = d;
+                                                            d_1 = s._lastDpList[identifier][i];
+                                                            if (d_1.hasEventListener("onMouseOut")) {
+                                                                outEvent.currentTarget = d_1;
                                                                 outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                                lp = d.globalToLocal(cp, annie.DisplayObject._bp);
+                                                                lp = d_1.globalToLocal(cp, annie.DisplayObject._bp);
                                                                 outEvent.localX = lp.x;
                                                                 outEvent.localY = lp.y;
-                                                                d.dispatchEvent(outEvent);
+                                                                d_1.dispatchEvent(outEvent);
                                                             }
                                                         }
                                                     }
                                                     if (displayList[i]) {
                                                         //触发onMouseOver事件
                                                         if (overEvent["_pd"] === false) {
-                                                            d = displayList[i];
-                                                            if (d.hasEventListener("onMouseOver")) {
-                                                                overEvent.currentTarget = d;
+                                                            d_1 = displayList[i];
+                                                            if (d_1.hasEventListener("onMouseOver")) {
+                                                                overEvent.currentTarget = d_1;
                                                                 overEvent.target = displayList[len2 - 1];
-                                                                lp = d.globalToLocal(cp, annie.DisplayObject._bp);
+                                                                lp = d_1.globalToLocal(cp, annie.DisplayObject._bp);
                                                                 overEvent.localX = lp.x;
                                                                 overEvent.localY = lp.y;
-                                                                d.dispatchEvent(overEvent);
+                                                                d_1.dispatchEvent(overEvent);
                                                             }
                                                         }
                                                     }
@@ -6345,16 +5060,6 @@ var annie;
                         }
                     }
                 }
-                if (e.target.id == "_a2x_canvas") {
-                    if (s.isPreventDefaultEvent) {
-                        if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                            e.preventDefault();
-                        }
-                        if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                            e.preventDefault();
-                        }
-                    }
-                }
                 if (s._cp) {
                     s.update();
                 }
@@ -6364,8 +5069,8 @@ var annie;
              */
             _this.setAlign = function () {
                 var s = this;
-                var divH = s.divHeight * annie.devicePixelRatio;
-                var divW = s.divWidth * annie.devicePixelRatio;
+                var divH = s.divHeight;
+                var divW = s.divWidth;
                 var desH = s.desHeight;
                 var desW = s.desWidth;
                 s.anchorX = desW >> 1;
@@ -6380,15 +5085,15 @@ var annie;
                 s.y = (divH - desH) >> 1;
                 if (s.autoSteering) {
                     if (isDesH != isDivH) {
-                        var d = divH;
+                        var d_2 = divH;
                         divH = divW;
-                        divW = d;
+                        divW = d_2;
                     }
                 }
-                if (s.scaleMode != "noScale") {
+                if (s._scaleMode != "noScale") {
                     scaleY = divH / desH;
                     scaleX = divW / desW;
-                    switch (s.scaleMode) {
+                    switch (s._scaleMode) {
                         case "noBorder":
                             if (scaleX > scaleY) {
                                 scaleY = scaleX;
@@ -6420,123 +5125,80 @@ var annie;
                 s.viewRect.y = (desH - divH / scaleY) >> 1;
                 s.viewRect.width = desW - s.viewRect.x * 2;
                 s.viewRect.height = desH - s.viewRect.y * 2;
-                if (s.autoSteering) {
-                    if (isDesH == isDivH) {
-                        s.rotation = 0;
-                    }
-                    else {
-                        if (desH > desW) {
-                            s.rotation = -90;
-                        }
-                        else {
-                            s.rotation = 90;
-                        }
-                    }
-                }
-                else {
+                if (isDesH == isDivH) {
                     s.rotation = 0;
                 }
-            };
-            /**
-             * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
-             * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
-             * 不管autoResize 的状态是什么，你只要侦听 了stage 的 annie.Event.RESIZE 事件
-             * 都可以接收到舞台变化的通知。
-             * @method resize
-             * @public
-             * @since 1.0.0
-             */
-            _this.resize = function () {
-                var s = this;
-                var whObj = s.getRootDivWH(s.rootDiv);
-                s._UI.UM = true;
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize();
-                s.setAlign();
-                s.update();
+                else {
+                    if (desH > desW) {
+                        s.rotation = -90;
+                    }
+                    else {
+                        s.rotation = 90;
+                    }
+                }
             };
             var s = _this;
             _this._instanceType = "annie.Stage";
-            s.name = rootDivId;
-            annie.Stage._stageList[rootDivId] = s;
             s.stage = _this;
-            var resizeEvent = "resize";
-            s.name = "stageInstance_" + s.instanceId;
-            var div = document.getElementById(rootDivId);
-            s.renderType = renderType;
+            s.name = "stageInstance" + s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
-            s.rootDiv = div;
+            s.divWidth = canW;
+            s.divHeight = canH;
             s.setFrameRate(frameRate);
-            s.scaleMode = scaleMode;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //目前具支持canvas
-            s.renderObj = new annie.CanvasRender(s);
-            /* webgl 直到对2d的支持非常成熟了再考虑开启
-            if (renderType == 0) {
-                //canvas
-                s.renderObj = new CanvasRender(s);
-            } else {
-                //webgl
-                s.renderObj = new WGRender(s);
-            }*/
-            s.renderObj.init();
-            window.addEventListener(resizeEvent, function (e) {
-                clearTimeout(s._rid);
-                s._rid = setTimeout(function () {
-                    if (s.autoResize) {
-                        s.resize();
-                    }
-                    var event = new annie.Event("onResize");
-                    s.dispatchEvent(event);
-                }, 300);
-            });
-            setTimeout(function () {
-                s.resize();
-                //同时添加到主更新循环中
-                Stage.addUpdateObj(s);
-                //告诉大家我初始化完成
-                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
-                if (annie.debug && !Stage._isLoadedVConsole) {
-                    var script_1 = document.createElement("script");
-                    script_1.onload = function () {
-                        s.dispatchEvent(new annie.Event("onInitStage"));
-                        script_1.onload = null;
-                    };
-                    document.head.appendChild(script_1);
-                    script_1.src = "libs/vConsole.min.js";
-                }
-                else {
-                    s.dispatchEvent(new annie.Event("onInitStage"));
-                }
-            }, 100);
-            // let rc = s.renderObj.rootContainer;
-            var rc = s.rootDiv;
-            var mouseEvent = s.onMouseEvent.bind(s);
-            if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent, false);
-                rc.addEventListener('touchmove', mouseEvent, false);
-                rc.addEventListener('touchend', mouseEvent, false);
-            }
-            else {
-                rc.addEventListener("mousedown", mouseEvent, false);
-                rc.addEventListener('mousemove', mouseEvent, false);
-                rc.addEventListener('mouseup', mouseEvent, false);
-            }
+            s.renderObj = new annie.CanvasRender(s, ctx);
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
+            s.onTouchEvent = s._onMouseEvent.bind(s);
+            s._scaleMode = scaleMode;
+            s.setAlign();
             return _this;
         }
-        /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @param {string} stageName
-         * @returns {any}
-         * @since 2.0.0
-         */
-        Stage.getStage = function (stageName) {
-            if (stageName === void 0) { stageName = "annieEngine"; }
-            return annie.Stage._stageList[stageName];
-        };
+        Object.defineProperty(Stage.prototype, "scaleMode", {
+            /**
+             * 舞台的缩放模式
+             * 默认为空就是无缩放的真实大小
+             * "noBorder" 无边框模式
+             * ”showAll" 显示所有内容
+             * “fixedWidth" 固定宽
+             * ”fixedHeight" 固定高
+             * @property scaleMode
+             * @public
+             * @since 1.0.0
+             * @default "onScale"
+             * @type {string}
+             * @example
+             *      //动态更改stage的对齐方式示例
+             *      //以下代码放到一个舞台的显示对象的构造函数中
+             *      let s=this;
+             *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+             *          let i=0;
+             *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+             *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+             *              let state=e.currentTarget;
+             *              state.scaleMode=aList[i];
+             *              state.resize();
+             *              if(i>5){i=0;}
+             *          }
+             *      }
+             *
+             */
+            get: function () {
+                return this._scaleMode;
+            },
+            set: function (value) {
+                var s = this;
+                if (value != s._scaleMode) {
+                    s._scaleMode = value;
+                    s.setAlign();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 重写刷新
          * @method update
@@ -6548,11 +5210,6 @@ var annie;
             var s = this;
             if (!s.pause) {
                 _super.prototype.update.call(this, isDrawUpdate);
-                var sf = s._floatDisplayList;
-                var len = sf.length;
-                for (var i = 0; i < len; i++) {
-                    sf[i].updateStyle();
-                }
             }
         };
         /**
@@ -6565,6 +5222,7 @@ var annie;
             if (!s.pause) {
                 renderObj.begin();
                 _super.prototype.render.call(this, renderObj);
+                renderObj.end();
             }
         };
         /**
@@ -6627,40 +5285,6 @@ var annie;
             return 60 / (this._flush + 1);
         };
         /**
-         * 获取引擎所在的div宽高
-         * @method getRootDivWH
-         * @public
-         * @since 1.0.0
-         * @param {HTMLDivElement} div
-         * @returns {{w: number, h: number}}
-         */
-        Stage.prototype.getRootDivWH = function (div) {
-            var sw = div.style.width;
-            var sh = div.style.height;
-            var iw = document.body.clientWidth;
-            // let ih = document.body.clientHeight-40;
-            var ih = document.body.clientHeight;
-            var vW = parseInt(sw);
-            var vH = parseInt(sh);
-            if (vW.toString() == "NaN") {
-                vW = iw;
-            }
-            else {
-                if (sw.indexOf("%") > 0) {
-                    vW *= iw / 100;
-                }
-            }
-            if (vH.toString() == "NaN") {
-                vH = ih;
-            }
-            else {
-                if (sh.indexOf("%") > 0) {
-                    vH *= ih / 100;
-                }
-            }
-            return { w: vW, h: vH };
-        };
-        /**
          * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
          * @method kill
          * @since 1.0.0
@@ -6680,11 +5304,13 @@ var annie;
          * @method flushAll
          */
         Stage.flushAll = function () {
-            var len = Stage.allUpdateObjList.length;
-            for (var i = 0; i < len; i++) {
-                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
-            }
-            requestAnimationFrame(Stage.flushAll);
+            setInterval(function () {
+                var len = Stage.allUpdateObjList.length;
+                for (var i = 0; i < len; i++) {
+                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                }
+            }, 20);
+            //requestAnimationFrame(Stage.flushAll);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -6730,8 +5356,6 @@ var annie;
             var s = this;
             Stage.removeUpdateObj(s);
             s.pause = true;
-            s.rootDiv = null;
-            s._floatDisplayList = null;
             s.renderObj = null;
             s.viewRect = null;
             s._lastDpList = null;
@@ -6742,14 +5366,7 @@ var annie;
             s._ml = null;
             _super.prototype.destroy.call(this);
         };
-        Stage._stageList = {};
         Stage._dragDisplay = null;
-        /**
-         * 上一次鼠标或触碰经过的显示对象列表
-         * @type {Array}
-         * @private
-         */
-        Stage._isLoadedVConsole = false;
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
@@ -7517,19 +6134,12 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        function CanvasRender(stage) {
+        function CanvasRender(stage, ctx) {
             var _this = _super.call(this) || this;
-            /**
-             * 渲染器所在最上层的对象
-             * @property rootContainer
-             * @public
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            _this.rootContainer = null;
-            _this._instanceType = "annie.CanvasRender";
-            _this._stage = stage;
+            var s = _this;
+            s._instanceType = "annie.CanvasRender";
+            s._stage = stage;
+            CanvasRender.drawCtx = ctx;
             return _this;
         }
         /**
@@ -7540,15 +6150,7 @@ var annie;
          */
         CanvasRender.prototype.begin = function () {
             var s = this;
-            var c = s.rootContainer;
-            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (s._stage.bgColor != "") {
-                s._ctx.fillStyle = s._stage.bgColor;
-                s._ctx.fillRect(0, 0, c.width, c.height);
-            }
-            else {
-                s._ctx.clearRect(0, 0, c.width, c.height);
-            }
+            CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
         };
         /**
          * 开始有遮罩时调用
@@ -7558,25 +6160,25 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.beginMask = function (target) {
-            var s = this;
-            var isHadPath = false;
+            /*let isHadPath = false;
+            let _ctx=CanvasRender.drawCtx;
             if (target.children && target.children.length > 0) {
                 target = target.children[0];
             }
             if (target._command && target._command.length > 0) {
-                s._ctx.save();
-                s._ctx.globalAlpha = 0;
-                var tm = target.cMatrix;
-                s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                target._drawShape(s._ctx, true);
-                s._ctx.restore();
+                _ctx.save();
+                _ctx.globalAlpha = 0;
+                let tm = target.cMatrix;
+                _ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                target._draw(_ctx);
+                _ctx.restore();
                 isHadPath = true;
             }
             //和后面endMask的restore对应
-            s._ctx.save();
+            _ctx.save();
             if (isHadPath) {
-                s._ctx.clip();
-            }
+                _ctx.clip();
+            }*/
         };
         /**
          * 结束遮罩时调用
@@ -7585,7 +6187,10 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.endMask = function () {
-            this._ctx.restore();
+            //CanvasRender.drawCtx.restore();
+        };
+        CanvasRender.prototype.end = function () {
+            CanvasRender.drawCtx.draw();
         };
         /**
          * 调用渲染
@@ -7599,1290 +6204,29 @@ var annie;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)
                 return;
+            var ctx = CanvasRender.drawCtx;
+            ctx.save();
+            ctx.globalAlpha = target.cAlpha;
+            var tm = target.cMatrix;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             var texture = target._texture;
-            if (texture && texture.width > 0 && texture.height > 0) {
-                var ctx = s._ctx;
-                ctx.globalAlpha = target.cAlpha;
-                var tm = target.cMatrix;
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (target.rect && !target._isCache) {
-                    var tr = target.rect;
-                    ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
-                }
-                else {
-                    ctx.translate(target._offsetX, target._offsetY);
-                    ctx.drawImage(texture, 0, 0);
-                }
+            if (texture) {
+                ctx.drawImage(texture, 0, 0);
             }
-        };
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.0
-         * @method init
-         */
-        CanvasRender.prototype.init = function () {
-            var s = this;
-            if (!s.rootContainer) {
-                s.rootContainer = document.createElement("canvas");
-                s._stage.rootDiv.appendChild(s.rootContainer);
-                s.rootContainer.id = "_a2x_canvas";
+            else {
+                target._draw(ctx);
             }
-            var c = s.rootContainer;
-            s._ctx = c["getContext"]('2d');
-        };
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.0
-         * @method reSize
-         */
-        CanvasRender.prototype.reSize = function () {
-            var s = this;
-            var c = s.rootContainer;
-            c.width = s._stage.divWidth * annie.devicePixelRatio;
-            c.height = s._stage.divHeight * annie.devicePixelRatio;
-            c.style.width = s._stage.divWidth + "px";
-            c.style.height = s._stage.divHeight + "px";
+            ctx.restore();
         };
         CanvasRender.prototype.destroy = function () {
             var s = this;
-            s.rootContainer = null;
             s._stage = null;
-            s._ctx = null;
         };
+        CanvasRender.drawCtx = null;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
 })(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
-     * @class annie.URLLoader
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     * @example
-     *      var urlLoader = new annie.URLLoader();
-     *      urlLoader.addEventListener('onComplete', function (e) {
-     *      //trace(e.data.response);
-     *      var bitmapData = e.data.response,//bitmap图片数据
-     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
-     *      //居中对齐
-     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-     *      s.addChild(bitmap);
-     *      });
-     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
-     */
-    var URLLoader = (function (_super) {
-        __extends(URLLoader, _super);
-        /**
-         * @param type text json js xml image sound css svg video unKnow
-         */
-        function URLLoader() {
-            var _this = _super.call(this) || this;
-            _this._req = null;
-            _this.headers = [];
-            /**
-             * 后台返回来的数据类弄
-             * @property responseType
-             * @type {string}
-             * @default null
-             * @public
-             * @since 1.0.0
-             */
-            _this.responseType = null;
-            /**
-             * 请求的url地址
-             * @property url
-             * @public
-             * @since 1.0.0
-             * @type {string}
-             */
-            _this.url = "";
-            /**
-             * 请求后台的类型 get post
-             * @property method
-             * @type {string}
-             * @default get
-             * @public
-             * @since 1.0.0
-             */
-            _this.method = "get";
-            /**
-             * 需要像后台传送的数据对象
-             * @property data
-             * @public
-             * @since 1.0.0
-             * @default null
-             * @type {Object}
-             */
-            _this.data = null;
-            /**
-             * 格式化post请求参数
-             * @method _fqs
-             * @param data
-             * @param query
-             * @return {string}
-             * @private
-             * @since 1.0.0
-             */
-            _this._fqs = function (data, query) {
-                var params = [];
-                if (data) {
-                    for (var n in data) {
-                        params.push(encodeURIComponent(n) + "=" + encodeURIComponent(data[n]));
-                    }
-                }
-                if (query) {
-                    params = params.concat(query);
-                }
-                return params.join("&");
-            };
-            //formatURIString
-            /**
-             * 格式化get 请求参数
-             * @method _fus
-             * @param src
-             * @param data
-             * @return {any}
-             * @private
-             */
-            _this._fus = function (src, data) {
-                var s = this;
-                if (data == null || data == "") {
-                    return src;
-                }
-                var query = [];
-                var idx = src.indexOf("?");
-                if (idx != -1) {
-                    var q = src.slice(idx + 1);
-                    query = query.concat(q.split("&"));
-                    return src.slice(0, idx) + "?" + s._fqs(data, query);
-                }
-                else {
-                    return src + "?" + s._fqs(data, query);
-                }
-            };
-            _this._instanceType = "annie.URLLoader";
-            return _this;
-        }
-        /**
-         * 取消加载
-         * @method loadCancel
-         * @public
-         * @since 1.0.0
-         */
-        URLLoader.prototype.loadCancel = function () {
-            var s = this;
-            if (s._req) {
-                s._req.abort();
-                // s._req = null;
-            }
-        };
-        /**
-         * 加载或请求数据
-         * @method load
-         * @public
-         * @since 1.0.0
-         * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
-         */
-        URLLoader.prototype.load = function (url, contentType) {
-            if (contentType === void 0) { contentType = "form"; }
-            var s = this;
-            s.loadCancel();
-            if (s.responseType == null || s.responseType == "") {
-                //看看是什么后缀
-                var urlSplit = url.split(".");
-                var extStr = urlSplit[urlSplit.length - 1];
-                var ext = extStr.split("?")[0].toLocaleLowerCase();
-                if (ext == "mp3" || ext == "ogg" || ext == "wav") {
-                    s.responseType = "sound";
-                }
-                else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
-                    s.responseType = "image";
-                }
-                else if (ext == "css") {
-                    s.responseType = "css";
-                }
-                else if (ext == "mp4") {
-                    s.responseType = "video";
-                }
-                else if (ext == "svg") {
-                    s.responseType = "svg";
-                }
-                else if (ext == "xml") {
-                    s.responseType = "xml";
-                }
-                else if (ext == "json") {
-                    s.responseType = "json";
-                }
-                else if (ext == "txt") {
-                    s.responseType = "text";
-                }
-                else if (ext == "js" || ext == "swf") {
-                    s.responseType = "js";
-                }
-                else {
-                    s.responseType = "unKnow";
-                }
-            }
-            if (!s._req) {
-                s._req = new XMLHttpRequest();
-                var req_1 = s._req;
-                req_1.withCredentials = false;
-                req_1.onprogress = function (event) {
-                    if (!event || event.loaded > 0 && event.total == 0) {
-                        return; // Sometimes we get no "total", so just ignore the progress event.
-                    }
-                    s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
-                };
-                req_1.onerror = function (event) {
-                    reSendTimes++;
-                    if (reSendTimes > 2) {
-                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
-                    }
-                    else {
-                        //断线重连
-                        req_1.abort();
-                        if (!s.data) {
-                            req_1.send();
-                        }
-                        else {
-                            if (contentType == "form") {
-                                req_1.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                                req_1.send(s._fqs(s.data, null));
-                            }
-                            else {
-                                var type = "application/json";
-                                if (contentType != "json") {
-                                    type = "multipart/form-data";
-                                }
-                                req_1.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                                req_1.send(s.data);
-                            }
-                        }
-                    }
-                };
-                req_1.onreadystatechange = function (event) {
-                    var t = event.target;
-                    if (t["readyState"] == 4) {
-                        if (req_1.status == 200 || req_1.status == 0) {
-                            var isImage = false;
-                            var e_1 = new annie.Event("onComplete");
-                            var result = t["response"];
-                            e_1.data = { type: s.responseType, response: null };
-                            var item = void 0;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    var itemObj_1;
-                                    if (s.responseType == "image") {
-                                        isImage = true;
-                                        itemObj_1 = document.createElement("img");
-                                        itemObj_1.onload = function () {
-                                            URL.revokeObjectURL(itemObj_1.src);
-                                            itemObj_1.onload = null;
-                                            s.dispatchEvent(e_1);
-                                        };
-                                        itemObj_1.src = URL.createObjectURL(result);
-                                    }
-                                    else {
-                                        if (s.responseType == "sound") {
-                                            itemObj_1 = document.createElement("AUDIO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                        }
-                                        else if (s.responseType == "video") {
-                                            itemObj_1 = document.createElement("VIDEO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                        }
-                                    }
-                                    item = itemObj_1;
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                    item = "JS_CODE";
-                                    annie.Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e_1.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
-                            if (!isImage)
-                                s.dispatchEvent(e_1);
-                        }
-                        else {
-                            //服务器返回报错
-                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
-                        }
-                    }
-                };
-            }
-            var req = s._req;
-            var reSendTimes = 0;
-            if (s.data && s.method.toLocaleLowerCase() == "get") {
-                s.url = s._fus(url, s.data);
-                s.data = null;
-            }
-            else {
-                s.url = url;
-            }
-            if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
-                req.responseType = "blob";
-            }
-            else {
-                req.responseType = "text";
-            }
-            req.open(s.method, s.url, true);
-            if (s.headers.length > 0) {
-                for (var h = 0; h < s.headers.length; h += 2) {
-                    req.setRequestHeader(s.headers[h], s.headers[h + 1]);
-                }
-                s.headers.length = 0;
-            }
-            if (!s.data) {
-                req.send();
-            }
-            else {
-                if (contentType == "form") {
-                    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                    req.send(s._fqs(s.data, null));
-                }
-                else {
-                    var type = "application/json";
-                    if (contentType != "json") {
-                        type = "multipart/form-data";
-                    }
-                    req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                    req.send(s.data);
-                }
-            }
-            /*req.onloadstart = function (e) {
-             s.dispatchEvent("onStart");
-             };*/
-        };
-        /**
-         * 添加自定义头
-         * @addHeader
-         * @param name
-         * @param value
-         */
-        URLLoader.prototype.addHeader = function (name, value) {
-            this.headers.push(name, value);
-        };
-        URLLoader.prototype.destroy = function () {
-            var s = this;
-            s.loadCancel();
-            s.headers = null;
-            s.data = null;
-            _super.prototype.destroy.call(this);
-        };
-        return URLLoader;
-    }(annie.EventDispatcher));
-    annie.URLLoader = URLLoader;
-})(annie || (annie = {}));
-/**
- * Flash资源加载或者管理类，静态类，不可实例化
- * 一般都是初始化或者设置从Flash里导出的资源
- * @class Annie2x
- */
-var Annie2x;
-(function (Annie2x) {
-    var URLLoader = annie.URLLoader;
-    var Event = annie.Event;
-    var ColorFilter = annie.ColorFilter;
-    var Shape = annie.Shape;
-    var BlurFilter = annie.BlurFilter;
-    var ShadowFilter = annie.ShadowFilter;
-    var ColorMatrixFilter = annie.ColorMatrixFilter;
-    //打包swf用
-    Annie2x._isReleased = false;
-    //打包swf用
-    Annie2x._shareSceneList = [];
-    /**
-     * 存储加载资源的总对象
-     * @type {Object}
-     */
-    Annie2x.res = {};
-    /**
-     * 加载器是否正在加载中
-     */
-    var _isLoading;
-    /**
-     * 加载中的场景名列表
-     */
-    var _loadSceneNames;
-    /**
-     * 加载地址的域名地址或前缀
-     */
-    var _domain;
-    /**
-     * 当前加载到哪一个资源
-     */
-    var _loadIndex;
-    /**
-     * 当前加载的总资源数
-     */
-    var _totalLoadRes;
-    /**
-     * 当前已经加载的资源数
-     */
-    var _loadedLoadRes;
-    /**
-     * 加载资源的完成回调
-     */
-    var _completeCallback;
-    /**
-     * 加载资源时的进度回调
-     */
-    var _progressCallback;
-    /**
-     * 加载配置文件的加载器
-     */
-    var _JSONQueue;
-    /**
-     * 加载资源文件的加载器
-     */
-    var _loaderQueue;
-    /**
-     * 加载器是否初始化过
-     */
-    var _isInited;
-    /**
-     * 当前加载的资源配置文件内容
-     */
-    var _currentConfig;
-    /**
-     * 获取当前加载的时间当作随机数用
-     */
-    var _time = new Date().getTime();
-    /**
-     * 加载资源数和总资源数的比
-     */
-    var _loadPer;
-    /**
-     * 单个资源占总资源数的比
-     */
-    var _loadSinglePer;
-    /**
-     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
-     * @method loadScene
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {string} sceneName fla通过flash2x转换时设置的包名
-     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100
-     * @param {Function} completeFun 加载完成回高,无回调参数
-     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
-     */
-    Annie2x.loadScene = function (sceneName, progressFun, completeFun, domain) {
-        if (domain === void 0) { domain = ""; }
-        //加载资源配置文件
-        if (_isLoading) {
-            _JSONQueue.loadCancel();
-            _loaderQueue.loadCancel();
-        }
-        _loadSceneNames = [];
-        _domain = domain;
-        if (typeof (sceneName) == "string") {
-            if (!isLoadedScene(sceneName)) {
-                Annie2x.res[sceneName] = {};
-                _loadSceneNames.push(sceneName);
-            }
-            else {
-                var info = {};
-                info.sceneName = sceneName;
-                info.sceneId = 1;
-                info.sceneTotal = 1;
-                completeFun(info);
-            }
-        }
-        else {
-            var len = sceneName.length;
-            var index = 0;
-            for (var i = 0; i < len; i++) {
-                if (!isLoadedScene(sceneName[i])) {
-                    Annie2x.res[sceneName[i]] = {};
-                    _loadSceneNames.push(sceneName[i]);
-                }
-                else {
-                    var info = {};
-                    info.sceneName = sceneName[i];
-                    info.sceneId = ++index;
-                    info.sceneTotal = len;
-                    completeFun(info);
-                }
-            }
-        }
-        if (_loadSceneNames.length == 0) {
-            return;
-        }
-        if (!_isInited) {
-            _JSONQueue = new URLLoader();
-            _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
-            _loaderQueue = new URLLoader();
-            _loaderQueue.addEventListener(Event.COMPLETE, _onRESComplete);
-            _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
-            _isInited = true;
-        }
-        _loadPer = 0;
-        _loadIndex = 0;
-        _totalLoadRes = 0;
-        _loadedLoadRes = 0;
-        _isLoading = true;
-        _completeCallback = completeFun;
-        _progressCallback = progressFun;
-        _currentConfig = [];
-        if (!Annie2x._isReleased) {
-            _loadConfig();
-        }
-        else {
-            //加载正式的单个文件
-            //看看是否需要加载共享资源
-            if (Annie2x._shareSceneList.length > 0 && (!isLoadedScene("f2xShare"))) {
-                for (var i = 0; i < _loadSceneNames.length; i++) {
-                    if (Annie2x._shareSceneList.indexOf(_loadSceneNames[i]) >= 0) {
-                        _loadSceneNames.unshift("f2xShare");
-                        break;
-                    }
-                }
-            }
-            _loadIndex = 0;
-            _totalLoadRes = _loadSceneNames.length;
-            _loadSinglePer = 1 / _totalLoadRes;
-            for (var i = 0; i < _totalLoadRes; i++) {
-                _currentConfig.push([{ src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + ".swf" }]);
-            }
-            _loadRes();
-        }
-    };
-    function _loadConfig() {
-        _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
-    }
-    function onCFGComplete(e) {
-        //配置文件加载完成
-        var resList = e.data.response;
-        _currentConfig.push(resList);
-        _totalLoadRes += resList.length;
-        _loadIndex++;
-        if (_loadSceneNames[_loadIndex]) {
-            _loadConfig();
-        }
-        else {
-            //所有配置文件加载完成,那就开始加载资源
-            _loadIndex = 0;
-            _loadSinglePer = 1 / _totalLoadRes;
-            _loadRes();
-        }
-    }
-    function _onRESProgress(e) {
-        if (_progressCallback) {
-            _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
-        }
-    }
-    function _parseContent(loadContent, rootObj) {
-        if (rootObj === void 0) { rootObj = null; }
-        //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
-        //主要工作就是遍历时间轴并调整成方便js读取的方式
-        var mc = null;
-        for (var item in loadContent) {
-            mc = loadContent[item];
-            if (mc.t == 1) {
-                if (!mc.f) {
-                    mc.f = [];
-                    mc.tf = 1;
-                    continue;
-                }
-                if (mc.tf > 1) {
-                    var frameList = mc.f;
-                    var count = frameList.length;
-                    var frameCon = null;
-                    var children = {};
-                    var children2 = {};
-                    for (var i = 0; i < count; i++) {
-                        frameCon = frameList[i].c;
-                        if (frameCon) {
-                            for (var j in frameCon) {
-                                if (i == 0) {
-                                    children[j] = [frameCon[j]][0];
-                                }
-                                else {
-                                    if (frameCon[j].a != 3) {
-                                        children2[j] = frameCon[j];
-                                    }
-                                    if (frameCon[j].a != 1) {
-                                        if (frameCon[j].a == 2) {
-                                            for (var o in children[j]) {
-                                                if (frameCon[j][o] == undefined) {
-                                                    frameCon[j][o] = children[j][o];
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            delete frameCon[j];
-                                        }
-                                        children[j] = null;
-                                        delete children[j];
-                                    }
-                                }
-                            }
-                            if (i > 0) {
-                                for (var o in children) {
-                                    frameCon[o] = children2[o] = children[o];
-                                }
-                                children = children2;
-                                children2 = {};
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                //如果是released版本，则需要更新资源数据
-                if (Annie2x._isReleased) {
-                    if (loadContent[item] == 2) {
-                        //图片
-                        var image = new Image();
-                        image.src = rootObj[item];
-                        rootObj[item] = image;
-                    }
-                    else if (loadContent[item] == 5) {
-                        //声音
-                        var audio = new Audio();
-                        audio.src = rootObj[item];
-                        rootObj[item] = audio;
-                    }
-                }
-            }
-        }
-    }
-    function _onRESComplete(e) {
-        var scene = _loadSceneNames[_loadIndex];
-        if (!Annie2x._isReleased) {
-            if (e.data.type != "js" && e.data.type != "css") {
-                var loadContent = e.data.response;
-                if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                    _parseContent(loadContent);
-                }
-                Annie2x.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-            }
-        }
-        else {
-            if (scene != "f2xShare") {
-                _parseContent(Annie2x.res[_loadSceneNames[_loadIndex]]._a2x_con, Annie2x.res[_loadSceneNames[_loadIndex]]);
-            }
-            else {
-                _currentConfig.shift();
-                _loadSceneNames.shift();
-                _loadRes();
-                return;
-            }
-        }
-        _checkComplete();
-    }
-    function _checkComplete() {
-        _loadedLoadRes++;
-        _loadPer = _loadedLoadRes / _totalLoadRes;
-        _currentConfig[_loadIndex].shift();
-        Annie2x.res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
-        if (_currentConfig[_loadIndex].length > 0) {
-            _loadRes();
-        }
-        else {
-            var info = {};
-            info.sceneName = _loadSceneNames[_loadIndex];
-            _loadIndex++;
-            info.sceneId = _loadIndex;
-            info.sceneTotal = _loadSceneNames.length;
-            if (_loadIndex == _loadSceneNames.length) {
-                //全部资源加载完成
-                _isLoading = false;
-                //_progressCallback(100);
-                setTimeout(function () {
-                    _completeCallback(info);
-                }, 100);
-            }
-            else {
-                _completeCallback(info);
-                _loadRes();
-            }
-        }
-    }
-    function _loadRes() {
-        var url = _domain + _currentConfig[_loadIndex][0].src;
-        if (Annie2x._isReleased) {
-            _loaderQueue.responseType = "js";
-            url += "?v=" + Annie2x._isReleased;
-        }
-        else {
-            url += "?v=" + _time;
-        }
-        _loaderQueue.load(url);
-    }
-    /**
-     * 判断一个场景是否已经被加载
-     * @method isLoadedScene
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {string} sceneName
-     * @returns {boolean}
-     */
-    function isLoadedScene(sceneName) {
-        if (Annie2x.res[sceneName] != undefined && Annie2x.res[sceneName] != null && Annie2x.res[sceneName]._f2x_had_loaded_scene) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    Annie2x.isLoadedScene = isLoadedScene;
-    /**
-     * 删除一个场景资源,以方便系统垃圾回收
-     * @method unLoadScene
-     * @public
-     * @static
-     * @since 1.0.2
-     * @param {string} sceneName
-     */
-    function unLoadScene(sceneName) {
-        delete Annie2x.res[sceneName];
-        var w = window;
-        var scene = w[sceneName];
-        for (var i in scene) {
-            delete scene[i];
-        }
-        delete w[sceneName];
-        scene = null;
-    }
-    Annie2x.unLoadScene = unLoadScene;
-    /**
-     * 获取已经加载场景中的资源
-     * @method getResource
-     * @public
-     * @static
-     * @since 2.0.0
-     * @param {string} sceneName
-     * @param {string} resName
-     * @returns {any}
-     */
-    function getResource(sceneName, resName) {
-        var s = Annie2x.res;
-        if (s[sceneName][resName]) {
-            return s[sceneName][resName];
-        }
-        return null;
-    }
-    Annie2x.getResource = getResource;
-    /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-     * @method b
-     * @public
-     * @since 1.0.0
-     * @static
-     * @param {string} sceneName
-     * @param {string} resName
-     * @returns {any}
-     */
-    function b(sceneName, resName) {
-        return new annie.Bitmap(Annie2x.res[sceneName][resName]);
-    }
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     */
-    function d(target, info) {
-        if (target._a2x_res_obj == info) {
-            return;
-        }
-        else {
-            //是不是文本
-            var lastInfo = target._a2x_res_obj;
-            if (info.w != undefined) {
-                target.textWidth = info.w;
-                target.textHeight = info.h;
-            }
-            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr == undefined || info.tr.length == 1) {
-                info.tr = [0, 0, 1, 1, 0, 0];
-            }
-            if (lastInfo.tr != info.tr) {
-                _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
-            }
-            /*if (info.v == undefined) {
-                info.v = 1;
-            }*/
-            //target.visible = new Boolean(info.v);
-            target.alpha = info.al == undefined ? 1 : info.al;
-            //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
-                }
-            }
-            ///////////////////////////////////////////
-            //添加滤镜
-            if (lastInfo.fi != info.fi) {
-                if (info.fi != undefined) {
-                    var filters = [];
-                    var blur_1;
-                    var color = void 0;
-                    for (var i = 0; i < info.fi.length; i++) {
-                        switch (info.fi[i].t) {
-                            case 0:
-                                blur_1 = (info.fi[i].bx + info.fi[i].by) * 0.5;
-                                color = Shape.getRGBA(info.fi[i].c, info.fi[i].a);
-                                var offsetX = info.fi[i].by * Math.cos(info.fi[i].r / 180 * Math.PI);
-                                var offsetY = info.fi[i].by * Math.sin(info.fi[i].r / 180 * Math.PI);
-                                filters[filters.length] = new ShadowFilter(color, offsetX, offsetY, blur_1);
-                                break;
-                            case 1:
-                                //模糊滤镜
-                                filters[filters.length] = new BlurFilter(info.fi[i].bx, info.fi[i].by, info.fi[i].q);
-                                break;
-                            case 2:
-                                blur_1 = (info.fi[i].bx + info.fi[i].by) * 0.5;
-                                color = Shape.getRGBA(info.fi[i].c, info.fi[i].a);
-                                filters[filters.length] = new ShadowFilter(color, 0, 0, blur_1);
-                                break;
-                            case 6:
-                                filters[filters.length] = new ColorMatrixFilter(info.fi[i].b, info.fi[i].c, info.fi[i].s, info.fi[i].h);
-                                break;
-                            case 7:
-                                filters[filters.length] = new ColorFilter(info.fi[i].cm);
-                                break;
-                            default:
-                        }
-                    }
-                    target.filters = filters;
-                }
-                else {
-                    target.filters = null;
-                }
-            }
-            target._a2x_res_obj = info;
-        }
-        var _a;
-    }
-    Annie2x.d = d;
-    var _textLineType = ["single", "multiline"];
-    var _textAlign = ["left", "center", "right"];
-    /**
-     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-     * @method t
-     * @public
-     * @static
-     * @since 1.0.0
-     * @returns {annie.TextFiled|annie.InputText}
-     */
-    function t(sceneName, resName) {
-        var textDate = Annie2x.res[sceneName]._a2x_con[resName];
-        var textObj;
-        var text = decodeURIComponent(textDate[9]);
-        var font = decodeURIComponent(textDate[4]);
-        var size = textDate[5];
-        var textAlign = _textAlign[textDate[3]];
-        var lineType = _textLineType[textDate[2]];
-        var italic = textDate[11];
-        var bold = textDate[10];
-        var color = textDate[6];
-        var textAlpha = textDate[7];
-        var border = textDate[12];
-        var lineSpacing = textDate[8];
-        if (textDate[1] == 0 || textDate[1] == 1) {
-            textObj = new annie.TextField();
-            textObj.text = text;
-            textObj.font = text;
-            textObj.size = size;
-            textObj.textAlign = textAlign;
-            textObj.lineType = lineType;
-            textObj.italic = italic;
-            textObj.bold = bold;
-            textObj.color = color;
-            textObj.textAlpha = textAlpha;
-            textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
-        }
-        else {
-            textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
-            textObj.italic = italic;
-            textObj.bold = bold;
-        }
-        return textObj;
-    }
-    /**
-     * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method sb
-     */
-    function sb(sceneName, resName) {
-        var sbName = "_f2x_s" + resName;
-        if (Annie2x.res[sceneName][sbName]) {
-            return Annie2x.res[sceneName][sbName];
-        }
-        else {
-            var bitmapData = null;
-            var bitmap = b(sceneName, resName);
-            if (bitmap) {
-                if (bitmap.rect) {
-                    //从SpriteSheet中取出Image单独存放
-                    bitmapData = annie.Bitmap.convertToImage(bitmap, false);
-                }
-                else {
-                    bitmapData = bitmap.bitmapData;
-                }
-                Annie2x.res[sceneName][sbName] = bitmapData;
-                return bitmapData;
-            }
-            else {
-                trace("error:矢量位图填充时,未找到位图资源!");
-                return null;
-            }
-        }
-    }
-    Annie2x.sb = sb;
-    /**
-     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-     * @method g
-     * @public
-     * @static
-     * @since 1.0.0
-     * @returns {annie.Shape}
-     */
-    function g(sceneName, resName) {
-        var shapeDate = Annie2x.res[sceneName]._a2x_con[resName][1];
-        var shape = new annie.Shape();
-        for (var i = 0; i < shapeDate.length; i++) {
-            if (shapeDate[i][0] == 1) {
-                if (shapeDate[i][1] == 0) {
-                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
-                }
-                else if (shapeDate[i][1] == 1) {
-                    shape.beginLinearGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
-                }
-                else if (shapeDate[i][1] == 2) {
-                    shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
-                }
-                else {
-                    shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
-                }
-                shape.decodePath(shapeDate[i][3]);
-                shape.endFill();
-            }
-            else {
-                if (shapeDate[i][1] == 0) {
-                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
-                }
-                else if (shapeDate[i][1] == 1) {
-                    shape.beginLinearGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
-                }
-                else if (shapeDate[i][1] == 2) {
-                    shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
-                }
-                else {
-                    shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
-                }
-                shape.decodePath(shapeDate[i][3]);
-                shape.endStroke();
-            }
-        }
-        return shape;
-    }
-    function s(sceneName, resName) {
-        return new annie.Sound(Annie2x.res[sceneName][resName]);
-    }
-    /**
-     * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-     * @method ajax
-     * @public
-     * @since 1.0.0
-     * @param info 向后台传送数据所需要设置的信息
-     * @param {url} info.url 向后台请求的地址
-     * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
-     * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
-     * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
-     * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
-     * @example
-     *      //get
-     *      Flash2x.ajax({
-     *             type: "GET",
-     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
-     *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
-     *      })
-     *      //post
-     *      Flash2x.ajax({
-     *             type: "POST",
-     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
-     *             data: {phone:'135******58'},
-     *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
-     *      })
-     */
-    function ajax(info) {
-        var urlLoader = new URLLoader();
-        urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
-        urlLoader.method = info.type == undefined ? "get" : info.type;
-        urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;
-        if (info.success != undefined) {
-            urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
-        }
-        if (info.error != undefined) {
-            urlLoader.addEventListener(annie.Event.ERROR, info.error);
-        }
-        urlLoader.load(info.url);
-    }
-    Annie2x.ajax = ajax;
-    /**
-     * jsonp调用方法
-     * @method jsonp
-     * @param url
-     * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
-     * @param callbackName
-     * @param callbackFun
-     * @static
-     * @since 1.0.4
-     * @example
-     *      Flash2x.jsonp('js/testData.js', 1, 'getdata', function (result) {
-     *          trace(result);
-     *      })
-     */
-    function jsonp(url, type, callbackName, callbackFun) {
-        var w = window;
-        if (type == 1) {
-            w[callbackName] = callbackFun;
-        }
-        var jsonpScript = document.createElement('script');
-        var head = document.getElementsByTagName('head')[0];
-        jsonpScript.onload = function (e) {
-            if (type == 0) {
-                callbackFun(w[callbackName]);
-            }
-            e.path[0].src = "";
-            w[callbackName] = null;
-            delete w[callbackName];
-            head.removeChild(e.path[0]);
-        };
-        head.appendChild(jsonpScript);
-        var param;
-        if (url.indexOf("?") > 0) {
-            param = "&";
-        }
-        else {
-            param = "?";
-        }
-        jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
-    }
-    Annie2x.jsonp = jsonp;
-    /**
-     * 获取url地址中的get参数
-     * @method getQueryString
-     * @static
-     * @param name
-     * @returns {any}
-     * @since 1.0.9
-     * @example
-     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
-     *      //通过此方法获取id和username的值
-     *      var id=Flash2x.getQueryString("id");
-     *      var userName=Flash2x.getQueryString("username");
-     *      trace(id,userName);
-     */
-    function getQueryString(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-        var r = window.location.search.substr(1).match(reg);
-        if (r != null)
-            return decodeURIComponent(r[2]);
-        return null;
-    }
-    Annie2x.getQueryString = getQueryString;
-    /**
-     * 引擎自调用.初始化 sprite和movieClip用
-     * @param target
-     * @param {string} _resId
-     * @private
-     */
-    function _initRes(target, sceneName, resName) {
-        var Root = window;
-        //资源树最顶层
-        var resRoot = Annie2x.res[sceneName];
-        //资源树里类对象json数据
-        var classRoot = resRoot._a2x_con;
-        //资源树里类对象json数据里非资源类数据
-        var resClass = classRoot[resName];
-        //时间轴
-        target._a2x_res_class = resClass;
-        var isMc = false;
-        var i;
-        if (resClass.tf > 1) {
-            isMc = true;
-            if (resClass.timeLine == undefined) {
-                //将时间轴丰满,抽出脚本，抽出标签
-                var keyFrameCount = resClass.f.length;
-                var timeLine = [];
-                var curKeyFrame = keyFrameCount > 0 ? resClass.f[0].i : resClass.tf;
-                var nextFrame = 0;
-                if (curKeyFrame > 0) {
-                    var frameValue = -1;
-                    for (var j = 0; j < curKeyFrame; j++) {
-                        timeLine[timeLine.length] = frameValue;
-                    }
-                }
-                if (keyFrameCount > 0) {
-                    for (i = 0; i < keyFrameCount; i++) {
-                        if (i + 1 < keyFrameCount) {
-                            nextFrame = resClass.f[i + 1].i;
-                        }
-                        else {
-                            nextFrame = resClass.tf;
-                        }
-                        curKeyFrame = resClass.f[i].i;
-                        //将时间线补齐
-                        for (var j = 0; j < nextFrame - curKeyFrame; j++) {
-                            timeLine[timeLine.length] = i;
-                        }
-                    }
-                }
-                resClass.timeLine = timeLine;
-                //初始化标签对象方便gotoAndStop gotoAndPlay
-                if (!resClass.f)
-                    resClass.f = [];
-                if (!resClass.c)
-                    resClass.c = [];
-                if (!resClass.a)
-                    resClass.a = {};
-                if (!resClass.s)
-                    resClass.s = {};
-                if (!resClass.e)
-                    resClass.e = {};
-                var label = {};
-                if (!resClass.l) {
-                    resClass.l = [];
-                }
-                else {
-                    for (var index in resClass.l) {
-                        for (var n = 0; n < resClass.l[index].length; n++) {
-                            label[resClass.l[index][n]] = parseInt(index);
-                        }
-                    }
-                }
-                resClass.label = label;
-            }
-        }
-        if (resClass.c) {
-            var children = resClass.c;
-            var objCount = children.length;
-            var obj = null;
-            var objId = 0;
-            var maskObj = null;
-            var maskTillId = 0;
-            for (i = 0; i < objCount; i++) {
-                if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    }
-                    else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
-                            if (classRoot[children[i]].tf > 1) {
-                                obj = new annie.MovieClip();
-                            }
-                            else {
-                                obj = new annie.Sprite();
-                            }
-                            _initRes(obj, sceneName, children[i]);
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
-                }
-                else {
-                    obj = new Root[sceneName][children[i]]();
-                }
-                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
-                target._a2x_res_children[target._a2x_res_children.length] = obj;
-                if (!isMc) {
-                    var index = i + 1;
-                    if (objId == 5) {
-                        obj._repeate = resClass.s[0][index];
-                    }
-                    else {
-                        d(obj, resClass.f[0].c[index]);
-                        // 检查是否有遮罩
-                        if (resClass.f[0].c[index].ma != undefined) {
-                            maskObj = obj;
-                            maskTillId = resClass.f[0].c[index].ma - 1;
-                        }
-                        else {
-                            if (maskObj && i <= maskTillId) {
-                                obj.mask = maskObj;
-                                if (i == maskTillId) {
-                                    maskObj = null;
-                                }
-                            }
-                        }
-                        //检查是否有名字
-                        if (resClass.f[0].c[index].n != undefined) {
-                            target[resClass.f[0].c[index].n] = obj;
-                            obj.name = resClass.f[0].c[index].n;
-                        }
-                        target.addChildAt(obj, 0);
-                    }
-                }
-            }
-        }
-    }
-    Annie2x._initRes = _initRes;
-})(Annie2x || (Annie2x = {}));
 /**
  * @module annie
  */
@@ -9856,27 +7200,6 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
-     * @public
-     * @property annie.Eval
-     * @since 1.0.3
-     * @public
-     * @type {any}
-     */
-    annie.Eval = eval.bind(window);
-    /**
-     * 是否开启调试模式
-     * @public
-     * @since 1.0.1
-     * @public
-     * @property annie.debug
-     * @type {boolean}
-     * @example
-     *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
-     *      annie.debug=true;
-     */
-    annie.debug = false;
-    /**
      * annie引擎的版本号
      * @public
      * @since 1.0.1
@@ -9886,44 +7209,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.1.3";
-    /**
-     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
-     * @property annie.osType
-     * @since 1.0.0
-     * @public
-     * @type {string|string}
-     * @static
-     * @example
-     *      //获取当前设备类型
-     *      trace(annie.osType);
-     */
-    annie.osType = (function () {
-        var n = navigator.userAgent.toLocaleLowerCase();
-        var reg1 = /android/;
-        var reg2 = /iphone|ipod|ipad/;
-        if (reg1.test(n)) {
-            return "android";
-        }
-        else if (reg2.test(n)) {
-            return "ios";
-        }
-        else {
-            return "pc";
-        }
-    })();
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     * @example
-     *      //打印当前设备的retina值
-     *      trace(annie.devicePixelRatio);
-     */
-    annie.devicePixelRatio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+    annie.version = "2.0.0";
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -9961,193 +7247,402 @@ var annie;
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    /**
-     * 跳转到指定网址
-     * @method annie.navigateToURL
-     * @public
-     * @since 1.0.0
-     * @param {string} url
-     * @static
-     * @example
-     *      displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *              annie.navigateToURL("http://www.annie2x.com");
-     *      })
-     *
-     */
-    function navigateToURL(url) {
-        window.location.href = url;
-    }
-    annie.navigateToURL = navigateToURL;
-    /**
-     * 向后台发送数据,但不会理会任何的后台反馈
-     * @method annie.sendToURL
-     * @public
-     * @since 1.0.0
-     * @param {string} url
-     * @static
-     * @example
-     *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
-     *      })
-     */
-    function sendToURL(url) {
-        var req = new XMLHttpRequest();
-        req.open("get", url, true);
-        req.send();
-    }
-    annie.sendToURL = sendToURL;
-    // 作为将显示对象导出成图片的render渲染器
-    var _dRender = null;
-    /**
-     * 将显示对象转成base64的图片数据
-     * @method annie.toDisplayDataURL
-     * @static
-     * @param {annie.DisplayObject} obj 显示对象
-     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
-     * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
-     * @return {string} base64格式数据
-     * @example
-     *      annie.toDisplayDataURL(DisplayObj, {
-     *               x: 0,
-     *               y: 32,
-     *               width: 441,
-     *               height: 694
-     *       }, {
-     *               type: "jpeg"//数据类型jpg/png
-     *               quality: 90//图片质量值1-100,png格式不需要设置quality
-     *       }, '#CDDBEB');
-     *
-     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
-     */
-    annie.toDisplayDataURL = function (obj, rect, typeInfo, bgColor) {
-        if (rect === void 0) { rect = null; }
-        if (typeInfo === void 0) { typeInfo = null; }
-        if (bgColor === void 0) { bgColor = ""; }
-        if (!_dRender) {
-            _dRender = new annie.CanvasRender(null);
+    annie.res = {};
+    function loadScene(sceneName, sceneRes, sceneData) {
+        annie.res[sceneName] = {};
+        annie.res[sceneName]._a2x_con = sceneData;
+        for (var i = 0; i < sceneRes.length; i++) {
+            if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
+                annie.res[sceneName][sceneRes[i].id] = sceneRes[i].src;
+            }
         }
-        _dRender._stage = obj;
-        _dRender.rootContainer = annie.DisplayObject["_canvas"];
-        var objInfo = {
-            p: obj.parent,
-            x: obj.x,
-            y: obj.y,
-            scX: obj.scaleX,
-            scY: obj.scaleY,
-            r: obj.rotation,
-            skX: obj.skewX,
-            skY: obj.skewY
-        };
-        obj.parent = null;
-        obj.x = obj.y = 0;
-        obj.scaleX = obj.scaleY = 1;
-        obj.rotation = obj.skewX = obj.skewY = 0;
-        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        var whObj = obj.getBounds();
-        var w = rect ? rect.width : whObj.width;
-        var h = rect ? rect.height : whObj.height;
-        obj.x = rect ? -rect.x : -whObj.x;
-        obj.y = rect ? -rect.y : -whObj.y;
-        obj._offsetX = rect ? rect.x : whObj.x;
-        obj._offsetY = rect ? rect.y : whObj.y;
-        _dRender.rootContainer.width = w;
-        _dRender.rootContainer.height = h;
-        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
-        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if (bgColor == "") {
-            _dRender._ctx.clearRect(0, 0, w, h);
+        var mc;
+        for (var item in sceneData) {
+            mc = sceneData[item];
+            if (mc.t == 1) {
+                if (!mc.f) {
+                    mc.f = [];
+                    mc.tf = 1;
+                    continue;
+                }
+                if (mc.tf > 1) {
+                    var frameList = mc.f;
+                    var count = frameList.length;
+                    var frameCon = null;
+                    var children = {};
+                    var children2 = {};
+                    for (var i = 0; i < count; i++) {
+                        frameCon = frameList[i].c;
+                        if (frameCon) {
+                            for (var j in frameCon) {
+                                if (i == 0) {
+                                    children[j] = [frameCon[j]][0];
+                                }
+                                else {
+                                    if (frameCon[j].a != 3) {
+                                        children2[j] = frameCon[j];
+                                    }
+                                    if (frameCon[j].a != 1) {
+                                        if (frameCon[j].a == 2) {
+                                            for (var o in children[j]) {
+                                                if (frameCon[j][o] == undefined) {
+                                                    frameCon[j][o] = children[j][o];
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            delete frameCon[j];
+                                        }
+                                        children[j] = null;
+                                        delete children[j];
+                                    }
+                                }
+                            }
+                            if (i > 0) {
+                                for (var o in children) {
+                                    frameCon[o] = children2[o] = children[o];
+                                }
+                                children = children2;
+                                children2 = {};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    annie.loadScene = loadScene;
+    /**
+     * 获取已经加载场景中的资源
+     * @method getResource
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function getResource(sceneName, resName) {
+        if (annie.res[sceneName][resName]) {
+            return annie.res[sceneName][resName];
+        }
+        return null;
+    }
+    annie.getResource = getResource;
+    /**
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+     * @method b
+     * @public
+     * @since 1.0.0
+     * @static
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function b(sceneName, resName) {
+        return new annie.Bitmap(annie.res[sceneName][resName]);
+    }
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} target
+     * @param {Object} info
+     */
+    function d(target, info) {
+        if (target._a2x_res_obj == info) {
+            return;
         }
         else {
-            _dRender._ctx.fillStyle = bgColor;
-            _dRender._ctx.fillRect(0, 0, w, h);
+            //是不是文本
+            var lastInfo = target._a2x_res_obj;
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+            }
+            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+            if (info.tr == undefined || info.tr.length == 1) {
+                info.tr = [0, 0, 1, 1, 0, 0];
+            }
+            if (lastInfo.tr != info.tr) {
+                _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
+            }
+            /*if (info.v == undefined) {
+                info.v = 1;
+            }*/
+            //target.visible = new Boolean(info.v);
+            target.alpha = info.al == undefined ? 1 : info.al;
+            //动画播放模式 图形 按钮 动画
+            if (info.t == 1) {
+                //initButton
+                if (target.initButton) {
+                    target.initButton();
+                }
+            }
+            target._a2x_res_obj = info;
         }
-        obj._cp = true;
-        obj.update();
-        obj.render(_dRender);
-        obj._cp = true;
-        obj.parent = objInfo.p;
-        obj.x = objInfo.x;
-        obj.y = objInfo.y;
-        obj.scaleX = objInfo.scX;
-        obj.scaleY = objInfo.scY;
-        obj.rotation = objInfo.r;
-        obj.skewX = objInfo.skX;
-        obj.skewY = objInfo.skY;
-        obj.update();
-        if (!typeInfo) {
-            typeInfo = { type: "png" };
-        }
-        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
-    };
+        var _a;
+    }
+    annie.d = d;
+    var _textLineType = ["single", "multiline"];
+    var _textAlign = ["left", "center", "right"];
     /**
-     * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
-     * @param {annie.Stage} stage
-     * @param {annie.Rectangle} rect
-     * @returns {Array}
+     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+     * @method t
      * @public
-     * @since 1.1.1
+     * @static
+     * @since 1.0.0
+     * @returns {annie.TextFiled|annie.InputText}
      */
-    annie.getStagePixels = function (stage, rect) {
-        var newPoint = stage.localToGlobal(new annie.Point(rect.x, rect.y));
-        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
-    };
+    function t(sceneName, resName) {
+        var textDate = annie.res[sceneName]._a2x_con[resName];
+        var textObj;
+        var text = decodeURIComponent(textDate[9]);
+        var font = decodeURIComponent(textDate[4]);
+        var size = textDate[5];
+        var textAlign = _textAlign[textDate[3]];
+        var lineType = _textLineType[textDate[2]];
+        var italic = textDate[11];
+        var bold = textDate[10];
+        var color = textDate[6];
+        var textAlpha = textDate[7];
+        var border = textDate[12];
+        var lineSpacing = textDate[8];
+        if (textDate[1] == 0 || textDate[1] == 1) {
+            textObj = new annie.TextField();
+            textObj.text = text;
+            textObj.font = text;
+            textObj.size = size;
+            textObj.textAlign = textAlign;
+            textObj.lineType = lineType;
+            textObj.italic = italic;
+            textObj.bold = bold;
+            textObj.color = color;
+            textObj.textAlpha = textAlpha;
+            textObj.border = border;
+            textObj.lineSpacing = lineSpacing;
+        }
+        else {
+            /*textObj = new annie.InputText(textDate[2]);
+            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+            textObj.italic = italic;
+            textObj.bold = bold;*/
+            console.log("wxApp isn't support inputText");
+        }
+        return textObj;
+    }
+    /**
+     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+     * @method g
+     * @public
+     * @static
+     * @since 1.0.0
+     * @returns {annie.Shape}
+     */
+    function g(sceneName, resName) {
+        var shapeDate = annie.res[sceneName]._a2x_con[resName][1];
+        var shape = new annie.Shape();
+        for (var i = 0; i < shapeDate.length; i++) {
+            if (shapeDate[i][0] == 1) {
+                if (shapeDate[i][1] == 0) {
+                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
+                }
+                else if (shapeDate[i][1] == 1) {
+                    shape.beginLinearGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
+                }
+                else if (shapeDate[i][1] == 2) {
+                    shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
+                }
+                else {
+                    //shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
+                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
+                }
+                shape.decodePath(shapeDate[i][3]);
+                shape.endFill();
+            }
+            else {
+                if (shapeDate[i][1] == 0) {
+                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                }
+                else if (shapeDate[i][1] == 1) {
+                    shape.beginLinearGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                }
+                else if (shapeDate[i][1] == 2) {
+                    shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                }
+                else {
+                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                    //shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                }
+                shape.decodePath(shapeDate[i][3]);
+                shape.endStroke();
+            }
+        }
+        return shape;
+    }
+    function s(sceneName, resName) {
+        return annie.res[sceneName][resName];
+    }
+    /**
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
+     */
+    function _initRes(target, sceneName, resName) {
+        var Root = window;
+        //资源树最顶层
+        var resRoot = annie.res[sceneName];
+        //资源树里类对象json数据
+        var classRoot = resRoot._a2x_con;
+        //资源树里类对象json数据里非资源类数据
+        var resClass = classRoot[resName];
+        //时间轴
+        target._a2x_res_class = resClass;
+        var isMc = false;
+        var i;
+        if (resClass.tf > 1) {
+            isMc = true;
+            if (resClass.timeLine == undefined) {
+                //将时间轴丰满,抽出脚本，抽出标签
+                var keyFrameCount = resClass.f.length;
+                var timeLine = [];
+                var curKeyFrame = keyFrameCount > 0 ? resClass.f[0].i : resClass.tf;
+                var nextFrame = 0;
+                if (curKeyFrame > 0) {
+                    var frameValue = -1;
+                    for (var j = 0; j < curKeyFrame; j++) {
+                        timeLine[timeLine.length] = frameValue;
+                    }
+                }
+                if (keyFrameCount > 0) {
+                    for (i = 0; i < keyFrameCount; i++) {
+                        if (i + 1 < keyFrameCount) {
+                            nextFrame = resClass.f[i + 1].i;
+                        }
+                        else {
+                            nextFrame = resClass.tf;
+                        }
+                        curKeyFrame = resClass.f[i].i;
+                        //将时间线补齐
+                        for (var j = 0; j < nextFrame - curKeyFrame; j++) {
+                            timeLine[timeLine.length] = i;
+                        }
+                    }
+                }
+                resClass.timeLine = timeLine;
+                //初始化标签对象方便gotoAndStop gotoAndPlay
+                if (!resClass.f)
+                    resClass.f = [];
+                if (!resClass.c)
+                    resClass.c = [];
+                if (!resClass.a)
+                    resClass.a = {};
+                if (!resClass.s)
+                    resClass.s = {};
+                if (!resClass.e)
+                    resClass.e = {};
+                var label = {};
+                if (!resClass.l) {
+                    resClass.l = [];
+                }
+                else {
+                    for (var index in resClass.l) {
+                        for (var n = 0; n < resClass.l[index].length; n++) {
+                            label[resClass.l[index][n]] = parseInt(index);
+                        }
+                    }
+                }
+                resClass.label = label;
+            }
+        }
+        if (resClass.c) {
+            var children = resClass.c;
+            var objCount = children.length;
+            var obj = null;
+            var objId = 0;
+            var maskObj = null;
+            var maskTillId = 0;
+            for (i = 0; i < objCount; i++) {
+                if (children[i].indexOf("_$") == 0) {
+                    if (Array.isArray(classRoot[children[i]])) {
+                        objId = classRoot[children[i]][0];
+                    }
+                    else {
+                        objId = classRoot[children[i]].t;
+                    }
+                    switch (objId) {
+                        case 1:
+                            //displayObject
+                            if (classRoot[children[i]].tf > 1) {
+                                obj = new annie.MovieClip();
+                            }
+                            else {
+                                obj = new annie.Sprite();
+                            }
+                            _initRes(obj, sceneName, children[i]);
+                            break;
+                        case 2:
+                            //bitmap
+                            obj = b(sceneName, children[i]);
+                            break;
+                        case 3:
+                            //shape
+                            obj = g(sceneName, children[i]);
+                            break;
+                        case 4:
+                            //text
+                            obj = t(sceneName, children[i]);
+                            break;
+                        case 5:
+                            //sound
+                            obj = s(sceneName, children[i]);
+                            target.addSound(obj);
+                    }
+                }
+                else {
+                    obj = new Root[sceneName][children[i]]();
+                }
+                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                target._a2x_res_children[target._a2x_res_children.length] = obj;
+                if (!isMc) {
+                    var index = i + 1;
+                    if (objId == 5) {
+                        obj._repeate = resClass.s[0][index];
+                    }
+                    else {
+                        d(obj, resClass.f[0].c[index]);
+                        // 检查是否有遮罩
+                        if (resClass.f[0].c[index].ma != undefined) {
+                            maskObj = obj;
+                            maskTillId = resClass.f[0].c[index].ma - 1;
+                        }
+                        else {
+                            if (maskObj && i <= maskTillId) {
+                                obj.mask = maskObj;
+                                if (i == maskTillId) {
+                                    maskObj = null;
+                                }
+                            }
+                        }
+                        //检查是否有名字
+                        if (resClass.f[0].c[index].n != undefined) {
+                            target[resClass.f[0].c[index].n] = obj;
+                            obj.name = resClass.f[0].c[index].n;
+                        }
+                        target.addChildAt(obj, 0);
+                    }
+                }
+            }
+        }
+    }
+    annie._initRes = _initRes;
 })(annie || (annie = {}));
 /// <reference path="./display/Stage.ts" />
-/// <reference path="./events/EventDispatcher.ts" />
 /// <reference path="./utils/Tween.ts" />
 /// <reference path="./utils/Timer.ts" />
-/**
- * @class 全局
- */
-/**
- * 往控制台打印调试信息
- * @method trace
- * @param {Object} arg 任何个数,任意类型的参数
- * @since 1.0.0
- * @public
- * @static
- * @example
- *      trace(1);
- *      trace(1,"hello");
- */
-var trace = function () {
-    var arg = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        arg[_i] = arguments[_i];
-    }
-    for (var i in arguments) {
-        console.log(arguments[i]);
-    }
-};
-/**
- * 全局事件触发器
- * @static
- * @property  globalDispatcher
- * @type {annie.EventDispatcher}
- * @public
- * @since 1.0.0
- * @example
- *      //A代码放到任何合适的地方
- *      globalDispatcher.addEventListener("myTest",function(e){
- *          trace("收到了其他地方发来的消息:"+e.data);
- *      });
- *
- *      //B代码放到任何一个可以点击的对象的构造函数中
- *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
- *          globalDispatcher.dispatchEvent("myTest","我是小可");
- *      });
- *
- */
-var globalDispatcher = new annie.EventDispatcher();
-var F2xContainer = annie.Sprite;
-var F2xMovieClip = annie.MovieClip;
-var F2xText = annie.TextField;
-var F2xInputText = annie.InputText;
-var F2xBitmap = annie.Bitmap;
-var F2xShape = annie.Shape;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();

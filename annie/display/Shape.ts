@@ -13,7 +13,6 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._texture = window.document.createElement("canvas");
         }
 
         /**
@@ -39,7 +38,7 @@ namespace annie {
          */
         public static getGradientColor(points: any,colors: any): any {
             let colorObj: any;
-            let ctx = DisplayObject["_canvas"].getContext("2d");
+            let ctx = CanvasRender.drawCtx;
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             } else {
@@ -61,7 +60,7 @@ namespace annie {
          * @since 1.0.0
          */
         public static getBitmapStyle(image: any): any {
-            let ctx = DisplayObject["_canvas"].getContext("2d");
+            let ctx = CanvasRender.drawCtx;
             return ctx.createPattern(image, "repeat");
         }
 
@@ -669,30 +668,6 @@ namespace annie {
                         s._bounds.y = leftY+10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
-                        ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if (!s._isUseToMask) {
-                            let _canvas: any = s._texture;
-                            let ctx = _canvas["getContext"]('2d');
-                            _canvas.width = w;
-                            _canvas.height = h;
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                            ////////////////////
-                            s._drawShape(ctx);
-                            ///////////////////////////
-                            //滤镜
-                            let cf = s.cFilters;
-                            let cfLen = cf.length;
-                            if (cfLen > 0) {
-                                let imageData = ctx.getImageData(0, 0, w, h);
-                                for (let i = 0; i < cfLen; i++) {
-                                    cf[i].drawFilter(imageData);
-                                }
-                                ctx.putImageData(imageData, 0, 0);
-                            }
-                            //给webgl更新新
-                            //_canvas.updateTexture = true;
-                        }
                     }
                 }
                 s._UI.UD = false;
@@ -702,7 +677,7 @@ namespace annie {
             s._UI.UF = false;
         }
 
-        private _drawShape(ctx: any): void {
+        private _draw(ctx: any): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;
@@ -755,26 +730,7 @@ namespace annie {
                 p = s.globalToLocal(globalPoint);
             }
             if (s.getBounds().isPointIn(p)){
-                if (!s._isUseToMask&&s.hitTestWidthPixel) {
-                    let image = s._texture;
-                    if (!image || image.width == 0 || image.height == 0) {
-                        return null;
-                    }
-                    let _canvas = DisplayObject["_canvas"];
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    p.x -= s._offsetX;
-                    p.y -= s._offsetY;
-                    let ctx = _canvas["getContext"]('2d');
-                    ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-                    ctx.drawImage(image, 0, 0);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                } else {
-                    return s;
-                }
+                return s;
             }
             return null;
         }

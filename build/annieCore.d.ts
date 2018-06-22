@@ -1369,15 +1369,6 @@ declare namespace annie {
             height: number;
         };
         /**
-         * 画缓存位图的时候需要使用
-         * @property _bitmapCanvas
-         * @private
-         * @static
-         * @since 1.0.0
-         * @type {Canvas}
-         */
-        static _canvas: any;
-        /**
          * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
          * @property _texture
          * @protected
@@ -1411,7 +1402,7 @@ declare namespace annie {
          * @param {annie.Sound} sound
          * @returns {number}
          */
-        addSound(sound: annie.Sound): number;
+        addSound(sound: any): number;
         /**
          * 删除一个已经添加进来的声音
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
@@ -1438,99 +1429,14 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Bitmap extends DisplayObject {
-        private _bitmapData;
-        private _realCacheImg;
-        /**
-         * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-         * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
-         * @property rect
-         * @public
-         * @since 1.0.0
-         * @type {annie.Rectangle}
-         * @default null
-         */
-        rect: Rectangle;
-        /**
-         * @property _isCache
-         * @private
-         * @since 1.0.0
-         * @type {boolean}
-         * @default false
-         */
-        private _isCache;
         /**
          * 构造函数
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
-         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
-         * @example
-         *      var imgEle=new Image();
-         *      imgEle.onload=function (e) {
-         *          var bitmap = new annie.Bitmap(imgEle)
-         *          //居中对齐
-         *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-         *          s.addChild(bitmap);
-         *
-         *          //截取图片的某一部分显示
-         *          var rect = new annie.Rectangle(0, 0, 200, 200),
-         *          rectBitmap = new annie.Bitmap(imgEle, rect);
-         *          rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *          rectBitmap.y = 100;
-         *          s.addChild(rectBitmap);
-         *      }
-         *      imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
-         *
-         * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
-         */
-        constructor(bitmapData?: any, rect?: Rectangle);
-        /**
-         * HTML的一个Image对象或者是canvas对象或者是video对象
-         * @property bitmapData
-         * @public
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        bitmapData: any;
-        /**
-         * 是否对矢量使用像素碰撞 默认开启
-         * @property hitTestWidthPixel
-         * @type {boolean}
-         * @default false
-         * @since 1.1.0
-         */
-        hitTestWidthPixel: boolean;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        /**
-         * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
-         * @method convertToImage
-         * @static
-         * @public
-         * @since 1.0.0
-         * @param {annie.Bitmap} bitmap
-         * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
-         * @return {Canvas|BitmapData}
-         * @example
-         *      var spriteSheetImg = new Image(),
-         *          rect = new annie.Rectangle(0, 0, 200, 200),
-         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
-         *       spriteSheetImg.onload=function(e){
-         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
-         *          trace(singleSmallImg);
-         *       }
-         *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
-         */
-        static convertToImage(bitmap: annie.Bitmap, isNeedImage?: boolean): any;
+         * @param {string} imagePath 一个图片地址
+        */
+        constructor(imagePath: string);
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -1870,7 +1776,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        private _drawShape(ctx);
+        private _draw(ctx);
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -1940,16 +1846,6 @@ declare namespace annie {
          * @readonly
          */
         children: DisplayObject[];
-        /**
-         * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
-         * @property  cacheAsBitmap
-         * @public
-         * @since 1.1.2
-         * @default false
-         * @type boolean
-         */
-        cacheAsBitmap: boolean;
-        _cacheAsBitmap: boolean;
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -2070,171 +1966,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         render(renderObj: IRender): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 抽象类 一般不直接使用
-     * @class annie.Media
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     */
-    class Media extends annie.EventDispatcher {
-        /**
-         * html 标签 有可能是audio 或者 video
-         * @property media
-         * @type {Video|Audio}
-         * @public
-         * @since 1.0.0
-         */
-        media: any;
-        /**
-         * 媒体类型 VIDEO 或者 AUDIO
-         * @type {string}
-         * @since 1.0.0
-         * @since 1.0.0
-         */
-        type: string;
-        private _loop;
-        /**
-         * 构造函数
-         * @method Media
-         * @param {string|HtmlElement} src
-         * @param {string} type
-         * @since 1.0.0
-         * @example
-         *      var media = new annie.Media('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3', 'Audio');
-         *          media.play();//媒体播放
-         *          //media.pause();//暂停播放
-         *          //media.stop();//停止播放
-         */
-        constructor(src: any, type: string);
-        private _repeate;
-        /**
-         * 开始播放媒体
-         * @method play
-         * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数 默认为1
-         * @public
-         * @since 1.0.0
-         */
-        play(start?: number, loop?: number): void;
-        private _SBWeixin;
-        private _weixinSB();
-        /**
-         * 停止播放
-         * @method stop
-         * @public
-         * @since 1.0.0
-         */
-        stop(): void;
-        /**
-         * 暂停播放,或者恢复播放
-         * @method pause
-         * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
-         * @since 1.0.4
-         */
-        pause(isPause?: boolean): void;
-        /**
-         * 设置或者获取音量 从0-1
-         * @since 1.1.0
-         * @property volume
-         * @returns {number}
-         */
-        volume: number;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 声音类
-     * @class annie.Sound
-     * @extends annie.Media
-     * @public
-     * @since 1.0.0
-     */
-    class Sound extends Media {
-        /**
-         * 构造函数
-         * @method  Sound
-         * @since 1.0.0
-         * @public
-         * @param src
-         * @example
-         *      var soundPlayer = new annie.Sound('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3');
-         *          soundPlayer.play();//播放音乐
-         *          //soundPlayer.pause();//暂停音乐
-         *          //soundPlayer.stop();//停止音乐
-         */
-        constructor(src: any);
-        /**
-         * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destroy
-         * @public
-         * @since 1.1.1
-         */
-        destroy(): void;
-        private static _soundList;
-        /**
-         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method stopAllSounds
-         * @since 1.1.1
-         * @static
-         * @public
-         */
-        static stopAllSounds(): void;
-        /**
-         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method setAllSoundsVolume
-         * @since 1.1.1
-         * @static
-         * @public
-         * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
-         */
-        static setAllSoundsVolume(volume: number): void;
-        private static _volume;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 视频类
-     * @class annie.Video
-     * @extends annie.Media
-     * @public
-     * @since 1.0.0
-     */
-    class Video extends Media {
-        /**
-         * 构造函数
-         * @method Video
-         * @param src
-         * @param width
-         * @param height
-         * @public
-         * @since 1.0.0
-         * @example
-         *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
-         *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
-         *      videoPlayer.play();//播放视频
-         *      //videoPlayer.pause();//暂停视频
-         *      //videoPlayer.stop();//停止播放
-         *      var floatDisplay=new annie.FloatDisplay();
-         *      floatDisplay.init(videoPlayer);
-         *      //这里的spriteObj是任何一个Sprite类或者其扩展类的实例对象
-         *      spriteObj.addChild(floatDisplay);
-         */
-        constructor(src: any, width?: number, height?: number);
     }
 }
 /**
@@ -2401,73 +2132,6 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 此类对于需要在canvas上放置html其他类型元素的时候非常有用<br/>
-     * 比如有时候我们需要放置一个注册,登录或者其他的内容.这些内容包含了输入框<br/>
-     * 或者下拉框什么的,无法在canvas里实现,但这些元素又跟canvas里面的元素<br/>
-     * 位置,大小,缩放对应.就相当于是annie里的一个显示对象一样。可以随意设置他的<br/>
-     * 属性,那么将你的html元素通过此类封装成annie的显示对象再合适不过了
-     * @class annie.FloatDisplay
-     * @extends annie.DisplayObject
-     * @public
-     * @since 1.0.0
-     */
-    class FloatDisplay extends DisplayObject {
-        /**
-         * 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
-         * @property htmlElement
-         * @public
-         * @since 1.0.0
-         * @type{HtmlElement}
-         */
-        htmlElement: any;
-        /**
-         * 是否已经添加了舞台事件
-         * @property _isAdded
-         * @since 1.0.0
-         * @type {boolean}
-         * @private
-         */
-        private _isAdded;
-        /**
-         * 构造函数
-         * @method FloatDisplay
-         * @since 1.0.0
-         * @public
-         * @example
-         *      var floatDisplay = new annie.FloatDisplay();
-         *      floatDisplay.init(document.getElementById('Flash2x'));
-         *      s.addChild(floatDisplay);
-         *
-         * <p><a href="" target="_blank">测试链接</a></p>
-         */
-        constructor();
-        /**
-         * 初始化方法,htmlElement 一定要设置width和height样式,并且一定要用px单位
-         * @method init
-         * @public
-         * @since 1.0.0
-         * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
-         */
-        init(htmlElement: any): void;
-        private getStyle(elem, cssName);
-        /**
-         * @method updateStyle
-         * @public
-         * @since 1.1.4
-         */
-        protected updateStyle(): void;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
      * 动态文本类,有时需要在canvas里有一个动态文本,能根据我们的显示内容来改变
      * @class annie.TextField
      * @extends annie.DisplayObject
@@ -2524,6 +2188,7 @@ declare namespace annie {
          */
         lineType: string;
         private _lineType;
+        private _textOffX;
         /**
          * 文本内容
          * @property text
@@ -2593,12 +2258,15 @@ declare namespace annie {
          */
         border: boolean;
         private _border;
+        private fontInfo;
+        private realLines;
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
          * @private
          * @since 1.0.0
          */
+        private _draw(ctx);
         private _prepContext(ctx);
         /**
          * 获取文本宽
@@ -2632,131 +2300,6 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 输入文本,此文本类是annie.FloatDisplay对象的典型代表
-     * @class annie.InputText
-     * @public
-     * @since 1.0.0
-     * @extends annie.FloatDisplay
-     */
-    class InputText extends FloatDisplay {
-        /**
-         * 输入文本的类型.
-         * @property inputType
-         * @public
-         * @since 1.0.0
-         * @type {number} 0 input 1 password 2 mulit
-         * @default 0
-         */
-        inputType: number;
-        /**
-         * 在手机端是否需要自动收回软键盘，在pc端此参数无效
-         * @property isAutoDownKeyBoard
-         * @type {boolean}
-         * @since 1.0.3
-         * @default true
-         */
-        isAutoDownKeyBoard: boolean;
-        private static _inputTypeList;
-        /**
-         * @method InputText
-         * @public
-         * @since 1.0.0
-         * @param {number} inputType 0 input 1 password 2 multiline
-         * @example
-         *      var inputText=new annie.InputText('singleline');
-         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
-         */
-        constructor(inputType?: number);
-        init(htmlElement: any): void;
-        /**
-         * 被始化输入文件的一些属性
-         * @method initInfo
-         * @public
-         * @since 1.0.0
-         * @param {string} text 默认文字
-         * @param {string}color 文字颜色
-         * @param {string}align 文字的对齐方式
-         * @param {number}size  文字大小
-         * @param {string}font  文字所使用的字体
-         * @param {boolean}showBorder 是否需要显示边框
-         * @param {number}lineSpacing 如果是多行,请设置行高
-         */
-        initInfo(text: string, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
-        lineSpacing: number;
-        /**
-         * 设置文本是否为粗体
-         * @property bold
-         * @param {boolean} bold true或false
-         * @public
-         * @since 1.0.3
-         */
-        bold: boolean;
-        /**
-         * 设置文本是否倾斜
-         * @property italic
-         * @param {boolean} italic true或false
-         * @public
-         * @since 1.0.3
-         */
-        italic: boolean;
-        /**
-         * 文本的行高
-         * @property textHeight
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        textHeight: number;
-        /**
-         * 文本的宽
-         * @property textWidth
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        textWidth: number;
-        /**
-         * 设置文本颜色
-         * @property color
-         * @param {boolean} italic true或false
-         * @public
-         * @since 1.0.3
-         */
-        color: string;
-        /**
-         * 设置或获取是否有边框
-         * @property property
-         * @param {boolean} show true或false
-         * @public
-         * @since 1.0.3
-         */
-        border: boolean;
-        /**
-         * 获取或设置输入文本的值
-         * 之前的getText 和setText 已废弃
-         * @property text
-         * @public
-         * @since 1.0.3
-         * @returns {string}
-         */
-        text: string;
-        /**
-         * 输入文本的最大输入字数
-         * @public
-         * @since 1.1.0
-         * @property maxCharacters
-         * @returns {number}
-         */
-        maxCharacters: number;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
      * @class annie.Stage
@@ -2765,34 +2308,6 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Stage extends Sprite {
-        /**
-         * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
-         * 所以需要自己灵活设置,默认阻止.
-         * @property iosTouchendPreventDefault
-         * @type {boolean}
-         * @default true
-         * @since 1.0.4
-         * @public
-         */
-        iosTouchendPreventDefault: boolean;
-        /**
-         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
-         * @property isPreventDefaultEvent
-         * @since 1.0.9
-         * @default true
-         * @type {boolean}
-         */
-        isPreventDefaultEvent: boolean;
-        /**
-         * 整个引擎的最上层的div元素,
-         * 承载canvas的那个div html元素
-         * @property rootDiv
-         * @public
-         * @since 1.0.0
-         * @type {Html Div}
-         * @default null
-         */
-        rootDiv: any;
         /**
          * 当前stage所使用的渲染器
          * 渲染器有两种,一种是canvas 一种是webGl
@@ -2803,25 +2318,6 @@ declare namespace annie {
          * @default null
          */
         renderObj: IRender;
-        /**
-         * 渲染模式值 只读 CANVAS:0, webGl: 1
-         * @property renderType
-         * @readonly
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         * @readonly
-         */
-        renderType: number;
-        /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @param {string} stageName
-         * @returns {any}
-         * @since 2.0.0
-         */
-        static getStage(stageName?: string): any;
-        private static _stageList;
         /**
          * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -2860,25 +2356,6 @@ declare namespace annie {
          * @type {boolean}
          */
         isMultiMouse: boolean;
-        /**
-         * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
-         * 端默认不开启
-         * @property autoSteering
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default false
-         */
-        autoSteering: boolean;
-        /**
-         * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
-         * @property autoResize
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default false
-         */
-        autoResize: boolean;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
          * @property desWidth
@@ -2959,6 +2436,7 @@ declare namespace annie {
          *
          */
         scaleMode: string;
+        private _scaleMode;
         /**
          * 原始为60的刷新速度时的计数器
          * @property _flush
@@ -2983,24 +2461,23 @@ declare namespace annie {
          * @type {Array}
          * @private
          */
-        private static _isLoadedVConsole;
         private _lastDpList;
-        private _rid;
-        private _floatDisplayList;
+        onTouchEvent: any;
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {string} rootDivId
+         * @param {Canvas} ctx
+         * @param {number} desW canvas宽
+         * @param {number} desH canvas高
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
          * @param {string} scaleMode 缩放模式 StageScaleMode
          * @param {string} bgColor 背景颜色-1为透明
-         * @param {number} renderType 渲染模式0:canvas 1:webGl 2:dom
          * @public
          * @since 1.0.0
          */
-        constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
+        constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
         /**
          * 重写刷新
          * @method update
@@ -3053,18 +2530,6 @@ declare namespace annie {
          */
         getFrameRate(): number;
         /**
-         * 获取引擎所在的div宽高
-         * @method getRootDivWH
-         * @public
-         * @since 1.0.0
-         * @param {HTMLDivElement} div
-         * @returns {{w: number, h: number}}
-         */
-        getRootDivWH(div: HTMLDivElement): {
-            w: number;
-            h: number;
-        };
-        /**
          * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
          * @method kill
          * @since 1.0.0
@@ -3084,21 +2549,11 @@ declare namespace annie {
          */
         private _mP1;
         private _mP2;
-        private onMouseEvent;
+        private _onMouseEvent;
         /**
          * 设置舞台的对齐模式
          */
         private setAlign;
-        /**
-         * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
-         * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
-         * 不管autoResize 的状态是什么，你只要侦听 了stage 的 annie.Event.RESIZE 事件
-         * 都可以接收到舞台变化的通知。
-         * @method resize
-         * @public
-         * @since 1.0.0
-         */
-        resize: () => void;
         getBounds(): Rectangle;
         /**
          * 要循环调用 flush 函数对象列表
@@ -3508,15 +2963,6 @@ declare namespace annie {
          */
         draw(target: any): void;
         /**
-         * 初始化事件
-         * @param stage
-         */
-        init(): void;
-        /**
-         * 改变尺寸
-         */
-        reSize(): void;
-        /**
          * 开始遮罩
          * @param target
          */
@@ -3525,10 +2971,7 @@ declare namespace annie {
          * 结束遮罩
          */
         endMask(): void;
-        /**
-         * 最上层容器对象
-         */
-        rootContainer: any;
+        end(): void;
         /**
          * 开始渲染
          */
@@ -3548,16 +2991,7 @@ declare namespace annie {
      * @since 1.0.0
      */
     class CanvasRender extends AObject implements IRender {
-        /**
-         * 渲染器所在最上层的对象
-         * @property rootContainer
-         * @public
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        rootContainer: any;
-        protected _ctx: any;
+        static drawCtx: any;
         private _stage;
         /**
          * @CanvasRender
@@ -3565,7 +2999,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        constructor(stage: Stage);
+        constructor(stage: Stage, ctx: any);
         /**
          * 开始渲染时执行
          * @method begin
@@ -3588,6 +3022,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         endMask(): void;
+        end(): void;
         /**
          * 调用渲染
          * @public
@@ -3596,272 +3031,8 @@ declare namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         draw(target: any): void;
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.0
-         * @method init
-         */
-        init(): void;
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.0
-         * @method reSize
-         */
-        reSize(): void;
         destroy(): void;
     }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
-     * @class annie.URLLoader
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     * @example
-     *      var urlLoader = new annie.URLLoader();
-     *      urlLoader.addEventListener('onComplete', function (e) {
-     *      //trace(e.data.response);
-     *      var bitmapData = e.data.response,//bitmap图片数据
-     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
-     *      //居中对齐
-     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-     *      s.addChild(bitmap);
-     *      });
-     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
-     */
-    class URLLoader extends EventDispatcher {
-        /**
-         * @param type text json js xml image sound css svg video unKnow
-         */
-        constructor();
-        /**
-         * 取消加载
-         * @method loadCancel
-         * @public
-         * @since 1.0.0
-         */
-        loadCancel(): void;
-        private _req;
-        private headers;
-        /**
-         * 加载或请求数据
-         * @method load
-         * @public
-         * @since 1.0.0
-         * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
-         */
-        load(url: string, contentType?: string): void;
-        /**
-         * 后台返回来的数据类弄
-         * @property responseType
-         * @type {string}
-         * @default null
-         * @public
-         * @since 1.0.0
-         */
-        responseType: string;
-        /**
-         * 请求的url地址
-         * @property url
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        url: string;
-        /**
-         * 请求后台的类型 get post
-         * @property method
-         * @type {string}
-         * @default get
-         * @public
-         * @since 1.0.0
-         */
-        method: string;
-        /**
-         * 需要像后台传送的数据对象
-         * @property data
-         * @public
-         * @since 1.0.0
-         * @default null
-         * @type {Object}
-         */
-        data: Object;
-        /**
-         * 格式化post请求参数
-         * @method _fqs
-         * @param data
-         * @param query
-         * @return {string}
-         * @private
-         * @since 1.0.0
-         */
-        private _fqs;
-        /**
-         * 格式化get 请求参数
-         * @method _fus
-         * @param src
-         * @param data
-         * @return {any}
-         * @private
-         */
-        private _fus;
-        /**
-         * 添加自定义头
-         * @addHeader
-         * @param name
-         * @param value
-         */
-        addHeader(name: string, value: string): void;
-        destroy(): void;
-    }
-}
-/**
- * Flash资源加载或者管理类，静态类，不可实例化
- * 一般都是初始化或者设置从Flash里导出的资源
- * @class Annie2x
- */
-declare namespace Annie2x {
-    let _isReleased: boolean;
-    let _shareSceneList: any;
-    /**
-     * 存储加载资源的总对象
-     * @type {Object}
-     */
-    let res: any;
-    /**
-     * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
-     * @method loadScene
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {string} sceneName fla通过flash2x转换时设置的包名
-     * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100
-     * @param {Function} completeFun 加载完成回高,无回调参数
-     * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
-     */
-    let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
-    /**
-     * 判断一个场景是否已经被加载
-     * @method isLoadedScene
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {string} sceneName
-     * @returns {boolean}
-     */
-    function isLoadedScene(sceneName: string): Boolean;
-    /**
-     * 删除一个场景资源,以方便系统垃圾回收
-     * @method unLoadScene
-     * @public
-     * @static
-     * @since 1.0.2
-     * @param {string} sceneName
-     */
-    function unLoadScene(sceneName: string): void;
-    /**
-     * 获取已经加载场景中的资源
-     * @method getResource
-     * @public
-     * @static
-     * @since 2.0.0
-     * @param {string} sceneName
-     * @param {string} resName
-     * @returns {any}
-     */
-    function getResource(sceneName: string, resName: string): any;
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     */
-    function d(target: any, info: any): void;
-    /**
-     * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method sb
-     */
-    function sb(sceneName: string, resName: string): annie.Bitmap;
-    /**
-     * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-     * @method ajax
-     * @public
-     * @since 1.0.0
-     * @param info 向后台传送数据所需要设置的信息
-     * @param {url} info.url 向后台请求的地址
-     * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
-     * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
-     * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
-     * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
-     * @example
-     *      //get
-     *      Flash2x.ajax({
-     *             type: "GET",
-     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
-     *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
-     *      })
-     *      //post
-     *      Flash2x.ajax({
-     *             type: "POST",
-     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
-     *             data: {phone:'135******58'},
-     *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
-     *      })
-     */
-    function ajax(info: any): void;
-    /**
-     * jsonp调用方法
-     * @method jsonp
-     * @param url
-     * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
-     * @param callbackName
-     * @param callbackFun
-     * @static
-     * @since 1.0.4
-     * @example
-     *      Flash2x.jsonp('js/testData.js', 1, 'getdata', function (result) {
-     *          trace(result);
-     *      })
-     */
-    function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
-    /**
-     * 获取url地址中的get参数
-     * @method getQueryString
-     * @static
-     * @param name
-     * @returns {any}
-     * @since 1.0.9
-     * @example
-     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
-     *      //通过此方法获取id和username的值
-     *      var id=Flash2x.getQueryString("id");
-     *      var userName=Flash2x.getQueryString("username");
-     *      trace(id,userName);
-     */
-    function getQueryString(name: string): string;
-    /**
-     * 引擎自调用.初始化 sprite和movieClip用
-     * @param target
-     * @param {string} _resId
-     * @private
-     */
-    function _initRes(target: any, sceneName: string, resName: string): void;
 }
 /**
  * @module annie
@@ -4381,27 +3552,6 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
-     * @public
-     * @property annie.Eval
-     * @since 1.0.3
-     * @public
-     * @type {any}
-     */
-    let Eval: any;
-    /**
-     * 是否开启调试模式
-     * @public
-     * @since 1.0.1
-     * @public
-     * @property annie.debug
-     * @type {boolean}
-     * @example
-     *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
-     *      annie.debug=true;
-     */
-    let debug: boolean;
-    /**
      * annie引擎的版本号
      * @public
      * @since 1.0.1
@@ -4412,30 +3562,6 @@ declare namespace annie {
      *      trace(annie.version);
      */
     let version: string;
-    /**
-     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
-     * @property annie.osType
-     * @since 1.0.0
-     * @public
-     * @type {string|string}
-     * @static
-     * @example
-     *      //获取当前设备类型
-     *      trace(annie.osType);
-     */
-    let osType: string;
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     * @example
-     *      //打印当前设备的retina值
-     *      trace(annie.devicePixelRatio);
-     */
-    let devicePixelRatio: number;
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -4473,105 +3599,34 @@ declare namespace annie {
         FIXED_WIDTH: string;
         FIXED_HEIGHT: string;
     };
+    let res: any;
+    function loadScene(sceneName: string, sceneRes: any, sceneData: any): void;
     /**
-     * 跳转到指定网址
-     * @method annie.navigateToURL
+     * 获取已经加载场景中的资源
+     * @method getResource
      * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function getResource(sceneName: string, resName: string): any;
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
      * @since 1.0.0
-     * @param {string} url
-     * @static
-     * @example
-     *      displayObject.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *              annie.navigateToURL("http://www.annie2x.com");
-     *      })
-     *
+     * @param {Object} target
+     * @param {Object} info
      */
-    function navigateToURL(url: string): void;
+    function d(target: any, info: any): void;
     /**
-     * 向后台发送数据,但不会理会任何的后台反馈
-     * @method annie.sendToURL
-     * @public
-     * @since 1.0.0
-     * @param {string} url
-     * @static
-     * @example
-     *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
-     *      })
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
      */
-    function sendToURL(url: string): void;
-    /**
-     * 将显示对象转成base64的图片数据
-     * @method annie.toDisplayDataURL
-     * @static
-     * @param {annie.DisplayObject} obj 显示对象
-     * @param {annie.Rectangle} rect 需要裁切的区域，默认不裁切
-     * @param {Object} typeInfo {type:"png"}  或者 {type:"jpeg",quality:100}  png格式不需要设置quality，jpeg 格式需要设置quality的值 从1-100
-     * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
-     * @return {string} base64格式数据
-     * @example
-     *      annie.toDisplayDataURL(DisplayObj, {
-     *               x: 0,
-     *               y: 32,
-     *               width: 441,
-     *               height: 694
-     *       }, {
-     *               type: "jpeg"//数据类型jpg/png
-     *               quality: 90//图片质量值1-100,png格式不需要设置quality
-     *       }, '#CDDBEB');
-     *
-     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
-     */
-    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
-    /**
-     * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
-     * @param {annie.Stage} stage
-     * @param {annie.Rectangle} rect
-     * @returns {Array}
-     * @public
-     * @since 1.1.1
-     */
-    let getStagePixels: (stage: Stage, rect: Rectangle) => number[];
+    function _initRes(target: any, sceneName: string, resName: string): void;
 }
-/**
- * @class 全局
- */
-/**
- * 往控制台打印调试信息
- * @method trace
- * @param {Object} arg 任何个数,任意类型的参数
- * @since 1.0.0
- * @public
- * @static
- * @example
- *      trace(1);
- *      trace(1,"hello");
- */
-declare let trace: (...arg: any[]) => void;
-/**
- * 全局事件触发器
- * @static
- * @property  globalDispatcher
- * @type {annie.EventDispatcher}
- * @public
- * @since 1.0.0
- * @example
- *      //A代码放到任何合适的地方
- *      globalDispatcher.addEventListener("myTest",function(e){
- *          trace("收到了其他地方发来的消息:"+e.data);
- *      });
- *
- *      //B代码放到任何一个可以点击的对象的构造函数中
- *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
- *          globalDispatcher.dispatchEvent("myTest","我是小可");
- *      });
- *
- */
-declare let globalDispatcher: annie.EventDispatcher;
-import F2xContainer = annie.Sprite;
-import F2xMovieClip = annie.MovieClip;
-import F2xText = annie.TextField;
-import F2xInputText = annie.InputText;
-import F2xBitmap = annie.Bitmap;
-import F2xShape = annie.Shape;

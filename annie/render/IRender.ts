@@ -9,15 +9,6 @@ namespace annie {
          */
         draw(target:any):void;
         /**
-         * 初始化事件
-         * @param stage
-         */
-        init():void;
-        /**
-         * 改变尺寸
-         */
-        reSize():void;
-        /**
          * 开始遮罩
          * @param target
          */
@@ -26,10 +17,7 @@ namespace annie {
          * 结束遮罩
          */
         endMask():void;
-        /**
-         * 最上层容器对象
-         */
-        rootContainer:any;
+        end():void;
         /**
          * 开始渲染
          */

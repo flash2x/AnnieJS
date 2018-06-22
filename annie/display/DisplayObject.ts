@@ -408,7 +408,6 @@ namespace annie {
         public startDrag(isCenter:boolean=false,bounds:Rectangle=null):void{
             let s=this;
             if(!s.stage) {
-                trace("The DisplayObject is not on stage");
                 return;
             }
             Stage._dragDisplay=s;
@@ -697,15 +696,6 @@ namespace annie {
             return {width:dr.width,height:dr.height};
         }
         /**
-         * 画缓存位图的时候需要使用
-         * @property _bitmapCanvas
-         * @private
-         * @static
-         * @since 1.0.0
-         * @type {Canvas}
-         */
-        public static _canvas: any = window.document.createElement("canvas");
-        /**
          * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
          * @property _texture
          * @protected
@@ -755,7 +745,7 @@ namespace annie {
          * @param {annie.Sound} sound
          * @returns {number}
          */
-        public addSound(sound:annie.Sound):number{
+        public addSound(sound:any):number{
             let s=this;
             if(!s._a2x_sounds){
                 s._a2x_sounds=[];
