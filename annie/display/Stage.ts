@@ -254,7 +254,6 @@ namespace annie {
             super();
             let s: Stage = this;
             this._instanceType = "annie.Stage";
-            s.name=rootDivId;
             annie.Stage._stageList[rootDivId]=s;
             s.stage = this;
             let resizeEvent = "resize";

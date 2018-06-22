@@ -6458,7 +6458,6 @@ var annie;
             };
             var s = _this;
             _this._instanceType = "annie.Stage";
-            s.name = rootDivId;
             annie.Stage._stageList[rootDivId] = s;
             s.stage = _this;
             var resizeEvent = "resize";
@@ -7559,24 +7558,11 @@ var annie;
          */
         CanvasRender.prototype.beginMask = function (target) {
             var s = this;
-            var isHadPath = false;
-            if (target.children && target.children.length > 0) {
-                target = target.children[0];
-            }
-            if (target._command && target._command.length > 0) {
-                s._ctx.save();
-                s._ctx.globalAlpha = 0;
-                var tm = target.cMatrix;
-                s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                target._drawShape(s._ctx, true);
-                s._ctx.restore();
-                isHadPath = true;
-            }
-            //和后面endMask的restore对应
-            s._ctx.save();
-            if (isHadPath) {
-                s._ctx.clip();
-            }
+            s._ctx.globalAlpha = 0;
+            var tm = target.cMatrix;
+            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            target._drawShape(s._ctx);
+            s._ctx.clip();
         };
         /**
          * 结束遮罩时调用
@@ -7585,7 +7571,6 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.endMask = function () {
-            this._ctx.restore();
         };
         /**
          * 调用渲染
