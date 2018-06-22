@@ -75,7 +75,6 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: any): void {
-            let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp) return;
             let ctx = CanvasRender.drawCtx;
