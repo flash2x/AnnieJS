@@ -219,19 +219,15 @@ namespace annie {
          */
         private _draw(ctx: any): void {
             let s = this;
-            s._prepContext(ctx);
+            ctx.font = s.fontInfo;
+            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
+            ctx.textAlign = s._textAlign;
             ctx.textBaseline = "top";
             for (let i = 0; i < s.realLines.length; i++) {
                 ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
             }
         }
 
-        private _prepContext(ctx:any):void{
-            var s=this;
-            ctx.font = s.fontInfo;
-            ctx.textAlign = s._textAlign || "left";
-            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
-        }
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -272,13 +268,13 @@ namespace annie {
                 if (s._italic) {
                     s.fontInfo  = "italic " + s.fontInfo ;
                 }
-                s._prepContext(ctx);
+                ctx.font = s.fontInfo;
                 let lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     s.realLines[s.realLines.length]=hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.textWidth) {
+                    if (lineW > s._textWidth) {
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let wordW = 0;
@@ -286,7 +282,7 @@ namespace annie {
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > s.textWidth) {
+                            if (w > s._textWidth) {
                                 s.realLines[0] = lineStr;
                                 break;
                             } else {
@@ -305,7 +301,7 @@ namespace annie {
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > this.textWidth) {
+                            if (w > s._textWidth) {
                                 s.realLines[s.realLines.length]=lineStr;
                                 lineStr = str[j];
                                 w = wordW;
@@ -317,10 +313,10 @@ namespace annie {
                     }
                 }
                 let maxH = lineH * s.realLines.length;
-                let maxW = s.textWidth;
-                if (s.textAlign == "center") {
+                let maxW = s._textWidth;
+                if (s._textAlign == "center") {
                     s._textOffX = maxW * 0.5;
-                } else if (s.textAlign == "right") {
+                } else if (s._textAlign == "right") {
                     s._textOffX = maxW;
                 }else{
                     s._textOffX=0;

@@ -2273,7 +2273,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         private _draw(ctx);
-        private _prepContext(ctx);
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -2598,6 +2597,68 @@ declare namespace annie {
          */
         static removeUpdateObj(target: any): void;
         destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 声音类
+     * @class annie.Sound
+     * @extends annie.EventDispatcher
+     * @public
+     * @since 1.0.0
+     */
+    class Sound extends annie.EventDispatcher {
+        /**
+         * html 标签 有可能是audio 或者 video
+         * @property media
+         * @type {Video|Audio}
+         * @public
+         * @since 1.0.0
+         */
+        media: any;
+        private _loop;
+        /**
+         * 构造函数
+         * @method Sound
+         * @param {string|HtmlElement} src
+         * @param {string} type
+         * @since 1.0.0
+         */
+        constructor(src: string);
+        /**
+         * 开始播放媒体
+         * @method play
+         * @param {number} start 开始点 默认为0
+         * @param {number} loop 循环次数 默认为1
+         * @public
+         * @since 1.0.0
+         */
+        play(start?: number, loop?: number): void;
+        /**
+         * 停止播放
+         * @method stop
+         * @public
+         * @since 1.0.0
+         */
+        stop(): void;
+        /**
+         * 暂停播放,或者恢复播放
+         * @method pause
+         * @public
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
+         * @since 1.0.4
+         */
+        pause(isPause?: boolean): void;
+        /**
+         * 设置或者获取音量 从0-1
+         * @since 1.1.0
+         * @property volume
+         * @returns {number}
+         */
+        volume: number;
     }
 }
 /**
@@ -3557,6 +3618,12 @@ declare namespace annie {
  * @class annie2x
  */
 declare namespace annie {
+    /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
+    let createAudio: Function;
+    let getImageInfo: Function;
     /**
      * 继承类方法
      * @type {Function}

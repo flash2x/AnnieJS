@@ -21,6 +21,7 @@ var coreList =[
     "annie/display/MovieClip.ts",
     "annie/display/TextField.ts",
     "annie/display/Stage.ts",
+    "annie/display/Sound.ts",
     "annie/filters/Filters.ts",
     "annie/render/IRender.ts",
     "annie/render/CanvasRender.ts",

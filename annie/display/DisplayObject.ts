@@ -542,7 +542,7 @@ namespace annie {
                 }
             }
             if (UI.UF){
-                s.cFilters.length = 0;
+               /* s.cFilters.length = 0;
                 let sf = s._filters;
                 if(sf) {
                     let len = sf.length;
@@ -558,7 +558,7 @@ namespace annie {
                             s.cFilters.unshift(pf[i]);
                         }
                     }
-                }
+                }*/
             }
             //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
@@ -578,7 +578,7 @@ namespace annie {
          */
         public render(renderObj: IRender|any): void{
             let s = this;
-            let cf = s.cFilters;
+            /*let cf = s.cFilters;
             let cfLen = cf.length;
             let fId=-1;
             if(cfLen) {
@@ -599,9 +599,9 @@ namespace annie {
                 ctx.shadowBlur = 0;
                 ctx.shadowOffsetX = 0;
                 ctx.shadowOffsetY = 0;
-            }else {
+            }else {*/
                 renderObj.draw(s);
-            }
+            //}
         }
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递

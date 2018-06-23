@@ -5,6 +5,12 @@
 namespace annie{
     let res:any={};
     /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
+    export let createAudio:Function=null;
+    export let getImageInfo:Function=null;
+    /**
      * 继承类方法
      * @type {Function}
      */
@@ -55,8 +61,8 @@ namespace annie{
         res[sceneName]={};
         res[sceneName]._a2x_con=sceneData;
         for(let i=0;i<sceneRes.length;i++){
-            if(sceneRes[i].type=="image"||sceneRes[i].type=="sound"){
-                res[sceneName][sceneRes[i].id]=sceneRes[i].src;
+            if(sceneRes[i].type=="image"||sceneRes[i].type=="sound") {
+                res[sceneName][sceneRes[i].id] = sceneRes[i].src;
             }
         }
         let mc: any;
@@ -139,7 +145,7 @@ namespace annie{
      * @returns {any}
      */
     function b(sceneName: string, resName: string): Bitmap {
-        return new annie.Bitmap(res[sceneName][resName]);
+        return new Bitmap(res[sceneName][resName]);
     }
 
     /**
@@ -272,8 +278,8 @@ namespace annie{
         }
         return shape;
     }
-    function s(sceneName: string, resName: string): string {
-        return res[sceneName][resName];
+    function s(sceneName: string, resName: string): Sound {
+        return new Sound(res[sceneName][resName]);
     }
     /**
      * 引擎自调用.初始化 sprite和movieClip用

@@ -2096,23 +2096,23 @@ var annie;
                 }
             }
             if (UI.UF) {
-                s.cFilters.length = 0;
-                var sf = s._filters;
-                if (sf) {
-                    var len = sf.length;
-                    for (var i = 0; i < len; i++) {
-                        s.cFilters.push(sf[i]);
-                    }
-                }
-                if (s.parent) {
-                    if (s.parent.cFilters.length > 0) {
-                        var len = s.parent.cFilters.length;
-                        var pf = s.parent.cFilters;
-                        for (var i = len - 1; i >= 0; i--) {
-                            s.cFilters.unshift(pf[i]);
-                        }
-                    }
-                }
+                /* s.cFilters.length = 0;
+                 let sf = s._filters;
+                 if(sf) {
+                     let len = sf.length;
+                     for (let i = 0; i < len; i++) {
+                         s.cFilters.push(sf[i]);
+                     }
+                 }
+                 if (s.parent) {
+                     if (s.parent.cFilters.length > 0) {
+                         let len = s.parent.cFilters.length;
+                         let pf = s.parent.cFilters;
+                         for (let i = len - 1; i >= 0; i--) {
+                             s.cFilters.unshift(pf[i]);
+                         }
+                     }
+                 }*/
             }
             //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
@@ -2132,19 +2132,19 @@ var annie;
          */
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
-            var cf = s.cFilters;
-            var cfLen = cf.length;
-            var fId = -1;
-            if (cfLen) {
-                for (var i = 0; i < cfLen; i++) {
+            /*let cf = s.cFilters;
+            let cfLen = cf.length;
+            let fId=-1;
+            if(cfLen) {
+                for (let i = 0; i < cfLen; i++) {
                     if (s.cFilters[i].type == "Shadow") {
-                        fId = i;
+                        fId=i;
                         break;
                     }
                 }
             }
-            if (fId >= 0) {
-                var ctx = renderObj["_ctx"];
+            if(fId>=0){
+                let ctx: any = renderObj["_ctx"];
                 ctx.shadowBlur = cf[fId].blur;
                 ctx.shadowColor = cf[fId].color;
                 ctx.shadowOffsetX = cf[fId].offsetX;
@@ -2153,10 +2153,9 @@ var annie;
                 ctx.shadowBlur = 0;
                 ctx.shadowOffsetX = 0;
                 ctx.shadowOffsetY = 0;
-            }
-            else {
-                renderObj.draw(s);
-            }
+            }else {*/
+            renderObj.draw(s);
+            //}
         };
         /**
          * 调用些方法会冒泡的将事件向显示列表下方传递
@@ -2379,6 +2378,13 @@ var annie;
             var s = _this;
             s._instanceType = "annie.Bitmap";
             s._texture = imagePath;
+            annie.getImageInfo({
+                src: imagePath,
+                success: function (res) {
+                    s._bounds.width = res.width;
+                    s._bounds.height = res.height;
+                }
+            });
             return _this;
         }
         /**
@@ -4430,16 +4436,13 @@ var annie;
          */
         TextField.prototype._draw = function (ctx) {
             var s = this;
-            s._prepContext(ctx);
+            ctx.font = s.fontInfo;
+            ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
+            ctx.textAlign = s._textAlign;
+            ctx.textBaseline = "top";
             for (var i = 0; i < s.realLines.length; i++) {
                 ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
             }
-        };
-        TextField.prototype._prepContext = function (ctx) {
-            var s = this;
-            ctx.font = s.fontInfo;
-            ctx.textAlign = s._textAlign || "left";
-            ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
         };
         /**
          * 获取文本宽
@@ -4483,13 +4486,13 @@ var annie;
                 if (s._italic) {
                     s.fontInfo = "italic " + s.fontInfo;
                 }
-                s._prepContext(ctx);
+                ctx.font = s.fontInfo;
                 var lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     s.realLines[s.realLines.length] = hardLines[0];
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.textWidth) {
+                    if (lineW > s._textWidth) {
                         var w = s._getMeasuredWidth(str[0]);
                         var lineStr = str[0];
                         var wordW = 0;
@@ -4497,7 +4500,7 @@ var annie;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > s.textWidth) {
+                            if (w > s._textWidth) {
                                 s.realLines[0] = lineStr;
                                 break;
                             }
@@ -4519,7 +4522,7 @@ var annie;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > this.textWidth) {
+                            if (w > s._textWidth) {
                                 s.realLines[s.realLines.length] = lineStr;
                                 lineStr = str[j];
                                 w = wordW;
@@ -4532,11 +4535,11 @@ var annie;
                     }
                 }
                 var maxH = lineH * s.realLines.length;
-                var maxW = s.textWidth;
-                if (s.textAlign == "center") {
+                var maxW = s._textWidth;
+                if (s._textAlign == "center") {
                     s._textOffX = maxW * 0.5;
                 }
-                else if (s.textAlign == "right") {
+                else if (s._textAlign == "right") {
                     s._textOffX = maxW;
                 }
                 else {
@@ -5380,6 +5383,112 @@ var annie;
         return Stage;
     }(annie.Sprite));
     annie.Stage = Stage;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    //declare let WeixinJSBridge:any;
+    /**
+     * 声音类
+     * @class annie.Sound
+     * @extends annie.EventDispatcher
+     * @public
+     * @since 1.0.0
+     */
+    var Sound = (function (_super) {
+        __extends(Sound, _super);
+        /**
+         * 构造函数
+         * @method Sound
+         * @param {string|HtmlElement} src
+         * @param {string} type
+         * @since 1.0.0
+         */
+        function Sound(src) {
+            var _this = _super.call(this) || this;
+            /**
+             * html 标签 有可能是audio 或者 video
+             * @property media
+             * @type {Video|Audio}
+             * @public
+             * @since 1.0.0
+             */
+            _this.media = null;
+            _this._loop = 0;
+            var s = _this;
+            s._instanceType = "annie.Sound";
+            s.media = annie.createAudio();
+            s.media.src = src;
+            s.media.onEnded = function () {
+                if (s._loop > 1) {
+                    s._loop--;
+                    s.media.play();
+                }
+            };
+            return _this;
+        }
+        /**
+         * 开始播放媒体
+         * @method play
+         * @param {number} start 开始点 默认为0
+         * @param {number} loop 循环次数 默认为1
+         * @public
+         * @since 1.0.0
+         */
+        Sound.prototype.play = function (start, loop) {
+            if (start === void 0) { start = 0; }
+            if (loop === void 0) { loop = 1; }
+            var s = this;
+            s.media.startTime = start;
+            s._loop = loop;
+            s.media.play();
+        };
+        /**
+         * 停止播放
+         * @method stop
+         * @public
+         * @since 1.0.0
+         */
+        Sound.prototype.stop = function () {
+            this.media.stop();
+        };
+        /**
+         * 暂停播放,或者恢复播放
+         * @method pause
+         * @public
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
+         * @since 1.0.4
+         */
+        Sound.prototype.pause = function (isPause) {
+            if (isPause === void 0) { isPause = true; }
+            if (isPause) {
+                this.media.pause();
+            }
+            else {
+                this.media.play();
+            }
+        };
+        Object.defineProperty(Sound.prototype, "volume", {
+            /**
+             * 设置或者获取音量 从0-1
+             * @since 1.1.0
+             * @property volume
+             * @returns {number}
+             */
+            get: function () {
+                return this.media.volume;
+            },
+            set: function (value) {
+                this.media.volume = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Sound;
+    }(annie.EventDispatcher));
+    annie.Sound = Sound;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -7187,6 +7296,12 @@ var annie;
 (function (annie) {
     var res = {};
     /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
+    annie.createAudio = null;
+    annie.getImageInfo = null;
+    /**
      * 继承类方法
      * @type {Function}
      */
@@ -7398,7 +7513,7 @@ var annie;
         if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
-            textObj.font = text;
+            textObj.font = font;
             textObj.size = size;
             textObj.textAlign = textAlign;
             textObj.lineType = lineType;
@@ -7468,7 +7583,7 @@ var annie;
         return shape;
     }
     function s(sceneName, resName) {
-        return res[sceneName][resName];
+        return new annie.Sound(res[sceneName][resName]);
     }
     /**
      * 引擎自调用.初始化 sprite和movieClip用
