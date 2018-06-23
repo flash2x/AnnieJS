@@ -509,7 +509,7 @@ namespace Annie2x {
         if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
-            textObj.font = text;
+            textObj.font = font;
             textObj.size = size;
             textObj.textAlign = textAlign;
             textObj.lineType = lineType;
