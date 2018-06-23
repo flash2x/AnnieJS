@@ -23,12 +23,10 @@ namespace annie {
                 annie._initRes(s, resInfo[0], resInfo[1]);
             }
         }
-
         protected _resId: string | null;
         //sprite 和 moveClip的类资源信息
         private _a2x_res_class: any = null;
         private _a2x_res_children: any = [];
-
         public destroy(): void {
             let s = this;
             //让子级也destroy
@@ -40,7 +38,6 @@ namespace annie {
             s.children = null;
             super.destroy();
         }
-
         /**
          * 是否可以让children接收鼠标事件,如果为false
          * 鼠标事件将不会往下冒泡

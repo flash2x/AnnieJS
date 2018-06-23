@@ -138,6 +138,12 @@ declare namespace annie {
         removeAllEventListener(): void;
         destroy(): void;
     }
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    let globalDispatcher: EventDispatcher;
 }
 /**
  * @module annie
@@ -1377,22 +1383,6 @@ declare namespace annie {
          * @default null
          */
         protected _texture: any;
-        /**
-         * @property _offsetX
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        protected _offsetX: number;
-        /**
-         * @property _offsetY
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        protected _offsetY: number;
         protected _bounds: Rectangle;
         protected _drawRect: Rectangle;
         protected _setProperty(property: string, value: any, type: number): void;
@@ -1787,6 +1777,22 @@ declare namespace annie {
          * @since 1.0.0
          */
         hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * @property _offsetX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetX: number;
+        /**
+         * @property _offsetY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetY: number;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor
@@ -3548,6 +3554,77 @@ declare namespace annie {
     }
 }
 /**
+ * @class annie2x
+ */
+declare namespace annie {
+    /**
+     * 继承类方法
+     * @type {Function}
+     */
+    let A2xExtend: any;
+    /**
+     * 加载后的类引用全放在这里
+     * @type {Object}
+     */
+    let classPool: any;
+    /**
+     * 加载场景的方法
+     * @method loadScene
+     * @param {String|Array} 单个场景名或者多个场景名组成的数组
+     * @type {Function}
+     */
+    let loadScene: Function;
+    /**
+     * 是否已经加载过场景
+     * @method isLoadedScene
+     * @param {string} sceneName
+     * @return {boolean}
+     */
+    function isLoadedScene(sceneName: string): boolean;
+    /**
+     * 删除加载过的场景
+     * @method unLoadScene
+     * @param {string} sceneName
+     */
+    function unLoadScene(sceneName: string): void;
+    /**
+     * 解析资源
+     * @method parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
+    function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
+    /**
+     * 获取已经加载场景中的资源
+     * @method getResource
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function getResource(sceneName: string, resName: string): any;
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} target
+     * @param {Object} info
+     */
+    function d(target: any, info: any): void;
+    /**
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
+     */
+    function _initRes(target: any, sceneName: string, resName: string): void;
+}
+/**
  * @class annie
  */
 declare namespace annie {
@@ -3599,34 +3676,4 @@ declare namespace annie {
         FIXED_WIDTH: string;
         FIXED_HEIGHT: string;
     };
-    let res: any;
-    function loadScene(sceneName: string, sceneRes: any, sceneData: any): void;
-    /**
-     * 获取已经加载场景中的资源
-     * @method getResource
-     * @public
-     * @static
-     * @since 2.0.0
-     * @param {string} sceneName
-     * @param {string} resName
-     * @returns {any}
-     */
-    function getResource(sceneName: string, resName: string): any;
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     */
-    function d(target: any, info: any): void;
-    /**
-     * 引擎自调用.初始化 sprite和movieClip用
-     * @param target
-     * @param {string} _resId
-     * @private
-     */
-    function _initRes(target: any, sceneName: string, resName: string): void;
 }

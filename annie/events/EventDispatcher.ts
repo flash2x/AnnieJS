@@ -262,4 +262,11 @@ namespace annie {
             s.eventTypes=null;
         }
     }
+
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    export let globalDispatcher:EventDispatcher=new EventDispatcher();
 }

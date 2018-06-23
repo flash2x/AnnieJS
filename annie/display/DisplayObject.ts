@@ -704,22 +704,6 @@ namespace annie {
          * @default null
          */
         protected _texture:any=null;
-        /**
-         * @property _offsetX
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        protected _offsetX:number = 0;
-        /**
-         * @property _offsetY
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        protected _offsetY:number = 0;
         protected _bounds:Rectangle=new Rectangle();
         protected _drawRect:Rectangle=new Rectangle();
         protected _setProperty(property:string,value:any,type:number){

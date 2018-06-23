@@ -102,7 +102,6 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
         }
-
         private onMouseDown(e: annie.MouseEvent): void {
             let s = this;
             s._isMouseDown = true;
@@ -120,7 +119,6 @@ namespace annieUI {
             s.addStepObj.sy = ly;
             s.addStepObj.ps = [];
         };
-
         private onMouseUp(e: annie.MouseEvent): void {
             let s = this;
             if(s._isMouseDown) {

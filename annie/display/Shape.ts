@@ -329,10 +329,6 @@ namespace annie {
             let s = this;
             s._command = [];
             s._UI.UD = true;
-            if (s._texture) {
-                s._texture.width = 0;
-                s._texture.height = 0;
-            }
             s._offsetX = 0;
             s._offsetY = 0;
             s._bounds.width = 0;
@@ -656,18 +652,18 @@ namespace annie {
                             leftX = 0;
                             leftY = 0;
                         }
-                        leftX -= 20 + lineWidth >> 1;
-                        leftY -= 20 + lineWidth >> 1;
-                        buttonRightX += 20 + lineWidth >> 1;
-                        buttonRightY += 20 + lineWidth >> 1;
+                        leftX -= lineWidth >> 1;
+                        leftY -=lineWidth >> 1;
+                        buttonRightX +=lineWidth >> 1;
+                        buttonRightY +=lineWidth >> 1;
                         let w = buttonRightX - leftX;
                         let h = buttonRightY - leftY;
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX+10;
-                        s._bounds.y = leftY+10;
-                        s._bounds.width = w - 20;
-                        s._bounds.height = h - 20;
+                        s._bounds.x = leftX;
+                        s._bounds.y = leftY;
+                        s._bounds.width = w;
+                        s._bounds.height = h;
                     }
                 }
                 s._UI.UD = false;
@@ -734,7 +730,22 @@ namespace annie {
             }
             return null;
         }
-
+        /**
+         * @property _offsetX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetX:number = 0;
+        /**
+         * @property _offsetY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetY:number = 0;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor

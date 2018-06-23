@@ -220,6 +220,7 @@ namespace annie {
         private _draw(ctx: any): void {
             let s = this;
             s._prepContext(ctx);
+            ctx.textBaseline = "top";
             for (let i = 0; i < s.realLines.length; i++) {
                 ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
             }

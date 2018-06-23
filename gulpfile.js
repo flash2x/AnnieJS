@@ -26,6 +26,7 @@ var coreList =[
     "annie/render/CanvasRender.ts",
     "annie/utils/Tween.ts",
     "annie/utils/Timer.ts",
+    "annie/utils/Flash2x.ts",
     "annie/Annie.ts",
     "annie/GlobalFunction.ts"
 ];

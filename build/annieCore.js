@@ -276,6 +276,12 @@ var annie;
         return EventDispatcher;
     }(AObject));
     annie.EventDispatcher = EventDispatcher;
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    annie.globalDispatcher = new EventDispatcher();
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -1642,22 +1648,6 @@ var annie;
              * @default null
              */
             _this._texture = null;
-            /**
-             * @property _offsetX
-             * @protected
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            _this._offsetX = 0;
-            /**
-             * @property _offsetY
-             * @protected
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
-            _this._offsetY = 0;
             _this._bounds = new annie.Rectangle();
             _this._drawRect = new annie.Rectangle();
             _this._a2x_sounds = null;
@@ -2512,6 +2502,22 @@ var annie;
                     }
                 }
             };
+            /**
+             * @property _offsetX
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            _this._offsetX = 0;
+            /**
+             * @property _offsetY
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            _this._offsetY = 0;
             _this._instanceType = "annie.Shape";
             return _this;
         }
@@ -2798,10 +2804,6 @@ var annie;
             var s = this;
             s._command = [];
             s._UI.UD = true;
-            if (s._texture) {
-                s._texture.width = 0;
-                s._texture.height = 0;
-            }
             s._offsetX = 0;
             s._offsetY = 0;
             s._bounds.width = 0;
@@ -3080,18 +3082,18 @@ var annie;
                             leftX = 0;
                             leftY = 0;
                         }
-                        leftX -= 20 + lineWidth >> 1;
-                        leftY -= 20 + lineWidth >> 1;
-                        buttonRightX += 20 + lineWidth >> 1;
-                        buttonRightY += 20 + lineWidth >> 1;
+                        leftX -= lineWidth >> 1;
+                        leftY -= lineWidth >> 1;
+                        buttonRightX += lineWidth >> 1;
+                        buttonRightY += lineWidth >> 1;
                         var w = buttonRightX - leftX;
                         var h = buttonRightY - leftY;
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX + 10;
-                        s._bounds.y = leftY + 10;
-                        s._bounds.width = w - 20;
-                        s._bounds.height = h - 20;
+                        s._bounds.x = leftX;
+                        s._bounds.y = leftY;
+                        s._bounds.width = w;
+                        s._bounds.height = h;
                     }
                 }
                 s._UI.UD = false;
@@ -6149,7 +6151,6 @@ var annie;
          * @public
          */
         CanvasRender.prototype.begin = function () {
-            var s = this;
             CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
         };
         /**
@@ -6160,25 +6161,13 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.beginMask = function (target) {
-            /*let isHadPath = false;
-            let _ctx=CanvasRender.drawCtx;
-            if (target.children && target.children.length > 0) {
-                target = target.children[0];
-            }
-            if (target._command && target._command.length > 0) {
-                _ctx.save();
-                _ctx.globalAlpha = 0;
-                let tm = target.cMatrix;
-                _ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                target._draw(_ctx);
-                _ctx.restore();
-                isHadPath = true;
-            }
-            //和后面endMask的restore对应
+            var _ctx = CanvasRender.drawCtx;
+            var tm = target.cMatrix;
             _ctx.save();
-            if (isHadPath) {
-                _ctx.clip();
-            }*/
+            _ctx.globalAlpha = 0;
+            _ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            target._draw(_ctx);
+            _ctx.clip();
         };
         /**
          * 结束遮罩时调用
@@ -6187,7 +6176,7 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.endMask = function () {
-            //CanvasRender.drawCtx.restore();
+            CanvasRender.drawCtx.restore();
         };
         CanvasRender.prototype.end = function () {
             CanvasRender.drawCtx.draw();
@@ -6200,12 +6189,10 @@ var annie;
          * @param {annie.DisplayObject} target 显示对象
          */
         CanvasRender.prototype.draw = function (target) {
-            var s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp)
                 return;
             var ctx = CanvasRender.drawCtx;
-            ctx.save();
             ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
@@ -6216,7 +6203,6 @@ var annie;
             else {
                 target._draw(ctx);
             }
-            ctx.restore();
         };
         CanvasRender.prototype.destroy = function () {
             var s = this;
@@ -7195,65 +7181,64 @@ var annie;
     annie.Timer = Timer;
 })(annie || (annie = {}));
 /**
- * @class annie
+ * @class annie2x
  */
 var annie;
 (function (annie) {
+    var res = {};
     /**
-     * annie引擎的版本号
-     * @public
-     * @since 1.0.1
-     * @property annie.version
-     * @type {string}
-     * @example
-     *      //打印当前引擎的版本号
-     *      trace(annie.version);
+     * 继承类方法
+     * @type {Function}
      */
-    annie.version = "2.0.0";
+    annie.A2xExtend = null;
     /**
-     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
-     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
-     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
-     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
-     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * @property annie.StageScaleMode
+     * 加载后的类引用全放在这里
      * @type {Object}
-     * @public
-     * @since 1.0.0
-     * @static
-     * @example
-     *      //动态更改stage的对齐方式示例
-     *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
-     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
-     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
-     *              if(i>5){i=0;}
-     *          }
-     *      }
-     *
      */
-    annie.StageScaleMode = {
-        EXACT_FIT: "exactFit",
-        NO_BORDER: "noBorder",
-        NO_SCALE: "noScale",
-        SHOW_ALL: "showAll",
-        FIXED_WIDTH: "fixedWidth",
-        FIXED_HEIGHT: "fixedHeight"
-    };
-    annie.res = {};
-    function loadScene(sceneName, sceneRes, sceneData) {
-        annie.res[sceneName] = {};
-        annie.res[sceneName]._a2x_con = sceneData;
+    annie.classPool = null;
+    /**
+     * 加载场景的方法
+     * @method loadScene
+     * @param {String|Array} 单个场景名或者多个场景名组成的数组
+     * @type {Function}
+     */
+    annie.loadScene = null;
+    /**
+     * 是否已经加载过场景
+     * @method isLoadedScene
+     * @param {string} sceneName
+     * @return {boolean}
+     */
+    function isLoadedScene(sceneName) {
+        if (annie.classPool[sceneName]) {
+            return true;
+        }
+        return false;
+    }
+    annie.isLoadedScene = isLoadedScene;
+    /**
+     * 删除加载过的场景
+     * @method unLoadScene
+     * @param {string} sceneName
+     */
+    function unLoadScene(sceneName) {
+        annie.classPool[sceneName] = null;
+        delete annie.classPool[sceneName];
+    }
+    annie.unLoadScene = unLoadScene;
+    /**
+     * 解析资源
+     * @method parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
+    function parseScene(sceneName, sceneRes, sceneData) {
+        res[sceneName] = {};
+        res[sceneName]._a2x_con = sceneData;
         for (var i = 0; i < sceneRes.length; i++) {
             if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
-                annie.res[sceneName][sceneRes[i].id] = sceneRes[i].src;
+                res[sceneName][sceneRes[i].id] = sceneRes[i].src;
             }
         }
         var mc;
@@ -7311,7 +7296,7 @@ var annie;
             }
         }
     }
-    annie.loadScene = loadScene;
+    annie.parseScene = parseScene;
     /**
      * 获取已经加载场景中的资源
      * @method getResource
@@ -7323,8 +7308,8 @@ var annie;
      * @returns {any}
      */
     function getResource(sceneName, resName) {
-        if (annie.res[sceneName][resName]) {
-            return annie.res[sceneName][resName];
+        if (res[sceneName][resName]) {
+            return res[sceneName][resName];
         }
         return null;
     }
@@ -7340,7 +7325,7 @@ var annie;
      * @returns {any}
      */
     function b(sceneName, resName) {
-        return new annie.Bitmap(annie.res[sceneName][resName]);
+        return new annie.Bitmap(res[sceneName][resName]);
     }
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
@@ -7397,7 +7382,7 @@ var annie;
      * @returns {annie.TextFiled|annie.InputText}
      */
     function t(sceneName, resName) {
-        var textDate = annie.res[sceneName]._a2x_con[resName];
+        var textDate = res[sceneName]._a2x_con[resName];
         var textObj;
         var text = decodeURIComponent(textDate[9]);
         var font = decodeURIComponent(textDate[4]);
@@ -7442,7 +7427,7 @@ var annie;
      * @returns {annie.Shape}
      */
     function g(sceneName, resName) {
-        var shapeDate = annie.res[sceneName]._a2x_con[resName][1];
+        var shapeDate = res[sceneName]._a2x_con[resName][1];
         var shape = new annie.Shape();
         for (var i = 0; i < shapeDate.length; i++) {
             if (shapeDate[i][0] == 1) {
@@ -7483,7 +7468,7 @@ var annie;
         return shape;
     }
     function s(sceneName, resName) {
-        return annie.res[sceneName][resName];
+        return res[sceneName][resName];
     }
     /**
      * 引擎自调用.初始化 sprite和movieClip用
@@ -7494,7 +7479,7 @@ var annie;
     function _initRes(target, sceneName, resName) {
         var Root = window;
         //资源树最顶层
-        var resRoot = annie.res[sceneName];
+        var resRoot = res[sceneName];
         //资源树里类对象json数据
         var classRoot = resRoot._a2x_con;
         //资源树里类对象json数据里非资源类数据
@@ -7639,6 +7624,60 @@ var annie;
         }
     }
     annie._initRes = _initRes;
+})(annie || (annie = {}));
+/**
+ * @class annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * annie引擎的版本号
+     * @public
+     * @since 1.0.1
+     * @property annie.version
+     * @type {string}
+     * @example
+     *      //打印当前引擎的版本号
+     *      trace(annie.version);
+     */
+    annie.version = "2.0.0";
+    /**
+     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
+     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
+     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
+     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
+     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * @property annie.StageScaleMode
+     * @type {Object}
+     * @public
+     * @since 1.0.0
+     * @static
+     * @example
+     *      //动态更改stage的对齐方式示例
+     *      //以下代码放到一个舞台的显示对象的构造函数中
+     *      let s=this;
+     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+     *          let i=0;
+     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              let state=e.currentTarget;
+     *              state.scaleMode=aList[i];
+     *              state.resize();
+     *              if(i>5){i=0;}
+     *          }
+     *      }
+     *
+     */
+    annie.StageScaleMode = {
+        EXACT_FIT: "exactFit",
+        NO_BORDER: "noBorder",
+        NO_SCALE: "noScale",
+        SHOW_ALL: "showAll",
+        FIXED_WIDTH: "fixedWidth",
+        FIXED_HEIGHT: "fixedHeight"
+    };
 })(annie || (annie = {}));
 /// <reference path="./display/Stage.ts" />
 /// <reference path="./utils/Tween.ts" />
