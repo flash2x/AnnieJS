@@ -231,7 +231,7 @@ namespace annie {
                 font = "italic " + font;
             }
             ctx.font = font;
-            ctx.textAlign = this._textAlign || "left";
+            ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
             ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha)
         }
@@ -315,9 +315,9 @@ namespace annie {
                 let maxH = lineH * realLines.length;
                 let maxW = s.textWidth;
                 let tx = 0;
-                if (s.textAlign == "center") {
+                if (s._textAlign == "center") {
                     tx = maxW * 0.5;
-                } else if (s.textAlign == "right") {
+                } else if (s._textAlign == "right") {
                     tx = maxW;
                 }
                 can.width = maxW + 20;

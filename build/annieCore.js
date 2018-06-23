@@ -5321,7 +5321,7 @@ var annie;
                 font = "italic " + font;
             }
             ctx.font = font;
-            ctx.textAlign = this._textAlign || "left";
+            ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
         };
@@ -5410,10 +5410,10 @@ var annie;
                 var maxH = lineH * realLines.length;
                 var maxW = s.textWidth;
                 var tx = 0;
-                if (s.textAlign == "center") {
+                if (s._textAlign == "center") {
                     tx = maxW * 0.5;
                 }
-                else if (s.textAlign == "right") {
+                else if (s._textAlign == "right") {
                     tx = maxW;
                 }
                 can.width = maxW + 20;
@@ -8507,7 +8507,7 @@ var Annie2x;
         if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
-            textObj.font = text;
+            textObj.font = font;
             textObj.size = size;
             textObj.textAlign = textAlign;
             textObj.lineType = lineType;
