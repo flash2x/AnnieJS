@@ -11,7 +11,7 @@ namespace annie {
         protected  _instanceId: number = 0;
         protected _instanceType: string = "annie.AObject";
         protected static _object_id = 0;
-        protected constructor() {
+        constructor() {
             this._instanceId = AObject._object_id++;
         }
         /**
@@ -110,7 +110,7 @@ namespace annie {
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        public addEventListener(type: string, listener: Function,): void {
+        public addEventListener(type: string, listener: any): void {
             if (!type) {
                 throw new Error("添加侦听的type值为undefined");
             }

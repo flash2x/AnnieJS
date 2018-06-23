@@ -23,7 +23,7 @@ namespace annie {
                 annie._initRes(s, resInfo[0], resInfo[1]);
             }
         }
-        protected _resId: string | null;
+        protected _resId: string =null;
         //sprite 和 moveClip的类资源信息
         private _a2x_res_class: any = null;
         private _a2x_res_children: any = [];

@@ -740,7 +740,8 @@ namespace annie {
                 for (let i = 0; i < len; i++) {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                 }
-            },20);
+            },16);
+            //什么时候支持这个方法，什么时候就换上
             //requestAnimationFrame(Stage.flushAll);
         }
 

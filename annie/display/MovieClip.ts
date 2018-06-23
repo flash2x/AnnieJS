@@ -323,7 +323,7 @@ namespace annie {
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
                     let timeLineObj = s._a2x_res_class;
-                    let curFrameObj = null;
+                    let curFrameObj:any = null;
                     let lastFrameObj = s._lastFrameObj;
                     if (timeLineObj.timeLine[s._curFrame - 1] >= 0) {
                         curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];

@@ -1,13 +1,8 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 /**
  * @module annie
  */
@@ -71,11 +66,10 @@ var annie;
     var EventDispatcher = (function (_super) {
         __extends(EventDispatcher, _super);
         function EventDispatcher() {
-            var _this = _super.call(this) || this;
-            _this.eventTypes = {};
-            _this.eventTypes1 = {};
-            _this._instanceType = "annie.EventDispatcher";
-            return _this;
+            _super.call(this);
+            this.eventTypes = {};
+            this.eventTypes1 = {};
+            this._instanceType = "annie.EventDispatcher";
         }
         /**
          * 看看有多少mouse或者touch侦听数
@@ -302,7 +296,7 @@ var annie;
          * @param {string} type 事件类型
          */
         function Event(type) {
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * 事件类型名
              * @property type
@@ -310,7 +304,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.type = "";
+            this.type = "";
             /**
              * 触发此事件的对象
              * @property target
@@ -318,7 +312,7 @@ var annie;
              * @since 1.0.0
              * @type {any}
              */
-            _this.target = null;
+            this.target = null;
             /**
              * 随着事件一起附带的信息对象
              * 所有需要随事件一起发送的信息都可以放在此对象中
@@ -328,7 +322,7 @@ var annie;
              * @type {any}
              * @default null
              */
-            _this.data = null;
+            this.data = null;
             /**
              * 是否阻止事件向下冒泡
              * @property _pd
@@ -336,10 +330,9 @@ var annie;
              * @private
              * @since 1.0.0
              */
-            _this._pd = false;
-            _this._instanceType = "annie.Event";
-            _this.type = type;
-            return _this;
+            this._pd = false;
+            this._instanceType = "annie.Event";
+            this.type = type;
         }
         /**
          * 阻止向下冒泡事件,如果在接收到事件后调用事件的这个方法,那么这个事件将不会再向显示对象的子级派送
@@ -612,7 +605,7 @@ var annie;
          * @param {string} type
          */
         function MouseEvent(type) {
-            var _this = _super.call(this, type) || this;
+            _super.call(this, type);
             /**
              * mouse或touch事件时rootDiv坐标x点
              * @property clientX
@@ -620,7 +613,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            _this.clientX = 0;
+            this.clientX = 0;
             /**
              * mouse或touch事件时rootDiv坐标y点
              * @property clientY
@@ -628,7 +621,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            _this.clientY = 0;
+            this.clientY = 0;
             /**
              * mouse或touch事件时全局坐标x点
              * @property stageX
@@ -636,7 +629,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            _this.stageX = 0;
+            this.stageX = 0;
             /**
              * mouse或touch事件时全局坐标y点
              * @property stageY
@@ -644,7 +637,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            _this.stageY = 0;
+            this.stageY = 0;
             /**
              * mouse或touch事件时本地坐标x点
              * @property localX
@@ -652,7 +645,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            _this.localX = 0;
+            this.localX = 0;
             /**
              * mouse或touch事件时本地坐标y点
              * @property localY
@@ -660,7 +653,7 @@ var annie;
              * @since 1.0.0
              * @type {number}
              */
-            _this.localY = 0;
+            this.localY = 0;
             /**
              * 绑定此事件的侦听对象
              * @property currentTarget
@@ -669,7 +662,7 @@ var annie;
              * @type{annie.DisplayObject}
              * @default null
              */
-            _this.currentTarget = null;
+            this.currentTarget = null;
             /**
              * 触摸或者鼠标事件的手指唯一标识
              * @property identifier
@@ -677,9 +670,8 @@ var annie;
              * @since 1.1.2
              * @public
              */
-            _this.identifier = 0;
-            _this._instanceType = "annie.MouseEvent";
-            return _this;
+            this.identifier = 0;
+            this._instanceType = "annie.MouseEvent";
         }
         /**
          * 事件后立即更新显示列表状态
@@ -773,7 +765,7 @@ var annie;
          * @param {string} type
          */
         function TouchEvent(type) {
-            var _this = _super.call(this, type) || this;
+            _super.call(this, type);
             /**
              * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第1个点。
              * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
@@ -783,7 +775,7 @@ var annie;
              * @since 1.0.3
              * @type {annie.Point}
              */
-            _this.clientPoint1 = new annie.Point();
+            this.clientPoint1 = new annie.Point();
             /**
              * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第2个点。
              * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
@@ -793,21 +785,20 @@ var annie;
              * @since 1.0.3
              * @type {annie.Point}
              */
-            _this.clientPoint2 = new annie.Point();
+            this.clientPoint2 = new annie.Point();
             /**
              * 相对于上一次的缩放值
              * @property scale
              * @since 1.0.3
              */
-            _this.scale = 0;
+            this.scale = 0;
             /**
              * 相对于上一次的旋转值
              * @property rotate
              * @since 1.0.3
              */
-            _this.rotate = 0;
-            _this._instanceType = "annie.TouchEvent";
-            return _this;
+            this.rotate = 0;
+            this._instanceType = "annie.TouchEvent";
         }
         /**
          * 事件后立即更新显示列表状态
@@ -861,7 +852,7 @@ var annie;
         function Point(x, y) {
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * 水平坐标
              * @property x
@@ -869,7 +860,7 @@ var annie;
              * @since 1.0.0
              * @type{number}
              */
-            _this.x = 0;
+            this.x = 0;
             /**
              * 垂直坐标
              * @property y
@@ -877,12 +868,11 @@ var annie;
              * @public
              * @type {number}
              */
-            _this.y = 0;
-            var s = _this;
+            this.y = 0;
+            var s = this;
             s._instanceType = "annie.Point";
             s.x = x;
             s.y = y;
-            return _this;
         }
         Point.prototype.destroy = function () { };
         /**
@@ -894,7 +884,7 @@ var annie;
         Point.distance = function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
+                args[_i - 0] = arguments[_i];
             }
             var len = args.length;
             if (len == 4) {
@@ -979,7 +969,7 @@ var annie;
             if (d === void 0) { d = 1; }
             if (tx === void 0) { tx = 0; }
             if (ty === void 0) { ty = 0; }
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * @property a
              * @type {number}
@@ -987,42 +977,42 @@ var annie;
              * @default 1
              * @since 1.0.0
              */
-            _this.a = 1;
+            this.a = 1;
             /**
              * @property b
              * @public
              * @since 1.0.0
              * @type {number}
              */
-            _this.b = 0;
+            this.b = 0;
             /**
              * @property c
              * @type {number}
              * @public
              * @since 1.0.0
              */
-            _this.c = 0;
+            this.c = 0;
             /**
              * @property d
              * @type {number}
              * @public
              * @since 1.0.0
              */
-            _this.d = 1;
+            this.d = 1;
             /**
              * @property tx
              * @type {number}
              * @public
              * @since 1.0.0
              */
-            _this.tx = 0;
+            this.tx = 0;
             /**
              * @property ty
              * @type {number}
              * @since 1.0.0
              * @public
              */
-            _this.ty = 0;
+            this.ty = 0;
             /**
              * 将一个点通过矩阵变换后的点
              * @method transformPoint
@@ -1033,7 +1023,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.transformPoint = function (x, y, bp) {
+            this.transformPoint = function (x, y, bp) {
                 if (bp === void 0) { bp = null; }
                 var s = this;
                 if (!bp) {
@@ -1050,7 +1040,7 @@ var annie;
              * @since 1.0.0
              * @param {annie.Matrix} mtx
              */
-            _this.prepend = function (mtx) {
+            this.prepend = function (mtx) {
                 var s = this;
                 var a = mtx.a;
                 var b = mtx.b;
@@ -1068,7 +1058,7 @@ var annie;
                 s.tx = a * tx1 + c * s.ty + tx;
                 s.ty = b * tx1 + d * s.ty + ty;
             };
-            var s = _this;
+            var s = this;
             s._instanceType = "annie.Matrix";
             s.a = a;
             s.b = b;
@@ -1076,7 +1066,6 @@ var annie;
             s.d = d;
             s.tx = tx;
             s.ty = ty;
-            return _this;
         }
         /**
          * 复制一个矩阵
@@ -1311,7 +1300,7 @@ var annie;
             if (y === void 0) { y = 0; }
             if (width === void 0) { width = 0; }
             if (height === void 0) { height = 0; }
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * 矩形左上角的 x 坐标
              * @property x
@@ -1320,7 +1309,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            _this.x = 0;
+            this.x = 0;
             /**
              * 矩形左上角的 y 坐标
              * @property y
@@ -1329,7 +1318,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            _this.y = 0;
+            this.y = 0;
             /**
              * 矩形的宽度（以像素为单位）
              * @property width
@@ -1338,7 +1327,7 @@ var annie;
              * @type{number}
              * @default 0
              */
-            _this.width = 0;
+            this.width = 0;
             /**
              * 矩形的高度（以像素为单位）
              * @property height
@@ -1347,14 +1336,13 @@ var annie;
              * @type{number}
              * @default 0
              */
-            _this.height = 0;
-            var s = _this;
+            this.height = 0;
+            var s = this;
             s._instanceType = "annie.Rectangle";
             s.x = x;
             s.y = y;
             s.height = height;
             s.width = width;
-            return _this;
         }
         /**
          * 判断一个点是否在矩形内包括边
@@ -1380,7 +1368,7 @@ var annie;
         Rectangle.createFromRects = function () {
             var arg = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                arg[_i] = arguments[_i];
+                arg[_i - 0] = arguments[_i];
             }
             if (arg.length == 0) {
                 return null;
@@ -1525,13 +1513,13 @@ var annie;
          * @public
          */
         function DisplayObject() {
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * 更新信息
              * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              */
-            _this._UI = { UD: false, UM: true, UA: true, UF: false };
+            this._UI = { UD: false, UM: true, UA: true, UF: false };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -1541,7 +1529,7 @@ var annie;
              * @default null;
              * @readonly
              * */
-            _this.stage = null;
+            this.stage = null;
             /**
              * 显示对象的父级
              * @property parent
@@ -1551,7 +1539,7 @@ var annie;
              * @default null
              * @readonly
              */
-            _this.parent = null;
+            this.parent = null;
             /**
              * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
              * @property cAlpha
@@ -1560,7 +1548,7 @@ var annie;
              * @since 1.0.0
              * @default 1
              */
-            _this.cAlpha = 1;
+            this.cAlpha = 1;
             /**
              * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
@@ -1569,7 +1557,7 @@ var annie;
              * @default null
              * @since 1.0.0
              */
-            _this.cMatrix = new annie.Matrix();
+            this.cMatrix = new annie.Matrix();
             /**
              * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
              * @property _enterFrameEvent
@@ -1578,7 +1566,7 @@ var annie;
              * @default null
              * @since 1.0.0
              */
-            _this._enterFrameEvent = null;
+            this._enterFrameEvent = null;
             /**
              * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
              * @property mouseEnable
@@ -1587,7 +1575,7 @@ var annie;
              * @since 1.0.0
              * @default false
              */
-            _this.mouseEnable = true;
+            this.mouseEnable = true;
             /**
              * 显示对象上对显示列表上的最终的所有滤镜组
              * @property cFilters
@@ -1596,7 +1584,7 @@ var annie;
              * @since 1.0.0
              * @type {Array}
              */
-            _this.cFilters = [];
+            this.cFilters = [];
             /**
              * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
              * @property name
@@ -1605,18 +1593,18 @@ var annie;
              * @type {string}
              * @default ""
              */
-            _this.name = "";
-            _this._x = 0;
-            _this._y = 0;
-            _this._scaleX = 1;
-            _this._scaleY = 1;
-            _this._rotation = 0;
-            _this._alpha = 1;
-            _this._skewX = 0;
-            _this._skewY = 0;
-            _this._anchorX = 0;
-            _this._anchorY = 0;
-            _this._visible = true;
+            this.name = "";
+            this._x = 0;
+            this._y = 0;
+            this._scaleX = 1;
+            this._scaleY = 1;
+            this._rotation = 0;
+            this._alpha = 1;
+            this._skewX = 0;
+            this._skewY = 0;
+            this._anchorX = 0;
+            this._anchorY = 0;
+            this._visible = true;
             /**
              * 显示对象的混合模式
              * 支持的混合模式大概有
@@ -1626,19 +1614,19 @@ var annie;
              * @type {string}
              * @default 0
              */
-            _this.blendMode = "normal";
-            _this._matrix = new annie.Matrix();
-            _this._mask = null;
-            _this._filters = [];
+            this.blendMode = "normal";
+            this._matrix = new annie.Matrix();
+            this._mask = null;
+            this._filters = [];
             /**
              * 是否自己的父级发生的改变
              * @type {boolean}
              * @private
              */
-            _this._cp = true;
-            _this._dragBounds = new annie.Rectangle();
-            _this._isDragCenter = false;
-            _this._lastDragPoint = new annie.Point();
+            this._cp = true;
+            this._dragBounds = new annie.Rectangle();
+            this._isDragCenter = false;
+            this._lastDragPoint = new annie.Point();
             /**
              * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
              * @property _texture
@@ -1647,13 +1635,12 @@ var annie;
              * @type {any}
              * @default null
              */
-            _this._texture = null;
-            _this._bounds = new annie.Rectangle();
-            _this._drawRect = new annie.Rectangle();
-            _this._a2x_sounds = null;
-            _this._a2x_res_obj = {};
-            _this._instanceType = "annie.DisplayObject";
-            return _this;
+            this._texture = null;
+            this._bounds = new annie.Rectangle();
+            this._drawRect = new annie.Rectangle();
+            this._a2x_sounds = null;
+            this._a2x_res_obj = {};
+            this._instanceType = "annie.DisplayObject";
         }
         Object.defineProperty(DisplayObject.prototype, "x", {
             /**
@@ -2096,23 +2083,6 @@ var annie;
                 }
             }
             if (UI.UF) {
-                /* s.cFilters.length = 0;
-                 let sf = s._filters;
-                 if(sf) {
-                     let len = sf.length;
-                     for (let i = 0; i < len; i++) {
-                         s.cFilters.push(sf[i]);
-                     }
-                 }
-                 if (s.parent) {
-                     if (s.parent.cFilters.length > 0) {
-                         let len = s.parent.cFilters.length;
-                         let pf = s.parent.cFilters;
-                         for (let i = len - 1; i >= 0; i--) {
-                             s.cFilters.unshift(pf[i]);
-                         }
-                     }
-                 }*/
             }
             //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
@@ -2374,8 +2344,8 @@ var annie;
          * @param {string} imagePath 一个图片地址
         */
         function Bitmap(imagePath) {
-            var _this = _super.call(this) || this;
-            var s = _this;
+            _super.call(this);
+            var s = this;
             s._instanceType = "annie.Bitmap";
             s._texture = imagePath;
             annie.getImageInfo({
@@ -2385,7 +2355,6 @@ var annie;
                     s._bounds.height = res.height;
                 }
             });
-            return _this;
         }
         /**
          * 重写hitTestPoint
@@ -2436,7 +2405,7 @@ var annie;
     var Shape = (function (_super) {
         __extends(Shape, _super);
         function Shape() {
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
              * @property _command
@@ -2445,7 +2414,7 @@ var annie;
              * @type {Array}
              * @default []
              */
-            _this._command = [];
+            this._command = [];
             /**
              * 是否对矢量使用像素碰撞 默认开启
              * @property hitTestWidthPixel
@@ -2453,7 +2422,7 @@ var annie;
              * @default true
              * @since 1.1.0
              */
-            _this.hitTestWidthPixel = true;
+            this.hitTestWidthPixel = true;
             /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
@@ -2463,7 +2432,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.beginRadialGradientFill = function (points, colors) {
+            this.beginRadialGradientFill = function (points, colors) {
                 this._fill(Shape.getGradientColor(points, colors));
             };
             /**
@@ -2478,14 +2447,14 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.beginRadialGradientStroke = function (points, colors, lineWidth, cap, join, miter) {
+            this.beginRadialGradientStroke = function (points, colors, lineWidth, cap, join, miter) {
                 if (lineWidth === void 0) { lineWidth = 1; }
                 if (cap === void 0) { cap = 0; }
                 if (join === void 0) { join = 0; }
                 if (miter === void 0) { miter = 10; }
                 this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
             };
-            _this._isUseToMask = false;
+            this._isUseToMask = false;
             /**
              * 解析一段路径 一般给Flash2x用
              * @method decodePath
@@ -2493,7 +2462,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.decodePath = function (data) {
+            this.decodePath = function (data) {
                 var s = this;
                 var instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
                 var count = data.length;
@@ -2515,7 +2484,7 @@ var annie;
              * @type {number}
              * @default 0
              */
-            _this._offsetX = 0;
+            this._offsetX = 0;
             /**
              * @property _offsetY
              * @protected
@@ -2523,9 +2492,8 @@ var annie;
              * @type {number}
              * @default 0
              */
-            _this._offsetY = 0;
-            _this._instanceType = "annie.Shape";
-            return _this;
+            this._offsetY = 0;
+            this._instanceType = "annie.Shape";
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
@@ -3244,10 +3212,11 @@ var annie;
     var Sprite = (function (_super) {
         __extends(Sprite, _super);
         function Sprite() {
-            var _this = _super.call(this) || this;
+            _super.call(this);
+            this._resId = null;
             //sprite 和 moveClip的类资源信息
-            _this._a2x_res_class = null;
-            _this._a2x_res_children = [];
+            this._a2x_res_class = null;
+            this._a2x_res_children = [];
             /**
              * 是否可以让children接收鼠标事件,如果为false
              * 鼠标事件将不会往下冒泡
@@ -3257,7 +3226,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.mouseChildren = true;
+            this.mouseChildren = true;
             /**
              * 显示对象的child列表
              * @property children
@@ -3267,14 +3236,13 @@ var annie;
              * @default []
              * @readonly
              */
-            _this.children = [];
-            var s = _this;
+            this.children = [];
+            var s = this;
             s._instanceType = "annie.Sprite";
             if (s._resId) {
                 var resInfo = s._resId.split(".");
                 annie._initRes(s, resInfo[0], resInfo[1]);
             }
-            return _this;
         }
         Sprite.prototype.destroy = function () {
             var s = this;
@@ -3682,16 +3650,16 @@ var annie;
     var MovieClip = (function (_super) {
         __extends(MovieClip, _super);
         function MovieClip() {
-            var _this = _super.call(this) || this;
-            _this._curFrame = 1;
-            _this._lastFrameObj = null;
-            _this._isPlaying = true;
-            _this._isFront = true;
-            _this._lastFrame = 0;
-            _this._a2x_script = null;
-            _this._isButton = false;
-            _this._clicked = false;
-            _this._mouseEvent = function (e) {
+            _super.call(this);
+            this._curFrame = 1;
+            this._lastFrameObj = null;
+            this._isPlaying = true;
+            this._isFront = true;
+            this._lastFrame = 0;
+            this._a2x_script = null;
+            this._isButton = false;
+            this._clicked = false;
+            this._mouseEvent = function (e) {
                 var s = this;
                 if (!s._clicked) {
                     var frame = 2;
@@ -3706,13 +3674,12 @@ var annie;
                     s.gotoAndStop(frame);
                 }
             };
-            _this._maskList = [];
-            var s = _this;
+            this._maskList = [];
+            var s = this;
             s._instanceType = "annie.MovieClip";
             if (s._a2x_res_class == null) {
                 s._a2x_res_class = { tf: 1 };
             }
-            return _this;
         }
         Object.defineProperty(MovieClip.prototype, "currentFrame", {
             /**
@@ -4189,23 +4156,22 @@ var annie;
     var TextField = (function (_super) {
         __extends(TextField, _super);
         function TextField() {
-            var _this = _super.call(this) || this;
-            _this._textAlign = "left";
-            _this._textAlpha = 1;
-            _this._textHeight = 0;
-            _this._lineSpacing = 14;
-            _this._textWidth = 0;
-            _this._lineType = "single";
-            _this._textOffX = 0;
-            _this._text = "";
-            _this._font = "Arial";
-            _this._size = 12;
-            _this._color = "#fff";
-            _this._italic = false;
-            _this._bold = false;
-            _this._border = false;
-            _this._instanceType = "annie.TextField";
-            return _this;
+            _super.call(this);
+            this._textAlign = "left";
+            this._textAlpha = 1;
+            this._textHeight = 0;
+            this._lineSpacing = 14;
+            this._textWidth = 0;
+            this._lineType = "single";
+            this._textOffX = 0;
+            this._text = "";
+            this._font = "Arial";
+            this._size = 12;
+            this._color = "#fff";
+            this._italic = false;
+            this._bold = false;
+            this._border = false;
+            this._instanceType = "annie.TextField";
         }
         Object.defineProperty(TextField.prototype, "textAlign", {
             get: function () {
@@ -4604,7 +4570,7 @@ var annie;
             if (desH === void 0) { desH = 1040; }
             if (frameRate === void 0) { frameRate = 30; }
             if (scaleMode === void 0) { scaleMode = "fixedHeight"; }
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * 当前stage所使用的渲染器
              * 渲染器有两种,一种是canvas 一种是webGl
@@ -4614,7 +4580,7 @@ var annie;
              * @type {IRender}
              * @default null
              */
-            _this.renderObj = null;
+            this.renderObj = null;
             /**
              * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
              * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -4625,7 +4591,7 @@ var annie;
              * @since 1.0.0
              * @default false
              */
-            _this.pause = false;
+            this.pause = false;
             /**
              * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
              * @property viewRect
@@ -4638,21 +4604,21 @@ var annie;
              * @example
              *      //始终让一个对象顶对齐，或者
              */
-            _this.viewRect = new annie.Rectangle();
+            this.viewRect = new annie.Rectangle();
             /**
              * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
              * @property isMultiTouch
              * @since 1.0.3
              * @type {boolean}
              */
-            _this.isMultiTouch = false;
+            this.isMultiTouch = false;
             /**
              * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
              * @property isMultiMouse
              * @since 1.1.3
              * @type {boolean}
              */
-            _this.isMultiMouse = false;
+            this.isMultiMouse = false;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -4662,7 +4628,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            _this.desWidth = 0;
+            this.desWidth = 0;
             /**
              * 舞台的尺寸高,也就是我们常说的设计尺寸
              * @property desHeight
@@ -4672,7 +4638,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            _this.desHeight = 0;
+            this.desHeight = 0;
             /**
              * 舞台在当前设备中的真实高
              * @property divHeight
@@ -4682,7 +4648,7 @@ var annie;
              * @type {number}
              * @readonly
              */
-            _this.divHeight = 0;
+            this.divHeight = 0;
             /**
              * 舞台在当前设备中的真实宽
              * @property divWidth
@@ -4692,7 +4658,7 @@ var annie;
              * @readonly
              * @type {number}
              */
-            _this.divWidth = 0;
+            this.divWidth = 0;
             /**
              * 舞台的背景色
              * 默认就是透明背景
@@ -4703,8 +4669,8 @@ var annie;
              * @type {string}
              * @default "";
              */
-            _this.bgColor = "";
-            _this._scaleMode = "onScale";
+            this.bgColor = "";
+            this._scaleMode = "onScale";
             /**
              * 原始为60的刷新速度时的计数器
              * @property _flush
@@ -4713,7 +4679,7 @@ var annie;
              * @default 0
              * @type {number}
              */
-            _this._flush = 0;
+            this._flush = 0;
             /**
              * 当前的刷新次数计数器
              * @property _currentFlush
@@ -4722,33 +4688,33 @@ var annie;
              * @default 0
              * @type {number}
              */
-            _this._currentFlush = 0;
+            this._currentFlush = 0;
             /**
              * 上一次鼠标或触碰经过的显示对象列表
              * @type {Array}
              * @private
              */
-            _this._lastDpList = {};
+            this._lastDpList = {};
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
              * @private
              */
-            _this._ml = [];
+            this._ml = [];
             /**
              * 这个是事件中用到的Point对象池,以提高性能
              * @type {Array}
              * @private
              */
-            _this._mp = [];
+            this._mp = [];
             //每一个手指事件的对象池
-            _this._mouseDownPoint = {};
+            this._mouseDownPoint = {};
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
              * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
              * @private
              */
-            _this._mouseEventTypes = {
+            this._mouseEventTypes = {
                 mousedown: "onMouseDown",
                 mouseup: "onMouseUp",
                 mousemove: "onMouseMove",
@@ -4756,14 +4722,14 @@ var annie;
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp"
             };
-            _this.muliPoints = [];
+            this.muliPoints = [];
             /**
              * 当document有鼠标或触摸事件时调用
              * @param e
              */
-            _this._mP1 = new annie.Point();
-            _this._mP2 = new annie.Point();
-            _this._onMouseEvent = function (e) {
+            this._mP1 = new annie.Point();
+            this._mP2 = new annie.Point();
+            this._onMouseEvent = function (e) {
                 //检查是否有
                 var s = this;
                 //判断是否有drag的显示对象
@@ -4866,7 +4832,6 @@ var annie;
                             }
                             if (item == "onMouseDown") {
                                 s._mouseDownPoint[identifier] = cp;
-                                //清空上次存在的显示列表
                             }
                             else if (item == "onMouseUp") {
                                 if (s._mouseDownPoint[identifier]) {
@@ -5072,7 +5037,7 @@ var annie;
             /**
              * 设置舞台的对齐模式
              */
-            _this.setAlign = function () {
+            this.setAlign = function () {
                 var s = this;
                 var divH = s.divHeight;
                 var divW = s.divWidth;
@@ -5142,9 +5107,9 @@ var annie;
                     }
                 }
             };
-            var s = _this;
-            _this._instanceType = "annie.Stage";
-            s.stage = _this;
+            var s = this;
+            this._instanceType = "annie.Stage";
+            s.stage = this;
             s.name = "stageInstance" + s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
@@ -5160,7 +5125,6 @@ var annie;
             s.onTouchEvent = s._onMouseEvent.bind(s);
             s._scaleMode = scaleMode;
             s.setAlign();
-            return _this;
         }
         Object.defineProperty(Stage.prototype, "scaleMode", {
             /**
@@ -5314,7 +5278,8 @@ var annie;
                 for (var i = 0; i < len; i++) {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                 }
-            }, 20);
+            }, 16);
+            //什么时候支持这个方法，什么时候就换上
             //requestAnimationFrame(Stage.flushAll);
         };
         /**
@@ -5407,7 +5372,7 @@ var annie;
          * @since 1.0.0
          */
         function Sound(src) {
-            var _this = _super.call(this) || this;
+            _super.call(this);
             /**
              * html 标签 有可能是audio 或者 video
              * @property media
@@ -5415,9 +5380,9 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            _this.media = null;
-            _this._loop = 0;
-            var s = _this;
+            this.media = null;
+            this._loop = 0;
+            var s = this;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
             s.media.src = src;
@@ -5427,7 +5392,6 @@ var annie;
                     s.media.play();
                 }
             };
-            return _this;
         }
         /**
          * 开始播放媒体
@@ -5496,740 +5460,6 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * 投影或者发光滤镜
-     * @class annie.ShadowFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    var ShadowFilter = (function (_super) {
-        __extends(ShadowFilter, _super);
-        /**
-         * @method ShadowFilter
-         * @param {string} color
-         * @param {number} offsetX
-         * @param {number} offsetY
-         * @param {number} blur
-         */
-        function ShadowFilter(color, offsetX, offsetY, blur) {
-            if (color === void 0) { color = "black"; }
-            if (offsetX === void 0) { offsetX = 2; }
-            if (offsetY === void 0) { offsetY = 2; }
-            if (blur === void 0) { blur = 2; }
-            var _this = _super.call(this) || this;
-            /**
-             * 颜色值
-             * @property color
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @default black
-             * @type {string}
-             */
-            _this.color = "black";
-            /**
-             * x方向投影距离
-             * @property offsetX
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @default 2
-             * @type {number}
-             */
-            _this.offsetX = 2;
-            /**
-             * y方向投影距离
-             * @property offsetY
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @default 2
-             * @type {number}
-             */
-            _this.offsetY = 2;
-            /**
-             * 模糊值
-             * @property blur
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @default 2
-             * @type {number}
-             */
-            _this.blur = 2;
-            /**
-             * 滤镜类型 只读
-             * @property color
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @default Shadow
-             * @type {string}
-             */
-            _this.type = "Shadow";
-            var s = _this;
-            s._instanceType = "annie.ShadowFilter";
-            s.offsetX = offsetX;
-            s.offsetY = offsetY;
-            s.blur = blur;
-            s.color = color;
-            return _this;
-        }
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        ShadowFilter.prototype.toString = function () {
-            var s = this;
-            return s.type + s.offsetX + s.offsetY + s.blur + s.color;
-        };
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @public
-         * @since 1.0.0
-         * @param {ImageData} imageData
-         */
-        ShadowFilter.prototype.drawFilter = function (imageData) {
-            if (imageData === void 0) { imageData = null; }
-            //什么也不要做
-        };
-        ShadowFilter.prototype.destroy = function () {
-        };
-        return ShadowFilter;
-    }(annie.AObject));
-    annie.ShadowFilter = ShadowFilter;
-    /**
-     * 普通变色滤镜
-     * @class annie.ColorFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    var ColorFilter = (function (_super) {
-        __extends(ColorFilter, _super);
-        /**
-         * @method ColorFilter
-         * @colorArrays 颜色值数据
-         */
-        function ColorFilter(colorArrays) {
-            var _this = _super.call(this) || this;
-            /**
-             * @property redMultiplier
-             * @public
-             * @since 1.0.0
-             * @readonly
-             * @type {number}
-             */
-            _this.redMultiplier = 0;
-            /**
-             * @property redOffset
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.redOffset = 0;
-            /**
-             * @property greenMultiplier
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.greenMultiplier = 0;
-            /**
-             * @property greenOffset
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.greenOffset = 0;
-            /**
-             * @property blueMultiplier
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.blueMultiplier = 0;
-            /**
-             * @property blueOffset
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.blueOffset = 0;
-            /**
-             * @property alphaMultiplier
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.alphaMultiplier = 0;
-            /**
-             * @property alphaOffset
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.alphaOffset = 0;
-            /**
-             * @property type
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {string}
-             */
-            _this.type = "Color";
-            var s = _this;
-            s._instanceType = "annie.ColorFilter";
-            s.redMultiplier = colorArrays[0];
-            s.greenMultiplier = colorArrays[1];
-            s.blueMultiplier = colorArrays[2];
-            s.alphaMultiplier = colorArrays[3];
-            s.redOffset = colorArrays[4];
-            s.greenOffset = colorArrays[5];
-            s.blueOffset = colorArrays[6];
-            s.alphaOffset = colorArrays[7];
-            return _this;
-        }
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        ColorFilter.prototype.drawFilter = function (imageData) {
-            if (imageData === void 0) { imageData = null; }
-            if (!imageData)
-                return;
-            var s = this;
-            var data = imageData.data;
-            var l = data.length;
-            for (var i = 0; i < l; i += 4) {
-                data[i] = data[i] * s.redMultiplier + s.redOffset;
-                data[i + 1] = data[i + 1] * s.greenMultiplier + s.greenOffset;
-                data[i + 2] = data[i + 2] * s.blueMultiplier + s.blueOffset;
-                data[i + 3] = data[i + 3] * s.alphaMultiplier + s.alphaOffset;
-            }
-        };
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        ColorFilter.prototype.toString = function () {
-            var s = this;
-            return s.type + s.redMultiplier + s.greenMultiplier + s.blueMultiplier + s.alphaMultiplier + s.redOffset + s.greenOffset + s.blueOffset + s.alphaOffset;
-        };
-        ColorFilter.prototype.destroy = function () {
-        };
-        return ColorFilter;
-    }(annie.AObject));
-    annie.ColorFilter = ColorFilter;
-    /**
-     * 矩阵变色滤镜
-     * @class annie.ColorMatrixFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    var ColorMatrixFilter = (function (_super) {
-        __extends(ColorMatrixFilter, _super);
-        /**
-         * @method ColorMatrixFilter
-         * @param {number} brightness
-         * @param {number} contrast
-         * @param {number} saturation
-         * @param {number} hue
-         * @public
-         * @since 1.0.0
-         */
-        function ColorMatrixFilter(brightness, contrast, saturation, hue) {
-            var _this = _super.call(this) || this;
-            /**
-             * @property brightness
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.brightness = 0;
-            /**
-             * @property contrast
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.contrast = 0;
-            /**
-             * @property saturation
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.saturation = 0;
-            /**
-             * @property hue
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.hue = 0;
-            /**
-             * 滤镜类型 只读
-             * @property type
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {string}
-             */
-            _this.type = "ColorMatrix";
-            var s = _this;
-            s._instanceType = "annie.ColorMatrixFilter";
-            s.brightness = brightness;
-            s.contrast = contrast;
-            s.saturation = saturation;
-            s.hue = hue;
-            s.colorMatrix = [
-                1, 0, 0, 0, 0,
-                0, 1, 0, 0, 0,
-                0, 0, 1, 0, 0,
-                0, 0, 0, 1, 0,
-                0, 0, 0, 0, 1
-            ];
-            //brightness
-            brightness = s._cleanValue(brightness, 255);
-            if (brightness != 0) {
-                s._multiplyMatrix([
-                    1, 0, 0, 0, brightness,
-                    0, 1, 0, 0, brightness,
-                    0, 0, 1, 0, brightness,
-                    0, 0, 0, 1, 0,
-                    0, 0, 0, 0, 1
-                ]);
-            }
-            //contrast
-            contrast = _this._cleanValue(contrast, 100);
-            var x;
-            if (contrast != 0) {
-                if (contrast < 0) {
-                    x = 127 + contrast / 100 * 127;
-                }
-                else {
-                    x = contrast % 1;
-                    if (x == 0) {
-                        x = ColorMatrixFilter.DELTA_INDEX[contrast];
-                    }
-                    else {
-                        x = ColorMatrixFilter.DELTA_INDEX[(contrast << 0)] * (1 - x) + ColorMatrixFilter.DELTA_INDEX[(contrast << 0) + 1] * x; // use linear interpolation for more granularity.
-                    }
-                    x = x * 127 + 127;
-                }
-                s._multiplyMatrix([
-                    x / 127, 0, 0, 0, 0.5 * (127 - x),
-                    0, x / 127, 0, 0, 0.5 * (127 - x),
-                    0, 0, x / 127, 0, 0.5 * (127 - x),
-                    0, 0, 0, 1, 0,
-                    0, 0, 0, 0, 1
-                ]);
-            }
-            //saturation
-            saturation = _this._cleanValue(saturation, 100);
-            if (saturation != 0) {
-                x = 1 + ((saturation > 0) ? 3 * saturation / 100 : saturation / 100);
-                var lumR = 0.3086;
-                var lumG = 0.6094;
-                var lumB = 0.0820;
-                s._multiplyMatrix([
-                    lumR * (1 - x) + x, lumG * (1 - x), lumB * (1 - x), 0, 0,
-                    lumR * (1 - x), lumG * (1 - x) + x, lumB * (1 - x), 0, 0,
-                    lumR * (1 - x), lumG * (1 - x), lumB * (1 - x) + x, 0, 0,
-                    0, 0, 0, 1, 0,
-                    0, 0, 0, 0, 1
-                ]);
-            }
-            //hue
-            hue = _this._cleanValue(hue, 180) / 180 * Math.PI;
-            if (hue != 0) {
-                var cosVal = Math.cos(hue);
-                var sinVal = Math.sin(hue);
-                var lumR = 0.213;
-                var lumG = 0.715;
-                var lumB = 0.072;
-                s._multiplyMatrix([
-                    lumR + cosVal * (1 - lumR) + sinVal * (-lumR), lumG + cosVal * (-lumG) + sinVal * (-lumG), lumB + cosVal * (-lumB) + sinVal * (1 - lumB), 0, 0,
-                    lumR + cosVal * (-lumR) + sinVal * (0.143), lumG + cosVal * (1 - lumG) + sinVal * (0.140), lumB + cosVal * (-lumB) + sinVal * (-0.283), 0, 0,
-                    lumR + cosVal * (-lumR) + sinVal * (-(1 - lumR)), lumG + cosVal * (-lumG) + sinVal * (lumG), lumB + cosVal * (1 - lumB) + sinVal * (lumB), 0, 0,
-                    0, 0, 0, 1, 0,
-                    0, 0, 0, 0, 1
-                ]);
-            }
-            return _this;
-        }
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        ColorMatrixFilter.prototype.drawFilter = function (imageData) {
-            if (imageData === void 0) { imageData = null; }
-            if (!imageData)
-                return;
-            var data = imageData.data;
-            var l = data.length;
-            var r, g, b, a;
-            var mtx = this.colorMatrix;
-            var m0 = mtx[0], m1 = mtx[1], m2 = mtx[2], m3 = mtx[3], m4 = mtx[4];
-            var m5 = mtx[5], m6 = mtx[6], m7 = mtx[7], m8 = mtx[8], m9 = mtx[9];
-            var m10 = mtx[10], m11 = mtx[11], m12 = mtx[12], m13 = mtx[13], m14 = mtx[14];
-            var m15 = mtx[15], m16 = mtx[16], m17 = mtx[17], m18 = mtx[18], m19 = mtx[19];
-            for (var i = 0; i < l; i += 4) {
-                r = data[i];
-                g = data[i + 1];
-                b = data[i + 2];
-                a = data[i + 3];
-                data[i] = r * m0 + g * m1 + b * m2 + a * m3 + m4; //red
-                data[i + 1] = r * m5 + g * m6 + b * m7 + a * m8 + m9; //green
-                data[i + 2] = r * m10 + g * m11 + b * m12 + a * m13 + m14; //blue
-                data[i + 3] = r * m15 + g * m16 + b * m17 + a * m18 + m19; //alpha
-            }
-        };
-        ColorMatrixFilter.prototype._multiplyMatrix = function (colorMat) {
-            var i, j, k, col = [];
-            for (i = 0; i < 5; i++) {
-                for (j = 0; j < 5; j++) {
-                    col[j] = this.colorMatrix[j + i * 5];
-                }
-                for (j = 0; j < 5; j++) {
-                    var val = 0;
-                    for (k = 0; k < 5; k++) {
-                        val += colorMat[j + k * 5] * col[k];
-                    }
-                    this.colorMatrix[j + i * 5] = val;
-                }
-            }
-        };
-        ColorMatrixFilter.prototype._cleanValue = function (value, limit) {
-            return Math.min(limit, Math.max(-limit, value));
-        };
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        ColorMatrixFilter.prototype.toString = function () {
-            var s = this;
-            return s.type + s.brightness + s.hue + s.saturation + s.contrast;
-        };
-        ColorMatrixFilter.prototype.destroy = function () {
-            this.colorMatrix = null;
-        };
-        ColorMatrixFilter.DELTA_INDEX = [
-            0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11,
-            0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24,
-            0.25, 0.27, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42,
-            0.44, 0.46, 0.48, 0.5, 0.53, 0.56, 0.59, 0.62, 0.65, 0.68,
-            0.71, 0.74, 0.77, 0.80, 0.83, 0.86, 0.89, 0.92, 0.95, 0.98,
-            1.0, 1.06, 1.12, 1.18, 1.24, 1.30, 1.36, 1.42, 1.48, 1.54,
-            1.60, 1.66, 1.72, 1.78, 1.84, 1.90, 1.96, 2.0, 2.12, 2.25,
-            2.37, 2.50, 2.62, 2.75, 2.87, 3.0, 3.2, 3.4, 3.6, 3.8,
-            4.0, 4.3, 4.7, 4.9, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0,
-            7.3, 7.5, 7.8, 8.0, 8.4, 8.7, 9.0, 9.4, 9.6, 9.8,
-            10.0
-        ];
-        return ColorMatrixFilter;
-    }(annie.AObject));
-    annie.ColorMatrixFilter = ColorMatrixFilter;
-    /**
-     * 模糊滤镜
-     * @class annie.BlurFilter
-     * @extends annie.AOjbect
-     * @public
-     * @since 1.0.0
-     */
-    var BlurFilter = (function (_super) {
-        __extends(BlurFilter, _super);
-        /**
-         * @method BlurFilter
-         * @public
-         * @since 1.0.0
-         * @param {number} blurX
-         * @param {number} blurY
-         * @param {number} quality
-         * @example
-         *      var imgEle = new Image();
-         *           imgEle.onload = function (e) {
-         *       var rect = new annie.Rectangle(0, 0, 200, 200),
-         *           rectBitmap = new annie.Bitmap(imgEle, rect);
-         *           rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *           rectBitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-         *           var blur=new annie.BlurFilter(30,30,1);//实例化模糊滤镜
-         *           rectBitmap.filters=[blur];//为bitmap添加模糊滤镜效果
-         *           s.addChild(rectBitmap);
-         *       }
-         *       imgEle.src = 'http://test.annie2x.com/biglong/logo.jpg';
-         */
-        function BlurFilter(blurX, blurY, quality) {
-            if (blurX === void 0) { blurX = 2; }
-            if (blurY === void 0) { blurY = 2; }
-            if (quality === void 0) { quality = 1; }
-            var _this = _super.call(this) || this;
-            /**
-             * 滤镜类型 只读
-             * @property type
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {string}
-             */
-            _this.type = "blur";
-            /**
-             * 水平模糊量
-             * @property blurX
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.blurX = 0;
-            /**
-             * 垂直模糊量
-             * @property blurY
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.blurY = 0;
-            /**
-             * 模糊品质
-             * @property quality
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.quality = 1;
-            var s = _this;
-            s._instanceType = "annie.BlurFilter";
-            s.blurX = blurX;
-            s.blurY = blurY;
-            s.quality = quality;
-            return _this;
-        }
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        BlurFilter.prototype.toString = function () {
-            var s = this;
-            return s.type + s.blurX + s.blurY + s.quality;
-        };
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        BlurFilter.prototype.drawFilter = function (imageData) {
-            if (imageData === void 0) { imageData = null; }
-            var s = this;
-            var radiusX = s.blurX >> 1;
-            if (isNaN(radiusX) || radiusX < 0)
-                return false;
-            var radiusY = s.blurY >> 1;
-            if (isNaN(radiusY) || radiusY < 0)
-                return false;
-            if (radiusX == 0 && radiusY == 0)
-                return false;
-            var iterations = s.quality;
-            if (isNaN(iterations) || iterations < 1)
-                iterations = 1;
-            iterations |= 0;
-            if (iterations > 3)
-                iterations = 3;
-            if (iterations < 1)
-                iterations = 1;
-            var px = imageData.data;
-            var x = 0, y = 0, i = 0, p = 0, yp = 0, yi = 0, yw = 0, r = 0, g = 0, b = 0, a = 0, pr = 0, pg = 0, pb = 0, pa = 0;
-            var divx = (radiusX + radiusX + 1) | 0;
-            var divy = (radiusY + radiusY + 1) | 0;
-            var w = imageData.width | 0;
-            var h = imageData.height | 0;
-            var w1 = (w - 1) | 0;
-            var h1 = (h - 1) | 0;
-            var rxp1 = (radiusX + 1) | 0;
-            var ryp1 = (radiusY + 1) | 0;
-            var ssx = { r: 0, b: 0, g: 0, a: 0 };
-            var sx = ssx;
-            for (i = 1; i < divx; i++) {
-                sx = sx.n = { r: 0, b: 0, g: 0, a: 0 };
-            }
-            sx.n = ssx;
-            var ssy = { r: 0, b: 0, g: 0, a: 0 };
-            var sy = ssy;
-            for (i = 1; i < divy; i++) {
-                sy = sy.n = { r: 0, b: 0, g: 0, a: 0 };
-            }
-            sy.n = ssy;
-            var si = null;
-            var mtx = BlurFilter.MUL_TABLE[radiusX] | 0;
-            var stx = BlurFilter.SHG_TABLE[radiusX] | 0;
-            var mty = BlurFilter.MUL_TABLE[radiusY] | 0;
-            var sty = BlurFilter.SHG_TABLE[radiusY] | 0;
-            while (iterations-- > 0) {
-                yw = yi = 0;
-                var ms = mtx;
-                var ss = stx;
-                for (y = h; --y > -1;) {
-                    r = rxp1 * (pr = px[(yi) | 0]);
-                    g = rxp1 * (pg = px[(yi + 1) | 0]);
-                    b = rxp1 * (pb = px[(yi + 2) | 0]);
-                    a = rxp1 * (pa = px[(yi + 3) | 0]);
-                    sx = ssx;
-                    for (i = rxp1; --i > -1;) {
-                        sx.r = pr;
-                        sx.g = pg;
-                        sx.b = pb;
-                        sx.a = pa;
-                        sx = sx.n;
-                    }
-                    for (i = 1; i < rxp1; i++) {
-                        p = (yi + ((w1 < i ? w1 : i) << 2)) | 0;
-                        r += (sx.r = px[p]);
-                        g += (sx.g = px[p + 1]);
-                        b += (sx.b = px[p + 2]);
-                        a += (sx.a = px[p + 3]);
-                        sx = sx.n;
-                    }
-                    si = ssx;
-                    for (x = 0; x < w; x++) {
-                        px[yi++] = (r * ms) >>> ss;
-                        px[yi++] = (g * ms) >>> ss;
-                        px[yi++] = (b * ms) >>> ss;
-                        px[yi++] = (a * ms) >>> ss;
-                        p = ((yw + ((p = x + radiusX + 1) < w1 ? p : w1)) << 2);
-                        r -= si.r - (si.r = px[p]);
-                        g -= si.g - (si.g = px[p + 1]);
-                        b -= si.b - (si.b = px[p + 2]);
-                        a -= si.a - (si.a = px[p + 3]);
-                        si = si.n;
-                    }
-                    yw += w;
-                }
-                ms = mty;
-                ss = sty;
-                for (x = 0; x < w; x++) {
-                    yi = (x << 2) | 0;
-                    r = (ryp1 * (pr = px[yi])) | 0;
-                    g = (ryp1 * (pg = px[(yi + 1) | 0])) | 0;
-                    b = (ryp1 * (pb = px[(yi + 2) | 0])) | 0;
-                    a = (ryp1 * (pa = px[(yi + 3) | 0])) | 0;
-                    sy = ssy;
-                    for (i = 0; i < ryp1; i++) {
-                        sy.r = pr;
-                        sy.g = pg;
-                        sy.b = pb;
-                        sy.a = pa;
-                        sy = sy.n;
-                    }
-                    yp = w;
-                    for (i = 1; i <= radiusY; i++) {
-                        yi = (yp + x) << 2;
-                        r += (sy.r = px[yi]);
-                        g += (sy.g = px[yi + 1]);
-                        b += (sy.b = px[yi + 2]);
-                        a += (sy.a = px[yi + 3]);
-                        sy = sy.n;
-                        if (i < h1) {
-                            yp += w;
-                        }
-                    }
-                    yi = x;
-                    si = ssy;
-                    if (iterations > 0) {
-                        for (y = 0; y < h; y++) {
-                            p = yi << 2;
-                            px[p + 3] = pa = (a * ms) >>> ss;
-                            if (pa > 0) {
-                                px[p] = ((r * ms) >>> ss);
-                                px[p + 1] = ((g * ms) >>> ss);
-                                px[p + 2] = ((b * ms) >>> ss);
-                            }
-                            else {
-                                px[p] = px[p + 1] = px[p + 2] = 0;
-                            }
-                            p = (x + (((p = y + ryp1) < h1 ? p : h1) * w)) << 2;
-                            r -= si.r - (si.r = px[p]);
-                            g -= si.g - (si.g = px[p + 1]);
-                            b -= si.b - (si.b = px[p + 2]);
-                            a -= si.a - (si.a = px[p + 3]);
-                            si = si.n;
-                            yi += w;
-                        }
-                    }
-                    else {
-                        for (y = 0; y < h; y++) {
-                            p = yi << 2;
-                            px[p + 3] = pa = (a * ms) >>> ss;
-                            if (pa > 0) {
-                                pa = 255 / pa;
-                                px[p] = ((r * ms) >>> ss) * pa;
-                                px[p + 1] = ((g * ms) >>> ss) * pa;
-                                px[p + 2] = ((b * ms) >>> ss) * pa;
-                            }
-                            else {
-                                px[p] = px[p + 1] = px[p + 2] = 0;
-                            }
-                            p = (x + (((p = y + ryp1) < h1 ? p : h1) * w)) << 2;
-                            r -= si.r - (si.r = px[p]);
-                            g -= si.g - (si.g = px[p + 1]);
-                            b -= si.b - (si.b = px[p + 2]);
-                            a -= si.a - (si.a = px[p + 3]);
-                            si = si.n;
-                            yi += w;
-                        }
-                    }
-                }
-            }
-        };
-        BlurFilter.prototype.destroy = function () {
-        };
-        BlurFilter.SHG_TABLE = [0, 9, 10, 11, 9, 12, 10, 11, 12, 9, 13, 13, 10, 9, 13, 13, 14, 14, 14, 14, 10, 13, 14, 14, 14, 13, 13, 13, 9, 14, 14, 14, 15, 14, 15, 14, 15, 15, 14, 15, 15, 15, 14, 15, 15, 15, 15, 15, 14, 15, 15, 15, 15, 15, 15, 12, 14, 15, 15, 13, 15, 15, 15, 15, 16, 16, 16, 15, 16, 14, 16, 16, 14, 16, 13, 16, 16, 16, 15, 16, 13, 16, 15, 16, 14, 9, 16, 16, 16, 16, 16, 16, 16, 16, 16, 13, 14, 16, 16, 15, 16, 16, 10, 16, 15, 16, 14, 16, 16, 14, 16, 16, 14, 16, 16, 14, 15, 16, 16, 16, 14, 15, 14, 15, 13, 16, 16, 15, 17, 17, 17, 17, 17, 17, 14, 15, 17, 17, 16, 16, 17, 16, 15, 17, 16, 17, 11, 17, 16, 17, 16, 17, 16, 17, 17, 16, 17, 17, 16, 17, 17, 16, 16, 17, 17, 17, 16, 14, 17, 17, 17, 17, 15, 16, 14, 16, 15, 16, 13, 16, 15, 16, 14, 16, 15, 16, 12, 16, 15, 16, 17, 17, 17, 17, 17, 13, 16, 15, 17, 17, 17, 16, 15, 17, 17, 17, 16, 15, 17, 17, 14, 16, 17, 17, 16, 17, 17, 16, 15, 17, 16, 14, 17, 16, 15, 17, 16, 17, 17, 16, 17, 15, 16, 17, 14, 17, 16, 15, 17, 16, 17, 13, 17, 16, 17, 17, 16, 17, 14, 17, 16, 17, 16, 17, 16, 17, 9];
-        BlurFilter.MUL_TABLE = [1, 171, 205, 293, 57, 373, 79, 137, 241, 27, 391, 357, 41, 19, 283, 265, 497, 469, 443, 421, 25, 191, 365, 349, 335, 161, 155, 149, 9, 278, 269, 261, 505, 245, 475, 231, 449, 437, 213, 415, 405, 395, 193, 377, 369, 361, 353, 345, 169, 331, 325, 319, 313, 307, 301, 37, 145, 285, 281, 69, 271, 267, 263, 259, 509, 501, 493, 243, 479, 118, 465, 459, 113, 446, 55, 435, 429, 423, 209, 413, 51, 403, 199, 393, 97, 3, 379, 375, 371, 367, 363, 359, 355, 351, 347, 43, 85, 337, 333, 165, 327, 323, 5, 317, 157, 311, 77, 305, 303, 75, 297, 294, 73, 289, 287, 71, 141, 279, 277, 275, 68, 135, 67, 133, 33, 262, 260, 129, 511, 507, 503, 499, 495, 491, 61, 121, 481, 477, 237, 235, 467, 232, 115, 457, 227, 451, 7, 445, 221, 439, 218, 433, 215, 427, 425, 211, 419, 417, 207, 411, 409, 203, 202, 401, 399, 396, 197, 49, 389, 387, 385, 383, 95, 189, 47, 187, 93, 185, 23, 183, 91, 181, 45, 179, 89, 177, 11, 175, 87, 173, 345, 343, 341, 339, 337, 21, 167, 83, 331, 329, 327, 163, 81, 323, 321, 319, 159, 79, 315, 313, 39, 155, 309, 307, 153, 305, 303, 151, 75, 299, 149, 37, 295, 147, 73, 291, 145, 289, 287, 143, 285, 71, 141, 281, 35, 279, 139, 69, 275, 137, 273, 17, 271, 135, 269, 267, 133, 265, 33, 263, 131, 261, 130, 259, 129, 257, 1];
-        return BlurFilter;
-    }(annie.AObject));
-    annie.BlurFilter = BlurFilter;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
      * Canvas 渲染器
      * @class annie.CanvasRender
      * @extends annie.AObject
@@ -6246,12 +5476,11 @@ var annie;
          * @since 1.0.0
          */
         function CanvasRender(stage, ctx) {
-            var _this = _super.call(this) || this;
-            var s = _this;
+            _super.call(this);
+            var s = this;
             s._instanceType = "annie.CanvasRender";
             s._stage = stage;
             CanvasRender.drawCtx = ctx;
-            return _this;
         }
         /**
          * 开始渲染时执行
@@ -6331,15 +5560,14 @@ var annie;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
-            var _this = _super.call(this) || this;
-            _this.currentFrame = 0;
-            _this.totalFrames = 0;
-            _this._isLoop = 0;
-            _this._delay = 0;
-            _this._isFront = true;
-            _this._cParams = null;
-            _this._loop = false;
-            return _this;
+            _super.call(this);
+            this.currentFrame = 0;
+            this.totalFrames = 0;
+            this._isLoop = 0;
+            this._delay = 0;
+            this._isFront = true;
+            this._cParams = null;
+            this._loop = false;
         }
         /**
          * 初始化数据
@@ -7117,22 +6345,21 @@ var annie;
          */
         function Timer(delay, repeatCount) {
             if (repeatCount === void 0) { repeatCount = 0; }
-            var _this = _super.call(this) || this;
-            _this._currentCount = 0;
-            _this._delay = 0;
-            _this._frameDelay = 0;
-            _this._currentFrameDelay = 0;
-            _this._repeatCount = 0;
-            _this._running = false;
+            _super.call(this);
+            this._currentCount = 0;
+            this._delay = 0;
+            this._frameDelay = 0;
+            this._currentFrameDelay = 0;
+            this._repeatCount = 0;
+            this._running = false;
             if (delay <= 0) {
                 delay = 1;
             }
-            var s = _this;
+            var s = this;
             s._delay = delay;
             s._frameDelay = Math.ceil(delay * 0.001 * 60);
             s._repeatCount = repeatCount;
             Timer._timerList.push(s);
-            return _this;
         }
         /**
          * 重置定时器
@@ -7574,7 +6801,6 @@ var annie;
                 }
                 else {
                     shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
-                    //shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endStroke();
@@ -7800,3 +7026,4 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+module.exports = annie;

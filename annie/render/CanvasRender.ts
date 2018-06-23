@@ -27,7 +27,6 @@ namespace annie {
             s._stage = stage;
             CanvasRender.drawCtx = ctx;
         }
-
         /**
          * 开始渲染时执行
          * @method begin
@@ -37,7 +36,6 @@ namespace annie {
         public begin(): void {
             CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask

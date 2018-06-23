@@ -11,7 +11,7 @@ declare namespace annie {
         protected _instanceId: number;
         protected _instanceType: string;
         protected static _object_id: number;
-        protected constructor();
+        constructor();
         /**
          * 每一个annie引擎对象都会有一个唯一的id码。
          * @property instanceId
@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        readonly instanceId: number;
+        instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        readonly instanceType: string;
+        instanceType: string;
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -82,7 +82,7 @@ declare namespace annie {
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        addEventListener(type: string, listener: Function): void;
+        addEventListener(type: string, listener: any): void;
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
@@ -1001,7 +1001,7 @@ declare namespace annie {
          * @since 1.0.0
          * @public
          */
-        protected constructor();
+        constructor();
         /**
          * 更新信息
          * @property _UI
@@ -1022,7 +1022,7 @@ declare namespace annie {
          * @default null;
          * @readonly
          * */
-        stage: Stage | null;
+        stage: Stage;
         /**
          * 显示对象的父级
          * @property parent
@@ -1032,7 +1032,7 @@ declare namespace annie {
          * @default null
          * @readonly
          */
-        parent: Sprite | null;
+        parent: Sprite;
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
@@ -1215,7 +1215,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        readonly matrix: Matrix;
+        matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1828,7 +1828,7 @@ declare namespace annie {
      */
     class Sprite extends DisplayObject {
         constructor();
-        protected _resId: string | null;
+        protected _resId: string;
         private _a2x_res_class;
         private _a2x_res_children;
         destroy(): void;
@@ -1995,7 +1995,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        readonly currentFrame: number;
+        currentFrame: number;
         private _curFrame;
         private _lastFrameObj;
         /**
@@ -2008,7 +2008,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        readonly isPlaying: boolean;
+        isPlaying: boolean;
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2019,7 +2019,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        readonly isFront: boolean;
+        isFront: boolean;
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2030,7 +2030,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        readonly totalFrames: number;
+        totalFrames: number;
         private _lastFrame;
         constructor();
         /**
@@ -2058,7 +2058,7 @@ declare namespace annie {
          * @param {number} frameIndex
          */
         removeFrameScript(frameIndex: number): void;
-        readonly isButton: boolean;
+        isButton: boolean;
         private _isButton;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2665,364 +2665,6 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
-    /**
-     * 投影或者发光滤镜
-     * @class annie.ShadowFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    class ShadowFilter extends AObject {
-        /**
-         * 颜色值
-         * @property color
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default black
-         * @type {string}
-         */
-        color: string;
-        /**
-         * x方向投影距离
-         * @property offsetX
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default 2
-         * @type {number}
-         */
-        offsetX: number;
-        /**
-         * y方向投影距离
-         * @property offsetY
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default 2
-         * @type {number}
-         */
-        offsetY: number;
-        /**
-         * 模糊值
-         * @property blur
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default 2
-         * @type {number}
-         */
-        blur: number;
-        /**
-         * 滤镜类型 只读
-         * @property color
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default Shadow
-         * @type {string}
-         */
-        type: string;
-        /**
-         * @method ShadowFilter
-         * @param {string} color
-         * @param {number} offsetX
-         * @param {number} offsetY
-         * @param {number} blur
-         */
-        constructor(color?: string, offsetX?: number, offsetY?: number, blur?: number);
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @public
-         * @since 1.0.0
-         * @param {ImageData} imageData
-         */
-        drawFilter(imageData?: ImageData): void;
-        destroy(): void;
-    }
-    /**
-     * 普通变色滤镜
-     * @class annie.ColorFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    class ColorFilter extends AObject {
-        /**
-         * @property redMultiplier
-         * @public
-         * @since 1.0.0
-         * @readonly
-         * @type {number}
-         */
-        redMultiplier: number;
-        /**
-         * @property redOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        redOffset: number;
-        /**
-         * @property greenMultiplier
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        greenMultiplier: number;
-        /**
-         * @property greenOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        greenOffset: number;
-        /**
-         * @property blueMultiplier
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blueMultiplier: number;
-        /**
-         * @property blueOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blueOffset: number;
-        /**
-         * @property alphaMultiplier
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        alphaMultiplier: number;
-        /**
-         * @property alphaOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        alphaOffset: number;
-        /**
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {string}
-         */
-        type: string;
-        /**
-         * @method ColorFilter
-         * @colorArrays 颜色值数据
-         */
-        constructor(colorArrays: number[]);
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        drawFilter(imageData?: ImageData): void;
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        destroy(): void;
-    }
-    /**
-     * 矩阵变色滤镜
-     * @class annie.ColorMatrixFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    class ColorMatrixFilter extends AObject {
-        /**
-         * @property brightness
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        brightness: number;
-        /**
-         * @property contrast
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        contrast: number;
-        /**
-         * @property saturation
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        saturation: number;
-        /**
-         * @property hue
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        hue: number;
-        /**
-         * 滤镜类型 只读
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {string}
-         */
-        type: string;
-        private colorMatrix;
-        /**
-         * @method ColorMatrixFilter
-         * @param {number} brightness
-         * @param {number} contrast
-         * @param {number} saturation
-         * @param {number} hue
-         * @public
-         * @since 1.0.0
-         */
-        constructor(brightness: number, contrast: number, saturation: number, hue: number);
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        drawFilter(imageData?: ImageData): void;
-        static DELTA_INDEX: number[];
-        private _multiplyMatrix(colorMat);
-        private _cleanValue(value, limit);
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        destroy(): void;
-    }
-    /**
-     * 模糊滤镜
-     * @class annie.BlurFilter
-     * @extends annie.AOjbect
-     * @public
-     * @since 1.0.0
-     */
-    class BlurFilter extends AObject {
-        /**
-         * 滤镜类型 只读
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {string}
-         */
-        type: string;
-        /**
-         * 水平模糊量
-         * @property blurX
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blurX: number;
-        /**
-         * 垂直模糊量
-         * @property blurY
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blurY: number;
-        /**
-         * 模糊品质
-         * @property quality
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        quality: number;
-        /**
-         * @method BlurFilter
-         * @public
-         * @since 1.0.0
-         * @param {number} blurX
-         * @param {number} blurY
-         * @param {number} quality
-         * @example
-         *      var imgEle = new Image();
-         *           imgEle.onload = function (e) {
-         *       var rect = new annie.Rectangle(0, 0, 200, 200),
-         *           rectBitmap = new annie.Bitmap(imgEle, rect);
-         *           rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *           rectBitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-         *           var blur=new annie.BlurFilter(30,30,1);//实例化模糊滤镜
-         *           rectBitmap.filters=[blur];//为bitmap添加模糊滤镜效果
-         *           s.addChild(rectBitmap);
-         *       }
-         *       imgEle.src = 'http://test.annie2x.com/biglong/logo.jpg';
-         */
-        constructor(blurX?: number, blurY?: number, quality?: number);
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        private static SHG_TABLE;
-        private static MUL_TABLE;
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        drawFilter(imageData?: ImageData): boolean;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
     interface IRender {
         /**
          * 渲染循环
@@ -3572,7 +3214,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {number}
          */
-        readonly currentCount: number;
+        currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -3599,7 +3241,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {boolean}
          */
-        readonly running: boolean;
+        running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你

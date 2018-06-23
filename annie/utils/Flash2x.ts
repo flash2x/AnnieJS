@@ -77,7 +77,7 @@ namespace annie{
                 if (mc.tf > 1) {
                     let frameList = mc.f;
                     let count = frameList.length;
-                    let frameCon = null;
+                    let frameCon:any = null;
                     let children: any = {};
                     let children2: any = {};
                     for (let i = 0; i < count; i++) {
@@ -352,7 +352,7 @@ namespace annie{
             let objCount = children.length;
             let obj: any = null;
             let objId: number = 0;
-            let maskObj = null;
+            let maskObj:any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 if (children[i].indexOf("_$") == 0) {
