@@ -31,24 +31,22 @@ namespace annie {
          * 一般给用户使用较少,Flash2x工具自动使用
          * @method getGradientColor
          * @static
-         * @param {string} colors
-         * @param {number}ratios
-         * @param {annie.Point} points
-         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param points
+         * @param colors
          * @returns {any}
          * @since 1.0.0
          * @pubic
          */
-        public static getGradientColor(colors: Array<string>, ratios: Array<number>, points: Array<number>): any {
+        public static getGradientColor(points: any,colors: any): any {
             let colorObj: any;
             let ctx = DisplayObject["_canvas"].getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             } else {
-                colorObj = ctx.createRadialGradient(points[0], points[1], points[2], points[3], points[4], points[5]);
+                colorObj = ctx.createRadialGradient(points[0], points[1], 0,points[2], points[3], points[4]);
             }
             for (let i = 0, l = colors.length; i < l; i++) {
-                colorObj.addColorStop(ratios[i], colors[i]);
+                colorObj.addColorStop(colors[i][0], Shape.getRGBA(colors[i][1],colors[i][2]));
             }
             return colorObj;
         }
@@ -93,8 +91,8 @@ namespace annie {
             return color;
         }
 
-        private _isBitmapStroke: Matrix;
-        private _isBitmapFill: Matrix;
+        private _isBitmapStroke:  Array<number>;
+        private _isBitmapFill: Array<number>;
         /**
          * 是否对矢量使用像素碰撞 默认开启
          * @property hitTestWidthPixel
@@ -115,7 +113,7 @@ namespace annie {
         public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
             s._UI.UD = true;
-            s._command.push([1, commandName, params]);
+            s._command[s._command.length]=[1, commandName, params];
         }
 
         /**
@@ -160,15 +158,15 @@ namespace annie {
                 rBL = max;
             }
             let c = this._command;
-            c.push([1, "moveTo", [x + w - rTR, y]]);
-            c.push([1, "arcTo", [x + w + rTR * mTR, y - rTR * mTR, x + w, y + rTR, rTR]]);
-            c.push([1, "lineTo", [x + w, y + h - rBR]]);
-            c.push([1, "arcTo", [x + w + rBR * mBR, y + h + rBR * mBR, x + w - rBR, y + h, rBR]]);
-            c.push([1, "lineTo", [x + rBL, y + h]]);
-            c.push([1, "arcTo", [x - rBL * mBL, y + h + rBL * mBL, x, y + h - rBL, rBL]]);
-            c.push([1, "lineTo", [x, y + rTL]]);
-            c.push([1, "arcTo", [x - rTL * mTL, y - rTL * mTL, x + rTL, y, rTL]]);
-            c.push([1, "closePath", []]);
+            c[c.length]=[1, "moveTo", [x + w - rTR, y]];
+            c[c.length]=[1, "arcTo", [x + w + rTR * mTR, y - rTR * mTR, x + w, y + rTR, rTR]];
+            c[c.length]=[1, "lineTo", [x + w, y + h - rBR]];
+            c[c.length]=[1, "arcTo", [x + w + rBR * mBR, y + h + rBR * mBR, x + w - rBR, y + h, rBR]];
+            c[c.length]=[1, "lineTo", [x + rBL, y + h]];
+            c[c.length]=[1, "arcTo", [x - rBL * mBL, y + h + rBL * mBL, x, y + h - rBL, rBL]];
+            c[c.length]=[1, "lineTo", [x, y + rTL]];
+            c[c.length]=[1, "arcTo", [x - rTL * mTL, y - rTL * mTL, x + rTL, y, rTL]];
+            c[c.length]=[1, "closePath", []];
         }
 
         /**
@@ -180,7 +178,7 @@ namespace annie {
          * @since 1.0.0
          */
         public moveTo(x: number, y: number): void {
-            this._command.push([1, "moveTo", [x, y]]);
+            this._command[this._command.length]=[1, "moveTo", [x, y]];
         }
 
         /**
@@ -192,7 +190,7 @@ namespace annie {
          * @since 1.0.0
          */
         public lineTo(x: number, y: number): void {
-            this._command.push([1, "lineTo", [x, y]]);
+            this._command[this._command.length]=[1, "lineTo", [x, y]];
         }
 
         /**
@@ -204,7 +202,7 @@ namespace annie {
          * @since 1.0.0
          */
         public arcTo(x: number, y: number): void {
-            this._command.push([1, "arcTo", [x, y]]);
+            this._command[this._command.length]=[1, "arcTo", [x, y]];
         }
 
         /**
@@ -219,7 +217,7 @@ namespace annie {
          * @since 1.0.0
          */
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
-            this._command.push([1, "quadraticCurveTo", [cpX, cpY, x, y]]);
+            this._command[this._command.length]=[1, "quadraticCurveTo", [cpX, cpY, x, y]];
         }
 
         /**
@@ -236,7 +234,7 @@ namespace annie {
          * @since 1.0.0
          */
         public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
-            this._command.push([1, "bezierCurveTo", [cp1X, cp1Y, cp2X, cp2Y, x, y]]);
+            this._command[this._command.length]=[1, "bezierCurveTo", [cp1X, cp1Y, cp2X, cp2Y, x, y]];
         }
 
         /**
@@ -246,7 +244,7 @@ namespace annie {
          * @since 1.0.0
          */
         public closePath(): void {
-            this._command.push([1, "closePath", []]);
+            this._command[this._command.length]=[1, "closePath", []];
         }
 
         /**
@@ -261,11 +259,11 @@ namespace annie {
          */
         public drawRect(x: number, y: number, w: number, h: number): void {
             let c = this._command;
-            c.push([1, "moveTo", [x, y]]);
-            c.push([1, "lineTo", [x + w, y]]);
-            c.push([1, "lineTo", [x + w, y + h]]);
-            c.push([1, "lineTo", [x, y + h]]);
-            c.push([1, "closePath", []]);
+            c[c.length]=[1, "moveTo", [x, y]];
+            c[c.length]=[1, "lineTo", [x + w, y]];
+            c[c.length]=[1, "lineTo", [x + w, y + h]];
+            c[c.length]=[1, "lineTo", [x, y + h]];
+            c[c.length]=[1, "closePath", []];
         }
 
         /**
@@ -280,7 +278,7 @@ namespace annie {
          * @since 1.0.0
          */
         public drawArc(x: number, y: number, radius: number, start: number, end: number): void {
-            this._command.push([1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]]);
+            this._command[this._command.length]=[1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]];
         }
 
         /**
@@ -293,7 +291,7 @@ namespace annie {
          * @since 1.0.0
          */
         public drawCircle(x: number, y: number, radius: number): void {
-            this._command.push([1, "arc", [x, y, radius, 0, 2 * Math.PI]]);
+            this._command[this._command.length]=[1, "arc", [x, y, radius, 0, 2 * Math.PI]];
         }
 
         /**
@@ -315,11 +313,11 @@ namespace annie {
             let xm = x + w / 2;
             let ym = y + h / 2;
             let c = this._command;
-            c.push([1, "moveTo", [x, ym]]);
-            c.push([1, "bezierCurveTo", [x, ym - oy, xm - ox, y, xm, y]]);
-            c.push([1, "bezierCurveTo", [xm + ox, y, xe, ym - oy, xe, ym]]);
-            c.push([1, "bezierCurveTo", [xe, ym + oy, xm + ox, ye, xm, ye]]);
-            c.push([1, "bezierCurveTo", [xm - ox, ye, x, ym + oy, x, ym]]);
+            c[c.length]=[1, "moveTo", [x, ym]];
+            c[c.length]=[1, "bezierCurveTo", [x, ym - oy, xm - ox, y, xm, y]];
+            c[c.length]=[1, "bezierCurveTo", [xm + ox, y, xe, ym - oy, xe, ym]];
+            c[c.length]=[1, "bezierCurveTo", [xe, ym + oy, xm + ox, ye, xm, ye]];
+            c[c.length]=[1, "bezierCurveTo", [xm - ox, ye, x, ym + oy, x, ym]];
         }
 
         /**
@@ -356,40 +354,37 @@ namespace annie {
         /**
          * 线性渐变填充 一般给Flash2x用
          * @method beginLinearGradientFill
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
-         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param {Array} colors 一组颜色值
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientFill(colors: Array<string>, ratios: Array<number>, points: Array<number>): void {
-            this._fill(Shape.getGradientColor(colors, ratios, points));
+        public beginLinearGradientFill(points: any,colors:any): void {
+            this._fill(Shape.getGradientColor( points,colors));
         }
 
         /**
          * 径向渐变填充 一般给Flash2x用
          * @method beginRadialGradientFill
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
          * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
-        public beginRadialGradientFill = function (colors: Array<string>, ratios: Array<number>, points: Array<number>) {
-            this._fill(Shape.getGradientColor(colors, ratios, points));
+        public beginRadialGradientFill = function (points: any,colors:any) {
+            this._fill(Shape.getGradientColor(points,colors));
         };
 
         /**
          * 位图填充 一般给Flash2x用
          * @method beginBitmapFill
          * @param {Image} image
-         * @param {annie.Matrix} matrix
+         * @param { Array} matrix
          * @public
          * @since 1.0.0
          */
-        public beginBitmapFill(image: any, matrix: Matrix): void {
+        public beginBitmapFill(image: any, matrix:  Array<number>): void {
             let s = this;
             if (matrix) {
                 s._isBitmapFill = matrix;
@@ -399,8 +394,8 @@ namespace annie {
 
         private _fill(fillStyle: any): void {
             let c = this._command;
-            c.push([0, "fillStyle", fillStyle]);
-            c.push([1, "beginPath", []]);
+            c[c.length]=[0, "fillStyle", fillStyle];
+            c[c.length]=[1, "beginPath", []];
             this._UI.UD = true;
         }
 
@@ -409,36 +404,39 @@ namespace annie {
          * @method beginStroke
          * @param {string} color  颜色值
          * @param {number} lineWidth 宽度
-         * @public
-         * @since 1.0.0
-         */
-        public beginStroke(color: string, lineWidth: number = 1, cap: string = "", join: string = "", miter: number = 0): void {
-            this._stroke(color, lineWidth, cap, join, miter);
-        }
-
-        /**
-         * 画线性渐变的线条 一般给Flash2x用
-         * @method beginLinearGradientStroke
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
-         * @param {Array} points 一组点
-         * @param {number} lineWidth
-         * @param {string} cap 线头的形状 butt round square 默认 butt
-         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
+         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        public beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10): void {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
+        public beginStroke(color: string, lineWidth: number = 1, cap: number=0, join: number = 0, miter: number = 0): void {
+            this._stroke(color, lineWidth, cap,join, miter);
+        }
+
+        private static _caps:Array<string>=["butt","round","square"];
+        private static _joins:Array<string>=["miter","round","bevel"];
+        /**
+         * 画线性渐变的线条 一般给Flash2x用
+         * @method beginLinearGradientStroke
+         * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
+         * @param {number} lineWidth
+         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
+         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
+         * @public
+         * @since 1.0.0
+         */
+        public beginLinearGradientStroke(points: Array<number>,colors:any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10): void {
+            this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
         }
 
         /**
          * 画径向渐变的线条 一般给Flash2x用
          * @method beginRadialGradientStroke
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
          * @param {number} lineWidth
          * @param {string} cap 线头的形状 butt round square 默认 butt
          * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
@@ -446,15 +444,14 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginRadialGradientStroke = function (colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10) {
-            this._stroke(Shape.getGradientColor(colors, ratios, points), lineWidth, cap, join, miter);
-        }
-
+        public beginRadialGradientStroke = function (points: Array<number>,colors:any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10) {
+            this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
+        };
         /**
          * 线条位图填充 一般给Flash2x用
          * @method beginBitmapStroke
          * @param {Image} image
-         * @param {annie.Matrix} matrix
+         * @param {Array} matrix
          * @param {number} lineWidth
          * @param {string} cap 线头的形状 butt round square 默认 butt
          * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
@@ -462,22 +459,22 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public beginBitmapStroke(image: any, matrix: Matrix, lineWidth: number = 1, cap: string = "butt", join: string = "miter", miter: number = 10): void {
+        public beginBitmapStroke(image: any, matrix: Array<number>, lineWidth: number = 1,  cap: number=0, join: number=0, miter: number = 10): void {
             let s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
+            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap,join, miter);
         }
 
-        private _stroke(strokeStyle: any, width: number, cap: string, join: string, miter: number): void {
+        private _stroke(strokeStyle: any, width: number, cap: number, join: number, miter: number): void {
             let c = this._command;
-            c.push([0, "lineWidth", width]);
-            c.push([0, "lineCap", cap]);
-            c.push([0, "lineJoin", join]);
-            c.push([0, "miterLimit", miter]);
-            c.push([0, "strokeStyle", strokeStyle]);
-            c.push([1, "beginPath", []]);
+            c[c.length]=[0, "lineWidth", width];
+            c[c.length]=[0, "lineCap", Shape._caps[cap]];
+            c[c.length]=[0, "lineJoin", Shape._joins[join]];
+            c[c.length]=[0, "miterLimit", miter];
+            c[c.length]=[0, "strokeStyle", strokeStyle];
+            c[c.length]=[1, "beginPath", []];
             this._UI.UD = true;
         }
 
@@ -492,16 +489,14 @@ namespace annie {
             let c = s._command;
             let m = s._isBitmapFill;
             if (m) {
-                //c.push([1, "save", []]);
-                c.push([2, "setTransform", [m.a, m.b, m.c, m.d, m.tx, m.ty]]);
+                c[c.length]=[2, "setTransform", m];
             }
-            c.push([1, "fill", []]);
+            c[c.length]=([1, "fill", []]);
             if (m) {
                 s._isBitmapFill = null;
-                //c.push([1, "restore", []]);
             }
         }
-
+        protected _isUseToMask:boolean=false;
         /**
          * 结束画线
          * @method endStroke
@@ -513,132 +508,33 @@ namespace annie {
             let c = s._command;
             let m = s._isBitmapStroke;
             if (m) {
-                //c.push([1, "save", []]);
                 //如果为2则还需要特别处理
-                c.push([2, "setTransform", [m.a, m.b, m.c, m.d, m.tx, m.ty]]);
+                c[c.length]=[2, "setTransform", m];
             }
-            c.push([1, "stroke", []]);
+            c[c.length]=([1, "stroke", []]);
             if (m) {
                 s._isBitmapStroke = null;
-                // c.push([1, "restore", []]);
             }
         }
-
-        private static BASE_64 = {
-            "A": 0,
-            "B": 1,
-            "C": 2,
-            "D": 3,
-            "E": 4,
-            "F": 5,
-            "G": 6,
-            "H": 7,
-            "I": 8,
-            "J": 9,
-            "K": 10,
-            "L": 11,
-            "M": 12,
-            "N": 13,
-            "O": 14,
-            "P": 15,
-            "Q": 16,
-            "R": 17,
-            "S": 18,
-            "T": 19,
-            "U": 20,
-            "V": 21,
-            "W": 22,
-            "X": 23,
-            "Y": 24,
-            "Z": 25,
-            "a": 26,
-            "b": 27,
-            "c": 28,
-            "d": 29,
-            "e": 30,
-            "f": 31,
-            "g": 32,
-            "h": 33,
-            "i": 34,
-            "j": 35,
-            "k": 36,
-            "l": 37,
-            "m": 38,
-            "n": 39,
-            "o": 40,
-            "p": 41,
-            "q": 42,
-            "r": 43,
-            "s": 44,
-            "t": 45,
-            "u": 46,
-            "v": 47,
-            "w": 48,
-            "x": 49,
-            "y": 50,
-            "z": 51,
-            "0": 52,
-            "1": 53,
-            "2": 54,
-            "3": 55,
-            "4": 56,
-            "5": 57,
-            "6": 58,
-            "7": 59,
-            "8": 60,
-            "9": 61,
-            "+": 62,
-            "/": 63
-        };
         /**
          * 解析一段路径 一般给Flash2x用
          * @method decodePath
-         * @param {string} data
+         * @param {Array} data
          * @public
          * @since 1.0.0
          */
-        public decodePath = function (data: string): void {
+        public decodePath = function (data: any): void {
             let s = this;
             let instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
-            let paramCount = [2, 2, 4, 6, 0];
-            let i = 0, l = data.length;
-            let params: any;
-            let x = 0, y = 0;
-            let base64: any = Shape.BASE_64;
-            while (i < l) {
-                let c = data.charAt(i);
-                let n: any = base64[c];
-                let fi = n >> 3; // highest order bits 1-3 code for operation.
-                let f = instructions[fi];
-                // check that we have a valid instruction & that the unused bits are empty:
-                if (!f || (n & 3)) {
-                    throw("bad path data (@" + i + "): " + c);
+            let count=data.length;
+            for(let i=0;i<count;i++){
+                if(data[i]==0||data[i]==1){
+                    s.addDraw(instructions[data[i]], [data[i+1],data[i+2]]);
+                    i+=2;
+                }else{
+                    s.addDraw(instructions[data[i]], [data[i+1],data[i+2],data[i+3],data[i+4]]);
+                    i+=4;
                 }
-                let pl = paramCount[fi];
-                if (!fi) {
-                    x = y = 0;
-                } // move operations reset the position.
-                params = [];
-                i++;
-                let charCount = (n >> 2 & 1) + 2;  // 4th header bit indicates number size for this operation.
-                for (let p = 0; p < pl; p++) {
-                    let num: any = base64[data.charAt(i)];
-                    let sign = (num >> 5) ? -1 : 1;
-                    num = ((num & 31) << 6) | (base64[data.charAt(i + 1)]);
-                    if (charCount == 3) {
-                        num = (num << 6) | (base64[data.charAt(i + 2)]);
-                    }
-                    num = sign * num / 10;
-                    if (p % 2) {
-                        x = (num += x);
-                    }
-                    else {
-                        y = (num += y);
-                    }
-                    params[p] = num;
-                    i += charCount;
-                }
-                s.addDraw(f, params);
             }
         };
 
@@ -769,12 +665,12 @@ namespace annie {
                         let h = buttonRightY - leftY;
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX;
-                        s._bounds.y = leftY;
+                        s._bounds.x = leftX+10;
+                        s._bounds.y = leftY+10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if (!s.isUseToMask && !s.parent.isUseToMask) {
+                        if (!s._isUseToMask) {
                             let _canvas: any = s._texture;
                             let ctx = _canvas["getContext"]('2d');
                             _canvas.width = w;
@@ -858,8 +754,8 @@ namespace annie {
             if (isMouseEvent) {
                 p = s.globalToLocal(globalPoint);
             }
-            if (s.getBounds().isPointIn(p)) {
-                if (s.hitTestWidthPixel) {
+            if (s.getBounds().isPointIn(p)){
+                if (!s._isUseToMask&&s.hitTestWidthPixel) {
                     let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
@@ -913,6 +809,23 @@ namespace annie {
                     }
                 }
             }
+        }
+        public render(renderObj: IRender|any): void{
+            if(!this._isUseToMask){
+                super.render(renderObj);
+            }
+        }
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        public destroy():void {
+            //清除相应的数据引用
+            let s = this;
+            s._command=null;
+            s._isBitmapStroke=null;
+            s._isBitmapFill=null;
+            super.destroy();
         }
     }
 }

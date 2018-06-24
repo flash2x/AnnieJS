@@ -100,5 +100,10 @@ namespace annieUI {
                 }
             }
         }
+        public destroy(): void {
+            let s=this;
+           s._drawList=null;
+            super.destroy();
+        }
     }
 }

@@ -97,6 +97,10 @@ namespace annie{
         public drawFilter(imageData:ImageData=null){
             //什么也不要做
         }
+
+        public destroy(): void {
+
+        }
     }
     /**
      * 普通变色滤镜
@@ -180,27 +184,20 @@ namespace annie{
         public type:string="Color";
         /**
          * @method ColorFilter
-         * @param {number} redMultiplier
-         * @param {number} greenMultiplier
-         * @param {number} blueMultiplier
-         * @param {number} alphaMultiplier
-         * @param {number} redOffset
-         * @param {number} greenOffset
-         * @param {number} blueOffset
-         * @param {number} alphaOffset
+         * @colorArrays 颜色值数据
          */
-        public constructor(redMultiplier:number=1, greenMultiplier:number=1, blueMultiplier:number=1, alphaMultiplier:number=1, redOffset:number=0, greenOffset:number=0, blueOffset:number=0, alphaOffset:number=0){
+        public constructor(colorArrays:number[]){
             super();
             let s=this;
             s._instanceType="annie.ColorFilter";
-            s.redMultiplier=redMultiplier;
-            s.greenMultiplier=greenMultiplier;
-            s.blueMultiplier=blueMultiplier;
-            s.alphaMultiplier=alphaMultiplier;
-            s.redOffset=redOffset;
-            s.greenOffset=greenOffset;
-            s.blueOffset=blueOffset;
-            s.alphaOffset=alphaOffset;
+            s.redMultiplier=colorArrays[0];
+            s.greenMultiplier=colorArrays[1];
+            s.blueMultiplier=colorArrays[2];
+            s.alphaMultiplier=colorArrays[3];
+            s.redOffset=colorArrays[4];
+            s.greenOffset=colorArrays[5];
+            s.blueOffset=colorArrays[6];
+            s.alphaOffset=colorArrays[7];
         }
         /**
          * 绘画滤镜效果
@@ -232,6 +229,9 @@ namespace annie{
         public toString():string{
             let s=this;
             return s.type+s.redMultiplier+s.greenMultiplier+s.blueMultiplier+s.alphaMultiplier+s.redOffset+s.greenOffset+s.blueOffset+s.alphaOffset;
+        }
+
+        public destroy(): void {
         }
     }
     /**
@@ -443,6 +443,10 @@ namespace annie{
         public toString():string{
             let s=this;
             return s.type+s.brightness+s.hue+s.saturation+s.contrast;
+        }
+
+        public destroy(): void {
+            this.colorMatrix=null;
         }
     }
     /**
@@ -702,6 +706,8 @@ namespace annie{
                     }
                 }
             }
+        }
+        public destroy(): void {
         }
     }
 }

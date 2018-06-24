@@ -1,3 +1,7 @@
+/// <reference path="./display/Stage.ts" />
+/// <reference path="./events/EventDispatcher.ts" />
+/// <reference path="./utils/Tween.ts" />
+/// <reference path="./utils/Timer.ts" />
 /**
  * @class 全局
  */

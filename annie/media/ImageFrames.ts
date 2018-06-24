@@ -264,5 +264,13 @@ namespace annie {
             s.src="";
             s._lastSrc="";
         }
+        public destroy(): void {
+            let s=this;
+            s._urlLoader=null;
+            s._configInfo=null;
+            s.currentBitmap=null;
+            s.rect=null;
+            super.destroy();
+        }
     }
 }

@@ -179,6 +179,7 @@ declare namespace annieUI {
          * @public
          */
         scrollTo(dis: number, time?: number): void;
+        destroy(): void;
     }
 }
 /**
@@ -231,6 +232,7 @@ declare namespace annieUI {
          * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
          */
         init(src: string, radio?: number, maskType?: number): void;
+        destroy(): void;
     }
 }
 /**
@@ -427,6 +429,7 @@ declare namespace annieUI {
          * @public
          */
         addPageList(classList: any): void;
+        destroy(): void;
     }
 }
 /**
@@ -561,6 +564,7 @@ declare namespace annieUI {
         private arc(argR, argN1, argN2);
         private angle(target1, target2);
         private pos(target1, target2);
+        destroy(): void;
     }
 }
 /**
@@ -571,6 +575,13 @@ declare namespace annieUI {
  */
 declare namespace annieUI {
     import DisplayObject = annie.DisplayObject;
+    /**
+     * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
+     * @class annieUI.IScrollListItem
+     * @public
+     * @extends annie.DisplayObject
+     * @since 1.0.9
+     */
     interface IScrollListItem extends DisplayObject {
         initData(id: number, data: Array<any>): void;
         id: number;
@@ -603,7 +614,7 @@ declare namespace annieUI {
          * @since 1.0.9
          * @returns {DisplayObject}
          */
-        readonly loadingView: DisplayObject;
+        loadingView: DisplayObject;
         /**
          * 构造函数
          * @method ScrollList
@@ -644,6 +655,7 @@ declare namespace annieUI {
          * @param {annie.DisplayObject} downLoading
          */
         setLoading(downLoading: DisplayObject): void;
+        destroy(): void;
     }
 }
 /**
@@ -738,6 +750,7 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         cancel(step?: number): boolean;
+        destroy(): void;
     }
 }
 /**
@@ -787,5 +800,6 @@ declare namespace annieUI {
          */
         cancel(step?: number): boolean;
         drawRadius: number;
+        destroy(): void;
     }
 }

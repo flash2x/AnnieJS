@@ -26,7 +26,7 @@ namespace annie {
          * @since 1.0.0
          */
         public type = "";
-        private _loop: number = 0;
+        private _loop: number = 1;
         /**
          * 构造函数
          * @method Media
@@ -51,11 +51,15 @@ namespace annie {
             }
             s._SBWeixin=s._weixinSB.bind(s);
             s.media.addEventListener('ended', function(){
-                s._loop--;
-                if (s._loop > 0) {
-                    s.play(0,s._loop);
-                } else {
-                    s.media.pause();
+                if(s._loop=-1){
+                    s.play(0);
+                }else{
+                    s._loop--;
+                    if (s._loop > 0) {
+                        s.play(0,s._loop);
+                    } else {
+                        s.stop();
+                    }
                 }
                 s.dispatchEvent("onPlayEnd");
             }.bind(s));
@@ -68,6 +72,7 @@ namespace annie {
                 s.dispatchEvent("onPlayStart");
             });
         }
+        private _repeate:number=1;
         /**
          * 开始播放媒体
          * @method play
@@ -76,9 +81,14 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public play(start: number=0, loop: number=1): void {
+        public play(start: number=0, loop: number=0): void {
             let s = this;
-            s._loop = loop;
+            if(loop==0){
+                s._loop=this._repeate;
+            }else{
+                s._loop=loop;
+                s._repeate=loop;
+            }
             try {
                 s.media.currentTime = start;
             } catch (e) {
@@ -142,6 +152,12 @@ namespace annie {
             }else{
                 this.media.muted=false;
             }
+        }
+        public destroy(): void {
+            let s=this;
+            this.media.pause();
+            s.media=null;
+            super.destroy();
         }
     }
 }

@@ -176,5 +176,10 @@ namespace annie {
                 }
             }
         }
+        public destroy(): void {
+            let s=this;
+            s.kill();
+            super.destroy();
+        }
     }
 }

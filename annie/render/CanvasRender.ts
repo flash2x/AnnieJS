@@ -62,24 +62,12 @@ namespace annie {
          */
         public beginMask(target: any): void {
             let s: CanvasRender = this;
-            let isHadPath = false;
-            if (target.children && target.children.length > 0) {
-                target = target.children[0];
-            }
-            if (target._command && target._command.length > 0) {
-                s._ctx.save();
-                s._ctx.globalAlpha = 0;
-                let tm = target.cMatrix;
-                s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                target._drawShape(s._ctx, true);
-                s._ctx.restore();
-                isHadPath = true;
-            }
-            //和后面endMask的restore对应
             s._ctx.save();
-            if (isHadPath) {
-                s._ctx.clip();
-            }
+            s._ctx.globalAlpha = 0;
+            let tm = target.cMatrix;
+            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            target._drawShape(s._ctx);
+            s._ctx.clip();
         }
 
         /**
@@ -102,14 +90,14 @@ namespace annie {
         public draw(target: any): void {
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp)return;
+            if (target._cp) return;
             let texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 let ctx = s._ctx;
                 ctx.globalAlpha = target.cAlpha;
                 let tm = target.cMatrix;
                 ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (target.rect && !target._isCache){
+                if (target.rect && !target._isCache) {
                     let tr = target.rect;
                     ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
                 } else {
@@ -130,7 +118,7 @@ namespace annie {
             if (!s.rootContainer) {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
-                s.rootContainer.id="_a2x_canvas";
+                s.rootContainer.id = "_a2x_canvas";
             }
             let c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
@@ -149,6 +137,13 @@ namespace annie {
             c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
+        }
+
+        destroy(): void {
+            let s = this;
+            s.rootContainer = null;
+            s._stage = null;
+            s._ctx = null;
         }
     }
 }

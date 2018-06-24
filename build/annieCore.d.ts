@@ -7,8 +7,8 @@ declare namespace annie {
      * @class annie.AObject
      * @since 1.0.0
      */
-    class AObject {
-        private _instanceId;
+    abstract class AObject {
+        protected _instanceId: number;
         protected _instanceType: string;
         protected static _object_id: number;
         constructor();
@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        readonly instanceId: number;
+        instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,16 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        readonly instanceType: string;
+        instanceType: string;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         * @method destroy
+         * @since 2.0.0
+         * @public
+         * @returns {void}
+         */
+        abstract destroy(): void;
     }
     /**
      * 事件触发基类
@@ -42,7 +51,8 @@ declare namespace annie {
      * @since 1.0.0
      */
     class EventDispatcher extends AObject {
-        private eventTypes;
+        protected eventTypes: any;
+        protected eventTypes1: any;
         constructor();
         /**
          * 全局的鼠标事件的监听数对象表
@@ -82,6 +92,7 @@ declare namespace annie {
          * @param {boolean} isAdd
          */
         private _changeMouseCount(type, isAdd);
+        private _defaultEvent;
         /**
          * 广播侦听
          * @method dispatchEvent
@@ -106,9 +117,10 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
+         * @param {number} state 0 查找所有 1 只找从事件对象本身向上冒泡的事件类型线路查找 2 只找从最上层向事件对象本身的线路事件类型查找
          * @returns {boolean} 如果有则返回true
          */
-        hasEventListener(type: string): boolean;
+        hasEventListener(type: string, state?: number): boolean;
         /**
          * 移除对应类型的侦听
          * @method removeEventListener
@@ -125,6 +137,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         removeAllEventListener(): void;
+        destroy(): void;
     }
 }
 /**
@@ -411,6 +424,14 @@ declare namespace annie {
          * @since 1.0.0
          */
         private _pd;
+        /**
+         * @method destroy
+         * @public
+         * @since 2.0.0
+         * @returns {void}
+         */
+        destroy(): void;
+        reset(type: string, target: any): void;
     }
 }
 /**
@@ -558,6 +579,7 @@ declare namespace annie {
          * @public
          */
         updateAfterEvent(): void;
+        destroy(): void;
     }
 }
 /**
@@ -571,7 +593,7 @@ declare namespace annie {
      */
     class TouchEvent extends Event {
         /**
-         * @property TOUCH_BEGIN
+         * @property ON_MULTI_TOUCH
          * @static
          * @public
          * @since 1.0.3
@@ -624,6 +646,7 @@ declare namespace annie {
          * @public
          */
         updateAfterEvent(): void;
+        destroy(): void;
     }
 }
 /**
@@ -637,6 +660,7 @@ declare namespace annie {
      * @public
      */
     class Point extends annie.AObject {
+        destroy(): void;
         /**
          * 构造函数
          * @method Point
@@ -843,6 +867,7 @@ declare namespace annie {
          * @param {Number} dy 沿 y 轴向右移动的量（以像素为单位
          */
         translate(dx: number, dy: number): void;
+        destroy(): void;
     }
 }
 /**
@@ -950,6 +975,7 @@ declare namespace annie {
          * @return {boolean}
          */
         static testRectCross(ra: Rectangle, rb: Rectangle): boolean;
+        destroy(): void;
     }
 }
 /**
@@ -1012,7 +1038,6 @@ declare namespace annie {
          * @default 1
          */
         protected cAlpha: number;
-        isUseToMask: boolean;
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
@@ -1022,15 +1047,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         protected cMatrix: Matrix;
-        /**
-         * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
-         * @property _enterFrameEvent
-         * @private
-         * @type {annie.Event}
-         * @default null
-         * @since 1.0.0
-         */
-        private _enterFrameEvent;
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -1048,7 +1064,7 @@ declare namespace annie {
          * @since 1.0.0
          * @type {Array}
          */
-        protected cFilters: any[];
+        protected cFilters: any;
         /**
          * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -1186,7 +1202,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        readonly matrix: Matrix;
+        matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1196,7 +1212,8 @@ declare namespace annie {
          * @type {annie.DisplayObject}
          * @default null
          */
-        mask: any;
+        mask: Shape;
+        private _mask;
         /**
          * 显示对象的滤镜数组
          * @property filters
@@ -1293,7 +1310,6 @@ declare namespace annie {
          * 更新函数
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
         protected update(isDrawUpdate?: boolean): void;
@@ -1315,7 +1331,7 @@ declare namespace annie {
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
          */
-        _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
+        _onDispatchBubbledEvent(type: string): void;
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
@@ -1382,6 +1398,21 @@ declare namespace annie {
         protected _bounds: Rectangle;
         protected _drawRect: Rectangle;
         protected _setProperty(property: string, value: any, type: number): void;
+        /**
+         * 返回一个id，这个id你要留着作为删除他时使用。
+         * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @param {annie.Sound} sound
+         * @returns {number}
+         */
+        addSound(sound: annie.Sound): number;
+        /**
+         * 删除一个已经添加进来的声音
+         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         */
+        removeSound(id: number): void;
+        private _a2x_sounds;
+        private _a2x_res_obj;
+        destroy(): void;
     }
 }
 /**
@@ -1503,6 +1534,11 @@ declare namespace annie {
          * @since 1.0.0
          */
         hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
     }
 }
 /**
@@ -1532,15 +1568,13 @@ declare namespace annie {
          * 一般给用户使用较少,Flash2x工具自动使用
          * @method getGradientColor
          * @static
-         * @param {string} colors
-         * @param {number}ratios
-         * @param {annie.Point} points
-         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param points
+         * @param colors
          * @returns {any}
          * @since 1.0.0
          * @pubic
          */
-        static getGradientColor(colors: Array<string>, ratios: Array<number>, points: Array<number>): any;
+        static getGradientColor(points: any, colors: any): any;
         /**
          * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
          * @method getBitmapStyle
@@ -1718,64 +1752,64 @@ declare namespace annie {
         /**
          * 线性渐变填充 一般给Flash2x用
          * @method beginLinearGradientFill
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
-         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @param {Array} colors 一组颜色值
          * @public
          * @since 1.0.0
          */
-        beginLinearGradientFill(colors: Array<string>, ratios: Array<number>, points: Array<number>): void;
+        beginLinearGradientFill(points: any, colors: any): void;
         /**
          * 径向渐变填充 一般给Flash2x用
          * @method beginRadialGradientFill
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
          * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
          */
-        beginRadialGradientFill: (colors: string[], ratios: number[], points: number[]) => void;
+        beginRadialGradientFill: (points: any, colors: any) => void;
         /**
          * 位图填充 一般给Flash2x用
          * @method beginBitmapFill
          * @param {Image} image
-         * @param {annie.Matrix} matrix
+         * @param { Array} matrix
          * @public
          * @since 1.0.0
          */
-        beginBitmapFill(image: any, matrix: Matrix): void;
+        beginBitmapFill(image: any, matrix: Array<number>): void;
         private _fill(fillStyle);
         /**
          * 给线条着色
          * @method beginStroke
          * @param {string} color  颜色值
          * @param {number} lineWidth 宽度
+         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
+         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        beginStroke(color: string, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
+        beginStroke(color: string, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
+        private static _caps;
+        private static _joins;
         /**
          * 画线性渐变的线条 一般给Flash2x用
          * @method beginLinearGradientStroke
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
          * @param {number} lineWidth
-         * @param {string} cap 线头的形状 butt round square 默认 butt
-         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
+         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
          */
-        beginLinearGradientStroke(colors: Array<string>, ratios: Array<number>, points: Array<number>, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
+        beginLinearGradientStroke(points: Array<number>, colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
         /**
          * 画径向渐变的线条 一般给Flash2x用
          * @method beginRadialGradientStroke
-         * @param {Array} colors 一组颜色值
-         * @param {Array} ratios 一组范围比例值
          * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
          * @param {number} lineWidth
          * @param {string} cap 线头的形状 butt round square 默认 butt
          * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
@@ -1783,12 +1817,12 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        beginRadialGradientStroke: (colors: string[], ratios: number[], points: number[], lineWidth?: number, cap?: string, join?: string, miter?: number) => void;
+        beginRadialGradientStroke: (points: number[], colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number) => void;
         /**
          * 线条位图填充 一般给Flash2x用
          * @method beginBitmapStroke
          * @param {Image} image
-         * @param {annie.Matrix} matrix
+         * @param {Array} matrix
          * @param {number} lineWidth
          * @param {string} cap 线头的形状 butt round square 默认 butt
          * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
@@ -1796,7 +1830,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        beginBitmapStroke(image: any, matrix: Matrix, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
+        beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
         private _stroke(strokeStyle, width, cap, join, miter);
         /**
          * 结束填充
@@ -1805,6 +1839,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         endFill(): void;
+        protected _isUseToMask: boolean;
         /**
          * 结束画线
          * @method endStroke
@@ -1812,15 +1847,14 @@ declare namespace annie {
          * @since 1.0.0
          */
         endStroke(): void;
-        private static BASE_64;
         /**
          * 解析一段路径 一般给Flash2x用
          * @method decodePath
-         * @param {string} data
+         * @param {Array} data
          * @public
          * @since 1.0.0
          */
-        decodePath: (data: string) => void;
+        decodePath: (data: any) => void;
         /**
          * 重写刷新
          * @method update
@@ -1851,6 +1885,12 @@ declare namespace annie {
          * @since 1.0.2
          */
         changeColor(infoObj: any): void;
+        render(renderObj: IRender | any): void;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
     }
 }
 /**
@@ -1869,6 +1909,9 @@ declare namespace annie {
      */
     class Sprite extends DisplayObject {
         constructor();
+        private _a2x_res_class;
+        private _a2x_res_children;
+        destroy(): void;
         /**
          * 是否可以让children接收鼠标事件,如果为false
          * 鼠标事件将不会往下冒泡
@@ -1955,6 +1998,13 @@ declare namespace annie {
          */
         getChildIndex(child: DisplayObject): number;
         /**
+         *
+         * @param child1 显示对象，或者显示对象的索引
+         * @param child2 显示对象，或者显示对象的索引
+         * @returns {boolean}
+         */
+        swapChild(child1: any, child2: any): boolean;
+        /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
          * @private
@@ -1962,7 +2012,7 @@ declare namespace annie {
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
          */
-        _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
+        _onDispatchBubbledEvent(type: string): void;
         /**
          * 移除指定层级上的孩子
          * @method removeChildAt
@@ -2055,6 +2105,7 @@ declare namespace annie {
          *          //media.stop();//停止播放
          */
         constructor(src: any, type: string);
+        private _repeate;
         /**
          * 开始播放媒体
          * @method play
@@ -2088,6 +2139,7 @@ declare namespace annie {
          * @returns {number}
          */
         volume: number;
+        destroy(): void;
     }
 }
 /**
@@ -2117,11 +2169,11 @@ declare namespace annie {
         constructor(src: any);
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destory
+         * @method destroy
          * @public
          * @since 1.1.1
          */
-        destory(): void;
+        destroy(): void;
         private static _soundList;
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
@@ -2190,28 +2242,6 @@ declare namespace annie {
      */
     class MovieClip extends Sprite {
         /**
-         * 时间轴 一般给Flash2x工具使用
-         * @property _timeline
-         * @private
-         * @since 1.0.0
-         * @type {Array}
-         */
-        private _timeline;
-        /**
-         * 有些时候我们需要在一个时间轴动画类中添加子元素
-         * 在默认情况下，MovieClip只有在停止播放的情况下
-         * 使用addChild等方法添加到mc中的子级对象是可见的
-         * 为了能够在动画播放期间的任意时刻都能使添加的对象可见
-         * 我们给MovieClip添加了一个特殊的子级容器对象，你只需要将你的显示
-         * 对象添加到这个特殊的容器对象中，就能在整个动画期间，被添加的显示对象都可见
-         * 此 floatView 容器会一直在mc的最上层
-         * @since 1.0.2
-         * @public
-         * @property floatView
-         * @type {annie.Sprite}
-         */
-        floatView: Sprite;
-        /**
          * mc的当前帧
          * @property currentFrame
          * @public
@@ -2221,6 +2251,8 @@ declare namespace annie {
          * @readonly
          */
         currentFrame: number;
+        private _curFrame;
+        private _lastFrameObj;
         /**
          * 当前动画是否处于播放状态
          * @property isPlaying
@@ -2232,6 +2264,7 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
+        private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
          * @property isFront
@@ -2242,6 +2275,7 @@ declare namespace annie {
          * @readonly
          */
         isFront: boolean;
+        private _isFront;
         /**
          * 当前动画的总帧数
          * @property totalFrames
@@ -2252,15 +2286,7 @@ declare namespace annie {
          * @readonly
          */
         totalFrames: number;
-        private _scriptLayer;
-        private _labelFrame;
-        private _frameLabel;
-        private _isNeedUpdateChildren;
-        private _currentLayer;
-        private _currentLayerFrame;
-        private _graphicInfo;
-        private _isUpdateFrame;
-        private _goFrame;
+        private _lastFrame;
         constructor();
         /**
          * 调用止方法将停止当前帧
@@ -2269,15 +2295,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         stop(): void;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method as
-         * @private
-         * @since 1.0.0
-         * @param {Function} frameScript
-         * @param {number} frameIndex
-         */
-        as(frameScript: Function, frameIndex: number): void;
+        private _a2x_script;
         /**
          * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
          * @method addFrameScript
@@ -2295,71 +2313,20 @@ declare namespace annie {
          * @param {number} frameIndex
          */
         removeFrameScript(frameIndex: number): void;
+        isButton: boolean;
+        private _isButton;
         /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method a
-         * @private
-         * @since 1.0.0
-         * @returns {annie.MovieClip}
-         */
-        a(): MovieClip;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method b
-         * @private
-         * @since 1.0.0
-         * @returns {annie.MovieClip}
-         * @param {number} count
-         */
-        b(count: number): MovieClip;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method c
-         * @private
-         * @since 1.0.0
-         * @param {annie.DisplayObject} display
-         * @param {Object} displayBaseInfo
-         * @param {Object} displayExtendInfo
-         * @returns {annie.MovieClip}
-         */
-        c(display: any, displayBaseInfo?: any, displayExtendInfo?: any): MovieClip;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method g
-         * @private
-         * @since 1.0.0
-         * @param loopType
-         * @param {number} firstFrame
-         * @param {number} parentFrameIndex
-         * @returns {annie.MovieClip}
-         */
-        g(loopType: string, firstFrame: number, parentFrameIndex: number): MovieClip;
-        /**
-         * 当将mc设置为图形动画模式时需要设置的相关信息 Flash2x工具调用的方法,用户一般不需要使用
-         * @method setGraphicInfo
-         * @public
-         * @since 1.0.0
-         * @param{Object} graphicInfo
-         */
-        setGraphicInfo(graphicInfo: any): void;
-        /**
-         * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码
+         * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
+         * 此方法不可逆，设置后不再能设置回剪辑，一定要这么做的话，请联系作者，看作者答不答应
          * @method initButton
          * @public
          * @since 1.0.0
          */
         initButton(): void;
+        clicked: boolean;
+        private _clicked;
         private _mouseEvent;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method d
-         * @private
-         * @since 1.0.0
-         * @param {string} name
-         * @param {number} index
-         * @returns {annie.MovieClip}
-         */
-        d(name: string, index: number): MovieClip;
+        private _maskList;
         /**
          * mc的当前帧的标签名,没有则为空
          * @method getCurrentLabel
@@ -2368,26 +2335,6 @@ declare namespace annie {
          * @returns {string}
          * */
         getCurrentLabel(): string;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method e
-         * @private
-         * @since 1.0.0
-         * @param {string} eventName
-         * @returns {annie.MovieClip}
-         */
-        e(eventName: string): MovieClip;
-        /**
-         * Flash2x工具调用的方法,用户一般不需要使用
-         * @method f
-         * @private
-         * @since 1.0.0
-         * @param {string} sceneName
-         * @param {string} soundName
-         * @param {number} times
-         * @returns {annie.MovieClip}
-         */
-        f(sceneName: string, soundName: string, times: number): MovieClip;
         /**
          * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
          * @method nextFrame
@@ -2427,20 +2374,6 @@ declare namespace annie {
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         /**
-         * 动画播放过程中更改movieClip中的一个child的显示属性，
-         * 如果是停止状态，可以直接设置子级显示属性
-         * 因为moveClip在播放的过程中是无法更新子级的显示属性的，
-         * 比如你要更新子级的坐标，透明度，旋转等等，这些更改都会无效
-         * 因为，moveClip自己记录了子级每一帧的这些属性，所有你需要通过
-         * 此方法告诉moveClip我要自己控制这些属性
-         * @method setFrameChild
-         * @public
-         * @since 1.0.0
-         * @param {annie.DisplayObject} child
-         * @param {Object} attr
-         */
-        setFrameChild(child: any, attr: any): void;
-        /**
          * 重写刷新
          * @method update
          * @public
@@ -2449,13 +2382,10 @@ declare namespace annie {
          */
         update(isDrawUpdate?: boolean): void;
         /**
-         * 触发显示列表上相关的事件
-         * @method _onDispatchBubbledEvent
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
          */
-        _onDispatchBubbledEvent(type: string, updateMc?: boolean): void;
+        destroy(): void;
     }
 }
 /**
@@ -2511,21 +2441,18 @@ declare namespace annie {
          * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
          */
         init(htmlElement: any): void;
-        /**
-         * 删除html元素,这样就等于解了封装
-         * @method delElement
-         * @since 1.0.0
-         * @public
-         */
-        delElement(): void;
         private getStyle(elem, cssName);
         /**
          * @method updateStyle
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
+         * @since 1.1.4
          */
         protected updateStyle(): void;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
     }
 }
 /**
@@ -2551,26 +2478,34 @@ declare namespace annie {
          */
         textAlign: string;
         private _textAlign;
+        textAlpha: number;
+        private _textAlpha;
         /**
          * 文本的行高
-         * @property lineHeight
+         * @property textHeight
          * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        lineHeight: number;
-        private _lineHeight;
+        textHeight: number;
+        private _textHeight;
+        /**
+         *
+         * @param {number} value
+         */
+        lineSpacing: number;
+        private _lineSpacing;
         /**
          * 文本的宽
-         * @property lineWidth
+         * @property textWidth
          * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        lineWidth: number;
-        private _lineWidth;
+        textWidth: number;
+        private _textWidth;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -2698,16 +2633,13 @@ declare namespace annie {
     class InputText extends FloatDisplay {
         /**
          * 输入文本的类型.
-         * multiline 多行
-         * password 密码
-         * singleline 单行
          * @property inputType
          * @public
          * @since 1.0.0
-         * @type {string}
-         * @default "singleline"
+         * @type {number} 0 input 1 password 2 mulit
+         * @default 0
          */
-        inputType: string;
+        inputType: number;
         /**
          * 在手机端是否需要自动收回软键盘，在pc端此参数无效
          * @property isAutoDownKeyBoard
@@ -2716,16 +2648,17 @@ declare namespace annie {
          * @default true
          */
         isAutoDownKeyBoard: boolean;
+        private static _inputTypeList;
         /**
          * @method InputText
          * @public
          * @since 1.0.0
-         * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
+         * @param {number} inputType 0 input 1 password 2 multiline
          * @example
          *      var inputText=new annie.InputText('singleline');
          *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
-        constructor(inputType: string);
+        constructor(inputType?: number);
         init(htmlElement: any): void;
         /**
          * 被始化输入文件的一些属性
@@ -2733,8 +2666,6 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} text 默认文字
-         * @param {number} w 文本宽
-         * @param {number} h 文本高
          * @param {string}color 文字颜色
          * @param {string}align 文字的对齐方式
          * @param {number}size  文字大小
@@ -2742,7 +2673,8 @@ declare namespace annie {
          * @param {boolean}showBorder 是否需要显示边框
          * @param {number}lineSpacing 如果是多行,请设置行高
          */
-        initInfo(text: string, w: number, h: number, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
+        initInfo(text: string, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
+        lineSpacing: number;
         /**
          * 设置文本是否为粗体
          * @property bold
@@ -2759,6 +2691,24 @@ declare namespace annie {
          * @since 1.0.3
          */
         italic: boolean;
+        /**
+         * 文本的行高
+         * @property textHeight
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        textHeight: number;
+        /**
+         * 文本的宽
+         * @property textWidth
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        textWidth: number;
         /**
          * 设置文本颜色
          * @property color
@@ -2856,6 +2806,14 @@ declare namespace annie {
          * @readonly
          */
         renderType: number;
+        /**
+         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @param {string} stageName
+         * @returns {any}
+         * @since 2.0.0
+         */
+        static getStage(stageName?: string): any;
+        private static _stageList;
         /**
          * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -3039,7 +2997,6 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
@@ -3171,6 +3128,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         static removeUpdateObj(target: any): void;
+        destroy(): void;
     }
 }
 /**
@@ -3259,6 +3217,7 @@ declare namespace annie {
          * @param {ImageData} imageData
          */
         drawFilter(imageData?: ImageData): void;
+        destroy(): void;
     }
     /**
      * 普通变色滤镜
@@ -3342,16 +3301,9 @@ declare namespace annie {
         type: string;
         /**
          * @method ColorFilter
-         * @param {number} redMultiplier
-         * @param {number} greenMultiplier
-         * @param {number} blueMultiplier
-         * @param {number} alphaMultiplier
-         * @param {number} redOffset
-         * @param {number} greenOffset
-         * @param {number} blueOffset
-         * @param {number} alphaOffset
+         * @colorArrays 颜色值数据
          */
-        constructor(redMultiplier?: number, greenMultiplier?: number, blueMultiplier?: number, alphaMultiplier?: number, redOffset?: number, greenOffset?: number, blueOffset?: number, alphaOffset?: number);
+        constructor(colorArrays: number[]);
         /**
          * 绘画滤镜效果
          * @method drawFilter
@@ -3368,6 +3320,7 @@ declare namespace annie {
          * @return {string}
          */
         toString(): string;
+        destroy(): void;
     }
     /**
      * 矩阵变色滤镜
@@ -3448,6 +3401,7 @@ declare namespace annie {
          * @return {string}
          */
         toString(): string;
+        destroy(): void;
     }
     /**
      * 模糊滤镜
@@ -3532,6 +3486,7 @@ declare namespace annie {
          * @public
          */
         drawFilter(imageData?: ImageData): boolean;
+        destroy(): void;
     }
 }
 /**
@@ -3647,6 +3602,7 @@ declare namespace annie {
          * @method reSize
          */
         reSize(): void;
+        destroy(): void;
     }
 }
 /**
@@ -3756,16 +3712,15 @@ declare namespace annie {
          * @param value
          */
         addHeader(name: string, value: string): void;
+        destroy(): void;
     }
 }
 /**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
- * @class Flash2x
+ * @class annie
  */
-declare namespace Flash2x {
-    import Shape = annie.Shape;
-    import Bitmap = annie.Bitmap;
+declare namespace annie {
     let _isReleased: boolean;
     let _shareSceneList: any;
     /**
@@ -3805,79 +3760,31 @@ declare namespace Flash2x {
      */
     function unLoadScene(sceneName: string): void;
     /**
-     * 获取已经加载场景中的声音或视频资源
-     * @method getMediaByName
+     * 获取已经加载场景中的资源
+     * @method getResource
      * @public
      * @static
-     * @since 1.0.0
+     * @since 2.0.0
      * @param {string} sceneName
-     * @param {string} mediaName
+     * @param {string} resName
      * @returns {any}
      */
-    function getMediaByName(sceneName: string, mediaName: string): any;
-    /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-     * @method b
-     * @public
-     * @since 1.0.0
-     * @static
-     * @param {string} sceneName
-     * @param {string} imageName
-     * @returns {any}
-     */
-    function b(sceneName: string, imageName: string): Bitmap;
+    function getResource(sceneName: string, resName: string): any;
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
      * @method d
      * @public
      * @static
      * @since 1.0.0
-     * @param {Object} display
-     * @param {Object} baseInfo
-     * @param {Object} extendInfo
+     * @param {Object} target
+     * @param {Object} info
      */
-    function d(display: any, baseInfo?: any, extendInfo?: any): void;
-    /**
-     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-     * @method t
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {number} type
-     * @param {string} text
-     * @param {number} size
-     * @param {string} color
-     * @param {string} face
-     * @param {number} top
-     * @param {number} left
-     * @param {number} width
-     * @param {number} height
-     * @param {number} lineSpacing
-     * @param {string} align
-     * @param {boolean} italic
-     * @param {boolean} bold
-     * @param {string} lineType
-     * @param {boolean} showBorder
-     * @returns {annie.TextFiled|annie.InputText}
-     */
-    function t(type: number, text: string, size: number, color: string, face: string, top: number, left: number, width: number, height: number, lineSpacing: number, align: string, italic?: boolean, bold?: boolean, lineType?: string, showBorder?: boolean): any;
+    function d(target: any, info: any): void;
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
      * @method sb
      */
-    function sb(sceneName: string, bitmapName: string): annie.Bitmap;
-    /**
-     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-     * @method s
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} pathObj
-     * @param {Object} fillObj
-     * @param {Object} strokeObj
-     * @returns {annie.Shape}
-     */
-    function s(pathObj: any, fillObj: any, strokeObj: any): Shape;
+    function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method ajax
@@ -3940,6 +3847,13 @@ declare namespace Flash2x {
      *      trace(id,userName);
      */
     function getQueryString(name: string): string;
+    /**
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
+     */
+    function initRes(target: any, sceneName: string, resName: string): void;
 }
 /**
  * @module annie
@@ -3979,6 +3893,7 @@ declare namespace annie {
          * @public
          */
         update(): void;
+        destroy(): void;
     }
     /**
      * 全局静态单列类,不要实例化此类
@@ -4411,7 +4326,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {number}
          */
-        readonly currentCount: number;
+        currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -4438,7 +4353,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {boolean}
          */
-        readonly running: boolean;
+        running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
@@ -4450,6 +4365,7 @@ declare namespace annie {
         private update();
         private static _timerList;
         private static flush();
+        destroy(): void;
     }
 }
 /**

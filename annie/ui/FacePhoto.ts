@@ -84,5 +84,12 @@ namespace annieUI {
             if (s.maskType != maskType)
                 s.maskType = maskType;
         }
+        public destroy(): void {
+            let s=this;
+           s.bitmap=null;
+           s.photo=null;
+           s.maskObj=null;
+            super.destroy();
+        }
     }
 }
