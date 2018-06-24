@@ -8087,6 +8087,9 @@ var annie;
             return;
         }
         if (!_isInited) {
+            if (annie._isReleased) {
+                trace("AnnieJS:https://github.com/flash2x/annieJS");
+            }
             _JSONQueue = new URLLoader();
             _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
             _loaderQueue = new URLLoader();
