@@ -361,10 +361,10 @@ namespace annie {
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].pageX - e.target.offsetLeft;
-                    s._mP1.y = e.targetTouches[0].pageY - e.target.offsetTop;
-                    s._mP2.x = e.targetTouches[1].pageX - e.target.offsetLeft;
-                    s._mP2.y = e.targetTouches[1].pageY - e.target.offsetTop;
+                    s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
+                    s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
+                    s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
+                    s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -377,10 +377,10 @@ namespace annie {
                         let len = s.muliPoints.length;
                         s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
                         s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
-                        s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x;
-                        s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x;
-                        s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y;
-                        s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y;
+                        s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
                         s.dispatchEvent(s._touchEvent);
                         s.muliPoints.shift();
                     }
@@ -427,14 +427,14 @@ namespace annie {
                     for (let o = 0; o < points.length; o++) {
                         eLen = 0;
                         events = [];
-                        identifier = points[o].identifier;
+                        identifier = "m" + points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         } else {
                             cp = new Point();
                         }
-                        cp.x = points[o].pageX;
-                        cp.y = points[o].pageY;
+                        cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
                         if (EventDispatcher.getMouseEventCount() > 0) {

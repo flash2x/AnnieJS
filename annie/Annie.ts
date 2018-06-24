@@ -14,6 +14,15 @@ namespace annie{
      */
     export let version: string = "2.0.0";
     /**
+     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
+     * @property annie.devicePixelRatio
+     * @type {number}
+     * @since 1.0.0
+     * @public
+     * @static
+     */
+    export let devicePixelRatio:number=1;
+    /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
      * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
