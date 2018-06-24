@@ -66,7 +66,7 @@ namespace annie {
             s._ctx.globalAlpha = 0;
             let tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            target._drawShape(s._ctx,);
+            target._drawShape(s._ctx);
             s._ctx.clip();
         }
 

@@ -11,7 +11,7 @@ declare namespace annie {
         protected _instanceId: number;
         protected _instanceType: string;
         protected static _object_id: number;
-        protected constructor();
+        constructor();
         /**
          * 每一个annie引擎对象都会有一个唯一的id码。
          * @property instanceId
@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        readonly instanceId: number;
+        instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        readonly instanceType: string;
+        instanceType: string;
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -995,7 +995,7 @@ declare namespace annie {
          * @since 1.0.0
          * @public
          */
-        protected constructor();
+        constructor();
         /**
          * 更新信息
          * @property _UI
@@ -1016,7 +1016,7 @@ declare namespace annie {
          * @default null;
          * @readonly
          * */
-        stage: Stage | null;
+        stage: Stage;
         /**
          * 显示对象的父级
          * @property parent
@@ -1026,7 +1026,7 @@ declare namespace annie {
          * @default null
          * @readonly
          */
-        parent: Sprite | null;
+        parent: Sprite;
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
@@ -1209,7 +1209,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        readonly matrix: Matrix;
+        matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1916,7 +1916,6 @@ declare namespace annie {
      */
     class Sprite extends DisplayObject {
         constructor();
-        protected _resId: string | null;
         private _a2x_res_class;
         private _a2x_res_children;
         destroy(): void;
@@ -2258,7 +2257,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        readonly currentFrame: number;
+        currentFrame: number;
         private _curFrame;
         private _lastFrameObj;
         /**
@@ -2271,7 +2270,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        readonly isPlaying: boolean;
+        isPlaying: boolean;
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2282,7 +2281,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        readonly isFront: boolean;
+        isFront: boolean;
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2293,7 +2292,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        readonly totalFrames: number;
+        totalFrames: number;
         private _lastFrame;
         constructor();
         /**
@@ -2321,7 +2320,7 @@ declare namespace annie {
          * @param {number} frameIndex
          */
         removeFrameScript(frameIndex: number): void;
-        readonly isButton: boolean;
+        isButton: boolean;
         private _isButton;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -3726,9 +3725,9 @@ declare namespace annie {
 /**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
- * @class Annie2x
+ * @class annie
  */
-declare namespace Annie2x {
+declare namespace annie {
     let _isReleased: boolean;
     let _shareSceneList: any;
     /**
@@ -3861,7 +3860,7 @@ declare namespace Annie2x {
      * @param {string} _resId
      * @private
      */
-    function _initRes(target: any, sceneName: string, resName: string): void;
+    function initRes(target: any, sceneName: string, resName: string): void;
 }
 /**
  * @module annie
@@ -4334,7 +4333,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {number}
          */
-        readonly currentCount: number;
+        currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -4361,7 +4360,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {boolean}
          */
-        readonly running: boolean;
+        running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你

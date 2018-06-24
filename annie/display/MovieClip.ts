@@ -323,7 +323,7 @@ namespace annie {
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
                     let timeLineObj = s._a2x_res_class;
-                    let curFrameObj = null;
+                    let curFrameObj:any = null;
                     let lastFrameObj = s._lastFrameObj;
                     if (timeLineObj.timeLine[s._curFrame - 1] >= 0) {
                         curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
@@ -383,7 +383,7 @@ namespace annie {
                             let maskList = s._maskList;
                             if (curFrameObj.c) {
                                 for (let i in curFrameObj.c) {
-                                    Annie2x.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
+                                    annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
                                     //检查是否有遮罩
                                     if (curFrameObj.c[i].ma != undefined) {
                                         if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {

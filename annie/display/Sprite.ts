@@ -19,12 +19,7 @@ namespace annie {
             super();
             let s=this;
             s._instanceType = "annie.Sprite";
-            if(s._resId) {
-                let resInfo=s._resId.split(".");
-                Annie2x._initRes(s, resInfo[0],resInfo[1]);
-            }
         }
-        protected _resId:string|null;
         //sprite 和 moveClip的类资源信息
         private _a2x_res_class:any=null;
         private _a2x_res_children:any=[];

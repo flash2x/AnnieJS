@@ -1,9 +1,9 @@
 /**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
- * @class Annie2x
+ * @class annie
  */
-namespace Annie2x {
+namespace annie {
     import URLLoader = annie.URLLoader;
     import Event = annie.Event;
     import ColorFilter=annie.ColorFilter;
@@ -212,7 +212,7 @@ namespace Annie2x {
                 if(mc.tf > 1) {
                     let frameList = mc.f;
                     let count = frameList.length;
-                    let frameCon = null;
+                    let frameCon:any = null;
                     let children: any = {};
                     let children2: any = {};
                     for (let i = 0; i < count; i++) {
@@ -281,7 +281,7 @@ namespace Annie2x {
             }
         } else {
             if (scene != "f2xShare") {
-               _parseContent(Annie2x.res[_loadSceneNames[_loadIndex]]._a2x_con, Annie2x.res[_loadSceneNames[_loadIndex]]);
+               _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
             } else {
                 _currentConfig.shift();
                 _loadSceneNames.shift();
@@ -441,9 +441,9 @@ namespace Annie2x {
             //添加滤镜
             if (lastInfo.fi != info.fi) {
                 if (info.fi != undefined) {
-                    let filters = [];
-                    let blur;
-                    let color;
+                    let filters:any = [];
+                    let blur:any;
+                    let color:any;
                     for (let i = 0; i < info.fi.length; i++) {
                         switch (info.fi[i].t) {
                             case 0:
@@ -713,7 +713,7 @@ namespace Annie2x {
      * @param {string} _resId
      * @private
      */
-    export function _initRes(target: any, sceneName: string, resName: string) {
+    export function initRes(target: any, sceneName: string, resName: string) {
         let Root: any = window;
         //资源树最顶层
         let resRoot: any = res[sceneName];
@@ -778,7 +778,7 @@ namespace Annie2x {
             let objCount = children.length;
             let obj: any = null;
             let objId: number = 0;
-            let maskObj = null;
+            let maskObj:any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 if (children[i].indexOf("_$") == 0) {
@@ -795,7 +795,7 @@ namespace Annie2x {
                             } else {
                                 obj = new annie.Sprite();
                             }
-                            _initRes(obj, sceneName, children[i]);
+                            initRes(obj, sceneName, children[i]);
                             break;
                         case 2:
                             //bitmap

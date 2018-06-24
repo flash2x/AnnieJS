@@ -614,7 +614,7 @@ declare namespace annieUI {
          * @since 1.0.9
          * @returns {DisplayObject}
          */
-        readonly loadingView: DisplayObject;
+        loadingView: DisplayObject;
         /**
          * 构造函数
          * @method ScrollList

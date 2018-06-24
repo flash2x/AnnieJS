@@ -19,7 +19,7 @@ namespace annie {
          * @since 1.0.0
          * @public
          */
-        protected constructor(){
+         constructor(){
             super();
             this._instanceType = "annie.DisplayObject";
         }
@@ -39,7 +39,7 @@ namespace annie {
          * @default null;
          * @readonly
          * */
-        public stage: Stage|null = null;
+        public stage: Stage = null;
         /**
          * 显示对象的父级
          * @property parent
@@ -49,7 +49,7 @@ namespace annie {
          * @default null
          * @readonly
          */
-        public parent: Sprite|null = null;
+        public parent: Sprite = null;
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
