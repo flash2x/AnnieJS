@@ -2345,14 +2345,12 @@ var annie;
             _super.call(this);
             var s = this;
             s._instanceType = "annie.Bitmap";
-            s._texture = imagePath;
-            annie.getImageInfo({
-                src: imagePath,
-                success: function (res) {
-                    s._bounds.width = res.width;
-                    s._bounds.height = res.height;
-                }
-            });
+            s._texture = annie.getImageInfo();
+            s._texture.onload = function () {
+                s._bounds.width = s._texture.width;
+                s._bounds.height = s._texture.height;
+            };
+            s._texture.src = imagePath;
         }
         /**
          * 重写hitTestPoint
@@ -5266,14 +5264,11 @@ var annie;
          * @method flushAll
          */
         Stage.flushAll = function () {
-            setInterval(function () {
-                var len = Stage.allUpdateObjList.length;
-                for (var i = 0; i < len; i++) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
-                }
-            }, 16);
-            //什么时候支持这个方法，什么时候就换上
-            //requestAnimationFrame(Stage.flushAll);
+            var len = Stage.allUpdateObjList.length;
+            for (var i = 0; i < len; i++) {
+                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            }
+            requestAnimationFrame(Stage.flushAll);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -5482,7 +5477,16 @@ var annie;
          * @public
          */
         CanvasRender.prototype.begin = function () {
+            var s = this;
             CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
+            var _ctx = CanvasRender.drawCtx;
+            if (s._stage.bgColor != "") {
+                _ctx.fillStyle = s._stage.bgColor;
+                _ctx.fillRect(0, 0, s._stage.divWidth, s._stage.divHeight);
+            }
+            else {
+                _ctx.clearRect(0, 0, s._stage.divWidth, s._stage.divHeight);
+            }
         };
         /**
          * 开始有遮罩时调用
@@ -5510,7 +5514,7 @@ var annie;
             CanvasRender.drawCtx.restore();
         };
         CanvasRender.prototype.end = function () {
-            CanvasRender.drawCtx.draw();
+            //CanvasRender.drawCtx.draw();
         };
         /**
          * 调用渲染

@@ -34,7 +34,15 @@ namespace annie {
          * @public
          */
         public begin(): void {
+            let s=this;
             CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
+            let _ctx = CanvasRender.drawCtx;
+            if (s._stage.bgColor != "") {
+                _ctx.fillStyle = s._stage.bgColor;
+                _ctx.fillRect(0, 0, s._stage.divWidth, s._stage.divHeight);
+            } else {
+                _ctx.clearRect(0, 0, s._stage.divWidth, s._stage.divHeight);
+            }
         }
         /**
          * 开始有遮罩时调用
@@ -64,7 +72,7 @@ namespace annie {
         }
 
         public end() {
-            CanvasRender.drawCtx.draw();
+            //CanvasRender.drawCtx.draw();
         }
 
         /**

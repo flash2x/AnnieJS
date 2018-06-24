@@ -26,14 +26,12 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s._texture = imagePath;
-            annie.getImageInfo({
-                src: imagePath,
-                success: function (res:any) {
-                    s._bounds.width=res.width;
-                    s._bounds.height=res.height;
-                }
-            })
+            s._texture = annie.getImageInfo();
+            s._texture.onload = function () {
+                s._bounds.width=s._texture.width;
+                s._bounds.height=s._texture.height;
+            };
+            s._texture.src = imagePath;
         }
         /**
          * 重写hitTestPoint

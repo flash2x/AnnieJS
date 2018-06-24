@@ -111,6 +111,7 @@ namespace annie {
          * @default "";
          */
         public bgColor: string = "";
+
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -198,7 +199,7 @@ namespace annie {
             let s: Stage = this;
             this._instanceType = "annie.Stage";
             s.stage = this;
-            s.name = "stageInstance"+s._instanceId;
+            s.name = "stageInstance" + s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
             s.divWidth = canW;
@@ -735,14 +736,11 @@ namespace annie {
          * @method flushAll
          */
         private static flushAll(): void {
-            setInterval(function(){
-                let len = Stage.allUpdateObjList.length;
-                for (let i = 0; i < len; i++) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
-                }
-            },16);
-            //什么时候支持这个方法，什么时候就换上
-            //requestAnimationFrame(Stage.flushAll);
+            let len = Stage.allUpdateObjList.length;
+            for (let i = 0; i < len; i++) {
+                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            }
+            requestAnimationFrame(Stage.flushAll);
         }
 
         /**
@@ -786,6 +784,7 @@ namespace annie {
                 }
             }
         }
+
         public destroy(): void {
             let s = this;
             Stage.removeUpdateObj(s);
