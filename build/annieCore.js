@@ -2900,14 +2900,14 @@ var annie;
         Shape.prototype.endFill = function () {
             var s = this;
             var c = s._command;
-            var m = s._isBitmapFill;
+            /*let m = s._isBitmapFill;
             if (m) {
-                c[c.length] = [2, "setTransform", m];
-            }
+                c[c.length]=[2, "setTransform", m];
+            }*/
             c[c.length] = ([1, "fill", []]);
-            if (m) {
+            /*if (m) {
                 s._isBitmapFill = null;
-            }
+            }*/
         };
         /**
          * 结束画线
@@ -2918,15 +2918,14 @@ var annie;
         Shape.prototype.endStroke = function () {
             var s = this;
             var c = s._command;
-            var m = s._isBitmapStroke;
+            /*let m = s._isBitmapStroke;
             if (m) {
-                //如果为2则还需要特别处理
-                c[c.length] = [2, "setTransform", m];
-            }
+                c[c.length]=[2, "setTransform", m];
+            }*/
             c[c.length] = ([1, "stroke", []]);
-            if (m) {
+            /*if (m) {
                 s._isBitmapStroke = null;
-            }
+            }*/
         };
         /**
          * 重写刷新
@@ -6781,8 +6780,7 @@ var annie;
                     shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
                 }
                 else {
-                    //shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
-                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
+                    shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0])._texture, shapeDate[i][2][1]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endFill();
@@ -6798,7 +6796,7 @@ var annie;
                     shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 }
                 else {
-                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                    shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0])._texture, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endStroke();

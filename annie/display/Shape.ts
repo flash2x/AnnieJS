@@ -482,14 +482,14 @@ namespace annie {
         public endFill(): void {
             let s = this;
             let c = s._command;
-            let m = s._isBitmapFill;
+            /*let m = s._isBitmapFill;
             if (m) {
                 c[c.length]=[2, "setTransform", m];
-            }
+            }*/
             c[c.length]=([1, "fill", []]);
-            if (m) {
+            /*if (m) {
                 s._isBitmapFill = null;
-            }
+            }*/
         }
         protected _isUseToMask:boolean=false;
         /**
@@ -501,15 +501,14 @@ namespace annie {
         public endStroke(): void {
             let s = this;
             let c = s._command;
-            let m = s._isBitmapStroke;
+            /*let m = s._isBitmapStroke;
             if (m) {
-                //如果为2则还需要特别处理
                 c[c.length]=[2, "setTransform", m];
-            }
+            }*/
             c[c.length]=([1, "stroke", []]);
-            if (m) {
+            /*if (m) {
                 s._isBitmapStroke = null;
-            }
+            }*/
         }
         /**
          * 解析一段路径 一般给Flash2x用
