@@ -148,7 +148,7 @@ namespace annie {
             }
             EventDispatcher._totalMEC += count;
         }
-
+        private _defaultEvent:annie.Event;
         /**
          * 广播侦听
          * @method dispatchEvent
@@ -169,7 +169,12 @@ namespace annie {
         public dispatchEvent(event: any, data: any = null): boolean {
             let s = this;
             if (typeof(event) == "string") {
-                event = new annie.Event(event);
+                if(!s._defaultEvent){
+                    s._defaultEvent =new annie.Event(event);
+                }else {
+                    s._defaultEvent.reset(event, s);
+                }
+                event=s._defaultEvent;
             }
             let listeners = s.eventTypes[event.type];
             if (listeners) {

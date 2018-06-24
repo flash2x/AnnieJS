@@ -166,7 +166,13 @@ var annie;
             if (data === void 0) { data = null; }
             var s = this;
             if (typeof (event) == "string") {
-                event = new annie.Event(event);
+                if (!s._defaultEvent) {
+                    s._defaultEvent = new annie.Event(event);
+                }
+                else {
+                    s._defaultEvent.reset(event, s);
+                }
+                event = s._defaultEvent;
             }
             var listeners = s.eventTypes[event.type];
             if (listeners) {
@@ -347,6 +353,11 @@ var annie;
             var s = this;
             s.target = null;
             s.data = null;
+        };
+        Event.prototype.reset = function (type, target) {
+            this.target = target;
+            this._pd = false;
+            this.type = type;
         };
         /**
          * 舞台尺寸发生变化时触发
@@ -1553,15 +1564,6 @@ var annie;
              */
             this.cMatrix = new annie.Matrix();
             /**
-             * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
-             * @property _enterFrameEvent
-             * @private
-             * @type {annie.Event}
-             * @default null
-             * @since 1.0.0
-             */
-            this._enterFrameEvent = null;
-            /**
              * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
              * @property mouseEnable
              * @type {boolean}
@@ -2114,10 +2116,7 @@ var annie;
             }
             //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new annie.Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
+                s.dispatchEvent("onEnterFrame");
             }
         };
         /**
@@ -2321,7 +2320,6 @@ var annie;
             s.stage = null;
             s._bounds = null;
             s._drawRect = null;
-            s._enterFrameEvent = null;
             s._dragBounds = null;
             s._lastDragPoint = null;
             s.cFilters = null;

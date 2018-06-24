@@ -68,15 +68,7 @@ namespace annie {
          * @since 1.0.0
          */
         protected cMatrix: Matrix = new Matrix();
-        /**
-         * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
-         * @property _enterFrameEvent
-         * @private
-         * @type {annie.Event}
-         * @default null
-         * @since 1.0.0
-         */
-        private _enterFrameEvent: annie.Event = null;
+
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -563,10 +555,7 @@ namespace annie {
             }
             //enterFrame事件一定要放在这里，不要再移到其他地方
             if (s.hasEventListener("onEnterFrame")) {
-                if (!s._enterFrameEvent) {
-                    s._enterFrameEvent = new Event("onEnterFrame");
-                }
-                s.dispatchEvent(s._enterFrameEvent);
+                s.dispatchEvent("onEnterFrame");
             }
         }
         /**
@@ -795,7 +784,6 @@ namespace annie {
             s.stage=null;
             s._bounds=null;
             s._drawRect=null;
-            s._enterFrameEvent=null;
             s._dragBounds=null;
             s._lastDragPoint=null;
             s.cFilters=null;
