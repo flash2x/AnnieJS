@@ -257,8 +257,7 @@ namespace annie{
                 } else if (shapeDate[i][1] == 2) {
                     shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
                 } else {
-                    //shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
-                    shape.beginFill(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]));
+                    shape.beginBitmapFill(res[sceneName][shapeDate[i][2][0]], shapeDate[i][2][1]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endFill();
@@ -270,8 +269,7 @@ namespace annie{
                 } else if (shapeDate[i][1] == 2) {
                     shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 } else {
-                    shape.beginStroke(annie.Shape.getRGBA(shapeDate[i][2][0], shapeDate[i][2][1]), shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
-                    //shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                    shape.beginBitmapStroke(res[sceneName][shapeDate[i][2][0]], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endStroke();
