@@ -287,7 +287,7 @@ namespace annie{
      * @param {string} _resId
      * @private
      */
-    export function _initRes(target: any, sceneName: string, resName: string){
+    export function initRes(target: any, sceneName: string, resName: string){
         let Root: any = window;
         //资源树最顶层
         let resRoot: any = res[sceneName];
@@ -369,7 +369,7 @@ namespace annie{
                             } else {
                                 obj = new annie.Sprite();
                             }
-                            _initRes(obj, sceneName, children[i]);
+                            initRes(obj, sceneName, children[i]);
                             break;
                         case 2:
                             //bitmap

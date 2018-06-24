@@ -1828,7 +1828,6 @@ declare namespace annie {
      */
     class Sprite extends DisplayObject {
         constructor();
-        protected _resId: string;
         private _a2x_res_class;
         private _a2x_res_children;
         destroy(): void;
@@ -3331,7 +3330,7 @@ declare namespace annie {
      * @param {string} _resId
      * @private
      */
-    function _initRes(target: any, sceneName: string, resName: string): void;
+    function initRes(target: any, sceneName: string, resName: string): void;
 }
 /**
  * @class annie

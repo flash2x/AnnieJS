@@ -3213,7 +3213,6 @@ var annie;
         __extends(Sprite, _super);
         function Sprite() {
             _super.call(this);
-            this._resId = null;
             //sprite 和 moveClip的类资源信息
             this._a2x_res_class = null;
             this._a2x_res_children = [];
@@ -3239,10 +3238,6 @@ var annie;
             this.children = [];
             var s = this;
             s._instanceType = "annie.Sprite";
-            if (s._resId) {
-                var resInfo = s._resId.split(".");
-                annie._initRes(s, resInfo[0], resInfo[1]);
-            }
         }
         Sprite.prototype.destroy = function () {
             var s = this;
@@ -6817,7 +6812,7 @@ var annie;
      * @param {string} _resId
      * @private
      */
-    function _initRes(target, sceneName, resName) {
+    function initRes(target, sceneName, resName) {
         var Root = window;
         //资源树最顶层
         var resRoot = res[sceneName];
@@ -6908,7 +6903,7 @@ var annie;
                             else {
                                 obj = new annie.Sprite();
                             }
-                            _initRes(obj, sceneName, children[i]);
+                            initRes(obj, sceneName, children[i]);
                             break;
                         case 2:
                             //bitmap
@@ -6964,7 +6959,7 @@ var annie;
             }
         }
     }
-    annie._initRes = _initRes;
+    annie.initRes = initRes;
 })(annie || (annie = {}));
 /**
  * @class annie
@@ -7026,4 +7021,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-module.exports = annie;
