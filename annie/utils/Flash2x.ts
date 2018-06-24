@@ -3,6 +3,7 @@
  */
 
 namespace annie{
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
     let res:any={};
     /**
      * 创建一个声音对象
@@ -288,7 +289,7 @@ namespace annie{
      * @private
      */
     export function initRes(target: any, sceneName: string, resName: string){
-        let Root: any = window;
+        let Root: any = classPool;
         //资源树最顶层
         let resRoot: any = res[sceneName];
         //资源树里类对象json数据

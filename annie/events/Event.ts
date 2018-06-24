@@ -301,5 +301,10 @@ namespace annie {
             s.target=null;
             s.data=null;
         }
+        public reset(type:string,target:any):void{
+            this.type=type;
+            this._pd=false;
+            this.target=target;
+        }
     }
 }
