@@ -139,12 +139,6 @@ declare namespace annie {
         removeAllEventListener(): void;
         destroy(): void;
     }
-    /**
-     * 全局事件侦听
-     * @property globalDispatcher
-     * @type {annie.EventDispatcher}
-     */
-    let globalDispatcher: EventDispatcher;
 }
 /**
  * @module annie
@@ -2325,6 +2319,7 @@ declare namespace annie {
          * @default false
          */
         static pause: boolean;
+        private static _pause;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -2605,7 +2600,7 @@ declare namespace annie {
         /**
          * html 标签 有可能是audio 或者 video
          * @property media
-         * @type {Video|Audio}
+         * @type {Audio}
          * @public
          * @since 1.0.0
          */
@@ -2614,11 +2609,17 @@ declare namespace annie {
         /**
          * 构造函数
          * @method Sound
-         * @param {string|HtmlElement} src
-         * @param {string} type
+         * @param {string} src
+         * @param {string}type
          * @since 1.0.0
          */
         constructor(src: string);
+        /**
+         * 是否正在播放中
+         * @property  isPlaying
+         * @type {boolean}
+         */
+        isPlaying: boolean;
         /**
          * 开始播放媒体
          * @method play
@@ -2650,6 +2651,41 @@ declare namespace annie {
          * @returns {number}
          */
         volume: number;
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
+        private stop2();
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
+        private play2();
+        private static _soundList;
+        /**
+         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method stopAllSounds
+         * @since 1.1.1
+         * @static
+         * @public
+         */
+        static stopAllSounds(): void;
+        /**
+         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
+         * @method resumePlaySounds
+         * @since 2.0.0
+         * @static
+         * @public
+         */
+        static resumePlaySounds(): void;
+        /**
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method setAllSoundsVolume
+         * @since 1.1.1
+         * @static
+         * @public
+         * @param {number} volume 音量大小，从0-1
+         */
+        static setAllSoundsVolume(volume: number): void;
+        private static _volume;
     }
 }
 /**
@@ -3348,6 +3384,12 @@ declare namespace annie {
      * @static
      */
     let devicePixelRatio: number;
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    let globalDispatcher: EventDispatcher;
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。

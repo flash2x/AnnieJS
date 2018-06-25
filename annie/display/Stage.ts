@@ -31,7 +31,22 @@ namespace annie {
          * @since 1.0.0
          * @default false
          */
-        public static  pause: boolean = false;
+        static get pause(): boolean {
+            return this._pause;
+        }
+
+        static set pause(value: boolean) {
+            let s=this;
+            if(s._pause!=value) {
+                if(value){
+                    Sound.stopAllSounds();
+                }else{
+                    Sound.resumePlaySounds();
+                }
+                this._pause = value;
+            }
+        }
+        private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -731,7 +746,7 @@ namespace annie {
          * @method flushAll
          */
         private static flushAll(): void {
-            if(!Stage.pause) {
+            if(!Stage._pause) {
                 let len = Stage.allUpdateObjList.length;
                 for (let i = 0; i < len; i++) {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
