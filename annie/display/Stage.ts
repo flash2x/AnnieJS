@@ -29,10 +29,11 @@ namespace annie {
          * @property pause
          * @type {boolean}
          * @public
+         * @static
          * @since 1.0.0
          * @default false
          */
-        public pause: boolean = false;
+        public static pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -111,6 +112,7 @@ namespace annie {
          * @default "";
          */
         public bgColor: string = "";
+
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -198,7 +200,7 @@ namespace annie {
             let s: Stage = this;
             this._instanceType = "annie.Stage";
             s.stage = this;
-            s.name = "stageInstance"+s._instanceId;
+            s.name = "stageInstance" + s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
             s.divWidth = canW;
@@ -223,9 +225,7 @@ namespace annie {
          */
         public update(isDrawUpdate: boolean = true): void {
             let s = this;
-            if (!s.pause) {
-                super.update(isDrawUpdate);
-            }
+            super.update(isDrawUpdate);
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -237,12 +237,9 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s = this;
-            if (!s.pause) {
-                renderObj.begin();
-                super.render(renderObj);
-                renderObj.end();
-            }
-
+            renderObj.begin();
+            super.render(renderObj);
+            renderObj.end();
         }
 
         /**
@@ -735,12 +732,14 @@ namespace annie {
          * @method flushAll
          */
         private static flushAll(): void {
-            setInterval(function(){
-                let len = Stage.allUpdateObjList.length;
-                for (let i = 0; i < len; i++) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            setInterval(function () {
+                if (!Stage.pause) {
+                    let len = Stage.allUpdateObjList.length;
+                    for (let i = 0; i < len; i++) {
+                        Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                    }
                 }
-            },16);
+            }, 16);
             //什么时候支持这个方法，什么时候就换上
             //requestAnimationFrame(Stage.flushAll);
         }
@@ -786,10 +785,10 @@ namespace annie {
                 }
             }
         }
+
         public destroy(): void {
             let s = this;
             Stage.removeUpdateObj(s);
-            s.pause = true;
             s.renderObj = null;
             s.viewRect = null;
             s._lastDpList = null;

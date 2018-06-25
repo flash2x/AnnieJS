@@ -2322,10 +2322,11 @@ declare namespace annie {
          * @property pause
          * @type {boolean}
          * @public
+         * @static
          * @since 1.0.0
          * @default false
          */
-        pause: boolean;
+        static pause: boolean;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
