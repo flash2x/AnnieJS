@@ -4572,17 +4572,6 @@ var annie;
              */
             this.renderObj = null;
             /**
-             * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-             * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-             * 对象视觉暂停更新
-             * @property pause
-             * @type {boolean}
-             * @public
-             * @since 1.0.0
-             * @default false
-             */
-            this.pause = false;
-            /**
              * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
              * @property viewRect
              * @public
@@ -5167,9 +5156,7 @@ var annie;
         Stage.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s.pause) {
-                _super.prototype.update.call(this, isDrawUpdate);
-            }
+            _super.prototype.update.call(this, isDrawUpdate);
         };
         /**
          * 渲染函数
@@ -5178,11 +5165,9 @@ var annie;
          */
         Stage.prototype.render = function (renderObj) {
             var s = this;
-            if (!s.pause) {
-                renderObj.begin();
-                _super.prototype.render.call(this, renderObj);
-                renderObj.end();
-            }
+            renderObj.begin();
+            _super.prototype.render.call(this, renderObj);
+            renderObj.end();
         };
         /**
          * 刷新mouse或者touch事件
@@ -5263,9 +5248,11 @@ var annie;
          * @method flushAll
          */
         Stage.flushAll = function () {
-            var len = Stage.allUpdateObjList.length;
-            for (var i = 0; i < len; i++) {
-                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            if (!Stage.pause) {
+                var len = Stage.allUpdateObjList.length;
+                for (var i = 0; i < len; i++) {
+                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                }
             }
             requestAnimationFrame(Stage.flushAll);
         };
@@ -5312,7 +5299,6 @@ var annie;
         Stage.prototype.destroy = function () {
             var s = this;
             Stage.removeUpdateObj(s);
-            s.pause = true;
             s.renderObj = null;
             s.viewRect = null;
             s._lastDpList = null;
@@ -5323,6 +5309,16 @@ var annie;
             s._ml = null;
             _super.prototype.destroy.call(this);
         };
+        /**
+         * 暂停
+         * @property pause
+         * @static
+         * @type {boolean}
+         * @public
+         * @since 1.0.0
+         * @default false
+         */
+        Stage.pause = false;
         Stage._dragDisplay = null;
         /**
          * 要循环调用 flush 函数对象列表

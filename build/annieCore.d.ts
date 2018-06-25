@@ -2316,16 +2316,15 @@ declare namespace annie {
          */
         renderObj: IRender;
         /**
-         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-         * 对象视觉暂停更新
+         * 暂停
          * @property pause
+         * @static
          * @type {boolean}
          * @public
          * @since 1.0.0
          * @default false
          */
-        pause: boolean;
+        static pause: boolean;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
