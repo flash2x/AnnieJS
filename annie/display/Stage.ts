@@ -12,6 +12,23 @@ namespace annie {
      * @since 1.0.0
      */
     export class Stage extends Sprite {
+        static get pause(): boolean {
+            return this._pause;
+        }
+        static set pause(value: boolean) {
+            this._pause = value;
+            if(value!=this._pause){
+                if(value){
+                    //停止声音
+                    Sound.stopAllSounds();
+                }else{
+                    //恢复声音
+                    Sound.resumePlaySounds();
+                }
+                //触发事件
+                globalDispatcher.dispatchEvent("onStagePause",{pause:value});
+            }
+        }
         /**
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
          * 所以需要自己灵活设置,默认阻止.
@@ -68,21 +85,21 @@ namespace annie {
          * @returns {any}
          * @since 2.0.0
          */
-        public  static getStage(stageName:string="annieEngine"){
+        public static getStage(stageName: string = "annieEngine") {
             return annie.Stage._stageList[stageName];
         }
-        private static _stageList:any={};
+
+        private static _stageList: any = {};
         /**
-         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-         * 对象视觉暂停更新
+         * 是否暂停
          * @property pause
+         * @static
          * @type {boolean}
          * @public
          * @since 1.0.0
          * @default false
          */
-        public pause: boolean = false;
+        private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -109,7 +126,7 @@ namespace annie {
          * @since 1.1.3
          * @type {boolean}
          */
-        public isMultiMouse:boolean=false;
+        public isMultiMouse: boolean = false;
         /**
          * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
          * 端默认不开启
@@ -236,7 +253,8 @@ namespace annie {
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
         private _rid = -1;
-        private _floatDisplayList:Array<FloatDisplay>=[];
+        private _floatDisplayList: Array<FloatDisplay> = [];
+
         /**
          * 显示对象入口函数
          * @method Stage
@@ -254,7 +272,7 @@ namespace annie {
             super();
             let s: Stage = this;
             this._instanceType = "annie.Stage";
-            annie.Stage._stageList[rootDivId]=s;
+            annie.Stage._stageList[rootDivId] = s;
             s.stage = this;
             let resizeEvent = "resize";
             s.name = "stageInstance_" + s.instanceId;
@@ -265,8 +283,8 @@ namespace annie {
             s.rootDiv = div;
             s.setFrameRate(frameRate);
             s.scaleMode = scaleMode;
-            s.anchorX = desW >>1;
-            s.anchorY = desH >>1;
+            s.anchorX = desW >> 1;
+            s.anchorY = desH >> 1;
             //目前具支持canvas
             s.renderObj = new CanvasRender(s);
             /* webgl 直到对2d的支持非常成熟了再考虑开启
@@ -328,13 +346,11 @@ namespace annie {
          */
         public update(isDrawUpdate: boolean = true): void {
             let s = this;
-            if (!s.pause) {
-                super.update(isDrawUpdate);
-                let sf:any=s._floatDisplayList;
-                let len=sf.length;
-                for(let i=0;i<len;i++){
-                    sf[i].updateStyle();
-                }
+            super.update(isDrawUpdate);
+            let sf: any = s._floatDisplayList;
+            let len = sf.length;
+            for (let i = 0; i < len; i++) {
+                sf[i].updateStyle();
             }
         }
 
@@ -347,10 +363,8 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s = this;
-            if (!s.pause) {
-                renderObj.begin();
-                super.render(renderObj);
-            }
+            renderObj.begin();
+            super.render(renderObj);
 
         }
 
@@ -499,8 +513,8 @@ namespace annie {
             let s: any = this;
             //判断是否有drag的显示对象
             let sd: any = Stage._dragDisplay;
-            if (s.isMultiTouch && e.targetTouches&&e.targetTouches.length>1) {
-                if (e.targetTouches.length == 2){
+            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
+                if (e.targetTouches.length == 2) {
                     //求角度和距离
                     s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
                     s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
@@ -525,17 +539,17 @@ namespace annie {
                         s.dispatchEvent(s._touchEvent);
                         s.muliPoints.shift();
                     }
-                }else {
-                    s.muliPoints.length=0;
+                } else {
+                    s.muliPoints.length = 0;
                 }
                 if (sd) {
                     sd._lastDragPoint.x = Number.MAX_VALUE;
                     sd._lastDragPoint.y = Number.MAX_VALUE;
                 }
-                s._mouseDownPoint={};
-                s._lastDpList={};
-            }else {
-                if(s.muliPoints.length>0) {
+                s._mouseDownPoint = {};
+                s._lastDpList = {};
+            } else {
+                if (s.muliPoints.length > 0) {
                     s._touchEvent.rotate = 0;
                     s._touchEvent.scale = 0;
                     s._touchEvent.clientPoint1.x = 0;
@@ -564,7 +578,7 @@ namespace annie {
                         e.identifier = 0;
                         points = [e];
                     } else {
-                        if (s.isMultiMouse){
+                        if (s.isMultiMouse) {
                             points = e.changedTouches;
                         } else {
                             points = [e.changedTouches[0]];
@@ -810,16 +824,16 @@ namespace annie {
             let divW = s.divWidth * devicePixelRatio;
             let desH = s.desHeight;
             let desW = s.desWidth;
-            s.anchorX = desW>>1;
-            s.anchorY = desH>>1;
+            s.anchorX = desW >> 1;
+            s.anchorY = desH >> 1;
             //设备是否为竖屏
             let isDivH = divH > divW;
             //内容是否为竖屏内容
             let isDesH = desH > desW;
             let scaleY = 1;
             let scaleX = 1;
-            s.x = (divW - desW)>>1;
-            s.y = (divH - desH)>>1;
+            s.x = (divW - desW) >> 1;
+            s.y = (divH - desH) >> 1;
             if (s.autoSteering) {
                 if (isDesH != isDivH) {
                     let d = divH;
@@ -857,10 +871,10 @@ namespace annie {
             s.scaleX = scaleX;
             s.scaleY = scaleY;
             // s.viewRect=new annie.Rectangle();
-            s.viewRect.x = (desW - divW / scaleX) >>1;
-            s.viewRect.y = (desH - divH / scaleY) >>1;
-            s.viewRect.width = desW - s.viewRect.x*2;
-            s.viewRect.height = desH - s.viewRect.y*2;
+            s.viewRect.x = (desW - divW / scaleX) >> 1;
+            s.viewRect.y = (desH - divH / scaleY) >> 1;
+            s.viewRect.width = desW - s.viewRect.x * 2;
+            s.viewRect.height = desH - s.viewRect.y * 2;
 
             if (s.autoSteering) {
                 if (isDesH == isDivH) {
@@ -917,9 +931,11 @@ namespace annie {
          * @method flushAll
          */
         private static flushAll(): void {
-            let len = Stage.allUpdateObjList.length;
-            for (let i = 0; i < len; i++) {
-                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            if(!Stage._pause) {
+                let len = Stage.allUpdateObjList.length;
+                for (let i = 0; i < len; i++) {
+                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                }
             }
             requestAnimationFrame(Stage.flushAll);
         }
@@ -947,6 +963,7 @@ namespace annie {
                 Stage.allUpdateObjList.unshift(target);
             }
         }
+
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj
@@ -964,20 +981,20 @@ namespace annie {
                 }
             }
         }
+
         public destroy(): void {
-            let s=this;
+            let s = this;
             Stage.removeUpdateObj(s);
-            s.pause=true;
-            s.rootDiv=null;
-            s._floatDisplayList=null;
-            s.renderObj=null;
-            s.viewRect=null;
-            s._lastDpList=null;
-            s._touchEvent=null;
-            s.muliPoints=null;
-            s._mP1=null;
-            s._mP2=null;
-            s._ml=null;
+            s.rootDiv = null;
+            s._floatDisplayList = null;
+            s.renderObj = null;
+            s.viewRect = null;
+            s._lastDpList = null;
+            s._touchEvent = null;
+            s.muliPoints = null;
+            s._mP1 = null;
+            s._mP2 = null;
+            s._ml = null;
             super.destroy();
         }
     }

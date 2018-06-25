@@ -163,6 +163,16 @@ declare namespace annie {
          */
         static RESIZE: string;
         /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        static ON_RUN_CHANGED: string;
+        /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @property ON_PLAY_UPDATE
          * @static
@@ -2091,6 +2101,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         type: string;
+        isPlaying: boolean;
         private _loop;
         /**
          * 构造函数
@@ -2174,6 +2185,14 @@ declare namespace annie {
          * @since 1.1.1
          */
         destroy(): void;
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
+        private stop2();
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
+        private play2();
         private static _soundList;
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
@@ -2183,6 +2202,14 @@ declare namespace annie {
          * @public
          */
         static stopAllSounds(): void;
+        /**
+         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
+         * @method resumePlaySounds
+         * @since 2.0.0
+         * @static
+         * @public
+         */
+        static resumePlaySounds(): void;
         /**
          * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
@@ -2757,6 +2784,7 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Stage extends Sprite {
+        static pause: boolean;
         /**
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
          * 所以需要自己灵活设置,默认阻止.
@@ -2815,16 +2843,15 @@ declare namespace annie {
         static getStage(stageName?: string): any;
         private static _stageList;
         /**
-         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-         * 对象视觉暂停更新
+         * 是否暂停
          * @property pause
+         * @static
          * @type {boolean}
          * @public
          * @since 1.0.0
          * @default false
          */
-        pause: boolean;
+        private static _pause;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -4417,6 +4444,26 @@ declare namespace annie {
      */
     let osType: string;
     /**
+     * 全局事件触发器
+     * @static
+     * @property  globalDispatcher
+     * @type {annie.EventDispatcher}
+     * @public
+     * @since 1.0.0
+     * @example
+     *      //A代码放到任何合适的地方
+     *      annie.globalDispatcher.addEventListener("myTest",function(e){
+     *          trace("收到了其他地方发来的消息:"+e.data);
+     *      });
+     *
+     *      //B代码放到任何一个可以点击的对象的构造函数中
+     *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *          annie..globalDispatcher.dispatchEvent("myTest","我是小可");
+     *      });
+     *
+     */
+    let globalDispatcher: annie.EventDispatcher;
+    /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
      * @type {number}
@@ -4541,29 +4588,3 @@ declare namespace annie {
  *      trace(1,"hello");
  */
 declare let trace: (...arg: any[]) => void;
-/**
- * 全局事件触发器
- * @static
- * @property  globalDispatcher
- * @type {annie.EventDispatcher}
- * @public
- * @since 1.0.0
- * @example
- *      //A代码放到任何合适的地方
- *      globalDispatcher.addEventListener("myTest",function(e){
- *          trace("收到了其他地方发来的消息:"+e.data);
- *      });
- *
- *      //B代码放到任何一个可以点击的对象的构造函数中
- *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
- *          globalDispatcher.dispatchEvent("myTest","我是小可");
- *      });
- *
- */
-declare let globalDispatcher: annie.EventDispatcher;
-import F2xContainer = annie.Sprite;
-import F2xMovieClip = annie.MovieClip;
-import F2xText = annie.TextField;
-import F2xInputText = annie.InputText;
-import F2xBitmap = annie.Bitmap;
-import F2xShape = annie.Shape;
