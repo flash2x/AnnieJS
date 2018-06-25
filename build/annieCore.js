@@ -276,12 +276,6 @@ var annie;
         return EventDispatcher;
     }(AObject));
     annie.EventDispatcher = EventDispatcher;
-    /**
-     * 全局事件侦听
-     * @property globalDispatcher
-     * @type {annie.EventDispatcher}
-     */
-    annie.globalDispatcher = new EventDispatcher();
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -5123,7 +5117,19 @@ var annie;
                 return this._pause;
             },
             set: function (value) {
-                this._pause = value;
+                var s = this;
+                s._pause = value;
+                if (value) {
+                    //关闭声音
+                    annie.Sound.stopAllSounds();
+                }
+                else {
+                    //恢复声音
+                    annie.Sound.resumePlaySounds();
+                }
+                if (value != s._pause) {
+                    annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
+                }
             },
             enumerable: true,
             configurable: true
@@ -5378,8 +5384,8 @@ var annie;
         /**
          * 构造函数
          * @method Sound
-         * @param {string|HtmlElement} src
-         * @param {string} type
+         * @param {string} src
+         * @param {string}type
          * @since 1.0.0
          */
         function Sound(src) {
@@ -5387,12 +5393,18 @@ var annie;
             /**
              * html 标签 有可能是audio 或者 video
              * @property media
-             * @type {Video|Audio}
+             * @type {Audio}
              * @public
              * @since 1.0.0
              */
             this.media = null;
             this._loop = 0;
+            /**
+             * 是否正在播放中
+             * @property  isPlaying
+             * @type {boolean}
+             */
+            this.isPlaying = false;
             var s = this;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
@@ -5419,6 +5431,7 @@ var annie;
             s.media.startTime = start;
             s._loop = loop;
             s.media.play();
+            s.isPlaying = true;
         };
         /**
          * 停止播放
@@ -5427,7 +5440,9 @@ var annie;
          * @since 1.0.0
          */
         Sound.prototype.stop = function () {
-            this.media.stop();
+            var s = this;
+            s.media.stop();
+            s.isPlaying = true;
         };
         /**
          * 暂停播放,或者恢复播放
@@ -5438,11 +5453,14 @@ var annie;
          */
         Sound.prototype.pause = function (isPause) {
             if (isPause === void 0) { isPause = true; }
+            var s = this;
             if (isPause) {
-                this.media.pause();
+                s.media.pause();
+                s.isPlaying = false;
             }
             else {
-                this.media.play();
+                s.media.play();
+                s.isPlaying = true;
             }
         };
         Object.defineProperty(Sound.prototype, "volume", {
@@ -5461,6 +5479,83 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
+        Sound.prototype.stop2 = function () {
+            var s = this;
+            if (s.isPlaying) {
+                s.media.pause();
+            }
+        };
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
+        Sound.prototype.play2 = function () {
+            var s = this;
+            if (s.isPlaying) {
+                s.media.play();
+            }
+        };
+        /**
+         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method stopAllSounds
+         * @since 1.1.1
+         * @static
+         * @public
+         */
+        Sound.stopAllSounds = function () {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].stop2();
+                }
+                else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        };
+        /**
+         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
+         * @method resumePlaySounds
+         * @since 2.0.0
+         * @static
+         * @public
+         */
+        Sound.resumePlaySounds = function () {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].play2();
+                }
+                else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        };
+        /**
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method setAllSoundsVolume
+         * @since 1.1.1
+         * @static
+         * @public
+         * @param {number} volume 音量大小，从0-1
+         */
+        Sound.setAllSoundsVolume = function (volume) {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].volume = volume;
+                }
+                else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+            Sound._volume = volume;
+        };
+        //声音对象池
+        Sound._soundList = [];
+        Sound._volume = 1;
         return Sound;
     }(annie.EventDispatcher));
     annie.Sound = Sound;
@@ -6977,6 +7072,7 @@ var annie;
     }
     annie.initRes = initRes;
 })(annie || (annie = {}));
+/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -7002,6 +7098,12 @@ var annie;
      * @static
      */
     annie.devicePixelRatio = 1;
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    annie.globalDispatcher = new annie.EventDispatcher();
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。

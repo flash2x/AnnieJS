@@ -23,7 +23,7 @@ namespace annie {
                 Sound.stopAllSounds();
             }else{
                 //恢复声音
-                Sound.remusePlaySounds();
+                Sound.resumePlaySounds();
             }
             if(value!=s._pause) {
                 annie.globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
