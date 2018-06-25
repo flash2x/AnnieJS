@@ -1,3 +1,4 @@
+/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -22,6 +23,13 @@ namespace annie{
      * @static
      */
     export let devicePixelRatio:number=1;
+
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    export let globalDispatcher:EventDispatcher=new annie.EventDispatcher();
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。

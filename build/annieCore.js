@@ -376,6 +376,16 @@ var annie;
          */
         Event.RESIZE = "onResize";
         /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        Event.ON_RUN_CHANGED = "onRunChanged";
+        /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @property ON_PLAY_UPDATE
          * @static
@@ -5108,6 +5118,16 @@ var annie;
             s._scaleMode = scaleMode;
             s.setAlign();
         }
+        Object.defineProperty(Stage, "pause", {
+            get: function () {
+                return this._pause;
+            },
+            set: function (value) {
+                this._pause = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Stage.prototype, "scaleMode", {
             /**
              * 舞台的缩放模式
@@ -5252,7 +5272,7 @@ var annie;
          */
         Stage.flushAll = function () {
             setInterval(function () {
-                if (!Stage.pause) {
+                if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
                     for (var i = 0; i < len; i++) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
@@ -5326,7 +5346,7 @@ var annie;
          * @since 1.0.0
          * @default false
          */
-        Stage.pause = false;
+        Stage._pause = false;
         Stage._dragDisplay = null;
         /**
          * 要循环调用 flush 函数对象列表
@@ -7026,5 +7046,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-
-module.exports = annie;
