@@ -12,23 +12,6 @@ namespace annie {
      * @since 1.0.0
      */
     export class Stage extends Sprite {
-        static get pause(): boolean {
-            return this._pause;
-        }
-        static set pause(value: boolean) {
-            let s=this;
-            s._pause = value;
-            if(value){
-                //关闭声音
-                Sound.stopAllSounds();
-            }else{
-                //恢复声音
-                Sound.resumePlaySounds();
-            }
-            if(value!=s._pause) {
-                annie.globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
-            }
-        }
         /**
          * 当前stage所使用的渲染器
          * 渲染器有两种,一种是canvas 一种是webGl
@@ -50,6 +33,23 @@ namespace annie {
          * @since 1.0.0
          * @default false
          */
+        static get pause(): boolean {
+            return this._pause;
+        }
+        static set pause(value: boolean) {
+            let s=this;
+            s._pause = value;
+            if(value){
+                //关闭声音
+                Sound.stopAllSounds();
+            }else{
+                //恢复声音
+                Sound.resumePlaySounds();
+            }
+            if(value!=s._pause) {
+                annie.globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
+            }
+        }
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
