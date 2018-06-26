@@ -5402,9 +5402,9 @@ var annie;
         TextField.prototype.getTextWidth = function (lineIndex) {
             if (lineIndex === void 0) { lineIndex = 0; }
             var s = this;
+            s.update();
             var can = s._texture;
             var ctx = can.getContext("2d");
-            s._prepContext(ctx);
             var obj = ctx.measureText(s.realLines[lineIndex]);
             return obj.width;
         };

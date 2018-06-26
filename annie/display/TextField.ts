@@ -243,9 +243,9 @@ namespace annie {
          */
         public getTextWidth(lineIndex:number=0){
             let s=this;
+            s.update();
             let can = s._texture;
             let ctx = can.getContext("2d");
-            s._prepContext(ctx);
             let obj:any=ctx.measureText(s.realLines[lineIndex]);
             return obj.width;
         }
