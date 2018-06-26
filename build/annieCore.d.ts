@@ -2279,6 +2279,26 @@ declare namespace annie {
          */
         private _getMeasuredWidth(text);
         /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        getTextWH(lineIndex?: number): {
+            width: any;
+            height: any;
+        };
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        lines: number;
+        /**
          * 重写 update
          * @method update
          * @return {annie.Rectangle}
@@ -2309,7 +2329,6 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Stage extends Sprite {
-        static pause: boolean;
         /**
          * 当前stage所使用的渲染器
          * 渲染器有两种,一种是canvas 一种是webGl
@@ -2331,6 +2350,7 @@ declare namespace annie {
          * @since 1.0.0
          * @default false
          */
+        static pause: boolean;
         private static _pause;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。

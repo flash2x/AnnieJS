@@ -4158,7 +4158,7 @@ var annie;
             this._textAlpha = 1;
             this._textHeight = 0;
             this._lineSpacing = 14;
-            this._textWidth = 0;
+            this._textWidth = 120;
             this._lineType = "single";
             this._textOffX = 0;
             this._text = "";
@@ -4422,6 +4422,36 @@ var annie;
             //ctx.restore();
             return w;
         };
+        /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        TextField.prototype.getTextWH = function (lineIndex) {
+            if (lineIndex === void 0) { lineIndex = 0; }
+            var s = this;
+            var ctx = annie.CanvasRender.drawCtx;
+            ctx.font = s.fontInfo;
+            var obj = ctx.measureText(s.realLines[lineIndex]);
+            return { width: obj.width, height: obj.height };
+        };
+        Object.defineProperty(TextField.prototype, "lines", {
+            /**
+             * @property _lines 获取当前文本行数
+             * @type {number}
+             * @public
+             * @readonly
+             * @since 2.0.0
+             */
+            get: function () {
+                return this.realLines.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 重写 update
          * @method update
@@ -5113,6 +5143,17 @@ var annie;
             s.setAlign();
         }
         Object.defineProperty(Stage, "pause", {
+            /**
+             * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
+             * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
+             * 对象视觉暂停更新
+             * @property pause
+             * @type {boolean}
+             * @public
+             * @static
+             * @since 1.0.0
+             * @default false
+             */
             get: function () {
                 return this._pause;
             },
@@ -5341,17 +5382,6 @@ var annie;
             s._ml = null;
             _super.prototype.destroy.call(this);
         };
-        /**
-         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-         * 对象视觉暂停更新
-         * @property pause
-         * @type {boolean}
-         * @public
-         * @static
-         * @since 1.0.0
-         * @default false
-         */
         Stage._pause = false;
         Stage._dragDisplay = null;
         /**
