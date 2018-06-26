@@ -192,6 +192,7 @@ namespace annie {
             return this._border;
         }
         private _border: boolean = false;
+        private realLines: any[];
 
         /**
          * 设置文本在canvas里的渲染样式
@@ -233,6 +234,33 @@ namespace annie {
             return w;
         }
         /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        public getTextWH(lineIndex:number=0){
+            let s=this;
+            let can = s._texture;
+            let ctx = can.getContext("2d");
+            s._prepContext(ctx);
+            let obj:any=ctx.measureText(s.realLines[lineIndex]);
+            return {width:obj.width,height:obj.height};
+        }
+
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        get lines(): number {
+            return this.realLines.length;
+        }
+        /**
          * 重写 update
          * @method update
          * @return {annie.Rectangle}
@@ -248,7 +276,7 @@ namespace annie {
                 let can = s._texture;
                 let ctx = can.getContext("2d");
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
-                let realLines: any = [];
+                s.realLines = [];
                 s._prepContext(ctx);
                 let lineH: number;
                 if (s.lineHeight) {
@@ -258,6 +286,7 @@ namespace annie {
                 }
                 if (!s.lineWidth) {
                     s.lineWidth = lineH * 10;
+                    s._bounds.width=s.lineWidth;
                 } else {
                     if (s.lineWidth < lineH) {
                         s.lineWidth = lineH;
