@@ -370,6 +370,16 @@ var annie;
          */
         Event.RESIZE = "onResize";
         /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        Event.ON_RUN_CHANGED = "onRunChanged";
+        /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @property ON_PLAY_UPDATE
          * @static
@@ -4035,6 +4045,7 @@ var annie;
              * @since 1.0.0
              */
             this.type = "";
+            this.isPlaying = false;
             this._loop = 1;
             this._repeate = 1;
             var s = this;
@@ -4108,6 +4119,7 @@ var annie;
             else {
                 s.media.play();
             }
+            s.isPlaying = true;
         };
         Media.prototype._weixinSB = function () {
             this.media.play();
@@ -4119,8 +4131,10 @@ var annie;
          * @since 1.0.0
          */
         Media.prototype.stop = function () {
-            this.media.pause();
-            this.media.currentTime = 0;
+            var s = this;
+            s.media.pause();
+            s.media.currentTime = 0;
+            s.isPlaying = false;
         };
         /**
          * 暂停播放,或者恢复播放
@@ -4131,11 +4145,14 @@ var annie;
          */
         Media.prototype.pause = function (isPause) {
             if (isPause === void 0) { isPause = true; }
+            var s = this;
             if (isPause) {
-                this.media.pause();
+                s.media.pause();
+                s.isPlaying = false;
             }
             else {
-                this.media.play();
+                s.media.play();
+                s.isPlaying = true;
             }
         };
         Object.defineProperty(Media.prototype, "volume", {
@@ -4149,12 +4166,13 @@ var annie;
                 return this.media.volume;
             },
             set: function (value) {
-                this.media.volume = value;
+                var s = this;
+                s.media.volume = value;
                 if (value == 0) {
-                    this.media.muted = true;
+                    s.media.muted = true;
                 }
                 else {
-                    this.media.muted = false;
+                    s.media.muted = false;
                 }
             },
             enumerable: true,
@@ -4162,7 +4180,7 @@ var annie;
         });
         Media.prototype.destroy = function () {
             var s = this;
-            this.media.pause();
+            s.media.pause();
             s.media = null;
             _super.prototype.destroy.call(this);
         };
@@ -4219,6 +4237,24 @@ var annie;
             _super.prototype.destroy.call(this);
         };
         /**
+         * 停止播放，给stopAllSounds调用
+         */
+        Sound.prototype.stop2 = function () {
+            var s = this;
+            if (s.isPlaying) {
+                s.media.pause();
+            }
+        };
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
+        Sound.prototype.play2 = function () {
+            var s = this;
+            if (s.isPlaying) {
+                s.media.play();
+            }
+        };
+        /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method stopAllSounds
          * @since 1.1.1
@@ -4229,7 +4265,25 @@ var annie;
             var len = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].stop();
+                    annie.Sound._soundList[i].stop2();
+                }
+                else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        };
+        /**
+         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
+         * @method resumePlaySounds
+         * @since 2.0.0
+         * @static
+         * @public
+         */
+        Sound.resumePlaySounds = function () {
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].play2();
                 }
                 else {
                     annie.Sound._soundList.splice(i, 1);
@@ -5037,7 +5091,7 @@ var annie;
             this._textAlpha = 1;
             this._textHeight = 0;
             this._lineSpacing = 14;
-            this._textWidth = 0;
+            this._textWidth = 120;
             this._lineType = "single";
             this._text = "";
             this._font = "Arial";
@@ -5046,6 +5100,7 @@ var annie;
             this._italic = false;
             this._bold = false;
             this._border = false;
+            this.realLines = [];
             this._instanceType = "annie.TextField";
             this._texture = window.document.createElement("canvas");
         }
@@ -5294,6 +5349,37 @@ var annie;
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
         };
         /**
+         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
+         * @method getTextWidth
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {number}
+         */
+        TextField.prototype.getTextWidth = function (lineIndex) {
+            if (lineIndex === void 0) { lineIndex = 0; }
+            var s = this;
+            s.update();
+            var can = s._texture;
+            var ctx = can.getContext("2d");
+            var obj = ctx.measureText(s.realLines[lineIndex]);
+            return obj.width;
+        };
+        Object.defineProperty(TextField.prototype, "lines", {
+            /**
+             * @property _lines 获取当前文本行数
+             * @type {number}
+             * @public
+             * @readonly
+             * @since 2.0.0
+             */
+            get: function () {
+                return this.realLines.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
          * 获取文本宽
          * @method _getMeasuredWidth
          * @param text
@@ -5327,13 +5413,14 @@ var annie;
                 var ctx = can.getContext("2d");
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
+                s.realLines = realLines;
                 s._prepContext(ctx);
                 var lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length] = hardLines[0];
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.textWidth) {
+                    if (lineW > s._textWidth) {
                         var w = s._getMeasuredWidth(str[0]);
                         var lineStr = str[0];
                         var wordW = 0;
@@ -5341,7 +5428,7 @@ var annie;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > s.textWidth) {
+                            if (w > s._textWidth) {
                                 realLines[0] = lineStr;
                                 break;
                             }
@@ -5363,7 +5450,7 @@ var annie;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > this.textWidth) {
+                            if (w > s._textWidth) {
                                 realLines[realLines.length] = lineStr;
                                 lineStr = str[j];
                                 w = wordW;
@@ -5376,7 +5463,7 @@ var annie;
                     }
                 }
                 var maxH = lineH * realLines.length;
-                var maxW = s.textWidth;
+                var maxW = s._textWidth;
                 var tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
@@ -5390,7 +5477,7 @@ var annie;
                 if (s.border) {
                     ctx.beginPath();
                     ctx.strokeStyle = "#000";
-                    ctx.textWidth = 1;
+                    ctx.lineWidth = 1;
                     ctx.strokeRect(10.5, 10.5, maxW, maxH);
                     ctx.closePath();
                 }
@@ -5812,17 +5899,6 @@ var annie;
              * @readonly
              */
             this.renderType = 0;
-            /**
-             * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-             * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-             * 对象视觉暂停更新
-             * @property pause
-             * @type {boolean}
-             * @public
-             * @since 1.0.0
-             * @default false
-             */
-            this.pause = false;
             /**
              * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
              * @property viewRect
@@ -6491,6 +6567,28 @@ var annie;
                 rc.addEventListener('mouseup', mouseEvent, false);
             }
         }
+        Object.defineProperty(Stage, "pause", {
+            get: function () {
+                return this._pause;
+            },
+            set: function (value) {
+                this._pause = value;
+                if (value != this._pause) {
+                    if (value) {
+                        //停止声音
+                        annie.Sound.stopAllSounds();
+                    }
+                    else {
+                        //恢复声音
+                        annie.Sound.resumePlaySounds();
+                    }
+                    //触发事件
+                    annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
          * @param {string} stageName
@@ -6510,13 +6608,11 @@ var annie;
         Stage.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s.pause) {
-                _super.prototype.update.call(this, isDrawUpdate);
-                var sf = s._floatDisplayList;
-                var len = sf.length;
-                for (var i = 0; i < len; i++) {
-                    sf[i].updateStyle();
-                }
+            _super.prototype.update.call(this, isDrawUpdate);
+            var sf = s._floatDisplayList;
+            var len = sf.length;
+            for (var i = 0; i < len; i++) {
+                sf[i].updateStyle();
             }
         };
         /**
@@ -6526,10 +6622,8 @@ var annie;
          */
         Stage.prototype.render = function (renderObj) {
             var s = this;
-            if (!s.pause) {
-                renderObj.begin();
-                _super.prototype.render.call(this, renderObj);
-            }
+            renderObj.begin();
+            _super.prototype.render.call(this, renderObj);
         };
         /**
          * 刷新mouse或者touch事件
@@ -6644,9 +6738,11 @@ var annie;
          * @method flushAll
          */
         Stage.flushAll = function () {
-            var len = Stage.allUpdateObjList.length;
-            for (var i = 0; i < len; i++) {
-                Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            if (!Stage._pause) {
+                var len = Stage.allUpdateObjList.length;
+                for (var i = 0; i < len; i++) {
+                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                }
             }
             requestAnimationFrame(Stage.flushAll);
         };
@@ -6693,7 +6789,6 @@ var annie;
         Stage.prototype.destroy = function () {
             var s = this;
             Stage.removeUpdateObj(s);
-            s.pause = true;
             s.rootDiv = null;
             s._floatDisplayList = null;
             s.renderObj = null;
@@ -6707,6 +6802,16 @@ var annie;
             _super.prototype.destroy.call(this);
         };
         Stage._stageList = {};
+        /**
+         * 是否暂停
+         * @property pause
+         * @static
+         * @type {boolean}
+         * @public
+         * @since 1.0.0
+         * @default false
+         */
+        Stage._pause = false;
         Stage._dragDisplay = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
@@ -9796,6 +9901,7 @@ var annie;
     }(annie.EventDispatcher));
     annie.Timer = Timer;
 })(annie || (annie = {}));
+/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -9858,6 +9964,26 @@ var annie;
             return "pc";
         }
     })();
+    /**
+     * 全局事件触发器
+     * @static
+     * @property  globalDispatcher
+     * @type {annie.EventDispatcher}
+     * @public
+     * @since 1.0.0
+     * @example
+     *      //A代码放到任何合适的地方
+     *      annie.globalDispatcher.addEventListener("myTest",function(e){
+     *          trace("收到了其他地方发来的消息:"+e.data);
+     *      });
+     *
+     *      //B代码放到任何一个可以点击的对象的构造函数中
+     *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *          annie..globalDispatcher.dispatchEvent("myTest","我是小可");
+     *      });
+     *
+     */
+    annie.globalDispatcher = new annie.EventDispatcher();
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -10042,7 +10168,6 @@ var annie;
     };
 })(annie || (annie = {}));
 /// <reference path="./display/Stage.ts" />
-/// <reference path="./events/EventDispatcher.ts" />
 /// <reference path="./utils/Tween.ts" />
 /// <reference path="./utils/Timer.ts" />
 /**
@@ -10068,32 +10193,6 @@ var trace = function () {
         console.log(arguments[i]);
     }
 };
-/**
- * 全局事件触发器
- * @static
- * @property  globalDispatcher
- * @type {annie.EventDispatcher}
- * @public
- * @since 1.0.0
- * @example
- *      //A代码放到任何合适的地方
- *      globalDispatcher.addEventListener("myTest",function(e){
- *          trace("收到了其他地方发来的消息:"+e.data);
- *      });
- *
- *      //B代码放到任何一个可以点击的对象的构造函数中
- *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
- *          globalDispatcher.dispatchEvent("myTest","我是小可");
- *      });
- *
- */
-var globalDispatcher = new annie.EventDispatcher();
-var F2xContainer = annie.Sprite;
-var F2xMovieClip = annie.MovieClip;
-var F2xText = annie.TextField;
-var F2xInputText = annie.InputText;
-var F2xBitmap = annie.Bitmap;
-var F2xShape = annie.Shape;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();

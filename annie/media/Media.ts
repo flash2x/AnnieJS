@@ -26,6 +26,7 @@ namespace annie {
          * @since 1.0.0
          */
         public type = "";
+        public isPlaying:boolean=false;
         private _loop: number = 1;
         /**
          * 构造函数
@@ -105,6 +106,7 @@ namespace annie {
             }else{
                 s.media.play();
             }
+            s.isPlaying=true;
         }
 
         private _SBWeixin:any;
@@ -118,9 +120,12 @@ namespace annie {
          * @since 1.0.0
          */
         public stop(): void {
-            this.media.pause();
-            this.media.currentTime = 0;
+            let s=this;
+            s.media.pause();
+            s.media.currentTime = 0;
+            s.isPlaying=false;
         }
+
         /**
          * 暂停播放,或者恢复播放
          * @method pause
@@ -129,10 +134,13 @@ namespace annie {
          * @since 1.0.4
          */
         public pause(isPause:boolean=true): void {
+            let s=this;
             if(isPause){
-                this.media.pause();
+                s.media.pause();
+                s.isPlaying=false;
             }else{
-                this.media.play();
+                s.media.play();
+                s.isPlaying=true;
             }
         }
 
@@ -146,16 +154,17 @@ namespace annie {
             return this.media.volume
         }
         public set volume(value:number){
-            this.media.volume=value;
+            let s=this;
+            s.media.volume=value;
             if(value==0){
-                this.media.muted=true;
+                s.media.muted=true;
             }else{
-                this.media.muted=false;
+                s.media.muted=false;
             }
         }
         public destroy(): void {
             let s=this;
-            this.media.pause();
+            s.media.pause();
             s.media=null;
             super.destroy();
         }
