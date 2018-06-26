@@ -71,7 +71,9 @@
 # AnnieJS 版本更新列表
 ## AnnieJS 2.0.0 版本
     变更:需要Flash2x 4.0工具及以上版本的支持
-    变更:Flash2x命名空间下所有方法全部移置到annie命名空间
+    变更:Flash2x命名空间下所有类和方法全部转为annie命名空间
+    变更:annieUI命名空间下所有类和方法全部转为annie命名空间
+    变更:globalDispatcher全局类转为annie命名空间
     优化:代码进行大量优化，性能进一步提升
 ## AnnieJS 1.1.3 版本
     修复annie.InputText类在pc端无法输入的bug
