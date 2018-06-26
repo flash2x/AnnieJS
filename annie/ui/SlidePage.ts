@@ -3,14 +3,14 @@
  */
 
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     import Sprite = annie.Sprite;
 
     /**
      * 滑动页面类
-     * @class annieUI.SlidePage
+     * @class annie.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0

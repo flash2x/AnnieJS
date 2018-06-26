@@ -197,7 +197,7 @@ declare namespace annie {
          */
         static ON_PLAY_START: string;
         /**
-         * annieUI.FlipBook组件翻页开始事件
+         * annie.FlipBook组件翻页开始事件
          * @property ON_FLIP_START
          * @static
          * @since 1.1.0
@@ -205,7 +205,7 @@ declare namespace annie {
          */
         static ON_FLIP_START: string;
         /**
-         * annieUI.FlipBook组件翻页结束事件
+         * annie.FlipBook组件翻页结束事件
          * @property ON_FLIP_STOP
          * @static
          * @since 1.1.0
@@ -213,7 +213,7 @@ declare namespace annie {
          */
         static ON_FLIP_STOP: string;
         /**
-         * annieUI.ScrollPage组件滑动到开始位置事件
+         * annie.ScrollPage组件滑动到开始位置事件
          * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
@@ -221,7 +221,7 @@ declare namespace annie {
          */
         static ON_SCROLL_TO_HEAD: string;
         /**
-         * annieUI.ScrollPage组件停止滑动事件
+         * annie.ScrollPage组件停止滑动事件
          * @property ON_SCROLL_STOP
          * @static
          * @since 1.1.0
@@ -229,7 +229,7 @@ declare namespace annie {
          */
         static ON_SCROLL_STOP: string;
         /**
-         * annieUI.ScrollPage组件开始滑动事件
+         * annie.ScrollPage组件开始滑动事件
          * @property ON_SCROLL_START
          * @static
          * @since 1.1.0
@@ -237,7 +237,7 @@ declare namespace annie {
          */
         static ON_SCROLL_START: string;
         /**
-         * annieUI.ScrollPage组件滑动到结束位置事件
+         * annie.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
@@ -245,7 +245,7 @@ declare namespace annie {
          */
         static ON_SCROLL_TO_END: string;
         /**
-         * annieUI.Slide 组件开始滑动事件
+         * annie.Slide 组件开始滑动事件
          * @property ON_SLIDE_START
          * @static
          * @since 1.1.0
@@ -253,7 +253,7 @@ declare namespace annie {
          */
         static ON_SLIDE_START: string;
         /**
-         * annieUI.Slide 组件结束滑动事件
+         * annie.Slide 组件结束滑动事件
          * @property ON_SLIDE_END
          * @static
          * @since 1.1.0
