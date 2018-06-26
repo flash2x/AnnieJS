@@ -3,14 +3,14 @@
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     import DisplayObject = annie.DisplayObject;
 
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
-     * @class annieUI.IScrollListItem
+     * @class annie.IScrollListItem
      * @public
      * @extends annie.DisplayObject
      * @since 1.0.9
@@ -24,9 +24,9 @@ namespace annieUI {
 
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annieUI.ScrollList
+     * @class annie.ScrollList
      * @public
-     * @extends annieUI.ScrollPage
+     * @extends annie.ScrollPage
      * @since 1.0.9
      */
     export class ScrollList extends ScrollPage {
@@ -70,7 +70,7 @@ namespace annieUI {
             super(vW, vH, 0, isVertical);
             let s = this;
             s._isInit = false;
-            s._instanceType = "annieUI.ScrollList";
+            s._instanceType = "annie.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
             s._items = [];

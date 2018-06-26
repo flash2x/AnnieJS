@@ -2,14 +2,14 @@
  * Created by anlun on 2017/5/24.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     /**
      * 刮刮卡类
-     * @class annieUI.ScratchCard
+     * @class annie.ScratchCard
      * @public
-     * @extends annieUI.DrawingBoard
+     * @extends annie.DrawingBoard
      * @since 1.1.1
      */
     export class ScratchCard extends DrawingBoard {

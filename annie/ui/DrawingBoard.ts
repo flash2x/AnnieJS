@@ -2,12 +2,12 @@
  * Created by anlun on 2017/5/24.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     /**
      * 画板类
-     * @class annieUI.DrawingBoard
+     * @class annie.DrawingBoard
      * @public
      * @extends annie.Bitmap
      * @since 1.1.1
