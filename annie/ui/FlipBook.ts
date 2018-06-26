@@ -1,7 +1,4 @@
-﻿/// <reference path="../display/Sprite.ts" />
-/// <reference path="../display/Shape.ts" />
-/// <reference path="../events/Event.ts" />
-/// <reference path="../events/MouseEvent.ts" />
+﻿
 /**
  * @module annie
  */

@@ -197,7 +197,7 @@ declare namespace annie {
          */
         static ON_PLAY_START: string;
         /**
-         * annieUI.FlipBook组件翻页开始事件
+         * annie.FlipBook组件翻页开始事件
          * @property ON_FLIP_START
          * @static
          * @since 1.1.0
@@ -205,7 +205,7 @@ declare namespace annie {
          */
         static ON_FLIP_START: string;
         /**
-         * annieUI.FlipBook组件翻页结束事件
+         * annie.FlipBook组件翻页结束事件
          * @property ON_FLIP_STOP
          * @static
          * @since 1.1.0
@@ -213,7 +213,7 @@ declare namespace annie {
          */
         static ON_FLIP_STOP: string;
         /**
-         * annieUI.ScrollPage组件滑动到开始位置事件
+         * annie.ScrollPage组件滑动到开始位置事件
          * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
@@ -221,7 +221,7 @@ declare namespace annie {
          */
         static ON_SCROLL_TO_HEAD: string;
         /**
-         * annieUI.ScrollPage组件停止滑动事件
+         * annie.ScrollPage组件停止滑动事件
          * @property ON_SCROLL_STOP
          * @static
          * @since 1.1.0
@@ -229,7 +229,7 @@ declare namespace annie {
          */
         static ON_SCROLL_STOP: string;
         /**
-         * annieUI.ScrollPage组件开始滑动事件
+         * annie.ScrollPage组件开始滑动事件
          * @property ON_SCROLL_START
          * @static
          * @since 1.1.0
@@ -237,7 +237,7 @@ declare namespace annie {
          */
         static ON_SCROLL_START: string;
         /**
-         * annieUI.ScrollPage组件滑动到结束位置事件
+         * annie.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
@@ -245,7 +245,7 @@ declare namespace annie {
          */
         static ON_SCROLL_TO_END: string;
         /**
-         * annieUI.Slide 组件开始滑动事件
+         * annie.Slide 组件开始滑动事件
          * @property ON_SLIDE_START
          * @static
          * @since 1.1.0
@@ -253,7 +253,7 @@ declare namespace annie {
          */
         static ON_SLIDE_START: string;
         /**
-         * annieUI.Slide 组件结束滑动事件
+         * annie.Slide 组件结束滑动事件
          * @property ON_SLIDE_END
          * @static
          * @since 1.1.0
@@ -1150,375 +1150,6 @@ declare namespace annie {
     }
 }
 /**
- * @class annie
- */
-declare namespace annie {
-    /**
-     * annie引擎的版本号
-     * @public
-     * @since 1.0.1
-     * @property annie.version
-     * @type {string}
-     * @example
-     *      //打印当前引擎的版本号
-     *      trace(annie.version);
-     */
-    let version: string;
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     */
-    let devicePixelRatio: number;
-    /**
-     * 全局事件侦听
-     * @property globalDispatcher
-     * @type {annie.EventDispatcher}
-     */
-    let globalDispatcher: EventDispatcher;
-    /**
-     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
-     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
-     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
-     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
-     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * @property annie.StageScaleMode
-     * @type {Object}
-     * @public
-     * @since 1.0.0
-     * @static
-     * @example
-     *      //动态更改stage的对齐方式示例
-     *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
-     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
-     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
-     *              if(i>5){i=0;}
-     *          }
-     *      }
-     *
-     */
-    let StageScaleMode: {
-        EXACT_FIT: string;
-        NO_BORDER: string;
-        NO_SCALE: string;
-        SHOW_ALL: string;
-        FIXED_WIDTH: string;
-        FIXED_HEIGHT: string;
-    };
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
-     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
-     * @class annie.Stage
-     * @extends annie.Sprite
-     * @public
-     * @since 1.0.0
-     */
-    class Stage extends Sprite {
-        /**
-         * 当前stage所使用的渲染器
-         * 渲染器有两种,一种是canvas 一种是webGl
-         * @property renderObj
-         * @public
-         * @since 1.0.0
-         * @type {IRender}
-         * @default null
-         */
-        renderObj: IRender;
-        /**
-         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-         * 对象视觉暂停更新
-         * @property pause
-         * @type {boolean}
-         * @public
-         * @static
-         * @since 1.0.0
-         * @default false
-         */
-        static pause: boolean;
-        private static _pause;
-        /**
-         * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
-         * @property viewRect
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {annie.Rectangle}
-         * @default {x:0,y:0,width:0,height:0}
-         * @readonly
-         * @example
-         *      //始终让一个对象顶对齐，或者
-         */
-        viewRect: Rectangle;
-        /**
-         * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
-         * @property isMultiTouch
-         * @since 1.0.3
-         * @type {boolean}
-         */
-        isMultiTouch: boolean;
-        /**
-         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
-         * @property isMultiMouse
-         * @since 1.1.3
-         * @type {boolean}
-         */
-        isMultiMouse: boolean;
-        /**
-         * 舞台的尺寸宽,也就是我们常说的设计尺寸
-         * @property desWidth
-         * @public
-         * @since 1.0.0
-         * @default 320
-         * @type {number}
-         * @readonly
-         */
-        desWidth: number;
-        /**
-         * 舞台的尺寸高,也就是我们常说的设计尺寸
-         * @property desHeight
-         * @public
-         * @since 1.0.0
-         * @default 240
-         * @type {number}
-         * @readonly
-         */
-        desHeight: number;
-        /**
-         * 舞台在当前设备中的真实高
-         * @property divHeight
-         * @public
-         * @since 1.0.0
-         * @default 320
-         * @type {number}
-         * @readonly
-         */
-        divHeight: number;
-        /**
-         * 舞台在当前设备中的真实宽
-         * @property divWidth
-         * @public
-         * @since 1.0.0
-         * @default 240
-         * @readonly
-         * @type {number}
-         */
-        divWidth: number;
-        /**
-         * 舞台的背景色
-         * 默认就是透明背景
-         * 可能设置一个颜色值改变舞台背景
-         * @property bgColor
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         * @default "";
-         */
-        bgColor: string;
-        /**
-         * 舞台的缩放模式
-         * 默认为空就是无缩放的真实大小
-         * "noBorder" 无边框模式
-         * ”showAll" 显示所有内容
-         * “fixedWidth" 固定宽
-         * ”fixedHeight" 固定高
-         * @property scaleMode
-         * @public
-         * @since 1.0.0
-         * @default "onScale"
-         * @type {string}
-         * @example
-         *      //动态更改stage的对齐方式示例
-         *      //以下代码放到一个舞台的显示对象的构造函数中
-         *      let s=this;
-         *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-         *          let i=0;
-         *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-         *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-         *              let state=e.currentTarget;
-         *              state.scaleMode=aList[i];
-         *              state.resize();
-         *              if(i>5){i=0;}
-         *          }
-         *      }
-         *
-         */
-        scaleMode: string;
-        private _scaleMode;
-        /**
-         * 原始为60的刷新速度时的计数器
-         * @property _flush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
-        private _flush;
-        /**
-         * 当前的刷新次数计数器
-         * @property _currentFlush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
-        private _currentFlush;
-        static _dragDisplay: DisplayObject;
-        /**
-         * 上一次鼠标或触碰经过的显示对象列表
-         * @type {Array}
-         * @private
-         */
-        private _lastDpList;
-        onTouchEvent: any;
-        /**
-         * 显示对象入口函数
-         * @method Stage
-         * @param {Canvas} ctx
-         * @param {number} desW canvas宽
-         * @param {number} desH canvas高
-         * @param {number} desW 舞台宽
-         * @param {number} desH 舞台高
-         * @param {number} fps 刷新率
-         * @param {string} scaleMode 缩放模式 StageScaleMode
-         * @param {string} bgColor 背景颜色-1为透明
-         * @public
-         * @since 1.0.0
-         */
-        constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        private _touchEvent;
-        /**
-         * 渲染函数
-         * @method render
-         * @param renderObj
-         */
-        render(renderObj: IRender): void;
-        /**
-         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-         * @type {Array}
-         * @private
-         */
-        private _ml;
-        /**
-         * 这个是事件中用到的Point对象池,以提高性能
-         * @type {Array}
-         * @private
-         */
-        private _mp;
-        /**
-         * 刷新mouse或者touch事件
-         * @private
-         */
-        private _initMouseEvent(event, cp, sp, identifier);
-        private _mouseDownPoint;
-        /**
-         * 循环刷新页面的函数
-         */
-        private flush();
-        /**
-         * 引擎的刷新率,就是一秒中执行多少次刷新
-         * @method setFrameRate
-         * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
-         * @since 1.0.0
-         * @public
-         */
-        setFrameRate(fps: number): void;
-        /**
-         * 引擎的刷新率,就是一秒中执行多少次刷新
-         * @method getFrameRate
-         * @since 1.0.0
-         * @public
-         */
-        getFrameRate(): number;
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         */
-        kill(): void;
-        /**
-         * html的鼠标或单点触摸对应的引擎事件类型名
-         * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
-         * @private
-         */
-        private _mouseEventTypes;
-        private muliPoints;
-        /**
-         * 当document有鼠标或触摸事件时调用
-         * @param e
-         */
-        private _mP1;
-        private _mP2;
-        private _onMouseEvent;
-        /**
-         * 设置舞台的对齐模式
-         */
-        private setAlign;
-        getBounds(): Rectangle;
-        /**
-         * 要循环调用 flush 函数对象列表
-         * @method allUpdateObjList
-         * @static
-         * @since 1.0.0
-         * @type {Array}
-         */
-        private static allUpdateObjList;
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
-        private static flushAll();
-        /**
-         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
-         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
-         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
-         * @method addUpdateObj
-         * @param target 要循化调用 flush 函数的对象
-         * @public
-         * @static
-         * @since
-         */
-        static addUpdateObj(target: any): void;
-        /**
-         * 移除掉已经添加的循环刷新对象
-         * @method removeUpdateObj
-         * @param target
-         * @public
-         * @static
-         * @since 1.0.0
-         */
-        static removeUpdateObj(target: any): void;
-        destroy(): void;
-    }
-}
-/**
  * @module annie
  */
 declare namespace annie {
@@ -1903,9 +1534,72 @@ declare namespace annie {
     }
 }
 /**
- * @class annie2x
+ * @class annie
  */
 declare namespace annie {
+    /**
+     * annie引擎的版本号
+     * @public
+     * @since 1.0.1
+     * @property annie.version
+     * @type {string}
+     * @example
+     *      //打印当前引擎的版本号
+     *      trace(annie.version);
+     */
+    let version: string;
+    /**
+     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
+     * @property annie.devicePixelRatio
+     * @type {number}
+     * @since 1.0.0
+     * @public
+     * @static
+     */
+    let devicePixelRatio: number;
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    let globalDispatcher: EventDispatcher;
+    /**
+     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
+     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
+     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
+     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
+     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * @property annie.StageScaleMode
+     * @type {Object}
+     * @public
+     * @since 1.0.0
+     * @static
+     * @example
+     *      //动态更改stage的对齐方式示例
+     *      //以下代码放到一个舞台的显示对象的构造函数中
+     *      let s=this;
+     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+     *          let i=0;
+     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              let state=e.currentTarget;
+     *              state.scaleMode=aList[i];
+     *              state.resize();
+     *              if(i>5){i=0;}
+     *          }
+     *      }
+     *
+     */
+    let StageScaleMode: {
+        EXACT_FIT: string;
+        NO_BORDER: string;
+        NO_SCALE: string;
+        SHOW_ALL: string;
+        FIXED_WIDTH: string;
+        FIXED_HEIGHT: string;
+    };
     /**
      * 创建一个声音对象
      * @type {Audio}
@@ -1978,6 +1672,307 @@ declare namespace annie {
      * @private
      */
     function initRes(target: any, sceneName: string, resName: string): void;
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
+     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
+     * @class annie.Stage
+     * @extends annie.Sprite
+     * @public
+     * @since 1.0.0
+     */
+    class Stage extends Sprite {
+        /**
+         * 当前stage所使用的渲染器
+         * 渲染器有两种,一种是canvas 一种是webGl
+         * @property renderObj
+         * @public
+         * @since 1.0.0
+         * @type {IRender}
+         * @default null
+         */
+        renderObj: IRender;
+        /**
+         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
+         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
+         * 对象视觉暂停更新
+         * @property pause
+         * @type {boolean}
+         * @public
+         * @static
+         * @since 1.0.0
+         * @default false
+         */
+        static pause: boolean;
+        private static _pause;
+        /**
+         * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
+         * @property viewRect
+         * @public
+         * @readonly
+         * @since 1.0.0
+         * @type {annie.Rectangle}
+         * @default {x:0,y:0,width:0,height:0}
+         * @readonly
+         * @example
+         *      //始终让一个对象顶对齐，或者
+         */
+        viewRect: Rectangle;
+        /**
+         * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
+         * @property isMultiTouch
+         * @since 1.0.3
+         * @type {boolean}
+         */
+        isMultiTouch: boolean;
+        /**
+         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * @property isMultiMouse
+         * @since 1.1.3
+         * @type {boolean}
+         */
+        isMultiMouse: boolean;
+        /**
+         * 舞台的尺寸宽,也就是我们常说的设计尺寸
+         * @property desWidth
+         * @public
+         * @since 1.0.0
+         * @default 320
+         * @type {number}
+         * @readonly
+         */
+        desWidth: number;
+        /**
+         * 舞台的尺寸高,也就是我们常说的设计尺寸
+         * @property desHeight
+         * @public
+         * @since 1.0.0
+         * @default 240
+         * @type {number}
+         * @readonly
+         */
+        desHeight: number;
+        /**
+         * 舞台在当前设备中的真实高
+         * @property divHeight
+         * @public
+         * @since 1.0.0
+         * @default 320
+         * @type {number}
+         * @readonly
+         */
+        divHeight: number;
+        /**
+         * 舞台在当前设备中的真实宽
+         * @property divWidth
+         * @public
+         * @since 1.0.0
+         * @default 240
+         * @readonly
+         * @type {number}
+         */
+        divWidth: number;
+        /**
+         * 舞台的背景色
+         * 默认就是透明背景
+         * 可能设置一个颜色值改变舞台背景
+         * @property bgColor
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         * @default "";
+         */
+        bgColor: string;
+        /**
+         * 舞台的缩放模式
+         * 默认为空就是无缩放的真实大小
+         * "noBorder" 无边框模式
+         * ”showAll" 显示所有内容
+         * “fixedWidth" 固定宽
+         * ”fixedHeight" 固定高
+         * @property scaleMode
+         * @public
+         * @since 1.0.0
+         * @default "onScale"
+         * @type {string}
+         * @example
+         *      //动态更改stage的对齐方式示例
+         *      //以下代码放到一个舞台的显示对象的构造函数中
+         *      let s=this;
+         *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+         *          let i=0;
+         *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+         *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+         *              let state=e.currentTarget;
+         *              state.scaleMode=aList[i];
+         *              state.resize();
+         *              if(i>5){i=0;}
+         *          }
+         *      }
+         *
+         */
+        scaleMode: string;
+        private _scaleMode;
+        /**
+         * 原始为60的刷新速度时的计数器
+         * @property _flush
+         * @private
+         * @since 1.0.0
+         * @default 0
+         * @type {number}
+         */
+        private _flush;
+        /**
+         * 当前的刷新次数计数器
+         * @property _currentFlush
+         * @private
+         * @since 1.0.0
+         * @default 0
+         * @type {number}
+         */
+        private _currentFlush;
+        static _dragDisplay: DisplayObject;
+        /**
+         * 上一次鼠标或触碰经过的显示对象列表
+         * @type {Array}
+         * @private
+         */
+        private _lastDpList;
+        onTouchEvent: any;
+        /**
+         * 显示对象入口函数
+         * @method Stage
+         * @param {Canvas} ctx
+         * @param {number} desW canvas宽
+         * @param {number} desH canvas高
+         * @param {number} desW 舞台宽
+         * @param {number} desH 舞台高
+         * @param {number} fps 刷新率
+         * @param {string} scaleMode 缩放模式 StageScaleMode
+         * @param {string} bgColor 背景颜色-1为透明
+         * @public
+         * @since 1.0.0
+         */
+        constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
+        /**
+         * 重写刷新
+         * @method update
+         * @public
+         * @since 1.0.0
+         */
+        update(isDrawUpdate?: boolean): void;
+        private _touchEvent;
+        /**
+         * 渲染函数
+         * @method render
+         * @param renderObj
+         */
+        render(renderObj: IRender): void;
+        /**
+         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * @type {Array}
+         * @private
+         */
+        private _ml;
+        /**
+         * 这个是事件中用到的Point对象池,以提高性能
+         * @type {Array}
+         * @private
+         */
+        private _mp;
+        /**
+         * 刷新mouse或者touch事件
+         * @private
+         */
+        private _initMouseEvent(event, cp, sp, identifier);
+        private _mouseDownPoint;
+        /**
+         * 循环刷新页面的函数
+         */
+        private flush();
+        /**
+         * 引擎的刷新率,就是一秒中执行多少次刷新
+         * @method setFrameRate
+         * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
+         * @since 1.0.0
+         * @public
+         */
+        setFrameRate(fps: number): void;
+        /**
+         * 引擎的刷新率,就是一秒中执行多少次刷新
+         * @method getFrameRate
+         * @since 1.0.0
+         * @public
+         */
+        getFrameRate(): number;
+        /**
+         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
+         * @method kill
+         * @since 1.0.0
+         * @public
+         */
+        kill(): void;
+        /**
+         * html的鼠标或单点触摸对应的引擎事件类型名
+         * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
+         * @private
+         */
+        private _mouseEventTypes;
+        private muliPoints;
+        /**
+         * 当document有鼠标或触摸事件时调用
+         * @param e
+         */
+        private _mP1;
+        private _mP2;
+        private _onMouseEvent;
+        /**
+         * 设置舞台的对齐模式
+         */
+        private setAlign;
+        getBounds(): Rectangle;
+        /**
+         * 要循环调用 flush 函数对象列表
+         * @method allUpdateObjList
+         * @static
+         * @since 1.0.0
+         * @type {Array}
+         */
+        private static allUpdateObjList;
+        /**
+         * 刷新所有定时器
+         * @static
+         * @private
+         * @since 1.0.0
+         * @method flushAll
+         */
+        private static flushAll();
+        /**
+         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
+         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
+         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
+         * @method addUpdateObj
+         * @param target 要循化调用 flush 函数的对象
+         * @public
+         * @static
+         * @since
+         */
+        static addUpdateObj(target: any): void;
+        /**
+         * 移除掉已经添加的循环刷新对象
+         * @method removeUpdateObj
+         * @param target
+         * @public
+         * @static
+         * @since 1.0.0
+         */
+        static removeUpdateObj(target: any): void;
+        destroy(): void;
+    }
 }
 /**
  * @module annie

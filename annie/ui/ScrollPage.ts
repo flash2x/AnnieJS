@@ -1,5 +1,4 @@
-/// <reference path="../annie.ts" />
-/// <reference path="../utils/Tween.ts" />
+
 /**
  * Created by anlun on 16/8/14.
  */

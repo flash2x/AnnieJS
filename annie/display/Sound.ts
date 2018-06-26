@@ -1,5 +1,4 @@
 /// <reference path="../annie.ts" />
-/// <reference path="../utils/Flash2x.ts" />
 /**
  * @module annie
  */
