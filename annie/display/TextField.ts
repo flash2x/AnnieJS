@@ -76,13 +76,13 @@ namespace annie {
          * @default 0
          */
         public set textWidth(value: number) {
-            this._setProperty("_textWidth",value,3);
+            this._setProperty("",value,3);
         }
 
         public get textWidth(): number {
             return this._textWidth;
         }
-        private _textWidth: number = 0;
+        private _textWidth: number = 120;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -209,7 +209,7 @@ namespace annie {
             return this._border;
         }
         private _border: boolean = false;
-        private fontInfo: string;
+        private fontInfo: any;
         private realLines: any;
         /**
          * 设置文本在canvas里的渲染样式
@@ -242,6 +242,41 @@ namespace annie {
             let w = ctx.measureText(text).width;
             //ctx.restore();
             return w;
+        }
+        /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        public getTextWH(lineIndex:number=0){
+            let s=this;
+            let ctx = CanvasRender.drawCtx;
+            s.fontInfo = s.size || 12;
+            s.fontInfo  += "px ";
+            s.fontInfo  += s.font;
+            if (s._bold) {
+                s.fontInfo  = "bold " + s.fontInfo ;
+            }
+            if (s._italic) {
+                s.fontInfo  = "italic " + s.fontInfo ;
+            }
+            ctx.font = s.fontInfo;
+            let obj:any=ctx.measureText(s.realLines[lineIndex]);
+            return {width:obj.width,height:obj.height};
+        }
+
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        get lines(): number {
+            return this.realLines.length;
         }
         /**
          * 重写 update

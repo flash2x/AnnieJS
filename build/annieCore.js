@@ -4145,7 +4145,7 @@ var annie;
             this._textAlpha = 1;
             this._textHeight = 0;
             this._lineSpacing = 14;
-            this._textWidth = 0;
+            this._textWidth = 120;
             this._lineType = "single";
             this._textOffX = 0;
             this._text = "";
@@ -4230,7 +4230,7 @@ var annie;
              * @default 0
              */
             set: function (value) {
-                this._setProperty("_textWidth", value, 3);
+                this._setProperty("", value, 3);
             },
             enumerable: true,
             configurable: true
@@ -4409,6 +4409,45 @@ var annie;
             //ctx.restore();
             return w;
         };
+        /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        TextField.prototype.getTextWH = function (lineIndex) {
+            if (lineIndex === void 0) { lineIndex = 0; }
+            var s = this;
+            var ctx = annie.CanvasRender.drawCtx;
+            s.fontInfo = s.size || 12;
+            s.fontInfo += "px ";
+            s.fontInfo += s.font;
+            if (s._bold) {
+                s.fontInfo = "bold " + s.fontInfo;
+            }
+            if (s._italic) {
+                s.fontInfo = "italic " + s.fontInfo;
+            }
+            ctx.font = s.fontInfo;
+            var obj = ctx.measureText(s.realLines[lineIndex]);
+            return { width: obj.width, height: obj.height };
+        };
+        Object.defineProperty(TextField.prototype, "lines", {
+            /**
+             * @property _lines 获取当前文本行数
+             * @type {number}
+             * @public
+             * @readonly
+             * @since 2.0.0
+             */
+            get: function () {
+                return this.realLines.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 重写 update
          * @method update
