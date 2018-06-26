@@ -4423,20 +4423,20 @@ var annie;
             return w;
         };
         /**
-         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
-         * @method getTextWH
+         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
+         * @method getTextWidth
          * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
          * @since 2.0.0
          * @public
-         * @return {{width: number; height: number}}
+         * @return {number}
          */
-        TextField.prototype.getTextWH = function (lineIndex) {
+        TextField.prototype.getTextWidth = function (lineIndex) {
             if (lineIndex === void 0) { lineIndex = 0; }
             var s = this;
+            s.update();
             var ctx = annie.CanvasRender.drawCtx;
-            ctx.font = s.fontInfo;
             var obj = ctx.measureText(s.realLines[lineIndex]);
-            return { width: obj.width, height: obj.height };
+            return obj.width;
         };
         Object.defineProperty(TextField.prototype, "lines", {
             /**
