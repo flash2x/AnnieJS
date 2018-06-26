@@ -244,30 +244,20 @@ namespace annie {
             return w;
         }
         /**
-         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
-         * @method getTextWH
+         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
+         * @method getTextWidth
          * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
          * @since 2.0.0
          * @public
-         * @return {{width: number; height: number}}
+         * @return {number}
          */
-        public getTextWH(lineIndex:number=0){
+        public getTextWidth(lineIndex:number=0){
             let s=this;
+            s.update();
             let ctx = CanvasRender.drawCtx;
-            s.fontInfo = s.size || 12;
-            s.fontInfo  += "px ";
-            s.fontInfo  += s.font;
-            if (s._bold) {
-                s.fontInfo  = "bold " + s.fontInfo ;
-            }
-            if (s._italic) {
-                s.fontInfo  = "italic " + s.fontInfo ;
-            }
-            ctx.font = s.fontInfo;
             let obj:any=ctx.measureText(s.realLines[lineIndex]);
-            return {width:obj.width,height:obj.height};
+            return obj.width;
         }
-
         /**
          * @property _lines 获取当前文本行数
          * @type {number}
