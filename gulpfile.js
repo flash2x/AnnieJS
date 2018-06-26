@@ -23,7 +23,7 @@ var coreList =[
     "annie/display/TextField.ts",
     "annie/display/Stage.ts",
     "annie/display/Sound.ts",
-    // "annie/filters/Filters.ts",
+    //"annie/filters/Filters.ts",
     "annie/render/IRender.ts",
     "annie/render/CanvasRender.ts",
     "annie/utils/Tween.ts",
@@ -33,15 +33,10 @@ var coreList =[
     "annie/GlobalFunction.ts"
 ];
 var uiList=[
-    "build/annieCore.d.ts",
     "annie/ui/ScrollPage.ts",
-    "annie/ui/FacePhoto.ts",
     "annie/ui/SlidePage.ts",
     "annie/ui/FlipBook.ts",
-    "annie/ui/ScrollList.ts",
-    "annie/ui/DrawingBoard.ts",
-    "annie/ui/ScratchCard.ts"
-];
+    "annie/ui/ScrollList.ts",];
 var onBuildCore = function(){
     var op = {
         noImplicitAny: true,
@@ -70,6 +65,8 @@ var onBuildUI = function(){
 var onModifyCore = function(){
     gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));
     gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/annieUI.js","build/add.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/annieUI.min.js","build/add.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("build"));
 }
 var onBuildDoc = function(){
     del([

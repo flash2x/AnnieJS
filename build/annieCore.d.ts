@@ -993,6 +993,1182 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
+     * 显示对象的容器类,可以将其他显示对象放入其中,是annie引擎的核心容器类.
+     * Sprite 类是基本显示列表构造块：一个可显示图形并且也可包含子项的显示列表节点。
+     * Sprite 对象与影片剪辑类似，但没有时间轴。Sprite 是不需要时间轴的对象的相应基类。
+     * 例如，Sprite 将是通常不使用时间轴的用户界面 (UI) 组件的逻辑基类
+     * @class annie.Sprite
+     * @extends annie.DisplayObject
+     * @public
+     * @since 1.0.0
+     */
+    class Sprite extends DisplayObject {
+        constructor();
+        private _a2x_res_class;
+        private _a2x_res_children;
+        destroy(): void;
+        /**
+         * 是否可以让children接收鼠标事件,如果为false
+         * 鼠标事件将不会往下冒泡
+         * @property mouseChildren
+         * @type {boolean}
+         * @default true
+         * @public
+         * @since 1.0.0
+         */
+        mouseChildren: boolean;
+        /**
+         * 显示对象的child列表
+         * @property children
+         * @type {Array}
+         * @public
+         * @since 1.0.0
+         * @default []
+         * @readonly
+         */
+        children: DisplayObject[];
+        /**
+         * 添加一个显示对象到Sprite
+         * @method addChild
+         * @param {annie.DisplayObject} child
+         * @public
+         * @since 1.0.0
+         */
+        addChild(child: DisplayObject): void;
+        /**
+         * 从Sprite中移除一个child
+         * @method removeChild
+         * @public
+         * @since 1.0.0
+         * @param {annie.DisplayObject} child
+         */
+        removeChild(child: DisplayObject): void;
+        private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
+        /**
+         * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
+         * @method getChildByName
+         * @param {string} name 对象的具体名字或是一个正则表达式
+         * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
+         * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
+         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @public
+         * @since 1.0.0
+         */
+        getChildByName(name: string | RegExp, isOnlyOne?: boolean, isRecursive?: boolean): any;
+        /**
+         * 添加一个child到Sprite中并指定添加到哪个层级
+         * @method addChildAt
+         * @param {annie.DisplayObject} child
+         * @param {number} index 从0开始
+         * @pubic
+         * @since 1.0.0
+         */
+        addChildAt(child: DisplayObject, index: number): void;
+        /**
+         * 获取Sprite中指定层级一个child
+         * @method getChildAt
+         * @param {number} index 从0开始
+         * @pubic
+         * @since 1.0.0
+         * @return {annie.DisplayObject}
+         */
+        getChildAt(index: number): annie.DisplayObject;
+        /**
+         * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
+         * @method getChildIndex
+         * @param {annie.DisplayObject} child 子对象
+         * @pubic
+         * @since 1.0.2
+         * @return {number}
+         */
+        getChildIndex(child: DisplayObject): number;
+        /**
+         *
+         * @param child1 显示对象，或者显示对象的索引
+         * @param child2 显示对象，或者显示对象的索引
+         * @returns {boolean}
+         */
+        swapChild(child1: any, child2: any): boolean;
+        /**
+         * 调用此方法对Sprite及其child触发一次指定事件
+         * @method _onDispatchBubbledEvent
+         * @private
+         * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
+         * @since 1.0.0
+         */
+        _onDispatchBubbledEvent(type: string): void;
+        /**
+         * 移除指定层级上的孩子
+         * @method removeChildAt
+         * @param {number} index 从0开始
+         * @public
+         * @since 1.0.0
+         */
+        removeChildAt(index: number): void;
+        /**
+         * 移除Sprite上的所有child
+         * @method removeAllChildren
+         * @public
+         * @since 1.0.0
+         */
+        removeAllChildren(): void;
+        /**
+         * 重写刷新
+         * @method update
+         * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @since 1.0.0
+         */
+        update(isDrawUpdate?: boolean): void;
+        /**
+         * 重写碰撞测试
+         * @method hitTestPoint
+         * @param {annie.Point} globalPoint
+         * @param {boolean} isMouseEvent
+         * @returns {any}
+         * @public
+         * @since 1.0.0
+         */
+        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * 重写getBounds
+         * @method getBounds
+         * @returns {any}
+         * @since 1.0.0
+         * @public
+         */
+        getBounds(): Rectangle;
+        /**
+         * 重写渲染
+         * @method render
+         * @param {annie.IRender} renderObj
+         * @public
+         * @since 1.0.0
+         */
+        render(renderObj: IRender): void;
+    }
+}
+/**
+ * @class annie
+ */
+declare namespace annie {
+    /**
+     * annie引擎的版本号
+     * @public
+     * @since 1.0.1
+     * @property annie.version
+     * @type {string}
+     * @example
+     *      //打印当前引擎的版本号
+     *      trace(annie.version);
+     */
+    let version: string;
+    /**
+     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
+     * @property annie.devicePixelRatio
+     * @type {number}
+     * @since 1.0.0
+     * @public
+     * @static
+     */
+    let devicePixelRatio: number;
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    let globalDispatcher: EventDispatcher;
+    /**
+     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
+     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
+     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
+     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
+     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * @property annie.StageScaleMode
+     * @type {Object}
+     * @public
+     * @since 1.0.0
+     * @static
+     * @example
+     *      //动态更改stage的对齐方式示例
+     *      //以下代码放到一个舞台的显示对象的构造函数中
+     *      let s=this;
+     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+     *          let i=0;
+     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              let state=e.currentTarget;
+     *              state.scaleMode=aList[i];
+     *              state.resize();
+     *              if(i>5){i=0;}
+     *          }
+     *      }
+     *
+     */
+    let StageScaleMode: {
+        EXACT_FIT: string;
+        NO_BORDER: string;
+        NO_SCALE: string;
+        SHOW_ALL: string;
+        FIXED_WIDTH: string;
+        FIXED_HEIGHT: string;
+    };
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
+     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
+     * @class annie.Stage
+     * @extends annie.Sprite
+     * @public
+     * @since 1.0.0
+     */
+    class Stage extends Sprite {
+        /**
+         * 当前stage所使用的渲染器
+         * 渲染器有两种,一种是canvas 一种是webGl
+         * @property renderObj
+         * @public
+         * @since 1.0.0
+         * @type {IRender}
+         * @default null
+         */
+        renderObj: IRender;
+        /**
+         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
+         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
+         * 对象视觉暂停更新
+         * @property pause
+         * @type {boolean}
+         * @public
+         * @static
+         * @since 1.0.0
+         * @default false
+         */
+        static pause: boolean;
+        private static _pause;
+        /**
+         * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
+         * @property viewRect
+         * @public
+         * @readonly
+         * @since 1.0.0
+         * @type {annie.Rectangle}
+         * @default {x:0,y:0,width:0,height:0}
+         * @readonly
+         * @example
+         *      //始终让一个对象顶对齐，或者
+         */
+        viewRect: Rectangle;
+        /**
+         * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
+         * @property isMultiTouch
+         * @since 1.0.3
+         * @type {boolean}
+         */
+        isMultiTouch: boolean;
+        /**
+         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * @property isMultiMouse
+         * @since 1.1.3
+         * @type {boolean}
+         */
+        isMultiMouse: boolean;
+        /**
+         * 舞台的尺寸宽,也就是我们常说的设计尺寸
+         * @property desWidth
+         * @public
+         * @since 1.0.0
+         * @default 320
+         * @type {number}
+         * @readonly
+         */
+        desWidth: number;
+        /**
+         * 舞台的尺寸高,也就是我们常说的设计尺寸
+         * @property desHeight
+         * @public
+         * @since 1.0.0
+         * @default 240
+         * @type {number}
+         * @readonly
+         */
+        desHeight: number;
+        /**
+         * 舞台在当前设备中的真实高
+         * @property divHeight
+         * @public
+         * @since 1.0.0
+         * @default 320
+         * @type {number}
+         * @readonly
+         */
+        divHeight: number;
+        /**
+         * 舞台在当前设备中的真实宽
+         * @property divWidth
+         * @public
+         * @since 1.0.0
+         * @default 240
+         * @readonly
+         * @type {number}
+         */
+        divWidth: number;
+        /**
+         * 舞台的背景色
+         * 默认就是透明背景
+         * 可能设置一个颜色值改变舞台背景
+         * @property bgColor
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         * @default "";
+         */
+        bgColor: string;
+        /**
+         * 舞台的缩放模式
+         * 默认为空就是无缩放的真实大小
+         * "noBorder" 无边框模式
+         * ”showAll" 显示所有内容
+         * “fixedWidth" 固定宽
+         * ”fixedHeight" 固定高
+         * @property scaleMode
+         * @public
+         * @since 1.0.0
+         * @default "onScale"
+         * @type {string}
+         * @example
+         *      //动态更改stage的对齐方式示例
+         *      //以下代码放到一个舞台的显示对象的构造函数中
+         *      let s=this;
+         *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+         *          let i=0;
+         *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+         *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+         *              let state=e.currentTarget;
+         *              state.scaleMode=aList[i];
+         *              state.resize();
+         *              if(i>5){i=0;}
+         *          }
+         *      }
+         *
+         */
+        scaleMode: string;
+        private _scaleMode;
+        /**
+         * 原始为60的刷新速度时的计数器
+         * @property _flush
+         * @private
+         * @since 1.0.0
+         * @default 0
+         * @type {number}
+         */
+        private _flush;
+        /**
+         * 当前的刷新次数计数器
+         * @property _currentFlush
+         * @private
+         * @since 1.0.0
+         * @default 0
+         * @type {number}
+         */
+        private _currentFlush;
+        static _dragDisplay: DisplayObject;
+        /**
+         * 上一次鼠标或触碰经过的显示对象列表
+         * @type {Array}
+         * @private
+         */
+        private _lastDpList;
+        onTouchEvent: any;
+        /**
+         * 显示对象入口函数
+         * @method Stage
+         * @param {Canvas} ctx
+         * @param {number} desW canvas宽
+         * @param {number} desH canvas高
+         * @param {number} desW 舞台宽
+         * @param {number} desH 舞台高
+         * @param {number} fps 刷新率
+         * @param {string} scaleMode 缩放模式 StageScaleMode
+         * @param {string} bgColor 背景颜色-1为透明
+         * @public
+         * @since 1.0.0
+         */
+        constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
+        /**
+         * 重写刷新
+         * @method update
+         * @public
+         * @since 1.0.0
+         */
+        update(isDrawUpdate?: boolean): void;
+        private _touchEvent;
+        /**
+         * 渲染函数
+         * @method render
+         * @param renderObj
+         */
+        render(renderObj: IRender): void;
+        /**
+         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * @type {Array}
+         * @private
+         */
+        private _ml;
+        /**
+         * 这个是事件中用到的Point对象池,以提高性能
+         * @type {Array}
+         * @private
+         */
+        private _mp;
+        /**
+         * 刷新mouse或者touch事件
+         * @private
+         */
+        private _initMouseEvent(event, cp, sp, identifier);
+        private _mouseDownPoint;
+        /**
+         * 循环刷新页面的函数
+         */
+        private flush();
+        /**
+         * 引擎的刷新率,就是一秒中执行多少次刷新
+         * @method setFrameRate
+         * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
+         * @since 1.0.0
+         * @public
+         */
+        setFrameRate(fps: number): void;
+        /**
+         * 引擎的刷新率,就是一秒中执行多少次刷新
+         * @method getFrameRate
+         * @since 1.0.0
+         * @public
+         */
+        getFrameRate(): number;
+        /**
+         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
+         * @method kill
+         * @since 1.0.0
+         * @public
+         */
+        kill(): void;
+        /**
+         * html的鼠标或单点触摸对应的引擎事件类型名
+         * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
+         * @private
+         */
+        private _mouseEventTypes;
+        private muliPoints;
+        /**
+         * 当document有鼠标或触摸事件时调用
+         * @param e
+         */
+        private _mP1;
+        private _mP2;
+        private _onMouseEvent;
+        /**
+         * 设置舞台的对齐模式
+         */
+        private setAlign;
+        getBounds(): Rectangle;
+        /**
+         * 要循环调用 flush 函数对象列表
+         * @method allUpdateObjList
+         * @static
+         * @since 1.0.0
+         * @type {Array}
+         */
+        private static allUpdateObjList;
+        /**
+         * 刷新所有定时器
+         * @static
+         * @private
+         * @since 1.0.0
+         * @method flushAll
+         */
+        private static flushAll();
+        /**
+         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
+         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
+         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
+         * @method addUpdateObj
+         * @param target 要循化调用 flush 函数的对象
+         * @public
+         * @static
+         * @since
+         */
+        static addUpdateObj(target: any): void;
+        /**
+         * 移除掉已经添加的循环刷新对象
+         * @method removeUpdateObj
+         * @param target
+         * @public
+         * @static
+         * @since 1.0.0
+         */
+        static removeUpdateObj(target: any): void;
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * annie引擎核心类
+     * @class annie.MovieClip
+     * @since 1.0.0
+     * @public
+     * @extends annie.Sprite
+     */
+    class MovieClip extends Sprite {
+        /**
+         * mc的当前帧
+         * @property currentFrame
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 1
+         * @readonly
+         */
+        currentFrame: number;
+        private _curFrame;
+        private _lastFrameObj;
+        /**
+         * 当前动画是否处于播放状态
+         * @property isPlaying
+         * @readOnly
+         * @public
+         * @since 1.0.0
+         * @type {boolean}
+         * @default true
+         * @readonly
+         */
+        isPlaying: boolean;
+        private _isPlaying;
+        /**
+         * 动画的播放方向,是顺着播还是在倒着播
+         * @property isFront
+         * @public
+         * @since 1.0.0
+         * @type {boolean}
+         * @default true
+         * @readonly
+         */
+        isFront: boolean;
+        private _isFront;
+        /**
+         * 当前动画的总帧数
+         * @property totalFrames
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 1
+         * @readonly
+         */
+        totalFrames: number;
+        private _lastFrame;
+        constructor();
+        /**
+         * 调用止方法将停止当前帧
+         * @method stop
+         * @public
+         * @since 1.0.0
+         */
+        stop(): void;
+        private _a2x_script;
+        /**
+         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
+         * @method addFrameScript
+         * @public
+         * @since 1.0.0
+         * @param {number} frameIndex {number} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
+         * @param {Function}frameScript {Function} 时间轴播放到当前帧时要执行回调方法
+         */
+        addFrameScript(frameIndex: number, frameScript: Function): void;
+        /**
+         * @移除帧上的回调方法
+         * @method removeFrameScript
+         * @public
+         * @since 1.0.0
+         * @param {number} frameIndex
+         */
+        removeFrameScript(frameIndex: number): void;
+        isButton: boolean;
+        private _isButton;
+        /**
+         * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
+         * 此方法不可逆，设置后不再能设置回剪辑，一定要这么做的话，请联系作者，看作者答不答应
+         * @method initButton
+         * @public
+         * @since 1.0.0
+         */
+        initButton(): void;
+        clicked: boolean;
+        private _clicked;
+        private _mouseEvent;
+        private _maskList;
+        /**
+         * mc的当前帧的标签名,没有则为空
+         * @method getCurrentLabel
+         * @public
+         * @since 1.0.0
+         * @returns {string}
+         * */
+        getCurrentLabel(): string;
+        /**
+         * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
+         * @method nextFrame
+         * @since 1.0.0
+         * @public
+         */
+        nextFrame(): void;
+        /**
+         * 将播放头向前移一帧并停在下一帧,如果本身在第一帧则不做任何反应
+         * @method prevFrame
+         * @since 1.0.0
+         * @public
+         */
+        prevFrame(): void;
+        /**
+         * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
+         * @method gotoAndStop
+         * @public
+         * @since 1.0.0
+         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         */
+        gotoAndStop(frameIndex: number | string): void;
+        /**
+         * 如果当前时间轴停在某一帧,调用此方法将继续播放.
+         * @method play
+         * @public
+         * @since 1.0.0
+         */
+        play(isFront?: boolean): void;
+        /**
+         * 将播放头跳转到指定帧并从那一帧开始继续播放
+         * @method gotoAndPlay
+         * @public
+         * @since 1.0.0
+         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         */
+        gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
+        /**
+         * 重写刷新
+         * @method update
+         * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @since 1.0.0
+         */
+        update(isDrawUpdate?: boolean): void;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 动态文本类,有时需要在canvas里有一个动态文本,能根据我们的显示内容来改变
+     * @class annie.TextField
+     * @extends annie.DisplayObject
+     * @since 1.0.0
+     * @public
+     */
+    class TextField extends DisplayObject {
+        constructor();
+        /**
+         * 文本的对齐方式
+         * @property textAlign
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         * @default left
+         */
+        textAlign: string;
+        private _textAlign;
+        textAlpha: number;
+        private _textAlpha;
+        /**
+         * 文本的行高
+         * @property textHeight
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        textHeight: number;
+        private _textHeight;
+        /**
+         *
+         * @param {number} value
+         */
+        lineSpacing: number;
+        private _lineSpacing;
+        /**
+         * 文本的宽
+         * @property textWidth
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        textWidth: number;
+        private _textWidth;
+        /**
+         * 文本类型,单行还是多行 single multi
+         * @property lineType
+         * @public
+         * @since 1.0.0
+         * @type {string} 两种 single和multi
+         * @default single
+         */
+        lineType: string;
+        private _lineType;
+        private _textOffX;
+        /**
+         * 文本内容
+         * @property text
+         * @type {string}
+         * @public
+         * @default ""
+         * @since 1.0.0
+         */
+        text: string;
+        private _text;
+        /**
+         * 文本的css字体样式
+         * @property font
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         * @default 12px Arial
+         */
+        font: string;
+        private _font;
+        /**
+         * 文本的size
+         * @property size
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 12
+         */
+        size: number;
+        private _size;
+        /**
+         * 文本的颜色值
+         * @property color
+         * @type {string}
+         * @public
+         * @since 1.0.0
+         * @default #fff
+         */
+        color: string;
+        _color: string;
+        /**
+         * 文本是否倾斜
+         * @property italic
+         * @public
+         * @since
+         * @default false
+         * @type {boolean}
+         */
+        italic: boolean;
+        private _italic;
+        /**
+         * 文本是否加粗
+         * @property bold
+         * @public
+         * @since
+         * @default false
+         * @type {boolean}
+         */
+        bold: boolean;
+        _bold: boolean;
+        /**
+         * 设置或获取是否有边框
+         * @property property
+         * @param {boolean} show true或false
+         * @public
+         * @since 1.0.6
+         */
+        border: boolean;
+        private _border;
+        private fontInfo;
+        private realLines;
+        /**
+         * 设置文本在canvas里的渲染样式
+         * @param ctx
+         * @private
+         * @since 1.0.0
+         */
+        private _draw(ctx);
+        /**
+         * 获取文本宽
+         * @method _getMeasuredWidth
+         * @param text
+         * @return {number}
+         * @private
+         * @since 1.0.0
+         */
+        private _getMeasuredWidth(text);
+        /**
+         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
+         * @method getTextWidth
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {number}
+         */
+        getTextWidth(lineIndex?: number): any;
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        lines: number;
+        /**
+         * 重写 update
+         * @method update
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
+        update(isDrawUpdate?: boolean): void;
+        /**
+         * 重写 getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @public
+         * @since 1.0.0
+         */
+        getBounds(): Rectangle;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
+     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
+     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
+     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
+     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
+     * @class annie.Bitmap
+     * @public
+     * @extends annie.DisplayObject
+     * @since 1.0.0
+     */
+    class Bitmap extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Bitmap
+         * @since 1.0.0
+         * @public
+         * @param {string} imagePath 一个图片地址
+        */
+        constructor(imagePath: string);
+        /**
+         * 重写hitTestPoint
+         * @method  hitTestPoint
+         * @param {annie.Point} globalPoint
+         * @param {boolean} isMouseEvent
+         * @returns {any}
+         * @public
+         * @since 1.0.0
+         */
+        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
+    }
+}
+/**
+ * @class annie2x
+ */
+declare namespace annie {
+    /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
+    let createAudio: Function;
+    let getImageInfo: Function;
+    /**
+     * 继承类方法
+     * @type {Function}
+     */
+    let A2xExtend: any;
+    /**
+     * 加载后的类引用全放在这里
+     * @type {Object}
+     */
+    let classPool: any;
+    /**
+     * 加载场景的方法
+     * @method loadScene
+     * @param {String|Array} 单个场景名或者多个场景名组成的数组
+     * @type {Function}
+     */
+    let loadScene: Function;
+    /**
+     * 是否已经加载过场景
+     * @method isLoadedScene
+     * @param {string} sceneName
+     * @return {boolean}
+     */
+    function isLoadedScene(sceneName: string): boolean;
+    /**
+     * 删除加载过的场景
+     * @method unLoadScene
+     * @param {string} sceneName
+     */
+    function unLoadScene(sceneName: string): void;
+    /**
+     * 解析资源
+     * @method parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
+    function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
+    /**
+     * 获取已经加载场景中的资源
+     * @method getResource
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function getResource(sceneName: string, resName: string): any;
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} target
+     * @param {Object} info
+     */
+    function d(target: any, info: any): void;
+    /**
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
+     */
+    function initRes(target: any, sceneName: string, resName: string): void;
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 声音类
+     * @class annie.Sound
+     * @extends annie.EventDispatcher
+     * @public
+     * @since 1.0.0
+     */
+    class Sound extends annie.EventDispatcher {
+        /**
+         * html 标签 有可能是audio 或者 video
+         * @property media
+         * @type {Audio}
+         * @public
+         * @since 1.0.0
+         */
+        media: any;
+        private _loop;
+        /**
+         * 构造函数
+         * @method Sound
+         * @param {string} src
+         * @param {string}type
+         * @since 1.0.0
+         */
+        constructor(src: string);
+        /**
+         * 是否正在播放中
+         * @property  isPlaying
+         * @type {boolean}
+         */
+        isPlaying: boolean;
+        /**
+         * 开始播放媒体
+         * @method play
+         * @param {number} start 开始点 默认为0
+         * @param {number} loop 循环次数 默认为1
+         * @public
+         * @since 1.0.0
+         */
+        play(start?: number, loop?: number): void;
+        /**
+         * 停止播放
+         * @method stop
+         * @public
+         * @since 1.0.0
+         */
+        stop(): void;
+        /**
+         * 暂停播放,或者恢复播放
+         * @method pause
+         * @public
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
+         * @since 1.0.4
+         */
+        pause(isPause?: boolean): void;
+        /**
+         * 设置或者获取音量 从0-1
+         * @since 1.1.0
+         * @property volume
+         * @returns {number}
+         */
+        volume: number;
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
+        private stop2();
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
+        private play2();
+        private static _soundList;
+        /**
+         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method stopAllSounds
+         * @since 1.1.1
+         * @static
+         * @public
+         */
+        static stopAllSounds(): void;
+        /**
+         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
+         * @method resumePlaySounds
+         * @since 2.0.0
+         * @static
+         * @public
+         */
+        static resumePlaySounds(): void;
+        /**
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * @method setAllSoundsVolume
+         * @since 1.1.1
+         * @static
+         * @public
+         * @param {number} volume 音量大小，从0-1
+         */
+        static setAllSoundsVolume(volume: number): void;
+        private static _volume;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    interface IRender {
+        /**
+         * 渲染循环
+         * @param target
+         */
+        draw(target: any): void;
+        /**
+         * 开始遮罩
+         * @param target
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩
+         */
+        endMask(): void;
+        end(): void;
+        /**
+         * 开始渲染
+         */
+        begin(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.CanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class CanvasRender extends AObject implements IRender {
+        static drawCtx: any;
+        private _stage;
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        constructor(stage: Stage, ctx: any);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        end(): void;
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
      * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
      * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
@@ -1405,47 +2581,6 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
-     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
-     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
-     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
-     * @class annie.Bitmap
-     * @public
-     * @extends annie.DisplayObject
-     * @since 1.0.0
-     */
-    class Bitmap extends DisplayObject {
-        /**
-         * 构造函数
-         * @method Bitmap
-         * @since 1.0.0
-         * @public
-         * @param {string} imagePath 一个图片地址
-        */
-        constructor(imagePath: string);
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @returns {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
      * 矢量对象
      * @class annie.Shape
      * @extends annie.DisplayObject
@@ -1806,996 +2941,6 @@ declare namespace annie {
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
          */
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 显示对象的容器类,可以将其他显示对象放入其中,是annie引擎的核心容器类.
-     * Sprite 类是基本显示列表构造块：一个可显示图形并且也可包含子项的显示列表节点。
-     * Sprite 对象与影片剪辑类似，但没有时间轴。Sprite 是不需要时间轴的对象的相应基类。
-     * 例如，Sprite 将是通常不使用时间轴的用户界面 (UI) 组件的逻辑基类
-     * @class annie.Sprite
-     * @extends annie.DisplayObject
-     * @public
-     * @since 1.0.0
-     */
-    class Sprite extends DisplayObject {
-        constructor();
-        private _a2x_res_class;
-        private _a2x_res_children;
-        destroy(): void;
-        /**
-         * 是否可以让children接收鼠标事件,如果为false
-         * 鼠标事件将不会往下冒泡
-         * @property mouseChildren
-         * @type {boolean}
-         * @default true
-         * @public
-         * @since 1.0.0
-         */
-        mouseChildren: boolean;
-        /**
-         * 显示对象的child列表
-         * @property children
-         * @type {Array}
-         * @public
-         * @since 1.0.0
-         * @default []
-         * @readonly
-         */
-        children: DisplayObject[];
-        /**
-         * 添加一个显示对象到Sprite
-         * @method addChild
-         * @param {annie.DisplayObject} child
-         * @public
-         * @since 1.0.0
-         */
-        addChild(child: DisplayObject): void;
-        /**
-         * 从Sprite中移除一个child
-         * @method removeChild
-         * @public
-         * @since 1.0.0
-         * @param {annie.DisplayObject} child
-         */
-        removeChild(child: DisplayObject): void;
-        private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
-        /**
-         * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
-         * @method getChildByName
-         * @param {string} name 对象的具体名字或是一个正则表达式
-         * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
-         * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
-         * @public
-         * @since 1.0.0
-         */
-        getChildByName(name: string | RegExp, isOnlyOne?: boolean, isRecursive?: boolean): any;
-        /**
-         * 添加一个child到Sprite中并指定添加到哪个层级
-         * @method addChildAt
-         * @param {annie.DisplayObject} child
-         * @param {number} index 从0开始
-         * @pubic
-         * @since 1.0.0
-         */
-        addChildAt(child: DisplayObject, index: number): void;
-        /**
-         * 获取Sprite中指定层级一个child
-         * @method getChildAt
-         * @param {number} index 从0开始
-         * @pubic
-         * @since 1.0.0
-         * @return {annie.DisplayObject}
-         */
-        getChildAt(index: number): annie.DisplayObject;
-        /**
-         * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
-         * @method getChildIndex
-         * @param {annie.DisplayObject} child 子对象
-         * @pubic
-         * @since 1.0.2
-         * @return {number}
-         */
-        getChildIndex(child: DisplayObject): number;
-        /**
-         *
-         * @param child1 显示对象，或者显示对象的索引
-         * @param child2 显示对象，或者显示对象的索引
-         * @returns {boolean}
-         */
-        swapChild(child1: any, child2: any): boolean;
-        /**
-         * 调用此方法对Sprite及其child触发一次指定事件
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @since 1.0.0
-         */
-        _onDispatchBubbledEvent(type: string): void;
-        /**
-         * 移除指定层级上的孩子
-         * @method removeChildAt
-         * @param {number} index 从0开始
-         * @public
-         * @since 1.0.0
-         */
-        removeChildAt(index: number): void;
-        /**
-         * 移除Sprite上的所有child
-         * @method removeAllChildren
-         * @public
-         * @since 1.0.0
-         */
-        removeAllChildren(): void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @returns {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @returns {any}
-         * @since 1.0.0
-         * @public
-         */
-        getBounds(): Rectangle;
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
-        render(renderObj: IRender): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * annie引擎核心类
-     * @class annie.MovieClip
-     * @since 1.0.0
-     * @public
-     * @extends annie.Sprite
-     */
-    class MovieClip extends Sprite {
-        /**
-         * mc的当前帧
-         * @property currentFrame
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 1
-         * @readonly
-         */
-        currentFrame: number;
-        private _curFrame;
-        private _lastFrameObj;
-        /**
-         * 当前动画是否处于播放状态
-         * @property isPlaying
-         * @readOnly
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default true
-         * @readonly
-         */
-        isPlaying: boolean;
-        private _isPlaying;
-        /**
-         * 动画的播放方向,是顺着播还是在倒着播
-         * @property isFront
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default true
-         * @readonly
-         */
-        isFront: boolean;
-        private _isFront;
-        /**
-         * 当前动画的总帧数
-         * @property totalFrames
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 1
-         * @readonly
-         */
-        totalFrames: number;
-        private _lastFrame;
-        constructor();
-        /**
-         * 调用止方法将停止当前帧
-         * @method stop
-         * @public
-         * @since 1.0.0
-         */
-        stop(): void;
-        private _a2x_script;
-        /**
-         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
-         * @method addFrameScript
-         * @public
-         * @since 1.0.0
-         * @param {number} frameIndex {number} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
-         * @param {Function}frameScript {Function} 时间轴播放到当前帧时要执行回调方法
-         */
-        addFrameScript(frameIndex: number, frameScript: Function): void;
-        /**
-         * @移除帧上的回调方法
-         * @method removeFrameScript
-         * @public
-         * @since 1.0.0
-         * @param {number} frameIndex
-         */
-        removeFrameScript(frameIndex: number): void;
-        isButton: boolean;
-        private _isButton;
-        /**
-         * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
-         * 此方法不可逆，设置后不再能设置回剪辑，一定要这么做的话，请联系作者，看作者答不答应
-         * @method initButton
-         * @public
-         * @since 1.0.0
-         */
-        initButton(): void;
-        clicked: boolean;
-        private _clicked;
-        private _mouseEvent;
-        private _maskList;
-        /**
-         * mc的当前帧的标签名,没有则为空
-         * @method getCurrentLabel
-         * @public
-         * @since 1.0.0
-         * @returns {string}
-         * */
-        getCurrentLabel(): string;
-        /**
-         * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
-         * @method nextFrame
-         * @since 1.0.0
-         * @public
-         */
-        nextFrame(): void;
-        /**
-         * 将播放头向前移一帧并停在下一帧,如果本身在第一帧则不做任何反应
-         * @method prevFrame
-         * @since 1.0.0
-         * @public
-         */
-        prevFrame(): void;
-        /**
-         * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
-         * @method gotoAndStop
-         * @public
-         * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
-         */
-        gotoAndStop(frameIndex: number | string): void;
-        /**
-         * 如果当前时间轴停在某一帧,调用此方法将继续播放.
-         * @method play
-         * @public
-         * @since 1.0.0
-         */
-        play(isFront?: boolean): void;
-        /**
-         * 将播放头跳转到指定帧并从那一帧开始继续播放
-         * @method gotoAndPlay
-         * @public
-         * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
-         * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
-         */
-        gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 动态文本类,有时需要在canvas里有一个动态文本,能根据我们的显示内容来改变
-     * @class annie.TextField
-     * @extends annie.DisplayObject
-     * @since 1.0.0
-     * @public
-     */
-    class TextField extends DisplayObject {
-        constructor();
-        /**
-         * 文本的对齐方式
-         * @property textAlign
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         * @default left
-         */
-        textAlign: string;
-        private _textAlign;
-        textAlpha: number;
-        private _textAlpha;
-        /**
-         * 文本的行高
-         * @property textHeight
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        textHeight: number;
-        private _textHeight;
-        /**
-         *
-         * @param {number} value
-         */
-        lineSpacing: number;
-        private _lineSpacing;
-        /**
-         * 文本的宽
-         * @property textWidth
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        textWidth: number;
-        private _textWidth;
-        /**
-         * 文本类型,单行还是多行 single multi
-         * @property lineType
-         * @public
-         * @since 1.0.0
-         * @type {string} 两种 single和multi
-         * @default single
-         */
-        lineType: string;
-        private _lineType;
-        private _textOffX;
-        /**
-         * 文本内容
-         * @property text
-         * @type {string}
-         * @public
-         * @default ""
-         * @since 1.0.0
-         */
-        text: string;
-        private _text;
-        /**
-         * 文本的css字体样式
-         * @property font
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         * @default 12px Arial
-         */
-        font: string;
-        private _font;
-        /**
-         * 文本的size
-         * @property size
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 12
-         */
-        size: number;
-        private _size;
-        /**
-         * 文本的颜色值
-         * @property color
-         * @type {string}
-         * @public
-         * @since 1.0.0
-         * @default #fff
-         */
-        color: string;
-        _color: string;
-        /**
-         * 文本是否倾斜
-         * @property italic
-         * @public
-         * @since
-         * @default false
-         * @type {boolean}
-         */
-        italic: boolean;
-        private _italic;
-        /**
-         * 文本是否加粗
-         * @property bold
-         * @public
-         * @since
-         * @default false
-         * @type {boolean}
-         */
-        bold: boolean;
-        _bold: boolean;
-        /**
-         * 设置或获取是否有边框
-         * @property property
-         * @param {boolean} show true或false
-         * @public
-         * @since 1.0.6
-         */
-        border: boolean;
-        private _border;
-        private fontInfo;
-        private realLines;
-        /**
-         * 设置文本在canvas里的渲染样式
-         * @param ctx
-         * @private
-         * @since 1.0.0
-         */
-        private _draw(ctx);
-        /**
-         * 获取文本宽
-         * @method _getMeasuredWidth
-         * @param text
-         * @return {number}
-         * @private
-         * @since 1.0.0
-         */
-        private _getMeasuredWidth(text);
-        /**
-         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
-         * @method getTextWidth
-         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
-         * @since 2.0.0
-         * @public
-         * @return {number}
-         */
-        getTextWidth(lineIndex?: number): any;
-        /**
-         * @property _lines 获取当前文本行数
-         * @type {number}
-         * @public
-         * @readonly
-         * @since 2.0.0
-         */
-        lines: number;
-        /**
-         * 重写 update
-         * @method update
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        /**
-         * 重写 getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        getBounds(): Rectangle;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
-     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
-     * @class annie.Stage
-     * @extends annie.Sprite
-     * @public
-     * @since 1.0.0
-     */
-    class Stage extends Sprite {
-        /**
-         * 当前stage所使用的渲染器
-         * 渲染器有两种,一种是canvas 一种是webGl
-         * @property renderObj
-         * @public
-         * @since 1.0.0
-         * @type {IRender}
-         * @default null
-         */
-        renderObj: IRender;
-        /**
-         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-         * 对象视觉暂停更新
-         * @property pause
-         * @type {boolean}
-         * @public
-         * @static
-         * @since 1.0.0
-         * @default false
-         */
-        static pause: boolean;
-        private static _pause;
-        /**
-         * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
-         * @property viewRect
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {annie.Rectangle}
-         * @default {x:0,y:0,width:0,height:0}
-         * @readonly
-         * @example
-         *      //始终让一个对象顶对齐，或者
-         */
-        viewRect: Rectangle;
-        /**
-         * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
-         * @property isMultiTouch
-         * @since 1.0.3
-         * @type {boolean}
-         */
-        isMultiTouch: boolean;
-        /**
-         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
-         * @property isMultiMouse
-         * @since 1.1.3
-         * @type {boolean}
-         */
-        isMultiMouse: boolean;
-        /**
-         * 舞台的尺寸宽,也就是我们常说的设计尺寸
-         * @property desWidth
-         * @public
-         * @since 1.0.0
-         * @default 320
-         * @type {number}
-         * @readonly
-         */
-        desWidth: number;
-        /**
-         * 舞台的尺寸高,也就是我们常说的设计尺寸
-         * @property desHeight
-         * @public
-         * @since 1.0.0
-         * @default 240
-         * @type {number}
-         * @readonly
-         */
-        desHeight: number;
-        /**
-         * 舞台在当前设备中的真实高
-         * @property divHeight
-         * @public
-         * @since 1.0.0
-         * @default 320
-         * @type {number}
-         * @readonly
-         */
-        divHeight: number;
-        /**
-         * 舞台在当前设备中的真实宽
-         * @property divWidth
-         * @public
-         * @since 1.0.0
-         * @default 240
-         * @readonly
-         * @type {number}
-         */
-        divWidth: number;
-        /**
-         * 舞台的背景色
-         * 默认就是透明背景
-         * 可能设置一个颜色值改变舞台背景
-         * @property bgColor
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         * @default "";
-         */
-        bgColor: string;
-        /**
-         * 舞台的缩放模式
-         * 默认为空就是无缩放的真实大小
-         * "noBorder" 无边框模式
-         * ”showAll" 显示所有内容
-         * “fixedWidth" 固定宽
-         * ”fixedHeight" 固定高
-         * @property scaleMode
-         * @public
-         * @since 1.0.0
-         * @default "onScale"
-         * @type {string}
-         * @example
-         *      //动态更改stage的对齐方式示例
-         *      //以下代码放到一个舞台的显示对象的构造函数中
-         *      let s=this;
-         *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-         *          let i=0;
-         *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-         *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-         *              let state=e.currentTarget;
-         *              state.scaleMode=aList[i];
-         *              state.resize();
-         *              if(i>5){i=0;}
-         *          }
-         *      }
-         *
-         */
-        scaleMode: string;
-        private _scaleMode;
-        /**
-         * 原始为60的刷新速度时的计数器
-         * @property _flush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
-        private _flush;
-        /**
-         * 当前的刷新次数计数器
-         * @property _currentFlush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
-        private _currentFlush;
-        static _dragDisplay: DisplayObject;
-        /**
-         * 上一次鼠标或触碰经过的显示对象列表
-         * @type {Array}
-         * @private
-         */
-        private _lastDpList;
-        onTouchEvent: any;
-        /**
-         * 显示对象入口函数
-         * @method Stage
-         * @param {Canvas} ctx
-         * @param {number} desW canvas宽
-         * @param {number} desH canvas高
-         * @param {number} desW 舞台宽
-         * @param {number} desH 舞台高
-         * @param {number} fps 刷新率
-         * @param {string} scaleMode 缩放模式 StageScaleMode
-         * @param {string} bgColor 背景颜色-1为透明
-         * @public
-         * @since 1.0.0
-         */
-        constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        private _touchEvent;
-        /**
-         * 渲染函数
-         * @method render
-         * @param renderObj
-         */
-        render(renderObj: IRender): void;
-        /**
-         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-         * @type {Array}
-         * @private
-         */
-        private _ml;
-        /**
-         * 这个是事件中用到的Point对象池,以提高性能
-         * @type {Array}
-         * @private
-         */
-        private _mp;
-        /**
-         * 刷新mouse或者touch事件
-         * @private
-         */
-        private _initMouseEvent(event, cp, sp, identifier);
-        private _mouseDownPoint;
-        /**
-         * 循环刷新页面的函数
-         */
-        private flush();
-        /**
-         * 引擎的刷新率,就是一秒中执行多少次刷新
-         * @method setFrameRate
-         * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
-         * @since 1.0.0
-         * @public
-         */
-        setFrameRate(fps: number): void;
-        /**
-         * 引擎的刷新率,就是一秒中执行多少次刷新
-         * @method getFrameRate
-         * @since 1.0.0
-         * @public
-         */
-        getFrameRate(): number;
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         */
-        kill(): void;
-        /**
-         * html的鼠标或单点触摸对应的引擎事件类型名
-         * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
-         * @private
-         */
-        private _mouseEventTypes;
-        private muliPoints;
-        /**
-         * 当document有鼠标或触摸事件时调用
-         * @param e
-         */
-        private _mP1;
-        private _mP2;
-        private _onMouseEvent;
-        /**
-         * 设置舞台的对齐模式
-         */
-        private setAlign;
-        getBounds(): Rectangle;
-        /**
-         * 要循环调用 flush 函数对象列表
-         * @method allUpdateObjList
-         * @static
-         * @since 1.0.0
-         * @type {Array}
-         */
-        private static allUpdateObjList;
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
-        private static flushAll();
-        /**
-         * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
-         * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
-         * 如，你的stage是30fps 那么你这个对象的 flush 函数1秒会调用30次。
-         * @method addUpdateObj
-         * @param target 要循化调用 flush 函数的对象
-         * @public
-         * @static
-         * @since
-         */
-        static addUpdateObj(target: any): void;
-        /**
-         * 移除掉已经添加的循环刷新对象
-         * @method removeUpdateObj
-         * @param target
-         * @public
-         * @static
-         * @since 1.0.0
-         */
-        static removeUpdateObj(target: any): void;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 声音类
-     * @class annie.Sound
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     */
-    class Sound extends annie.EventDispatcher {
-        /**
-         * html 标签 有可能是audio 或者 video
-         * @property media
-         * @type {Audio}
-         * @public
-         * @since 1.0.0
-         */
-        media: any;
-        private _loop;
-        /**
-         * 构造函数
-         * @method Sound
-         * @param {string} src
-         * @param {string}type
-         * @since 1.0.0
-         */
-        constructor(src: string);
-        /**
-         * 是否正在播放中
-         * @property  isPlaying
-         * @type {boolean}
-         */
-        isPlaying: boolean;
-        /**
-         * 开始播放媒体
-         * @method play
-         * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数 默认为1
-         * @public
-         * @since 1.0.0
-         */
-        play(start?: number, loop?: number): void;
-        /**
-         * 停止播放
-         * @method stop
-         * @public
-         * @since 1.0.0
-         */
-        stop(): void;
-        /**
-         * 暂停播放,或者恢复播放
-         * @method pause
-         * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
-         * @since 1.0.4
-         */
-        pause(isPause?: boolean): void;
-        /**
-         * 设置或者获取音量 从0-1
-         * @since 1.1.0
-         * @property volume
-         * @returns {number}
-         */
-        volume: number;
-        /**
-         * 停止播放，给stopAllSounds调用
-         */
-        private stop2();
-        /**
-         * 恢复播放，给stopAllSounds调用
-         */
-        private play2();
-        private static _soundList;
-        /**
-         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method stopAllSounds
-         * @since 1.1.1
-         * @static
-         * @public
-         */
-        static stopAllSounds(): void;
-        /**
-         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
-         * @method resumePlaySounds
-         * @since 2.0.0
-         * @static
-         * @public
-         */
-        static resumePlaySounds(): void;
-        /**
-         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method setAllSoundsVolume
-         * @since 1.1.1
-         * @static
-         * @public
-         * @param {number} volume 音量大小，从0-1
-         */
-        static setAllSoundsVolume(volume: number): void;
-        private static _volume;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    interface IRender {
-        /**
-         * 渲染循环
-         * @param target
-         */
-        draw(target: any): void;
-        /**
-         * 开始遮罩
-         * @param target
-         */
-        beginMask(target: any): void;
-        /**
-         * 结束遮罩
-         */
-        endMask(): void;
-        end(): void;
-        /**
-         * 开始渲染
-         */
-        begin(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * Canvas 渲染器
-     * @class annie.CanvasRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.0
-     */
-    class CanvasRender extends AObject implements IRender {
-        static drawCtx: any;
-        private _stage;
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.0
-         */
-        constructor(stage: Stage, ctx: any);
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.0
-         * @public
-         */
-        begin(): void;
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.0
-         */
-        beginMask(target: any): void;
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.0
-         */
-        endMask(): void;
-        end(): void;
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        draw(target: any): void;
         destroy(): void;
     }
 }
@@ -3311,149 +3456,4 @@ declare namespace annie {
         private static flush();
         destroy(): void;
     }
-}
-/**
- * @class annie2x
- */
-declare namespace annie {
-    /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
-    let createAudio: Function;
-    let getImageInfo: Function;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
-    let A2xExtend: any;
-    /**
-     * 加载后的类引用全放在这里
-     * @type {Object}
-     */
-    let classPool: any;
-    /**
-     * 加载场景的方法
-     * @method loadScene
-     * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
-     */
-    let loadScene: Function;
-    /**
-     * 是否已经加载过场景
-     * @method isLoadedScene
-     * @param {string} sceneName
-     * @return {boolean}
-     */
-    function isLoadedScene(sceneName: string): boolean;
-    /**
-     * 删除加载过的场景
-     * @method unLoadScene
-     * @param {string} sceneName
-     */
-    function unLoadScene(sceneName: string): void;
-    /**
-     * 解析资源
-     * @method parseScene
-     * @param {string} sceneName
-     * @param sceneRes
-     * @param sceneData
-     */
-    function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
-    /**
-     * 获取已经加载场景中的资源
-     * @method getResource
-     * @public
-     * @static
-     * @since 2.0.0
-     * @param {string} sceneName
-     * @param {string} resName
-     * @returns {any}
-     */
-    function getResource(sceneName: string, resName: string): any;
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     */
-    function d(target: any, info: any): void;
-    /**
-     * 引擎自调用.初始化 sprite和movieClip用
-     * @param target
-     * @param {string} _resId
-     * @private
-     */
-    function initRes(target: any, sceneName: string, resName: string): void;
-}
-/**
- * @class annie
- */
-declare namespace annie {
-    /**
-     * annie引擎的版本号
-     * @public
-     * @since 1.0.1
-     * @property annie.version
-     * @type {string}
-     * @example
-     *      //打印当前引擎的版本号
-     *      trace(annie.version);
-     */
-    let version: string;
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     */
-    let devicePixelRatio: number;
-    /**
-     * 全局事件侦听
-     * @property globalDispatcher
-     * @type {annie.EventDispatcher}
-     */
-    let globalDispatcher: EventDispatcher;
-    /**
-     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
-     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
-     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
-     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
-     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * @property annie.StageScaleMode
-     * @type {Object}
-     * @public
-     * @since 1.0.0
-     * @static
-     * @example
-     *      //动态更改stage的对齐方式示例
-     *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
-     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
-     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
-     *              if(i>5){i=0;}
-     *          }
-     *      }
-     *
-     */
-    let StageScaleMode: {
-        EXACT_FIT: string;
-        NO_BORDER: string;
-        NO_SCALE: string;
-        SHOW_ALL: string;
-        FIXED_WIDTH: string;
-        FIXED_HEIGHT: string;
-    };
 }

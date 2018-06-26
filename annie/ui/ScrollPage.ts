@@ -1,15 +1,17 @@
+/// <reference path="../annie.ts" />
+/// <reference path="../utils/Tween.ts" />
 /**
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annieUI.ScrollPage
+     * @class annie.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -153,7 +155,7 @@ namespace annieUI {
          * @param {number} maxDistance 最大滚动的长度
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annie.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
@@ -163,7 +165,7 @@ namespace annieUI {
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             let s = this;
-            s._instanceType = "annieUI.ScrollPage";
+            s._instanceType = "annie.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;

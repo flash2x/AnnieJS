@@ -1,4 +1,6 @@
 /// <reference path="Sprite.ts" />
+/// <reference path="../annie.ts" />
+/// <reference path="../events/TouchEvent.ts" />
 /**
  * @module annie
  */
