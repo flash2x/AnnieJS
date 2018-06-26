@@ -235,7 +235,7 @@ namespace annie {
         }
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
-         * @method getTextWH
+         * @method getTextWidth
          * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
          * @since 2.0.0
          * @public
