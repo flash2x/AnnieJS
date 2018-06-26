@@ -293,7 +293,7 @@ namespace annie {
                     }
                 }
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines.push(hardLines[0]);
+                    s.realLines.push(hardLines[0]);
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
                     if (lineW > s.lineWidth) {
@@ -305,7 +305,7 @@ namespace annie {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s.lineWidth) {
-                                realLines[0] = lineStr;
+                                s.realLines[0] = lineStr;
                                 break;
                             } else {
                                 lineStr += str[j];
@@ -324,17 +324,17 @@ namespace annie {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > this.lineWidth) {
-                                realLines.push(lineStr);
+                                s.realLines.push(lineStr);
                                 lineStr = str[j];
                                 w = wordW;
                             } else {
                                 lineStr += str[j];
                             }
                         }
-                        realLines.push(lineStr);
+                        s.realLines.push(lineStr);
                     }
                 }
-                let maxH = lineH * realLines.length;
+                let maxH = lineH * s.realLines.length;
                 let maxW = s.lineWidth;
                 let tx = 0;
                 if (s.textAlign == "center") {
@@ -354,8 +354,8 @@ namespace annie {
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                for (let i = 0; i < s.realLines.length; i++) {
+                    ctx.fillText(s.realLines[i], 0, i * lineH, maxW);
                 }
                 /////////////////////
                 let cf = s.cFilters;

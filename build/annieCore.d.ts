@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        readonly instanceId: number;
+        instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        readonly instanceType: string;
+        instanceType: string;
     }
     /**
      * 事件触发基类
@@ -1186,7 +1186,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        readonly matrix: Matrix;
+        matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -2650,6 +2650,7 @@ declare namespace annie {
          */
         border: boolean;
         private _border;
+        private realLines;
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
@@ -2666,6 +2667,26 @@ declare namespace annie {
          * @since 1.0.0
          */
         private _getMeasuredWidth(text);
+        /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        getTextWH(lineIndex?: number): {
+            width: any;
+            height: any;
+        };
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        lines: number;
         /**
          * 重写 update
          * @method update
@@ -4411,7 +4432,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {number}
          */
-        readonly currentCount: number;
+        currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -4438,7 +4459,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {boolean}
          */
-        readonly running: boolean;
+        running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
