@@ -2,13 +2,13 @@
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-declare namespace annieUI {
+declare namespace annie {
     import Sprite = annie.Sprite;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annieUI.ScrollPage
+     * @class annie.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -151,7 +151,7 @@ declare namespace annieUI {
          * @param {number} maxDistance 最大滚动的长度
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annie.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
@@ -183,69 +183,16 @@ declare namespace annieUI {
     }
 }
 /**
- * Created by anlun on 16/8/14.
- */
-/**
- * @module annieUI
- */
-declare namespace annieUI {
-    import Sprite = annie.Sprite;
-    /**
-     * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
-     * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
-     * @class annieUI.FacePhoto
-     * @public
-     * @extends annie.Sprite
-     * @since 1.0.0
-     */
-    class FacePhoto extends Sprite {
-        /**
-         * 构造函数
-         * @method  FacePhoto
-         * @since 1.0.0
-         * @public
-         * @example
-         *      var circleface = new annieUI.FacePhoto(),
-         *          rectFace=new annieUI.FacePhoto();
-         *          //圆形头像
-         *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
-         *          circleface.x = 260;
-         *          circleface.y = 100;
-         *          s.addChild(circleface);
-         *          //方形头像
-         *          rectFace.init('http://test.annie2x.com/biglong/logo.jpg', 200, 1);
-         *          rectFace.x = 260;
-         *          rectFace.y = 400;
-         *          s.addChild(rectFace);
-         */
-        constructor();
-        private photo;
-        private bitmap;
-        private maskType;
-        private radio;
-        private maskObj;
-        /**
-         * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
-         * @method init
-         * @param {string} src 头像的地址
-         * @param {number} radio 指定头像的长宽或者直径
-         * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
-         */
-        init(src: string, radio?: number, maskType?: number): void;
-        destroy(): void;
-    }
-}
-/**
  * Created by saron on 16/10/19.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-declare namespace annieUI {
+declare namespace annie {
     import Sprite = annie.Sprite;
     /**
      * 滑动页面类
-     * @class annieUI.SlidePage
+     * @class annie.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -433,13 +380,13 @@ declare namespace annieUI {
     }
 }
 /**
- * @module annieUI
+ * @module annie
  */
-declare namespace annieUI {
+declare namespace annie {
     import Sprite = annie.Sprite;
     /**
      * 电子杂志组件类
-     * @class annieUI.FlipBook
+     * @class annie.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -571,13 +518,13 @@ declare namespace annieUI {
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-declare namespace annieUI {
+declare namespace annie {
     import DisplayObject = annie.DisplayObject;
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
-     * @class annieUI.IScrollListItem
+     * @class annie.IScrollListItem
      * @public
      * @extends annie.DisplayObject
      * @since 1.0.9
@@ -589,9 +536,9 @@ declare namespace annieUI {
     }
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annieUI.ScrollList
+     * @class annie.ScrollList
      * @public
-     * @extends annieUI.ScrollPage
+     * @extends annie.ScrollPage
      * @since 1.0.9
      */
     class ScrollList extends ScrollPage {
@@ -614,7 +561,7 @@ declare namespace annieUI {
          * @since 1.0.9
          * @returns {DisplayObject}
          */
-        readonly loadingView: DisplayObject;
+        loadingView: DisplayObject;
         /**
          * 构造函数
          * @method ScrollList
@@ -655,151 +602,6 @@ declare namespace annieUI {
          * @param {annie.DisplayObject} downLoading
          */
         setLoading(downLoading: DisplayObject): void;
-        destroy(): void;
-    }
-}
-/**
- * Created by anlun on 2017/5/24.
- */
-/**
- * @module annieUI
- */
-declare namespace annieUI {
-    /**
-     * 画板类
-     * @class annieUI.DrawingBoard
-     * @public
-     * @extends annie.Bitmap
-     * @since 1.1.1
-     */
-    class DrawingBoard extends annie.Bitmap {
-        protected context: CanvasRenderingContext2D;
-        protected _isMouseDown: boolean;
-        /**
-         * 绘画半径
-         * @property drawRadius
-         * @type {number}
-         * @public
-         * @since 1.1.1
-         */
-        drawRadius: number;
-        protected _drawRadius: number;
-        /**
-         * 绘画颜色, 可以是任何的颜色类型
-         * @property drawColor
-         * @type {string}
-         * @public
-         * @since
-         * @type {any}
-         */
-        drawColor: any;
-        /**
-         * 背景色 可以是任何的颜色类型
-         * @property bgColor
-         * @type {any}
-         * @public
-         * @since 1.1.1
-         */
-        bgColor: any;
-        /**
-         * 画板宽
-         * @property drawWidth
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        drawWidth: number;
-        /**
-         * 画板高
-         * @property drawHeight
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        drawHeight: number;
-        protected totalStepList: any;
-        protected addStepObj: any;
-        protected currentStepId: number;
-        /**
-         * 构造函数
-         * @method DrawingBoard
-         * @param width 画板宽
-         * @param height 画板高
-         * @param bgColor 背景色 默认透明
-         * @since 1.1.1
-         */
-        constructor(width: number, height: number, bgColor?: any);
-        private onMouseDown(e);
-        private onMouseUp(e);
-        private onMouseMove(e);
-        /**
-         * 重置画板
-         * @method reset
-         * @param bgColor
-         * @public
-         * @since 1.1.1
-         */
-        reset(bgColor?: any): void;
-        /**
-         * 撤销步骤
-         * @method cancel
-         * @param {number} step 撤销几步 0则全部撤销,等同于reset
-         * @public
-         * @since 1.1.1
-         */
-        cancel(step?: number): boolean;
-        destroy(): void;
-    }
-}
-/**
- * Created by anlun on 2017/5/24.
- */
-/**
- * @module annieUI
- */
-declare namespace annieUI {
-    /**
-     * 刮刮卡类
-     * @class annieUI.ScratchCard
-     * @public
-     * @extends annieUI.DrawingBoard
-     * @since 1.1.1
-     */
-    class ScratchCard extends DrawingBoard {
-        /**
-         * 构造函数
-         * 请监听 "onDrawTime"事件来判断刮完多少百分比了。
-         * @method ScratchCard
-         * @param width 宽
-         * @param height 高
-         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。一般是用位图填充，如果生成位图填充，请自行复习canvas位图填充
-         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。一般是用位图填充，如果生成位图填充，请自行复习canvas位图填充
-         * @param drawRadius 刮刮卡刮的时候的半径，默认为50
-         */
-        constructor(width: number, height: number, frontColorObj: any, backColorObj: any, drawRadius?: number);
-        private _drawList;
-        private _totalDraw;
-        private _currentDraw;
-        /**
-         * 重置刮刮卡
-         * @method reset
-         * @param backColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
-         * @since 1.1.1
-         * @public
-         */
-        reset(backColorObj?: any): void;
-        /**
-         * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
-         * @param step
-         * @public
-         * @since 1.1.1
-         * @returns {boolean}
-         */
-        cancel(step?: number): boolean;
-        drawRadius: number;
         destroy(): void;
     }
 }
