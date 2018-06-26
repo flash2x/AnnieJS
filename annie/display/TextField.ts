@@ -209,7 +209,7 @@ namespace annie {
             return this._border;
         }
         private _border: boolean = false;
-        private fontInfo: string;
+        private fontInfo: any;
         private realLines: any;
         /**
          * 设置文本在canvas里的渲染样式
@@ -254,6 +254,15 @@ namespace annie {
         public getTextWH(lineIndex:number=0){
             let s=this;
             let ctx = CanvasRender.drawCtx;
+            s.fontInfo = s.size || 12;
+            s.fontInfo  += "px ";
+            s.fontInfo  += s.font;
+            if (s._bold) {
+                s.fontInfo  = "bold " + s.fontInfo ;
+            }
+            if (s._italic) {
+                s.fontInfo  = "italic " + s.fontInfo ;
+            }
             ctx.font = s.fontInfo;
             let obj:any=ctx.measureText(s.realLines[lineIndex]);
             return {width:obj.width,height:obj.height};
