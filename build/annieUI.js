@@ -1605,5 +1605,3 @@ var annie;
     }(annie.ScrollPage));
     annie.ScrollList = ScrollList;
 })(annie || (annie = {}));
-
-module.exports = annie;

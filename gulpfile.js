@@ -23,12 +23,10 @@ var coreList =[
     "annie/display/TextField.ts",
     "annie/display/Stage.ts",
     "annie/display/Sound.ts",
-    // "annie/filters/Filters.ts",
     "annie/render/IRender.ts",
     "annie/render/CanvasRender.ts",
     "annie/utils/Tween.ts",
     "annie/utils/Timer.ts",
-    "annie/utils/Flash2x.ts",
     "annie/Annie.ts",
     "annie/GlobalFunction.ts"
 ];
