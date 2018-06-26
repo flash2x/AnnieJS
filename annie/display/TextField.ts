@@ -84,7 +84,7 @@ namespace annie {
         public get textWidth(): number {
             return this._textWidth;
         }
-        private _textWidth: number = 0;
+        private _textWidth: number = 120;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -235,7 +235,33 @@ namespace annie {
             ctx.textBaseline = "top";
             ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha)
         }
+        /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        public getTextWH(lineIndex:number=0){
+            let s=this;
+            let can = s._texture;
+            let ctx = can.getContext("2d");
+            s._prepContext(ctx);
+            let obj:any=ctx.measureText(s.realLines[lineIndex]);
+            return {width:obj.width,height:obj.height};
+        }
 
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        get lines(): number {
+            return this.realLines.length;
+        }
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -251,6 +277,7 @@ namespace annie {
             //ctx.restore();
             return w;
         }
+        private  realLines: any = [];
         /**
          * 重写 update
          * @method update
@@ -268,13 +295,14 @@ namespace annie {
                 let ctx = can.getContext("2d");
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
+                s.realLines=realLines;
                 s._prepContext(ctx);
                 let lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length]=hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.textWidth) {
+                    if (lineW > s._textWidth){
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let wordW = 0;
@@ -282,7 +310,7 @@ namespace annie {
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > s.textWidth) {
+                            if (w > s._textWidth) {
                                 realLines[0] = lineStr;
                                 break;
                             } else {
@@ -301,7 +329,7 @@ namespace annie {
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > this.textWidth) {
+                            if (w > s._textWidth) {
                                 realLines[realLines.length]=lineStr;
                                 lineStr = str[j];
                                 w = wordW;
@@ -313,7 +341,7 @@ namespace annie {
                     }
                 }
                 let maxH = lineH * realLines.length;
-                let maxW = s.textWidth;
+                let maxW = s._textWidth;
                 let tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
@@ -326,7 +354,7 @@ namespace annie {
                 if (s.border) {
                     ctx.beginPath();
                     ctx.strokeStyle = "#000";
-                    ctx.textWidth = 1;
+                    ctx.lineWidth = 1;
                     ctx.strokeRect(10.5, 10.5, maxW, maxH);
                     ctx.closePath();
                 }

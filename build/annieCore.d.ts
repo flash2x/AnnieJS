@@ -2620,6 +2620,26 @@ declare namespace annie {
          */
         private _prepContext(ctx);
         /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        getTextWH(lineIndex?: number): {
+            width: any;
+            height: any;
+        };
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        lines: number;
+        /**
          * 获取文本宽
          * @method _getMeasuredWidth
          * @param text
@@ -2628,6 +2648,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         private _getMeasuredWidth(text);
+        private realLines;
         /**
          * 重写 update
          * @method update

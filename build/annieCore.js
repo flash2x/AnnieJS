@@ -5091,7 +5091,7 @@ var annie;
             this._textAlpha = 1;
             this._textHeight = 0;
             this._lineSpacing = 14;
-            this._textWidth = 0;
+            this._textWidth = 120;
             this._lineType = "single";
             this._text = "";
             this._font = "Arial";
@@ -5100,6 +5100,7 @@ var annie;
             this._italic = false;
             this._bold = false;
             this._border = false;
+            this.realLines = [];
             this._instanceType = "annie.TextField";
             this._texture = window.document.createElement("canvas");
         }
@@ -5348,6 +5349,37 @@ var annie;
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
         };
         /**
+         * 获取当前文本中单行文字的宽高，注意是文字的不是文本框的宽高
+         * @method getTextWH
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {{width: number; height: number}}
+         */
+        TextField.prototype.getTextWH = function (lineIndex) {
+            if (lineIndex === void 0) { lineIndex = 0; }
+            var s = this;
+            var can = s._texture;
+            var ctx = can.getContext("2d");
+            s._prepContext(ctx);
+            var obj = ctx.measureText(s.realLines[lineIndex]);
+            return { width: obj.width, height: obj.height };
+        };
+        Object.defineProperty(TextField.prototype, "lines", {
+            /**
+             * @property _lines 获取当前文本行数
+             * @type {number}
+             * @public
+             * @readonly
+             * @since 2.0.0
+             */
+            get: function () {
+                return this.realLines.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
          * 获取文本宽
          * @method _getMeasuredWidth
          * @param text
@@ -5381,13 +5413,14 @@ var annie;
                 var ctx = can.getContext("2d");
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
+                s.realLines = realLines;
                 s._prepContext(ctx);
                 var lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length] = hardLines[0];
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.textWidth) {
+                    if (lineW > s._textWidth) {
                         var w = s._getMeasuredWidth(str[0]);
                         var lineStr = str[0];
                         var wordW = 0;
@@ -5395,7 +5428,7 @@ var annie;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > s.textWidth) {
+                            if (w > s._textWidth) {
                                 realLines[0] = lineStr;
                                 break;
                             }
@@ -5417,7 +5450,7 @@ var annie;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > this.textWidth) {
+                            if (w > s._textWidth) {
                                 realLines[realLines.length] = lineStr;
                                 lineStr = str[j];
                                 w = wordW;
@@ -5430,7 +5463,7 @@ var annie;
                     }
                 }
                 var maxH = lineH * realLines.length;
-                var maxW = s.textWidth;
+                var maxW = s._textWidth;
                 var tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
@@ -5444,7 +5477,7 @@ var annie;
                 if (s.border) {
                     ctx.beginPath();
                     ctx.strokeStyle = "#000";
-                    ctx.textWidth = 1;
+                    ctx.lineWidth = 1;
                     ctx.strokeRect(10.5, 10.5, maxW, maxH);
                     ctx.closePath();
                 }
