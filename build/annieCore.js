@@ -105,10 +105,12 @@ var annie;
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        EventDispatcher.prototype.addEventListener = function (type, listener) {
+        EventDispatcher.prototype.addEventListener = function (type, listener, useCapture) {
+            if (useCapture === void 0) { useCapture = true; }
             if (!type) {
                 throw new Error("添加侦听的type值为undefined");
             }
@@ -116,11 +118,15 @@ var annie;
                 throw new Error("侦听回调函数不能为null");
             }
             var s = this;
-            if (!s.eventTypes[type]) {
-                s.eventTypes[type] = [];
+            var eventTypes = s.eventTypes;
+            if (!useCapture) {
+                eventTypes = s.eventTypes1;
             }
-            if (s.eventTypes[type].indexOf(listener) < 0) {
-                s.eventTypes[type].unshift(listener);
+            if (!eventTypes[type]) {
+                eventTypes[type] = [];
+            }
+            if (eventTypes[type].indexOf(listener) < 0) {
+                eventTypes[type].unshift(listener);
                 if (type.indexOf("onMouse") == 0) {
                     s._changeMouseCount(type, true);
                 }
@@ -152,18 +158,20 @@ var annie;
          * @since 1.0.0
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @returns {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
-         *       yourEvent.data='Flash2x';
+         *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
          *          trace(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
-        EventDispatcher.prototype.dispatchEvent = function (event, data) {
+        EventDispatcher.prototype.dispatchEvent = function (event, data, useCapture) {
             if (data === void 0) { data = null; }
+            if (useCapture === void 0) { useCapture = true; }
             var s = this;
             if (typeof (event) == "string") {
                 if (!s._defaultEvent) {
@@ -175,6 +183,9 @@ var annie;
                 event = s._defaultEvent;
             }
             var listeners = s.eventTypes[event.type];
+            if (!useCapture) {
+                listeners = s.eventTypes1[event.type];
+            }
             if (listeners) {
                 var len = listeners.length;
                 if (event.target == null) {
@@ -184,11 +195,13 @@ var annie;
                     event.data = data;
                 }
                 for (var i = len - 1; i >= 0; i--) {
-                    if (listeners[i]) {
-                        listeners[i](event);
-                    }
-                    else {
-                        listeners.splice(i, 1);
+                    if (!event["_pd"]) {
+                        if (listeners[i]) {
+                            listeners[i](event);
+                        }
+                        else {
+                            listeners.splice(i, 1);
+                        }
                     }
                 }
                 return true;
@@ -203,18 +216,19 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
-         * @param {number} state 0 查找所有 1 只找从事件对象本身向上冒泡的事件类型线路查找 2 只找从最上层向事件对象本身的线路事件类型查找
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @returns {boolean} 如果有则返回true
          */
-        EventDispatcher.prototype.hasEventListener = function (type, state) {
-            if (state === void 0) { state = 0; }
-            if (state == 0 || state == 1) {
-                if (this.eventTypes[type] && this.eventTypes[type].length > 0) {
+        EventDispatcher.prototype.hasEventListener = function (type, useCapture) {
+            if (useCapture === void 0) { useCapture = true; }
+            var s = this;
+            if (useCapture) {
+                if (s.eventTypes[type] && s.eventTypes[type].length > 0) {
                     return true;
                 }
             }
-            if (state == 0 || state == 2) {
-                if (this.eventTypes1[type] && this.eventTypes1[type].length > 0) {
+            else {
+                if (s.eventTypes1[type] && s.eventTypes1[type].length > 0) {
                     return true;
                 }
             }
@@ -227,10 +241,15 @@ var annie;
          * @since 1.0.0
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          */
-        EventDispatcher.prototype.removeEventListener = function (type, listener) {
+        EventDispatcher.prototype.removeEventListener = function (type, listener, useCapture) {
+            if (useCapture === void 0) { useCapture = true; }
             var s = this;
             var listeners = s.eventTypes[type];
+            if (!useCapture) {
+                listeners = s.eventTypes1[type];
+            }
             if (listeners) {
                 var len = listeners.length;
                 for (var i = len - 1; i >= 0; i--) {
@@ -258,6 +277,14 @@ var annie;
                     }
                 }
             }
+            for (var type in s.eventTypes1) {
+                if (type.indexOf("onMouse") == 0) {
+                    for (var j = 0; j < s.eventTypes1[type].length; j++) {
+                        s._changeMouseCount(type, false);
+                    }
+                }
+            }
+            s.eventTypes1 = {};
             s.eventTypes = {};
         };
         EventDispatcher.prototype.destroy = function () {
@@ -323,6 +350,7 @@ var annie;
              * @default null
              */
             this.data = null;
+            this._bpd = false;
             /**
              * 是否阻止事件向下冒泡
              * @property _pd
@@ -335,13 +363,22 @@ var annie;
             this.type = type;
         }
         /**
-         * 阻止向下冒泡事件,如果在接收到事件后调用事件的这个方法,那么这个事件将不会再向显示对象的子级派送
-         * @method preventDefault
+         * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
+         * @method stopImmediatePropagation
          * @public
-         * @since 1.0.0
+         * @since 2.0.0
          */
-        Event.prototype.preventDefault = function () {
+        Event.prototype.stopImmediatePropagation = function () {
             this._pd = true;
+        };
+        /**
+         * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。
+         * @method stopPropagation
+         * @public
+         * @since 2.0.0
+         */
+        Event.prototype.stopPropagation = function () {
+            this._bpd = true;
         };
         /**
          * @method destroy
@@ -357,6 +394,7 @@ var annie;
         Event.prototype.reset = function (type, target) {
             this.target = target;
             this._pd = false;
+            this._bpd = false;
             this.type = type;
         };
         /**
@@ -1530,9 +1568,10 @@ var annie;
         function DisplayObject() {
             _super.call(this);
             /**
-             * 更新信息
+             * 更新信息对象
              * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+             * @since 1.0.0
              */
             this._UI = { UD: false, UM: true, UA: true, UF: false };
             /**
@@ -1567,7 +1606,7 @@ var annie;
             /**
              * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
-             * @private
+             * @protected
              * @type {annie.Matrix}
              * @default null
              * @since 1.0.0
@@ -1585,7 +1624,7 @@ var annie;
             /**
              * 显示对象上对显示列表上的最终的所有滤镜组
              * @property cFilters
-             * @private
+             * @protected
              * @default []
              * @since 1.0.0
              * @type {Array}
@@ -1611,16 +1650,6 @@ var annie;
             this._anchorX = 0;
             this._anchorY = 0;
             this._visible = true;
-            /**
-             * 显示对象的混合模式
-             * 支持的混合模式大概有
-             * @property blendMode
-             * @public
-             * @since 1.0.0
-             * @type {string}
-             * @default 0
-             */
-            this.blendMode = "normal";
             this._matrix = new annie.Matrix();
             this._mask = null;
             this._filters = [];
@@ -1628,6 +1657,7 @@ var annie;
              * 是否自己的父级发生的改变
              * @type {boolean}
              * @private
+             * @since 1.1.2
              */
             this._cp = true;
             this._dragBounds = new annie.Rectangle();
@@ -1863,6 +1893,16 @@ var annie;
         });
         Object.defineProperty(DisplayObject.prototype, "matrix", {
             /**
+             * 显示对象的混合模式
+             * 支持的混合模式大概有
+             * @property blendMode
+             * @public
+             * @since 1.0.0
+             * @type {string}
+             * @default 0
+             */
+            //public blendMode: string = "normal";
+            /**
              * 显示对象的变形矩阵
              * @property matrix
              * @public
@@ -1940,13 +1980,14 @@ var annie;
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
-            if (this.parent) {
+            var s = this;
+            if (s.parent) {
                 //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
-                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.parent.cMatrix.transformPoint(point.x, point.y, bp);
             }
             else {
                 //没有父级
-                return this.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.cMatrix.transformPoint(point.x, point.y, bp);
             }
         };
         /**
@@ -3741,23 +3782,48 @@ var annie;
          * @return {number}
          */
         Sprite.prototype.getChildIndex = function (child) {
-            var len = this.children.length;
+            var s = this;
+            var len = s.children.length;
             for (var i = 0; i < len; i++) {
-                if (this.children[i] == child) {
+                if (s.children[i] == child) {
                     return i;
                 }
             }
             return -1;
         };
         /**
-         *
+         * @method 交换两个显示对象的层级
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
+         * @since 2.0.0
          * @returns {boolean}
          */
-        //TODO
         Sprite.prototype.swapChild = function (child1, child2) {
-            return false;
+            var s = this;
+            var id1 = -1;
+            var id2 = -1;
+            var childCount = s.children.length;
+            if (typeof (child1) == "number") {
+                id1 = child1;
+            }
+            else {
+                id1 = s.getChildIndex(child1);
+            }
+            if (typeof (child2) == "number") {
+                id2 = child2;
+            }
+            else {
+                id2 = s.getChildIndex(child2);
+            }
+            if (id1 == id2 || id1 < 0 || id1 >= childCount || id2 < 0 || id2 >= childCount) {
+                return false;
+            }
+            else {
+                var temp = s.children[id1];
+                s.children[id1] = s.children[id2];
+                s.children[id2] = temp;
+                return true;
+            }
         };
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
@@ -6231,10 +6297,10 @@ var annie;
                                     displayList[displayList.length] = s;
                                 }
                                 var len = displayList.length;
-                                for (var i = 0; i < len; i++) {
+                                for (var i = len - 1; i >= 0; i--) {
                                     d_2 = displayList[i];
-                                    for (var j = eLen - 1; j >= 0; j--) {
-                                        if (events[j]["_pd"] === false) {
+                                    for (var j = 0; j < eLen; j++) {
+                                        if (!events[j]["_bpd"]) {
                                             if (d_2.hasEventListener(events[j].type)) {
                                                 events[j].currentTarget = d_2;
                                                 events[j].target = displayList[0];
@@ -6246,24 +6312,23 @@ var annie;
                                         }
                                     }
                                 }
-                                //TODO 冒泡
-                                /*for (let i = 0; i < len; i++) {
-                                    d = displayList[i];
-                                    for (let j = 0; j < eLen; j++) {
-                                        if (events[j]["_pd"] === false){
-                                            if (d.hasEventListener(events[j].type)) {
-                                                events[j].currentTarget = d;
-                                                events[j].target = displayList[0];
-                                                lp = d.globalToLocal(cp, DisplayObject._bp);
+                                //这里一定要反转一下，因为会影响mouseOut mouseOver
+                                displayList.reverse();
+                                for (var i = len - 1; i >= 0; i--) {
+                                    d_2 = displayList[i];
+                                    for (var j = 0; j < eLen; j++) {
+                                        if (!events[j]["_bpd"]) {
+                                            if (d_2.hasEventListener(events[j].type)) {
+                                                events[j].currentTarget = d_2;
+                                                events[j].target = displayList[eLen - 1];
+                                                lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
                                                 events[j].localX = lp.x;
                                                 events[j].localY = lp.y;
-                                                d.dispatchEvent(events[j]);
+                                                d_2.dispatchEvent(events[j], null, false);
                                             }
                                         }
                                     }
-                                }*/
-                                //这里一定要反转一下，因为会影响mouseOut mouseOver
-                                displayList.reverse();
+                                }
                                 //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                                 if (item != "onMouseDown") {
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
@@ -6304,7 +6369,7 @@ var annie;
                                                 if (isDiff) {
                                                     if (s._lastDpList[identifier][i]) {
                                                         //触发onMouseOut事件
-                                                        if (outEvent["_pd"] === false) {
+                                                        if (!outEvent["_bpd"]) {
                                                             d_2 = s._lastDpList[identifier][i];
                                                             if (d_2.hasEventListener("onMouseOut")) {
                                                                 outEvent.currentTarget = d_2;
@@ -6318,7 +6383,7 @@ var annie;
                                                     }
                                                     if (displayList[i]) {
                                                         //触发onMouseOver事件
-                                                        if (overEvent["_pd"] === false) {
+                                                        if (!overEvent["_bpd"]) {
                                                             d_2 = displayList[i];
                                                             if (d_2.hasEventListener("onMouseOver")) {
                                                                 overEvent.currentTarget = d_2;
@@ -6631,6 +6696,7 @@ var annie;
          */
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
             event["_pd"] = false;
+            event["_bpd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;

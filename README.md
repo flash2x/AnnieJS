@@ -75,6 +75,7 @@
     变更:annieUI命名空间下所有类和方法全部转为annie命名空间
     变更:globalDispatcher全局类转为annie命名空间
     优化:代码进行大量优化，性能进一步提升
+    优化:优化完善了鼠标的事件冒泡机制
 ## AnnieJS 1.1.3 版本
     修复annie.InputText类在pc端无法输入的bug
     修复有时获取Sprite.getWH()方法返回宽高为0的bug
