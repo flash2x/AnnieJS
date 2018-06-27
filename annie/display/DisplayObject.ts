@@ -25,9 +25,10 @@ namespace annie {
         }
 
         /**
-         * 更新信息
+         * 更新信息对象
          * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+         * @since 1.0.0
          */
         protected _UI:{UD:boolean,UM: boolean, UA: boolean, UF: boolean} = {UD:false,UM: true, UA: true, UF: false};
         /**
@@ -62,7 +63,7 @@ namespace annie {
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
-         * @private
+         * @protected
          * @type {annie.Matrix}
          * @default null
          * @since 1.0.0
@@ -81,7 +82,7 @@ namespace annie {
         /**
          * 显示对象上对显示列表上的最终的所有滤镜组
          * @property cFilters
-         * @private
+         * @protected
          * @default []
          * @since 1.0.0
          * @type {Array}
@@ -288,7 +289,7 @@ namespace annie {
          * @type {string}
          * @default 0
          */
-        public blendMode: string = "normal";
+        //public blendMode: string = "normal";
 
         /**
          * 显示对象的变形矩阵
@@ -343,6 +344,7 @@ namespace annie {
          * 是否自己的父级发生的改变
          * @type {boolean}
          * @private
+         * @since 1.1.2
          */
         protected _cp:boolean=true;
         /**
@@ -366,12 +368,13 @@ namespace annie {
          * @returns {annie.Point}
          */
         public localToGlobal(point: Point, bp: Point = null): Point {
-            if(this.parent){
+            let s=this;
+            if(s.parent){
                 //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
-                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.parent.cMatrix.transformPoint(point.x, point.y, bp);
             }else{
                 //没有父级
-                return this.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.cMatrix.transformPoint(point.x, point.y, bp);
             }
         }
 

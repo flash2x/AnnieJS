@@ -235,24 +235,45 @@ namespace annie {
          * @return {number}
          */
         public getChildIndex(child: DisplayObject): number {
-            let len = this.children.length;
+            let s=this;
+            let len = s.children.length;
             for (let i: number = 0; i < len; i++) {
-                if (this.children[i] == child) {
+                if (s.children[i] == child) {
                     return i;
                 }
             }
             return -1;
         }
-
         /**
-         *
+         * @method 交换两个显示对象的层级
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
+         * @since 2.0.0
          * @returns {boolean}
          */
-        //TODO
         public swapChild(child1:any,child2:any):boolean{
-            return false;
+            let s=this;
+            let id1=-1;
+            let id2=-1;
+            let childCount=s.children.length;
+            if(typeof(child1)=="number"){
+               id1=child1;
+            }else{
+                id1=s.getChildIndex(child1);
+            }
+            if(typeof(child2)=="number"){
+                id2=child2;
+            }else{
+                id2=s.getChildIndex(child2);
+            }
+            if(id1==id2||id1<0||id1>=childCount||id2<0||id2>=childCount){
+                return false;
+            }else{
+                let temp:any=s.children[id1];
+                s.children[id1]=s.children[id2];
+                s.children[id2]=temp;
+                return true;
+            }
         }
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
