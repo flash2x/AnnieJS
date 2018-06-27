@@ -21,6 +21,16 @@ namespace annie {
          */
         public static RESIZE:string = "onResize";
         /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        public static ON_RUN_CHANGED:string = "onRunChanged";
+        /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @property ON_PLAY_UPDATE
          * @static
@@ -273,14 +283,25 @@ namespace annie {
             this.type = type;
         }
         /**
-         * 阻止向下冒泡事件,如果在接收到事件后调用事件的这个方法,那么这个事件将不会再向显示对象的子级派送
-         * @method preventDefault
+         * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
+         * @method stopImmediatePropagation
          * @public
-         * @since 1.0.0
+         * @since 2.0.0
          */
-        public preventDefault(){
+        public stopImmediatePropagation(){
             this._pd=true;
         }
+
+        /**
+         * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。
+         * @method stopPropagation
+         * @public
+         * @since 2.0.0
+         */
+        public stopPropagation():void{
+            this._bpd=true;
+        }
+        private  _bpd:boolean=false;
         /**
          * 是否阻止事件向下冒泡
          * @property _pd
@@ -301,10 +322,11 @@ namespace annie {
             s.target=null;
             s.data=null;
         }
-        public reset(type:string,target:any):void{
-            this.type=type;
-            this._pd=false;
+        public reset(type:string,target:any){
             this.target=target;
+            this._pd=false;
+            this._bpd=false;
+            this.type=type;
         }
     }
 }

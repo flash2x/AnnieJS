@@ -79,10 +79,11 @@ declare namespace annie {
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        addEventListener(type: string, listener: any): void;
+        addEventListener(type: string, listener: Function, useCapture?: boolean): void;
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
@@ -100,27 +101,28 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @returns {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
-         *       yourEvent.data='Flash2x';
+         *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
          *          trace(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
-        dispatchEvent(event: any, data?: any): boolean;
+        dispatchEvent(event: any, data?: any, useCapture?: boolean): boolean;
         /**
          * 是否有添加过此类形的侦听
          * @method hasEventListener
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
-         * @param {number} state 0 查找所有 1 只找从事件对象本身向上冒泡的事件类型线路查找 2 只找从最上层向事件对象本身的线路事件类型查找
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @returns {boolean} 如果有则返回true
          */
-        hasEventListener(type: string, state?: number): boolean;
+        hasEventListener(type: string, useCapture?: boolean): boolean;
         /**
          * 移除对应类型的侦听
          * @method removeEventListener
@@ -128,8 +130,9 @@ declare namespace annie {
          * @since 1.0.0
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          */
-        removeEventListener(type: string, listener: Function): void;
+        removeEventListener(type: string, listener: Function, useCapture?: boolean): void;
         /**
          * 移除对象中所有的侦听
          * @method removeAllEventListener
@@ -162,6 +165,16 @@ declare namespace annie {
          * @since 1.0.0
          */
         static RESIZE: string;
+        /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
+         * @Event
+         * @property RESIZE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        static ON_RUN_CHANGED: string;
         /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @property ON_PLAY_UPDATE
@@ -410,12 +423,20 @@ declare namespace annie {
          */
         constructor(type: string);
         /**
-         * 阻止向下冒泡事件,如果在接收到事件后调用事件的这个方法,那么这个事件将不会再向显示对象的子级派送
-         * @method preventDefault
+         * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
+         * @method stopImmediatePropagation
          * @public
-         * @since 1.0.0
+         * @since 2.0.0
          */
-        preventDefault(): void;
+        stopImmediatePropagation(): void;
+        /**
+         * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。
+         * @method stopPropagation
+         * @public
+         * @since 2.0.0
+         */
+        stopPropagation(): void;
+        private _bpd;
         /**
          * 是否阻止事件向下冒泡
          * @property _pd
@@ -1894,9 +1915,10 @@ declare namespace annie {
          */
         getChildIndex(child: DisplayObject): number;
         /**
-         *
+         * @method 交换两个显示对象的层级
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
+         * @since 2.0.0
          * @returns {boolean}
          */
         swapChild(child1: any, child2: any): boolean;
