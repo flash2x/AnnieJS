@@ -280,6 +280,7 @@ namespace annie {
          */
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
             event["_pd"] = false;
+            event["_bpd"] = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
@@ -506,10 +507,10 @@ namespace annie {
                                 displayList[displayList.length] = s;
                             }
                             let len: number = displayList.length;
-                            for (let i = 0; i < len; i++) {
+                            for (let i =len-1; i >=0; i--) {
                                 d = displayList[i];
-                                for (let j = eLen - 1; j >= 0; j--) {
-                                    if (events[j]["_pd"] === false) {
+                                for (let j = 0; j <eLen; j++) {
+                                    if (!events[j]["_bpd"]) {
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
                                             events[j].target = displayList[0];
@@ -521,24 +522,23 @@ namespace annie {
                                     }
                                 }
                             }
-                            //TODO 冒泡
-                            /*for (let i = 0; i < len; i++) {
+                            //这里一定要反转一下，因为会影响mouseOut mouseOver
+                            displayList.reverse();
+                            for (let i =len-1; i >=0; i--) {
                                 d = displayList[i];
-                                for (let j = 0; j < eLen; j++) {
-                                    if (events[j]["_pd"] === false){
+                                for (let j = 0; j <eLen; j++) {
+                                    if (!events[j]["_bpd"]){
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
-                                            events[j].target = displayList[0];
+                                            events[j].target = displayList[eLen-1];
                                             lp = d.globalToLocal(cp, DisplayObject._bp);
                                             events[j].localX = lp.x;
                                             events[j].localY = lp.y;
-                                            d.dispatchEvent(events[j]);
+                                            d.dispatchEvent(events[j],null,false);
                                         }
                                     }
                                 }
-                            }*/
-                            //这里一定要反转一下，因为会影响mouseOut mouseOver
-                            displayList.reverse();
+                            }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                             if (item != "onMouseDown") {
                                 if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
@@ -577,7 +577,7 @@ namespace annie {
                                             if (isDiff) {
                                                 if (s._lastDpList[identifier][i]) {
                                                     //触发onMouseOut事件
-                                                    if (outEvent["_pd"] === false) {
+                                                    if (outEvent["_bpd"] === false) {
                                                         d = s._lastDpList[identifier][i];
                                                         if (d.hasEventListener("onMouseOut")) {
                                                             outEvent.currentTarget = d;
@@ -591,7 +591,7 @@ namespace annie {
                                                 }
                                                 if (displayList[i]) {
                                                     //触发onMouseOver事件
-                                                    if (overEvent["_pd"] === false) {
+                                                    if (overEvent["_bpd"] === false) {
                                                         d = displayList[i];
                                                         if (d.hasEventListener("onMouseOver")) {
                                                             overEvent.currentTarget = d;
