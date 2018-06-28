@@ -265,7 +265,6 @@ declare namespace annie {
         static ON_SLIDE_END: string;
         /**
          * 舞台初始化完成后会触发的事件
-         * @Event
          * @property ON_INIT_STAGE
          * @type {string}
          * @static
@@ -2598,13 +2597,13 @@ declare namespace annie {
          */
         private _maskList;
         /**
-         * mc的当前帧的标签名,没有则为空
+         * mc的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
-         * @return {string}
+         * @return {Array}
          * */
-        getCurrentLabel(): string;
+        getCurrentLabel(): any;
         /**
          * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
          * @method nextFrame
