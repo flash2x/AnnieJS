@@ -169,7 +169,7 @@ namespace annie {
             if (!s._clicked) {
                 let frame = 2;
                 if (e.type == "onMouseDown") {
-                    if (s._currentFrame > 2) {
+                    if (s._curFrame > 2) {
                         frame = 3;
                     }
                 } else {
