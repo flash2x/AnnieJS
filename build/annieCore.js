@@ -3720,7 +3720,7 @@ var annie;
                 if (!s._clicked) {
                     var frame = 2;
                     if (e.type == "onMouseDown") {
-                        if (s._currentFrame > 2) {
+                        if (s._curFrame > 2) {
                             frame = 3;
                         }
                     }
@@ -3881,14 +3881,18 @@ var annie;
             configurable: true
         });
         /**
-         * mc的当前帧的标签名,没有则为空
+         * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
-         * @returns {string}
+         * @return {Array}
          * */
         MovieClip.prototype.getCurrentLabel = function () {
-            return "";
+            var s = this;
+            if (s._a2x_res_class.tf > 1 && s._a2x_res_class.l[s._curFrame - 1]) {
+                return s._a2x_res_class.l[s._curFrame - 1];
+            }
+            return null;
         };
         /**
          * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
