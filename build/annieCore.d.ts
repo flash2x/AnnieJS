@@ -2597,7 +2597,7 @@ declare namespace annie {
          */
         private _maskList;
         /**
-         * mc的当前帧的标签数组,没有则为null
+         * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
@@ -3278,6 +3278,7 @@ declare namespace annie {
          *
          */
         scaleMode: string;
+        private _scaleMode;
         /**
          * 原始为60的刷新速度时的计数器
          * @property _flush

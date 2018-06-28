@@ -4852,7 +4852,7 @@ var annie;
         };
         ;
         /**
-         * mc的当前帧的标签数组,没有则为null
+         * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
@@ -6316,35 +6316,7 @@ var annie;
              * @default "";
              */
             this.bgColor = "";
-            /**
-             * 舞台的缩放模式
-             * 默认为空就是无缩放的真实大小
-             * "noBorder" 无边框模式
-             * ”showAll" 显示所有内容
-             * “fixedWidth" 固定宽
-             * ”fixedHeight" 固定高
-             * @property scaleMode
-             * @public
-             * @since 1.0.0
-             * @default "onScale"
-             * @type {string}
-             * @example
-             *      //动态更改stage的对齐方式示例
-             *      //以下代码放到一个舞台的显示对象的构造函数中
-             *      let s=this;
-             *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-             *          let i=0;
-             *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-             *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-             *              let state=e.currentTarget;
-             *              state.scaleMode=aList[i];
-             *              state.resize();
-             *              if(i>5){i=0;}
-             *          }
-             *      }
-             *
-             */
-            this.scaleMode = "onScale";
+            this._scaleMode = "onScale";
             /**
              * 原始为60的刷新速度时的计数器
              * @property _flush
@@ -6465,7 +6437,7 @@ var annie;
             s.desHeight = desH;
             s.rootDiv = div;
             s.setFrameRate(frameRate);
-            s.scaleMode = scaleMode;
+            s._scaleMode = scaleMode;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //目前具支持canvas
@@ -6559,6 +6531,48 @@ var annie;
                     }
                     //触发事件
                     annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Stage.prototype, "scaleMode", {
+            /**
+             * 舞台的缩放模式
+             * 默认为空就是无缩放的真实大小
+             * "noBorder" 无边框模式
+             * ”showAll" 显示所有内容
+             * “fixedWidth" 固定宽
+             * ”fixedHeight" 固定高
+             * @property scaleMode
+             * @public
+             * @since 1.0.0
+             * @default "onScale"
+             * @type {string}
+             * @example
+             *      //动态更改stage的对齐方式示例
+             *      //以下代码放到一个舞台的显示对象的构造函数中
+             *      let s=this;
+             *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+             *          let i=0;
+             *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+             *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+             *              let state=e.currentTarget;
+             *              state.scaleMode=aList[i];
+             *              state.resize();
+             *              if(i>5){i=0;}
+             *          }
+             *      }
+             *
+             */
+            get: function () {
+                return this._scaleMode;
+            },
+            set: function (value) {
+                var s = this;
+                if (value != s._scaleMode) {
+                    s._scaleMode = value;
+                    s.setAlign();
                 }
             },
             enumerable: true,
@@ -7051,10 +7065,10 @@ var annie;
                     divW = d_3;
                 }
             }
-            if (s.scaleMode != "noScale") {
+            if (s._scaleMode != "noScale") {
                 scaleY = divH / desH;
                 scaleX = divW / desW;
-                switch (s.scaleMode) {
+                switch (s._scaleMode) {
                     case "noBorder":
                         if (scaleX > scaleY) {
                             scaleY = scaleX;
