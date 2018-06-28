@@ -120,7 +120,6 @@ namespace annie {
         public static ON_SLIDE_END="onSlideEnd";
         /**
          * 舞台初始化完成后会触发的事件
-         * @Event
          * @property ON_INIT_STAGE
          * @type {string}
          * @static
