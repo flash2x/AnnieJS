@@ -226,7 +226,7 @@ namespace annie {
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -262,10 +262,6 @@ namespace annie {
             }
             return null;
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy():void {
             //清除相应的数据引用
             let s = this;

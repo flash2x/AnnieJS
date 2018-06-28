@@ -78,7 +78,7 @@ namespace annie {
          * @readonly
          * @public
          * @since 1.0.9
-         * @returns {number}
+         * @return {number}
          */
         public get currentCount():number{
             return this._currentCount;
@@ -89,7 +89,7 @@ namespace annie {
          * @property delay
          * @since 1.0.9
          * @public
-         * @returns {number}
+         * @return {number}
          */
         public get 	delay():number{
             return this._delay;
@@ -106,7 +106,7 @@ namespace annie {
          * 执行触发Timer 的总次数
          * @public
          * @since 1.0.9
-         * @returns {number}
+         * @return {number}
          */
         public get repeatCount():number{
             return this._repeatCount;
@@ -123,7 +123,7 @@ namespace annie {
          * 当前是否在运行中
          * @property running
          * @since 1.0.9
-         * @returns {boolean}
+         * @return {boolean}
          */
         public get running():boolean{
             return this._running;

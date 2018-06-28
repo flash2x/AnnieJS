@@ -67,11 +67,26 @@ namespace annie {
          * @since 1.1.1
          */
         public drawHeight: number = 0;
-        //总步数数据
+        /**
+         * 总步数数据
+         * @property totalStepList
+         * @protected
+         * @type {any[]}
+         */
         protected totalStepList: any = [];
-        //单步数据
+        /**
+         * 单步数据
+         * @protected
+         * @property addStepObj
+         * @type {Object}
+         */
         protected addStepObj: any;
-        //当前步数所在的id
+        /**
+         * 当前步数所在的id
+         * @property currentStepId
+         * @protected
+         * @type {number}
+         */
         protected currentStepId: number = 0;
 
         /**
@@ -103,6 +118,11 @@ namespace annie {
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
         }
 
+        /**
+         * @method onMouseDown
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         private onMouseDown(e: annie.MouseEvent): void {
             let s = this;
             s._isMouseDown = true;
@@ -120,7 +140,11 @@ namespace annie {
             s.addStepObj.sy = ly;
             s.addStepObj.ps = [];
         };
-
+        /**
+         * @method onMouseUp
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         private onMouseUp(e: annie.MouseEvent): void {
             let s = this;
             if(s._isMouseDown) {
@@ -131,7 +155,11 @@ namespace annie {
                 }
             }
         };
-
+        /**
+         * @method onMouseMove
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         private onMouseMove(e: annie.MouseEvent): void {
             let s = this;
             if (s._isMouseDown) {

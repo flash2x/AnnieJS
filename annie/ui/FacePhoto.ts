@@ -63,6 +63,10 @@ namespace annie {
             s.bitmap.mask = s.maskObj;
         }
 
+        /**
+         * @property photo
+         * @private
+         */
         private photo: any;
         private bitmap: Bitmap;
         private maskType: number = 0;

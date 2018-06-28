@@ -23,7 +23,7 @@ namespace annie {
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
          * @Event
-         * @property RESIZE
+         * @property ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -121,13 +121,13 @@ namespace annie {
         /**
          * 舞台初始化完成后会触发的事件
          * @Event
-         * @property ON_STAGE_INIT
+         * @property ON_INIT_STAGE
          * @type {string}
          * @static
          * @public
          * @since 1.0.0
          */
-        public static INIT_TO_STAGE:string = "onInitStage";
+        public static ON_INIT_STAGE:string = "onInitStage";
         /**
          * 显示对象加入到舞台事件
          * @Event
@@ -276,6 +276,8 @@ namespace annie {
         /**
          * @method Event
          * @param {string} type 事件类型
+         * @public
+         * @since 1.0.0
          */
         public constructor(type:string) {
             super();
@@ -286,9 +288,10 @@ namespace annie {
          * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
          * @method stopImmediatePropagation
          * @public
+         * @return {void}
          * @since 2.0.0
          */
-        public stopImmediatePropagation(){
+        public stopImmediatePropagation():void{
             this._pd=true;
         }
 
@@ -297,6 +300,7 @@ namespace annie {
          * @method stopPropagation
          * @public
          * @since 2.0.0
+         * @return {void}
          */
         public stopPropagation():void{
             this._bpd=true;
@@ -311,22 +315,27 @@ namespace annie {
          */
         private _pd:boolean=false;
 
-        /**
-         * @method destroy
-         * @public
-         * @since 2.0.0
-         * @returns {void}
-         */
         public destroy(): void {
             let s=this;
             s.target=null;
             s.data=null;
         }
-        public reset(type:string,target:any){
-            this.target=target;
-            this._pd=false;
-            this._bpd=false;
-            this.type=type;
+
+        /**
+         * 重围事件到初始状态方便重复利用
+         * @method reset
+         * @param {string} type
+         * @param target
+         * @since 2.0.0
+         * @return {void}
+         * @public
+         */
+        public reset(type:string,target:any):void{
+            let s=this;
+            s.target=target;
+            s._pd=false;
+            s._bpd=false;
+            s.type=type;
         }
     }
 }

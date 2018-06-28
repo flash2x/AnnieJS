@@ -184,7 +184,7 @@ namespace annie{
         public type:string="Color";
         /**
          * @method ColorFilter
-         * @colorArrays 颜色值数据
+         * @param {number} colorArrays 颜色值数据
          */
         public constructor(colorArrays:number[]){
             super();

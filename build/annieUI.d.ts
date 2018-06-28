@@ -219,6 +219,10 @@ declare namespace annie {
          *          s.addChild(rectFace);
          */
         constructor();
+        /**
+         * @property photo
+         * @private
+         */
         private photo;
         private bitmap;
         private maskType;
@@ -612,7 +616,7 @@ declare namespace annie {
          * 获取下拉滚动的loadingView对象
          * @property loadingView
          * @since 1.0.9
-         * @returns {DisplayObject}
+         * @return {DisplayObject}
          */
         loadingView: DisplayObject;
         /**
@@ -719,8 +723,26 @@ declare namespace annie {
          * @since 1.1.1
          */
         drawHeight: number;
+        /**
+         * 总步数数据
+         * @property totalStepList
+         * @protected
+         * @type {any[]}
+         */
         protected totalStepList: any;
+        /**
+         * 单步数据
+         * @protected
+         * @property addStepObj
+         * @type {Object}
+         */
         protected addStepObj: any;
+        /**
+         * 当前步数所在的id
+         * @property currentStepId
+         * @protected
+         * @type {number}
+         */
         protected currentStepId: number;
         /**
          * 构造函数
@@ -731,8 +753,23 @@ declare namespace annie {
          * @since 1.1.1
          */
         constructor(width: number, height: number, bgColor?: any);
+        /**
+         * @method onMouseDown
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         private onMouseDown(e);
+        /**
+         * @method onMouseUp
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         private onMouseUp(e);
+        /**
+         * @method onMouseMove
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         private onMouseMove(e);
         /**
          * 重置画板
@@ -796,7 +833,7 @@ declare namespace annie {
          * @param step
          * @public
          * @since 1.1.1
-         * @returns {boolean}
+         * @return {boolean}
          */
         cancel(step?: number): boolean;
         drawRadius: number;

@@ -24,7 +24,20 @@ namespace annie {
             return this._curFrame;
         }
 
+        /**
+         * @property _curFrame
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         * @default 1
+         */
         private _curFrame: number = 1;
+        /**
+         * @property _lastFrameObj
+         * @type {Object}
+         * @private
+         * @default null
+         */
         private _lastFrameObj: any = null;
 
         /**
@@ -41,6 +54,13 @@ namespace annie {
             return this._isPlaying;
         }
 
+        /**
+         * @property _isPlaying
+         * @type {boolean}
+         * @private
+         * @since 2.0.0
+         * @default true
+         */
         private _isPlaying: boolean = true;
 
         /**
@@ -56,6 +76,12 @@ namespace annie {
             return this._isFront;
         }
 
+        /**
+         * @property _isFront
+         * @type {boolean}
+         * @private
+         * @default true
+         */
         private _isFront: boolean = true;
 
         /**
@@ -71,8 +97,20 @@ namespace annie {
             return (<any>this)._a2x_res_class.tf;
         }
 
+        /**
+         * @property _lastFrame
+         * @type {number}
+         * @private
+         * @default 0
+         */
         private _lastFrame: number = 0;
 
+        /**
+         * 构造函数
+         * @method MovieClip
+         * @public
+         * @since 1.0.0
+         */
         public constructor() {
             super();
             let s: any = this;
@@ -93,6 +131,13 @@ namespace annie {
             s._isPlaying = false;
         }
 
+        /**
+         * @property _a2x_script
+         * @type {Object}
+         * @default null
+         * @private
+         * @since 2.0.0
+         */
         private _a2x_script: any = null;
 
         /**
@@ -111,7 +156,7 @@ namespace annie {
         }
 
         /**
-         * @移除帧上的回调方法
+         * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
@@ -123,10 +168,24 @@ namespace annie {
                 s._a2x_script[frameIndex] = null;
         }
 
+        /**
+         * 确认是不是按钮形态
+         * @property isButton
+         * @return {boolean}
+         * @public
+         * @since 2.0.0
+         * @default false
+         */
         public get isButton(): boolean {
             return this._isButton;
         }
 
+        /**
+         * @property _isButton
+         * @type {boolean}
+         * @private
+         * @default false
+         */
         private _isButton: boolean = false;
 
         /**
@@ -135,6 +194,7 @@ namespace annie {
          * @method initButton
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public initButton(): void {
             let s: any = this;
@@ -149,6 +209,14 @@ namespace annie {
             }
         }
 
+        /**
+         * 设置是否为点击状态
+         * @property clicked
+         * @param {boolean} value
+         * @public
+         * @since 2.0.0
+         * @default false
+         */
         public set clicked(value: boolean) {
             let s = this;
             if (value != s._clicked) {
@@ -164,12 +232,17 @@ namespace annie {
         }
 
         private _clicked = false;
-        private _mouseEvent = function (e: any): void {
+        /**
+         * @method  _mouseEvent
+         * @param e
+         * @private
+         */
+        private _mouseEvent(e: any): void {
             let s = this;
             if (!s._clicked) {
                 let frame = 2;
                 if (e.type == "onMouseDown") {
-                    if (s._currentFrame > 2) {
+                    if (s._curFrame > 2) {
                         frame = 3;
                     }
                 } else {
@@ -178,6 +251,13 @@ namespace annie {
                 s.gotoAndStop(frame);
             }
         };
+
+        /**
+         * @property _maskList
+         * @type {any[]}
+         * @private
+         * @default []
+         */
         private _maskList: any = [];
 
         /**
@@ -185,7 +265,7 @@ namespace annie {
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
-         * @returns {string}
+         * @return {string}
          * */
         public getCurrentLabel(): string {
             return "";
@@ -471,11 +551,6 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
-
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

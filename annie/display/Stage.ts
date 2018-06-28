@@ -12,23 +12,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class Stage extends Sprite {
-        static get pause(): boolean {
-            return this._pause;
-        }
-        static set pause(value: boolean) {
-            this._pause = value;
-            if(value!=this._pause){
-                if(value){
-                    //停止声音
-                    Sound.stopAllSounds();
-                }else{
-                    //恢复声音
-                    Sound.resumePlaySounds();
-                }
-                //触发事件
-                globalDispatcher.dispatchEvent("onStagePause",{pause:value});
-            }
-        }
+
         /**
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
          * 所以需要自己灵活设置,默认阻止.
@@ -81,14 +65,21 @@ namespace annie {
 
         /**
          * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @property getStage
          * @param {string} stageName
-         * @returns {any}
+         * @return {any}
          * @since 2.0.0
          */
         public static getStage(stageName: string = "annieEngine") {
             return annie.Stage._stageList[stageName];
         }
 
+        /**
+         * @property _stageList
+         * @static
+         * @type {Object}
+         * @private
+         */
         private static _stageList: any = {};
         /**
          * 是否暂停
@@ -98,6 +89,30 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @default false
+         */
+        static get pause(): boolean {
+            return this._pause;
+        }
+        static set pause(value: boolean) {
+            this._pause = value;
+            if(value!=this._pause){
+                if(value){
+                    //停止声音
+                    Sound.stopAllSounds();
+                }else{
+                    //恢复声音
+                    Sound.resumePlaySounds();
+                }
+                //触发事件
+                globalDispatcher.dispatchEvent("onStagePause",{pause:value});
+            }
+        }
+
+        /**
+         * @property _pause
+         * @type {boolean}
+         * @private
+         * @static
          */
         private static _pause: boolean = false;
         /**
@@ -244,15 +259,39 @@ namespace annie {
          * @type {number}
          */
         private _currentFlush: number = 0;
+        /**
+         * @property _dragDisplay
+         * @private
+         * @type {null}
+         * @private
+         * @static
+         */
         public static _dragDisplay: DisplayObject = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
+         * @property _isLoadedVConsole
          * @type {Array}
          * @private
+         * @static
          */
         private static _isLoadedVConsole: boolean = false;
+        /**
+         * @property _lastDpList
+         * @type {Object}
+         * @private
+         */
         private _lastDpList: any = {};
+        /**
+         * @property _rid
+         * @type {number}
+         * @private
+         */
         private _rid = -1;
+        /**
+         * @property _floatDisplayList
+         * @type {any[]}
+         * @private
+         */
         private _floatDisplayList: Array<FloatDisplay> = [];
 
         /**
@@ -354,6 +393,10 @@ namespace annie {
             }
         }
 
+        /**
+         * @property _touchEvent
+         * @private
+         */
         private _touchEvent: annie.TouchEvent;
 
         /**
@@ -362,7 +405,6 @@ namespace annie {
          * @param renderObj
          */
         public render(renderObj: IRender): void {
-            let s = this;
             renderObj.begin();
             super.render(renderObj);
 
@@ -370,12 +412,14 @@ namespace annie {
 
         /**
          * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * @property _ml
          * @type {Array}
          * @private
          */
         private _ml: any = [];
         /**
          * 这个是事件中用到的Point对象池,以提高性能
+         * @property _mp
          * @type {Array}
          * @private
          */
@@ -383,6 +427,7 @@ namespace annie {
 
         /**
          * 刷新mouse或者touch事件
+         * @method _initMouseEvent
          * @private
          */
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
@@ -396,10 +441,18 @@ namespace annie {
         }
 
         //每一个手指事件的对象池
+        /**
+         * @property _mouseDownPoint
+         * @type {Object}
+         * @private
+         */
         private _mouseDownPoint: any = {};
 
         /**
          * 循环刷新页面的函数
+         * @method flush
+         * @private
+         * @return {void}
          */
         private flush(): void {
             let s = this;
@@ -452,7 +505,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
-         * @returns {{w: number, h: number}}
+         * @return {{w: number, h: number}}
          */
         public getRootDivWH(div: HTMLDivElement) {
             let sw = div.style.width;
@@ -491,6 +544,7 @@ namespace annie {
 
         /**
          * html的鼠标或单点触摸对应的引擎事件类型名
+         * @property _mouseEventTypes
          * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
          * @private
          */
@@ -502,14 +556,31 @@ namespace annie {
             touchmove: "onMouseMove",
             touchend: "onMouseUp"
         };
+        /**
+         * @property muliPoints
+         * @type {Object[]}
+         * @private
+         */
         private muliPoints: Array<any> = [];
         /**
          * 当document有鼠标或触摸事件时调用
+         * @property _mP1
          * @param e
          */
         private _mP1: Point = new Point();
+        /**
+         * 当document有鼠标或触摸事件时调用
+         * @property _mP2
+         * @param e
+         */
         private _mP2: Point = new Point();
-        private onMouseEvent = function (e: any): void {
+
+        /**
+         * @method onMouseEvent
+         * @param e
+         * @private
+         */
+        private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this;
             //判断是否有drag的显示对象
@@ -815,10 +886,14 @@ namespace annie {
                 s.update();
             }
         };
+
         /**
          * 设置舞台的对齐模式
+         * @method setAlign
+         * @private
+         * @return {void}
          */
-        private setAlign = function () {
+        private setAlign():void {
             let s = this;
             let divH = s.divHeight * devicePixelRatio;
             let divW = s.divWidth * devicePixelRatio;

@@ -28,6 +28,13 @@ namespace annie {
          * @default true
          */
         public isAutoDownKeyBoard: boolean = true;
+        /**
+         * @property _inputTypeList
+         * @static
+         * @type {string[]}
+         * @private
+         * @since 2.0.0
+         */
         private static _inputTypeList:Array<string>=["input","password","textarea"];
         /**
          * @method InputText
@@ -65,6 +72,15 @@ namespace annie {
             });
             s.init(input);
         }
+
+        /**
+         * 初始化输入文本
+         * @method init
+         * @param htmlElement
+         * @public
+         * @return {void}
+         * @since 1.0.0
+         */
         public init(htmlElement: any): void {
             super.init(htmlElement);
             //默认设置
@@ -100,6 +116,13 @@ namespace annie {
                 s.htmlElement.style.lineHeight = lineSpacing + "px";
             }
         }
+
+        /**
+         * @property lineSpacing
+         * @public
+         * @since 2.0.0
+         * @param {number} value
+         */
         public set lineSpacing(value:number){
             this.htmlElement.style.lineHeight = value + "px";
         }
@@ -219,7 +242,7 @@ namespace annie {
          * @property text
          * @public
          * @since 1.0.3
-         * @returns {string}
+         * @return {string}
          */
         public get text(): string {
             let s = this;
@@ -240,7 +263,7 @@ namespace annie {
          * @public
          * @since 1.1.0
          * @property maxCharacters
-         * @returns {number}
+         * @return {number}
          */
         public get maxCharacters():number{
             let l:any=this.htmlElement.getAttribute("maxlength");

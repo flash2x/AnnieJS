@@ -14,14 +14,31 @@ namespace annie {
      * @since 1.0.0
      */
     export class Sprite extends DisplayObject {
-
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         public constructor() {
             super();
             let s=this;
             s._instanceType = "annie.Sprite";
         }
-        //sprite 和 moveClip的类资源信息
+        /**
+         * sprite 和 moveClip的类资源信息
+         * @property _a2x_res_class
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         */
         private _a2x_res_class:any=null;
+        /**
+         * @property _a2x_res_children
+         * @type {any[]}
+         * @private
+         * @since 2.0.0
+         */
         private _a2x_res_children:any=[];
         public destroy():void {
             let s=this;
@@ -82,7 +99,13 @@ namespace annie {
             s._cacheAsBitmap = value;
         }
 
-        public _cacheAsBitmap: boolean;
+        /**
+         * @property
+         * @since 2.0.0
+         * @public
+         * @default false
+         */
+        private _cacheAsBitmap: boolean;
 
         /**
          * 添加一个显示对象到Sprite
@@ -113,6 +136,16 @@ namespace annie {
         }
 
         //全局遍历
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         */
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
             if (len > 0) {
@@ -144,7 +177,7 @@ namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -174,7 +207,7 @@ namespace annie {
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          */
         public addChildAt(child: DisplayObject, index: number): void {
@@ -214,7 +247,7 @@ namespace annie {
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -230,7 +263,7 @@ namespace annie {
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
@@ -249,7 +282,7 @@ namespace annie {
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
-         * @returns {boolean}
+         * @return {boolean}
          */
         public swapChild(child1:any,child2:any):boolean{
             let s=this;
@@ -357,7 +390,7 @@ namespace annie {
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -413,7 +446,7 @@ namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @public
          */

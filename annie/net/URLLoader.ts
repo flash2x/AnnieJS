@@ -23,6 +23,8 @@ namespace annie {
      */
     export class URLLoader extends EventDispatcher {
         /**
+         * 构造函数
+         * @method URLLoader
          * @param type text json js xml image sound css svg video unKnow
          */
         public constructor() {
@@ -44,7 +46,17 @@ namespace annie {
             }
         }
 
+        /**
+         * @property _req
+         * @type {null}
+         * @private
+         */
         private _req: XMLHttpRequest = null;
+        /**
+         * @property headers
+         * @private
+         * @type {any[]}
+         */
         private headers: Array<string> = [];
 
         /**
@@ -307,7 +319,7 @@ namespace annie {
         };
         /**
          * 添加自定义头
-         * @addHeader
+         * @method addHeader
          * @param name
          * @param value
          */

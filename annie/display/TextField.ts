@@ -32,6 +32,12 @@ namespace annie {
             return this._textAlign;
         }
         private _textAlign = "left";
+
+        /**
+         * @property textAlpha
+         * @since 2.0.0
+         * @public
+         */
         public set textAlpha(value: number) {
             this._setProperty("_textAlpha",value,3);
         }
@@ -59,7 +65,9 @@ namespace annie {
         private _textHeight: number = 0;
 
         /**
-         *
+         * @property lineSpacing
+         * @public
+         * @since 1.0.0
          * @param {number} value
          */
         public set lineSpacing(value:number){
@@ -214,6 +222,7 @@ namespace annie {
 
         /**
          * 设置文本在canvas里的渲染样式
+         * @method _prepContext
          * @param ctx
          * @private
          * @since 1.0.0

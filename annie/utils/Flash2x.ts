@@ -18,15 +18,21 @@ namespace annie {
     export let _shareSceneList: any = [];
     /**
      * 存储加载资源的总对象
+     * @property res
+     * @public
      * @type {Object}
      */
     export let res: any = {};
     /**
      * 加载器是否正在加载中
+     * @property _isLoading
+     * @type {boolean}
+     * @private
      */
     let _isLoading: boolean;
     /**
      * 加载中的场景名列表
+     *
      */
     let _loadSceneNames: any;
     /**
@@ -341,7 +347,7 @@ namespace annie {
      * @static
      * @since 1.0.0
      * @param {string} sceneName
-     * @returns {boolean}
+     * @return {boolean}
      */
     export function isLoadedScene(sceneName: string): Boolean {
         if (res[sceneName] != undefined && res[sceneName] != null && res[sceneName]._f2x_had_loaded_scene) {
@@ -378,7 +384,7 @@ namespace annie {
      * @since 2.0.0
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     export function getResource(sceneName: string, resName: string): any {
         let s = res;
@@ -396,7 +402,7 @@ namespace annie {
      * @static
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
@@ -493,7 +499,7 @@ namespace annie {
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.TextFiled|annie.InputText}
+     * @return {annie.TextFiled|annie.InputText}
      */
     function t(sceneName: string, resName: string): any {
         let textDate = res[sceneName]._a2x_con[resName];
@@ -564,7 +570,7 @@ namespace annie {
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.Shape}
+     * @return {annie.Shape}
      */
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
@@ -694,7 +700,7 @@ namespace annie {
      * @method getQueryString
      * @static
      * @param name
-     * @returns {any}
+     * @return {any}
      * @since 1.0.9
      * @example
      *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun

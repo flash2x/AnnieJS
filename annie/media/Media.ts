@@ -21,12 +21,24 @@ namespace annie {
         public media: any = null;
         /**
          * 媒体类型 VIDEO 或者 AUDIO
+         * @property type
          * @type {string}
-         * @since 1.0.0
          * @since 1.0.0
          */
         public type = "";
+        /**
+         * @property isPlaying
+         * @type {boolean}
+         * @since 2.0.0
+         * @default false
+         */
         public isPlaying:boolean=false;
+        /**
+         * @property _loop
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         */
         private _loop: number = 1;
         /**
          * 构造函数
@@ -73,6 +85,13 @@ namespace annie {
                 s.dispatchEvent("onPlayStart");
             });
         }
+
+        /**
+         * @property _repeate
+         * @type {number}
+         * @private
+         * @default 1
+         */
         private _repeate:number=1;
         /**
          * 开始播放媒体
@@ -148,7 +167,7 @@ namespace annie {
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
-         * @returns {number}
+         * @return {number}
          */
         public get volume():number{
             return this.media.volume

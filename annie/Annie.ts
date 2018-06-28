@@ -63,7 +63,7 @@ namespace annie {
     /**
      * 全局事件触发器
      * @static
-     * @property  globalDispatcher
+     * @property  annie.globalDispatcher
      * @type {annie.EventDispatcher}
      * @public
      * @since 1.0.0
@@ -247,10 +247,10 @@ namespace annie {
     };
     /**
      * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
+     * @method annie.getStagePixels
      * @param {annie.Stage} stage
      * @param {annie.Rectangle} rect
-     * @returns {Array}
+     * @return {Array}
      * @public
      * @since 1.1.1
      */

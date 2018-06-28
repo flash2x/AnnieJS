@@ -17,7 +17,7 @@ declare namespace annie {
          * @property instanceId
          * @public
          * @since 1.0.0
-         * @returns {number}
+         * @return {number}
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
@@ -39,7 +39,7 @@ declare namespace annie {
          * @method destroy
          * @since 2.0.0
          * @public
-         * @returns {void}
+         * @return {void}
          */
         abstract destroy(): void;
     }
@@ -65,7 +65,7 @@ declare namespace annie {
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
-         * @returns {number}
+         * @return {number}
          * @static
          * @private
          * @since 1.0.0
@@ -102,7 +102,7 @@ declare namespace annie {
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有收听者则返回true
+         * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
@@ -120,7 +120,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有则返回true
+         * @return {boolean} 如果有则返回true
          */
         hasEventListener(type: string, useCapture?: boolean): boolean;
         /**
@@ -168,7 +168,7 @@ declare namespace annie {
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
          * @Event
-         * @property RESIZE
+         * @property ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -266,13 +266,13 @@ declare namespace annie {
         /**
          * 舞台初始化完成后会触发的事件
          * @Event
-         * @property ON_STAGE_INIT
+         * @property ON_INIT_STAGE
          * @type {string}
          * @static
          * @public
          * @since 1.0.0
          */
-        static INIT_TO_STAGE: string;
+        static ON_INIT_STAGE: string;
         /**
          * 显示对象加入到舞台事件
          * @Event
@@ -420,12 +420,15 @@ declare namespace annie {
         /**
          * @method Event
          * @param {string} type 事件类型
+         * @public
+         * @since 1.0.0
          */
         constructor(type: string);
         /**
          * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
          * @method stopImmediatePropagation
          * @public
+         * @return {void}
          * @since 2.0.0
          */
         stopImmediatePropagation(): void;
@@ -434,6 +437,7 @@ declare namespace annie {
          * @method stopPropagation
          * @public
          * @since 2.0.0
+         * @return {void}
          */
         stopPropagation(): void;
         private _bpd;
@@ -445,13 +449,16 @@ declare namespace annie {
          * @since 1.0.0
          */
         private _pd;
-        /**
-         * @method destroy
-         * @public
-         * @since 2.0.0
-         * @returns {void}
-         */
         destroy(): void;
+        /**
+         * 重围事件到初始状态方便重复利用
+         * @method reset
+         * @param {string} type
+         * @param target
+         * @since 2.0.0
+         * @return {void}
+         * @public
+         */
         reset(type: string, target: any): void;
     }
 }
@@ -711,7 +718,8 @@ declare namespace annie {
          * 求两点之间的距离
          * @method distance
          * @param args 可变参数 传两个参数的话就是两个annie.Point类型 传四个参数的话分别是两个点的x y x y
-         * @returns {number}
+         * @return {number}
+         * @static
          */
         static distance(...args: any[]): number;
     }
@@ -789,7 +797,7 @@ declare namespace annie {
          * @method clone
          * @since 1.0.0
          * @public
-         * @returns {annie.Matrix}
+         * @return {annie.Matrix}
          */
         clone(): Matrix;
         /**
@@ -798,7 +806,7 @@ declare namespace annie {
          * @param {number} x
          * @param {number} y
          * @param {annie.Point} 默认为空，如果不为null，则返回的是Point就是此对象，如果为null，则返回来的Point是新建的对象
-         * @returns {annie.Point}
+         * @return {annie.Point}
          * @public
          * @since 1.0.0
          */
@@ -813,15 +821,15 @@ declare namespace annie {
         setFrom(mtx: Matrix): void;
         /**
          * 将矩阵恢复成原始矩阵
-         * @method
+         * @method identity
          * @public
          * @since 1.0.0
          */
         identity(): void;
         /**
          * 反转一个矩阵
-         * @method
-         * @returns {Matrix}
+         * @method invert
+         * @return {Matrix}
          * @since 1.0.0
          * @public
          */
@@ -858,7 +866,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.Matrix} m1
          * @param {annie.Matrix} m2
-         * @returns {boolean}
+         * @return {boolean}
          */
         static isEqual(m1: Matrix, m2: Matrix): boolean;
         concat(mtx: annie.Matrix): void;
@@ -952,7 +960,7 @@ declare namespace annie {
          * 判断一个点是否在矩形内包括边
          * @method isPointIn
          * @param {annie.Point} point
-         * @returns {boolean}
+         * @return {boolean}
          * @public
          * @since 1.0.0
          */
@@ -976,14 +984,17 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.Point} p1
          * @param {..arg} ary
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         static createFromPoints(rect: Rectangle, ...arg: Point[]): Rectangle;
         /**
          * 通过两个点来确定一个矩形
+         * @method createRectform2Point
+         * @static
          * @param rect
          * @param p1
          * @param p2
+         * @return {void}
          */
         static createRectform2Point(rect: Rectangle, p1: Point, p2: Point): void;
         /**
@@ -1024,6 +1035,8 @@ declare namespace annie {
          * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
          * @since 1.0.0
+         * @protected
+         * @readonly
          */
         protected _UI: {
             UD: boolean;
@@ -1189,7 +1202,7 @@ declare namespace annie {
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
-         * @pubic
+         * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
@@ -1247,9 +1260,11 @@ declare namespace annie {
         private _filters;
         /**
          * 是否自己的父级发生的改变
+         * @property _cp
          * @type {boolean}
          * @private
          * @since 1.1.2
+         * @default true
          */
         protected _cp: boolean;
         /**
@@ -1258,7 +1273,7 @@ declare namespace annie {
          * @since 1.0.0
          * @public
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         globalToLocal(point: Point, bp?: Point): Point;
         /**
@@ -1267,15 +1282,9 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         localToGlobal(point: Point, bp?: Point): Point;
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
         static _bp: Point;
         static _p1: Point;
         static _p2: Point;
@@ -1291,6 +1300,7 @@ declare namespace annie {
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
          * @public
+         * @return {void}
          */
         startDrag(isCenter?: boolean, bounds?: Rectangle): void;
         /**
@@ -1298,6 +1308,7 @@ declare namespace annie {
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         stopDrag(): void;
         /**
@@ -1307,7 +1318,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
-         * @returns {annie.DisplayObject}
+         * @return {annie.DisplayObject}
          */
         hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
         /**
@@ -1315,8 +1326,7 @@ declare namespace annie {
          * @method getBounds
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
-         * @abstract
+         * @return {annie.Rectangle}
          */
         getBounds(): Rectangle;
         /**
@@ -1325,7 +1335,7 @@ declare namespace annie {
          * @method getDrawRect
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         getDrawRect(): Rectangle;
         /**
@@ -1333,6 +1343,7 @@ declare namespace annie {
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         protected update(isDrawUpdate?: boolean): void;
         /**
@@ -1341,7 +1352,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
-         * @abstract
+         * @return {void}
          */
         render(renderObj: IRender | any): void;
         /**
@@ -1351,7 +1362,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
+         * @return {void}
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
@@ -1376,7 +1387,7 @@ declare namespace annie {
          * 如果需要同时获取宽和高的值，建议使用此方法更有效率
          * @method getWH
          * @public
-         * @returns {{width: number, height: number}}
+         * @return {{width: number, height: number}}
          * @since 1.0.9
          */
         getWH(): {
@@ -1417,22 +1428,61 @@ declare namespace annie {
          * @default 0
          */
         protected _offsetY: number;
+        /**
+         * @property _bounds
+         * @type {annie.Rectangle}
+         * @private
+         */
         protected _bounds: Rectangle;
+        /**
+         * @property _drawRect
+         * @type {annie.Rectangle}
+         * @private
+         */
         protected _drawRect: Rectangle;
+        /**
+         * 设置属性
+         * @method _setProperty
+         * @param {string} property
+         * @param value
+         * @param {number} type
+         * @private
+         */
         protected _setProperty(property: string, value: any, type: number): void;
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
-         * @returns {number}
+         * @return {number}
+         * @since 2.0.0
+         * @public
          */
         addSound(sound: annie.Sound): number;
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
+         * @public
+         * @since 2.0.0
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @return {void}
          */
         removeSound(id: number): void;
+        /**
+         * @property _a2x_sounds
+         * @since 2.0.0
+         * @type {Object}
+         * @private
+         * @default {null}
+         */
         private _a2x_sounds;
+        /**
+         * @property _a2x_res_obj
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         * @default {Object}
+         */
         private _a2x_res_obj;
         destroy(): void;
     }
@@ -1551,15 +1601,11 @@ declare namespace annie {
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
         hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         destroy(): void;
     }
 }
@@ -1592,9 +1638,9 @@ declare namespace annie {
          * @static
          * @param points
          * @param colors
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
-         * @pubic
+         * @public
          */
         static getGradientColor(points: any, colors: any): any;
         /**
@@ -1602,7 +1648,7 @@ declare namespace annie {
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
-         * @returns {CanvasPattern}
+         * @return {CanvasPattern}
          * @public
          * @since 1.0.0
          */
@@ -1615,10 +1661,20 @@ declare namespace annie {
          * @since 1.0.0
          * @param {string} color 字符串的颜色值,如:#33ffee
          * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
-         * @returns {string}
+         * @return {string}
          */
         static getRGBA(color: string, alpha: number): string;
+        /**
+         * @property _isBitmapStroke
+         * @private
+         * @since 1.0.0
+         */
         private _isBitmapStroke;
+        /**
+         * @property _isBitmapFill
+         * @private
+         * @since 1.0.0
+         */
         private _isBitmapFill;
         /**
          * 是否对矢量使用像素碰撞 默认开启
@@ -1812,7 +1868,17 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginStroke(color: string, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
+        /**
+         * @property _caps
+         * @type {string[]}
+         * @private
+         */
         private static _caps;
+        /**
+         * @property _joins
+         * @type {string[]}
+         * @private
+         */
         private static _joins;
         /**
          * 画线性渐变的线条 一般给Flash2x用
@@ -1853,6 +1919,16 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
+        /**
+         * @method _stroke
+         * @param strokeStyle
+         * @param {number} width
+         * @param {number} cap
+         * @param {number} join
+         * @param {number} miter
+         * @private
+         * @since 1.0.0
+         */
         private _stroke(strokeStyle, width, cap, join, miter);
         /**
          * 结束填充
@@ -1885,13 +1961,19 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
+        /**
+         * @method _drawShape
+         * @param ctx
+         * @private
+         * @return {void}
+         */
         private _drawShape(ctx);
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -1907,11 +1989,12 @@ declare namespace annie {
          * @since 1.0.2
          */
         changeColor(infoObj: any): void;
-        render(renderObj: IRender | any): void;
         /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
+         * 渲染
+         * @method render
+         * @param {annie.IRender | any} renderObj
          */
+        render(renderObj: IRender | any): void;
         destroy(): void;
     }
 }
@@ -1930,8 +2013,27 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Sprite extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         constructor();
+        /**
+         * sprite 和 moveClip的类资源信息
+         * @property _a2x_res_class
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         */
         private _a2x_res_class;
+        /**
+         * @property _a2x_res_children
+         * @type {any[]}
+         * @private
+         * @since 2.0.0
+         */
         private _a2x_res_children;
         destroy(): void;
         /**
@@ -1963,7 +2065,13 @@ declare namespace annie {
          * @type boolean
          */
         cacheAsBitmap: boolean;
-        _cacheAsBitmap: boolean;
+        /**
+         * @property
+         * @since 2.0.0
+         * @public
+         * @default false
+         */
+        private _cacheAsBitmap;
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -1980,6 +2088,16 @@ declare namespace annie {
          * @param {annie.DisplayObject} child
          */
         removeChild(child: DisplayObject): void;
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         */
         private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
@@ -1987,7 +2105,7 @@ declare namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -1997,7 +2115,7 @@ declare namespace annie {
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          */
         addChildAt(child: DisplayObject, index: number): void;
@@ -2005,7 +2123,7 @@ declare namespace annie {
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -2014,7 +2132,7 @@ declare namespace annie {
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
@@ -2024,7 +2142,7 @@ declare namespace annie {
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
-         * @returns {boolean}
+         * @return {boolean}
          */
         swapChild(child1: any, child2: any): boolean;
         /**
@@ -2064,7 +2182,7 @@ declare namespace annie {
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -2072,7 +2190,7 @@ declare namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @public
          */
@@ -2109,12 +2227,24 @@ declare namespace annie {
         media: any;
         /**
          * 媒体类型 VIDEO 或者 AUDIO
+         * @property type
          * @type {string}
-         * @since 1.0.0
          * @since 1.0.0
          */
         type: string;
+        /**
+         * @property isPlaying
+         * @type {boolean}
+         * @since 2.0.0
+         * @default false
+         */
         isPlaying: boolean;
+        /**
+         * @property _loop
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         */
         private _loop;
         /**
          * 构造函数
@@ -2129,6 +2259,12 @@ declare namespace annie {
          *          //media.stop();//停止播放
          */
         constructor(src: any, type: string);
+        /**
+         * @property _repeate
+         * @type {number}
+         * @private
+         * @default 1
+         */
         private _repeate;
         /**
          * 开始播放媒体
@@ -2160,7 +2296,7 @@ declare namespace annie {
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
-         * @returns {number}
+         * @return {number}
          */
         volume: number;
         destroy(): void;
@@ -2200,12 +2336,22 @@ declare namespace annie {
         destroy(): void;
         /**
          * 停止播放，给stopAllSounds调用
+         * @method stop2
+         * @private
          */
         private stop2();
         /**
          * 恢复播放，给stopAllSounds调用
+         * @method play2
+         * @private
          */
         private play2();
+        /**
+         * 音对象池
+         * @property _soundList
+         * @type {any[]}
+         * @private
+         */
         private static _soundList;
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
@@ -2232,6 +2378,11 @@ declare namespace annie {
          * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
          */
         static setAllSoundsVolume(volume: number): void;
+        /**
+         * @static
+         * @type {number}
+         * @private
+         */
         private static _volume;
     }
 }
@@ -2291,7 +2442,20 @@ declare namespace annie {
          * @readonly
          */
         currentFrame: number;
+        /**
+         * @property _curFrame
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         * @default 1
+         */
         private _curFrame;
+        /**
+         * @property _lastFrameObj
+         * @type {Object}
+         * @private
+         * @default null
+         */
         private _lastFrameObj;
         /**
          * 当前动画是否处于播放状态
@@ -2304,6 +2468,13 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
+        /**
+         * @property _isPlaying
+         * @type {boolean}
+         * @private
+         * @since 2.0.0
+         * @default true
+         */
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2315,6 +2486,12 @@ declare namespace annie {
          * @readonly
          */
         isFront: boolean;
+        /**
+         * @property _isFront
+         * @type {boolean}
+         * @private
+         * @default true
+         */
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2326,7 +2503,19 @@ declare namespace annie {
          * @readonly
          */
         totalFrames: number;
+        /**
+         * @property _lastFrame
+         * @type {number}
+         * @private
+         * @default 0
+         */
         private _lastFrame;
+        /**
+         * 构造函数
+         * @method MovieClip
+         * @public
+         * @since 1.0.0
+         */
         constructor();
         /**
          * 调用止方法将停止当前帧
@@ -2335,6 +2524,13 @@ declare namespace annie {
          * @since 1.0.0
          */
         stop(): void;
+        /**
+         * @property _a2x_script
+         * @type {Object}
+         * @default null
+         * @private
+         * @since 2.0.0
+         */
         private _a2x_script;
         /**
          * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
@@ -2346,14 +2542,28 @@ declare namespace annie {
          */
         addFrameScript(frameIndex: number, frameScript: Function): void;
         /**
-         * @移除帧上的回调方法
+         * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
          * @param {number} frameIndex
          */
         removeFrameScript(frameIndex: number): void;
+        /**
+         * 确认是不是按钮形态
+         * @property isButton
+         * @return {boolean}
+         * @public
+         * @since 2.0.0
+         * @default false
+         */
         isButton: boolean;
+        /**
+         * @property _isButton
+         * @type {boolean}
+         * @private
+         * @default false
+         */
         private _isButton;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2361,18 +2571,38 @@ declare namespace annie {
          * @method initButton
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         initButton(): void;
+        /**
+         * 设置是否为点击状态
+         * @property clicked
+         * @param {boolean} value
+         * @public
+         * @since 2.0.0
+         * @default false
+         */
         clicked: boolean;
         private _clicked;
-        private _mouseEvent;
+        /**
+         * @method  _mouseEvent
+         * @param e
+         * @private
+         */
+        private _mouseEvent(e);
+        /**
+         * @property _maskList
+         * @type {any[]}
+         * @private
+         * @default []
+         */
         private _maskList;
         /**
          * mc的当前帧的标签名,没有则为空
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
-         * @returns {string}
+         * @return {string}
          * */
         getCurrentLabel(): string;
         /**
@@ -2421,10 +2651,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         destroy(): void;
     }
 }
@@ -2481,17 +2707,19 @@ declare namespace annie {
          * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
          */
         init(htmlElement: any): void;
+        /**
+         * @method getStyle
+         * @param {HTMLElement} elem
+         * @param cssName
+         * @return {any}
+         */
         private getStyle(elem, cssName);
         /**
          * @method updateStyle
          * @public
          * @since 1.1.4
          */
-        protected updateStyle(): void;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
+        updateStyle(): void;
         destroy(): void;
     }
 }
@@ -2518,6 +2746,11 @@ declare namespace annie {
          */
         textAlign: string;
         private _textAlign;
+        /**
+         * @property textAlpha
+         * @since 2.0.0
+         * @public
+         */
         textAlpha: number;
         private _textAlpha;
         /**
@@ -2531,7 +2764,9 @@ declare namespace annie {
         textHeight: number;
         private _textHeight;
         /**
-         *
+         * @property lineSpacing
+         * @public
+         * @since 1.0.0
          * @param {number} value
          */
         lineSpacing: number;
@@ -2627,6 +2862,7 @@ declare namespace annie {
         private _border;
         /**
          * 设置文本在canvas里的渲染样式
+         * @method _prepContext
          * @param ctx
          * @private
          * @since 1.0.0
@@ -2706,6 +2942,13 @@ declare namespace annie {
          * @default true
          */
         isAutoDownKeyBoard: boolean;
+        /**
+         * @property _inputTypeList
+         * @static
+         * @type {string[]}
+         * @private
+         * @since 2.0.0
+         */
         private static _inputTypeList;
         /**
          * @method InputText
@@ -2717,6 +2960,14 @@ declare namespace annie {
          *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         constructor(inputType?: number);
+        /**
+         * 初始化输入文本
+         * @method init
+         * @param htmlElement
+         * @public
+         * @return {void}
+         * @since 1.0.0
+         */
         init(htmlElement: any): void;
         /**
          * 被始化输入文件的一些属性
@@ -2732,6 +2983,12 @@ declare namespace annie {
          * @param {number}lineSpacing 如果是多行,请设置行高
          */
         initInfo(text: string, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
+        /**
+         * @property lineSpacing
+         * @public
+         * @since 2.0.0
+         * @param {number} value
+         */
         lineSpacing: number;
         /**
          * 设置文本是否为粗体
@@ -2789,7 +3046,7 @@ declare namespace annie {
          * @property text
          * @public
          * @since 1.0.3
-         * @returns {string}
+         * @return {string}
          */
         text: string;
         /**
@@ -2797,7 +3054,7 @@ declare namespace annie {
          * @public
          * @since 1.1.0
          * @property maxCharacters
-         * @returns {number}
+         * @return {number}
          */
         maxCharacters: number;
     }
@@ -2815,7 +3072,6 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Stage extends Sprite {
-        static pause: boolean;
         /**
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
          * 所以需要自己灵活设置,默认阻止.
@@ -2867,11 +3123,18 @@ declare namespace annie {
         renderType: number;
         /**
          * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @property getStage
          * @param {string} stageName
-         * @returns {any}
+         * @return {any}
          * @since 2.0.0
          */
         static getStage(stageName?: string): any;
+        /**
+         * @property _stageList
+         * @static
+         * @type {Object}
+         * @private
+         */
         private static _stageList;
         /**
          * 是否暂停
@@ -2881,6 +3144,13 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @default false
+         */
+        static pause: boolean;
+        /**
+         * @property _pause
+         * @type {boolean}
+         * @private
+         * @static
          */
         private static _pause;
         /**
@@ -3027,15 +3297,39 @@ declare namespace annie {
          * @type {number}
          */
         private _currentFlush;
+        /**
+         * @property _dragDisplay
+         * @private
+         * @type {null}
+         * @private
+         * @static
+         */
         static _dragDisplay: DisplayObject;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
+         * @property _isLoadedVConsole
          * @type {Array}
          * @private
+         * @static
          */
         private static _isLoadedVConsole;
+        /**
+         * @property _lastDpList
+         * @type {Object}
+         * @private
+         */
         private _lastDpList;
+        /**
+         * @property _rid
+         * @type {number}
+         * @private
+         */
         private _rid;
+        /**
+         * @property _floatDisplayList
+         * @type {any[]}
+         * @private
+         */
         private _floatDisplayList;
         /**
          * 显示对象入口函数
@@ -3058,6 +3352,10 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
+        /**
+         * @property _touchEvent
+         * @private
+         */
         private _touchEvent;
         /**
          * 渲染函数
@@ -3067,24 +3365,35 @@ declare namespace annie {
         render(renderObj: IRender): void;
         /**
          * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * @property _ml
          * @type {Array}
          * @private
          */
         private _ml;
         /**
          * 这个是事件中用到的Point对象池,以提高性能
+         * @property _mp
          * @type {Array}
          * @private
          */
         private _mp;
         /**
          * 刷新mouse或者touch事件
+         * @method _initMouseEvent
          * @private
          */
         private _initMouseEvent(event, cp, sp, identifier);
+        /**
+         * @property _mouseDownPoint
+         * @type {Object}
+         * @private
+         */
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数
+         * @method flush
+         * @private
+         * @return {void}
          */
         private flush();
         /**
@@ -3108,7 +3417,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
-         * @returns {{w: number, h: number}}
+         * @return {{w: number, h: number}}
          */
         getRootDivWH(div: HTMLDivElement): {
             w: number;
@@ -3123,22 +3432,42 @@ declare namespace annie {
         kill(): void;
         /**
          * html的鼠标或单点触摸对应的引擎事件类型名
+         * @property _mouseEventTypes
          * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
          * @private
          */
         private _mouseEventTypes;
+        /**
+         * @property muliPoints
+         * @type {Object[]}
+         * @private
+         */
         private muliPoints;
         /**
          * 当document有鼠标或触摸事件时调用
+         * @property _mP1
          * @param e
          */
         private _mP1;
+        /**
+         * 当document有鼠标或触摸事件时调用
+         * @property _mP2
+         * @param e
+         */
         private _mP2;
-        private onMouseEvent;
+        /**
+         * @method onMouseEvent
+         * @param e
+         * @private
+         */
+        private onMouseEvent(e);
         /**
          * 设置舞台的对齐模式
+         * @method setAlign
+         * @private
+         * @return {void}
          */
-        private setAlign;
+        private setAlign();
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -3359,7 +3688,7 @@ declare namespace annie {
         type: string;
         /**
          * @method ColorFilter
-         * @colorArrays 颜色值数据
+         * @param {number} colorArrays 颜色值数据
          */
         constructor(colorArrays: number[]);
         /**
@@ -3607,10 +3936,20 @@ declare namespace annie {
          * @default null
          */
         rootContainer: any;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
         protected _ctx: any;
+        /**
+         * @protected _stage
+         * @protected
+         * @default null
+         */
         private _stage;
         /**
-         * @CanvasRender
+         * @method CanvasRender
          * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
@@ -3688,6 +4027,8 @@ declare namespace annie {
      */
     class URLLoader extends EventDispatcher {
         /**
+         * 构造函数
+         * @method URLLoader
          * @param type text json js xml image sound css svg video unKnow
          */
         constructor();
@@ -3698,7 +4039,17 @@ declare namespace annie {
          * @since 1.0.0
          */
         loadCancel(): void;
+        /**
+         * @property _req
+         * @type {null}
+         * @private
+         */
         private _req;
+        /**
+         * @property headers
+         * @private
+         * @type {any[]}
+         */
         private headers;
         /**
          * 加载或请求数据
@@ -3765,7 +4116,7 @@ declare namespace annie {
         private _fus;
         /**
          * 添加自定义头
-         * @addHeader
+         * @method addHeader
          * @param name
          * @param value
          */
@@ -3783,6 +4134,8 @@ declare namespace annie {
     let _shareSceneList: any;
     /**
      * 存储加载资源的总对象
+     * @property res
+     * @public
      * @type {Object}
      */
     let res: any;
@@ -3805,7 +4158,7 @@ declare namespace annie {
      * @static
      * @since 1.0.0
      * @param {string} sceneName
-     * @returns {boolean}
+     * @return {boolean}
      */
     function isLoadedScene(sceneName: string): Boolean;
     /**
@@ -3825,7 +4178,7 @@ declare namespace annie {
      * @since 2.0.0
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function getResource(sceneName: string, resName: string): any;
     /**
@@ -3895,7 +4248,7 @@ declare namespace annie {
      * @method getQueryString
      * @static
      * @param name
-     * @returns {any}
+     * @return {any}
      * @since 1.0.9
      * @example
      *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
@@ -4025,7 +4378,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quadraticIn(k: number): number;
         /**
@@ -4035,7 +4388,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quadraticOut(k: number): number;
         /**
@@ -4045,7 +4398,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quadraticInOut(k: number): number;
         /**
@@ -4055,7 +4408,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static cubicIn(k: number): number;
         /**
@@ -4065,7 +4418,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static cubicOut(k: number): number;
         /**
@@ -4075,7 +4428,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static cubicInOut(k: number): number;
         /**
@@ -4085,7 +4438,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quarticIn(k: number): number;
         /**
@@ -4095,7 +4448,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quarticOut(k: number): number;
         /**
@@ -4105,7 +4458,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quarticInOut(k: number): number;
         /**
@@ -4115,7 +4468,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quinticIn(k: number): number;
         /**
@@ -4125,7 +4478,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quinticOut(k: number): number;
         /**
@@ -4135,7 +4488,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static quinticInOut(k: number): number;
         /**
@@ -4145,7 +4498,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static sinusoidalIn(k: number): number;
         /**
@@ -4155,7 +4508,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static sinusoidalOut(k: number): number;
         /**
@@ -4165,7 +4518,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static sinusoidalInOut(k: number): number;
         /**
@@ -4175,7 +4528,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static exponentialIn(k: number): number;
         /**
@@ -4185,7 +4538,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static exponentialOut(k: number): number;
         /**
@@ -4195,7 +4548,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static exponentialInOut(k: number): number;
         /**
@@ -4205,7 +4558,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static circularIn(k: number): number;
         /**
@@ -4215,7 +4568,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static circularOut(k: number): number;
         /**
@@ -4225,7 +4578,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static circularInOut(k: number): number;
         /**
@@ -4235,7 +4588,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static elasticIn(k: number): number;
         /**
@@ -4245,7 +4598,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static elasticOut(k: number): number;
         /**
@@ -4255,7 +4608,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static elasticInOut(k: number): number;
         /**
@@ -4265,7 +4618,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static backIn(k: number): number;
         /**
@@ -4275,7 +4628,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static backOut(k: number): number;
         /**
@@ -4285,7 +4638,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static backInOut(k: number): number;
         /**
@@ -4295,7 +4648,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static bounceIn(k: number): number;
         /**
@@ -4305,7 +4658,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static bounceOut(k: number): number;
         /**
@@ -4315,7 +4668,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         static bounceInOut(k: number): number;
         /**
@@ -4382,7 +4735,7 @@ declare namespace annie {
          * @readonly
          * @public
          * @since 1.0.9
-         * @returns {number}
+         * @return {number}
          */
         currentCount: number;
         private _currentCount;
@@ -4391,7 +4744,7 @@ declare namespace annie {
          * @property delay
          * @since 1.0.9
          * @public
-         * @returns {number}
+         * @return {number}
          */
         delay: number;
         private _delay;
@@ -4401,7 +4754,7 @@ declare namespace annie {
          * 执行触发Timer 的总次数
          * @public
          * @since 1.0.9
-         * @returns {number}
+         * @return {number}
          */
         repeatCount: number;
         private _repeatCount;
@@ -4409,7 +4762,7 @@ declare namespace annie {
          * 当前是否在运行中
          * @property running
          * @since 1.0.9
-         * @returns {boolean}
+         * @return {boolean}
          */
         running: boolean;
         private _running;
@@ -4477,7 +4830,7 @@ declare namespace annie {
     /**
      * 全局事件触发器
      * @static
-     * @property  globalDispatcher
+     * @property  annie.globalDispatcher
      * @type {annie.EventDispatcher}
      * @public
      * @since 1.0.0
@@ -4595,10 +4948,10 @@ declare namespace annie {
     let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
     /**
      * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
+     * @method annie.getStagePixels
      * @param {annie.Stage} stage
      * @param {annie.Rectangle} rect
-     * @returns {Array}
+     * @return {Array}
      * @public
      * @since 1.1.1
      */

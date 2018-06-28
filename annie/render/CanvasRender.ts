@@ -20,11 +20,21 @@ namespace annie {
          * @default null
          */
         public rootContainer: any = null;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
         protected _ctx: any;
+        /**
+         * @protected _stage
+         * @protected
+         * @default null
+         */
         private _stage: Stage;
 
         /**
-         * @CanvasRender
+         * @method CanvasRender
          * @param {annie.Stage} stage
          * @public
          * @since 1.0.0

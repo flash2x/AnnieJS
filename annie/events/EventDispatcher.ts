@@ -21,7 +21,7 @@ namespace annie {
          * @property instanceId
          * @public
          * @since 1.0.0
-         * @returns {number}
+         * @return {number}
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
@@ -49,7 +49,7 @@ namespace annie {
          * @method destroy
          * @since 2.0.0
          * @public
-         * @returns {void}
+         * @return {void}
          */
         abstract destroy(): void;
     }
@@ -83,7 +83,7 @@ namespace annie {
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
-         * @returns {number}
+         * @return {number}
          * @static
          * @private
          * @since 1.0.0
@@ -170,7 +170,7 @@ namespace annie {
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有收听者则返回true
+         * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
@@ -224,7 +224,7 @@ namespace annie {
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有则返回true
+         * @return {boolean} 如果有则返回true
          */
         public hasEventListener(type: string, useCapture = true): boolean {
             let s = this;

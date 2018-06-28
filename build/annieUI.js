@@ -1548,7 +1548,7 @@ var annie;
              * 获取下拉滚动的loadingView对象
              * @property loadingView
              * @since 1.0.9
-             * @returns {DisplayObject}
+             * @return {DisplayObject}
              */
             get: function () {
                 return this.downL;
@@ -1765,9 +1765,19 @@ var annie;
              * @since 1.1.1
              */
             this.drawHeight = 0;
-            //总步数数据
+            /**
+             * 总步数数据
+             * @property totalStepList
+             * @protected
+             * @type {any[]}
+             */
             this.totalStepList = [];
-            //当前步数所在的id
+            /**
+             * 当前步数所在的id
+             * @property currentStepId
+             * @protected
+             * @type {number}
+             */
             this.currentStepId = 0;
             var s = this;
             var bd = document.createElement("canvas");
@@ -1805,6 +1815,11 @@ var annie;
             configurable: true
         });
         ;
+        /**
+         * @method onMouseDown
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         DrawingBoard.prototype.onMouseDown = function (e) {
             var s = this;
             s._isMouseDown = true;
@@ -1823,6 +1838,11 @@ var annie;
             s.addStepObj.ps = [];
         };
         ;
+        /**
+         * @method onMouseUp
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         DrawingBoard.prototype.onMouseUp = function (e) {
             var s = this;
             if (s._isMouseDown) {
@@ -1834,6 +1854,11 @@ var annie;
             }
         };
         ;
+        /**
+         * @method onMouseMove
+         * @private
+         * @param {annie.MouseEvent} e
+         */
         DrawingBoard.prototype.onMouseMove = function (e) {
             var s = this;
             if (s._isMouseDown) {
@@ -2011,7 +2036,7 @@ var annie;
          * @param step
          * @public
          * @since 1.1.1
-         * @returns {boolean}
+         * @return {boolean}
          */
         ScratchCard.prototype.cancel = function (step) {
             if (step === void 0) { step = 0; }

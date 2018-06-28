@@ -25,7 +25,7 @@ var annie;
              * @property instanceId
              * @public
              * @since 1.0.0
-             * @returns {number}
+             * @return {number}
              * @readonly
              * @example
              *      //获取 annie引擎类对象唯一码
@@ -74,7 +74,7 @@ var annie;
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
-         * @returns {number}
+         * @return {number}
          * @static
          * @private
          * @since 1.0.0
@@ -159,7 +159,7 @@ var annie;
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有收听者则返回true
+         * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
@@ -217,7 +217,7 @@ var annie;
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有则返回true
+         * @return {boolean} 如果有则返回true
          */
         EventDispatcher.prototype.hasEventListener = function (type, useCapture) {
             if (useCapture === void 0) { useCapture = true; }
@@ -321,6 +321,8 @@ var annie;
         /**
          * @method Event
          * @param {string} type 事件类型
+         * @public
+         * @since 1.0.0
          */
         function Event(type) {
             _super.call(this);
@@ -366,6 +368,7 @@ var annie;
          * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
          * @method stopImmediatePropagation
          * @public
+         * @return {void}
          * @since 2.0.0
          */
         Event.prototype.stopImmediatePropagation = function () {
@@ -376,26 +379,31 @@ var annie;
          * @method stopPropagation
          * @public
          * @since 2.0.0
+         * @return {void}
          */
         Event.prototype.stopPropagation = function () {
             this._bpd = true;
         };
-        /**
-         * @method destroy
-         * @public
-         * @since 2.0.0
-         * @returns {void}
-         */
         Event.prototype.destroy = function () {
             var s = this;
             s.target = null;
             s.data = null;
         };
+        /**
+         * 重围事件到初始状态方便重复利用
+         * @method reset
+         * @param {string} type
+         * @param target
+         * @since 2.0.0
+         * @return {void}
+         * @public
+         */
         Event.prototype.reset = function (type, target) {
-            this.target = target;
-            this._pd = false;
-            this._bpd = false;
-            this.type = type;
+            var s = this;
+            s.target = target;
+            s._pd = false;
+            s._bpd = false;
+            s.type = type;
         };
         /**
          * 舞台尺寸发生变化时触发
@@ -410,7 +418,7 @@ var annie;
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
          * @Event
-         * @property RESIZE
+         * @property ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -508,13 +516,13 @@ var annie;
         /**
          * 舞台初始化完成后会触发的事件
          * @Event
-         * @property ON_STAGE_INIT
+         * @property ON_INIT_STAGE
          * @type {string}
          * @static
          * @public
          * @since 1.0.0
          */
-        Event.INIT_TO_STAGE = "onInitStage";
+        Event.ON_INIT_STAGE = "onInitStage";
         /**
          * 显示对象加入到舞台事件
          * @Event
@@ -932,7 +940,8 @@ var annie;
          * 求两点之间的距离
          * @method distance
          * @param args 可变参数 传两个参数的话就是两个annie.Point类型 传四个参数的话分别是两个点的x y x y
-         * @returns {number}
+         * @return {number}
+         * @static
          */
         Point.distance = function () {
             var args = [];
@@ -961,6 +970,12 @@ var annie;
     var PacPI = PI + HalfPI;
     var TwoPI = PI << 1;
     var DEG_TO_RAD = Math.PI / 180;
+    /**
+     * @method cos
+     * @private
+     * @param {number} angle
+     * @return {number}
+     */
     function cos(angle) {
         switch (angle) {
             case HalfPI:
@@ -977,6 +992,9 @@ var annie;
         }
     }
     /**
+     * @method sin
+     * @param {number} angle
+     * @return {number}
      * @private
      */
     function sin(angle) {
@@ -1072,7 +1090,7 @@ var annie;
              * @param {number} x
              * @param {number} y
              * @param {annie.Point} 默认为空，如果不为null，则返回的是Point就是此对象，如果为null，则返回来的Point是新建的对象
-             * @returns {annie.Point}
+             * @return {annie.Point}
              * @public
              * @since 1.0.0
              */
@@ -1125,7 +1143,7 @@ var annie;
          * @method clone
          * @since 1.0.0
          * @public
-         * @returns {annie.Matrix}
+         * @return {annie.Matrix}
          */
         Matrix.prototype.clone = function () {
             var s = this;
@@ -1149,7 +1167,7 @@ var annie;
         };
         /**
          * 将矩阵恢复成原始矩阵
-         * @method
+         * @method identity
          * @public
          * @since 1.0.0
          */
@@ -1160,8 +1178,8 @@ var annie;
         };
         /**
          * 反转一个矩阵
-         * @method
-         * @returns {Matrix}
+         * @method invert
+         * @return {Matrix}
          * @since 1.0.0
          * @public
          */
@@ -1257,7 +1275,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.Matrix} m1
          * @param {annie.Matrix} m2
-         * @returns {boolean}
+         * @return {boolean}
          */
         Matrix.isEqual = function (m1, m2) {
             return m1.tx == m2.tx && m1.ty == m2.ty && m1.a == m2.a && m1.b == m2.b && m1.c == m2.c && m1.d == m2.d;
@@ -1401,7 +1419,7 @@ var annie;
          * 判断一个点是否在矩形内包括边
          * @method isPointIn
          * @param {annie.Point} point
-         * @returns {boolean}
+         * @return {boolean}
          * @public
          * @since 1.0.0
          */
@@ -1466,7 +1484,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.Point} p1
          * @param {..arg} ary
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         Rectangle.createFromPoints = function (rect) {
             var arg = [];
@@ -1498,9 +1516,12 @@ var annie;
         };
         /**
          * 通过两个点来确定一个矩形
+         * @method createRectform2Point
+         * @static
          * @param rect
          * @param p1
          * @param p2
+         * @return {void}
          */
         Rectangle.createRectform2Point = function (rect, p1, p2) {
             var x = p1.x, y = p1.y, w = p1.x, h = p1.y;
@@ -1572,6 +1593,8 @@ var annie;
              * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              * @since 1.0.0
+             * @protected
+             * @readonly
              */
             this._UI = { UD: false, UM: true, UA: true, UF: false };
             /**
@@ -1655,9 +1678,11 @@ var annie;
             this._filters = [];
             /**
              * 是否自己的父级发生的改变
+             * @property _cp
              * @type {boolean}
              * @private
              * @since 1.1.2
+             * @default true
              */
             this._cp = true;
             this._dragBounds = new annie.Rectangle();
@@ -1688,9 +1713,33 @@ var annie;
              * @default 0
              */
             this._offsetY = 0;
+            /**
+             * @property _bounds
+             * @type {annie.Rectangle}
+             * @private
+             */
             this._bounds = new annie.Rectangle();
+            /**
+             * @property _drawRect
+             * @type {annie.Rectangle}
+             * @private
+             */
             this._drawRect = new annie.Rectangle();
+            /**
+             * @property _a2x_sounds
+             * @since 2.0.0
+             * @type {Object}
+             * @private
+             * @default {null}
+             */
             this._a2x_sounds = null;
+            /**
+             * @property _a2x_res_obj
+             * @type {Object}
+             * @since 2.0.0
+             * @private
+             * @default {Object}
+             */
             this._a2x_res_obj = {};
             this._instanceType = "annie.DisplayObject";
         }
@@ -1861,7 +1910,7 @@ var annie;
             /**
              * 显示对象上y方向的缩放或旋转点
              * @property anchorY
-             * @pubic
+             * @public
              * @since 1.0.0
              * @type {number}
              * @default 0
@@ -1964,7 +2013,7 @@ var annie;
          * @since 1.0.0
          * @public
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         DisplayObject.prototype.globalToLocal = function (point, bp) {
             if (bp === void 0) { bp = null; }
@@ -1976,7 +2025,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
@@ -1997,6 +2046,7 @@ var annie;
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
          * @public
+         * @return {void}
          */
         DisplayObject.prototype.startDrag = function (isCenter, bounds) {
             if (isCenter === void 0) { isCenter = false; }
@@ -2028,6 +2078,7 @@ var annie;
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         DisplayObject.prototype.stopDrag = function () {
             if (annie.Stage._dragDisplay == this) {
@@ -2041,7 +2092,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
-         * @returns {annie.DisplayObject}
+         * @return {annie.DisplayObject}
          */
         DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
             if (isMouseEvent === void 0) { isMouseEvent = false; }
@@ -2068,8 +2119,7 @@ var annie;
          * @method getBounds
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
-         * @abstract
+         * @return {annie.Rectangle}
          */
         DisplayObject.prototype.getBounds = function () {
             return this._bounds;
@@ -2081,7 +2131,7 @@ var annie;
          * @method getDrawRect
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         DisplayObject.prototype.getDrawRect = function () {
             var s = this;
@@ -2113,6 +2163,7 @@ var annie;
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         DisplayObject.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -2176,7 +2227,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
-         * @abstract
+         * @return {void}
          */
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
@@ -2213,7 +2264,7 @@ var annie;
          * @since 1.0.0
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
+         * @return {void}
          */
         DisplayObject.prototype._onDispatchBubbledEvent = function (type) {
             var s = this;
@@ -2299,7 +2350,7 @@ var annie;
          * 如果需要同时获取宽和高的值，建议使用此方法更有效率
          * @method getWH
          * @public
-         * @returns {{width: number, height: number}}
+         * @return {{width: number, height: number}}
          * @since 1.0.9
          */
         DisplayObject.prototype.getWH = function () {
@@ -2308,6 +2359,14 @@ var annie;
             var dr = s.getDrawRect();
             return { width: dr.width, height: dr.height };
         };
+        /**
+         * 设置属性
+         * @method _setProperty
+         * @param {string} property
+         * @param value
+         * @param {number} type
+         * @private
+         */
         DisplayObject.prototype._setProperty = function (property, value, type) {
             var s = this;
             if (s[property] != value) {
@@ -2330,8 +2389,11 @@ var annie;
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
-         * @returns {number}
+         * @return {number}
+         * @since 2.0.0
+         * @public
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
@@ -2344,7 +2406,11 @@ var annie;
         };
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
+         * @public
+         * @since 2.0.0
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @return {void}
          */
         DisplayObject.prototype.removeSound = function (id) {
             var s = this;
@@ -2380,12 +2446,7 @@ var annie;
             s._texture = null;
             _super.prototype.destroy.call(this);
         };
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
+        //为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
         DisplayObject._p1 = new annie.Point();
         DisplayObject._p2 = new annie.Point();
@@ -2648,7 +2709,7 @@ var annie;
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -2687,10 +2748,6 @@ var annie;
             }
             return null;
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         Bitmap.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -2800,9 +2857,9 @@ var annie;
          * @static
          * @param points
          * @param colors
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
-         * @pubic
+         * @public
          */
         Shape.getGradientColor = function (points, colors) {
             var colorObj;
@@ -2823,7 +2880,7 @@ var annie;
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
-         * @returns {CanvasPattern}
+         * @return {CanvasPattern}
          * @public
          * @since 1.0.0
          */
@@ -2839,7 +2896,7 @@ var annie;
          * @since 1.0.0
          * @param {string} color 字符串的颜色值,如:#33ffee
          * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
-         * @returns {string}
+         * @return {string}
          */
         Shape.getRGBA = function (color, alpha) {
             if (color.indexOf("0x") == 0) {
@@ -3187,6 +3244,16 @@ var annie;
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
         };
+        /**
+         * @method _stroke
+         * @param strokeStyle
+         * @param {number} width
+         * @param {number} cap
+         * @param {number} join
+         * @param {number} miter
+         * @private
+         * @since 1.0.0
+         */
         Shape.prototype._stroke = function (strokeStyle, width, cap, join, miter) {
             var c = this._command;
             c[c.length] = [0, "lineWidth", width];
@@ -3400,6 +3467,12 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
+        /**
+         * @method _drawShape
+         * @param ctx
+         * @private
+         * @return {void}
+         */
         Shape.prototype._drawShape = function (ctx) {
             var s = this;
             var com = s._command;
@@ -3444,7 +3517,7 @@ var annie;
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -3514,15 +3587,16 @@ var annie;
                 }
             }
         };
+        /**
+         * 渲染
+         * @method render
+         * @param {annie.IRender | any} renderObj
+         */
         Shape.prototype.render = function (renderObj) {
             if (!this._isUseToMask) {
                 _super.prototype.render.call(this, renderObj);
             }
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         Shape.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -3531,7 +3605,17 @@ var annie;
             s._isBitmapFill = null;
             _super.prototype.destroy.call(this);
         };
+        /**
+         * @property _caps
+         * @type {string[]}
+         * @private
+         */
         Shape._caps = ["butt", "round", "square"];
+        /**
+         * @property _joins
+         * @type {string[]}
+         * @private
+         */
         Shape._joins = ["miter", "round", "bevel"];
         return Shape;
     }(annie.DisplayObject));
@@ -3555,10 +3639,28 @@ var annie;
      */
     var Sprite = (function (_super) {
         __extends(Sprite, _super);
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         function Sprite() {
             _super.call(this);
-            //sprite 和 moveClip的类资源信息
+            /**
+             * sprite 和 moveClip的类资源信息
+             * @property _a2x_res_class
+             * @type {Object}
+             * @since 2.0.0
+             * @private
+             */
             this._a2x_res_class = null;
+            /**
+             * @property _a2x_res_children
+             * @type {any[]}
+             * @private
+             * @since 2.0.0
+             */
             this._a2x_res_children = [];
             /**
              * 是否可以让children接收鼠标事件,如果为false
@@ -3653,6 +3755,16 @@ var annie;
             }
         };
         //全局遍历
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         */
         Sprite._getElementsByName = function (rex, root, isOnlyOne, isRecursive, resultList) {
             var len = root.children.length;
             if (len > 0) {
@@ -3683,7 +3795,7 @@ var annie;
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -3718,7 +3830,7 @@ var annie;
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          */
         Sprite.prototype.addChildAt = function (child, index) {
@@ -3761,7 +3873,7 @@ var annie;
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -3777,7 +3889,7 @@ var annie;
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
@@ -3796,7 +3908,7 @@ var annie;
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
-         * @returns {boolean}
+         * @return {boolean}
          */
         Sprite.prototype.swapChild = function (child1, child2) {
             var s = this;
@@ -3910,7 +4022,7 @@ var annie;
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -3969,7 +4081,7 @@ var annie;
         /**
          * 重写getBounds
          * @method getBounds
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @public
          */
@@ -4106,13 +4218,31 @@ var annie;
             this.media = null;
             /**
              * 媒体类型 VIDEO 或者 AUDIO
+             * @property type
              * @type {string}
-             * @since 1.0.0
              * @since 1.0.0
              */
             this.type = "";
+            /**
+             * @property isPlaying
+             * @type {boolean}
+             * @since 2.0.0
+             * @default false
+             */
             this.isPlaying = false;
+            /**
+             * @property _loop
+             * @type {number}
+             * @private
+             * @since 2.0.0
+             */
             this._loop = 1;
+            /**
+             * @property _repeate
+             * @type {number}
+             * @private
+             * @default 1
+             */
             this._repeate = 1;
             var s = this;
             s._instanceType = "annie.Media";
@@ -4226,7 +4356,7 @@ var annie;
              * 设置或者获取音量 从0-1
              * @since 1.1.0
              * @property volume
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this.media.volume;
@@ -4304,6 +4434,8 @@ var annie;
         };
         /**
          * 停止播放，给stopAllSounds调用
+         * @method stop2
+         * @private
          */
         Sound.prototype.stop2 = function () {
             var s = this;
@@ -4313,6 +4445,8 @@ var annie;
         };
         /**
          * 恢复播放，给stopAllSounds调用
+         * @method play2
+         * @private
          */
         Sound.prototype.play2 = function () {
             var s = this;
@@ -4376,8 +4510,18 @@ var annie;
             }
             Sound._volume = volume;
         };
-        //声音对象池
+        /**
+         * 音对象池
+         * @property _soundList
+         * @type {any[]}
+         * @private
+         */
         Sound._soundList = [];
+        /**
+         * @static
+         * @type {number}
+         * @private
+         */
         Sound._volume = 1;
         return Sound;
     }(annie.Media));
@@ -4453,31 +4597,73 @@ var annie;
      */
     var MovieClip = (function (_super) {
         __extends(MovieClip, _super);
+        /**
+         * 构造函数
+         * @method MovieClip
+         * @public
+         * @since 1.0.0
+         */
         function MovieClip() {
             _super.call(this);
+            /**
+             * @property _curFrame
+             * @type {number}
+             * @private
+             * @since 2.0.0
+             * @default 1
+             */
             this._curFrame = 1;
+            /**
+             * @property _lastFrameObj
+             * @type {Object}
+             * @private
+             * @default null
+             */
             this._lastFrameObj = null;
+            /**
+             * @property _isPlaying
+             * @type {boolean}
+             * @private
+             * @since 2.0.0
+             * @default true
+             */
             this._isPlaying = true;
+            /**
+             * @property _isFront
+             * @type {boolean}
+             * @private
+             * @default true
+             */
             this._isFront = true;
+            /**
+             * @property _lastFrame
+             * @type {number}
+             * @private
+             * @default 0
+             */
             this._lastFrame = 0;
+            /**
+             * @property _a2x_script
+             * @type {Object}
+             * @default null
+             * @private
+             * @since 2.0.0
+             */
             this._a2x_script = null;
+            /**
+             * @property _isButton
+             * @type {boolean}
+             * @private
+             * @default false
+             */
             this._isButton = false;
             this._clicked = false;
-            this._mouseEvent = function (e) {
-                var s = this;
-                if (!s._clicked) {
-                    var frame = 2;
-                    if (e.type == "onMouseDown") {
-                        if (s._currentFrame > 2) {
-                            frame = 3;
-                        }
-                    }
-                    else {
-                        frame = 1;
-                    }
-                    s.gotoAndStop(frame);
-                }
-            };
+            /**
+             * @property _maskList
+             * @type {any[]}
+             * @private
+             * @default []
+             */
             this._maskList = [];
             var s = this;
             s._instanceType = "annie.MovieClip";
@@ -4575,7 +4761,7 @@ var annie;
             s._a2x_script[frameIndex] = frameScript;
         };
         /**
-         * @移除帧上的回调方法
+         * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
@@ -4587,6 +4773,14 @@ var annie;
                 s._a2x_script[frameIndex] = null;
         };
         Object.defineProperty(MovieClip.prototype, "isButton", {
+            /**
+             * 确认是不是按钮形态
+             * @property isButton
+             * @return {boolean}
+             * @public
+             * @since 2.0.0
+             * @default false
+             */
             get: function () {
                 return this._isButton;
             },
@@ -4599,6 +4793,7 @@ var annie;
          * @method initButton
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.initButton = function () {
             var s = this;
@@ -4616,6 +4811,14 @@ var annie;
             get: function () {
                 return this._clicked;
             },
+            /**
+             * 设置是否为点击状态
+             * @property clicked
+             * @param {boolean} value
+             * @public
+             * @since 2.0.0
+             * @default false
+             */
             set: function (value) {
                 var s = this;
                 if (value != s._clicked) {
@@ -4629,11 +4832,32 @@ var annie;
             configurable: true
         });
         /**
+         * @method  _mouseEvent
+         * @param e
+         * @private
+         */
+        MovieClip.prototype._mouseEvent = function (e) {
+            var s = this;
+            if (!s._clicked) {
+                var frame = 2;
+                if (e.type == "onMouseDown") {
+                    if (s._curFrame > 2) {
+                        frame = 3;
+                    }
+                }
+                else {
+                    frame = 1;
+                }
+                s.gotoAndStop(frame);
+            }
+        };
+        ;
+        /**
          * mc的当前帧的标签名,没有则为空
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
-         * @returns {string}
+         * @return {string}
          * */
         MovieClip.prototype.getCurrentLabel = function () {
             return "";
@@ -4929,10 +5153,6 @@ var annie;
             }
             _super.prototype.update.call(this, isDrawUpdate);
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -5052,6 +5272,12 @@ var annie;
             s._bounds.height = h;
             s.htmlElement = she;
         };
+        /**
+         * @method getStyle
+         * @param {HTMLElement} elem
+         * @param cssName
+         * @return {any}
+         */
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
             if (elem.style[cssName]) {
@@ -5107,10 +5333,6 @@ var annie;
                 }
             }
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         FloatDisplay.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -5192,6 +5414,11 @@ var annie;
             get: function () {
                 return this._textAlpha;
             },
+            /**
+             * @property textAlpha
+             * @since 2.0.0
+             * @public
+             */
             set: function (value) {
                 this._setProperty("_textAlpha", value, 3);
             },
@@ -5221,7 +5448,9 @@ var annie;
                 return this._lineSpacing;
             },
             /**
-             *
+             * @property lineSpacing
+             * @public
+             * @since 1.0.0
              * @param {number} value
              */
             set: function (value) {
@@ -5393,6 +5622,7 @@ var annie;
         });
         /**
          * 设置文本在canvas里的渲染样式
+         * @method _prepContext
          * @param ctx
          * @private
          * @since 1.0.0
@@ -5657,6 +5887,14 @@ var annie;
             });
             s.init(input);
         }
+        /**
+         * 初始化输入文本
+         * @method init
+         * @param htmlElement
+         * @public
+         * @return {void}
+         * @since 1.0.0
+         */
         InputText.prototype.init = function (htmlElement) {
             _super.prototype.init.call(this, htmlElement);
             //默认设置
@@ -5696,6 +5934,12 @@ var annie;
             get: function () {
                 return parseInt(this.htmlElement.style.lineHeight);
             },
+            /**
+             * @property lineSpacing
+             * @public
+             * @since 2.0.0
+             * @param {number} value
+             */
             set: function (value) {
                 this.htmlElement.style.lineHeight = value + "px";
             },
@@ -5834,7 +6078,7 @@ var annie;
              * @property text
              * @public
              * @since 1.0.3
-             * @returns {string}
+             * @return {string}
              */
             get: function () {
                 var s = this;
@@ -5857,7 +6101,7 @@ var annie;
              * @public
              * @since 1.1.0
              * @property maxCharacters
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 var l = this.htmlElement.getAttribute("maxlength");
@@ -5874,6 +6118,13 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        /**
+         * @property _inputTypeList
+         * @static
+         * @type {string[]}
+         * @private
+         * @since 2.0.0
+         */
         InputText._inputTypeList = ["input", "password", "textarea"];
         return InputText;
     }(annie.FloatDisplay));
@@ -6109,25 +6360,48 @@ var annie;
              * @type {number}
              */
             this._currentFlush = 0;
+            /**
+             * @property _lastDpList
+             * @type {Object}
+             * @private
+             */
             this._lastDpList = {};
+            /**
+             * @property _rid
+             * @type {number}
+             * @private
+             */
             this._rid = -1;
+            /**
+             * @property _floatDisplayList
+             * @type {any[]}
+             * @private
+             */
             this._floatDisplayList = [];
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+             * @property _ml
              * @type {Array}
              * @private
              */
             this._ml = [];
             /**
              * 这个是事件中用到的Point对象池,以提高性能
+             * @property _mp
              * @type {Array}
              * @private
              */
             this._mp = [];
             //每一个手指事件的对象池
+            /**
+             * @property _mouseDownPoint
+             * @type {Object}
+             * @private
+             */
             this._mouseDownPoint = {};
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
+             * @property _mouseEventTypes
              * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
              * @private
              */
@@ -6139,411 +6413,24 @@ var annie;
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp"
             };
+            /**
+             * @property muliPoints
+             * @type {Object[]}
+             * @private
+             */
             this.muliPoints = [];
             /**
              * 当document有鼠标或触摸事件时调用
+             * @property _mP1
              * @param e
              */
             this._mP1 = new annie.Point();
-            this._mP2 = new annie.Point();
-            this.onMouseEvent = function (e) {
-                //检查是否有
-                var s = this;
-                //判断是否有drag的显示对象
-                var sd = Stage._dragDisplay;
-                if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
-                    if (e.targetTouches.length == 2) {
-                        //求角度和距离
-                        s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
-                        s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
-                        s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
-                        s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
-                        var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
-                        var dis = annie.Point.distance(s._mP1, s._mP2);
-                        s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
-                        if (s.muliPoints.length >= 2) {
-                            //如果有事件，抛事件
-                            if (!s._touchEvent) {
-                                s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
-                                s._touchEvent.target = s;
-                            }
-                            var len = s.muliPoints.length;
-                            s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
-                            s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
-                            s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
-                            s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
-                            s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
-                            s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
-                            s.dispatchEvent(s._touchEvent);
-                            s.muliPoints.shift();
-                        }
-                    }
-                    else {
-                        s.muliPoints.length = 0;
-                    }
-                    if (sd) {
-                        sd._lastDragPoint.x = Number.MAX_VALUE;
-                        sd._lastDragPoint.y = Number.MAX_VALUE;
-                    }
-                    s._mouseDownPoint = {};
-                    s._lastDpList = {};
-                }
-                else {
-                    if (s.muliPoints.length > 0) {
-                        s._touchEvent.rotate = 0;
-                        s._touchEvent.scale = 0;
-                        s._touchEvent.clientPoint1.x = 0;
-                        s._touchEvent.clientPoint2.x = 0;
-                        s._touchEvent.clientPoint1.y = 0;
-                        s._touchEvent.clientPoint2.y = 0;
-                        s.dispatchEvent(s._touchEvent);
-                        s.muliPoints.length = 0;
-                    }
-                    //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-                    if (annie.EventDispatcher._totalMEC > 0) {
-                        var points = void 0;
-                        var item = s._mouseEventTypes[e.type];
-                        var events = void 0;
-                        var event_1;
-                        //stageMousePoint
-                        var sp = void 0;
-                        //localPoint;
-                        var lp = void 0;
-                        //clientPoint
-                        var cp = void 0;
-                        //事件个数
-                        var eLen = void 0;
-                        var identifier = void 0;
-                        if (annie.osType == "pc") {
-                            e.identifier = 0;
-                            points = [e];
-                        }
-                        else {
-                            if (s.isMultiMouse) {
-                                points = e.changedTouches;
-                            }
-                            else {
-                                points = [e.changedTouches[0]];
-                            }
-                        }
-                        for (var o = 0; o < points.length; o++) {
-                            eLen = 0;
-                            events = [];
-                            identifier = "m" + points[o].identifier;
-                            if (s._mp.length > 0) {
-                                cp = s._mp.shift();
-                            }
-                            else {
-                                cp = new annie.Point();
-                            }
-                            cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
-                            cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
-                            //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
-                            sp = s.globalToLocal(cp, annie.DisplayObject._bp);
-                            if (annie.EventDispatcher.getMouseEventCount() > 0) {
-                                if (!s._ml[eLen]) {
-                                    event_1 = new annie.MouseEvent(item);
-                                    s._ml[eLen] = event_1;
-                                }
-                                else {
-                                    event_1 = s._ml[eLen];
-                                    event_1.type = item;
-                                }
-                                events[events.length] = event_1;
-                                s._initMouseEvent(event_1, cp, sp, identifier);
-                                eLen++;
-                            }
-                            if (item == "onMouseDown") {
-                                s._mouseDownPoint[identifier] = cp;
-                            }
-                            else if (item == "onMouseUp") {
-                                if (s._mouseDownPoint[identifier]) {
-                                    if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
-                                        //click事件
-                                        //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                                        if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                            if (!s._ml[eLen]) {
-                                                event_1 = new annie.MouseEvent("onMouseClick");
-                                                s._ml[eLen] = event_1;
-                                            }
-                                            else {
-                                                event_1 = s._ml[eLen];
-                                                event_1.type = "onMouseClick";
-                                            }
-                                            events[events.length] = event_1;
-                                            s._initMouseEvent(event_1, cp, sp, identifier);
-                                            eLen++;
-                                        }
-                                    }
-                                }
-                            }
-                            if (eLen > 0) {
-                                //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                                var d_2 = s.hitTestPoint(cp, true);
-                                var displayList = [];
-                                if (d_2) {
-                                    //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
-                                    //找出真正的target,因为有些父级可能会mouseChildren=false;
-                                    while (d_2) {
-                                        if (d_2["mouseChildren"] === false) {
-                                            //丢掉之前的层级,因为根本没用了
-                                            displayList.length = 0;
-                                        }
-                                        displayList[displayList.length] = d_2;
-                                        d_2 = d_2.parent;
-                                    }
-                                }
-                                else {
-                                    displayList[displayList.length] = s;
-                                }
-                                var len = displayList.length;
-                                for (var i = len - 1; i >= 0; i--) {
-                                    d_2 = displayList[i];
-                                    for (var j = 0; j < eLen; j++) {
-                                        if (!events[j]["_bpd"]) {
-                                            if (d_2.hasEventListener(events[j].type)) {
-                                                events[j].currentTarget = d_2;
-                                                events[j].target = displayList[0];
-                                                lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                                events[j].localX = lp.x;
-                                                events[j].localY = lp.y;
-                                                d_2.dispatchEvent(events[j]);
-                                            }
-                                        }
-                                    }
-                                }
-                                //这里一定要反转一下，因为会影响mouseOut mouseOver
-                                displayList.reverse();
-                                for (var i = len - 1; i >= 0; i--) {
-                                    d_2 = displayList[i];
-                                    for (var j = 0; j < eLen; j++) {
-                                        if (!events[j]["_bpd"]) {
-                                            if (d_2.hasEventListener(events[j].type)) {
-                                                events[j].currentTarget = d_2;
-                                                events[j].target = displayList[eLen - 1];
-                                                lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                                events[j].localX = lp.x;
-                                                events[j].localY = lp.y;
-                                                d_2.dispatchEvent(events[j], null, false);
-                                            }
-                                        }
-                                    }
-                                }
-                                //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                                if (item != "onMouseDown") {
-                                    if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
-                                        if (s._lastDpList[identifier]) {
-                                            //从第二个开始，因为第一个对象始终是stage顶级对象
-                                            var len1 = s._lastDpList[identifier].length;
-                                            var len2 = displayList.length;
-                                            len = len1 > len2 ? len1 : len2;
-                                            var isDiff = false;
-                                            var overEvent = void 0;
-                                            var outEvent = void 0;
-                                            for (var i = 1; i < len; i++) {
-                                                if (!isDiff) {
-                                                    if (s._lastDpList[identifier][i] != displayList[i]) {
-                                                        //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
-                                                        isDiff = true;
-                                                        if (!s._ml[eLen]) {
-                                                            overEvent = new annie.MouseEvent("onMouseOver");
-                                                            s._ml[eLen] = overEvent;
-                                                        }
-                                                        else {
-                                                            overEvent = s._ml[eLen];
-                                                            overEvent.type = "onMouseOver";
-                                                        }
-                                                        s._initMouseEvent(overEvent, cp, sp, identifier);
-                                                        eLen++;
-                                                        if (!s._ml[eLen]) {
-                                                            outEvent = new annie.MouseEvent("onMouseOut");
-                                                            s._ml[eLen] = outEvent;
-                                                        }
-                                                        else {
-                                                            outEvent = s._ml[eLen];
-                                                            outEvent.type = "onMouseOut";
-                                                        }
-                                                        s._initMouseEvent(outEvent, cp, sp, identifier);
-                                                    }
-                                                }
-                                                if (isDiff) {
-                                                    if (s._lastDpList[identifier][i]) {
-                                                        //触发onMouseOut事件
-                                                        if (!outEvent["_bpd"]) {
-                                                            d_2 = s._lastDpList[identifier][i];
-                                                            if (d_2.hasEventListener("onMouseOut")) {
-                                                                outEvent.currentTarget = d_2;
-                                                                outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                                lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                                                outEvent.localX = lp.x;
-                                                                outEvent.localY = lp.y;
-                                                                d_2.dispatchEvent(outEvent);
-                                                            }
-                                                        }
-                                                    }
-                                                    if (displayList[i]) {
-                                                        //触发onMouseOver事件
-                                                        if (!overEvent["_bpd"]) {
-                                                            d_2 = displayList[i];
-                                                            if (d_2.hasEventListener("onMouseOver")) {
-                                                                overEvent.currentTarget = d_2;
-                                                                overEvent.target = displayList[len2 - 1];
-                                                                lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                                                overEvent.localX = lp.x;
-                                                                overEvent.localY = lp.y;
-                                                                d_2.dispatchEvent(overEvent);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    s._mp[s._mp.length] = cp;
-                                }
-                                if (sd && sd.stage && sd.parent) {
-                                    var x1 = sd.x, y1 = sd.y;
-                                    lp = sd.parent.globalToLocal(cp, annie.DisplayObject._bp);
-                                    if (!sd._isDragCenter) {
-                                        if (sd._lastDragPoint.x != Number.MAX_VALUE) {
-                                            x1 += lp.x - sd._lastDragPoint.x;
-                                            y1 += lp.y - sd._lastDragPoint.y;
-                                        }
-                                        sd._lastDragPoint.x = lp.x;
-                                        sd._lastDragPoint.y = lp.y;
-                                    }
-                                    else {
-                                        x1 = lp.x;
-                                        y1 = lp.y;
-                                    }
-                                    lp.x = x1;
-                                    lp.y = y1;
-                                    if (sd._dragBounds.width != 0) {
-                                        if (!sd._dragBounds.isPointIn(lp)) {
-                                            if (x1 < sd._dragBounds.x) {
-                                                x1 = sd._dragBounds.x;
-                                            }
-                                            else if (x1 > sd._dragBounds.x + sd._dragBounds.width) {
-                                                x1 = sd._dragBounds.x + sd._dragBounds.width;
-                                            }
-                                            if (y1 < sd._dragBounds.y) {
-                                                y1 = sd._dragBounds.y;
-                                            }
-                                            else if (y1 > sd._dragBounds.y + sd._dragBounds.height) {
-                                                y1 = sd._dragBounds.y + sd._dragBounds.height;
-                                            }
-                                        }
-                                    }
-                                    sd.x = x1;
-                                    sd.y = y1;
-                                }
-                                if (item == "onMouseUp") {
-                                    if (sd) {
-                                        sd._lastDragPoint.x = Number.MAX_VALUE;
-                                        sd._lastDragPoint.y = Number.MAX_VALUE;
-                                    }
-                                    delete s._mouseDownPoint[identifier];
-                                    delete s._lastDpList[identifier];
-                                }
-                                else {
-                                    s._lastDpList[identifier] = displayList;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (e.target.id == "_a2x_canvas") {
-                    if (s.isPreventDefaultEvent) {
-                        if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                            e.preventDefault();
-                        }
-                        if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                            e.preventDefault();
-                        }
-                    }
-                }
-                if (s._cp) {
-                    s.update();
-                }
-            };
             /**
-             * 设置舞台的对齐模式
+             * 当document有鼠标或触摸事件时调用
+             * @property _mP2
+             * @param e
              */
-            this.setAlign = function () {
-                var s = this;
-                var divH = s.divHeight * annie.devicePixelRatio;
-                var divW = s.divWidth * annie.devicePixelRatio;
-                var desH = s.desHeight;
-                var desW = s.desWidth;
-                s.anchorX = desW >> 1;
-                s.anchorY = desH >> 1;
-                //设备是否为竖屏
-                var isDivH = divH > divW;
-                //内容是否为竖屏内容
-                var isDesH = desH > desW;
-                var scaleY = 1;
-                var scaleX = 1;
-                s.x = (divW - desW) >> 1;
-                s.y = (divH - desH) >> 1;
-                if (s.autoSteering) {
-                    if (isDesH != isDivH) {
-                        var d_3 = divH;
-                        divH = divW;
-                        divW = d_3;
-                    }
-                }
-                if (s.scaleMode != "noScale") {
-                    scaleY = divH / desH;
-                    scaleX = divW / desW;
-                    switch (s.scaleMode) {
-                        case "noBorder":
-                            if (scaleX > scaleY) {
-                                scaleY = scaleX;
-                            }
-                            else {
-                                scaleX = scaleY;
-                            }
-                            break;
-                        case "showAll":
-                            if (scaleX < scaleY) {
-                                scaleY = scaleX;
-                            }
-                            else {
-                                scaleX = scaleY;
-                            }
-                            break;
-                        case "fixedWidth":
-                            scaleY = scaleX;
-                            break;
-                        case "fixedHeight":
-                            scaleX = scaleY;
-                            break;
-                    }
-                }
-                s.scaleX = scaleX;
-                s.scaleY = scaleY;
-                // s.viewRect=new annie.Rectangle();
-                s.viewRect.x = (desW - divW / scaleX) >> 1;
-                s.viewRect.y = (desH - divH / scaleY) >> 1;
-                s.viewRect.width = desW - s.viewRect.x * 2;
-                s.viewRect.height = desH - s.viewRect.y * 2;
-                if (s.autoSteering) {
-                    if (isDesH == isDivH) {
-                        s.rotation = 0;
-                    }
-                    else {
-                        if (desH > desW) {
-                            s.rotation = -90;
-                        }
-                        else {
-                            s.rotation = 90;
-                        }
-                    }
-                }
-                else {
-                    s.rotation = 0;
-                }
-            };
+            this._mP2 = new annie.Point();
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
              * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -6632,7 +6519,27 @@ var annie;
                 rc.addEventListener('mouseup', mouseEvent, false);
             }
         }
+        /**
+         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
+         * @property getStage
+         * @param {string} stageName
+         * @return {any}
+         * @since 2.0.0
+         */
+        Stage.getStage = function (stageName) {
+            if (stageName === void 0) { stageName = "annieEngine"; }
+            return annie.Stage._stageList[stageName];
+        };
         Object.defineProperty(Stage, "pause", {
+            /**
+             * 是否暂停
+             * @property pause
+             * @static
+             * @type {boolean}
+             * @public
+             * @since 1.0.0
+             * @default false
+             */
             get: function () {
                 return this._pause;
             },
@@ -6655,16 +6562,6 @@ var annie;
             configurable: true
         });
         /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @param {string} stageName
-         * @returns {any}
-         * @since 2.0.0
-         */
-        Stage.getStage = function (stageName) {
-            if (stageName === void 0) { stageName = "annieEngine"; }
-            return annie.Stage._stageList[stageName];
-        };
-        /**
          * 重写刷新
          * @method update
          * @public
@@ -6686,12 +6583,12 @@ var annie;
          * @param renderObj
          */
         Stage.prototype.render = function (renderObj) {
-            var s = this;
             renderObj.begin();
             _super.prototype.render.call(this, renderObj);
         };
         /**
          * 刷新mouse或者touch事件
+         * @method _initMouseEvent
          * @private
          */
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
@@ -6705,6 +6602,9 @@ var annie;
         };
         /**
          * 循环刷新页面的函数
+         * @method flush
+         * @private
+         * @return {void}
          */
         Stage.prototype.flush = function () {
             var s = this;
@@ -6756,7 +6656,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
-         * @returns {{w: number, h: number}}
+         * @return {{w: number, h: number}}
          */
         Stage.prototype.getRootDivWH = function (div) {
             var sw = div.style.width;
@@ -6793,6 +6693,414 @@ var annie;
         Stage.prototype.kill = function () {
             Stage.removeUpdateObj(this);
         };
+        /**
+         * @method onMouseEvent
+         * @param e
+         * @private
+         */
+        Stage.prototype.onMouseEvent = function (e) {
+            //检查是否有
+            var s = this;
+            //判断是否有drag的显示对象
+            var sd = Stage._dragDisplay;
+            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
+                if (e.targetTouches.length == 2) {
+                    //求角度和距离
+                    s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
+                    s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
+                    s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
+                    s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                    var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
+                    var dis = annie.Point.distance(s._mP1, s._mP2);
+                    s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
+                    if (s.muliPoints.length >= 2) {
+                        //如果有事件，抛事件
+                        if (!s._touchEvent) {
+                            s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
+                            s._touchEvent.target = s;
+                        }
+                        var len = s.muliPoints.length;
+                        s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
+                        s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
+                        s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
+                        s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
+                        s.dispatchEvent(s._touchEvent);
+                        s.muliPoints.shift();
+                    }
+                }
+                else {
+                    s.muliPoints.length = 0;
+                }
+                if (sd) {
+                    sd._lastDragPoint.x = Number.MAX_VALUE;
+                    sd._lastDragPoint.y = Number.MAX_VALUE;
+                }
+                s._mouseDownPoint = {};
+                s._lastDpList = {};
+            }
+            else {
+                if (s.muliPoints.length > 0) {
+                    s._touchEvent.rotate = 0;
+                    s._touchEvent.scale = 0;
+                    s._touchEvent.clientPoint1.x = 0;
+                    s._touchEvent.clientPoint2.x = 0;
+                    s._touchEvent.clientPoint1.y = 0;
+                    s._touchEvent.clientPoint2.y = 0;
+                    s.dispatchEvent(s._touchEvent);
+                    s.muliPoints.length = 0;
+                }
+                //检查mouse或touch事件是否有，如果有的话，就触发事件函数
+                if (annie.EventDispatcher._totalMEC > 0) {
+                    var points = void 0;
+                    var item = s._mouseEventTypes[e.type];
+                    var events = void 0;
+                    var event_1;
+                    //stageMousePoint
+                    var sp = void 0;
+                    //localPoint;
+                    var lp = void 0;
+                    //clientPoint
+                    var cp = void 0;
+                    //事件个数
+                    var eLen = void 0;
+                    var identifier = void 0;
+                    if (annie.osType == "pc") {
+                        e.identifier = 0;
+                        points = [e];
+                    }
+                    else {
+                        if (s.isMultiMouse) {
+                            points = e.changedTouches;
+                        }
+                        else {
+                            points = [e.changedTouches[0]];
+                        }
+                    }
+                    for (var o = 0; o < points.length; o++) {
+                        eLen = 0;
+                        events = [];
+                        identifier = "m" + points[o].identifier;
+                        if (s._mp.length > 0) {
+                            cp = s._mp.shift();
+                        }
+                        else {
+                            cp = new annie.Point();
+                        }
+                        cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
+                        //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
+                        sp = s.globalToLocal(cp, annie.DisplayObject._bp);
+                        if (annie.EventDispatcher.getMouseEventCount() > 0) {
+                            if (!s._ml[eLen]) {
+                                event_1 = new annie.MouseEvent(item);
+                                s._ml[eLen] = event_1;
+                            }
+                            else {
+                                event_1 = s._ml[eLen];
+                                event_1.type = item;
+                            }
+                            events[events.length] = event_1;
+                            s._initMouseEvent(event_1, cp, sp, identifier);
+                            eLen++;
+                        }
+                        if (item == "onMouseDown") {
+                            s._mouseDownPoint[identifier] = cp;
+                        }
+                        else if (item == "onMouseUp") {
+                            if (s._mouseDownPoint[identifier]) {
+                                if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
+                                    //click事件
+                                    //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                                    if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
+                                        if (!s._ml[eLen]) {
+                                            event_1 = new annie.MouseEvent("onMouseClick");
+                                            s._ml[eLen] = event_1;
+                                        }
+                                        else {
+                                            event_1 = s._ml[eLen];
+                                            event_1.type = "onMouseClick";
+                                        }
+                                        events[events.length] = event_1;
+                                        s._initMouseEvent(event_1, cp, sp, identifier);
+                                        eLen++;
+                                    }
+                                }
+                            }
+                        }
+                        if (eLen > 0) {
+                            //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
+                            var d_2 = s.hitTestPoint(cp, true);
+                            var displayList = [];
+                            if (d_2) {
+                                //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
+                                //找出真正的target,因为有些父级可能会mouseChildren=false;
+                                while (d_2) {
+                                    if (d_2["mouseChildren"] === false) {
+                                        //丢掉之前的层级,因为根本没用了
+                                        displayList.length = 0;
+                                    }
+                                    displayList[displayList.length] = d_2;
+                                    d_2 = d_2.parent;
+                                }
+                            }
+                            else {
+                                displayList[displayList.length] = s;
+                            }
+                            var len = displayList.length;
+                            for (var i = len - 1; i >= 0; i--) {
+                                d_2 = displayList[i];
+                                for (var j = 0; j < eLen; j++) {
+                                    if (!events[j]["_bpd"]) {
+                                        if (d_2.hasEventListener(events[j].type)) {
+                                            events[j].currentTarget = d_2;
+                                            events[j].target = displayList[0];
+                                            lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
+                                            events[j].localX = lp.x;
+                                            events[j].localY = lp.y;
+                                            d_2.dispatchEvent(events[j]);
+                                        }
+                                    }
+                                }
+                            }
+                            //这里一定要反转一下，因为会影响mouseOut mouseOver
+                            displayList.reverse();
+                            for (var i = len - 1; i >= 0; i--) {
+                                d_2 = displayList[i];
+                                for (var j = 0; j < eLen; j++) {
+                                    if (!events[j]["_bpd"]) {
+                                        if (d_2.hasEventListener(events[j].type)) {
+                                            events[j].currentTarget = d_2;
+                                            events[j].target = displayList[eLen - 1];
+                                            lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
+                                            events[j].localX = lp.x;
+                                            events[j].localY = lp.y;
+                                            d_2.dispatchEvent(events[j], null, false);
+                                        }
+                                    }
+                                }
+                            }
+                            //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
+                            if (item != "onMouseDown") {
+                                if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
+                                    if (s._lastDpList[identifier]) {
+                                        //从第二个开始，因为第一个对象始终是stage顶级对象
+                                        var len1 = s._lastDpList[identifier].length;
+                                        var len2 = displayList.length;
+                                        len = len1 > len2 ? len1 : len2;
+                                        var isDiff = false;
+                                        var overEvent = void 0;
+                                        var outEvent = void 0;
+                                        for (var i = 1; i < len; i++) {
+                                            if (!isDiff) {
+                                                if (s._lastDpList[identifier][i] != displayList[i]) {
+                                                    //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
+                                                    isDiff = true;
+                                                    if (!s._ml[eLen]) {
+                                                        overEvent = new annie.MouseEvent("onMouseOver");
+                                                        s._ml[eLen] = overEvent;
+                                                    }
+                                                    else {
+                                                        overEvent = s._ml[eLen];
+                                                        overEvent.type = "onMouseOver";
+                                                    }
+                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                    eLen++;
+                                                    if (!s._ml[eLen]) {
+                                                        outEvent = new annie.MouseEvent("onMouseOut");
+                                                        s._ml[eLen] = outEvent;
+                                                    }
+                                                    else {
+                                                        outEvent = s._ml[eLen];
+                                                        outEvent.type = "onMouseOut";
+                                                    }
+                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                }
+                                            }
+                                            if (isDiff) {
+                                                if (s._lastDpList[identifier][i]) {
+                                                    //触发onMouseOut事件
+                                                    if (!outEvent["_bpd"]) {
+                                                        d_2 = s._lastDpList[identifier][i];
+                                                        if (d_2.hasEventListener("onMouseOut")) {
+                                                            outEvent.currentTarget = d_2;
+                                                            outEvent.target = s._lastDpList[identifier][len1 - 1];
+                                                            lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
+                                                            outEvent.localX = lp.x;
+                                                            outEvent.localY = lp.y;
+                                                            d_2.dispatchEvent(outEvent);
+                                                        }
+                                                    }
+                                                }
+                                                if (displayList[i]) {
+                                                    //触发onMouseOver事件
+                                                    if (!overEvent["_bpd"]) {
+                                                        d_2 = displayList[i];
+                                                        if (d_2.hasEventListener("onMouseOver")) {
+                                                            overEvent.currentTarget = d_2;
+                                                            overEvent.target = displayList[len2 - 1];
+                                                            lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
+                                                            overEvent.localX = lp.x;
+                                                            overEvent.localY = lp.y;
+                                                            d_2.dispatchEvent(overEvent);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                s._mp[s._mp.length] = cp;
+                            }
+                            if (sd && sd.stage && sd.parent) {
+                                var x1 = sd.x, y1 = sd.y;
+                                lp = sd.parent.globalToLocal(cp, annie.DisplayObject._bp);
+                                if (!sd._isDragCenter) {
+                                    if (sd._lastDragPoint.x != Number.MAX_VALUE) {
+                                        x1 += lp.x - sd._lastDragPoint.x;
+                                        y1 += lp.y - sd._lastDragPoint.y;
+                                    }
+                                    sd._lastDragPoint.x = lp.x;
+                                    sd._lastDragPoint.y = lp.y;
+                                }
+                                else {
+                                    x1 = lp.x;
+                                    y1 = lp.y;
+                                }
+                                lp.x = x1;
+                                lp.y = y1;
+                                if (sd._dragBounds.width != 0) {
+                                    if (!sd._dragBounds.isPointIn(lp)) {
+                                        if (x1 < sd._dragBounds.x) {
+                                            x1 = sd._dragBounds.x;
+                                        }
+                                        else if (x1 > sd._dragBounds.x + sd._dragBounds.width) {
+                                            x1 = sd._dragBounds.x + sd._dragBounds.width;
+                                        }
+                                        if (y1 < sd._dragBounds.y) {
+                                            y1 = sd._dragBounds.y;
+                                        }
+                                        else if (y1 > sd._dragBounds.y + sd._dragBounds.height) {
+                                            y1 = sd._dragBounds.y + sd._dragBounds.height;
+                                        }
+                                    }
+                                }
+                                sd.x = x1;
+                                sd.y = y1;
+                            }
+                            if (item == "onMouseUp") {
+                                if (sd) {
+                                    sd._lastDragPoint.x = Number.MAX_VALUE;
+                                    sd._lastDragPoint.y = Number.MAX_VALUE;
+                                }
+                                delete s._mouseDownPoint[identifier];
+                                delete s._lastDpList[identifier];
+                            }
+                            else {
+                                s._lastDpList[identifier] = displayList;
+                            }
+                        }
+                    }
+                }
+            }
+            if (e.target.id == "_a2x_canvas") {
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
+                }
+            }
+            if (s._cp) {
+                s.update();
+            }
+        };
+        ;
+        /**
+         * 设置舞台的对齐模式
+         * @method setAlign
+         * @private
+         * @return {void}
+         */
+        Stage.prototype.setAlign = function () {
+            var s = this;
+            var divH = s.divHeight * annie.devicePixelRatio;
+            var divW = s.divWidth * annie.devicePixelRatio;
+            var desH = s.desHeight;
+            var desW = s.desWidth;
+            s.anchorX = desW >> 1;
+            s.anchorY = desH >> 1;
+            //设备是否为竖屏
+            var isDivH = divH > divW;
+            //内容是否为竖屏内容
+            var isDesH = desH > desW;
+            var scaleY = 1;
+            var scaleX = 1;
+            s.x = (divW - desW) >> 1;
+            s.y = (divH - desH) >> 1;
+            if (s.autoSteering) {
+                if (isDesH != isDivH) {
+                    var d_3 = divH;
+                    divH = divW;
+                    divW = d_3;
+                }
+            }
+            if (s.scaleMode != "noScale") {
+                scaleY = divH / desH;
+                scaleX = divW / desW;
+                switch (s.scaleMode) {
+                    case "noBorder":
+                        if (scaleX > scaleY) {
+                            scaleY = scaleX;
+                        }
+                        else {
+                            scaleX = scaleY;
+                        }
+                        break;
+                    case "showAll":
+                        if (scaleX < scaleY) {
+                            scaleY = scaleX;
+                        }
+                        else {
+                            scaleX = scaleY;
+                        }
+                        break;
+                    case "fixedWidth":
+                        scaleY = scaleX;
+                        break;
+                    case "fixedHeight":
+                        scaleX = scaleY;
+                        break;
+                }
+            }
+            s.scaleX = scaleX;
+            s.scaleY = scaleY;
+            // s.viewRect=new annie.Rectangle();
+            s.viewRect.x = (desW - divW / scaleX) >> 1;
+            s.viewRect.y = (desH - divH / scaleY) >> 1;
+            s.viewRect.width = desW - s.viewRect.x * 2;
+            s.viewRect.height = desH - s.viewRect.y * 2;
+            if (s.autoSteering) {
+                if (isDesH == isDivH) {
+                    s.rotation = 0;
+                }
+                else {
+                    if (desH > desW) {
+                        s.rotation = -90;
+                    }
+                    else {
+                        s.rotation = 90;
+                    }
+                }
+            }
+            else {
+                s.rotation = 0;
+            }
+        };
+        ;
         Stage.prototype.getBounds = function () {
             return this.viewRect;
         };
@@ -6867,22 +7175,34 @@ var annie;
             s._ml = null;
             _super.prototype.destroy.call(this);
         };
+        /**
+         * @property _stageList
+         * @static
+         * @type {Object}
+         * @private
+         */
         Stage._stageList = {};
         /**
-         * 是否暂停
-         * @property pause
-         * @static
+         * @property _pause
          * @type {boolean}
-         * @public
-         * @since 1.0.0
-         * @default false
+         * @private
+         * @static
          */
         Stage._pause = false;
+        /**
+         * @property _dragDisplay
+         * @private
+         * @type {null}
+         * @private
+         * @static
+         */
         Stage._dragDisplay = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
+         * @property _isLoadedVConsole
          * @type {Array}
          * @private
+         * @static
          */
         Stage._isLoadedVConsole = false;
         /**
@@ -7019,7 +7339,7 @@ var annie;
         __extends(ColorFilter, _super);
         /**
          * @method ColorFilter
-         * @colorArrays 颜色值数据
+         * @param {number} colorArrays 颜色值数据
          */
         function ColorFilter(colorArrays) {
             _super.call(this);
@@ -7643,7 +7963,7 @@ var annie;
     var CanvasRender = (function (_super) {
         __extends(CanvasRender, _super);
         /**
-         * @CanvasRender
+         * @method CanvasRender
          * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
@@ -7800,11 +8120,23 @@ var annie;
     var URLLoader = (function (_super) {
         __extends(URLLoader, _super);
         /**
+         * 构造函数
+         * @method URLLoader
          * @param type text json js xml image sound css svg video unKnow
          */
         function URLLoader() {
             _super.call(this);
+            /**
+             * @property _req
+             * @type {null}
+             * @private
+             */
             this._req = null;
+            /**
+             * @property headers
+             * @private
+             * @type {any[]}
+             */
             this.headers = [];
             /**
              * 后台返回来的数据类弄
@@ -8101,7 +8433,7 @@ var annie;
         };
         /**
          * 添加自定义头
-         * @addHeader
+         * @method addHeader
          * @param name
          * @param value
          */
@@ -8139,15 +8471,21 @@ var annie;
     annie._shareSceneList = [];
     /**
      * 存储加载资源的总对象
+     * @property res
+     * @public
      * @type {Object}
      */
     annie.res = {};
     /**
      * 加载器是否正在加载中
+     * @property _isLoading
+     * @type {boolean}
+     * @private
      */
     var _isLoading;
     /**
      * 加载中的场景名列表
+     *
      */
     var _loadSceneNames;
     /**
@@ -8467,7 +8805,7 @@ var annie;
      * @static
      * @since 1.0.0
      * @param {string} sceneName
-     * @returns {boolean}
+     * @return {boolean}
      */
     function isLoadedScene(sceneName) {
         if (annie.res[sceneName] != undefined && annie.res[sceneName] != null && annie.res[sceneName]._f2x_had_loaded_scene) {
@@ -8505,7 +8843,7 @@ var annie;
      * @since 2.0.0
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function getResource(sceneName, resName) {
         var s = annie.res;
@@ -8523,7 +8861,7 @@ var annie;
      * @static
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function b(sceneName, resName) {
         return new annie.Bitmap(annie.res[sceneName][resName]);
@@ -8620,7 +8958,7 @@ var annie;
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.TextFiled|annie.InputText}
+     * @return {annie.TextFiled|annie.InputText}
      */
     function t(sceneName, resName) {
         var textDate = annie.res[sceneName]._a2x_con[resName];
@@ -8694,7 +9032,7 @@ var annie;
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.Shape}
+     * @return {annie.Shape}
      */
     function g(sceneName, resName) {
         var shapeDate = annie.res[sceneName]._a2x_con[resName][1];
@@ -8830,7 +9168,7 @@ var annie;
      * @method getQueryString
      * @static
      * @param name
-     * @returns {any}
+     * @return {any}
      * @since 1.0.9
      * @example
      *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
@@ -9320,7 +9658,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quadraticIn = function (k) {
             return k * k;
@@ -9332,7 +9670,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quadraticOut = function (k) {
             return k * (2 - k);
@@ -9344,7 +9682,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quadraticInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -9359,7 +9697,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.cubicIn = function (k) {
             return k * k * k;
@@ -9371,7 +9709,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.cubicOut = function (k) {
             return --k * k * k + 1;
@@ -9383,7 +9721,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.cubicInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -9398,7 +9736,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quarticIn = function (k) {
             return k * k * k * k;
@@ -9410,7 +9748,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quarticOut = function (k) {
             return 1 - (--k * k * k * k);
@@ -9422,7 +9760,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quarticInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -9437,7 +9775,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quinticIn = function (k) {
             return k * k * k * k * k;
@@ -9449,7 +9787,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quinticOut = function (k) {
             return --k * k * k * k * k + 1;
@@ -9461,7 +9799,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quinticInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -9476,7 +9814,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.sinusoidalIn = function (k) {
             return 1 - Math.cos(k * Math.PI / 2);
@@ -9488,7 +9826,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.sinusoidalOut = function (k) {
             return Math.sin(k * Math.PI / 2);
@@ -9500,7 +9838,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.sinusoidalInOut = function (k) {
             return 0.5 * (1 - Math.cos(Math.PI * k));
@@ -9512,7 +9850,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.exponentialIn = function (k) {
             return k === 0 ? 0 : Math.pow(1024, k - 1);
@@ -9524,7 +9862,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.exponentialOut = function (k) {
             return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
@@ -9536,7 +9874,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.exponentialInOut = function (k) {
             if (k === 0) {
@@ -9557,7 +9895,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.circularIn = function (k) {
             return 1 - Math.sqrt(1 - k * k);
@@ -9569,7 +9907,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.circularOut = function (k) {
             return Math.sqrt(1 - (--k * k));
@@ -9581,7 +9919,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.circularInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -9596,7 +9934,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.elasticIn = function (k) {
             if (k === 0) {
@@ -9614,7 +9952,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.elasticOut = function (k) {
             if (k === 0) {
@@ -9632,7 +9970,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.elasticInOut = function (k) {
             if (k === 0) {
@@ -9654,7 +9992,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.backIn = function (k) {
             var s = 1.70158;
@@ -9667,7 +10005,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.backOut = function (k) {
             var s = 1.70158;
@@ -9680,7 +10018,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.backInOut = function (k) {
             var s = 1.70158 * 1.525;
@@ -9696,7 +10034,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.bounceIn = function (k) {
             return 1 - Tween.bounceOut(1 - k);
@@ -9708,7 +10046,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.bounceOut = function (k) {
             if (k < (1 / 2.75)) {
@@ -9731,7 +10069,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.bounceInOut = function (k) {
             if (k < 0.5) {
@@ -9853,7 +10191,7 @@ var annie;
              * @readonly
              * @public
              * @since 1.0.9
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this._currentCount;
@@ -9867,7 +10205,7 @@ var annie;
              * @property delay
              * @since 1.0.9
              * @public
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this._delay;
@@ -9884,7 +10222,7 @@ var annie;
              * 执行触发Timer 的总次数
              * @public
              * @since 1.0.9
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this._repeatCount;
@@ -9903,7 +10241,7 @@ var annie;
              * 当前是否在运行中
              * @property running
              * @since 1.0.9
-             * @returns {boolean}
+             * @return {boolean}
              */
             get: function () {
                 return this._running;
@@ -10033,7 +10371,7 @@ var annie;
     /**
      * 全局事件触发器
      * @static
-     * @property  globalDispatcher
+     * @property  annie.globalDispatcher
      * @type {annie.EventDispatcher}
      * @public
      * @since 1.0.0
@@ -10221,10 +10559,10 @@ var annie;
     };
     /**
      * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
+     * @method annie.getStagePixels
      * @param {annie.Stage} stage
      * @param {annie.Rectangle} rect
-     * @returns {Array}
+     * @return {Array}
      * @public
      * @since 1.1.1
      */

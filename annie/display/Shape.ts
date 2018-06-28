@@ -33,9 +33,9 @@ namespace annie {
          * @static
          * @param points
          * @param colors
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
-         * @pubic
+         * @public
          */
         public static getGradientColor(points: any,colors: any): any {
             let colorObj: any;
@@ -56,7 +56,7 @@ namespace annie {
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
-         * @returns {CanvasPattern}
+         * @return {CanvasPattern}
          * @public
          * @since 1.0.0
          */
@@ -73,7 +73,7 @@ namespace annie {
          * @since 1.0.0
          * @param {string} color 字符串的颜色值,如:#33ffee
          * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
-         * @returns {string}
+         * @return {string}
          */
         public static getRGBA(color: string, alpha: number): string {
             if (color.indexOf("0x") == 0) {
@@ -91,7 +91,17 @@ namespace annie {
             return color;
         }
 
+        /**
+         * @property _isBitmapStroke
+         * @private
+         * @since 1.0.0
+         */
         private _isBitmapStroke:  Array<number>;
+        /**
+         * @property _isBitmapFill
+         * @private
+         * @since 1.0.0
+         */
         private _isBitmapFill: Array<number>;
         /**
          * 是否对矢量使用像素碰撞 默认开启
@@ -414,7 +424,17 @@ namespace annie {
             this._stroke(color, lineWidth, cap,join, miter);
         }
 
+        /**
+         * @property _caps
+         * @type {string[]}
+         * @private
+         */
         private static _caps:Array<string>=["butt","round","square"];
+        /**
+         * @property _joins
+         * @type {string[]}
+         * @private
+         */
         private static _joins:Array<string>=["miter","round","bevel"];
         /**
          * 画线性渐变的线条 一般给Flash2x用
@@ -467,6 +487,16 @@ namespace annie {
             s._stroke(Shape.getBitmapStyle(image), lineWidth, cap,join, miter);
         }
 
+        /**
+         * @method _stroke
+         * @param strokeStyle
+         * @param {number} width
+         * @param {number} cap
+         * @param {number} join
+         * @param {number} miter
+         * @private
+         * @since 1.0.0
+         */
         private _stroke(strokeStyle: any, width: number, cap: number, join: number, miter: number): void {
             let c = this._command;
             c[c.length]=[0, "lineWidth", width];
@@ -702,6 +732,12 @@ namespace annie {
             s._UI.UF = false;
         }
 
+        /**
+         * @method _drawShape
+         * @param ctx
+         * @private
+         * @return {void}
+         */
         private _drawShape(ctx: any): void {
             let s = this;
             let com = s._command;
@@ -742,7 +778,7 @@ namespace annie {
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -810,15 +846,17 @@ namespace annie {
                 }
             }
         }
+
+        /**
+         * 渲染
+         * @method render
+         * @param {annie.IRender | any} renderObj
+         */
         public render(renderObj: IRender|any): void{
             if(!this._isUseToMask){
                 super.render(renderObj);
             }
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy():void {
             //清除相应的数据引用
             let s = this;

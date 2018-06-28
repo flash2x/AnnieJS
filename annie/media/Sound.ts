@@ -48,6 +48,8 @@ namespace annie {
 
         /**
          * 停止播放，给stopAllSounds调用
+         * @method stop2
+         * @private
          */
         private stop2() {
             let s = this;
@@ -57,6 +59,8 @@ namespace annie {
         }
         /**
          * 恢复播放，给stopAllSounds调用
+         * @method play2
+         * @private
          */
         private play2() {
             let s = this;
@@ -65,7 +69,12 @@ namespace annie {
             }
         }
 
-        //声音对象池
+        /**
+         * 音对象池
+         * @property _soundList
+         * @type {any[]}
+         * @private
+         */
         private static _soundList: any = [];
 
         /**
@@ -124,6 +133,11 @@ namespace annie {
             Sound._volume = volume;
         }
 
+        /**
+         * @static
+         * @type {number}
+         * @private
+         */
         private static _volume: number = 1;
     }
 }

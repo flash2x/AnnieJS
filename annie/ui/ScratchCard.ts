@@ -80,7 +80,7 @@ namespace annie {
          * @param step
          * @public
          * @since 1.1.1
-         * @returns {boolean}
+         * @return {boolean}
          */
         public cancel(step: number = 0): boolean {
             trace("no support");

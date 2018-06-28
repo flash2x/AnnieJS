@@ -102,6 +102,13 @@ namespace annie {
             s._bounds.height=h;
             s.htmlElement=she;
         }
+
+        /**
+         * @method getStyle
+         * @param {HTMLElement} elem
+         * @param cssName
+         * @return {any}
+         */
         private getStyle(elem:HTMLElement, cssName:any ):any
         {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
@@ -125,7 +132,7 @@ namespace annie {
          * @public
          * @since 1.1.4
          */
-        protected updateStyle(): void {
+        public updateStyle(): void {
             let s = this;
             let o = s.htmlElement;
             if (o) {
@@ -160,10 +167,6 @@ namespace annie {
                 }
             }
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy():void {
             //清除相应的数据引用
             let s = this;
