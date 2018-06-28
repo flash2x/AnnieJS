@@ -179,16 +179,19 @@ namespace annie {
         private _maskList: any = [];
 
         /**
-         * mc的当前帧的标签名,没有则为空
+         * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
          * @public
          * @since 1.0.0
-         * @returns {string}
+         * @return {Array}
          * */
-        public getCurrentLabel(): string {
-            return "";
+        public getCurrentLabel(): any {
+            let s:any=this;
+            if(s._a2x_res_class.tf>1&&s._a2x_res_class.l[s._curFrame-1]){
+                return s._a2x_res_class.l[s._curFrame-1];
+            }
+            return null;
         }
-
         /**
          * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
          * @method nextFrame
