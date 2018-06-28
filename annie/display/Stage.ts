@@ -12,7 +12,6 @@ namespace annie {
      * @since 1.0.0
      */
     export class Stage extends Sprite {
-
         /**
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
          * 所以需要自己灵活设置,默认阻止.
@@ -240,7 +239,18 @@ namespace annie {
          *      }
          *
          */
-        public scaleMode: string = "onScale";
+        get scaleMode(): string {
+            return this._scaleMode;
+        }
+
+        set scaleMode(value: string) {
+            let s=this;
+            if(value!=s._scaleMode) {
+                s._scaleMode = value;
+                s.setAlign();
+            }
+        }
+        private _scaleMode: string = "onScale";
         /**
          * 原始为60的刷新速度时的计数器
          * @property _flush
@@ -321,7 +331,7 @@ namespace annie {
             s.desHeight = desH;
             s.rootDiv = div;
             s.setFrameRate(frameRate);
-            s.scaleMode = scaleMode;
+            s._scaleMode = scaleMode;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //目前具支持canvas
@@ -916,10 +926,10 @@ namespace annie {
                     divW = d;
                 }
             }
-            if (s.scaleMode != "noScale") {
+            if (s._scaleMode != "noScale") {
                 scaleY = divH / desH;
                 scaleX = divW / desW;
-                switch (s.scaleMode) {
+                switch (s._scaleMode) {
                     case "noBorder":
                         if (scaleX > scaleY) {
                             scaleY = scaleX;
