@@ -1,4 +1,3 @@
-/// <reference path="../annie.ts" />
 /**
  * @module annie
  */

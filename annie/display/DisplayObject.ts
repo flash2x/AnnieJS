@@ -1,11 +1,3 @@
-/// <reference path="../events/EventDispatcher.ts" />
-/// <reference path="../geom/Point.ts" />
-/// <reference path="./Stage.ts" />
-/// <reference path="./Sound.ts" />
-/// <reference path="../geom/Matrix.ts" />
-/// <reference path="../geom/Rectangle.ts" />
-/// <reference path="../render/IRender.ts" />
-/// <reference path="../render/CanvasRender.ts" />
 /**
  * @module annie
  */

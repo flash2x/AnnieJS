@@ -1,8 +1,3 @@
-/// <reference path="./events/EventDispatcher.ts" />
-/// <reference path="./display/Sprite.ts" />
-/// <reference path="./display/MovieClip.ts" />
-/// <reference path="./display/TextField.ts" />
-/// <reference path="./display/Bitmap.ts" />
 /**
  * @class annie
  */

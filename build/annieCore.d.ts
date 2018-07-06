@@ -1004,6 +1004,827 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
+     * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
+     * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
+     * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
+     * 上呈现内容的 API 的子类，如 Shape、Sprite、Bitmap、TextField 或 MovieClip 类。
+     * @class annie.DisplayObject
+     * @since 1.0.0
+     * @extends annie.EventDispatcher
+     */
+    abstract class DisplayObject extends EventDispatcher {
+        /**
+         * @method DisplayObject
+         * @since 1.0.0
+         * @public
+         */
+        constructor();
+        /**
+         * 更新信息
+         * @property _UI
+         * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+         */
+        protected _UI: {
+            UD: boolean;
+            UM: boolean;
+            UA: boolean;
+            UF: boolean;
+        };
+        /**
+         * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
+         * @property stage
+         * @public
+         * @since 1.0.0
+         * @type {Stage}
+         * @default null;
+         * @readonly
+         * */
+        stage: Stage;
+        /**
+         * 显示对象的父级
+         * @property parent
+         * @since 1.0.0
+         * @public
+         * @type {annie.Sprite}
+         * @default null
+         * @readonly
+         */
+        parent: Sprite;
+        /**
+         * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
+         * @property cAlpha
+         * @private
+         * @type {number}
+         * @since 1.0.0
+         * @default 1
+         */
+        protected cAlpha: number;
+        /**
+         * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
+         * @property cMatrix
+         * @private
+         * @type {annie.Matrix}
+         * @default null
+         * @since 1.0.0
+         */
+        protected cMatrix: Matrix;
+        /**
+         * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
+         * @property mouseEnable
+         * @type {boolean}
+         * @public
+         * @since 1.0.0
+         * @default false
+         */
+        mouseEnable: boolean;
+        /**
+         * 显示对象上对显示列表上的最终的所有滤镜组
+         * @property cFilters
+         * @private
+         * @default []
+         * @since 1.0.0
+         * @type {Array}
+         */
+        protected cFilters: any;
+        /**
+         * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
+         * @property name
+         * @since 1.0.0
+         * @public
+         * @type {string}
+         * @default ""
+         */
+        name: string;
+        /**
+         * 显示对象位置x
+         * @property x
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        x: number;
+        private _x;
+        /**
+         * 显示对象位置y
+         * @property y
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        y: number;
+        private _y;
+        /**
+         * 显示对象x方向的缩放值
+         * @property scaleX
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 1
+         */
+        scaleX: number;
+        private _scaleX;
+        /**
+         * 显示对象y方向的缩放值
+         * @property scaleY
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 1
+         */
+        scaleY: number;
+        private _scaleY;
+        /**
+         * 显示对象旋转角度
+         * @property rotation
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        rotation: number;
+        private _rotation;
+        /**
+         * 显示对象透明度
+         * @property alpha
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 1
+         */
+        alpha: number;
+        private _alpha;
+        /**
+         * 显示对象x方向的斜切值
+         * @property skewX
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        skewX: number;
+        private _skewX;
+        /**
+         * 显示对象y方向的斜切值
+         * @property skewY
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        skewY: number;
+        private _skewY;
+        /**
+         * 显示对象上x方向的缩放或旋转点
+         * @property anchorX
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        anchorX: number;
+        private _anchorX;
+        /**
+         * 显示对象上y方向的缩放或旋转点
+         * @property anchorY
+         * @pubic
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        anchorY: number;
+        private _anchorY;
+        /**
+         * 显未对象是否可见
+         * @property visible
+         * @public
+         * @since 1.0.0
+         * @type {boolean}
+         * @default 0
+         */
+        visible: boolean;
+        _visible: boolean;
+        /**
+         * 显示对象的混合模式
+         * 支持的混合模式大概有
+         * @property blendMode
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         * @default 0
+         */
+        blendMode: string;
+        /**
+         * 显示对象的变形矩阵
+         * @property matrix
+         * @public
+         * @since 1.0.0
+         * @type {annie.Matrix}
+         * @default null
+         */
+        matrix: Matrix;
+        private _matrix;
+        /**
+         * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
+         * @property mask
+         * @public
+         * @since 1.0.0
+         * @type {annie.DisplayObject}
+         * @default null
+         */
+        mask: Shape;
+        private _mask;
+        /**
+         * 显示对象的滤镜数组
+         * @property filters
+         * @since 1.0.0
+         * @public
+         * @type {Array}
+         * @default null
+         */
+        filters: any[];
+        private _filters;
+        /**
+         * 是否自己的父级发生的改变
+         * @type {boolean}
+         * @private
+         */
+        protected _cp: boolean;
+        /**
+         *将全局坐标转换到本地坐标值
+         * @method globalToLocal
+         * @since 1.0.0
+         * @public
+         * @param {annie.Point} point
+         * @returns {annie.Point}
+         */
+        globalToLocal(point: Point, bp?: Point): Point;
+        /**
+         *将本地坐标转换到全局坐标值
+         * @method localToGlobal
+         * @public
+         * @since 1.0.0
+         * @param {annie.Point} point
+         * @returns {annie.Point}
+         */
+        localToGlobal(point: Point, bp?: Point): Point;
+        /**
+         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+         * @type {annie.Point}
+         * @private
+         * @static
+         */
+        static _bp: Point;
+        static _p1: Point;
+        static _p2: Point;
+        static _p3: Point;
+        static _p4: Point;
+        protected _dragBounds: Rectangle;
+        protected _isDragCenter: boolean;
+        protected _lastDragPoint: Point;
+        /**
+         * 启动鼠标或者触摸拖动
+         * @method startDrag
+         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
+         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @since 1.1.2
+         * @public
+         */
+        startDrag(isCenter?: boolean, bounds?: Rectangle): void;
+        /**
+         * 停止鼠标或者触摸拖动
+         * @method stopDrag
+         * @public
+         * @since 1.1.2
+         */
+        stopDrag(): void;
+        /**
+         * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
+         * @method hitTestPoint
+         * @public
+         * @since 1.0.0
+         * @param {annie.Point} point 需要碰到的坐标点
+         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @returns {annie.DisplayObject}
+         */
+        hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
+         * @method getBounds
+         * @public
+         * @since 1.0.0
+         * @returns {annie.Rectangle}
+         * @abstract
+         */
+        getBounds(): Rectangle;
+        /**
+         * 获取对象形变后外切矩形。
+         * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
+         * @method getDrawRect
+         * @public
+         * @since 1.0.0
+         * @returns {annie.Rectangle}
+         */
+        getDrawRect(): Rectangle;
+        /**
+         * 更新函数
+         * @method update
+         * @public
+         * @since 1.0.0
+         */
+        protected update(isDrawUpdate?: boolean): void;
+        /**
+         * 调用此方法将显示对象渲染到屏幕
+         * @method render
+         * @public
+         * @since 1.0.0
+         * @param {annie.IRender} renderObj
+         * @abstract
+         */
+        render(renderObj: IRender | any): void;
+        /**
+         * 调用些方法会冒泡的将事件向显示列表下方传递
+         * @method _onDispatchBubbledEvent
+         * @private
+         * @since 1.0.0
+         * @param {string} type
+         * @param {boolean} updateMc 是否更新movieClip时间轴信息
+         * @private
+         */
+        _onDispatchBubbledEvent(type: string): void;
+        /**
+         * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
+         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
+         * @property  width
+         * @public
+         * @since 1.0.3
+         * @return {number}
+         */
+        width: number;
+        /**
+         * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
+         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
+         * @property  height
+         * @public
+         * @since 1.0.3
+         * @return {number}
+         */
+        height: number;
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @returns {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        getWH(): {
+            width: number;
+            height: number;
+        };
+        /**
+         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+         * @property _texture
+         * @protected
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        protected _texture: any;
+        protected _bounds: Rectangle;
+        protected _drawRect: Rectangle;
+        protected _setProperty(property: string, value: any, type: number): void;
+        /**
+         * 返回一个id，这个id你要留着作为删除他时使用。
+         * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @param {annie.Sound} sound
+         * @returns {number}
+         */
+        addSound(sound: any): number;
+        /**
+         * 删除一个已经添加进来的声音
+         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         */
+        removeSound(id: number): void;
+        private _a2x_sounds;
+        private _a2x_res_obj;
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
+     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
+     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
+     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
+     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
+     * @class annie.Bitmap
+     * @public
+     * @extends annie.DisplayObject
+     * @since 1.0.0
+     */
+    class Bitmap extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Bitmap
+         * @since 1.0.0
+         * @public
+         * @param {string} imagePath 一个图片地址
+        */
+        constructor(imagePath: string);
+        /**
+         * 重写hitTestPoint
+         * @method  hitTestPoint
+         * @param {annie.Point} globalPoint
+         * @param {boolean} isMouseEvent
+         * @returns {any}
+         * @public
+         * @since 1.0.0
+         */
+        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 矢量对象
+     * @class annie.Shape
+     * @extends annie.DisplayObject
+     * @since 1.0.0
+     * @public
+     */
+    class Shape extends DisplayObject {
+        constructor();
+        /**
+         * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
+         * @property _command
+         * @private
+         * @since 1.0.0
+         * @type {Array}
+         * @default []
+         */
+        private _command;
+        /**
+         * 通过一系统参数获取生成颜色或渐变所需要的对象
+         * 一般给用户使用较少,Flash2x工具自动使用
+         * @method getGradientColor
+         * @static
+         * @param points
+         * @param colors
+         * @returns {any}
+         * @since 1.0.0
+         * @pubic
+         */
+        static getGradientColor(points: any, colors: any): any;
+        /**
+         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
+         * @method getBitmapStyle
+         * @static
+         * @param {Image} image HTML Image元素
+         * @returns {CanvasPattern}
+         * @public
+         * @since 1.0.0
+         */
+        static getBitmapStyle(image: any): any;
+        /**
+         * 通过24位颜色值和一个透明度值生成RGBA值
+         * @method getRGBA
+         * @static
+         * @public
+         * @since 1.0.0
+         * @param {string} color 字符串的颜色值,如:#33ffee
+         * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
+         * @returns {string}
+         */
+        static getRGBA(color: string, alpha: number): string;
+        private _isBitmapStroke;
+        private _isBitmapFill;
+        /**
+         * 是否对矢量使用像素碰撞 默认开启
+         * @property hitTestWidthPixel
+         * @type {boolean}
+         * @default true
+         * @since 1.1.0
+         */
+        hitTestWidthPixel: boolean;
+        /**
+         * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
+         * @method addDraw
+         * @param {string} commandName ctx指令的方法名 如moveTo lineTo arcTo等
+         * @param {Array} params
+         * @public
+         * @since 1.0.0
+         */
+        addDraw(commandName: string, params: Array<any>): void;
+        /**
+         * 画一个带圆角的矩形
+         * @method drawRoundRect
+         * @param {number} x 点x值
+         * @param {number} y 点y值
+         * @param {number} w 宽
+         * @param {number} h 高
+         * @param {number} rTL 左上圆角半径
+         * @param {number} rTR 右上圆角半径
+         * @param {number} rBL 左下圆角半径
+         * @param {number} rBR 右上圆角半径
+         * @public
+         * @since 1.0.0
+         */
+        drawRoundRect(x: number, y: number, w: number, h: number, rTL?: number, rTR?: number, rBL?: number, rBR?: number): void;
+        /**
+         * 绘画时移动到某一点
+         * @method moveTo
+         * @param {number} x
+         * @param {number} y
+         * @public
+         * @since 1.0.0
+         */
+        moveTo(x: number, y: number): void;
+        /**
+         * 从上一点画到某一点,如果没有设置上一点，则上一点默认为(0,0)
+         * @method lineTo
+         * @param {number} x
+         * @param {number} y
+         * @public
+         * @since 1.0.0
+         */
+        lineTo(x: number, y: number): void;
+        /**
+         * 从上一点画弧到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * @method arcTo
+         * @param {number} x
+         * @param {number} y
+         * @public
+         * @since 1.0.0
+         */
+        arcTo(x: number, y: number): void;
+        /**
+         * 二次贝赛尔曲线
+         * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * @method quadraticCurveTo
+         * @param {number} cpX 控制点X
+         * @param {number} cpX 控制点Y
+         * @param {number} x 终点X
+         * @param {number} y 终点Y
+         * @public
+         * @since 1.0.0
+         */
+        quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void;
+        /**
+         * 三次贝赛尔曲线
+         * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * @method bezierCurveTo
+         * @param {number} cp1X 1控制点X
+         * @param {number} cp1Y 1控制点Y
+         * @param {number} cp2X 2控制点X
+         * @param {number} cp2Y 2控制点Y
+         * @param {number} x 终点X
+         * @param {number} y 终点Y
+         * @public
+         * @since 1.0.0
+         */
+        bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void;
+        /**
+         * 闭合一个绘画路径
+         * @method closePath
+         * @public
+         * @since 1.0.0
+         */
+        closePath(): void;
+        /**
+         * 画一个矩形
+         * @method drawRect
+         * @param {number} x
+         * @param {number} y
+         * @param {number} w
+         * @param {number} h
+         * @public
+         * @since 1.0.0
+         */
+        drawRect(x: number, y: number, w: number, h: number): void;
+        /**
+         * 画一个弧形
+         * @method drawArc
+         * @param {number} x 起始点x
+         * @param {number} y 起始点y
+         * @param {number} radius 半径
+         * @param {number} start 开始角度
+         * @param {number} end 结束角度
+         * @public
+         * @since 1.0.0
+         */
+        drawArc(x: number, y: number, radius: number, start: number, end: number): void;
+        /**
+         * 画一个圆
+         * @method drawCircle
+         * @param {number} x 圆心x
+         * @param {number} y 圆心y
+         * @param {number} radius 半径
+         * @public
+         * @since 1.0.0
+         */
+        drawCircle(x: number, y: number, radius: number): void;
+        /**
+         * 画一个椭圆
+         * @method drawEllipse
+         * @param {number} x
+         * @param {number} y
+         * @param {number} w
+         * @param {number} h
+         * @public
+         * @since 1.0.0
+         */
+        drawEllipse(x: number, y: number, w: number, h: number): void;
+        /**
+         * 清除掉之前所有绘画的东西
+         * @method clear
+         * @public
+         * @since 1.0.0
+         */
+        clear(): void;
+        /**
+         * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
+         * @method beginFill
+         * @param {string} color 颜色值 单色和RGBA格式
+         * @public
+         * @since 1.0.0
+         */
+        beginFill(color: string): void;
+        /**
+         * 线性渐变填充 一般给Flash2x用
+         * @method beginLinearGradientFill
+         * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
+         * @public
+         * @since 1.0.0
+         */
+        beginLinearGradientFill(points: any, colors: any): void;
+        /**
+         * 径向渐变填充 一般给Flash2x用
+         * @method beginRadialGradientFill
+         * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
+         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
+         * @public
+         * @since 1.0.0
+         */
+        beginRadialGradientFill: (points: any, colors: any) => void;
+        /**
+         * 位图填充 一般给Flash2x用
+         * @method beginBitmapFill
+         * @param {Image} image
+         * @param { Array} matrix
+         * @public
+         * @since 1.0.0
+         */
+        beginBitmapFill(image: any, matrix: Array<number>): void;
+        private _fill(fillStyle);
+        /**
+         * 给线条着色
+         * @method beginStroke
+         * @param {string} color  颜色值
+         * @param {number} lineWidth 宽度
+         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
+         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
+         * @public
+         * @since 1.0.0
+         */
+        beginStroke(color: string, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
+        private static _caps;
+        private static _joins;
+        /**
+         * 画线性渐变的线条 一般给Flash2x用
+         * @method beginLinearGradientStroke
+         * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
+         * @param {number} lineWidth
+         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
+         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
+         * @public
+         * @since 1.0.0
+         */
+        beginLinearGradientStroke(points: Array<number>, colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
+        /**
+         * 画径向渐变的线条 一般给Flash2x用
+         * @method beginRadialGradientStroke
+         * @param {Array} points 一组点
+         * @param {Array} colors 一组颜色值
+         * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
+         * @public
+         * @since 1.0.0
+         */
+        beginRadialGradientStroke: (points: number[], colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number) => void;
+        /**
+         * 线条位图填充 一般给Flash2x用
+         * @method beginBitmapStroke
+         * @param {Image} image
+         * @param {Array} matrix
+         * @param {number} lineWidth
+         * @param {string} cap 线头的形状 butt round square 默认 butt
+         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
+         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
+         * @public
+         * @since 1.0.0
+         */
+        beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
+        private _stroke(strokeStyle, width, cap, join, miter);
+        /**
+         * 结束填充
+         * @method endFill
+         * @public
+         * @since 1.0.0
+         */
+        endFill(): void;
+        protected _isUseToMask: boolean;
+        /**
+         * 结束画线
+         * @method endStroke
+         * @public
+         * @since 1.0.0
+         */
+        endStroke(): void;
+        /**
+         * 解析一段路径 一般给Flash2x用
+         * @method decodePath
+         * @param {Array} data
+         * @public
+         * @since 1.0.0
+         */
+        decodePath: (data: any) => void;
+        /**
+         * 重写刷新
+         * @method update
+         * @public
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @since 1.0.0
+         */
+        update(isDrawUpdate?: boolean): void;
+        private _draw(ctx);
+        /**
+         * 重写hitTestPoint
+         * @method  hitTestPoint
+         * @param {annie.Point} globalPoint
+         * @param {boolean} isMouseEvent
+         * @returns {any}
+         * @public
+         * @since 1.0.0
+         */
+        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        /**
+         * @property _offsetX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetX: number;
+        /**
+         * @property _offsetY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetY: number;
+        /**
+         * 如果有的话,改变矢量对象的边框或者填充的颜色.
+         * @method changeColor
+         * @param {Object} infoObj
+         * @param {string|any} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)"或者是annie.Shape.getGradientColor()方法返回的渐变对象;
+         * @param {string} infoObj.strokeColor 线条颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
+         * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
+         * @public
+         * @since 1.0.2
+         */
+        changeColor(infoObj: any): void;
+        render(renderObj: IRender | any): void;
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         */
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
      * 显示对象的容器类,可以将其他显示对象放入其中,是annie引擎的核心容器类.
      * Sprite 类是基本显示列表构造块：一个可显示图形并且也可包含子项的显示列表节点。
      * Sprite 对象与影片剪辑类似，但没有时间轴。Sprite 是不需要时间轴的对象的相应基类。
@@ -1509,187 +2330,6 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
-     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
-     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
-     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
-     * @class annie.Bitmap
-     * @public
-     * @extends annie.DisplayObject
-     * @since 1.0.0
-     */
-    class Bitmap extends DisplayObject {
-        /**
-         * 构造函数
-         * @method Bitmap
-         * @since 1.0.0
-         * @public
-         * @param {string} imagePath 一个图片地址
-        */
-        constructor(imagePath: string);
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @returns {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
-        destroy(): void;
-    }
-}
-/**
- * @class annie
- */
-declare namespace annie {
-    /**
-     * annie引擎的版本号
-     * @public
-     * @since 1.0.1
-     * @property annie.version
-     * @type {string}
-     * @example
-     *      //打印当前引擎的版本号
-     *      trace(annie.version);
-     */
-    let version: string;
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     */
-    let devicePixelRatio: number;
-    /**
-     * 全局事件侦听
-     * @property globalDispatcher
-     * @type {annie.EventDispatcher}
-     */
-    let globalDispatcher: EventDispatcher;
-    /**
-     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
-     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
-     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
-     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
-     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * @property annie.StageScaleMode
-     * @type {Object}
-     * @public
-     * @since 1.0.0
-     * @static
-     * @example
-     *      //动态更改stage的对齐方式示例
-     *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
-     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
-     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
-     *              if(i>5){i=0;}
-     *          }
-     *      }
-     *
-     */
-    let StageScaleMode: {
-        EXACT_FIT: string;
-        NO_BORDER: string;
-        NO_SCALE: string;
-        SHOW_ALL: string;
-        FIXED_WIDTH: string;
-        FIXED_HEIGHT: string;
-    };
-    /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
-    let createAudio: Function;
-    let getImageInfo: Function;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
-    let A2xExtend: any;
-    /**
-     * 加载后的类引用全放在这里
-     * @type {Object}
-     */
-    let classPool: any;
-    /**
-     * 加载场景的方法
-     * @method loadScene
-     * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
-     */
-    let loadScene: Function;
-    /**
-     * 是否已经加载过场景
-     * @method isLoadedScene
-     * @param {string} sceneName
-     * @return {boolean}
-     */
-    function isLoadedScene(sceneName: string): boolean;
-    /**
-     * 删除加载过的场景
-     * @method unLoadScene
-     * @param {string} sceneName
-     */
-    function unLoadScene(sceneName: string): void;
-    /**
-     * 解析资源
-     * @method parseScene
-     * @param {string} sceneName
-     * @param sceneRes
-     * @param sceneData
-     */
-    function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
-    /**
-     * 获取已经加载场景中的资源
-     * @method getResource
-     * @public
-     * @static
-     * @since 2.0.0
-     * @param {string} sceneName
-     * @param {string} resName
-     * @returns {any}
-     */
-    function getResource(sceneName: string, resName: string): any;
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     */
-    function d(target: any, info: any): void;
-    /**
-     * 引擎自调用.初始化 sprite和movieClip用
-     * @param target
-     * @param {string} _resId
-     * @private
-     */
-    function initRes(target: any, sceneName: string, resName: string): void;
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
      * @class annie.Stage
@@ -2168,786 +2808,6 @@ declare namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         draw(target: any): void;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
-     * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
-     * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
-     * 上呈现内容的 API 的子类，如 Shape、Sprite、Bitmap、TextField 或 MovieClip 类。
-     * @class annie.DisplayObject
-     * @since 1.0.0
-     * @extends annie.EventDispatcher
-     */
-    abstract class DisplayObject extends EventDispatcher {
-        /**
-         * @method DisplayObject
-         * @since 1.0.0
-         * @public
-         */
-        constructor();
-        /**
-         * 更新信息
-         * @property _UI
-         * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-         */
-        protected _UI: {
-            UD: boolean;
-            UM: boolean;
-            UA: boolean;
-            UF: boolean;
-        };
-        /**
-         * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
-         * @property stage
-         * @public
-         * @since 1.0.0
-         * @type {Stage}
-         * @default null;
-         * @readonly
-         * */
-        stage: Stage;
-        /**
-         * 显示对象的父级
-         * @property parent
-         * @since 1.0.0
-         * @public
-         * @type {annie.Sprite}
-         * @default null
-         * @readonly
-         */
-        parent: Sprite;
-        /**
-         * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
-         * @property cAlpha
-         * @private
-         * @type {number}
-         * @since 1.0.0
-         * @default 1
-         */
-        protected cAlpha: number;
-        /**
-         * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
-         * @property cMatrix
-         * @private
-         * @type {annie.Matrix}
-         * @default null
-         * @since 1.0.0
-         */
-        protected cMatrix: Matrix;
-        /**
-         * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
-         * @property mouseEnable
-         * @type {boolean}
-         * @public
-         * @since 1.0.0
-         * @default false
-         */
-        mouseEnable: boolean;
-        /**
-         * 显示对象上对显示列表上的最终的所有滤镜组
-         * @property cFilters
-         * @private
-         * @default []
-         * @since 1.0.0
-         * @type {Array}
-         */
-        protected cFilters: any;
-        /**
-         * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
-         * @property name
-         * @since 1.0.0
-         * @public
-         * @type {string}
-         * @default ""
-         */
-        name: string;
-        /**
-         * 显示对象位置x
-         * @property x
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        x: number;
-        private _x;
-        /**
-         * 显示对象位置y
-         * @property y
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        y: number;
-        private _y;
-        /**
-         * 显示对象x方向的缩放值
-         * @property scaleX
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 1
-         */
-        scaleX: number;
-        private _scaleX;
-        /**
-         * 显示对象y方向的缩放值
-         * @property scaleY
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 1
-         */
-        scaleY: number;
-        private _scaleY;
-        /**
-         * 显示对象旋转角度
-         * @property rotation
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        rotation: number;
-        private _rotation;
-        /**
-         * 显示对象透明度
-         * @property alpha
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 1
-         */
-        alpha: number;
-        private _alpha;
-        /**
-         * 显示对象x方向的斜切值
-         * @property skewX
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        skewX: number;
-        private _skewX;
-        /**
-         * 显示对象y方向的斜切值
-         * @property skewY
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        skewY: number;
-        private _skewY;
-        /**
-         * 显示对象上x方向的缩放或旋转点
-         * @property anchorX
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        anchorX: number;
-        private _anchorX;
-        /**
-         * 显示对象上y方向的缩放或旋转点
-         * @property anchorY
-         * @pubic
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        anchorY: number;
-        private _anchorY;
-        /**
-         * 显未对象是否可见
-         * @property visible
-         * @public
-         * @since 1.0.0
-         * @type {boolean}
-         * @default 0
-         */
-        visible: boolean;
-        _visible: boolean;
-        /**
-         * 显示对象的混合模式
-         * 支持的混合模式大概有
-         * @property blendMode
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         * @default 0
-         */
-        blendMode: string;
-        /**
-         * 显示对象的变形矩阵
-         * @property matrix
-         * @public
-         * @since 1.0.0
-         * @type {annie.Matrix}
-         * @default null
-         */
-        matrix: Matrix;
-        private _matrix;
-        /**
-         * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
-         * @property mask
-         * @public
-         * @since 1.0.0
-         * @type {annie.DisplayObject}
-         * @default null
-         */
-        mask: Shape;
-        private _mask;
-        /**
-         * 显示对象的滤镜数组
-         * @property filters
-         * @since 1.0.0
-         * @public
-         * @type {Array}
-         * @default null
-         */
-        filters: any[];
-        private _filters;
-        /**
-         * 是否自己的父级发生的改变
-         * @type {boolean}
-         * @private
-         */
-        protected _cp: boolean;
-        /**
-         *将全局坐标转换到本地坐标值
-         * @method globalToLocal
-         * @since 1.0.0
-         * @public
-         * @param {annie.Point} point
-         * @returns {annie.Point}
-         */
-        globalToLocal(point: Point, bp?: Point): Point;
-        /**
-         *将本地坐标转换到全局坐标值
-         * @method localToGlobal
-         * @public
-         * @since 1.0.0
-         * @param {annie.Point} point
-         * @returns {annie.Point}
-         */
-        localToGlobal(point: Point, bp?: Point): Point;
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
-        static _bp: Point;
-        static _p1: Point;
-        static _p2: Point;
-        static _p3: Point;
-        static _p4: Point;
-        protected _dragBounds: Rectangle;
-        protected _isDragCenter: boolean;
-        protected _lastDragPoint: Point;
-        /**
-         * 启动鼠标或者触摸拖动
-         * @method startDrag
-         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
-         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
-         * @since 1.1.2
-         * @public
-         */
-        startDrag(isCenter?: boolean, bounds?: Rectangle): void;
-        /**
-         * 停止鼠标或者触摸拖动
-         * @method stopDrag
-         * @public
-         * @since 1.1.2
-         */
-        stopDrag(): void;
-        /**
-         * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
-         * @method hitTestPoint
-         * @public
-         * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
-         * @returns {annie.DisplayObject}
-         */
-        hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
-         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
-         * @method getBounds
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         * @abstract
-         */
-        getBounds(): Rectangle;
-        /**
-         * 获取对象形变后外切矩形。
-         * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
-         * @method getDrawRect
-         * @public
-         * @since 1.0.0
-         * @returns {annie.Rectangle}
-         */
-        getDrawRect(): Rectangle;
-        /**
-         * 更新函数
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        protected update(isDrawUpdate?: boolean): void;
-        /**
-         * 调用此方法将显示对象渲染到屏幕
-         * @method render
-         * @public
-         * @since 1.0.0
-         * @param {annie.IRender} renderObj
-         * @abstract
-         */
-        render(renderObj: IRender | any): void;
-        /**
-         * 调用些方法会冒泡的将事件向显示列表下方传递
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
-         */
-        _onDispatchBubbledEvent(type: string): void;
-        /**
-         * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
-         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
-         * @property  width
-         * @public
-         * @since 1.0.3
-         * @return {number}
-         */
-        width: number;
-        /**
-         * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
-         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
-         * @property  height
-         * @public
-         * @since 1.0.3
-         * @return {number}
-         */
-        height: number;
-        /**
-         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
-         * @method getWH
-         * @public
-         * @returns {{width: number, height: number}}
-         * @since 1.0.9
-         */
-        getWH(): {
-            width: number;
-            height: number;
-        };
-        /**
-         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _texture
-         * @protected
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        protected _texture: any;
-        protected _bounds: Rectangle;
-        protected _drawRect: Rectangle;
-        protected _setProperty(property: string, value: any, type: number): void;
-        /**
-         * 返回一个id，这个id你要留着作为删除他时使用。
-         * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
-         * @param {annie.Sound} sound
-         * @returns {number}
-         */
-        addSound(sound: any): number;
-        /**
-         * 删除一个已经添加进来的声音
-         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
-         */
-        removeSound(id: number): void;
-        private _a2x_sounds;
-        private _a2x_res_obj;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 矢量对象
-     * @class annie.Shape
-     * @extends annie.DisplayObject
-     * @since 1.0.0
-     * @public
-     */
-    class Shape extends DisplayObject {
-        constructor();
-        /**
-         * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
-         * @property _command
-         * @private
-         * @since 1.0.0
-         * @type {Array}
-         * @default []
-         */
-        private _command;
-        /**
-         * 通过一系统参数获取生成颜色或渐变所需要的对象
-         * 一般给用户使用较少,Flash2x工具自动使用
-         * @method getGradientColor
-         * @static
-         * @param points
-         * @param colors
-         * @returns {any}
-         * @since 1.0.0
-         * @pubic
-         */
-        static getGradientColor(points: any, colors: any): any;
-        /**
-         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
-         * @method getBitmapStyle
-         * @static
-         * @param {Image} image HTML Image元素
-         * @returns {CanvasPattern}
-         * @public
-         * @since 1.0.0
-         */
-        static getBitmapStyle(image: any): any;
-        /**
-         * 通过24位颜色值和一个透明度值生成RGBA值
-         * @method getRGBA
-         * @static
-         * @public
-         * @since 1.0.0
-         * @param {string} color 字符串的颜色值,如:#33ffee
-         * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
-         * @returns {string}
-         */
-        static getRGBA(color: string, alpha: number): string;
-        private _isBitmapStroke;
-        private _isBitmapFill;
-        /**
-         * 是否对矢量使用像素碰撞 默认开启
-         * @property hitTestWidthPixel
-         * @type {boolean}
-         * @default true
-         * @since 1.1.0
-         */
-        hitTestWidthPixel: boolean;
-        /**
-         * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
-         * @method addDraw
-         * @param {string} commandName ctx指令的方法名 如moveTo lineTo arcTo等
-         * @param {Array} params
-         * @public
-         * @since 1.0.0
-         */
-        addDraw(commandName: string, params: Array<any>): void;
-        /**
-         * 画一个带圆角的矩形
-         * @method drawRoundRect
-         * @param {number} x 点x值
-         * @param {number} y 点y值
-         * @param {number} w 宽
-         * @param {number} h 高
-         * @param {number} rTL 左上圆角半径
-         * @param {number} rTR 右上圆角半径
-         * @param {number} rBL 左下圆角半径
-         * @param {number} rBR 右上圆角半径
-         * @public
-         * @since 1.0.0
-         */
-        drawRoundRect(x: number, y: number, w: number, h: number, rTL?: number, rTR?: number, rBL?: number, rBR?: number): void;
-        /**
-         * 绘画时移动到某一点
-         * @method moveTo
-         * @param {number} x
-         * @param {number} y
-         * @public
-         * @since 1.0.0
-         */
-        moveTo(x: number, y: number): void;
-        /**
-         * 从上一点画到某一点,如果没有设置上一点，则上一点默认为(0,0)
-         * @method lineTo
-         * @param {number} x
-         * @param {number} y
-         * @public
-         * @since 1.0.0
-         */
-        lineTo(x: number, y: number): void;
-        /**
-         * 从上一点画弧到某一点,如果没有设置上一点，则上一占默认为(0,0)
-         * @method arcTo
-         * @param {number} x
-         * @param {number} y
-         * @public
-         * @since 1.0.0
-         */
-        arcTo(x: number, y: number): void;
-        /**
-         * 二次贝赛尔曲线
-         * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
-         * @method quadraticCurveTo
-         * @param {number} cpX 控制点X
-         * @param {number} cpX 控制点Y
-         * @param {number} x 终点X
-         * @param {number} y 终点Y
-         * @public
-         * @since 1.0.0
-         */
-        quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void;
-        /**
-         * 三次贝赛尔曲线
-         * 从上一点画二次贝赛尔曲线到某一点,如果没有设置上一点，则上一占默认为(0,0)
-         * @method bezierCurveTo
-         * @param {number} cp1X 1控制点X
-         * @param {number} cp1Y 1控制点Y
-         * @param {number} cp2X 2控制点X
-         * @param {number} cp2Y 2控制点Y
-         * @param {number} x 终点X
-         * @param {number} y 终点Y
-         * @public
-         * @since 1.0.0
-         */
-        bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void;
-        /**
-         * 闭合一个绘画路径
-         * @method closePath
-         * @public
-         * @since 1.0.0
-         */
-        closePath(): void;
-        /**
-         * 画一个矩形
-         * @method drawRect
-         * @param {number} x
-         * @param {number} y
-         * @param {number} w
-         * @param {number} h
-         * @public
-         * @since 1.0.0
-         */
-        drawRect(x: number, y: number, w: number, h: number): void;
-        /**
-         * 画一个弧形
-         * @method drawArc
-         * @param {number} x 起始点x
-         * @param {number} y 起始点y
-         * @param {number} radius 半径
-         * @param {number} start 开始角度
-         * @param {number} end 结束角度
-         * @public
-         * @since 1.0.0
-         */
-        drawArc(x: number, y: number, radius: number, start: number, end: number): void;
-        /**
-         * 画一个圆
-         * @method drawCircle
-         * @param {number} x 圆心x
-         * @param {number} y 圆心y
-         * @param {number} radius 半径
-         * @public
-         * @since 1.0.0
-         */
-        drawCircle(x: number, y: number, radius: number): void;
-        /**
-         * 画一个椭圆
-         * @method drawEllipse
-         * @param {number} x
-         * @param {number} y
-         * @param {number} w
-         * @param {number} h
-         * @public
-         * @since 1.0.0
-         */
-        drawEllipse(x: number, y: number, w: number, h: number): void;
-        /**
-         * 清除掉之前所有绘画的东西
-         * @method clear
-         * @public
-         * @since 1.0.0
-         */
-        clear(): void;
-        /**
-         * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
-         * @method beginFill
-         * @param {string} color 颜色值 单色和RGBA格式
-         * @public
-         * @since 1.0.0
-         */
-        beginFill(color: string): void;
-        /**
-         * 线性渐变填充 一般给Flash2x用
-         * @method beginLinearGradientFill
-         * @param {Array} points 一组点
-         * @param {Array} colors 一组颜色值
-         * @public
-         * @since 1.0.0
-         */
-        beginLinearGradientFill(points: any, colors: any): void;
-        /**
-         * 径向渐变填充 一般给Flash2x用
-         * @method beginRadialGradientFill
-         * @param {Array} points 一组点
-         * @param {Array} colors 一组颜色值
-         * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
-         * @public
-         * @since 1.0.0
-         */
-        beginRadialGradientFill: (points: any, colors: any) => void;
-        /**
-         * 位图填充 一般给Flash2x用
-         * @method beginBitmapFill
-         * @param {Image} image
-         * @param { Array} matrix
-         * @public
-         * @since 1.0.0
-         */
-        beginBitmapFill(image: any, matrix: Array<number>): void;
-        private _fill(fillStyle);
-        /**
-         * 给线条着色
-         * @method beginStroke
-         * @param {string} color  颜色值
-         * @param {number} lineWidth 宽度
-         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
-         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
-         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
-         * @public
-         * @since 1.0.0
-         */
-        beginStroke(color: string, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
-        private static _caps;
-        private static _joins;
-        /**
-         * 画线性渐变的线条 一般给Flash2x用
-         * @method beginLinearGradientStroke
-         * @param {Array} points 一组点
-         * @param {Array} colors 一组颜色值
-         * @param {number} lineWidth
-         * @param {number} cap 线头的形状 0 butt 1 round 2 square 默认 butt
-         * @param {number} join 线与线之间的交接处形状 0 miter 1 bevel 2 round  默认miter
-         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
-         * @public
-         * @since 1.0.0
-         */
-        beginLinearGradientStroke(points: Array<number>, colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
-        /**
-         * 画径向渐变的线条 一般给Flash2x用
-         * @method beginRadialGradientStroke
-         * @param {Array} points 一组点
-         * @param {Array} colors 一组颜色值
-         * @param {number} lineWidth
-         * @param {string} cap 线头的形状 butt round square 默认 butt
-         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
-         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
-         * @public
-         * @since 1.0.0
-         */
-        beginRadialGradientStroke: (points: number[], colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number) => void;
-        /**
-         * 线条位图填充 一般给Flash2x用
-         * @method beginBitmapStroke
-         * @param {Image} image
-         * @param {Array} matrix
-         * @param {number} lineWidth
-         * @param {string} cap 线头的形状 butt round square 默认 butt
-         * @param {string} join 线与线之间的交接处形状 bevel round miter 默认miter
-         * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
-         * @public
-         * @since 1.0.0
-         */
-        beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
-        private _stroke(strokeStyle, width, cap, join, miter);
-        /**
-         * 结束填充
-         * @method endFill
-         * @public
-         * @since 1.0.0
-         */
-        endFill(): void;
-        protected _isUseToMask: boolean;
-        /**
-         * 结束画线
-         * @method endStroke
-         * @public
-         * @since 1.0.0
-         */
-        endStroke(): void;
-        /**
-         * 解析一段路径 一般给Flash2x用
-         * @method decodePath
-         * @param {Array} data
-         * @public
-         * @since 1.0.0
-         */
-        decodePath: (data: any) => void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
-        private _draw(ctx);
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @returns {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
-         * @property _offsetX
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        protected _offsetX: number;
-        /**
-         * @property _offsetY
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        protected _offsetY: number;
-        /**
-         * 如果有的话,改变矢量对象的边框或者填充的颜色.
-         * @method changeColor
-         * @param {Object} infoObj
-         * @param {string|any} infoObj.fillColor 填充颜色值，如"#fff" 或者 "rgba(255,255,255,1)"或者是annie.Shape.getGradientColor()方法返回的渐变对象;
-         * @param {string} infoObj.strokeColor 线条颜色值，如"#fff" 或者 "rgba(255,255,255,1)";
-         * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
-         * @public
-         * @since 1.0.2
-         */
-        changeColor(infoObj: any): void;
-        render(renderObj: IRender | any): void;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         destroy(): void;
     }
 }
@@ -3463,4 +3323,144 @@ declare namespace annie {
         private static flush();
         destroy(): void;
     }
+}
+/**
+ * @class annie
+ */
+declare namespace annie {
+    /**
+     * annie引擎的版本号
+     * @public
+     * @since 1.0.1
+     * @property annie.version
+     * @type {string}
+     * @example
+     *      //打印当前引擎的版本号
+     *      trace(annie.version);
+     */
+    let version: string;
+    /**
+     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
+     * @property annie.devicePixelRatio
+     * @type {number}
+     * @since 1.0.0
+     * @public
+     * @static
+     */
+    let devicePixelRatio: number;
+    /**
+     * 全局事件侦听
+     * @property globalDispatcher
+     * @type {annie.EventDispatcher}
+     */
+    let globalDispatcher: EventDispatcher;
+    /**
+     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
+     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
+     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
+     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
+     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
+     * @property annie.StageScaleMode
+     * @type {Object}
+     * @public
+     * @since 1.0.0
+     * @static
+     * @example
+     *      //动态更改stage的对齐方式示例
+     *      //以下代码放到一个舞台的显示对象的构造函数中
+     *      let s=this;
+     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
+     *          let i=0;
+     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              let state=e.currentTarget;
+     *              state.scaleMode=aList[i];
+     *              state.resize();
+     *              if(i>5){i=0;}
+     *          }
+     *      }
+     *
+     */
+    let StageScaleMode: {
+        EXACT_FIT: string;
+        NO_BORDER: string;
+        NO_SCALE: string;
+        SHOW_ALL: string;
+        FIXED_WIDTH: string;
+        FIXED_HEIGHT: string;
+    };
+    /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
+    let createAudio: Function;
+    let getImageInfo: Function;
+    /**
+     * 继承类方法
+     * @type {Function}
+     */
+    let A2xExtend: any;
+    /**
+     * 加载后的类引用全放在这里
+     * @type {Object}
+     */
+    let classPool: any;
+    /**
+     * 加载场景的方法
+     * @method loadScene
+     * @param {String|Array} 单个场景名或者多个场景名组成的数组
+     * @type {Function}
+     */
+    let loadScene: Function;
+    /**
+     * 是否已经加载过场景
+     * @method isLoadedScene
+     * @param {string} sceneName
+     * @return {boolean}
+     */
+    function isLoadedScene(sceneName: string): boolean;
+    /**
+     * 删除加载过的场景
+     * @method unLoadScene
+     * @param {string} sceneName
+     */
+    function unLoadScene(sceneName: string): void;
+    /**
+     * 解析资源
+     * @method parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
+    function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
+    /**
+     * 获取已经加载场景中的资源
+     * @method getResource
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} resName
+     * @returns {any}
+     */
+    function getResource(sceneName: string, resName: string): any;
+    /**
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * @method d
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param {Object} target
+     * @param {Object} info
+     */
+    function d(target: any, info: any): void;
+    /**
+     * 引擎自调用.初始化 sprite和movieClip用
+     * @param target
+     * @param {string} _resId
+     * @private
+     */
+    function initRes(target: any, sceneName: string, resName: string): void;
 }
