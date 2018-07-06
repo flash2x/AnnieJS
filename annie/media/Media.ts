@@ -21,12 +21,25 @@ namespace annie {
         public media: any = null;
         /**
          * 媒体类型 VIDEO 或者 AUDIO
+         * @property type
          * @type {string}
-         * @since 1.0.0
          * @since 1.0.0
          */
         public type = "";
-        private _loop: number = 0;
+        /**
+         * @property isPlaying
+         * @type {boolean}
+         * @since 2.0.0
+         * @default false
+         */
+        public isPlaying:boolean=false;
+        /**
+         * @property _loop
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         */
+        private _loop: number = 1;
         /**
          * 构造函数
          * @method Media
@@ -51,11 +64,15 @@ namespace annie {
             }
             s._SBWeixin=s._weixinSB.bind(s);
             s.media.addEventListener('ended', function(){
-                s._loop--;
-                if (s._loop > 0) {
-                    s.play(0,s._loop);
-                } else {
-                    s.media.pause();
+                if(s._loop=-1){
+                    s.play(0);
+                }else{
+                    s._loop--;
+                    if (s._loop > 0) {
+                        s.play(0,s._loop);
+                    } else {
+                        s.stop();
+                    }
                 }
                 s.dispatchEvent("onPlayEnd");
             }.bind(s));
@@ -68,6 +85,14 @@ namespace annie {
                 s.dispatchEvent("onPlayStart");
             });
         }
+
+        /**
+         * @property _repeate
+         * @type {number}
+         * @private
+         * @default 1
+         */
+        private _repeate:number=1;
         /**
          * 开始播放媒体
          * @method play
@@ -76,9 +101,14 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public play(start: number=0, loop: number=1): void {
+        public play(start: number=0, loop: number=0): void {
             let s = this;
-            s._loop = loop;
+            if(loop==0){
+                s._loop=this._repeate;
+            }else{
+                s._loop=loop;
+                s._repeate=loop;
+            }
             try {
                 s.media.currentTime = start;
             } catch (e) {
@@ -95,6 +125,7 @@ namespace annie {
             }else{
                 s.media.play();
             }
+            s.isPlaying=true;
         }
 
         private _SBWeixin:any;
@@ -108,9 +139,12 @@ namespace annie {
          * @since 1.0.0
          */
         public stop(): void {
-            this.media.pause();
-            this.media.currentTime = 0;
+            let s=this;
+            s.media.pause();
+            s.media.currentTime = 0;
+            s.isPlaying=false;
         }
+
         /**
          * 暂停播放,或者恢复播放
          * @method pause
@@ -119,10 +153,13 @@ namespace annie {
          * @since 1.0.4
          */
         public pause(isPause:boolean=true): void {
+            let s=this;
             if(isPause){
-                this.media.pause();
+                s.media.pause();
+                s.isPlaying=false;
             }else{
-                this.media.play();
+                s.media.play();
+                s.isPlaying=true;
             }
         }
 
@@ -130,18 +167,25 @@ namespace annie {
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
-         * @returns {number}
+         * @return {number}
          */
         public get volume():number{
             return this.media.volume
         }
         public set volume(value:number){
-            this.media.volume=value;
+            let s=this;
+            s.media.volume=value;
             if(value==0){
-                this.media.muted=true;
+                s.media.muted=true;
             }else{
-                this.media.muted=false;
+                s.media.muted=false;
             }
+        }
+        public destroy(): void {
+            let s=this;
+            s.media.pause();
+            s.media=null;
+            super.destroy();
         }
     }
 }

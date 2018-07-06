@@ -7,12 +7,12 @@ namespace annie {
      * @class annie.AObject
      * @since 1.0.0
      */
-    export class AObject {
-        private _instanceId: number = 0;
-        protected _instanceType: string = "AObject";
+    export abstract class AObject {
+        protected _instanceId: number = 0;
+        protected _instanceType: string = "annie.AObject";
         protected static _object_id = 0;
 
-        public constructor() {
+        constructor() {
             this._instanceId = AObject._object_id++;
         }
 
@@ -21,7 +21,7 @@ namespace annie {
          * @property instanceId
          * @public
          * @since 1.0.0
-         * @returns {number}
+         * @return {number}
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
@@ -42,7 +42,18 @@ namespace annie {
         public get instanceType(): string {
             return this._instanceType;
         }
+
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要从显示对象移除，否则将会出错
+         * @method destroy
+         * @since 2.0.0
+         * @public
+         * @return {void}
+         */
+        abstract destroy(): void;
     }
+
     /**
      * 事件触发基类
      * @class annie.EventDispatcher
@@ -51,14 +62,19 @@ namespace annie {
      * @since 1.0.0
      */
     export class EventDispatcher extends AObject {
-        private eventTypes: any = null;
+        protected eventTypes: any = {};
+        protected eventTypes1: any = {};
 
         public constructor() {
             super();
             this._instanceType = "annie.EventDispatcher";
+<<<<<<< HEAD
             this.eventTypes = {};
             
+=======
+>>>>>>> flash2x/master
         }
+
         /**
          * 全局的鼠标事件的监听数对象表
          * @property _MECO
@@ -72,7 +88,7 @@ namespace annie {
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
-         * @returns {number}
+         * @return {number}
          * @static
          * @private
          * @since 1.0.0
@@ -102,22 +118,27 @@ namespace annie {
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        public addEventListener(type: string, listener: Function): void {
+        public addEventListener(type: string, listener: Function,useCapture = true): void {
             if (!type) {
                 throw new Error("添加侦听的type值为undefined");
             }
-            if(!listener){
+            if (!listener) {
                 throw new Error("侦听回调函数不能为null");
             }
             let s = this;
-            if (!s.eventTypes[type]) {
-                s.eventTypes[type] = [];
+            let eventTypes=s.eventTypes;
+            if(!useCapture){
+                eventTypes=s.eventTypes1;
             }
-            if (s.eventTypes[type].indexOf(listener) < 0) {
-                s.eventTypes[type].unshift(listener);
+            if (!eventTypes[type]) {
+                eventTypes[type] = [];
+            }
+            if (eventTypes[type].indexOf(listener) < 0) {
+                eventTypes[type].unshift(listener);
                 if (type.indexOf("onMouse") == 0) {
                     s._changeMouseCount(type, true);
                 }
@@ -147,6 +168,8 @@ namespace annie {
             EventDispatcher._totalMEC += count;
         }
 
+        private _defaultEvent: annie.Event;
+
         /**
          * 广播侦听
          * @method dispatchEvent
@@ -154,22 +177,31 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
-         * @returns {boolean} 如果有收听者则返回true
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
-         *       yourEvent.data='Flash2x';
+         *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
          *          trace(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
-        public dispatchEvent(event: any, data: any = null): boolean {
+        public dispatchEvent(event: any, data: any = null,useCapture = true): boolean {
             let s = this;
             if (typeof(event) == "string") {
-                event = new annie.Event(event);
+                if (!s._defaultEvent) {
+                    s._defaultEvent = new annie.Event(event);
+                } else {
+                    s._defaultEvent.reset(event, s);
+                }
+                event = s._defaultEvent;
             }
             let listeners = s.eventTypes[event.type];
+            if(!useCapture){
+                listeners=s.eventTypes1[event.type];
+            }
             if (listeners) {
                 let len = listeners.length;
                 if (event.target == null) {
@@ -179,10 +211,12 @@ namespace annie {
                     event.data = data;
                 }
                 for (let i = len - 1; i >= 0; i--) {
-                    if(listeners[i]){
-                        listeners[i](event);
-                    }else{
-                        listeners.splice(i, 1);
+                    if(!event["_pd"]) {
+                        if (listeners[i]) {
+                            listeners[i](event);
+                        } else {
+                            listeners.splice(i, 1);
+                        }
                     }
                 }
                 return true;
@@ -200,11 +234,19 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} type 侦听类形
-         * @returns {boolean} 如果有则返回true
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {boolean} 如果有则返回true
          */
-        public hasEventListener(type: string): boolean {
-            if (this.eventTypes[type]&&this.eventTypes[type].length>0) {
-                return true
+        public hasEventListener(type: string, useCapture = true): boolean {
+            let s = this;
+            if (useCapture) {
+                if (s.eventTypes[type] && s.eventTypes[type].length > 0) {
+                    return true
+                }
+            } else {
+                if (s.eventTypes1[type] && s.eventTypes1[type].length > 0) {
+                    return true
+                }
             }
             return false;
         }
@@ -216,10 +258,14 @@ namespace annie {
          * @since 1.0.0
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          */
-        public removeEventListener(type: string, listener: Function): void {
+        public removeEventListener(type: string, listener: Function,useCapture = true): void {
             let s = this;
             let listeners = s.eventTypes[type];
+            if(!useCapture){
+                listeners=s.eventTypes1[type];
+            }
             if (listeners) {
                 let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
@@ -232,9 +278,13 @@ namespace annie {
                 }
             }
         }
+<<<<<<< HEAD
         public off(type: string, listener: Function): void {
             this.removeAllEventListener.apply(this, arguments);
         }
+=======
+
+>>>>>>> flash2x/master
         /**
          * 移除对象中所有的侦听
          * @method removeAllEventListener
@@ -250,7 +300,21 @@ namespace annie {
                     }
                 }
             }
+            for (let type in s.eventTypes1) {
+                if (type.indexOf("onMouse") == 0) {
+                    for (let j = 0; j < s.eventTypes1[type].length; j++) {
+                        s._changeMouseCount(type, false);
+                    }
+                }
+            }
+            s.eventTypes1 = {};
             s.eventTypes = {};
+        }
+
+        destroy(): void {
+            let s = this;
+            s.removeAllEventListener();
+            s.eventTypes = null;
         }
     }
 }

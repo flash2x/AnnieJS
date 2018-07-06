@@ -2,18 +2,17 @@
     "compilerOptions": {
         "target": "ES5",
         "module": "amd",
-        "sourceMap": true,
+        "sourceMap": false,
         "outFile": "build/build.js",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "removeComments": false,
-        "noImplicitAny": false
+        "removeComments": true,
+        "noImplicitAny": true
     },
     "exclude": [
         "node_modules",
         "build",
         "example",
-        "docRes",
         "libs",
         "out",
         "docRes"

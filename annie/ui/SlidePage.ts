@@ -3,14 +3,14 @@
  */
 
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     import Sprite = annie.Sprite;
 
     /**
      * 滑动页面类
-     * @class annieUI.SlidePage
+     * @class annie.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -179,10 +179,11 @@ namespace annieUI {
                 s.paramXY = "x";
                 s.distance = vW;
             }
-            s.maskObj.alpha = 0;
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
+            s.maskObj["_isUseToMask"]=false;
+            s.maskObj.alpha=0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
@@ -207,7 +208,6 @@ namespace annieUI {
             s.viewHeight = h;
             s.maskObj.endFill();
         }
-
         /**
          * 触摸事件
          * @param e
@@ -418,6 +418,12 @@ namespace annieUI {
                 s.view.addChild(pageFirst);
             }
             s.listLen = s.pageClassList.length;
+        }
+        public destroy(): void {
+            let s=this;
+            s.pageList=null;
+            s.pageClassList=null;
+            super.destroy();
         }
     }
 }

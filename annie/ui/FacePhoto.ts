@@ -2,16 +2,16 @@
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     import Sprite = annie.Sprite;
     import Bitmap = annie.Bitmap;
     import Shape = annie.Shape;
     /**
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
-     * @class annieUI.FacePhoto
+     * @class annie.FacePhoto
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -23,8 +23,8 @@ namespace annieUI {
          * @since 1.0.0
          * @public
          * @example
-         *      var circleface = new annieUI.FacePhoto(),
-         *          rectFace=new annieUI.FacePhoto();
+         *      var circleface = new annie.FacePhoto(),
+         *          rectFace=new annie.FacePhoto();
          *          //圆形头像
          *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
          *          circleface.x = 260;
@@ -39,7 +39,7 @@ namespace annieUI {
         constructor() {
             super();
             let s = this;
-            s._instanceType = "annieUI.FacePhoto";
+            s._instanceType = "annie.FacePhoto";
             s.photo = new Image();
             s.bitmap = new annie.Bitmap();
             s.maskObj = new annie.Shape();
@@ -63,6 +63,10 @@ namespace annieUI {
             s.bitmap.mask = s.maskObj;
         }
 
+        /**
+         * @property photo
+         * @private
+         */
         private photo: any;
         private bitmap: Bitmap;
         private maskType: number = 0;
@@ -83,6 +87,13 @@ namespace annieUI {
                 s.photo.src = src;
             if (s.maskType != maskType)
                 s.maskType = maskType;
+        }
+        public destroy(): void {
+            let s=this;
+           s.bitmap=null;
+           s.photo=null;
+           s.maskObj=null;
+            super.destroy();
         }
     }
 }

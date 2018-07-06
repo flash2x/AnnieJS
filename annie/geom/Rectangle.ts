@@ -69,7 +69,7 @@ namespace annie {
          * 判断一个点是否在矩形内包括边
          * @method isPointIn
          * @param {annie.Point} point
-         * @returns {boolean}
+         * @return {boolean}
          * @public
          * @since 1.0.0
          */
@@ -128,7 +128,7 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Point} p1
          * @param {..arg} ary
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         public static createFromPoints(rect:Rectangle,...arg:Point[]):Rectangle{
            let x=arg[0].x,y=arg[0].y,w=arg[0].x,h=arg[0].y;
@@ -138,7 +138,7 @@ namespace annie {
                     x=arg[i].x;
                 }
                 if(y>arg[i].y){
-                    x=arg[i].y;
+                    y=arg[i].y;
                 }
                 if(w<arg[i].x){
                     w=arg[i].x;
@@ -156,9 +156,12 @@ namespace annie {
 
         /**
          * 通过两个点来确定一个矩形
+         * @method createRectform2Point
+         * @static
          * @param rect
          * @param p1
          * @param p2
+         * @return {void}
          */
         public static createRectform2Point(rect:Rectangle,p1:Point,p2:Point):void{
             let x=p1.x,y=p1.y,w=p1.x,h=p1.y;
@@ -166,7 +169,7 @@ namespace annie {
                     x=p2.x;
                 }
                 if(y>p2.y){
-                    x=p2.y;
+                    y=p2.y;
                 }
                 if(w<p2.x){
                     w=p2.x;
@@ -193,6 +196,9 @@ namespace annie {
             b_cx = rb.x + (rb.width/2);
             b_cy = rb.y + (rb.height/2);
             return ((Math.abs(a_cx - b_cx) <= (ra.width/2 + rb.width/2))&&(Math.abs(a_cy - b_cy) <= (ra.height/2 + rb.height/2)));
+        }
+
+        public destroy(): void {
         }
     }
 }

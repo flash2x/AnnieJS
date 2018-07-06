@@ -12,16 +12,13 @@ namespace annie {
     export class InputText extends FloatDisplay {
         /**
          * 输入文本的类型.
-         * multiline 多行
-         * password 密码
-         * singleline 单行
          * @property inputType
          * @public
          * @since 1.0.0
-         * @type {string}
-         * @default "singleline"
+         * @type {number} 0 input 1 password 2 mulit
+         * @default 0
          */
-        public inputType: string = "singleline";
+        public inputType: number = 0;
 
         /**
          * 在手机端是否需要自动收回软键盘，在pc端此参数无效
@@ -31,27 +28,31 @@ namespace annie {
          * @default true
          */
         public isAutoDownKeyBoard: boolean = true;
-
+        /**
+         * @property _inputTypeList
+         * @static
+         * @type {string[]}
+         * @private
+         * @since 2.0.0
+         */
+        private static _inputTypeList:Array<string>=["input","password","textarea"];
         /**
          * @method InputText
          * @public
          * @since 1.0.0
-         * @param {string} inputType multiline 多行 password 密码 singleline 单行 number 数字 等
+         * @param {number} inputType 0 input 1 password 2 multiline
          * @example
          *      var inputText=new annie.InputText('singleline');
          *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
-        public constructor(inputType: string) {
+        public constructor(inputType:number=0) {
             super();
             var input: any = null;
             let s: InputText = this;
             s._instanceType = "annie.InputText";
-            if (inputType != "multiline") {
+           if(inputType<2){
                 input = document.createElement("input");
-                if(inputType.indexOf("multiline")>=0){
-                    inputType="input";
-                }
-                input.type = inputType;
+                input.type = InputText._inputTypeList[inputType];
             } else {
                 input = document.createElement("textarea");
                 input.style.resize = "none";
@@ -71,6 +72,15 @@ namespace annie {
             });
             s.init(input);
         }
+
+        /**
+         * 初始化输入文本
+         * @method init
+         * @param htmlElement
+         * @public
+         * @return {void}
+         * @since 1.0.0
+         */
         public init(htmlElement: any): void {
             super.init(htmlElement);
             //默认设置
@@ -85,8 +95,6 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} text 默认文字
-         * @param {number} w 文本宽
-         * @param {number} h 文本高
          * @param {string}color 文字颜色
          * @param {string}align 文字的对齐方式
          * @param {number}size  文字大小
@@ -94,11 +102,9 @@ namespace annie {
          * @param {boolean}showBorder 是否需要显示边框
          * @param {number}lineSpacing 如果是多行,请设置行高
          */
-        public initInfo(text: string, w: number, h: number, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void {
+        public initInfo(text: string,color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void {
             let s: InputText = this;
             s.htmlElement.placeholder = text;
-            s.htmlElement.style.width = w + "px";
-            s.htmlElement.style.height = h + "px";
             //font包括字体和大小
             s.htmlElement.style.font = size + "px " + font;
             s.htmlElement.style.color = color;
@@ -106,11 +112,23 @@ namespace annie {
             /////////////////////设置边框//////////////
             s.border = showBorder;
             //color:blue; text-align:center"
-            if (s.inputType == "multiLine") {
+            if (s.inputType == 2) {
                 s.htmlElement.style.lineHeight = lineSpacing + "px";
             }
         }
 
+        /**
+         * @property lineSpacing
+         * @public
+         * @since 2.0.0
+         * @param {number} value
+         */
+        public set lineSpacing(value:number){
+            this.htmlElement.style.lineHeight = value + "px";
+        }
+        public get lineSpacing():number{
+            return parseInt(this.htmlElement.style.lineHeight);
+        }
         /**
          * 设置文本是否为粗体
          * @property bold
@@ -150,7 +168,36 @@ namespace annie {
         public get italic(): boolean {
             return this.htmlElement.style.fontStyle == "italic"
         }
+        /**
+         * 文本的行高
+         * @property textHeight
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        public set textHeight(value: number) {
+            this.htmlElement.style.height = value+"px";
+        }
 
+        public get textHeight(): number {
+            return parseInt(this.htmlElement.style.height);
+        }
+        /**
+         * 文本的宽
+         * @property textWidth
+         * @public
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        public set textWidth(value: number) {
+            this.htmlElement.style.width = value+"px";
+        }
+
+        public get textWidth(): number {
+            return parseInt(this.htmlElement.style.width);
+        }
         /**
          * 设置文本颜色
          * @property color
@@ -195,7 +242,7 @@ namespace annie {
          * @property text
          * @public
          * @since 1.0.3
-         * @returns {string}
+         * @return {string}
          */
         public get text(): string {
             let s = this;
@@ -216,7 +263,7 @@ namespace annie {
          * @public
          * @since 1.1.0
          * @property maxCharacters
-         * @returns {number}
+         * @return {number}
          */
         public get maxCharacters():number{
             let l:any=this.htmlElement.getAttribute("maxlength");
@@ -229,5 +276,6 @@ namespace annie {
         public set maxCharacters(value:number){
             this.htmlElement.setAttribute("maxlength",value);
         }
+
     }
 }

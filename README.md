@@ -3,13 +3,13 @@
 ## [Flash2x 官网:http://www.flash2x.org](http://www.flash2x.org)
 ## [AnnieJS API文档:http://api.annie2x.com](http://api.annie2x.com) 
 ## [AnnieJS demo演示:http://test.annie2x.com](http://test.annie2x.com)
-    AnnieJS 是一款专注于Html5 互动交互的2d动画引擎。
-    AnnieJS 借助于Adobe Flash以及Flash2x工具将以前开发as3项目的工作流程完美复制到HTML5项目开发中来。
+    AnnieJS 是一款专注于将Flash交互技术扩展到任何需要交互的应用领域的2d动画引擎。目前支持导出制作Html5 微信小程序 微信小游戏
     AnnieJS 完全仿照as3的语法和架构，动画效果流畅,制作视觉震撼,但学习简单,安装方便！
     AnnieJS 支持ts和js两种开发语言环境，使用你熟悉的语言开发事半功倍。
     AnnieJS 最大的优势就是短小精悍。全部核心代码压缩后不到70k，该有的功能都有了。
     AnnieJS 需要结合Adobe 及 Flash2x工具使用才能发挥它最大的优势。
     Flash2x 是一款优秀的Adobe Flash插件,与AnnieJS无缝集成。
+    Flash2x 借助于Adobe Flash以及Flash2x工具将以前开发as3项目的工作流程完美延续下来。
 # 相比Flash自带的CreateJs有什么区别和优势
     不得不承认CreateJs非常的优秀，但是它当初不是以移动优先的原则设计的，大量的逻辑和判断代码针对移动端没有任何意义。
     CreateJs鼠标穿透非常让人头疼，上层的显示对象无法阻断事件会一直往下冒泡，非常讨厌。
@@ -69,6 +69,13 @@
 # 如何更新引擎及工具
     下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
 # AnnieJS 版本更新列表
+## AnnieJS 2.0.0 版本
+    变更:需要Flash2x 4.0工具及以上版本的支持
+    变更:Flash2x命名空间下所有类和方法全部转为annie命名空间
+    变更:annieUI命名空间下所有类和方法全部转为annie命名空间
+    变更:globalDispatcher全局类转为annie命名空间
+    优化:代码进行大量优化，性能进一步提升
+    优化:优化完善了鼠标的事件冒泡机制
 ## AnnieJS 1.1.3 版本
     修复annie.InputText类在pc端无法输入的bug
     修复有时获取Sprite.getWH()方法返回宽高为0的bug
@@ -246,6 +253,15 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Flash2x 4.0.0
+    全新的版本,同步AnnieJS 2.0.0
+    支持导出Html5
+    支持导出微信小程序
+    支持导出微信小游戏
+## Flash2x 3.1.2
+    修复少量bug，同步AnnieJS 1.1.2
+## Flash2x 3.1.1
+    修复少量bug，同步AnnieJS 1.1.1
 ## Flash2x 3.1.0
     支持AnnieJS导出输入文本的maxCharacters属性，以限制最大输入字符数
     修复fla文件命名为main.fla后gulp打包成swf报错的bug

@@ -1,3 +1,4 @@
+/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -53,12 +54,32 @@ namespace annie {
         let reg2 = /iphone|ipod|ipad/;
         if (reg1.test(n)) {
             return "android";
-        } else if (reg2.test(n)) {
+        } else if (reg2.test(n)){
             return "ios"
         } else {
             return "pc";
         }
     })();
+    /**
+     * 全局事件触发器
+     * @static
+     * @property  annie.globalDispatcher
+     * @type {annie.EventDispatcher}
+     * @public
+     * @since 1.0.0
+     * @example
+     *      //A代码放到任何合适的地方
+     *      annie.globalDispatcher.addEventListener("myTest",function(e){
+     *          trace("收到了其他地方发来的消息:"+e.data);
+     *      });
+     *
+     *      //B代码放到任何一个可以点击的对象的构造函数中
+     *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
+     *          annie..globalDispatcher.dispatchEvent("myTest","我是小可");
+     *      });
+     *
+     */
+    export let globalDispatcher:annie.EventDispatcher=new annie.EventDispatcher();
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
@@ -226,10 +247,10 @@ namespace annie {
     };
     /**
      * 获取显示区域的颜色值，会返回颜色值的数组
-     * @method getStagePixels
+     * @method annie.getStagePixels
      * @param {annie.Stage} stage
      * @param {annie.Rectangle} rect
-     * @returns {Array}
+     * @return {Array}
      * @public
      * @since 1.1.1
      */

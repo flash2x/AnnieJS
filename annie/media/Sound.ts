@@ -24,29 +24,59 @@ namespace annie {
          */
         public constructor(src: any) {
             super(src, "Audio");
-            let s=this;
+            let s = this;
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
-            s.volume=Sound._volume;
+            s.volume = Sound._volume;
         }
 
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destory
+         * @method destroy
          * @public
          * @since 1.1.1
          */
-        public destory(): void {
+        public destroy(): void {
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
+            super.destroy();
         }
 
-        //声音对象池
+        /**
+         * 停止播放，给stopAllSounds调用
+         * @method stop2
+         * @private
+         */
+        private stop2() {
+            let s = this;
+            if (s.isPlaying) {
+                s.media.pause();
+            }
+        }
+        /**
+         * 恢复播放，给stopAllSounds调用
+         * @method play2
+         * @private
+         */
+        private play2() {
+            let s = this;
+            if (s.isPlaying) {
+                s.media.play();
+            }
+        }
+
+        /**
+         * 音对象池
+         * @property _soundList
+         * @type {any[]}
+         * @private
+         */
         private static _soundList: any = [];
+
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method stopAllSounds
@@ -58,12 +88,31 @@ namespace annie {
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].stop();
+                    annie.Sound._soundList[i].stop2();
                 } else {
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
         }
+
+        /**
+         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
+         * @method resumePlaySounds
+         * @since 2.0.0
+         * @static
+         * @public
+         */
+        public static resumePlaySounds() {
+            let len: number = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]) {
+                    annie.Sound._soundList[i].play2();
+                } else {
+                    annie.Sound._soundList.splice(i, 1);
+                }
+            }
+        }
+
         /**
          * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
@@ -72,7 +121,7 @@ namespace annie {
          * @public
          * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
          */
-        public static setAllSoundsVolume(volume: number){
+        public static setAllSoundsVolume(volume: number) {
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
@@ -81,8 +130,14 @@ namespace annie {
                     annie.Sound._soundList.splice(i, 1);
                 }
             }
-            Sound._volume=volume;
+            Sound._volume = volume;
         }
-        private static _volume:number=1;
+
+        /**
+         * @static
+         * @type {number}
+         * @private
+         */
+        private static _volume: number = 1;
     }
 }

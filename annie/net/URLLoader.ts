@@ -23,12 +23,15 @@ namespace annie {
      */
     export class URLLoader extends EventDispatcher {
         /**
+         * 构造函数
+         * @method URLLoader
          * @param type text json js xml image sound css svg video unKnow
          */
         public constructor() {
             super();
             this._instanceType = "annie.URLLoader";
         }
+
         /**
          * 取消加载
          * @method loadCancel
@@ -42,7 +45,18 @@ namespace annie {
                 // s._req = null;
             }
         }
-        private _req: XMLHttpRequest=null;
+
+        /**
+         * @property _req
+         * @type {null}
+         * @private
+         */
+        private _req: XMLHttpRequest = null;
+        /**
+         * @property headers
+         * @private
+         * @type {any[]}
+         */
         private headers: Array<string> = [];
 
         /**
@@ -124,6 +138,7 @@ namespace annie {
                 // itemObj.src = url;
                 return;
             }
+<<<<<<< HEAD
 
             if(!s._req){
                 s._req=new XMLHttpRequest();
@@ -145,6 +160,22 @@ namespace annie {
                     req.abort();
                     if (!s.data) {
                         req.send();
+=======
+            if (!s._req) {
+                s._req = new XMLHttpRequest();
+                let req = s._req;
+                req.withCredentials = false;
+                req.onprogress = function (event: any): void {
+                    if (!event || event.loaded > 0 && event.total == 0) {
+                        return; // Sometimes we get no "total", so just ignore the progress event.
+                    }
+                    s.dispatchEvent("onProgress", {loadedBytes: event.loaded, totalBytes: event.total});
+                };
+                req.onerror = function (event: any): void {
+                    reSendTimes++;
+                    if (reSendTimes > 2) {
+                        s.dispatchEvent("onError", {id: 2, msg: event["message"]});
+>>>>>>> flash2x/master
                     } else {
                         //断线重连
                         req.abort();
@@ -164,6 +195,7 @@ namespace annie {
                             }
                         }
                     }
+<<<<<<< HEAD
                 }
             };
             req.onreadystatechange = function (event: any): void {
@@ -222,6 +254,71 @@ namespace annie {
                             default:
                                 item = result;
                                 break;
+=======
+                };
+                req.onreadystatechange = function (event: any): void {
+                    let t = event.target;
+                    if (t["readyState"] == 4) {
+                        if (req.status == 200||req.status==0) {
+                            let isImage: boolean = false;
+                            let e: Event = new Event("onComplete");
+                            let result = t["response"];
+                            e.data = {type: s.responseType, response: null};
+                            let item: any;
+                            switch (s.responseType) {
+                                case "css":
+                                    item = document.createElement("link");
+                                    item.rel = "stylesheet";
+                                    item.href = s.url;
+                                    break;
+                                case "image":
+                                case "sound":
+                                case "video":
+                                    let itemObj: any;
+                                    if (s.responseType == "image") {
+                                        isImage = true;
+                                        itemObj = document.createElement("img");
+                                        itemObj.onload = function () {
+                                            URL.revokeObjectURL(itemObj.src);
+                                            itemObj.onload = null;
+                                            s.dispatchEvent(e);
+                                        };
+                                        itemObj.src = URL.createObjectURL(result);
+                                    } else {
+                                        if (s.responseType == "sound") {
+                                            itemObj = document.createElement("AUDIO");
+                                            itemObj.preload = true;
+                                            itemObj.src = s.url;
+                                        } else if (s.responseType == "video") {
+                                            itemObj = document.createElement("VIDEO");
+                                            itemObj.preload = true;
+                                            itemObj.src = s.url;
+                                        }
+                                    }
+                                    item = itemObj;
+                                    break;
+                                case "json":
+                                    item = JSON.parse(result);
+                                    break;
+                                case "js":
+                                    item = "JS_CODE";
+                                    Eval(result);
+                                    break;
+                                case "text":
+                                case "unKnow":
+                                case "xml":
+                                default:
+                                    item = result;
+                                    break;
+                            }
+                            e.data["response"] = item;
+                            s.data = null;
+                            s.responseType = "";
+                            if (!isImage) s.dispatchEvent(e);
+                        } else {
+                            //服务器返回报错
+                            s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});
+>>>>>>> flash2x/master
                         }
                         e.data["response"] = item;
                         s.data = null;
@@ -353,15 +450,21 @@ namespace annie {
                 return src + "?" + s._fqs(data, query);
             }
         };
-
         /**
          * 添加自定义头
-         * @addHeader
+         * @method addHeader
          * @param name
          * @param value
          */
         public addHeader(name: string, value: string): void {
             this.headers.push(name, value);
+        }
+        public destroy(): void {
+            let s=this;
+            s.loadCancel();
+            s.headers=null;
+            s.data=null;
+            super.destroy();
         }
     }
 }

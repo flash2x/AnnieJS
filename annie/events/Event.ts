@@ -21,6 +21,16 @@ namespace annie {
          */
         public static RESIZE:string = "onResize";
         /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
+         * @Event
+         * @property ON_RUN_CHANGED
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        public static ON_RUN_CHANGED:string = "onRunChanged";
+        /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @property ON_PLAY_UPDATE
          * @static
@@ -45,7 +55,7 @@ namespace annie {
          */
         public static ON_PLAY_START="onPlayStart";
         /**
-         * annieUI.FlipBook组件翻页开始事件
+         * annie.FlipBook组件翻页开始事件
          * @property ON_FLIP_START
          * @static
          * @since 1.1.0
@@ -53,7 +63,7 @@ namespace annie {
          */
         public static ON_FLIP_START="onFlipStart";
         /**
-         * annieUI.FlipBook组件翻页结束事件
+         * annie.FlipBook组件翻页结束事件
          * @property ON_FLIP_STOP
          * @static
          * @since 1.1.0
@@ -61,7 +71,7 @@ namespace annie {
          */
         public static ON_FLIP_STOP="onFlipStop";
         /**
-         * annieUI.ScrollPage组件滑动到开始位置事件
+         * annie.ScrollPage组件滑动到开始位置事件
          * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
@@ -69,7 +79,7 @@ namespace annie {
          */
         public static ON_SCROLL_TO_HEAD="onScrollToHead";
         /**
-         * annieUI.ScrollPage组件停止滑动事件
+         * annie.ScrollPage组件停止滑动事件
          * @property ON_SCROLL_STOP
          * @static
          * @since 1.1.0
@@ -77,7 +87,7 @@ namespace annie {
          */
         public static ON_SCROLL_STOP="onScrollStop";
         /**
-         * annieUI.ScrollPage组件开始滑动事件
+         * annie.ScrollPage组件开始滑动事件
          * @property ON_SCROLL_START
          * @static
          * @since 1.1.0
@@ -85,7 +95,7 @@ namespace annie {
          */
         public static ON_SCROLL_START="onScrollStart";
         /**
-         * annieUI.ScrollPage组件滑动到结束位置事件
+         * annie.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
@@ -93,7 +103,7 @@ namespace annie {
          */
         public static ON_SCROLL_TO_END="onScrollToEnd";
         /**
-         * annieUI.Slide 组件开始滑动事件
+         * annie.Slide 组件开始滑动事件
          * @property ON_SLIDE_START
          * @static
          * @since 1.1.0
@@ -101,7 +111,7 @@ namespace annie {
          */
         public static ON_SLIDE_START="onSlideStart";
         /**
-         * annieUI.Slide 组件结束滑动事件
+         * annie.Slide 组件结束滑动事件
          * @property ON_SLIDE_END
          * @static
          * @since 1.1.0
@@ -110,14 +120,13 @@ namespace annie {
         public static ON_SLIDE_END="onSlideEnd";
         /**
          * 舞台初始化完成后会触发的事件
-         * @Event
-         * @property ON_STAGE_INIT
+         * @property ON_INIT_STAGE
          * @type {string}
          * @static
          * @public
          * @since 1.0.0
          */
-        public static INIT_TO_STAGE:string = "onInitStage";
+        public static ON_INIT_STAGE:string = "onInitStage";
         /**
          * 显示对象加入到舞台事件
          * @Event
@@ -266,6 +275,8 @@ namespace annie {
         /**
          * @method Event
          * @param {string} type 事件类型
+         * @public
+         * @since 1.0.0
          */
         public constructor(type:string) {
             super();
@@ -273,14 +284,27 @@ namespace annie {
             this.type = type;
         }
         /**
-         * 阻止向下冒泡事件,如果在接收到事件后调用事件的这个方法,那么这个事件将不会再向显示对象的子级派送
-         * @method preventDefault
+         * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。
+         * @method stopImmediatePropagation
          * @public
-         * @since 1.0.0
+         * @return {void}
+         * @since 2.0.0
          */
-        public preventDefault(){
+        public stopImmediatePropagation():void{
             this._pd=true;
         }
+
+        /**
+         * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。
+         * @method stopPropagation
+         * @public
+         * @since 2.0.0
+         * @return {void}
+         */
+        public stopPropagation():void{
+            this._bpd=true;
+        }
+        private  _bpd:boolean=false;
         /**
          * 是否阻止事件向下冒泡
          * @property _pd
@@ -289,5 +313,28 @@ namespace annie {
          * @since 1.0.0
          */
         private _pd:boolean=false;
+
+        public destroy(): void {
+            let s=this;
+            s.target=null;
+            s.data=null;
+        }
+
+        /**
+         * 重围事件到初始状态方便重复利用
+         * @method reset
+         * @param {string} type
+         * @param target
+         * @since 2.0.0
+         * @return {void}
+         * @public
+         */
+        public reset(type:string,target:any):void{
+            let s=this;
+            s.target=target;
+            s._pd=false;
+            s._bpd=false;
+            s.type=type;
+        }
     }
 }

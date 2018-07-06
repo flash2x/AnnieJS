@@ -31,40 +31,68 @@ namespace annie {
         public get textAlign(): string {
             return this._textAlign;
         }
-
         private _textAlign = "left";
+
+        /**
+         * @property textAlpha
+         * @since 2.0.0
+         * @public
+         */
+        public set textAlpha(value: number) {
+            this._setProperty("_textAlpha",value,3);
+        }
+
+        public get textAlpha(): number {
+            return this._textAlpha;
+        }
+        private _textAlpha:number= 1;
+
         /**
          * 文本的行高
-         * @property lineHeight
+         * @property textHeight
          * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        public set lineHeight(value: number) {
-            this._setProperty("_lineHeight",value,3);
+        public set textHeight(value: number) {
+            this._setProperty("_textHeight",value,3);
         }
 
-        public get lineHeight(): number {
-            return this._lineHeight;
+        public get textHeight(): number {
+            return this._textHeight;
         }
-        private _lineHeight: number = 0;
+        private _textHeight: number = 0;
+
+        /**
+         * @property lineSpacing
+         * @public
+         * @since 1.0.0
+         * @param {number} value
+         */
+        public set lineSpacing(value:number){
+            this._setProperty("_lineSpacing",value,3);
+        }
+        public get lineSpacing():number{
+            return this._lineSpacing;
+        }
+        private _lineSpacing: number =14;
         /**
          * 文本的宽
-         * @property lineWidth
+         * @property textWidth
          * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-        public set lineWidth(value: number) {
-            this._setProperty("_lineWidth",value,3);
+        public set textWidth(value: number) {
+            this._setProperty("_textWidth",value,3);
         }
 
-        public get lineWidth(): number {
-            return this._lineWidth;
+        public get textWidth(): number {
+            return this._textWidth;
         }
-        private _lineWidth: number = 0;
+        private _textWidth: number = 120;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -172,7 +200,6 @@ namespace annie {
         public set bold(value: boolean) {
             this._setProperty("_bold",value,3);
         }
-
         public get bold(): boolean {
             return this._bold;
         }
@@ -195,6 +222,7 @@ namespace annie {
 
         /**
          * 设置文本在canvas里的渲染样式
+         * @method _prepContext
          * @param ctx
          * @private
          * @since 1.0.0
@@ -212,11 +240,36 @@ namespace annie {
                 font = "italic " + font;
             }
             ctx.font = font;
-            ctx.textAlign = this._textAlign || "left";
+            ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
-            ctx.fillStyle = this._color;
+            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha)
         }
-
+        /**
+         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
+         * @method getTextWidth
+         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
+         * @since 2.0.0
+         * @public
+         * @return {number}
+         */
+        public getTextWidth(lineIndex:number=0){
+            let s=this;
+            s.update();
+            let can = s._texture;
+            let ctx = can.getContext("2d");
+            let obj:any=ctx.measureText(s.realLines[lineIndex]);
+            return obj.width;
+        }
+        /**
+         * @property _lines 获取当前文本行数
+         * @type {number}
+         * @public
+         * @readonly
+         * @since 2.0.0
+         */
+        get lines(): number {
+            return this.realLines.length;
+        }
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -232,6 +285,7 @@ namespace annie {
             //ctx.restore();
             return w;
         }
+        private  realLines: any = [];
         /**
          * 重写 update
          * @method update
@@ -249,25 +303,14 @@ namespace annie {
                 let ctx = can.getContext("2d");
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
+                s.realLines=realLines;
                 s._prepContext(ctx);
-                let lineH: number;
-                if (s.lineHeight) {
-                    lineH = s.lineHeight;
-                } else {
-                    lineH = s._getMeasuredWidth("M") * 1.2;
-                }
-                if (!s.lineWidth) {
-                    s.lineWidth = lineH * 10;
-                } else {
-                    if (s.lineWidth < lineH) {
-                        s.lineWidth = lineH;
-                    }
-                }
+                let lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines.push(hardLines[0]);
+                    realLines[realLines.length]=hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
-                    if (lineW > s.lineWidth) {
+                    if (lineW > s._textWidth){
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let wordW = 0;
@@ -275,7 +318,7 @@ namespace annie {
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > s.lineWidth) {
+                            if (w > s._textWidth) {
                                 realLines[0] = lineStr;
                                 break;
                             } else {
@@ -294,23 +337,23 @@ namespace annie {
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
-                            if (w > this.lineWidth) {
-                                realLines.push(lineStr);
+                            if (w > s._textWidth) {
+                                realLines[realLines.length]=lineStr;
                                 lineStr = str[j];
                                 w = wordW;
                             } else {
                                 lineStr += str[j];
                             }
                         }
-                        realLines.push(lineStr);
+                        realLines[realLines.length]=lineStr;
                     }
                 }
                 let maxH = lineH * realLines.length;
-                let maxW = s.lineWidth;
+                let maxW = s._textWidth;
                 let tx = 0;
-                if (s.textAlign == "center") {
+                if (s._textAlign == "center") {
                     tx = maxW * 0.5;
-                } else if (s.textAlign == "right") {
+                } else if (s._textAlign == "right") {
                     tx = maxW;
                 }
                 can.width = maxW + 20;

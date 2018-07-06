@@ -1,3 +1,4 @@
+/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -13,11 +14,43 @@ namespace annie {
      * @since 1.0.0
      */
     export class Sprite extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         public constructor() {
             super();
-            this._instanceType = "annie.Sprite";
+            let s=this;
+            s._instanceType = "annie.Sprite";
         }
-
+        /**
+         * sprite 和 moveClip的类资源信息
+         * @property _a2x_res_class
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         */
+        private _a2x_res_class:any=null;
+        /**
+         * @property _a2x_res_children
+         * @type {any[]}
+         * @private
+         * @since 2.0.0
+         */
+        private _a2x_res_children:any=[];
+        public destroy():void {
+            let s=this;
+            //让子级也destroy
+            for(let i=0;i<s.children.length;i++){
+                s.children[i].destroy();
+            }
+            s._a2x_res_children=null;
+            s._a2x_res_class=null;
+            s.children=null;
+            super.destroy();
+        }
         /**
          * 是否可以让children接收鼠标事件,如果为false
          * 鼠标事件将不会往下冒泡
@@ -66,7 +99,13 @@ namespace annie {
             s._cacheAsBitmap = value;
         }
 
-        public _cacheAsBitmap: boolean;
+        /**
+         * @property
+         * @since 2.0.0
+         * @public
+         * @default false
+         */
+        private _cacheAsBitmap: boolean;
 
         /**
          * 添加一个显示对象到Sprite
@@ -97,6 +136,16 @@ namespace annie {
         }
 
         //全局遍历
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         */
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
             if (len > 0) {
@@ -107,7 +156,7 @@ namespace annie {
                     name = child.name;
                     if (name && name != "") {
                         if (rex.test(name)) {
-                            resultList.push(child);
+                            resultList[resultList.length]=child;
                             if (isOnlyOne) {
                                 return;
                             }
@@ -128,7 +177,7 @@ namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -158,7 +207,7 @@ namespace annie {
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          */
         public addChildAt(child: DisplayObject, index: number): void {
@@ -182,7 +231,7 @@ namespace annie {
             child.parent = s;
             len = s.children.length;
             if (index >= len) {
-                s.children.push(child);
+                s.children[s.children.length]=child;
             } else if (index == 0) {
                 s.children.unshift(child);
             } else {
@@ -198,7 +247,7 @@ namespace annie {
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -214,18 +263,50 @@ namespace annie {
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
         public getChildIndex(child: DisplayObject): number {
-            let len = this.children.length;
+            let s=this;
+            let len = s.children.length;
             for (let i: number = 0; i < len; i++) {
-                if (this.children[i] == child) {
+                if (s.children[i] == child) {
                     return i;
                 }
             }
             return -1;
+        }
+        /**
+         * @method 交换两个显示对象的层级
+         * @param child1 显示对象，或者显示对象的索引
+         * @param child2 显示对象，或者显示对象的索引
+         * @since 2.0.0
+         * @return {boolean}
+         */
+        public swapChild(child1:any,child2:any):boolean{
+            let s=this;
+            let id1=-1;
+            let id2=-1;
+            let childCount=s.children.length;
+            if(typeof(child1)=="number"){
+               id1=child1;
+            }else{
+                id1=s.getChildIndex(child1);
+            }
+            if(typeof(child2)=="number"){
+                id2=child2;
+            }else{
+                id2=s.getChildIndex(child2);
+            }
+            if(id1==id2||id1<0||id1>=childCount||id2<0||id2>=childCount){
+                return false;
+            }else{
+                let temp:any=s.children[id1];
+                s.children[id1]=s.children[id2];
+                s.children[id2]=temp;
+                return true;
+            }
         }
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
@@ -235,15 +316,15 @@ namespace annie {
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
          */
-        public _onDispatchBubbledEvent(type: string, updateMc: boolean = false): void {
+        public _onDispatchBubbledEvent(type: string): void {
             let s = this;
             let len = s.children.length;
             if (type == "onRemoveToStage" && !s.stage) return;
             s.stage = s.parent.stage;
             for (let i = 0; i < len; i++) {
-                s.children[i]._onDispatchBubbledEvent(type, updateMc);
+                s.children[i]._onDispatchBubbledEvent(type);
             }
-            super._onDispatchBubbledEvent(type, updateMc);
+            super._onDispatchBubbledEvent(type);
         }
 
         /**
@@ -289,15 +370,14 @@ namespace annie {
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
          */
-        public update(isDrawUpdate: boolean = false): void {
+        public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if(!s._visible)return;
-            super.update(isDrawUpdate);
             if (!s._cacheAsBitmap){
+                super.update(isDrawUpdate);
                 let len = s.children.length;
-                let child: any;
-                let maskObjIds: any = [];
                 for (let i = len - 1; i >= 0; i--) {
+<<<<<<< HEAD
                     child = s.children[i];
                     if(!s._visible) continue;
                     //更新遮罩
@@ -325,11 +405,14 @@ namespace annie {
                         maskObjIds.push(child.mask.instanceId);
                     }
                     child.update(isDrawUpdate);
+=======
+                    s.children[i].update(isDrawUpdate);
+>>>>>>> flash2x/master
                 }
+                s._UI.UM = false;
+                s._UI.UA = false;
+                s._UI.UF = false;
             }
-            s._UI.UM = false;
-            s._UI.UA = false;
-            s._UI.UF = false;
         }
 
         /**
@@ -337,7 +420,7 @@ namespace annie {
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -352,7 +435,10 @@ namespace annie {
                 //这里特别注意是从上往下遍历
                 for (let i = len - 1; i >= 0; i--) {
                     child = s.children[i];
-                    if (child.mask) {
+                    if(child._isUseToMask){
+                        continue;
+                    }
+                    if (child.mask&&child.mask.parent==child.parent) {
                         //看看点是否在遮罩内
                         if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
@@ -390,7 +476,7 @@ namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @public
          */
@@ -408,7 +494,7 @@ namespace annie {
                         if (s.children[i].visible)
                             Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                     }
-                    if (s.mask) {
+                    if (s.mask&&s.mask.parent==s.parent) {
                         let maskRect = s.mask.getDrawRect();
                         if (rect.x < maskRect.x) {
                             rect.x = maskRect.x;
@@ -456,7 +542,7 @@ namespace annie {
                         child = s.children[i];
                         if (child.cAlpha > 0 && child._visible) {
                             if (maskObj) {
-                                if (child.mask) {
+                                if (child.mask&&child.mask.parent==child.parent) {
                                     if (child.mask != maskObj) {
                                         renderObj.endMask();
                                         maskObj = child.mask;
@@ -467,7 +553,7 @@ namespace annie {
                                     maskObj = null;
                                 }
                             } else {
-                                if (child.mask) {
+                                if (child.mask&&child.mask.parent==child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }

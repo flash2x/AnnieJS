@@ -102,32 +102,13 @@ namespace annie {
             s._bounds.height=h;
             s.htmlElement=she;
         }
+
         /**
-         * 删除html元素,这样就等于解了封装
-         * @method delElement
-         * @since 1.0.0
-         * @public
+         * @method getStyle
+         * @param {HTMLElement} elem
+         * @param cssName
+         * @return {any}
          */
-        public delElement(): void {
-            let s=this;
-            let elem = s.htmlElement;
-            if (elem) {
-                elem.style.display = "none";
-                if (elem.parentNode) {
-                    elem.parentNode.removeChild(elem);
-                }
-                s._isAdded = false;
-                s.htmlElement = null;
-            }
-            let sf:any=s.stage["_floatDisplayList"];
-            let len=sf.length;
-            for(let i=0;i<len;i++){
-                if(sf[i]==s){
-                    sf.splice(i,1);
-                    break;
-                }
-            }
-        }
         private getStyle(elem:HTMLElement, cssName:any ):any
         {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
@@ -149,10 +130,9 @@ namespace annie {
         /**
          * @method updateStyle
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
+         * @since 1.1.4
          */
-        protected updateStyle(): void {
+        public updateStyle(): void {
             let s = this;
             let o = s.htmlElement;
             if (o) {
@@ -186,6 +166,28 @@ namespace annie {
                     s._UI.UA = false;
                 }
             }
+        }
+        public destroy():void {
+            //清除相应的数据引用
+            let s = this;
+            let elem = s.htmlElement;
+            if (elem) {
+                elem.style.display = "none";
+                if (elem.parentNode) {
+                    elem.parentNode.removeChild(elem);
+                }
+                s._isAdded = false;
+                s.htmlElement = null;
+            }
+            let sf:any=s.stage["_floatDisplayList"];
+            let len=sf.length;
+            for(let i=0;i<len;i++){
+                if(sf[i]==s){
+                    sf.splice(i,1);
+                    break;
+                }
+            }
+            super.destroy();
         }
     }
 }

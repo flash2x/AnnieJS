@@ -2,14 +2,14 @@
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annieUI
+ * @module annie
  */
-namespace annieUI {
+namespace annie {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annieUI.ScrollPage
+     * @class annie.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -153,7 +153,7 @@ namespace annieUI {
          * @param {number} maxDistance 最大滚动的长度
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annie.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
@@ -163,14 +163,15 @@ namespace annieUI {
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             let s = this;
-            s._instanceType = "annieUI.ScrollPage";
-            s.maskObj.alpha = 0;
+            s._instanceType = "annie.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
+            s.maskObj["_isUseToMask"]=false;
+            s.maskObj.alpha=0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH,isVertical);
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
+           // s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
@@ -261,23 +262,24 @@ namespace annieUI {
             let s = this;
             let view: any = s.view;
             // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_DOWN){
-                if (!s.isStop) {
-                    s.isStop = true;
-                }
-                if (s.autoScroll){
-                    s.autoScroll=false;
-                    annie.Tween.kill(s._tweenId);
-                }
-                if (s.isVertical) {
-                    s.lastValue = e.localY;
-                } else {
-                    s.lastValue = e.localX;
-                }
-                s.speed = 0;
-                s.isMouseDownState = 1;
-            } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState<1)return;
+            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState<1){
+                    if (!s.isStop) {
+                        s.isStop = true;
+                    }
+                    if (s.autoScroll){
+                        s.autoScroll=false;
+                        annie.Tween.kill(s._tweenId);
+                    }
+                    if (s.isVertical) {
+                        s.lastValue = e.localY;
+                    } else {
+                        s.lastValue = e.localX;
+                    }
+                    s.speed = 0;
+                    s.isMouseDownState = 1;
+                    return;
+                };
                 if(s.isMouseDownState==1){
                     s.dispatchEvent("onScrollStart");
                 }
@@ -351,6 +353,12 @@ namespace annieUI {
                     s.dispatchEvent("onScrollStart");
                 }
             }
+        }
+        public destroy(): void {
+            let s=this;
+            s.maskObj=null;
+            s.view=null;
+            super.destroy();
         }
     }
 }
