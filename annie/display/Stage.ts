@@ -1,4 +1,3 @@
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */

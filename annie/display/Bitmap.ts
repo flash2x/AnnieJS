@@ -1,4 +1,3 @@
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */

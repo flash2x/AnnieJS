@@ -1,4 +1,3 @@
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -187,6 +186,7 @@ namespace annie {
          * @default false
          */
         private _isButton: boolean = false;
+        private _isGraphics: boolean = false;
 
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -383,6 +383,10 @@ namespace annie {
             let s: any = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
+                if(s._isGraphics){
+                    s._isPlaying=false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame){
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;

@@ -1562,8 +1562,6 @@ var annie;
     }(annie.AObject));
     annie.Rectangle = Rectangle;
 })(annie || (annie = {}));
-/// <reference path="../events/EventDispatcher.ts" />
-/// <reference path="../geom/Point.ts" />
 /**
  * @module annie
  */
@@ -2464,7 +2462,6 @@ var annie;
     }(annie.EventDispatcher));
     annie.DisplayObject = DisplayObject;
 })(annie || (annie = {}));
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -3620,7 +3617,6 @@ var annie;
     }(annie.DisplayObject));
     annie.Shape = Shape;
 })(annie || (annie = {}));
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -4581,7 +4577,6 @@ var annie;
     }(annie.Media));
     annie.Video = Video;
 })(annie || (annie = {}));
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -4656,6 +4651,7 @@ var annie;
              * @default false
              */
             this._isButton = false;
+            this._isGraphics = false;
             this._clicked = false;
             /**
              * @property _maskList
@@ -4976,6 +4972,10 @@ var annie;
             var s = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
+                if (s._isGraphics) {
+                    s._isPlaying = false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;
@@ -6133,7 +6133,6 @@ var annie;
     }(annie.FloatDisplay));
     annie.InputText = InputText;
 })(annie || (annie = {}));
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -8916,10 +8915,15 @@ var annie;
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
+            if (info.t) {
+                if (info.t == 1) {
+                    //initButton
+                    if (target.initButton) {
+                        target.initButton();
+                    }
+                }
+                else if (info.t == 2) {
+                    target._isGraphics = true;
                 }
             }
             ///////////////////////////////////////////
@@ -10322,7 +10326,6 @@ var annie;
     }(annie.EventDispatcher));
     annie.Timer = Timer;
 })(annie || (annie = {}));
-/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -10588,9 +10591,6 @@ var annie;
         return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
     };
 })(annie || (annie = {}));
-/// <reference path="./display/Stage.ts" />
-/// <reference path="./utils/Tween.ts" />
-/// <reference path="./utils/Timer.ts" />
 /**
  * @class 全局
  */

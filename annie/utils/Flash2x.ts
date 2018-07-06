@@ -440,10 +440,14 @@ namespace annie {
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
+            if(info.t) {
+                if (info.t == 1) {
+                    //initButton
+                    if (target.initButton) {
+                        target.initButton();
+                    }
+                } else if (info.t == 2) {
+                    target._isGraphics = true;
                 }
             }
             ///////////////////////////////////////////
