@@ -286,7 +286,7 @@ namespace annie {
         let textAlpha = textDate[7];
         let border = textDate[12];
         let lineSpacing = textDate[8];
-        if (textDate[1] == 0 || textDate[1] == 1) {
+        //if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
             textObj.font = font;
@@ -299,13 +299,13 @@ namespace annie {
             textObj.textAlpha = textAlpha;
             textObj.border = border;
             textObj.lineSpacing = lineSpacing;
-        } else {
+        //} else {
             /*textObj = new annie.InputText(textDate[2]);
             textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
             textObj.italic = italic;
             textObj.bold = bold;*/
             console.log("wxApp isn't support inputText");
-        }
+        //}
         return textObj;
     }
 

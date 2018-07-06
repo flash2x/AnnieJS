@@ -7008,27 +7008,26 @@ var annie;
         var textAlpha = textDate[7];
         var border = textDate[12];
         var lineSpacing = textDate[8];
-        if (textDate[1] == 0 || textDate[1] == 1) {
-            textObj = new annie.TextField();
-            textObj.text = text;
-            textObj.font = font;
-            textObj.size = size;
-            textObj.textAlign = textAlign;
-            textObj.lineType = lineType;
-            textObj.italic = italic;
-            textObj.bold = bold;
-            textObj.color = color;
-            textObj.textAlpha = textAlpha;
-            textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
-        }
-        else {
-            /*textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
-            textObj.italic = italic;
-            textObj.bold = bold;*/
-            console.log("wxApp isn't support inputText");
-        }
+        //if (textDate[1] == 0 || textDate[1] == 1) {
+        textObj = new annie.TextField();
+        textObj.text = text;
+        textObj.font = font;
+        textObj.size = size;
+        textObj.textAlign = textAlign;
+        textObj.lineType = lineType;
+        textObj.italic = italic;
+        textObj.bold = bold;
+        textObj.color = color;
+        textObj.textAlpha = textAlpha;
+        textObj.border = border;
+        textObj.lineSpacing = lineSpacing;
+        //} else {
+        /*textObj = new annie.InputText(textDate[2]);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.italic = italic;
+        textObj.bold = bold;*/
+        console.log("wxApp isn't support inputText");
+        //}
         return textObj;
     }
     /**
