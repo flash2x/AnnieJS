@@ -1,5 +1,3 @@
-/// <reference path="../events/EventDispatcher.ts" />
-/// <reference path="../geom/Point.ts" />
 /**
  * @module annie
  */

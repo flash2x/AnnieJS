@@ -1,4 +1,3 @@
-/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */

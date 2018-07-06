@@ -1542,8 +1542,6 @@ var annie;
     }(annie.AObject));
     annie.Rectangle = Rectangle;
 })(annie || (annie = {}));
-/// <reference path="../events/EventDispatcher.ts" />
-/// <reference path="../geom/Point.ts" />
 /**
  * @module annie
  */
@@ -2357,7 +2355,6 @@ var annie;
     }(annie.EventDispatcher));
     annie.DisplayObject = DisplayObject;
 })(annie || (annie = {}));
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -3230,7 +3227,6 @@ var annie;
     }(annie.DisplayObject));
     annie.Shape = Shape;
 })(annie || (annie = {}));
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -3690,7 +3686,6 @@ var annie;
     }(annie.DisplayObject));
     annie.Sprite = Sprite;
 })(annie || (annie = {}));
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -4623,7 +4618,6 @@ var annie;
     }(annie.DisplayObject));
     annie.TextField = TextField;
 })(annie || (annie = {}));
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -6719,7 +6713,6 @@ var annie;
     }(annie.EventDispatcher));
     annie.Timer = Timer;
 })(annie || (annie = {}));
-/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -7233,9 +7226,6 @@ var annie;
     }
     annie.initRes = initRes;
 })(annie || (annie = {}));
-/// <reference path="./display/Stage.ts" />
-/// <reference path="./utils/Tween.ts" />
-/// <reference path="./utils/Timer.ts" />
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();

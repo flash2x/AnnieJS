@@ -1399,7 +1399,6 @@ var annie;
     }(Sprite));
     annie.FlipBook = FlipBook;
 })(annie || (annie = {}));
-/// <reference path="ScrollPage" />
 /**
  * Created by anlun on 16/8/14.
  */
