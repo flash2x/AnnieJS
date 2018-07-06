@@ -3707,6 +3707,8 @@ var annie;
             _super.call(this);
             this._curFrame = 1;
             this._lastFrameObj = null;
+            //0 剪辑 1 按钮 2 图形
+            this._isGraphics = false;
             this._isPlaying = true;
             this._isFront = true;
             this._lastFrame = 0;
@@ -4003,6 +4005,10 @@ var annie;
             var s = this;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
+                if (s._isGraphics) {
+                    s._isPlaying = false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;
@@ -6962,10 +6968,15 @@ var annie;
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
+            if (info.t) {
+                if (info.t == 1) {
+                    //initButton
+                    if (target.initButton) {
+                        target.initButton();
+                    }
+                }
+                else if (info.t == 2) {
+                    target._isGraphics = true;
                 }
             }
             target._a2x_res_obj = info;

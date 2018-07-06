@@ -25,7 +25,8 @@ namespace annie {
 
         private _curFrame: number = 1;
         private _lastFrameObj: any = null;
-
+        //0 剪辑 1 按钮 2 图形
+        private _isGraphics:boolean=false;
         /**
          * 当前动画是否处于播放状态
          * @property isPlaying
@@ -299,6 +300,10 @@ namespace annie {
             let s: any = this;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
+                if(s._isGraphics){
+                    s._isPlaying=false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame){
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;
