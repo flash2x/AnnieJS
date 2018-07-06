@@ -197,9 +197,9 @@ namespace annie {
                                 //     item = itemObj;
                                 // } else {
                                     if (s.responseType == "sound") {
-                                        itemObj = document.createElement("AUDIO");
-                                        itemObj.preload = true;
-                                        itemObj.src = s.url;
+                                        // itemObj = document.createElement("AUDIO");
+                                        // itemObj.preload = true;
+                                        // itemObj.src = s.url;
                                         item = new Sound(s.url);
                                     } else if (s.responseType == "video") {
                                         itemObj = document.createElement("VIDEO");

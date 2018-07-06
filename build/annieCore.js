@@ -649,22 +649,8 @@ var annie;
              * @since 1.1.2
              * @public
              */
-<<<<<<< HEAD
             this.identifier = 0;
-            /**
-             * 触摸或者鼠标事件的手指是否是多个
-             * @property isMultiTouch
-             * @type {boolean}
-             * @since 1.1.3
-             * @public
-             */
-            this.isMultiTouch = false;
             this._instanceType = "annie.MouseEvent";
-=======
-            _this.identifier = 0;
-            _this._instanceType = "annie.MouseEvent";
-            return _this;
->>>>>>> flash2x/master
         }
         /**
          * 事件后立即更新显示列表状态
@@ -5931,7 +5917,7 @@ var annie;
              * @since 1.1.3
              * @type {boolean}
              */
-            _this.isMultiMouse = false;
+            this.isMultiMouse = false;
             /**
              * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
              * 端默认不开启
@@ -6048,16 +6034,10 @@ var annie;
              * @default 0
              * @type {number}
              */
-<<<<<<< HEAD
             this._currentFlush = 0;
             this._lastDpList = {};
             this._rid = -1;
-=======
-            _this._currentFlush = 0;
-            _this._lastDpList = {};
-            _this._rid = -1;
-            _this._floatDisplayList = [];
->>>>>>> flash2x/master
+            this._floatDisplayList = [];
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
              * @type {Array}
