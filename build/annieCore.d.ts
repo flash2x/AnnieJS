@@ -2017,6 +2017,7 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
+        private _isGraphics;
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播

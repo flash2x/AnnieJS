@@ -244,10 +244,14 @@ namespace annie{
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
+            if(info.t) {
+                if (info.t == 1) {
+                    //initButton
+                    if (target.initButton) {
+                        target.initButton();
+                    }
+                } else if (info.t == 2) {
+                    target._isGraphics = true;
                 }
             }
             target._a2x_res_obj = info;
@@ -278,7 +282,7 @@ namespace annie{
         let textAlpha = textDate[7];
         let border = textDate[12];
         let lineSpacing = textDate[8];
-        if (textDate[1] == 0 || textDate[1] == 1) {
+        //if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
             textObj.font = font;
@@ -291,13 +295,13 @@ namespace annie{
             textObj.textAlpha = textAlpha;
             textObj.border = border;
             textObj.lineSpacing = lineSpacing;
-        } else {
+        //} else {
             /*textObj = new annie.InputText(textDate[2]);
             textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
             textObj.italic = italic;
             textObj.bold = bold;*/
             console.log("wxApp isn't support inputText");
-        }
+        //}
         return textObj;
     }
     /**

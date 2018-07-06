@@ -39,6 +39,7 @@ namespace annie {
         public get isPlaying(): boolean {
             return this._isPlaying;
         }
+        private _isGraphics:boolean=false;
 
         private _isPlaying: boolean = true;
 
@@ -300,6 +301,10 @@ namespace annie {
             let s: any = this;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
+                if(s._isGraphics){
+                    s._isPlaying=false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame){
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;

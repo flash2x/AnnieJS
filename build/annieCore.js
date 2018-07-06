@@ -3704,6 +3704,7 @@ var annie;
             _super.call(this);
             this._curFrame = 1;
             this._lastFrameObj = null;
+            this._isGraphics = false;
             this._isPlaying = true;
             this._isFront = true;
             this._lastFrame = 0;
@@ -4000,6 +4001,10 @@ var annie;
             var s = this;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
+                if (s._isGraphics) {
+                    s._isPlaying = false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;
@@ -6963,10 +6968,15 @@ var annie;
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
+            if (info.t) {
+                if (info.t == 1) {
+                    //initButton
+                    if (target.initButton) {
+                        target.initButton();
+                    }
+                }
+                else if (info.t == 2) {
+                    target._isGraphics = true;
                 }
             }
             target._a2x_res_obj = info;
@@ -6998,27 +7008,26 @@ var annie;
         var textAlpha = textDate[7];
         var border = textDate[12];
         var lineSpacing = textDate[8];
-        if (textDate[1] == 0 || textDate[1] == 1) {
-            textObj = new annie.TextField();
-            textObj.text = text;
-            textObj.font = font;
-            textObj.size = size;
-            textObj.textAlign = textAlign;
-            textObj.lineType = lineType;
-            textObj.italic = italic;
-            textObj.bold = bold;
-            textObj.color = color;
-            textObj.textAlpha = textAlpha;
-            textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
-        }
-        else {
-            /*textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
-            textObj.italic = italic;
-            textObj.bold = bold;*/
-            console.log("wxApp isn't support inputText");
-        }
+        //if (textDate[1] == 0 || textDate[1] == 1) {
+        textObj = new annie.TextField();
+        textObj.text = text;
+        textObj.font = font;
+        textObj.size = size;
+        textObj.textAlign = textAlign;
+        textObj.lineType = lineType;
+        textObj.italic = italic;
+        textObj.bold = bold;
+        textObj.color = color;
+        textObj.textAlpha = textAlpha;
+        textObj.border = border;
+        textObj.lineSpacing = lineSpacing;
+        //} else {
+        /*textObj = new annie.InputText(textDate[2]);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.italic = italic;
+        textObj.bold = bold;*/
+        console.log("wxApp isn't support inputText");
+        //}
         return textObj;
     }
     /**
