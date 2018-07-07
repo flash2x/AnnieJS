@@ -300,6 +300,7 @@ namespace annie{
             textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
             textObj.italic = italic;
             textObj.bold = bold;*/
+            if(textDate[1] == 2)
             console.log("wxApp isn't support inputText");
         //}
         return textObj;

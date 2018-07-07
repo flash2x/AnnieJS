@@ -4798,7 +4798,10 @@ var annie;
                 mousemove: "onMouseMove",
                 touchstart: "onMouseDown",
                 touchmove: "onMouseMove",
-                touchend: "onMouseUp"
+                touchend: "onMouseUp",
+                ontouchstart: "onMouseDown",
+                ontouchmove: "onMouseMove",
+                ontouchend: "onMouseUp"
             };
             this.muliPoints = [];
             /**
@@ -4895,19 +4898,19 @@ var annie;
                             cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
                             //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                             sp = s.globalToLocal(cp, annie.DisplayObject._bp);
-                            if (annie.EventDispatcher.getMouseEventCount() > 0) {
-                                if (!s._ml[eLen]) {
-                                    event_1 = new annie.MouseEvent(item);
-                                    s._ml[eLen] = event_1;
-                                }
-                                else {
-                                    event_1 = s._ml[eLen];
-                                    event_1.type = item;
-                                }
-                                events[events.length] = event_1;
-                                s._initMouseEvent(event_1, cp, sp, identifier);
-                                eLen++;
+                            //if (EventDispatcher.getMouseEventCount() > 0) {
+                            if (!s._ml[eLen]) {
+                                event_1 = new annie.MouseEvent(item);
+                                s._ml[eLen] = event_1;
                             }
+                            else {
+                                event_1 = s._ml[eLen];
+                                event_1.type = item;
+                            }
+                            events[events.length] = event_1;
+                            s._initMouseEvent(event_1, cp, sp, identifier);
+                            eLen++;
+                            //}
                             if (item == "onMouseDown") {
                                 s._mouseDownPoint[identifier] = cp;
                             }
@@ -7026,7 +7029,8 @@ var annie;
         textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
         textObj.italic = italic;
         textObj.bold = bold;*/
-        console.log("wxApp isn't support inputText");
+        if (textDate[1] == 2)
+            console.log("wxApp isn't support inputText");
         //}
         return textObj;
     }
