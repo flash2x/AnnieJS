@@ -77,9 +77,6 @@ namespace annie {
             super();
             let s: any = this;
             s._instanceType = "annie.MovieClip";
-            if (s._a2x_res_class == null) {
-                s._a2x_res_class = {tf: 1};
-            }
         }
 
         /**

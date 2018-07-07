@@ -1,7 +1,7 @@
 /**
  * @class annie
  */
-namespace annie{
+namespace annie {
     /**
      * annie引擎的版本号
      * @public
@@ -21,14 +21,14 @@ namespace annie{
      * @public
      * @static
      */
-    export let devicePixelRatio:number=1;
+    export let devicePixelRatio: number = 1;
 
     /**
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
      */
-    export let globalDispatcher:EventDispatcher=new EventDispatcher();
+    export let globalDispatcher: EventDispatcher = new EventDispatcher();
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -67,38 +67,39 @@ namespace annie{
         FIXED_HEIGHT: "fixedHeight"
     };
     console.log("AnnieJS:https://github.com/flash2x/annieJS");
-    let res:any={};
+    let res: any = {};
     /**
      * 创建一个声音对象
      * @type {Audio}
      */
-    export let createAudio:Function=null;
-    export let getImageInfo:Function=null;
+    export let createAudio: Function = null;
+    export let getImageInfo: Function = null;
     /**
      * 继承类方法
      * @type {Function}
      */
-    export let A2xExtend:any=null;
+    export let A2xExtend: any = null;
     /**
      * 加载后的类引用全放在这里
      * @type {Object}
      */
-    export let classPool:any=null;
+    export let classPool: any = null;
     /**
      * 加载场景的方法
      * @method loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
      * @type {Function}
      */
-    export let loadScene:Function=null;
+    export let loadScene: Function = null;
+
     /**
      * 是否已经加载过场景
      * @method isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
      */
-    export function isLoadedScene(sceneName:string){
-        if(classPool[sceneName]){
+    export function isLoadedScene(sceneName: string) {
+        if (classPool[sceneName]) {
             return true;
         }
         return false;
@@ -109,8 +110,8 @@ namespace annie{
      * @method unLoadScene
      * @param {string} sceneName
      */
-    export function unLoadScene(sceneName:string) {
-        classPool[sceneName]=null;
+    export function unLoadScene(sceneName: string) {
+        classPool[sceneName] = null;
         delete classPool[sceneName];
     }
 
@@ -121,11 +122,11 @@ namespace annie{
      * @param sceneRes
      * @param sceneData
      */
-    export function parseScene(sceneName:string,sceneRes:any,sceneData: any){
-        res[sceneName]={};
-        res[sceneName]._a2x_con=sceneData;
-        for(let i=0;i<sceneRes.length;i++) {
-            if (sceneRes[i].type == "image"||sceneRes[i].type == "sound") {
+    export function parseScene(sceneName: string, sceneRes: any, sceneData: any) {
+        res[sceneName] = {};
+        res[sceneName]._a2x_con = sceneData;
+        for (let i = 0; i < sceneRes.length; i++) {
+            if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
                 res[sceneName][sceneRes[i].id] = sceneRes[i].src;
             }
         }
@@ -141,7 +142,7 @@ namespace annie{
                 if (mc.tf > 1) {
                     let frameList = mc.f;
                     let count = frameList.length;
-                    let frameCon:any = null;
+                    let frameCon: any = null;
                     let children: any = {};
                     let children2: any = {};
                     for (let i = 0; i < count; i++) {
@@ -182,6 +183,7 @@ namespace annie{
             }
         }
     }
+
     /**
      * 获取已经加载场景中的资源
      * @method getResource
@@ -198,6 +200,7 @@ namespace annie{
         }
         return null;
     }
+
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method b
@@ -244,7 +247,7 @@ namespace annie{
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if(info.t) {
+            if (info.t) {
                 if (info.t == 1) {
                     //initButton
                     if (target.initButton) {
@@ -260,6 +263,7 @@ namespace annie{
 
     let _textLineType: Array<string> = ["single", "multiline"];
     let _textAlign: Array<string> = ["left", "center", "right"];
+
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method t
@@ -283,28 +287,29 @@ namespace annie{
         let border = textDate[12];
         let lineSpacing = textDate[8];
         //if (textDate[1] == 0 || textDate[1] == 1) {
-            textObj = new annie.TextField();
-            textObj.text = text;
-            textObj.font = font;
-            textObj.size = size;
-            textObj.textAlign = textAlign;
-            textObj.lineType = lineType;
-            textObj.italic = italic;
-            textObj.bold = bold;
-            textObj.color = color;
-            textObj.textAlpha = textAlpha;
-            textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
+        textObj = new annie.TextField();
+        textObj.text = text;
+        textObj.font = font;
+        textObj.size = size;
+        textObj.textAlign = textAlign;
+        textObj.lineType = lineType;
+        textObj.italic = italic;
+        textObj.bold = bold;
+        textObj.color = color;
+        textObj.textAlpha = textAlpha;
+        textObj.border = border;
+        textObj.lineSpacing = lineSpacing;
         //} else {
-            /*textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
-            textObj.italic = italic;
-            textObj.bold = bold;*/
-            if(textDate[1] == 2)
+        /*textObj = new annie.InputText(textDate[2]);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.italic = italic;
+        textObj.bold = bold;*/
+        if (textDate[1] == 2)
             console.log("wxApp isn't support inputText");
         //}
         return textObj;
     }
+
     /**
      * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
      * @method g
@@ -345,16 +350,18 @@ namespace annie{
         }
         return shape;
     }
+
     function s(sceneName: string, resName: string): Sound {
         return new Sound(res[sceneName][resName]);
     }
+
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @param target
      * @param {string} _resId
      * @private
      */
-    export function initRes(target: any, sceneName: string, resName: string){
+    export function initRes(target: any, sceneName: string, resName: string) {
         let Root: any = classPool;
         //资源树最顶层
         let resRoot: any = res[sceneName];
@@ -419,45 +426,49 @@ namespace annie{
             let objCount = children.length;
             let obj: any = null;
             let objId: number = 0;
-            let maskObj:any = null;
+            let maskObj: any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
-                if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    } else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
+                if (Array.isArray(classRoot[children[i]])) {
+                    objId = classRoot[children[i]][0];
+                } else {
+                    objId = classRoot[children[i]].t;
+                }
+                switch (objId) {
+                    case 1:
+                        //displayObject
+                        if (children[i].indexOf("_$") == 0) {
                             if (classRoot[children[i]].tf > 1) {
                                 obj = new annie.MovieClip();
                             } else {
                                 obj = new annie.Sprite();
                             }
                             initRes(obj, sceneName, children[i]);
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
-                } else {
-                    obj = new Root[sceneName][children[i]]();
+                        }
+                        else {
+                            obj = new Root[sceneName][children[i]]();
+                        }
+                        break;
+                    case 2:
+                        //bitmap
+                        obj = b(sceneName, children[i]);
+                        break;
+                    case 3:
+                        //shape
+                        obj = g(sceneName, children[i]);
+                        break;
+                    case 4:
+                        //text
+                        obj = t(sceneName, children[i]);
+                        break;
+                    case 5:
+                        //sound
+                        obj = s(sceneName, children[i]);
+                        target.addSound(obj);
                 }
+                //} else {
+                //obj = new Root[sceneName][children[i]]();
+                //}
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
