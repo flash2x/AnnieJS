@@ -2280,7 +2280,7 @@ var annie;
                     }
                 }
                 //如果是mc，则还原成动画初始时的状态
-                if (s._instanceType == "annie.MovieClip" && timeLineObj && timeLineObj.tf > 1) {
+                if (timeLineObj && timeLineObj.tf > 1) {
                     s._curFrame = 1;
                     s._lastFrame = 0;
                     s._isPlaying = true;
@@ -2289,7 +2289,7 @@ var annie;
             }
             else if (type == "onAddToStage") {
                 //如果有音乐，如果是Sprite则播放音乐
-                if (sounds && sounds.length > 0 && s._instanceType == "annie.Sprite") {
+                if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
                     for (var i = 0; i < sounds.length; i++) {
                         sounds[i].play(0);
                     }
@@ -3649,7 +3649,7 @@ var annie;
              * @since 2.0.0
              * @private
              */
-            this._a2x_res_class = null;
+            this._a2x_res_class = { tf: 1 };
             /**
              * @property _a2x_res_children
              * @type {any[]}
@@ -4662,9 +4662,6 @@ var annie;
             this._maskList = [];
             var s = this;
             s._instanceType = "annie.MovieClip";
-            if (s._a2x_res_class == null) {
-                s._a2x_res_class = { tf: 1 };
-            }
         }
         Object.defineProperty(MovieClip.prototype, "currentFrame", {
             /**
@@ -9287,16 +9284,17 @@ var annie;
             var maskObj = null;
             var maskTillId = 0;
             for (i = 0; i < objCount; i++) {
-                if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    }
-                    else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
+                //if (children[i].indexOf("_$") == 0) {
+                if (Array.isArray(classRoot[children[i]])) {
+                    objId = classRoot[children[i]][0];
+                }
+                else {
+                    objId = classRoot[children[i]].t;
+                }
+                switch (objId) {
+                    case 1:
+                        //displayObject
+                        if (children[i].indexOf("_$") == 0) {
                             if (classRoot[children[i]].tf > 1) {
                                 obj = new annie.MovieClip();
                             }
@@ -9304,28 +9302,31 @@ var annie;
                                 obj = new annie.Sprite();
                             }
                             initRes(obj, sceneName, children[i]);
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
+                        }
+                        else {
+                            obj = new Root[sceneName][children[i]]();
+                        }
+                        break;
+                    case 2:
+                        //bitmap
+                        obj = b(sceneName, children[i]);
+                        break;
+                    case 3:
+                        //shape
+                        obj = g(sceneName, children[i]);
+                        break;
+                    case 4:
+                        //text
+                        obj = t(sceneName, children[i]);
+                        break;
+                    case 5:
+                        //sound
+                        obj = s(sceneName, children[i]);
+                        target.addSound(obj);
                 }
-                else {
-                    obj = new Root[sceneName][children[i]]();
-                }
+                //} else {
+                //obj = new Root[sceneName][children[i]]();
+                // }
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
