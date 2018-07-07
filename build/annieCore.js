@@ -4815,10 +4815,10 @@ var annie;
                 if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                     if (e.targetTouches.length == 2) {
                         //求角度和距离
-                        s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
-                        s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
-                        s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
-                        s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                        s._mP1.x = e.targetTouches[0].clientX;
+                        s._mP1.y = e.targetTouches[0].clientY;
+                        s._mP2.x = e.targetTouches[1].clientX;
+                        s._mP2.y = e.targetTouches[1].clientY;
                         var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                         var dis = annie.Point.distance(s._mP1, s._mP2);
                         s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -4891,8 +4891,8 @@ var annie;
                             else {
                                 cp = new annie.Point();
                             }
-                            cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
-                            cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
+                            cp.x = points[o].clientX * annie.devicePixelRatio;
+                            cp.y = points[o].clientY * annie.devicePixelRatio;
                             //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                             sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                             //if (EventDispatcher.getMouseEventCount() > 0) {
