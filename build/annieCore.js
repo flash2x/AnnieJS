@@ -10362,7 +10362,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.1.3";
+    annie.version = "2.0.0";
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
