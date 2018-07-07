@@ -247,7 +247,7 @@ namespace annie {
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if(info.t) {
+            if (info.t) {
                 if (info.t == 1) {
                     //initButton
                     if (target.initButton) {
@@ -287,24 +287,24 @@ namespace annie {
         let border = textDate[12];
         let lineSpacing = textDate[8];
         //if (textDate[1] == 0 || textDate[1] == 1) {
-            textObj = new annie.TextField();
-            textObj.text = text;
-            textObj.font = font;
-            textObj.size = size;
-            textObj.textAlign = textAlign;
-            textObj.lineType = lineType;
-            textObj.italic = italic;
-            textObj.bold = bold;
-            textObj.color = color;
-            textObj.textAlpha = textAlpha;
-            textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
+        textObj = new annie.TextField();
+        textObj.text = text;
+        textObj.font = font;
+        textObj.size = size;
+        textObj.textAlign = textAlign;
+        textObj.lineType = lineType;
+        textObj.italic = italic;
+        textObj.bold = bold;
+        textObj.color = color;
+        textObj.textAlpha = textAlpha;
+        textObj.border = border;
+        textObj.lineSpacing = lineSpacing;
         //} else {
-            /*textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
-            textObj.italic = italic;
-            textObj.bold = bold;*/
-            if(textDate[1] == 2)
+        /*textObj = new annie.InputText(textDate[2]);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.italic = italic;
+        textObj.bold = bold;*/
+        if (textDate[1] == 2)
             console.log("wxApp isn't support inputText");
         //}
         return textObj;
@@ -429,42 +429,45 @@ namespace annie {
             let maskObj: any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
-                if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    } else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
+                if (Array.isArray(classRoot[children[i]])) {
+                    objId = classRoot[children[i]][0];
+                } else {
+                    objId = classRoot[children[i]].t;
+                }
+                switch (objId) {
+                    case 1:
+                        //displayObject
+                        if (children[i].indexOf("_$") == 0) {
                             if (classRoot[children[i]].tf > 1) {
                                 obj = new annie.MovieClip();
                             } else {
                                 obj = new annie.Sprite();
                             }
                             initRes(obj, sceneName, children[i]);
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
-                } else {
-                    obj = new Root[sceneName][children[i]]();
+                        } else {
+                            obj = new Root[sceneName][children[i]]();
+                        }
+                        break;
+                    case 2:
+                        //bitmap
+                        obj = b(sceneName, children[i]);
+                        break;
+                    case 3:
+                        //shape
+                        obj = g(sceneName, children[i]);
+                        break;
+                    case 4:
+                        //text
+                        obj = t(sceneName, children[i]);
+                        break;
+                    case 5:
+                        //sound
+                        obj = s(sceneName, children[i]);
+                        target.addSound(obj);
                 }
+                //} else {
+
+                //}
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
