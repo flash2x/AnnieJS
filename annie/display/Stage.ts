@@ -378,10 +378,10 @@ namespace annie {
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].pageX - e.target.offsetLeft;
-                    s._mP1.y = e.targetTouches[0].pageY - e.target.offsetTop;
-                    s._mP2.x = e.targetTouches[1].pageX - e.target.offsetLeft;
-                    s._mP2.y = e.targetTouches[1].pageY - e.target.offsetTop;
+                    s._mP1.x = e.targetTouches[0].pageX ;
+                    s._mP1.y = e.targetTouches[0].pageY;
+                    s._mP2.x = e.targetTouches[1].pageX;
+                    s._mP2.y = e.targetTouches[1].pageY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
