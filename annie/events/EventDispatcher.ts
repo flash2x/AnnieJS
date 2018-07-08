@@ -68,11 +68,6 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.EventDispatcher";
-<<<<<<< HEAD
-            this.eventTypes = {};
-            
-=======
->>>>>>> flash2x/master
         }
 
         /**
@@ -278,13 +273,6 @@ namespace annie {
                 }
             }
         }
-<<<<<<< HEAD
-        public off(type: string, listener: Function): void {
-            this.removeAllEventListener.apply(this, arguments);
-        }
-=======
-
->>>>>>> flash2x/master
         /**
          * 移除对象中所有的侦听
          * @method removeAllEventListener

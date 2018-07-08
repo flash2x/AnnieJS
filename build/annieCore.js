@@ -67,15 +67,9 @@ var annie;
         __extends(EventDispatcher, _super);
         function EventDispatcher() {
             _super.call(this);
-<<<<<<< HEAD
-            this.eventTypes = null;
-            this._instanceType = "annie.EventDispatcher";
-            this.eventTypes = {};
-=======
             this.eventTypes = {};
             this.eventTypes1 = {};
             this._instanceType = "annie.EventDispatcher";
->>>>>>> flash2x/master
         }
         /**
          * 看看有多少mouse或者touch侦听数
@@ -275,9 +269,6 @@ var annie;
                 }
             }
         };
-        EventDispatcher.prototype.off = function (type, listener) {
-            this.removeAllEventListener.apply(this, arguments);
-        };
         /**
          * 移除对象中所有的侦听
          * @method removeAllEventListener
@@ -368,10 +359,7 @@ var annie;
              * @default null
              */
             this.data = null;
-<<<<<<< HEAD
-=======
             this._bpd = false;
->>>>>>> flash2x/master
             /**
              * 是否阻止事件向下冒泡
              * @property _pd
@@ -1644,10 +1632,6 @@ var annie;
              * @default 1
              */
             this.cAlpha = 1;
-<<<<<<< HEAD
-            this.isUseToMask = false;
-=======
->>>>>>> flash2x/master
             /**
              * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
@@ -1657,18 +1641,6 @@ var annie;
              * @since 1.0.0
              */
             this.cMatrix = new annie.Matrix();
-<<<<<<< HEAD
-            /**
-             * 因为每次enterFrame事件时都生成一个Event非常浪费资源,所以做成一个全局的
-             * @property _enterFrameEvent
-             * @private
-             * @type {annie.Event}
-             * @default null
-             * @since 1.0.0
-             */
-            this._enterFrameEvent = null;
-=======
->>>>>>> flash2x/master
             /**
              * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
              * @property mouseEnable
@@ -1707,31 +1679,8 @@ var annie;
             this._anchorX = 0;
             this._anchorY = 0;
             this._visible = true;
-<<<<<<< HEAD
-            /**
-             * 显示对象的混合模式
-             * 支持的混合模式大概有
-             * @property blendMode
-             * @public
-             * @since 1.0.0
-             * @type {string}
-             * @default 0
-             */
-            this.blendMode = "normal";
-            this._matrix = new annie.Matrix();
-            /**
-             * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
-             * @property mask
-             * @public
-             * @since 1.0.0
-             * @type {annie.DisplayObject}
-             * @default null
-             */
-            this.mask = null;
-=======
             this._matrix = new annie.Matrix();
             this._mask = null;
->>>>>>> flash2x/master
             this._filters = [];
             /**
              * 是否自己的父级发生的改变
@@ -1770,10 +1719,6 @@ var annie;
              * @default 0
              */
             this._offsetY = 0;
-<<<<<<< HEAD
-            this._bounds = new annie.Rectangle();
-            this._drawRect = new annie.Rectangle();
-=======
             /**
              * @property _bounds
              * @type {annie.Rectangle}
@@ -1802,7 +1747,6 @@ var annie;
              * @default {Object}
              */
             this._a2x_res_obj = {};
->>>>>>> flash2x/master
             this._instanceType = "annie.DisplayObject";
         }
         Object.defineProperty(DisplayObject.prototype, "x", {
@@ -2864,13 +2808,8 @@ var annie;
              * @public
              * @since 1.0.0
              */
-<<<<<<< HEAD
-            this.beginRadialGradientFill = function (colors, ratios, points) {
-                this._fill(Shape.getGradientColor(colors, ratios, points));
-=======
             this.beginRadialGradientFill = function (points, colors) {
                 this._fill(Shape.getGradientColor(points, colors));
->>>>>>> flash2x/master
             };
             /**
              * 画径向渐变的线条 一般给Flash2x用
@@ -2884,11 +2823,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-<<<<<<< HEAD
-            this.beginRadialGradientStroke = function (colors, ratios, points, lineWidth, cap, join, miter) {
-=======
             this.beginRadialGradientStroke = function (points, colors, lineWidth, cap, join, miter) {
->>>>>>> flash2x/master
                 if (lineWidth === void 0) { lineWidth = 1; }
                 if (cap === void 0) { cap = 0; }
                 if (join === void 0) { join = 0; }
@@ -3718,8 +3653,6 @@ var annie;
          */
         function Sprite() {
             _super.call(this);
-<<<<<<< HEAD
-=======
             /**
              * sprite 和 moveClip的类资源信息
              * @property _a2x_res_class
@@ -3735,7 +3668,6 @@ var annie;
              * @since 2.0.0
              */
             this._a2x_res_children = [];
->>>>>>> flash2x/master
             /**
              * 是否可以让children接收鼠标事件,如果为false
              * 鼠标事件将不会往下冒泡
@@ -3756,12 +3688,8 @@ var annie;
              * @readonly
              */
             this.children = [];
-<<<<<<< HEAD
-            this._instanceType = "annie.Sprite";
-=======
             var s = this;
             s._instanceType = "annie.Sprite";
->>>>>>> flash2x/master
         }
         Sprite.prototype.destroy = function () {
             var s = this;
@@ -4088,39 +4016,7 @@ var annie;
                 _super.prototype.update.call(this, isDrawUpdate);
                 var len = s.children.length;
                 for (var i = len - 1; i >= 0; i--) {
-<<<<<<< HEAD
-                    child = s.children[i];
-                    if (!s._visible)
-                        continue;
-                    //更新遮罩
-                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
-                        var childChild = void 0;
-                        child.mask.parent = s;
-                        if (s.totalFrames && child.mask.totalFrames) {
-                            child.mask.gotoAndStop(s.currentFrame);
-                            //一定要为true
-                            childChild = child.mask.getChildAt(0);
-                            if (childChild) {
-                                childChild.isUseToMask = true;
-                                childChild.hitTestWidthPixel = false;
-                            }
-                        }
-                        else {
-                            child.mask.isUseToMask = true;
-                            child.mask.hitTestWidthPixel = false;
-                        }
-                        child.mask._cp = true;
-                        child.mask.update(isDrawUpdate);
-                        child.mask.isUseToMask = false;
-                        if (childChild) {
-                            childChild.isUseToMask = false;
-                        }
-                        maskObjIds.push(child.mask.instanceId);
-                    }
-                    child.update(isDrawUpdate);
-=======
                     s.children[i].update(isDrawUpdate);
->>>>>>> flash2x/master
                 }
                 s._UI.UM = false;
                 s._UI.UA = false;
@@ -4333,9 +4229,6 @@ var annie;
              * @since 1.0.0
              */
             this.type = "";
-<<<<<<< HEAD
-            this._loop = 0;
-=======
             /**
              * @property isPlaying
              * @type {boolean}
@@ -4357,7 +4250,6 @@ var annie;
              * @default 1
              */
             this._repeate = 1;
->>>>>>> flash2x/master
             var s = this;
             s._instanceType = "annie.Media";
             if (typeof (src) == "string") {
@@ -4726,20 +4618,13 @@ var annie;
              * @since 2.0.0
              * @default 1
              */
-<<<<<<< HEAD
-            this._timeline = [];
-=======
             this._curFrame = 1;
->>>>>>> flash2x/master
             /**
              * @property _lastFrameObj
              * @type {Object}
              * @private
              * @default null
              */
-<<<<<<< HEAD
-            this.floatView = new annie.Sprite();
-=======
             this._lastFrameObj = null;
             /**
              * @property _isPlaying
@@ -4793,7 +4678,6 @@ var annie;
             }
         }
         Object.defineProperty(MovieClip.prototype, "currentFrame", {
->>>>>>> flash2x/master
             /**
              * mc的当前帧
              * @property currentFrame
@@ -4803,9 +4687,6 @@ var annie;
              * @default 1
              * @readonly
              */
-<<<<<<< HEAD
-            this.currentFrame = 1;
-=======
             get: function () {
                 return this._curFrame;
             },
@@ -4813,7 +4694,6 @@ var annie;
             configurable: true
         });
         Object.defineProperty(MovieClip.prototype, "isPlaying", {
->>>>>>> flash2x/master
             /**
              * 当前动画是否处于播放状态
              * @property isPlaying
@@ -4824,9 +4704,6 @@ var annie;
              * @default true
              * @readonly
              */
-<<<<<<< HEAD
-            this.isPlaying = true;
-=======
             get: function () {
                 return this._isPlaying;
             },
@@ -4834,7 +4711,6 @@ var annie;
             configurable: true
         });
         Object.defineProperty(MovieClip.prototype, "isFront", {
->>>>>>> flash2x/master
             /**
              * 动画的播放方向,是顺着播还是在倒着播
              * @property isFront
@@ -4844,9 +4720,6 @@ var annie;
              * @default true
              * @readonly
              */
-<<<<<<< HEAD
-            this.isFront = true;
-=======
             get: function () {
                 return this._isFront;
             },
@@ -4854,7 +4727,6 @@ var annie;
             configurable: true
         });
         Object.defineProperty(MovieClip.prototype, "totalFrames", {
->>>>>>> flash2x/master
             /**
              * 当前动画的总帧数
              * @property totalFrames
@@ -4864,39 +4736,12 @@ var annie;
              * @default 1
              * @readonly
              */
-<<<<<<< HEAD
-            this.totalFrames = 1;
-            this._scriptLayer = [];
-            this._labelFrame = {};
-            this._frameLabel = {};
-            this._isNeedUpdateChildren = true;
-            this._isUpdateFrame = false;
-            this._goFrame = 1;
-            this._mouseEvent = function (e) {
-                var s = this;
-                var frame = 2;
-                if (e.type == "onMouseDown") {
-                    if (s.currentFrame > 2) {
-                        frame = 3;
-                    }
-                }
-                else {
-                    frame = 1;
-                }
-                s.gotoAndStop(frame);
-            };
-            var s = this;
-            s._instanceType = "annie.MovieClip";
-            s.addChild(s.floatView);
-        }
-=======
             get: function () {
                 return this._a2x_res_class.tf;
             },
             enumerable: true,
             configurable: true
         });
->>>>>>> flash2x/master
         /**
          * 调用止方法将停止当前帧
          * @method stop
@@ -5541,15 +5386,10 @@ var annie;
         function TextField() {
             _super.call(this);
             this._textAlign = "left";
-<<<<<<< HEAD
-            this._lineHeight = 0;
-            this._lineWidth = 0;
-=======
             this._textAlpha = 1;
             this._textHeight = 0;
             this._lineSpacing = 14;
             this._textWidth = 120;
->>>>>>> flash2x/master
             this._lineType = "single";
             this._text = "";
             this._font = "Arial";
@@ -5558,10 +5398,7 @@ var annie;
             this._italic = false;
             this._bold = false;
             this._border = false;
-<<<<<<< HEAD
-=======
             this.realLines = [];
->>>>>>> flash2x/master
             this._instanceType = "annie.TextField";
             this._texture = window.document.createElement("canvas");
         }
@@ -6015,10 +5852,7 @@ var annie;
          *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         function InputText(inputType) {
-<<<<<<< HEAD
-=======
             if (inputType === void 0) { inputType = 0; }
->>>>>>> flash2x/master
             _super.call(this);
             /**
              * 输入文本的类型.
@@ -6028,11 +5862,7 @@ var annie;
              * @type {number} 0 input 1 password 2 mulit
              * @default 0
              */
-<<<<<<< HEAD
-            this.inputType = "singleline";
-=======
             this.inputType = 0;
->>>>>>> flash2x/master
             /**
              * 在手机端是否需要自动收回软键盘，在pc端此参数无效
              * @property isAutoDownKeyBoard
@@ -6396,20 +6226,6 @@ var annie;
              * @readonly
              */
             this.renderType = 0;
-<<<<<<< HEAD
-            /**
-             * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
-             * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
-             * 对象视觉暂停更新
-             * @property pause
-             * @type {boolean}
-             * @public
-             * @since 1.0.0
-             * @default false
-             */
-            this.pause = false;
-=======
->>>>>>> flash2x/master
             /**
              * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
              * @property viewRect
@@ -6507,39 +6323,7 @@ var annie;
              * @default "";
              */
             this.bgColor = "";
-<<<<<<< HEAD
-            /**
-             * 舞台的缩放模式
-             * 默认为空就是无缩放的真实大小
-             * "noBorder" 无边框模式
-             * ”showAll" 显示所有内容
-             * “fixedWidth" 固定宽
-             * ”fixedHeight" 固定高
-             * @property scaleMode
-             * @public
-             * @since 1.0.0
-             * @default "onScale"
-             * @type {string}
-             * @example
-             *      //动态更改stage的对齐方式示例
-             *      //以下代码放到一个舞台的显示对象的构造函数中
-             *      let s=this;
-             *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-             *          let i=0;
-             *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-             *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-             *              let state=e.currentTarget;
-             *              state.scaleMode=aList[i];
-             *              state.resize();
-             *              if(i>5){i=0;}
-             *          }
-             *      }
-             *
-             */
-            this.scaleMode = "onScale";
-=======
             this._scaleMode = "onScale";
->>>>>>> flash2x/master
             /**
              * 原始为60的刷新速度时的计数器
              * @property _flush
@@ -6558,10 +6342,6 @@ var annie;
              * @type {number}
              */
             this._currentFlush = 0;
-<<<<<<< HEAD
-            this._lastDpList = {};
-            this._rid = -1;
-=======
             /**
              * @property _lastDpList
              * @type {Object}
@@ -6579,7 +6359,6 @@ var annie;
              * @type {any[]}
              * @private
              */
->>>>>>> flash2x/master
             this._floatDisplayList = [];
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
@@ -6596,14 +6375,11 @@ var annie;
              */
             this._mp = [];
             //每一个手指事件的对象池
-<<<<<<< HEAD
-=======
             /**
              * @property _mouseDownPoint
              * @type {Object}
              * @private
              */
->>>>>>> flash2x/master
             this._mouseDownPoint = {};
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
@@ -6619,9 +6395,6 @@ var annie;
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp"
             };
-<<<<<<< HEAD
-            this.muliPoints = [];
-=======
             /**
              * @property muliPoints
              * @type {Object[]}
@@ -6634,18 +6407,11 @@ var annie;
              * @param e
              */
             this._mP1 = new annie.Point();
->>>>>>> flash2x/master
             /**
              * 当document有鼠标或触摸事件时调用
              * @property _mP2
              * @param e
              */
-<<<<<<< HEAD
-            this._mP1 = new annie.Point();
-            this._mP2 = new annie.Point();
-            this.onMouseEvent = function (e) {
-                //检查是否有
-=======
             this._mP2 = new annie.Point();
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
@@ -6657,7 +6423,6 @@ var annie;
              * @since 1.0.0
              */
             this.resize = function () {
->>>>>>> flash2x/master
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
                 s._UI.UM = true;
@@ -6771,8 +6536,6 @@ var annie;
                         //恢复声音
                         annie.Sound.resumePlaySounds();
                     }
-<<<<<<< HEAD
-=======
                     //触发事件
                     annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
                 }
@@ -7039,7 +6802,6 @@ var annie;
                             points = [e.changedTouches[0]];
                         }
                     }
->>>>>>> flash2x/master
                     for (var o = 0; o < points.length; o++) {
                         eLen = 0;
                         events = [];
@@ -7056,17 +6818,6 @@ var annie;
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                         if (annie.EventDispatcher.getMouseEventCount() > 0) {
                             if (!s._ml[eLen]) {
-<<<<<<< HEAD
-                                event_3 = new annie.MouseEvent(item);
-                                s._ml[eLen] = event_3;
-                            }
-                            else {
-                                event_3 = s._ml[eLen];
-                                event_3.type = item;
-                            }
-                            events.push(event_3);
-                            s._initMouseEvent(event_3, cp, sp, identifier);
-=======
                                 event_1 = new annie.MouseEvent(item);
                                 s._ml[eLen] = event_1;
                             }
@@ -7076,7 +6827,6 @@ var annie;
                             }
                             events[events.length] = event_1;
                             s._initMouseEvent(event_1, cp, sp, identifier);
->>>>>>> flash2x/master
                             eLen++;
                         }
                         if (item == "onMouseDown") {
@@ -7089,17 +6839,6 @@ var annie;
                                     //这个地方检查是所有显示对象列表里是否有添加对应的事件
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
                                         if (!s._ml[eLen]) {
-<<<<<<< HEAD
-                                            event_3 = new annie.MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event_3;
-                                        }
-                                        else {
-                                            event_3 = s._ml[eLen];
-                                            event_3.type = "onMouseClick";
-                                        }
-                                        events.push(event_3);
-                                        s._initMouseEvent(event_3, cp, sp, identifier);
-=======
                                             event_1 = new annie.MouseEvent("onMouseClick");
                                             s._ml[eLen] = event_1;
                                         }
@@ -7109,7 +6848,6 @@ var annie;
                                         }
                                         events[events.length] = event_1;
                                         s._initMouseEvent(event_1, cp, sp, identifier);
->>>>>>> flash2x/master
                                         eLen++;
                                     }
                                 }
@@ -7117,20 +6855,6 @@ var annie;
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-<<<<<<< HEAD
-                            var d = s.hitTestPoint(cp, true);
-                            var displayList = [];
-                            if (d) {
-                                //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
-                                //找出真正的target,因为有些父级可能会mouseChildren=false;
-                                while (d) {
-                                    if (d["mouseChildren"] === false) {
-                                        //丢掉之前的层级,因为根本没用了
-                                        displayList.length = 0;
-                                    }
-                                    displayList.push(d);
-                                    d = d.parent;
-=======
                             var d_2 = s.hitTestPoint(cp, true);
                             var displayList = [];
                             if (d_2) {
@@ -7143,7 +6867,6 @@ var annie;
                                     }
                                     displayList[displayList.length] = d_2;
                                     d_2 = d_2.parent;
->>>>>>> flash2x/master
                                 }
                             }
                             else {
@@ -7304,203 +7027,15 @@ var annie;
                         }
                     }
                 }
-<<<<<<< HEAD
-                if (e.target.id == "_a2x_canvas") {
-                    if (s.isPreventDefaultEvent) {
-                        if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                            e.preventDefault();
-                        }
-                        if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                            e.preventDefault();
-                        }
-                    }
-                }
-                if (s._cp) {
-                    s.update();
-                }
-            };
-            /**
-             * 设置舞台的对齐模式
-             */
-            this.setAlign = function () {
-                var s = this;
-                var divH = s.divHeight * annie.devicePixelRatio;
-                var divW = s.divWidth * annie.devicePixelRatio;
-                var desH = s.desHeight;
-                var desW = s.desWidth;
-                s.anchorX = desW / 2;
-                s.anchorY = desH / 2;
-                //设备是否为竖屏
-                var isDivH = divH > divW;
-                //内容是否为竖屏内容
-                var isDesH = desH > desW;
-                var scaleY = 1;
-                var scaleX = 1;
-                s.x = (divW - desW) / 2;
-                s.y = (divH - desH) / 2;
-                if (s.autoSteering) {
-                    if (isDesH != isDivH) {
-                        var d = divH;
-                        divH = divW;
-                        divW = d;
-                    }
-                }
-                if (s.scaleMode != "noScale") {
-                    scaleY = divH / desH;
-                    scaleX = divW / desW;
-                    switch (s.scaleMode) {
-                        case "noBorder":
-                            if (scaleX > scaleY) {
-                                scaleY = scaleX;
-                            }
-                            else {
-                                scaleX = scaleY;
-                            }
-                            break;
-                        case "showAll":
-                            if (scaleX < scaleY) {
-                                scaleY = scaleX;
-                            }
-                            else {
-                                scaleX = scaleY;
-                            }
-                            break;
-                        case "fixedWidth":
-                            scaleY = scaleX;
-                            break;
-                        case "fixedHeight":
-                            scaleX = scaleY;
-                            break;
-=======
             }
             if (e.target.id == "_a2x_canvas") {
                 if (s.isPreventDefaultEvent) {
                     if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
                         e.preventDefault();
->>>>>>> flash2x/master
                     }
                     if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
                         e.preventDefault();
                     }
-<<<<<<< HEAD
-                    else {
-                        if (desH > desW) {
-                            s.rotation = -90;
-                        }
-                        else {
-                            s.rotation = 90;
-                        }
-                    }
-                }
-                else {
-                    s.rotation = 0;
-                }
-            };
-            /**
-             * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
-             * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
-             * 不管autoResize 的状态是什么，你只要侦听 了stage 的 annie.Event.RESIZE 事件
-             * 都可以接收到舞台变化的通知。
-             * @method resize
-             * @public
-             * @since 1.0.0
-             */
-            this.resize = function () {
-                var s = this;
-                var whObj = s.getRootDivWH(s.rootDiv);
-                s._UI.UM = true;
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize();
-                s.setAlign();
-                s.update();
-            };
-            var s = this;
-            this._instanceType = "annie.Stage";
-            s.stage = this;
-            var resizeEvent = "resize";
-            s.name = "stageInstance_" + s.instanceId;
-            var div = document.getElementById(rootDivId);
-            s.renderType = renderType;
-            s.desWidth = desW;
-            s.desHeight = desH;
-            s.rootDiv = div;
-            s.setFrameRate(frameRate);
-            s.scaleMode = scaleMode;
-            s.anchorX = desW / 2;
-            s.anchorY = desH / 2;
-            //目前具支持canvas
-            s.renderObj = new annie.CanvasRender(s);
-            /* webgl 直到对2d的支持非常成熟了再考虑开启
-            if (renderType == 0) {
-                //canvas
-                s.renderObj = new CanvasRender(s);
-            } else {
-                //webgl
-                s.renderObj = new WGRender(s);
-            }*/
-            s.renderObj.init();
-            window.addEventListener(resizeEvent, function (e) {
-                clearTimeout(s._rid);
-                s._rid = setTimeout(function () {
-                    if (s.autoResize) {
-                        s.resize();
-                    }
-                    var event = new annie.Event("onResize");
-                    s.dispatchEvent(event);
-                }, 300);
-            });
-            setTimeout(function () {
-                s.resize();
-                //同时添加到主更新循环中
-                Stage.addUpdateObj(s);
-                //告诉大家我初始化完成
-                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
-                if (annie.debug && !Stage._isLoadedVConsole) {
-                    var script_1 = document.createElement("script");
-                    script_1.onload = function () {
-                        s.dispatchEvent(new annie.Event("onInitStage"));
-                        script_1.onload = null;
-                    };
-                    document.head.appendChild(script_1);
-                    script_1.src = "libs/vConsole.min.js";
-                }
-                else {
-                    s.dispatchEvent(new annie.Event("onInitStage"));
-                }
-            }, 100);
-            // let rc = s.renderObj.rootContainer;
-            var rc = s.rootDiv;
-            var mouseEvent = s.onMouseEvent.bind(s);
-            if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent, false);
-                rc.addEventListener('touchmove', mouseEvent, false);
-                rc.addEventListener('touchend', mouseEvent, false);
-            }
-            else {
-                rc.addEventListener("mousedown", mouseEvent, false);
-                rc.addEventListener('mousemove', mouseEvent, false);
-                rc.addEventListener('mouseup', mouseEvent, false);
-            }
-        }
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
-        Stage.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
-            var s = this;
-            if (!s.pause) {
-                _super.prototype.update.call(this, isDrawUpdate);
-                var sf = s._floatDisplayList;
-                var len = sf.length;
-                for (var i = 0; i < len; i++) {
-                    sf[i].updateStyle();
-=======
->>>>>>> flash2x/master
                 }
             }
             if (s._cp) {
@@ -7828,30 +7363,9 @@ var annie;
         __extends(ColorFilter, _super);
         /**
          * @method ColorFilter
-<<<<<<< HEAD
-         * @param {number} redMultiplier
-         * @param {number} greenMultiplier
-         * @param {number} blueMultiplier
-         * @param {number} alphaMultiplier
-         * @param {number} redOffset
-         * @param {number} greenOffset
-         * @param {number} blueOffset
-         * @param {number} alphaOffset
-         */
-        function ColorFilter(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset) {
-            if (redMultiplier === void 0) { redMultiplier = 1; }
-            if (greenMultiplier === void 0) { greenMultiplier = 1; }
-            if (blueMultiplier === void 0) { blueMultiplier = 1; }
-            if (alphaMultiplier === void 0) { alphaMultiplier = 1; }
-            if (redOffset === void 0) { redOffset = 0; }
-            if (greenOffset === void 0) { greenOffset = 0; }
-            if (blueOffset === void 0) { blueOffset = 0; }
-            if (alphaOffset === void 0) { alphaOffset = 0; }
-=======
          * @param {number} colorArrays 颜色值数据
          */
         function ColorFilter(colorArrays) {
->>>>>>> flash2x/master
             _super.call(this);
             /**
              * @property redMultiplier
@@ -7927,16 +7441,6 @@ var annie;
             this.type = "Color";
             var s = this;
             s._instanceType = "annie.ColorFilter";
-<<<<<<< HEAD
-            s.redMultiplier = redMultiplier;
-            s.greenMultiplier = greenMultiplier;
-            s.blueMultiplier = blueMultiplier;
-            s.alphaMultiplier = alphaMultiplier;
-            s.redOffset = redOffset;
-            s.greenOffset = greenOffset;
-            s.blueOffset = blueOffset;
-            s.alphaOffset = alphaOffset;
-=======
             s.redMultiplier = colorArrays[0];
             s.greenMultiplier = colorArrays[1];
             s.blueMultiplier = colorArrays[2];
@@ -7945,7 +7449,6 @@ var annie;
             s.greenOffset = colorArrays[5];
             s.blueOffset = colorArrays[6];
             s.alphaOffset = colorArrays[7];
->>>>>>> flash2x/master
         }
         /**
          * 绘画滤镜效果
@@ -8647,9 +8150,6 @@ var annie;
          */
         function URLLoader() {
             _super.call(this);
-<<<<<<< HEAD
-            this._req = null;
-=======
             /**
              * @property _req
              * @type {null}
@@ -8661,7 +8161,6 @@ var annie;
              * @private
              * @type {any[]}
              */
->>>>>>> flash2x/master
             this.headers = [];
             /**
              * 后台返回来的数据类弄
@@ -8888,7 +8387,6 @@ var annie;
                             }
                         }
                     }
-<<<<<<< HEAD
                 }
             };
             req.onreadystatechange = function (event) {
@@ -8922,9 +8420,9 @@ var annie;
                                 //     item = itemObj;
                                 // } else {
                                 if (s.responseType == "sound") {
-                                    itemObj = document.createElement("AUDIO");
-                                    itemObj.preload = true;
-                                    itemObj.src = s.url;
+                                    // itemObj = document.createElement("AUDIO");
+                                    // itemObj.preload = true;
+                                    // itemObj.src = s.url;
                                     item = new annie.Sound(s.url);
                                 }
                                 else if (s.responseType == "video") {
@@ -8948,76 +8446,8 @@ var annie;
                             default:
                                 item = result;
                                 break;
-=======
-                };
-                req_1.onreadystatechange = function (event) {
-                    var t = event.target;
-                    if (t["readyState"] == 4) {
-                        if (req_1.status == 200 || req_1.status == 0) {
-                            var isImage = false;
-                            var e_1 = new annie.Event("onComplete");
-                            var result = t["response"];
-                            e_1.data = { type: s.responseType, response: null };
-                            var item = void 0;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    var itemObj_1;
-                                    if (s.responseType == "image") {
-                                        isImage = true;
-                                        itemObj_1 = document.createElement("img");
-                                        itemObj_1.onload = function () {
-                                            URL.revokeObjectURL(itemObj_1.src);
-                                            itemObj_1.onload = null;
-                                            s.dispatchEvent(e_1);
-                                        };
-                                        itemObj_1.src = URL.createObjectURL(result);
-                                    }
-                                    else {
-                                        if (s.responseType == "sound") {
-                                            itemObj_1 = document.createElement("AUDIO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                        }
-                                        else if (s.responseType == "video") {
-                                            itemObj_1 = document.createElement("VIDEO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                        }
-                                    }
-                                    item = itemObj_1;
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                    item = "JS_CODE";
-                                    annie.Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e_1.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
-                            if (!isImage)
-                                s.dispatchEvent(e_1);
                         }
-                        else {
-                            //服务器返回报错
-                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
->>>>>>> flash2x/master
-                        }
+                        console.log(item);
                         e.data["response"] = item;
                         s.data = null;
                         s.responseType = "";

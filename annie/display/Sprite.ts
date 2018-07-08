@@ -377,37 +377,7 @@ namespace annie {
                 super.update(isDrawUpdate);
                 let len = s.children.length;
                 for (let i = len - 1; i >= 0; i--) {
-<<<<<<< HEAD
-                    child = s.children[i];
-                    if(!s._visible) continue;
-                    //更新遮罩
-                    if (child.mask && (maskObjIds.indexOf(child.mask.instanceId) < 0)) {
-                        let childChild:any;
-                        child.mask.parent = s;
-                        if (s.totalFrames && child.mask.totalFrames){
-                            child.mask.gotoAndStop(s.currentFrame);
-                            //一定要为true
-                            childChild=child.mask.getChildAt(0);
-                            if(childChild){
-                                childChild.isUseToMask=true;
-                                childChild.hitTestWidthPixel=false;
-                            }
-                        }else{
-                            child.mask.isUseToMask=true;
-                            child.mask.hitTestWidthPixel=false;
-                        }
-                        child.mask._cp=true;
-                        child.mask.update(isDrawUpdate);
-                        child.mask.isUseToMask=false;
-                        if(childChild) {
-                            childChild.isUseToMask = false;
-                        }
-                        maskObjIds.push(child.mask.instanceId);
-                    }
-                    child.update(isDrawUpdate);
-=======
                     s.children[i].update(isDrawUpdate);
->>>>>>> flash2x/master
                 }
                 s._UI.UM = false;
                 s._UI.UA = false;

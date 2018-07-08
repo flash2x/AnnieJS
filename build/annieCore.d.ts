@@ -33,8 +33,6 @@ declare namespace annie {
          * @readonly
          */
         instanceType: string;
-<<<<<<< HEAD
-=======
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -44,7 +42,6 @@ declare namespace annie {
          * @return {void}
          */
         abstract destroy(): void;
->>>>>>> flash2x/master
     }
     /**
      * 事件触发基类
@@ -86,12 +83,8 @@ declare namespace annie {
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-<<<<<<< HEAD
-        addEventListener(type: string, listener: Function): void;
-        on(type: string, listener: Function): void;
-=======
         addEventListener(type: string, listener: Function, useCapture?: boolean): void;
->>>>>>> flash2x/master
+        on(type: string, listener: Function): void;
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
@@ -120,12 +113,8 @@ declare namespace annie {
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
-<<<<<<< HEAD
-        dispatchEvent(event: any, data?: any): boolean;
-        trigger(event: any, data?: any): boolean;
-=======
         dispatchEvent(event: any, data?: any, useCapture?: boolean): boolean;
->>>>>>> flash2x/master
+        trigger(event: any, data?: any): boolean;
         /**
          * 是否有添加过此类形的侦听
          * @method hasEventListener
@@ -145,12 +134,7 @@ declare namespace annie {
          * @param {Function} listener 及侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          */
-<<<<<<< HEAD
-        removeEventListener(type: string, listener: Function): void;
-        off(type: string, listener: Function): void;
-=======
         removeEventListener(type: string, listener: Function, useCapture?: boolean): void;
->>>>>>> flash2x/master
         /**
          * 移除对象中所有的侦听
          * @method removeAllEventListener
