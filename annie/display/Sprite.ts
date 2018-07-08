@@ -1,4 +1,3 @@
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -32,7 +31,7 @@ namespace annie {
          * @since 2.0.0
          * @private
          */
-        private _a2x_res_class:any=null;
+        private _a2x_res_class:any={tf:1};
         /**
          * @property _a2x_res_children
          * @type {any[]}

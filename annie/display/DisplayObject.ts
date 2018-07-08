@@ -1,5 +1,3 @@
-/// <reference path="../events/EventDispatcher.ts" />
-/// <reference path="../geom/Point.ts" />
 /**
  * @module annie
  */
@@ -621,7 +619,7 @@ namespace annie {
                     }
                 }
                 //如果是mc，则还原成动画初始时的状态
-                if(s._instanceType == "annie.MovieClip"&&timeLineObj&&timeLineObj.tf>1){
+                if(timeLineObj&&timeLineObj.tf>1){
                     s._curFrame=1;
                     s._lastFrame=0;
                     s._isPlaying=true;
@@ -629,7 +627,7 @@ namespace annie {
                 }
             }else if(type=="onAddToStage"){
                 //如果有音乐，如果是Sprite则播放音乐
-                if(sounds&&sounds.length>0&&s._instanceType == "annie.Sprite"){
+                if(sounds&&sounds.length>0&&timeLineObj.tf==1){
                     for(let i=0;i<sounds.length;i++){
                         sounds[i].play(0);
                     }

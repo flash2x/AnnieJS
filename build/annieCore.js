@@ -1569,8 +1569,6 @@ var annie;
     }(annie.AObject));
     annie.Rectangle = Rectangle;
 })(annie || (annie = {}));
-/// <reference path="../events/EventDispatcher.ts" />
-/// <reference path="../geom/Point.ts" />
 /**
  * @module annie
  */
@@ -2289,7 +2287,7 @@ var annie;
                     }
                 }
                 //如果是mc，则还原成动画初始时的状态
-                if (s._instanceType == "annie.MovieClip" && timeLineObj && timeLineObj.tf > 1) {
+                if (timeLineObj && timeLineObj.tf > 1) {
                     s._curFrame = 1;
                     s._lastFrame = 0;
                     s._isPlaying = true;
@@ -2298,7 +2296,7 @@ var annie;
             }
             else if (type == "onAddToStage") {
                 //如果有音乐，如果是Sprite则播放音乐
-                if (sounds && sounds.length > 0 && s._instanceType == "annie.Sprite") {
+                if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
                     for (var i = 0; i < sounds.length; i++) {
                         sounds[i].play(0);
                     }
@@ -2471,7 +2469,6 @@ var annie;
     }(annie.EventDispatcher));
     annie.DisplayObject = DisplayObject;
 })(annie || (annie = {}));
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -3627,7 +3624,6 @@ var annie;
     }(annie.DisplayObject));
     annie.Shape = Shape;
 })(annie || (annie = {}));
-/// <reference path="DisplayObject.ts" />
 /**
  * @module annie
  */
@@ -3660,7 +3656,7 @@ var annie;
              * @since 2.0.0
              * @private
              */
-            this._a2x_res_class = null;
+            this._a2x_res_class = { tf: 1 };
             /**
              * @property _a2x_res_children
              * @type {any[]}
@@ -4588,7 +4584,6 @@ var annie;
     }(annie.Media));
     annie.Video = Video;
 })(annie || (annie = {}));
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -4663,6 +4658,7 @@ var annie;
              * @default false
              */
             this._isButton = false;
+            this._isGraphics = false;
             this._clicked = false;
             /**
              * @property _maskList
@@ -4673,9 +4669,6 @@ var annie;
             this._maskList = [];
             var s = this;
             s._instanceType = "annie.MovieClip";
-            if (s._a2x_res_class == null) {
-                s._a2x_res_class = { tf: 1 };
-            }
         }
         Object.defineProperty(MovieClip.prototype, "currentFrame", {
             /**
@@ -4983,6 +4976,10 @@ var annie;
             var s = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
+                if (s._isGraphics) {
+                    s._isPlaying = false;
+                    s._curFrame = s.parent._curFrame;
+                }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
                     s._lastFrame = s._curFrame;
@@ -6140,7 +6137,6 @@ var annie;
     }(annie.FloatDisplay));
     annie.InputText = InputText;
 })(annie || (annie = {}));
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -6816,19 +6812,19 @@ var annie;
                         cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
-                        if (annie.EventDispatcher.getMouseEventCount() > 0) {
-                            if (!s._ml[eLen]) {
-                                event_1 = new annie.MouseEvent(item);
-                                s._ml[eLen] = event_1;
-                            }
-                            else {
-                                event_1 = s._ml[eLen];
-                                event_1.type = item;
-                            }
-                            events[events.length] = event_1;
-                            s._initMouseEvent(event_1, cp, sp, identifier);
-                            eLen++;
+                        //if (EventDispatcher.getMouseEventCount() > 0) {
+                        if (!s._ml[eLen]) {
+                            event_1 = new annie.MouseEvent(item);
+                            s._ml[eLen] = event_1;
                         }
+                        else {
+                            event_1 = s._ml[eLen];
+                            event_1.type = item;
+                        }
+                        events[events.length] = event_1;
+                        s._initMouseEvent(event_1, cp, sp, identifier);
+                        eLen++;
+                        //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                         }
@@ -8983,10 +8979,15 @@ var annie;
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t == 1) {
-                //initButton
-                if (target.initButton) {
-                    target.initButton();
+            if (info.t) {
+                if (info.t == 1) {
+                    //initButton
+                    if (target.initButton) {
+                        target.initButton();
+                    }
+                }
+                else if (info.t == 2) {
+                    target._isGraphics = true;
                 }
             }
             ///////////////////////////////////////////
@@ -9350,16 +9351,17 @@ var annie;
             var maskObj = null;
             var maskTillId = 0;
             for (i = 0; i < objCount; i++) {
-                if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    }
-                    else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
+                //if (children[i].indexOf("_$") == 0) {
+                if (Array.isArray(classRoot[children[i]])) {
+                    objId = classRoot[children[i]][0];
+                }
+                else {
+                    objId = classRoot[children[i]].t;
+                }
+                switch (objId) {
+                    case 1:
+                        //displayObject
+                        if (children[i].indexOf("_$") == 0) {
                             if (classRoot[children[i]].tf > 1) {
                                 obj = new annie.MovieClip();
                             }
@@ -9367,28 +9369,31 @@ var annie;
                                 obj = new annie.Sprite();
                             }
                             initRes(obj, sceneName, children[i]);
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
+                        }
+                        else {
+                            obj = new Root[sceneName][children[i]]();
+                        }
+                        break;
+                    case 2:
+                        //bitmap
+                        obj = b(sceneName, children[i]);
+                        break;
+                    case 3:
+                        //shape
+                        obj = g(sceneName, children[i]);
+                        break;
+                    case 4:
+                        //text
+                        obj = t(sceneName, children[i]);
+                        break;
+                    case 5:
+                        //sound
+                        obj = s(sceneName, children[i]);
+                        target.addSound(obj);
                 }
-                else {
-                    obj = new Root[sceneName][children[i]]();
-                }
+                //} else {
+                //obj = new Root[sceneName][children[i]]();
+                // }
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
@@ -10389,7 +10394,6 @@ var annie;
     }(annie.EventDispatcher));
     annie.Timer = Timer;
 })(annie || (annie = {}));
-/// <reference path="./events/EventDispatcher.ts" />
 /**
  * @class annie
  */
@@ -10426,7 +10430,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      trace(annie.version);
      */
-    annie.version = "1.1.3";
+    annie.version = "2.0.0";
     /**
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
@@ -10655,9 +10659,6 @@ var annie;
         return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
     };
 })(annie || (annie = {}));
-/// <reference path="./display/Stage.ts" />
-/// <reference path="./utils/Tween.ts" />
-/// <reference path="./utils/Timer.ts" />
 /**
  * @class 全局
  */

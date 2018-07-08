@@ -2566,6 +2566,7 @@ declare namespace annie {
          * @default false
          */
         private _isButton;
+        private _isGraphics;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
          * 此方法不可逆，设置后不再能设置回剪辑，一定要这么做的话，请联系作者，看作者答不答应

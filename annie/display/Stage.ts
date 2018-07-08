@@ -1,4 +1,3 @@
-/// <reference path="Sprite.ts" />
 /**
  * @module annie
  */
@@ -679,7 +678,7 @@ namespace annie {
                         cp.y = (points[o].clientY - points[o].target.offsetTop) * devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
-                        if (EventDispatcher.getMouseEventCount() > 0) {
+                        //if (EventDispatcher.getMouseEventCount() > 0) {
                             if (!s._ml[eLen]) {
                                 event = new MouseEvent(item);
                                 s._ml[eLen] = event;
@@ -690,7 +689,7 @@ namespace annie {
                             events[events.length] = event;
                             s._initMouseEvent(event, cp, sp, identifier);
                             eLen++;
-                        }
+                        //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                             //清空上次存在的显示列表
