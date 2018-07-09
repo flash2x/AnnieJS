@@ -76,7 +76,7 @@ namespace annie {
          * @default 0
          */
         public set textWidth(value: number) {
-            this._setProperty("",value,3);
+            this._setProperty("_textWidth",value,3);
         }
 
         public get textWidth(): number {

@@ -4295,7 +4295,7 @@ var annie;
              * @default 0
              */
             set: function (value) {
-                this._setProperty("", value, 3);
+                this._setProperty("_textWidth", value, 3);
             },
             enumerable: true,
             configurable: true
