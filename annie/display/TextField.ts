@@ -368,10 +368,10 @@ namespace annie {
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
+                for (let i = 0; i < realLines.length; i++){
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
-                /////////////////////
+                /////////////////////////////////////
                 let cf = s.cFilters;
                 let cfLen = cf.length;
                 if(cfLen>0) {
