@@ -326,101 +326,93 @@ namespace annie {
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
                     let timeLineObj = s._a2x_res_class;
-                    let curFrameObj:any = null;
+                    let curFrameObj: any = null;
                     let lastFrameObj = s._lastFrameObj;
                     if (timeLineObj.timeLine[s._curFrame - 1] >= 0) {
                         curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
+                    } else {
+                        curFrameObj = {};
                     }
                     if (lastFrameObj != curFrameObj) {
                         //更新元素
-                        if (lastFrameObj) {
-                            let lastFrameChildrenObjectIdObj: any = null;
+                        let lastFrameChildrenObjectIdObj: any = null;
+                        if (lastFrameObj && lastFrameObj.c) {
                             //获取上一次动画所在的帧数据
-                            if (lastFrameObj.c) {
-                                lastFrameChildrenObjectIdObj = lastFrameObj.c;
-                            } else {
-                                lastFrameChildrenObjectIdObj = {};
-                            }
-                            //获取当前动画所在的帧数据
-                            let curFrameChildrenObjectIdObj: any = null;
-                            if (curFrameObj && curFrameObj.c) {
-                                curFrameChildrenObjectIdObj = curFrameObj.c;
-                            } else {
-                                curFrameChildrenObjectIdObj = {};
-                            }
-                            //上一帧有，这一帧没有的，要执行移除事件
-                            for (let item in lastFrameChildrenObjectIdObj) {
-                                if (curFrameChildrenObjectIdObj[item] == undefined) {
-                                    //remove
-                                    s.removeChild(allChildren[lastFrameChildrenObjectIdObj[item].o - 1]);
-                                }
-                            }
-                            //这一帧有，上一帧没有，要执行添加到舞台
-                            for (let item in curFrameChildrenObjectIdObj) {
-                                if (lastFrameChildrenObjectIdObj[item] == undefined) {
-                                    //add
-                                    if (curFrameChildrenObjectIdObj[item].at==undefined) {
-                                        s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1],0);
-                                    }else if(curFrameChildrenObjectIdObj[item].at==0){
-                                        s.addChild(allChildren[curFrameChildrenObjectIdObj[item].o - 1]);
-                                    } else {
-                                        for (let i = 0; i < s.children.length; i++) {
-                                            if (s.children[i] == allChildren[curFrameChildrenObjectIdObj[item].at - 1]) {
-                                                s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1], i);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            lastFrameChildrenObjectIdObj = lastFrameObj.c;
                         } else {
-                            if (curFrameObj.c) {
-                                for (let i in curFrameObj.c) {
-                                    s.addChildAt(allChildren[curFrameObj.c[i].o - 1], 0);
-                                }
+                            lastFrameChildrenObjectIdObj = {};
+                        }
+                        //获取当前动画所在的帧数据
+                        let curFrameChildrenObjectIdObj: any = null;
+                        if (curFrameObj.c) {
+                            curFrameChildrenObjectIdObj = curFrameObj.c;
+                        } else {
+                            curFrameChildrenObjectIdObj = {};
+                        }
+                        //上一帧有，这一帧没有的，要执行移除事件
+                        for (let item in lastFrameChildrenObjectIdObj) {
+                            if (curFrameChildrenObjectIdObj[item] == undefined) {
+                                //remove
+                                s.removeChild(allChildren[lastFrameChildrenObjectIdObj[item].o - 1]);
                             }
                         }
-                        if (curFrameObj) {
-                            //更新child属性
-                            s._maskList.length = 0;
-                            let maskList = s._maskList;
-                            if (curFrameObj.c) {
-                                for (let i in curFrameObj.c) {
-                                    annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
-                                    //检查是否有遮罩
-                                    if (curFrameObj.c[i].ma != undefined) {
-                                        if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
-                                            maskList.push(allChildren[curFrameObj.c[i].ma - 1], allChildren[curFrameObj.c[i].o - 1]);
-                                        }
-                                        allChildren[curFrameObj.c[i].o - 1]._isUseToMask = true;
-                                    }
-                                    //是否有名字
-                                    if (curFrameObj.c[i].n != undefined) {
-                                        s[curFrameObj.c[i].n] = allChildren[curFrameObj.c[i].o - 1];
-                                        allChildren[curFrameObj.c[i].o - 1].name=curFrameObj.c[i].n;
-                                    }
-                                }
-                            }
-                            //如果有遮罩则更新遮罩
-                            if (maskList.length > 0) {
-                                let isFindMask: boolean = false;
-                                for (let i = 0; i < s.children.length; i++) {
-                                    if (s.children[i] == maskList[0]) {
-                                        //找到最下面的mask对象
-                                        isFindMask = true;
-                                    } else if (s.children[i] == maskList[1]) {
-                                        //结束mask，并寻找下一个mask
-                                        isFindMask = false;
-                                        //同时删除maskList前两位元素
-                                        maskList.splice(0, 2);
-                                        //判断是否还有遮罩，有就继续，没有就退出循环
-                                        if (maskList.length == 0) {
+                        //这一帧有，上一帧没有，要执行添加到舞台
+                        for (let item in curFrameChildrenObjectIdObj) {
+                            if (lastFrameChildrenObjectIdObj[item] == undefined) {
+                                //add
+                                if (curFrameChildrenObjectIdObj[item].at == undefined) {
+                                    s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1], 0);
+                                } else if (curFrameChildrenObjectIdObj[item].at == 0) {
+                                    s.addChild(allChildren[curFrameChildrenObjectIdObj[item].o - 1]);
+                                } else {
+                                    for (let i = 0; i < s.children.length; i++) {
+                                        if (s.children[i] == allChildren[curFrameChildrenObjectIdObj[item].at - 1]) {
+                                            s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1], i);
                                             break;
                                         }
                                     }
-                                    if (isFindMask) {
-                                        s.children[i].mask = maskList[1];
+                                }
+                            }
+                        }
+                        //更新child属性
+                        s._maskList.length = 0;
+                        let maskList = s._maskList;
+                        if (curFrameObj.c) {
+                            for (let i in curFrameObj.c) {
+                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
+                                //检查是否有遮罩
+                                if (curFrameObj.c[i].ma != undefined) {
+                                    if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
+                                        maskList.push(allChildren[curFrameObj.c[i].ma - 1], allChildren[curFrameObj.c[i].o - 1]);
                                     }
+                                    allChildren[curFrameObj.c[i].o - 1]._isUseToMask = true;
+                                }
+                                //是否有名字
+                                if (curFrameObj.c[i].n != undefined) {
+                                    s[curFrameObj.c[i].n] = allChildren[curFrameObj.c[i].o - 1];
+                                    allChildren[curFrameObj.c[i].o - 1].name = curFrameObj.c[i].n;
+                                }
+                            }
+                        }
+                        //如果有遮罩则更新遮罩
+                        if (maskList.length > 0) {
+                            let isFindMask: boolean = false;
+                            for (let i = 0; i < s.children.length; i++) {
+                                if (s.children[i] == maskList[0]) {
+                                    //找到最下面的mask对象
+                                    isFindMask = true;
+                                } else if (s.children[i] == maskList[1]) {
+                                    //结束mask，并寻找下一个mask
+                                    isFindMask = false;
+                                    //同时删除maskList前两位元素
+                                    maskList.splice(0, 2);
+                                    //判断是否还有遮罩，有就继续，没有就退出循环
+                                    if (maskList.length == 0) {
+                                        break;
+                                    }
+                                }
+                                if (isFindMask) {
+                                    s.children[i].mask = maskList[1];
                                 }
                             }
                         }
