@@ -353,7 +353,7 @@ namespace annie {
                 let tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
-                } else if (s._textAlign == "right") {
+                } else if (s._textAlign == "right"){
                     tx = maxW;
                 }
                 can.width = maxW + 20;

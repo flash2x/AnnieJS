@@ -300,7 +300,6 @@ namespace annie {
         }
         _checkComplete();
     }
-
     function _checkComplete() {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
