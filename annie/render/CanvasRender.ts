@@ -44,13 +44,29 @@ namespace annie {
          * @since 1.0.0
          */
         public beginMask(target: any): void {
-            let _ctx = CanvasRender.drawCtx;
+            let s: CanvasRender = this;
+            let ctx=CanvasRender.drawCtx;
+            ctx.save();
+            ctx.globalAlpha = 0;
+            s.drawMask(target,ctx);
+            ctx.clip();
+        }
+        private drawMask(target:any,ctx:any):void{
+            let s=this;
             let tm = target.cMatrix;
-            _ctx.save();
-            _ctx.globalAlpha = 0;
-            _ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            target._draw(_ctx);
-            _ctx.clip();
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if(target._instanceType=="annie.Shape"){
+                target._draw(ctx);
+            }else if(target._instanceType=="annie.Sprite"||target._instanceType=="annie.MovieClip"){
+                for(let i=0;i<target.children.length;i++){
+                    s.drawMask(target.children[i],ctx);
+                }
+            }else if(target._instanceType=="annie.TextField"||target._instanceType=="annie.Bitmap"){
+                let bounds=target._bounds;
+                ctx.rect(0,0,bounds.width,bounds.height);
+            }else{
+                //其他不管
+            }
         }
 
         /**

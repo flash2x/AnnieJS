@@ -492,7 +492,6 @@ namespace annie {
                 s._isBitmapFill = null;
             }*/
         }
-        protected _isUseToMask:boolean=false;
         /**
          * 结束画线
          * @method endStroke

@@ -340,9 +340,7 @@ namespace annie {
             //这里特别注意是从上往下遍历
             for (let i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if (child._isUseToMask) {
-                    continue;
-                }
+                if (child._isUseToMask>0)continue;
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
                     if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
@@ -413,6 +411,7 @@ namespace annie {
                 let len: number = s.children.length;
                 for (let i = 0; i < len; i++) {
                     child = s.children[i];
+                    if (child._isUseToMask>0)continue;
                     if (child.cAlpha > 0 && child._visible) {
                         if (maskObj) {
                             if (child.mask && child.mask.parent == child.parent) {

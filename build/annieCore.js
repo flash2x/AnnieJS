@@ -1658,6 +1658,7 @@ var annie;
              */
             this.blendMode = "normal";
             this._matrix = new annie.Matrix();
+            this._isUseToMask = 0;
             this._mask = null;
             this._filters = [];
             /**
@@ -1910,11 +1911,15 @@ var annie;
                 return this._mask;
             },
             set: function (value) {
-                if (value != this.mask) {
-                    this._mask = value;
+                var s = this;
+                if (value != s.mask) {
                     if (value) {
-                        value["_isUseToMask"] = true;
+                        value["_isUseToMask"]++;
                     }
+                    if (s._mask) {
+                        s._mask["_isUseToMask"]--;
+                    }
+                    s._mask = value;
                 }
             },
             enumerable: true,
@@ -2491,7 +2496,6 @@ var annie;
                 if (miter === void 0) { miter = 10; }
                 this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
             };
-            this._isUseToMask = false;
             /**
              * 解析一段路径 一般给Flash2x用
              * @method decodePath
@@ -3585,9 +3589,8 @@ var annie;
             //这里特别注意是从上往下遍历
             for (var i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if (child._isUseToMask) {
+                if (child._isUseToMask > 0)
                     continue;
-                }
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
                     if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
@@ -3657,6 +3660,8 @@ var annie;
                 var len = s.children.length;
                 for (var i = 0; i < len; i++) {
                     child = s.children[i];
+                    if (child._isUseToMask > 0)
+                        continue;
                     if (child.cAlpha > 0 && child._visible) {
                         if (maskObj) {
                             if (child.mask && child.mask.parent == child.parent) {
@@ -5693,13 +5698,31 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.beginMask = function (target) {
-            var _ctx = CanvasRender.drawCtx;
+            var s = this;
+            var ctx = CanvasRender.drawCtx;
+            ctx.save();
+            ctx.globalAlpha = 0;
+            s.drawMask(target, ctx);
+            ctx.clip();
+        };
+        CanvasRender.prototype.drawMask = function (target, ctx) {
+            var s = this;
             var tm = target.cMatrix;
-            _ctx.save();
-            _ctx.globalAlpha = 0;
-            _ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            target._draw(_ctx);
-            _ctx.clip();
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if (target._instanceType == "annie.Shape") {
+                target._draw(ctx);
+            }
+            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+                for (var i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i], ctx);
+                }
+            }
+            else if (target._instanceType == "annie.TextField" || target._instanceType == "annie.Bitmap") {
+                var bounds = target._bounds;
+                ctx.rect(0, 0, bounds.width, bounds.height);
+            }
+            else {
+            }
         };
         /**
          * 结束遮罩时调用
