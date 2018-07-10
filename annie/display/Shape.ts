@@ -852,9 +852,7 @@ namespace annie {
          * @param {annie.IRender | any} renderObj
          */
         public render(renderObj: IRender|any): void{
-            if(!this._isUseToMask){
-                super.render(renderObj);
-            }
+            super.render(renderObj);
         }
         public destroy():void {
             //清除相应的数据引用

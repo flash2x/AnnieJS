@@ -3595,9 +3595,7 @@ var annie;
          * @param {annie.IRender | any} renderObj
          */
         Shape.prototype.render = function (renderObj) {
-            if (!this._isUseToMask) {
-                _super.prototype.render.call(this, renderObj);
-            }
+            _super.prototype.render.call(this, renderObj);
         };
         Shape.prototype.destroy = function () {
             //清除相应的数据引用
@@ -8038,11 +8036,9 @@ var annie;
                     s.drawMask(target.children[i]);
                 }
             }
-            else if (target._instanceType == "annie.TextField" || target._instanceType == "annie.Bitmap") {
+            else {
                 var bounds = target._bounds;
                 s._ctx.rect(0, 0, bounds.width, bounds.height);
-            }
-            else {
             }
         };
         /**
