@@ -182,7 +182,7 @@ namespace annie {
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.maskObj["_isUseToMask"]=false;
+            s.maskObj["_isUseToMask"]=0;
             s.maskObj.alpha=0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
