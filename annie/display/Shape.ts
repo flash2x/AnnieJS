@@ -777,9 +777,7 @@ namespace annie {
             }
         }
         public render(renderObj: IRender|any): void{
-            if(!this._isUseToMask){
-                super.render(renderObj);
-            }
+            super.render(renderObj);
         }
         /**
          * 销毁一个对象

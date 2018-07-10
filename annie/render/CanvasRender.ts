@@ -61,11 +61,9 @@ namespace annie {
                 for(let i=0;i<target.children.length;i++){
                     s.drawMask(target.children[i],ctx);
                 }
-            }else if(target._instanceType=="annie.TextField"||target._instanceType=="annie.Bitmap"){
+            }else{
                 let bounds=target._bounds;
                 ctx.rect(0,0,bounds.width,bounds.height);
-            }else{
-                //其他不管
             }
         }
 

@@ -3212,9 +3212,7 @@ var annie;
             }
         };
         Shape.prototype.render = function (renderObj) {
-            if (!this._isUseToMask) {
-                _super.prototype.render.call(this, renderObj);
-            }
+            _super.prototype.render.call(this, renderObj);
         };
         /**
          * 销毁一个对象
@@ -5717,11 +5715,9 @@ var annie;
                     s.drawMask(target.children[i], ctx);
                 }
             }
-            else if (target._instanceType == "annie.TextField" || target._instanceType == "annie.Bitmap") {
+            else {
                 var bounds = target._bounds;
                 ctx.rect(0, 0, bounds.width, bounds.height);
-            }
-            else {
             }
         };
         /**
