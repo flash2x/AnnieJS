@@ -340,7 +340,7 @@ namespace annie {
             //这里特别注意是从上往下遍历
             for (let i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if (child._isUseToMask) {
+                if (child._isUseToMask>0) {
                     continue;
                 }
                 if (child.mask && child.mask.parent == child.parent) {
@@ -413,6 +413,9 @@ namespace annie {
                 let len: number = s.children.length;
                 for (let i = 0; i < len; i++) {
                     child = s.children[i];
+                    if (child._isUseToMask>0) {
+                        continue;
+                    }
                     if (child.cAlpha > 0 && child._visible) {
                         if (maskObj) {
                             if (child.mask && child.mask.parent == child.parent) {

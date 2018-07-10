@@ -491,7 +491,6 @@ namespace annie {
                 s._isBitmapFill = null;
             }*/
         }
-        protected _isUseToMask:boolean=false;
         /**
          * 结束画线
          * @method endStroke
@@ -777,9 +776,7 @@ namespace annie {
             }
         }
         public render(renderObj: IRender|any): void{
-            if(!this._isUseToMask){
-                super.render(renderObj);
-            }
+            super.render(renderObj);
         }
         /**
          * 销毁一个对象
