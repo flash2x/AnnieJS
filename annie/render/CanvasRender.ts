@@ -62,7 +62,6 @@ namespace annie {
                 s._ctx.clearRect(0, 0, c.width, c.height);
             }
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -74,12 +73,26 @@ namespace annie {
             let s: CanvasRender = this;
             s._ctx.save();
             s._ctx.globalAlpha = 0;
-            let tm = target.cMatrix;
-            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            target._drawShape(s._ctx);
+            s.drawMask(target);
             s._ctx.clip();
         }
-
+        private drawMask(target:any):void{
+            let s=this;
+            let tm = target.cMatrix;
+            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if(target._instanceType=="annie.Shape"){
+                target._drawShape(s._ctx);
+            }else if(target._instanceType=="annie.Sprite"||target._instanceType=="annie.MovieClip"){
+                for(let i=0;i<target.children.length;i++){
+                    s.drawMask(target.children[i]);
+                }
+            }else if(target._instanceType=="annie.TextField"||target._instanceType=="annie.Bitmap"){
+                    let bounds=target._bounds;
+                    s._ctx.rect(0,0,bounds.width,bounds.height);
+            }else{
+                //其他不管
+            }
+        }
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -97,7 +110,7 @@ namespace annie {
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          */
-        public draw(target: any): void {
+        public draw(target: any): void{
             let s = this;
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
             if (target._cp) return;

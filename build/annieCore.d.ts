@@ -1245,7 +1245,7 @@ declare namespace annie {
          * @type {annie.DisplayObject}
          * @default null
          */
-        mask: Shape;
+        mask: DisplayObject;
         private _mask;
         /**
          * 显示对象的滤镜数组
@@ -1302,6 +1302,7 @@ declare namespace annie {
          * @return {void}
          */
         startDrag(isCenter?: boolean, bounds?: Rectangle): void;
+        protected _isUseToMask: number;
         /**
          * 停止鼠标或者触摸拖动
          * @method stopDrag
@@ -1936,7 +1937,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         endFill(): void;
-        protected _isUseToMask: boolean;
         /**
          * 结束画线
          * @method endStroke
@@ -3971,6 +3971,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginMask(target: any): void;
+        private drawMask(target);
         /**
          * 结束遮罩时调用
          * @method endMask

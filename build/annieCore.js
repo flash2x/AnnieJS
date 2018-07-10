@@ -1685,6 +1685,7 @@ var annie;
             this._dragBounds = new annie.Rectangle();
             this._isDragCenter = false;
             this._lastDragPoint = new annie.Point();
+            this._isUseToMask = 0;
             /**
              * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
              * @property _texture
@@ -1976,11 +1977,17 @@ var annie;
                 return this._mask;
             },
             set: function (value) {
-                if (value != this.mask) {
-                    this._mask = value;
+                var s = this;
+                if (value != s.mask) {
                     if (value) {
-                        value["_isUseToMask"] = true;
+                        value["_isUseToMask"]++;
                     }
+                    else {
+                        if (s.mask != null) {
+                            s["_isUseToMask"]--;
+                        }
+                    }
+                    s._mask = value;
                 }
             },
             enumerable: true,
@@ -2820,7 +2827,6 @@ var annie;
                 if (miter === void 0) { miter = 10; }
                 this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
             };
-            this._isUseToMask = false;
             /**
              * 解析一段路径 一般给Flash2x用
              * @method decodePath
@@ -4035,9 +4041,8 @@ var annie;
                 //这里特别注意是从上往下遍历
                 for (var i = len - 1; i >= 0; i--) {
                     child = s.children[i];
-                    if (child._isUseToMask) {
+                    if (child._isUseToMask > 0)
                         continue;
-                    }
                     if (child.mask && child.mask.parent == child.parent) {
                         //看看点是否在遮罩内
                         if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
@@ -4142,6 +4147,8 @@ var annie;
                     var len = s.children.length;
                     for (var i = 0; i < len; i++) {
                         child = s.children[i];
+                        if (child._isUseToMask > 0)
+                            continue;
                         if (child.cAlpha > 0 && child._visible) {
                             if (maskObj) {
                                 if (child.mask && child.mask.parent == child.parent) {
@@ -5774,7 +5781,7 @@ var annie;
                 for (var i = 0; i < realLines.length; i++) {
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
-                /////////////////////
+                /////////////////////////////////////
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
@@ -8016,10 +8023,27 @@ var annie;
             var s = this;
             s._ctx.save();
             s._ctx.globalAlpha = 0;
+            s.drawMask(target);
+            s._ctx.clip();
+        };
+        CanvasRender.prototype.drawMask = function (target) {
+            var s = this;
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            target._drawShape(s._ctx);
-            s._ctx.clip();
+            if (target._instanceType == "annie.Shape") {
+                target._drawShape(s._ctx);
+            }
+            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+                for (var i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i]);
+                }
+            }
+            else if (target._instanceType == "annie.TextField" || target._instanceType == "annie.Bitmap") {
+                var bounds = target._bounds;
+                s._ctx.rect(0, 0, bounds.width, bounds.height);
+            }
+            else {
+            }
         };
         /**
          * 结束遮罩时调用

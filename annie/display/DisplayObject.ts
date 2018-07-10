@@ -312,18 +312,23 @@ namespace annie {
          * @type {annie.DisplayObject}
          * @default null
          */
-        public get mask():Shape{
+        public get mask():DisplayObject{
             return this._mask;
         }
-        public set mask(value:Shape){
-            if(value!=this.mask) {
-                this._mask = value;
+        public set mask(value:DisplayObject){
+            let s=this;
+            if(value!=s.mask){
                 if (value) {
-                    value["_isUseToMask"] = true;
+                    value["_isUseToMask"]++;
+                }else{
+                    if(s.mask!=null){
+                        s["_isUseToMask"]--;
+                    }
                 }
+                s._mask = value;
             }
         }
-        private _mask:Shape=null;
+        private _mask:DisplayObject=null;
         /**
          * 显示对象的滤镜数组
          * @property filters
@@ -419,7 +424,7 @@ namespace annie {
                 s._dragBounds.height=0;
             }
         }
-
+        protected _isUseToMask:number=0;
         /**
          * 停止鼠标或者触摸拖动
          * @method stopDrag
