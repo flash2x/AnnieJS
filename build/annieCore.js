@@ -4656,7 +4656,7 @@ var annie;
              * @default false
              */
             this._isButton = false;
-            this._isGraphics = false;
+            this._isGraphics = 0;
             this._clicked = false;
             /**
              * @property _maskList
@@ -4974,9 +4974,9 @@ var annie;
             var s = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
-                if (s._isGraphics) {
+                if (s._isGraphics > 0) {
                     s._isPlaying = false;
-                    s._curFrame = s.parent._curFrame;
+                    s._curFrame = s.parent._curFrame - s._isGraphics + 1;
                 }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
@@ -5062,7 +5062,7 @@ var annie;
                         var maskList = s._maskList;
                         if (curFrameObj.c) {
                             for (var i in curFrameObj.c) {
-                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
+                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i], s._curFrame);
                                 //检查是否有遮罩
                                 if (curFrameObj.c[i].ma != undefined) {
                                     if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
@@ -8899,8 +8899,10 @@ var annie;
      * @since 1.0.0
      * @param {Object} target
      * @param {Object} info
+     * @param {number} parentFrame
      */
-    function d(target, info) {
+    function d(target, info, parentFrame) {
+        if (parentFrame === void 0) { parentFrame = 1; }
         if (target._a2x_res_obj == info) {
             return;
         }
@@ -8932,7 +8934,9 @@ var annie;
                     }
                 }
                 else if (info.t == 2) {
-                    target._isGraphics = true;
+                    if (target._isGraphics == 0) {
+                        target._isGraphics = parentFrame;
+                    }
                 }
             }
             ///////////////////////////////////////////

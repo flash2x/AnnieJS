@@ -183,7 +183,7 @@ namespace annie {
          * @default false
          */
         private _isButton: boolean = false;
-        private _isGraphics: boolean = false;
+        private _isGraphics: number = 0;
 
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -239,7 +239,7 @@ namespace annie {
             let s = this;
             if (!s._clicked) {
                 let frame = 2;
-                if (e.type == "onMouseDown") {
+                if (e.type == "onMouseDown"){
                     if (s._curFrame > 2) {
                         frame = 3;
                     }
@@ -370,7 +370,6 @@ namespace annie {
             }
             s._curFrame = <number>frameIndex;
         }
-
         /**
          * 重写刷新
          * @method update
@@ -382,9 +381,9 @@ namespace annie {
             let s: any = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
-                if (s._isGraphics) {
+                if (s._isGraphics>0) {
                     s._isPlaying = false;
-                    s._curFrame = s.parent._curFrame;
+                    s._curFrame = s.parent._curFrame-s._isGraphics+1;
                 }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
@@ -463,9 +462,9 @@ namespace annie {
                         let maskList = s._maskList;
                         if (curFrameObj.c) {
                             for (let i in curFrameObj.c) {
-                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
+                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i],s._curFrame);
                                 //检查是否有遮罩
-                                if (curFrameObj.c[i].ma != undefined) {
+                                if (curFrameObj.c[i].ma != undefined){
                                     if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
                                         maskList.push(allChildren[curFrameObj.c[i].ma - 1], allChildren[curFrameObj.c[i].o - 1]);
                                     }
@@ -550,7 +549,6 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

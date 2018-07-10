@@ -415,8 +415,9 @@ namespace annie {
      * @since 1.0.0
      * @param {Object} target
      * @param {Object} info
+     * @param {number} parentFrame
      */
-    export function d(target: any, info: any): void {
+    export function d(target: any, info: any,parentFrame:number=1): void {
         if (target._a2x_res_obj == info) {
             return;
         } else {
@@ -446,7 +447,10 @@ namespace annie {
                         target.initButton();
                     }
                 } else if (info.t == 2) {
-                    target._isGraphics = true;
+                    if(target._isGraphics==0){
+                        target._isGraphics = parentFrame;
+                    }
+
                 }
             }
             ///////////////////////////////////////////
