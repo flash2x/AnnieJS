@@ -247,15 +247,14 @@ namespace annie {
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t) {
-                if (info.t == 1) {
+            if(info.t!=undefined) {
+                if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();
                     }
-                } else if (info.t == 2) {
-                    target._isGraphics = true;
                 }
+                target._mode=info.t;
             }
             target._a2x_res_obj = info;
         }
