@@ -173,17 +173,16 @@ namespace annie {
          * @default false
          */
         public get isButton(): boolean {
-            return this._isButton;
+            return this._mode==0;
         }
 
         /**
-         * @property _isButton
+         * @property _mode
          * @type {boolean}
          * @private
          * @default false
          */
-        private _isButton: boolean = false;
-        private _isGraphics: number = 0;
+        private _mode: number = -1;
 
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -195,14 +194,14 @@ namespace annie {
          */
         public initButton(): void {
             let s: any = this;
-            if (!s._isButton && s._a2x_res_class.tf > 1) {
+            if (s._mode!=0&& s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
-                s._isButton = true;
+                s._mode = 0;
             }
         }
 
@@ -381,9 +380,9 @@ namespace annie {
             let s: any = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
-                if (s._isGraphics>0) {
+                if (s._mode>0) {
                     s._isPlaying = false;
-                    s._curFrame = s.parent._curFrame-s._isGraphics+1;
+                    s._curFrame = s.parent._curFrame-s._mode-1;
                 }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
@@ -462,7 +461,7 @@ namespace annie {
                         let maskList = s._maskList;
                         if (curFrameObj.c) {
                             for (let i in curFrameObj.c) {
-                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i],s._curFrame);
+                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
                                 //检查是否有遮罩
                                 if (curFrameObj.c[i].ma != undefined){
                                     if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
