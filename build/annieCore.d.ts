@@ -2006,7 +2006,6 @@ declare namespace annie {
         currentFrame: number;
         private _curFrame;
         private _lastFrameObj;
-        private _isGraphics;
         /**
          * 当前动画是否处于播放状态
          * @property isPlaying

@@ -3710,8 +3710,6 @@ var annie;
             _super.call(this);
             this._curFrame = 1;
             this._lastFrameObj = null;
-            //0 剪辑 1 按钮 2 图形
-            this._isGraphics = false;
             this._isPlaying = true;
             this._isFront = true;
             this._lastFrame = 0;
@@ -7251,3 +7249,5 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+
+module.exports = annie;

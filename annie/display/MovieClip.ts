@@ -25,8 +25,6 @@ namespace annie {
 
         private _curFrame: number = 1;
         private _lastFrameObj: any = null;
-        //0 剪辑 1 按钮 2 图形
-        private _isGraphics:boolean=false;
         /**
          * 当前动画是否处于播放状态
          * @property isPlaying
