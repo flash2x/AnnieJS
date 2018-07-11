@@ -39,8 +39,6 @@ namespace annie {
         public get isPlaying(): boolean {
             return this._isPlaying;
         }
-        private _isGraphics:boolean=false;
-
         private _isPlaying: boolean = true;
 
         /**
@@ -121,10 +119,10 @@ namespace annie {
         }
 
         public get isButton(): boolean {
-            return this._isButton;
+            return this._mode==-1;
         }
 
-        private _isButton: boolean = false;
+        private _mode: number = -2;
 
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -135,14 +133,14 @@ namespace annie {
          */
         public initButton(): void {
             let s: any = this;
-            if (!s._isButton && s._a2x_res_class.tf > 1) {
+            if (s._mode !=-1&& s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
-                s._isButton = true;
+                s._mode = -1;
             }
         }
 
@@ -298,9 +296,9 @@ namespace annie {
             let s: any = this;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 let isNeedUpdate = false;
-                if(s._isGraphics){
+                if(s._mode>=0){
                     s._isPlaying=false;
-                    s._curFrame = s.parent._curFrame;
+                    s._curFrame = s.parent._curFrame-s._mode;
                 }
                 if (s._lastFrame != s._curFrame){
                     isNeedUpdate = true;

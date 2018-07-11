@@ -3709,12 +3709,11 @@ var annie;
             _super.call(this);
             this._curFrame = 1;
             this._lastFrameObj = null;
-            this._isGraphics = false;
             this._isPlaying = true;
             this._isFront = true;
             this._lastFrame = 0;
             this._a2x_script = null;
-            this._isButton = false;
+            this._mode = -2;
             this._clicked = false;
             this._mouseEvent = function (e) {
                 var s = this;
@@ -3838,7 +3837,7 @@ var annie;
         };
         Object.defineProperty(MovieClip.prototype, "isButton", {
             get: function () {
-                return this._isButton;
+                return this._mode == -1;
             },
             enumerable: true,
             configurable: true
@@ -3852,14 +3851,14 @@ var annie;
          */
         MovieClip.prototype.initButton = function () {
             var s = this;
-            if (!s._isButton && s._a2x_res_class.tf > 1) {
+            if (s._mode != -1 && s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
-                s._isButton = true;
+                s._mode = -1;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
@@ -4003,9 +4002,9 @@ var annie;
             var s = this;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
-                if (s._isGraphics) {
+                if (s._mode >= 0) {
                     s._isPlaying = false;
-                    s._curFrame = s.parent._curFrame;
+                    s._curFrame = s.parent._curFrame - s._mode;
                 }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
@@ -6981,16 +6980,14 @@ var annie;
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t) {
-                if (info.t == 1) {
+            if (info.t != undefined) {
+                if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();
                     }
                 }
-                else if (info.t == 2) {
-                    target._isGraphics = true;
-                }
+                target._mode = info.t;
             }
             target._a2x_res_obj = info;
         }
