@@ -441,7 +441,7 @@ namespace annie {
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
             if(info.t!=undefined) {
-                if (info.t == 0) {
+                if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();

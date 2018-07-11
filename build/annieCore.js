@@ -4655,7 +4655,7 @@ var annie;
              * @private
              * @default false
              */
-            this._mode = -1;
+            this._mode = -2;
             this._clicked = false;
             /**
              * @property _maskList
@@ -4778,7 +4778,7 @@ var annie;
              * @default false
              */
             get: function () {
-                return this._mode == 0;
+                return this._mode == -1;
             },
             enumerable: true,
             configurable: true
@@ -4793,14 +4793,14 @@ var annie;
          */
         MovieClip.prototype.initButton = function () {
             var s = this;
-            if (s._mode != 0 && s._a2x_res_class.tf > 1) {
+            if (s._mode != -1 && s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
-                s._mode = 0;
+                s._mode = -1;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
@@ -4973,9 +4973,9 @@ var annie;
             var s = this;
             if (!s._cacheAsBitmap && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 var isNeedUpdate = false;
-                if (s._mode > 0) {
+                if (s._mode >= 0) {
                     s._isPlaying = false;
-                    s._curFrame = s.parent._curFrame - s._mode - 1;
+                    s._curFrame = s.parent._curFrame - s._mode;
                 }
                 if (s._lastFrame != s._curFrame) {
                     isNeedUpdate = true;
@@ -8925,8 +8925,8 @@ var annie;
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t) {
-                if (info.t == 0) {
+            if (info.t != undefined) {
+                if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();
