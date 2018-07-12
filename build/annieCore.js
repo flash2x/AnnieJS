@@ -9356,7 +9356,7 @@ var annie;
                     }
                 }
                 //检查是否有名字
-                if (resClass.n[i] != undefined) {
+                if (resClass.n && resClass.n[i] != undefined) {
                     target[resClass.n[i]] = obj;
                     obj.name = resClass.n[i];
                 }
