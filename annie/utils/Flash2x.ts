@@ -78,7 +78,7 @@ namespace annie {
     /**
      * 获取当前加载的时间当作随机数用
      */
-    let _time: number=new Date().getTime();
+    let _time: number = new Date().getTime();
     /**
      * 加载资源数和总资源数的比
      */
@@ -138,7 +138,7 @@ namespace annie {
             return;
         }
         if (!_isInited) {
-            if(_isReleased){
+            if (_isReleased) {
                 trace("AnnieJS:https://github.com/flash2x/annieJS");
             }
             _JSONQueue = new URLLoader();
@@ -213,15 +213,15 @@ namespace annie {
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
-                if(!mc.f){
-                    mc.f=[];
-                    mc.tf=1;
+                if (!mc.f) {
+                    mc.f = [];
+                    mc.tf = 1;
                     continue;
                 }
-                if(mc.tf > 1) {
+                if (mc.tf > 1) {
                     let frameList = mc.f;
                     let count = frameList.length;
-                    let frameCon:any = null;
+                    let frameCon: any = null;
                     let children: any = {};
                     let children2: any = {};
                     for (let i = 0; i < count; i++) {
@@ -262,7 +262,7 @@ namespace annie {
             } else {
                 //如果是released版本，则需要更新资源数据
                 if (_isReleased) {
-                    if (loadContent[item]== 2) {
+                    if (loadContent[item] == 2) {
                         //图片
                         var image = new Image();
                         image.src = rootObj[item];
@@ -290,7 +290,7 @@ namespace annie {
             }
         } else {
             if (scene != "f2xShare") {
-               _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
+                _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
             } else {
                 _currentConfig.shift();
                 _loadSceneNames.shift();
@@ -300,6 +300,7 @@ namespace annie {
         }
         _checkComplete();
     }
+
     function _checkComplete() {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -333,7 +334,7 @@ namespace annie {
         if (_isReleased) {
             _loaderQueue.responseType = "js";
             url += "?v=" + _isReleased;
-        }else{
+        } else {
             url += "?v=" + _time;
         }
         _loaderQueue.load(url);
@@ -417,7 +418,7 @@ namespace annie {
      * @param {Object} info
      * @param {number} parentFrame
      */
-    export function d(target: any, info: any,parentFrame:number=1): void {
+    export function d(target: any, info: any, parentFrame: number = 1): void {
         if (target._a2x_res_obj == info) {
             return;
         } else {
@@ -428,7 +429,7 @@ namespace annie {
                 target.textHeight = info.h;
             }
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr == undefined||info.tr.length==1) {
+            if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             if (lastInfo.tr != info.tr) {
@@ -440,22 +441,22 @@ namespace annie {
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if(info.t!=undefined) {
+            if (info.t != undefined) {
                 if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();
                     }
                 }
-                target._mode=info.t;
+                target._mode = info.t;
             }
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {
                 if (info.fi != undefined) {
-                    let filters:any = [];
-                    let blur:any;
-                    let color:any;
+                    let filters: any = [];
+                    let blur: any;
+                    let color: any;
                     for (let i = 0; i < info.fi.length; i++) {
                         switch (info.fi[i].t) {
                             case 0:
@@ -790,49 +791,46 @@ namespace annie {
             let objCount = children.length;
             let obj: any = null;
             let objId: number = 0;
-            let maskObj:any = null;
+            let maskObj: any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    } else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
-                            if (children[i].indexOf("_$") == 0){
-                                if (classRoot[children[i]].tf > 1) {
-                                    obj = new annie.MovieClip();
-                                } else {
-                                    obj = new annie.Sprite();
-                                }
-                                initRes(obj, sceneName, children[i]);
-                            }else{
-                                obj = new Root[sceneName][children[i]]();
+                if (Array.isArray(classRoot[children[i]])) {
+                    objId = classRoot[children[i]][0];
+                } else {
+                    objId = classRoot[children[i]].t;
+                }
+                switch (objId) {
+                    case 1:
+                        //displayObject
+                        if (children[i].indexOf("_$") == 0) {
+                            if (classRoot[children[i]].tf > 1) {
+                                obj = new annie.MovieClip();
+                            } else {
+                                obj = new annie.Sprite();
                             }
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
-                //} else {
-                    //obj = new Root[sceneName][children[i]]();
-               // }
+                            initRes(obj, sceneName, children[i]);
+                        } else {
+                            obj = new Root[sceneName][children[i]]();
+                        }
+                        break;
+                    case 2:
+                        //bitmap
+                        obj = b(sceneName, children[i]);
+                        break;
+                    case 3:
+                        //shape
+                        obj = g(sceneName, children[i]);
+                        break;
+                    case 4:
+                        //text
+                        obj = t(sceneName, children[i]);
+                        break;
+                    case 5:
+                        //sound
+                        obj = s(sceneName, children[i]);
+                        target.addSound(obj);
+                }
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
@@ -853,13 +851,13 @@ namespace annie {
                                 }
                             }
                         }
-                        //检查是否有名字
-                        if (resClass.f[0].c[index].n != undefined) {
-                            target[resClass.f[0].c[index].n] = obj;
-                            obj.name=resClass.f[0].c[index].n;
-                        }
                         target.addChildAt(obj, 0);
                     }
+                }
+                //检查是否有名字
+                if (resClass.n[i] != undefined) {
+                    target[resClass.n[i]] = obj;
+                    obj.name = resClass.n[i];
                 }
             }
         }

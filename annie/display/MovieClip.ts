@@ -469,11 +469,6 @@ namespace annie {
                                     }
                                     allChildren[curFrameObj.c[i].o - 1]._isUseToMask = true;
                                 }
-                                //是否有名字
-                                if (curFrameObj.c[i].n != undefined) {
-                                    s[curFrameObj.c[i].n] = allChildren[curFrameObj.c[i].o - 1];
-                                    allChildren[curFrameObj.c[i].o - 1].name = curFrameObj.c[i].n;
-                                }
                             }
                         }
                         //如果有遮罩则更新遮罩

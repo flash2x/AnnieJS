@@ -5069,11 +5069,6 @@ var annie;
                                     }
                                     allChildren[curFrameObj.c[i].o - 1]._isUseToMask = true;
                                 }
-                                //是否有名字
-                                if (curFrameObj.c[i].n != undefined) {
-                                    s[curFrameObj.c[i].n] = allChildren[curFrameObj.c[i].o - 1];
-                                    allChildren[curFrameObj.c[i].o - 1].name = curFrameObj.c[i].n;
-                                }
                             }
                         }
                         //如果有遮罩则更新遮罩
@@ -9335,9 +9330,6 @@ var annie;
                         obj = s(sceneName, children[i]);
                         target.addSound(obj);
                 }
-                //} else {
-                //obj = new Root[sceneName][children[i]]();
-                // }
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
@@ -9360,13 +9352,13 @@ var annie;
                                 }
                             }
                         }
-                        //检查是否有名字
-                        if (resClass.f[0].c[index].n != undefined) {
-                            target[resClass.f[0].c[index].n] = obj;
-                            obj.name = resClass.f[0].c[index].n;
-                        }
                         target.addChildAt(obj, 0);
                     }
+                }
+                //检查是否有名字
+                if (resClass.n[i] != undefined) {
+                    target[resClass.n[i]] = obj;
+                    obj.name = resClass.n[i];
                 }
             }
         }
