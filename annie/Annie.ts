@@ -488,13 +488,13 @@ namespace annie {
                                 }
                             }
                         }
-                        //检查是否有名字
-                        if (resClass.f[0].c[index].n != undefined) {
-                            target[resClass.f[0].c[index].n] = obj;
-                            obj.name = resClass.f[0].c[index].n;
-                        }
                         target.addChildAt(obj, 0);
                     }
+                }
+                //检查是否有名字
+                if (resClass.n&&resClass.n[i] != undefined) {
+                    target[resClass.n[i]] = obj;
+                    obj.name = resClass.n[i];
                 }
             }
         }
