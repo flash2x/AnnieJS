@@ -7217,8 +7217,6 @@ var annie;
                         obj = s(sceneName, children[i]);
                         target.addSound(obj);
                 }
-                //} else {
-                //}
                 //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                 target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
@@ -7243,11 +7241,6 @@ var annie;
                         }
                         target.addChildAt(obj, 0);
                     }
-                }
-                //检查是否有名字
-                if (resClass.n && resClass.n[i] != undefined) {
-                    target[resClass.n[i]] = obj;
-                    obj.name = resClass.n[i];
                 }
             }
         }
