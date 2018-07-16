@@ -109,7 +109,7 @@ namespace annie {
         public get textWidth(): number {
             return this._textWidth;
         }
-        private _textWidth: number = NaN;
+        private _textWidth: number = 120;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
