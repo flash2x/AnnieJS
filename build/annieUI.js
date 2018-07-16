@@ -1453,7 +1453,7 @@ var annie;
              * 获取下拉滚动的loadingView对象
              * @property loadingView
              * @since 1.0.9
-             * @returns {DisplayObject}
+             * @return {DisplayObject}
              */
             get: function () {
                 return this.downL;
