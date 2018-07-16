@@ -1,7 +1,3 @@
-/// <reference path="ScrollPage" />
-/**
- * Created by anlun on 16/8/14.
- */
 /**
  * @module annie
  */

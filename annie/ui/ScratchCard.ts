@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 2017/5/24.
- */
-/**
  * @module annie
  */
 namespace annie {
@@ -76,7 +73,7 @@ namespace annie {
 
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
+         * @method cancel
          * @param step
          * @public
          * @since 1.1.1

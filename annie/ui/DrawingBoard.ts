@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 2017/5/24.
- */
-/**
  * @module annie
  */
 namespace annie {

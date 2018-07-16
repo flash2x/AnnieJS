@@ -305,7 +305,7 @@ namespace annie {
          * @method gotoAndStop
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          */
         public gotoAndStop(frameIndex: number | string): void {
             let s: any = this;
@@ -345,7 +345,7 @@ namespace annie {
          * @method gotoAndPlay
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
          */
         public gotoAndPlay(frameIndex: number | string, isFront: boolean = true): void {
@@ -354,7 +354,7 @@ namespace annie {
             s._isPlaying = true;
             let timeLineObj = s._a2x_res_class;
             if (typeof(frameIndex) == "string") {
-                if (timeLineObj.label[frameIndex] != undefined) {
+                if (timeLineObj.label[frameIndex] != undefined){
                     frameIndex = timeLineObj.label[frameIndex];
                 } else {
                     frameIndex = s._curFrame;

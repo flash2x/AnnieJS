@@ -32,59 +32,101 @@ namespace annie {
     let _isLoading: boolean;
     /**
      * 加载中的场景名列表
+     * @property _loadSceneNames
+     * @private
+     * @type {string|Array}
      *
      */
     let _loadSceneNames: any;
     /**
      * 加载地址的域名地址或前缀
+     * @property _domain
+     * @private
+     * @type {string}
      */
     let _domain: string;
     /**
      * 当前加载到哪一个资源
+     * @property _loadIndex
+     * @private
+     * @type {number}
      */
     let _loadIndex: number;
     /**
      * 当前加载的总资源数
+     * @property _totalLoadRes
+     * @private
+     * @type {number}
      */
     let _totalLoadRes: number;
     /**
      * 当前已经加载的资源数
+     * @property _loadedLoadRes
+     * @private
+     * @type {number}
      */
     let _loadedLoadRes: number;
     /**
      * 加载资源的完成回调
+     * @property _completeCallback
+     * @private
+     * @type {Function}
      */
     let _completeCallback: Function;
     /**
      * 加载资源时的进度回调
+     * @property _progressCallback
+     * @private
+     * @type {Function}
      */
     let _progressCallback: Function;
     /**
      * 加载配置文件的加载器
+     * @property _JSONQueue
+     * @private
+     * @type {annie.URLLoader}
      */
     let _JSONQueue: URLLoader;
     /**
      * 加载资源文件的加载器
+     * @property _loaderQueue
+     * @private
+     * @type {annie.URLLoader}
      */
     let _loaderQueue: URLLoader;
     /**
      * 加载器是否初始化过
+     * @property _isInited
+     * @private
+     * @type {Boolean}
      */
     let _isInited: Boolean;
     /**
      * 当前加载的资源配置文件内容
+     * @property _currentConfig
+     * @private
+     * @type {Object}
      */
     let _currentConfig: any;
     /**
      * 获取当前加载的时间当作随机数用
+     * @property _time
+     * @private
+     * @type {number}
      */
     let _time: number = new Date().getTime();
     /**
      * 加载资源数和总资源数的比
+     * @property _loadPer
+     * @private
+     * @type {number}
      */
     let _loadPer: number;
     /**
      * 单个资源占总资源数的比
+     * @property _loadSinglePer
+     * @private
+     * @type {number}
      */
     let _loadSinglePer: number;
     /**
@@ -179,10 +221,24 @@ namespace annie {
         }
     };
 
+    /**
+     * 加载配置文件,打包成released线上版时才会用到这个方法。
+     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
+     * @private
+     * @method _loadConfig
+     * @return {void}
+     */
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
 
+    /**
+     * 加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
+     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
+     * @method onCFGComplete
+     * @param {annie.Event} e
+     * @return {void}
+     */
     function onCFGComplete(e: Event): void {
         //配置文件加载完成
         let resList: any = e.data.response;
@@ -200,12 +256,27 @@ namespace annie {
         }
     }
 
+    /**
+     * 加载资源过程中调用的回调方法。
+     * @method _onRESProgress
+     * @param {annie.Event} e
+     * @private
+     * @return {void}
+     */
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
 
+    /**
+     * 解析加载后的json资源数据
+     * @method _parseContent
+     * @param loadContent
+     * @param rootObj
+     * @private
+     * @return {void}
+     */
     function _parseContent(loadContent: any, rootObj: any = null) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
@@ -278,6 +349,13 @@ namespace annie {
         }
     }
 
+    /**
+     * 一个场景加载完成后的事件回调
+     * @method _onRESComplete
+     * @param {annie.Event} e
+     * @private
+     * @return {void}
+     */
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
         if (!_isReleased) {
@@ -301,7 +379,13 @@ namespace annie {
         _checkComplete();
     }
 
-    function _checkComplete() {
+    /**
+     * 检查所有资源是否全加载完成
+     * @method _checkComplete
+     * @private
+     * @return {void}
+     */
+    function _checkComplete():void {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         _currentConfig[_loadIndex].shift();
@@ -329,6 +413,12 @@ namespace annie {
         }
     }
 
+    /**
+     * 加载场景资源
+     * @private
+     * @method _loadRes
+     * @return {void}
+     */
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
         if (_isReleased) {
@@ -494,9 +584,20 @@ namespace annie {
         }
     }
 
+    /**
+     * 解析数据里需要确定的文本类型
+     * @property _textLineType
+     * @type {string[]}
+     * @private
+     */
     let _textLineType: Array<string> = ["single", "multiline"];
+    /**
+     * 解析数据里需要确定的文本对齐方式
+     * @property _textAlign
+     * @type {string[]}
+     * @private
+     */
     let _textAlign: Array<string> = ["left", "center", "right"];
-
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method t
@@ -544,6 +645,9 @@ namespace annie {
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
      * @method sb
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Bitmap}
      */
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
@@ -609,6 +713,13 @@ namespace annie {
         return shape;
     }
 
+    /**
+     * 获取声音实例
+     * @method s
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Sound}
+     */
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
     }
@@ -722,8 +833,10 @@ namespace annie {
 
     /**
      * 引擎自调用.初始化 sprite和movieClip用
+     * @method initRes
      * @param target
-     * @param {string} _resId
+     * @param {string} sceneName
+     * @param {string} resName
      * @private
      */
     export function initRes(target: any, sceneName: string, resName: string) {

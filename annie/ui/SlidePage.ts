@@ -1,8 +1,4 @@
 /**
- * Created by saron on 16/10/19.
- */
-
-/**
  * @module annie
  */
 namespace annie {
@@ -209,7 +205,9 @@ namespace annie {
             s.maskObj.endFill();
         }
         /**
-         * 触摸事件
+         * 触摸事件 onMouseEvent
+         * @method
+         * @private
          * @param e
          */
         private onMouseEvent(e: annie.MouseEvent): void {

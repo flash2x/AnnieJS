@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annie
  */
 namespace annie {
@@ -62,6 +59,8 @@ namespace annie {
         protected distance: number = 0;
         /**
          * 最小鼠标滑动距离
+         * @property  minDis
+         * @private
          * @type {number}
          */
         private minDis: number = 2;
