@@ -1538,7 +1538,6 @@ declare namespace annie {
          *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
          *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
          *          s.addChild(bitmap);
-         *
          *          //截取图片的某一部分显示
          *          var rect = new annie.Rectangle(0, 0, 200, 200),
          *          rectBitmap = new annie.Bitmap(imgEle, rect);
@@ -2378,6 +2377,7 @@ declare namespace annie {
          */
         static setAllSoundsVolume(volume: number): void;
         /**
+         * @property _volume
          * @static
          * @type {number}
          * @private
@@ -2623,7 +2623,7 @@ declare namespace annie {
          * @method gotoAndStop
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          */
         gotoAndStop(frameIndex: number | string): void;
         /**
@@ -2638,7 +2638,7 @@ declare namespace annie {
          * @method gotoAndPlay
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
@@ -4196,6 +4196,9 @@ declare namespace annie {
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
      * @method sb
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Bitmap}
      */
     function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
@@ -4262,8 +4265,10 @@ declare namespace annie {
     function getQueryString(name: string): string;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
+     * @method initRes
      * @param target
-     * @param {string} _resId
+     * @param {string} sceneName
+     * @param {string} resName
      * @private
      */
     function initRes(target: any, sceneName: string, resName: string): void;
@@ -4754,6 +4759,7 @@ declare namespace annie {
         private _currentFrameDelay;
         /**
          * 执行触发Timer 的总次数
+         * @method repeatCount
          * @public
          * @since 1.0.9
          * @return {number}
@@ -4960,7 +4966,7 @@ declare namespace annie {
     let getStagePixels: (stage: Stage, rect: Rectangle) => number[];
 }
 /**
- * @class 全局
+ * @class 全局类和方法
  */
 /**
  * 往控制台打印调试信息

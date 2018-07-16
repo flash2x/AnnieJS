@@ -2502,7 +2502,6 @@ var annie;
          *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
          *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
          *          s.addChild(bitmap);
-         *
          *          //截取图片的某一部分显示
          *          var rect = new annie.Rectangle(0, 0, 200, 200),
          *          rectBitmap = new annie.Bitmap(imgEle, rect);
@@ -4518,6 +4517,7 @@ var annie;
          */
         Sound._soundList = [];
         /**
+         * @property _volume
          * @static
          * @type {number}
          * @private
@@ -4893,7 +4893,7 @@ var annie;
          * @method gotoAndStop
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          */
         MovieClip.prototype.gotoAndStop = function (frameIndex) {
             var s = this;
@@ -4934,7 +4934,7 @@ var annie;
          * @method gotoAndPlay
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
          */
         MovieClip.prototype.gotoAndPlay = function (frameIndex, isFront) {
@@ -5702,6 +5702,7 @@ var annie;
                 var realLines = [];
                 s.realLines = realLines;
                 s._prepContext(ctx);
+                var wordW = 0;
                 var lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length] = hardLines[0];
@@ -5710,7 +5711,6 @@ var annie;
                     if (lineW > s._textWidth) {
                         var w = s._getMeasuredWidth(str[0]);
                         var lineStr = str[0];
-                        var wordW = 0;
                         var strLen = str.length;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
@@ -5732,7 +5732,6 @@ var annie;
                             continue;
                         var w = s._getMeasuredWidth(str[0]);
                         var lineStr = str[0];
-                        var wordW = 0;
                         var strLen = str.length;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
@@ -5933,6 +5932,7 @@ var annie;
              */
             set: function (value) {
                 this.htmlElement.style.lineHeight = value + "px";
+                this.htmlElement.style.height = value + "px";
             },
             enumerable: true,
             configurable: true
@@ -8504,59 +8504,101 @@ var annie;
     var _isLoading;
     /**
      * 加载中的场景名列表
+     * @property _loadSceneNames
+     * @private
+     * @type {string|Array}
      *
      */
     var _loadSceneNames;
     /**
      * 加载地址的域名地址或前缀
+     * @property _domain
+     * @private
+     * @type {string}
      */
     var _domain;
     /**
      * 当前加载到哪一个资源
+     * @property _loadIndex
+     * @private
+     * @type {number}
      */
     var _loadIndex;
     /**
      * 当前加载的总资源数
+     * @property _totalLoadRes
+     * @private
+     * @type {number}
      */
     var _totalLoadRes;
     /**
      * 当前已经加载的资源数
+     * @property _loadedLoadRes
+     * @private
+     * @type {number}
      */
     var _loadedLoadRes;
     /**
      * 加载资源的完成回调
+     * @property _completeCallback
+     * @private
+     * @type {Function}
      */
     var _completeCallback;
     /**
      * 加载资源时的进度回调
+     * @property _progressCallback
+     * @private
+     * @type {Function}
      */
     var _progressCallback;
     /**
      * 加载配置文件的加载器
+     * @property _JSONQueue
+     * @private
+     * @type {annie.URLLoader}
      */
     var _JSONQueue;
     /**
      * 加载资源文件的加载器
+     * @property _loaderQueue
+     * @private
+     * @type {annie.URLLoader}
      */
     var _loaderQueue;
     /**
      * 加载器是否初始化过
+     * @property _isInited
+     * @private
+     * @type {Boolean}
      */
     var _isInited;
     /**
      * 当前加载的资源配置文件内容
+     * @property _currentConfig
+     * @private
+     * @type {Object}
      */
     var _currentConfig;
     /**
      * 获取当前加载的时间当作随机数用
+     * @property _time
+     * @private
+     * @type {number}
      */
     var _time = new Date().getTime();
     /**
      * 加载资源数和总资源数的比
+     * @property _loadPer
+     * @private
+     * @type {number}
      */
     var _loadPer;
     /**
      * 单个资源占总资源数的比
+     * @property _loadSinglePer
+     * @private
+     * @type {number}
      */
     var _loadSinglePer;
     /**
@@ -8654,9 +8696,23 @@ var annie;
             _loadRes();
         }
     };
+    /**
+     * 加载配置文件,打包成released线上版时才会用到这个方法。
+     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
+     * @private
+     * @method _loadConfig
+     * @return {void}
+     */
     function _loadConfig() {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
+    /**
+     * 加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
+     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
+     * @method onCFGComplete
+     * @param {annie.Event} e
+     * @return {void}
+     */
     function onCFGComplete(e) {
         //配置文件加载完成
         var resList = e.data.response;
@@ -8673,11 +8729,26 @@ var annie;
             _loadRes();
         }
     }
+    /**
+     * 加载资源过程中调用的回调方法。
+     * @method _onRESProgress
+     * @param {annie.Event} e
+     * @private
+     * @return {void}
+     */
     function _onRESProgress(e) {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
+    /**
+     * 解析加载后的json资源数据
+     * @method _parseContent
+     * @param loadContent
+     * @param rootObj
+     * @private
+     * @return {void}
+     */
     function _parseContent(loadContent, rootObj) {
         if (rootObj === void 0) { rootObj = null; }
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
@@ -8754,6 +8825,13 @@ var annie;
             }
         }
     }
+    /**
+     * 一个场景加载完成后的事件回调
+     * @method _onRESComplete
+     * @param {annie.Event} e
+     * @private
+     * @return {void}
+     */
     function _onRESComplete(e) {
         var scene = _loadSceneNames[_loadIndex];
         if (!annie._isReleased) {
@@ -8778,6 +8856,12 @@ var annie;
         }
         _checkComplete();
     }
+    /**
+     * 检查所有资源是否全加载完成
+     * @method _checkComplete
+     * @private
+     * @return {void}
+     */
     function _checkComplete() {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -8806,6 +8890,12 @@ var annie;
             }
         }
     }
+    /**
+     * 加载场景资源
+     * @private
+     * @method _loadRes
+     * @return {void}
+     */
     function _loadRes() {
         var url = _domain + _currentConfig[_loadIndex][0].src;
         if (annie._isReleased) {
@@ -8902,14 +8992,14 @@ var annie;
         }
         else {
             //是不是文本
+            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+            if (info.tr == undefined || info.tr.length == 1) {
+                info.tr = [0, 0, 1, 1, 0, 0];
+            }
             var lastInfo = target._a2x_res_obj;
             if (info.w != undefined) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-            }
-            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr == undefined || info.tr.length == 1) {
-                info.tr = [0, 0, 1, 1, 0, 0];
             }
             if (lastInfo.tr != info.tr) {
                 _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
@@ -8974,7 +9064,19 @@ var annie;
         var _a;
     }
     annie.d = d;
+    /**
+     * 解析数据里需要确定的文本类型
+     * @property _textLineType
+     * @type {string[]}
+     * @private
+     */
     var _textLineType = ["single", "multiline"];
+    /**
+     * 解析数据里需要确定的文本对齐方式
+     * @property _textAlign
+     * @type {string[]}
+     * @private
+     */
     var _textAlign = ["left", "center", "right"];
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
@@ -9023,6 +9125,9 @@ var annie;
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
      * @method sb
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Bitmap}
      */
     function sb(sceneName, resName) {
         var sbName = "_f2x_s" + resName;
@@ -9097,6 +9202,13 @@ var annie;
         }
         return shape;
     }
+    /**
+     * 获取声音实例
+     * @method s
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Sound}
+     */
     function s(sceneName, resName) {
         return new annie.Sound(annie.res[sceneName][resName]);
     }
@@ -9211,8 +9323,10 @@ var annie;
     annie.getQueryString = getQueryString;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
+     * @method initRes
      * @param target
-     * @param {string} _resId
+     * @param {string} sceneName
+     * @param {string} resName
      * @private
      */
     function initRes(target, sceneName, resName) {
@@ -9299,18 +9413,35 @@ var annie;
                 }
                 switch (objId) {
                     case 1:
-                        //displayObject
-                        if (children[i].indexOf("_$") == 0) {
-                            if (classRoot[children[i]].tf > 1) {
-                                obj = new annie.MovieClip();
-                            }
-                            else {
-                                obj = new annie.Sprite();
-                            }
-                            initRes(obj, sceneName, children[i]);
+                    case 4:
+                        //text 和 Sprite
+                        //检查是否有名字，并且已经初始化过了
+                        if (resClass.n && resClass.n[i] && target[resClass.n[i]]) {
+                            obj = target[resClass.n[i]];
                         }
                         else {
-                            obj = new Root[sceneName][children[i]]();
+                            if (objId == 4) {
+                                obj = t(sceneName, children[i]);
+                            }
+                            else {
+                                //displayObject
+                                if (children[i].indexOf("_$") == 0) {
+                                    if (classRoot[children[i]].tf > 1) {
+                                        obj = new annie.MovieClip();
+                                    }
+                                    else {
+                                        obj = new annie.Sprite();
+                                    }
+                                    initRes(obj, sceneName, children[i]);
+                                }
+                                else {
+                                    obj = new Root[sceneName][children[i]]();
+                                }
+                            }
+                            if (resClass.n && resClass.n[i]) {
+                                target[resClass.n[i]] = obj;
+                                obj.name = resClass.n[i];
+                            }
                         }
                         break;
                     case 2:
@@ -9320,10 +9451,6 @@ var annie;
                     case 3:
                         //shape
                         obj = g(sceneName, children[i]);
-                        break;
-                    case 4:
-                        //text
-                        obj = t(sceneName, children[i]);
                         break;
                     case 5:
                         //sound
@@ -9354,11 +9481,6 @@ var annie;
                         }
                         target.addChildAt(obj, 0);
                     }
-                }
-                //检查是否有名字
-                if (resClass.n && resClass.n[i] != undefined) {
-                    target[resClass.n[i]] = obj;
-                    obj.name = resClass.n[i];
                 }
             }
         }
@@ -10245,6 +10367,7 @@ var annie;
         Object.defineProperty(Timer.prototype, "repeatCount", {
             /**
              * 执行触发Timer 的总次数
+             * @method repeatCount
              * @public
              * @since 1.0.9
              * @return {number}
@@ -10596,7 +10719,7 @@ var annie;
     };
 })(annie || (annie = {}));
 /**
- * @class 全局
+ * @class 全局类和方法
  */
 /**
  * 往控制台打印调试信息
