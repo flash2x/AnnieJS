@@ -17,6 +17,23 @@ namespace annie {
         }
 
         /**
+         * 自动调整文本尺寸
+         * @property autoSize
+         * @public
+         * @since 2.0.0
+         * @type {string}
+         * @default false
+         */
+        public set autoSize(value: boolean) {
+            this._setProperty("_autoSize",value,3);
+        }
+
+        public get autoSize(): boolean {
+            return this._autoSize;
+        }
+        private _autoSize = false;
+
+        /**
          * 文本的对齐方式
          * @property textAlign
          * @public
@@ -92,7 +109,7 @@ namespace annie {
         public get textWidth(): number {
             return this._textWidth;
         }
-        private _textWidth: number = 120;
+        private _textWidth: number = NaN;
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -305,12 +322,15 @@ namespace annie {
                 let realLines: any = [];
                 s.realLines=realLines;
                 s._prepContext(ctx);
-                let lineH = s._lineSpacing;
+                let lineH = s._textHeight;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length]=hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
-                    if (lineW > s._textWidth){
+                    if(s._autoSize){
+                        s._textWidth = lineW;
+                        lineH = s._textHeight = s._size;
+                    }else if (lineW > s._textWidth){
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let wordW = 0;
