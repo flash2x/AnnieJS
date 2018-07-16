@@ -435,17 +435,32 @@ namespace annie {
                 }
                 switch (objId) {
                     case 1:
-                        //displayObject
-                        if (children[i].indexOf("_$") == 0) {
-                            if (classRoot[children[i]].tf > 1) {
-                                obj = new annie.MovieClip();
-                            } else {
-                                obj = new annie.Sprite();
+                    case 4:
+                        //text 和 Sprite
+                        //检查是否有名字，并且已经初始化过了
+                        if (resClass.n&&resClass.n[i]&&target[resClass.n[i]]) {
+                            obj=target[resClass.n[i]];
+                        }else{
+                            if (objId == 4) {
+                                obj = t(sceneName, children[i]);
                             }
-                            initRes(obj, sceneName, children[i]);
-                        }
-                        else {
-                            obj = new Root[sceneName][children[i]]();
+                            else {
+                                //displayObject
+                                if (children[i].indexOf("_$") == 0) {
+                                    if (classRoot[children[i]].tf > 1) {
+                                        obj = new annie.MovieClip();
+                                    } else {
+                                        obj = new annie.Sprite();
+                                    }
+                                    initRes(obj, sceneName, children[i]);
+                                } else {
+                                    obj = new Root[sceneName][children[i]]();
+                                }
+                            }
+                            if (resClass.n&&resClass.n[i]) {
+                                target[resClass.n[i]] = obj;
+                                obj.name = resClass.n[i];
+                            }
                         }
                         break;
                     case 2:
@@ -455,10 +470,6 @@ namespace annie {
                     case 3:
                         //shape
                         obj = g(sceneName, children[i]);
-                        break;
-                    case 4:
-                        //text
-                        obj = t(sceneName, children[i]);
                         break;
                     case 5:
                         //sound
@@ -490,11 +501,6 @@ namespace annie {
                         }
                         target.addChildAt(obj, 0);
                     }
-                }
-                //检查是否有名字
-                if (resClass.n&&resClass.n[i] != undefined) {
-                    target[resClass.n[i]] = obj;
-                    obj.name = resClass.n[i];
                 }
             }
         }

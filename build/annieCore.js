@@ -25,7 +25,7 @@ var annie;
              * @property instanceId
              * @public
              * @since 1.0.0
-             * @returns {number}
+             * @return {number}
              * @readonly
              * @example
              *      //获取 annie引擎类对象唯一码
@@ -74,7 +74,7 @@ var annie;
         /**
          * 看看有多少mouse或者touch侦听数
          * @method getMouseEventCount
-         * @returns {number}
+         * @return {number}
          * @static
          * @private
          * @since 1.0.0
@@ -159,7 +159,7 @@ var annie;
          * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有收听者则返回true
+         * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
          *          yourEvent=new annie.Event("yourCustomerEvent");
@@ -217,7 +217,7 @@ var annie;
          * @since 1.0.0
          * @param {string} type 侦听类形
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
-         * @returns {boolean} 如果有则返回true
+         * @return {boolean} 如果有则返回true
          */
         EventDispatcher.prototype.hasEventListener = function (type, useCapture) {
             if (useCapture === void 0) { useCapture = true; }
@@ -384,7 +384,7 @@ var annie;
          * @method destroy
          * @public
          * @since 2.0.0
-         * @returns {void}
+         * @return {void}
          */
         Event.prototype.destroy = function () {
             var s = this;
@@ -932,7 +932,7 @@ var annie;
          * 求两点之间的距离
          * @method distance
          * @param args 可变参数 传两个参数的话就是两个annie.Point类型 传四个参数的话分别是两个点的x y x y
-         * @returns {number}
+         * @return {number}
          */
         Point.distance = function () {
             var args = [];
@@ -1072,7 +1072,7 @@ var annie;
              * @param {number} x
              * @param {number} y
              * @param {annie.Point} 默认为空，如果不为null，则返回的是Point就是此对象，如果为null，则返回来的Point是新建的对象
-             * @returns {annie.Point}
+             * @return {annie.Point}
              * @public
              * @since 1.0.0
              */
@@ -1125,7 +1125,7 @@ var annie;
          * @method clone
          * @since 1.0.0
          * @public
-         * @returns {annie.Matrix}
+         * @return {annie.Matrix}
          */
         Matrix.prototype.clone = function () {
             var s = this;
@@ -1161,7 +1161,7 @@ var annie;
         /**
          * 反转一个矩阵
          * @method
-         * @returns {Matrix}
+         * @return {Matrix}
          * @since 1.0.0
          * @public
          */
@@ -1257,7 +1257,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.Matrix} m1
          * @param {annie.Matrix} m2
-         * @returns {boolean}
+         * @return {boolean}
          */
         Matrix.isEqual = function (m1, m2) {
             return m1.tx == m2.tx && m1.ty == m2.ty && m1.a == m2.a && m1.b == m2.b && m1.c == m2.c && m1.d == m2.d;
@@ -1401,7 +1401,7 @@ var annie;
          * 判断一个点是否在矩形内包括边
          * @method isPointIn
          * @param {annie.Point} point
-         * @returns {boolean}
+         * @return {boolean}
          * @public
          * @since 1.0.0
          */
@@ -1466,7 +1466,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.Point} p1
          * @param {..arg} ary
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         Rectangle.createFromPoints = function (rect) {
             var arg = [];
@@ -1949,7 +1949,7 @@ var annie;
          * @since 1.0.0
          * @public
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         DisplayObject.prototype.globalToLocal = function (point, bp) {
             if (bp === void 0) { bp = null; }
@@ -1961,7 +1961,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
@@ -2024,7 +2024,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
-         * @returns {annie.DisplayObject}
+         * @return {annie.DisplayObject}
          */
         DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
             if (isMouseEvent === void 0) { isMouseEvent = false; }
@@ -2051,7 +2051,7 @@ var annie;
          * @method getBounds
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          * @abstract
          */
         DisplayObject.prototype.getBounds = function () {
@@ -2064,7 +2064,7 @@ var annie;
          * @method getDrawRect
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         DisplayObject.prototype.getDrawRect = function () {
             var s = this;
@@ -2264,7 +2264,7 @@ var annie;
          * 如果需要同时获取宽和高的值，建议使用此方法更有效率
          * @method getWH
          * @public
-         * @returns {{width: number, height: number}}
+         * @return {{width: number, height: number}}
          * @since 1.0.9
          */
         DisplayObject.prototype.getWH = function () {
@@ -2296,7 +2296,7 @@ var annie;
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @param {annie.Sound} sound
-         * @returns {number}
+         * @return {number}
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
@@ -2401,7 +2401,7 @@ var annie;
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -2541,7 +2541,7 @@ var annie;
          * @static
          * @param points
          * @param colors
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @pubic
          */
@@ -2564,7 +2564,7 @@ var annie;
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
-         * @returns {CanvasPattern}
+         * @return {CanvasPattern}
          * @public
          * @since 1.0.0
          */
@@ -2580,7 +2580,7 @@ var annie;
          * @since 1.0.0
          * @param {string} color 字符串的颜色值,如:#33ffee
          * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
-         * @returns {string}
+         * @return {string}
          */
         Shape.getRGBA = function (color, alpha) {
             if (color.indexOf("0x") == 0) {
@@ -3158,7 +3158,7 @@ var annie;
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -3343,7 +3343,7 @@ var annie;
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -3455,7 +3455,7 @@ var annie;
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
-         * @returns {boolean}
+         * @return {boolean}
          */
         Sprite.prototype.swapChild = function (child1, child2) {
             var s = this;
@@ -3567,7 +3567,7 @@ var annie;
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -3604,7 +3604,7 @@ var annie;
         /**
          * 重写getBounds
          * @method getBounds
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @public
          */
@@ -5546,7 +5546,7 @@ var annie;
              * 设置或者获取音量 从0-1
              * @since 1.1.0
              * @property volume
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this.media.volume;
@@ -6078,7 +6078,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quadraticIn = function (k) {
             return k * k;
@@ -6090,7 +6090,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quadraticOut = function (k) {
             return k * (2 - k);
@@ -6102,7 +6102,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quadraticInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -6117,7 +6117,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.cubicIn = function (k) {
             return k * k * k;
@@ -6129,7 +6129,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.cubicOut = function (k) {
             return --k * k * k + 1;
@@ -6141,7 +6141,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.cubicInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -6156,7 +6156,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quarticIn = function (k) {
             return k * k * k * k;
@@ -6168,7 +6168,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quarticOut = function (k) {
             return 1 - (--k * k * k * k);
@@ -6180,7 +6180,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quarticInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -6195,7 +6195,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quinticIn = function (k) {
             return k * k * k * k * k;
@@ -6207,7 +6207,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quinticOut = function (k) {
             return --k * k * k * k * k + 1;
@@ -6219,7 +6219,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.quinticInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -6234,7 +6234,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.sinusoidalIn = function (k) {
             return 1 - Math.cos(k * Math.PI / 2);
@@ -6246,7 +6246,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.sinusoidalOut = function (k) {
             return Math.sin(k * Math.PI / 2);
@@ -6258,7 +6258,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.sinusoidalInOut = function (k) {
             return 0.5 * (1 - Math.cos(Math.PI * k));
@@ -6270,7 +6270,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.exponentialIn = function (k) {
             return k === 0 ? 0 : Math.pow(1024, k - 1);
@@ -6282,7 +6282,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.exponentialOut = function (k) {
             return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
@@ -6294,7 +6294,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.exponentialInOut = function (k) {
             if (k === 0) {
@@ -6315,7 +6315,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.circularIn = function (k) {
             return 1 - Math.sqrt(1 - k * k);
@@ -6327,7 +6327,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.circularOut = function (k) {
             return Math.sqrt(1 - (--k * k));
@@ -6339,7 +6339,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.circularInOut = function (k) {
             if ((k *= 2) < 1) {
@@ -6354,7 +6354,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.elasticIn = function (k) {
             if (k === 0) {
@@ -6372,7 +6372,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.elasticOut = function (k) {
             if (k === 0) {
@@ -6390,7 +6390,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.elasticInOut = function (k) {
             if (k === 0) {
@@ -6412,7 +6412,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.backIn = function (k) {
             var s = 1.70158;
@@ -6425,7 +6425,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.backOut = function (k) {
             var s = 1.70158;
@@ -6438,7 +6438,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.backInOut = function (k) {
             var s = 1.70158 * 1.525;
@@ -6454,7 +6454,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.bounceIn = function (k) {
             return 1 - Tween.bounceOut(1 - k);
@@ -6466,7 +6466,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.bounceOut = function (k) {
             if (k < (1 / 2.75)) {
@@ -6489,7 +6489,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         Tween.bounceInOut = function (k) {
             if (k < 0.5) {
@@ -6611,7 +6611,7 @@ var annie;
              * @readonly
              * @public
              * @since 1.0.9
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this._currentCount;
@@ -6625,7 +6625,7 @@ var annie;
              * @property delay
              * @since 1.0.9
              * @public
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this._delay;
@@ -6642,7 +6642,7 @@ var annie;
              * 执行触发Timer 的总次数
              * @public
              * @since 1.0.9
-             * @returns {number}
+             * @return {number}
              */
             get: function () {
                 return this._repeatCount;
@@ -6661,7 +6661,7 @@ var annie;
              * 当前是否在运行中
              * @property running
              * @since 1.0.9
-             * @returns {boolean}
+             * @return {boolean}
              */
             get: function () {
                 return this._running;
@@ -6920,7 +6920,7 @@ var annie;
      * @since 2.0.0
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function getResource(sceneName, resName) {
         if (res[sceneName][resName]) {
@@ -6937,7 +6937,7 @@ var annie;
      * @static
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function b(sceneName, resName) {
         return new annie.Bitmap(res[sceneName][resName]);
@@ -6997,7 +6997,7 @@ var annie;
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.TextFiled|annie.InputText}
+     * @return {annie.TextFiled|annie.InputText}
      */
     function t(sceneName, resName) {
         var textDate = res[sceneName]._a2x_con[resName];
@@ -7042,7 +7042,7 @@ var annie;
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.Shape}
+     * @return {annie.Shape}
      */
     function g(sceneName, resName) {
         var shapeDate = res[sceneName]._a2x_con[resName][1];
@@ -7175,18 +7175,35 @@ var annie;
                 }
                 switch (objId) {
                     case 1:
-                        //displayObject
-                        if (children[i].indexOf("_$") == 0) {
-                            if (classRoot[children[i]].tf > 1) {
-                                obj = new annie.MovieClip();
-                            }
-                            else {
-                                obj = new annie.Sprite();
-                            }
-                            initRes(obj, sceneName, children[i]);
+                    case 4:
+                        //text 和 Sprite
+                        //检查是否有名字，并且已经初始化过了
+                        if (resClass.n && resClass.n[i] && target[resClass.n[i]]) {
+                            obj = target[resClass.n[i]];
                         }
                         else {
-                            obj = new Root[sceneName][children[i]]();
+                            if (objId == 4) {
+                                obj = t(sceneName, children[i]);
+                            }
+                            else {
+                                //displayObject
+                                if (children[i].indexOf("_$") == 0) {
+                                    if (classRoot[children[i]].tf > 1) {
+                                        obj = new annie.MovieClip();
+                                    }
+                                    else {
+                                        obj = new annie.Sprite();
+                                    }
+                                    initRes(obj, sceneName, children[i]);
+                                }
+                                else {
+                                    obj = new Root[sceneName][children[i]]();
+                                }
+                            }
+                            if (resClass.n && resClass.n[i]) {
+                                target[resClass.n[i]] = obj;
+                                obj.name = resClass.n[i];
+                            }
                         }
                         break;
                     case 2:
@@ -7196,10 +7213,6 @@ var annie;
                     case 3:
                         //shape
                         obj = g(sceneName, children[i]);
-                        break;
-                    case 4:
-                        //text
-                        obj = t(sceneName, children[i]);
                         break;
                     case 5:
                         //sound
@@ -7233,11 +7246,6 @@ var annie;
                         }
                         target.addChildAt(obj, 0);
                     }
-                }
-                //检查是否有名字
-                if (resClass.n && resClass.n[i] != undefined) {
-                    target[resClass.n[i]] = obj;
-                    obj.name = resClass.n[i];
                 }
             }
         }
