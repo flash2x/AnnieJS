@@ -192,7 +192,7 @@ namespace annie {
      * @since 2.0.0
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     export function getResource(sceneName: string, resName: string): any {
         if (res[sceneName][resName]) {
@@ -209,7 +209,7 @@ namespace annie {
      * @static
      * @param {string} sceneName
      * @param {string} resName
-     * @returns {any}
+     * @return {any}
      */
     function b(sceneName: string, resName: string): any {
         return new Bitmap(res[sceneName][resName]);
@@ -269,7 +269,7 @@ namespace annie {
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.TextFiled|annie.InputText}
+     * @return {annie.TextFiled|annie.InputText}
      */
     function t(sceneName: string, resName: string): any {
         let textDate = res[sceneName]._a2x_con[resName];
@@ -315,7 +315,7 @@ namespace annie {
      * @public
      * @static
      * @since 1.0.0
-     * @returns {annie.Shape}
+     * @return {annie.Shape}
      */
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];

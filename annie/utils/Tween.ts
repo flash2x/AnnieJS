@@ -313,7 +313,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quadraticIn(k:number):number {
             return k * k;
@@ -325,7 +325,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quadraticOut(k:number):number {
             return k * (2 - k);
@@ -337,7 +337,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quadraticInOut(k:number):number {
             if ((k *= 2) < 1) {
@@ -352,7 +352,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static cubicIn(k:number):number {
             return k * k * k;
@@ -365,7 +365,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static cubicOut(k:number):number {
 
@@ -379,7 +379,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static cubicInOut(k:number):number {
             if ((k *= 2) < 1) {
@@ -395,7 +395,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quarticIn(k:number):number {
 
@@ -409,7 +409,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quarticOut(k:number):number {
 
@@ -423,7 +423,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quarticInOut(k:number):number {
 
@@ -440,7 +440,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quinticIn(k:number):number {
 
@@ -454,7 +454,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quinticOut(k:number):number {
 
@@ -468,7 +468,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static quinticInOut(k:number):number {
             if ((k *= 2) < 1) {
@@ -485,7 +485,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static sinusoidalIn(k:number):number {
 
@@ -499,7 +499,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static sinusoidalOut(k:number):number {
 
@@ -512,7 +512,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static sinusoidalInOut(k:number):number {
             return 0.5 * (1 - Math.cos(Math.PI * k));
@@ -524,7 +524,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static exponentialIn(k:number):number {
 
@@ -538,7 +538,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static exponentialOut(k:number):number {
 
@@ -552,7 +552,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static exponentialInOut(k:number):number {
             if (k === 0) {
@@ -573,7 +573,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static circularIn(k:number):number {
 
@@ -587,7 +587,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static circularOut(k:number):number {
 
@@ -601,7 +601,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static circularInOut(k:number):number {
 
@@ -619,7 +619,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static elasticIn(k:number):number {
 
@@ -641,7 +641,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static elasticOut(k:number):number {
 
@@ -662,7 +662,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static elasticInOut(k:number):number {
             if (k === 0) {
@@ -686,7 +686,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static backIn(k:number):number {
             let s = 1.70158;
@@ -699,7 +699,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static backOut(k:number):number {
             let s = 1.70158;
@@ -712,7 +712,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static backInOut(k:number):number {
             let s = 1.70158 * 1.525;
@@ -728,7 +728,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static bounceIn(k:number):number {
             return 1 - Tween.bounceOut(1 - k);
@@ -740,7 +740,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static bounceOut(k:number):number {
 
@@ -761,7 +761,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number}k
-         * @returns {number}
+         * @return {number}
          */
         public static bounceInOut(k:number):number {
             if (k < 0.5) {

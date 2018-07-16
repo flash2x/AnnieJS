@@ -315,7 +315,7 @@ namespace annie {
          * @method destroy
          * @public
          * @since 2.0.0
-         * @returns {void}
+         * @return {void}
          */
         public destroy(): void {
             let s=this;

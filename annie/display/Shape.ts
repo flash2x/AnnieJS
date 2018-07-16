@@ -32,7 +32,7 @@ namespace annie {
          * @static
          * @param points
          * @param colors
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @pubic
          */
@@ -55,7 +55,7 @@ namespace annie {
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
-         * @returns {CanvasPattern}
+         * @return {CanvasPattern}
          * @public
          * @since 1.0.0
          */
@@ -72,7 +72,7 @@ namespace annie {
          * @since 1.0.0
          * @param {string} color 字符串的颜色值,如:#33ffee
          * @param {number} alpha 0-1区间的一个数据 0完全透明 1完全不透明
-         * @returns {string}
+         * @return {string}
          */
         public static getRGBA(color: string, alpha: number): string {
             if (color.indexOf("0x") == 0) {
@@ -711,7 +711,7 @@ namespace annie {
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */

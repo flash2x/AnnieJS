@@ -69,7 +69,7 @@ namespace annie {
          * 判断一个点是否在矩形内包括边
          * @method isPointIn
          * @param {annie.Point} point
-         * @returns {boolean}
+         * @return {boolean}
          * @public
          * @since 1.0.0
          */
@@ -128,7 +128,7 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Point} p1
          * @param {..arg} ary
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         public static createFromPoints(rect:Rectangle,...arg:Point[]):Rectangle{
            let x=arg[0].x,y=arg[0].y,w=arg[0].x,h=arg[0].y;
