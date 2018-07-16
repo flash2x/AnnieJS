@@ -39,7 +39,7 @@ namespace annie {
          * @method  hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */

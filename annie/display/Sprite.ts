@@ -114,7 +114,7 @@ namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @returns {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -219,7 +219,7 @@ namespace annie {
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
-         * @returns {boolean}
+         * @return {boolean}
          */
         public swapChild(child1:any,child2:any):boolean{
             let s=this;
@@ -326,7 +326,7 @@ namespace annie {
          * @method hitTestPoint
          * @param {annie.Point} globalPoint
          * @param {boolean} isMouseEvent
-         * @returns {any}
+         * @return {any}
          * @public
          * @since 1.0.0
          */
@@ -359,7 +359,7 @@ namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @returns {any}
+         * @return {any}
          * @since 1.0.0
          * @public
          */

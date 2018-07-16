@@ -95,7 +95,7 @@ namespace annie {
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
-         * @returns {number}
+         * @return {number}
          */
         public get volume():number{
             return this.media.volume

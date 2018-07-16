@@ -353,7 +353,7 @@ namespace annie {
          * @since 1.0.0
          * @public
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         public globalToLocal(point: Point, bp: Point = null): Point {
             return this.cMatrix.invert().transformPoint(point.x, point.y, bp);
@@ -365,7 +365,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.Point} point
-         * @returns {annie.Point}
+         * @return {annie.Point}
          */
         public localToGlobal(point: Point, bp: Point = null): Point {
             if(this.parent){
@@ -439,7 +439,7 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Point} point 需要碰到的坐标点
          * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
-         * @returns {annie.DisplayObject}
+         * @return {annie.DisplayObject}
          */
         public hitTestPoint(point: Point,isMouseEvent: boolean = false): DisplayObject {
             let s = this;
@@ -462,7 +462,7 @@ namespace annie {
          * @method getBounds
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          * @abstract
          */
         public getBounds(): Rectangle{
@@ -474,7 +474,7 @@ namespace annie {
          * @method getDrawRect
          * @public
          * @since 1.0.0
-         * @returns {annie.Rectangle}
+         * @return {annie.Rectangle}
          */
         public getDrawRect(): Rectangle {
             let s = this;
@@ -677,7 +677,7 @@ namespace annie {
          * 如果需要同时获取宽和高的值，建议使用此方法更有效率
          * @method getWH
          * @public
-         * @returns {{width: number, height: number}}
+         * @return {{width: number, height: number}}
          * @since 1.0.9
          */
         public getWH():{width:number,height:number}{
@@ -718,7 +718,7 @@ namespace annie {
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @param {annie.Sound} sound
-         * @returns {number}
+         * @return {number}
          */
         public addSound(sound:any):number{
             let s=this;

@@ -123,7 +123,7 @@ namespace annie {
          * @method clone
          * @since 1.0.0
          * @public
-         * @returns {annie.Matrix}
+         * @return {annie.Matrix}
          */
         public clone():Matrix {
             let s = this;
@@ -136,7 +136,7 @@ namespace annie {
          * @param {number} x
          * @param {number} y
          * @param {annie.Point} 默认为空，如果不为null，则返回的是Point就是此对象，如果为null，则返回来的Point是新建的对象
-         * @returns {annie.Point}
+         * @return {annie.Point}
          * @public
          * @since 1.0.0
          */
@@ -182,7 +182,7 @@ namespace annie {
         /**
          * 反转一个矩阵
          * @method
-         * @returns {Matrix}
+         * @return {Matrix}
          * @since 1.0.0
          * @public
          */
@@ -303,7 +303,7 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.Matrix} m1
          * @param {annie.Matrix} m2
-         * @returns {boolean}
+         * @return {boolean}
          */
         public static isEqual(m1:Matrix, m2:Matrix):boolean {
             return m1.tx == m2.tx && m1.ty == m2.ty && m1.a == m2.a && m1.b == m2.b && m1.c == m2.c && m1.d == m2.d;
