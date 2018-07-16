@@ -50,7 +50,6 @@ namespace annie {
          *          bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
          *          bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
          *          s.addChild(bitmap);
-         *
          *          //截取图片的某一部分显示
          *          var rect = new annie.Rectangle(0, 0, 200, 200),
          *          rectBitmap = new annie.Bitmap(imgEle, rect);

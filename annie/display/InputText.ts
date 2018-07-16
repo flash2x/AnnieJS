@@ -59,7 +59,7 @@ namespace annie {
                 input.style.overflow = "hidden";
             }
             s.inputType = inputType;
-            var remove = function () {
+            var remove = function (){
                 if (s.isAutoDownKeyBoard&&annie.osType!="pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
@@ -125,6 +125,7 @@ namespace annie {
          */
         public set lineSpacing(value:number){
             this.htmlElement.style.lineHeight = value + "px";
+            this.htmlElement.style.height = value + "px";
         }
         public get lineSpacing():number{
             return parseInt(this.htmlElement.style.lineHeight);
