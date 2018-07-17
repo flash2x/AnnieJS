@@ -1462,9 +1462,13 @@ declare namespace annie {
          * @public
          * @param width
          * @param height
+         * @param fps
+         * @param scaleMode
          */
-        constructor(width: number, height: number);
+        constructor(width: number, height: number, fps: number, scaleMode: string);
+        visible: boolean;
         destroy(): void;
+        private static _isInit;
         private _openDataContext;
         /**
          * 设置子域的宽和高

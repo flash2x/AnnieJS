@@ -2430,16 +2430,50 @@ var annie;
          * @public
          * @param width
          * @param height
+         * @param fps
+         * @param scaleMode
          */
-        function SharedCanvas(width, height) {
+        function SharedCanvas(width, height, fps, scaleMode) {
             _super.call(this);
-            var s = this;
-            s._instanceType = "annie.SharedCanvas";
-            s._openDataContext = wx.getOpenDataContext();
-            var sharedCanvas = s._openDataContext.canvas;
-            s._texture = sharedCanvas;
-            s.setWH(width, height);
+            if (!SharedCanvas._isInit) {
+                var s_1 = this;
+                s_1._instanceType = "annie.SharedCanvas";
+                s_1._openDataContext = wx.getOpenDataContext();
+                var sharedCanvas = s_1._openDataContext.canvas;
+                s_1._texture = sharedCanvas;
+                s_1.setWH(width, height);
+                s_1.postMessage({
+                    event: "initSharedCanvasStage",
+                    data: { w: width, h: height, fps: fps, scaleMode: scaleMode }
+                });
+                SharedCanvas._isInit = true;
+                s_1.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
+                    if (s_1._visible)
+                        s_1.postMessage({ event: "onShow" });
+                });
+                s_1.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
+                    if (s_1._visible)
+                        s_1.postMessage({ event: "onHide" });
+                });
+            }
+            else {
+                throw new Error("annie.SharedCanvas只能初始化一次");
+            }
         }
+        Object.defineProperty(SharedCanvas.prototype, "visible", {
+            set: function (value) {
+                var s = this;
+                s._setProperty("_visible", value, 0);
+                if (value) {
+                    s.postMessage({ event: "onShow" });
+                }
+                else {
+                    s.postMessage({ event: "onHide" });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         SharedCanvas.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -2470,6 +2504,7 @@ var annie;
             //呼叫数据显示端
             this._openDataContext.postMessage(data);
         };
+        SharedCanvas._isInit = false;
         return SharedCanvas;
     }(annie.DisplayObject));
     annie.SharedCanvas = SharedCanvas;
