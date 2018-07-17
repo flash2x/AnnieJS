@@ -5370,8 +5370,8 @@ var annie;
             this._wordWrap = false;
             this._textAlign = "left";
             this._textAlpha = 1;
-            this._textHeight = 0;
-            this._lineSpacing = 14;
+            this._textHeight = 14;
+            this._lineSpacing = 0;
             this._textWidth = 120;
             this._lineType = "single";
             this._text = "";
@@ -5801,7 +5801,8 @@ var annie;
                         realLines[realLines.length] = lineStr;
                     }
                 }
-                var maxH = lineH * realLines.length;
+                var lineCount = realLines.length;
+                var maxH = lineH * lineCount + this._lineSpacing * (lineCount - 1);
                 var maxW = s._textWidth;
                 var tx = 0;
                 if (s._textAlign == "center") {
@@ -5822,8 +5823,10 @@ var annie;
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (var i = 0; i < realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                for (var i = 0; i < lineCount; i++) {
+                    var y = i * (lineH + (i > 0 ? this._lineSpacing : 0));
+                    console.log(i, y);
+                    ctx.fillText(realLines[i], 0, y, maxW);
                 }
                 /////////////////////////////////////
                 var cf = s.cFilters;

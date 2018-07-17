@@ -101,7 +101,7 @@ namespace annie {
             return this._textHeight;
         }
 
-        private _textHeight: number = 0;
+        private _textHeight: number = 14;
 
         /**
          * @property lineSpacing
@@ -117,7 +117,7 @@ namespace annie {
             return this._lineSpacing;
         }
 
-        private _lineSpacing: number = 14;
+        private _lineSpacing: number = 0;
 
         /**
          * 文本的宽
@@ -426,7 +426,8 @@ namespace annie {
                         realLines[realLines.length] = lineStr;
                     }
                 }
-                let maxH = lineH * realLines.length;
+                let lineCount = realLines.length;
+                let maxH = lineH * lineCount + this._lineSpacing * (lineCount - 1);
                 let maxW = s._textWidth;
                 let tx = 0;
                 if (s._textAlign == "center") {
@@ -446,8 +447,10 @@ namespace annie {
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                for (let i = 0; i < lineCount; i++) {
+                    let y = i * (lineH + (i > 0 ? this._lineSpacing : 0));
+                    console.log(i, y);
+                    ctx.fillText(realLines[i], 0, y, maxW);
                 }
                 /////////////////////////////////////
                 let cf = s.cFilters;
