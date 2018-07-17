@@ -706,29 +706,6 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
-            let s = this;
-            if (isMouseEvent && !s.mouseEnable) return null;
-            //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            let p: Point = globalPoint;
-            if (isMouseEvent) {
-                p = s.globalToLocal(globalPoint);
-            }
-            if (s.getBounds().isPointIn(p)){
-                return s;
-            }
-            return null;
-        }
         /**
          * @property _offsetX
          * @protected

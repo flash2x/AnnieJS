@@ -788,5 +788,8 @@ namespace annie {
             }
             isUpdateTween=!isUpdateTween;
         }
+        private static destroy(){
+            Tween.killAll();
+        }
     }
 }

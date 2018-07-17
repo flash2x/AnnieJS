@@ -1437,16 +1437,6 @@ declare namespace annie {
         */
         constructor(imagePath: string);
         /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
          */
@@ -1775,16 +1765,6 @@ declare namespace annie {
          */
         update(isDrawUpdate?: boolean): void;
         private _draw(ctx);
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
         /**
          * @property _offsetX
          * @protected
@@ -2603,6 +2583,14 @@ declare namespace annie {
          * @method flushAll
          */
         private static flushAll();
+        private static _runIntervalId;
+        /**
+         * 当小程序unload的时候，同时也unload 整个annie项目
+         * @method unLoadAnnie
+         * @public
+         * @static
+         */
+        static unLoadAnnie(): void;
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -3224,6 +3212,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         private static flush();
+        private static destroy();
     }
 }
 /**

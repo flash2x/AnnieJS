@@ -752,7 +752,7 @@ namespace annie {
          * @method flushAll
          */
         private static flushAll(): void {
-            setInterval(function () {
+            Stage._runIntervalId=setInterval(function () {
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
                     for (let i = 0; i < len; i++) {
@@ -763,7 +763,17 @@ namespace annie {
             //什么时候支持这个方法，什么时候就换上
             //requestAnimationFrame(Stage.flushAll);
         }
+        private static _runIntervalId=-1;
 
+        /**
+         * 当小程序unload的时候，同时也unload 整个annie项目
+         * @method unLoadAnnie
+         * @public
+         * @static
+         */
+        public static unLoadAnnie():void{
+            clearInterval(Stage._runIntervalId);
+        }
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -805,7 +815,6 @@ namespace annie {
                 }
             }
         }
-
         public destroy(): void {
             let s = this;
             Stage.removeUpdateObj(s);

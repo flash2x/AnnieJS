@@ -35,24 +35,6 @@ namespace annie {
             })
         }
         /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
-            let s = this;
-            if (isMouseEvent && !s.mouseEnable)return null;
-            let p = s.globalToLocal(globalPoint);
-            if (s.getBounds().isPointIn(p)) {
-                return s;
-            }
-            return null;
-        }
-        /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
          */

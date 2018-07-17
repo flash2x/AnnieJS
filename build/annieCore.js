@@ -2399,26 +2399,6 @@ var annie;
             });
         }
         /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        Bitmap.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
-            var s = this;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            var p = s.globalToLocal(globalPoint);
-            if (s.getBounds().isPointIn(p)) {
-                return s;
-            }
-            return null;
-        };
-        /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
          */
@@ -3155,30 +3135,6 @@ var annie;
                     ctx[data[1]] = data[2];
                 }
             }
-        };
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        Shape.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
-            var s = this;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p = globalPoint;
-            if (isMouseEvent) {
-                p = s.globalToLocal(globalPoint);
-            }
-            if (s.getBounds().isPointIn(p)) {
-                return s;
-            }
-            return null;
         };
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
@@ -5373,7 +5329,7 @@ var annie;
          * @method flushAll
          */
         Stage.flushAll = function () {
-            setInterval(function () {
+            Stage._runIntervalId = setInterval(function () {
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
                     for (var i = 0; i < len; i++) {
@@ -5383,6 +5339,15 @@ var annie;
             }, 16);
             //什么时候支持这个方法，什么时候就换上
             //requestAnimationFrame(Stage.flushAll);
+        };
+        /**
+         * 当小程序unload的时候，同时也unload 整个annie项目
+         * @method unLoadAnnie
+         * @public
+         * @static
+         */
+        Stage.unLoadAnnie = function () {
+            clearInterval(Stage._runIntervalId);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -5447,6 +5412,7 @@ var annie;
          * @type {Array}
          */
         Stage.allUpdateObjList = [];
+        Stage._runIntervalId = -1;
         return Stage;
     }(annie.Sprite));
     annie.Stage = Stage;
@@ -6514,6 +6480,9 @@ var annie;
                 }
             }
             isUpdateTween = !isUpdateTween;
+        };
+        Tween.destroy = function () {
+            Tween.killAll();
         };
         Tween._tweenPool = [];
         Tween._tweenList = [];
