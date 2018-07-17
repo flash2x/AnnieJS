@@ -4,9 +4,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annie
  */
 var annie;
@@ -87,6 +84,8 @@ var annie;
             this.distance = 0;
             /**
              * 最小鼠标滑动距离
+             * @property  minDis
+             * @private
              * @type {number}
              */
             this.minDis = 2;
@@ -386,9 +385,6 @@ var annie;
     annie.ScrollPage = ScrollPage;
 })(annie || (annie = {}));
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annie
  */
 var annie;
@@ -479,9 +475,6 @@ var annie;
     }(Sprite));
     annie.FacePhoto = FacePhoto;
 })(annie || (annie = {}));
-/**
- * Created by saron on 16/10/19.
- */
 /**
  * @module annie
  */
@@ -683,7 +676,9 @@ var annie;
             s.maskObj.endFill();
         };
         /**
-         * 触摸事件
+         * 触摸事件 onMouseEvent
+         * @method
+         * @private
          * @param e
          */
         SlidePage.prototype.onMouseEvent = function (e) {
@@ -1493,10 +1488,6 @@ var annie;
     }(Sprite));
     annie.FlipBook = FlipBook;
 })(annie || (annie = {}));
-/// <reference path="ScrollPage" />
-/**
- * Created by anlun on 16/8/14.
- */
 /**
  * @module annie
  */
@@ -1699,9 +1690,6 @@ var annie;
     }(annie.ScrollPage));
     annie.ScrollList = ScrollList;
 })(annie || (annie = {}));
-/**
- * Created by anlun on 2017/5/24.
- */
 /**
  * @module annie
  */
@@ -1953,9 +1941,6 @@ var annie;
     annie.DrawingBoard = DrawingBoard;
 })(annie || (annie = {}));
 /**
- * Created by anlun on 2017/5/24.
- */
-/**
  * @module annie
  */
 var annie;
@@ -2032,7 +2017,7 @@ var annie;
         };
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
+         * @method cancel
          * @param step
          * @public
          * @since 1.1.1

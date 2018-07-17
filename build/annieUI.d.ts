@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annie
  */
 declare namespace annie {
@@ -61,6 +58,8 @@ declare namespace annie {
         protected distance: number;
         /**
          * 最小鼠标滑动距离
+         * @property  minDis
+         * @private
          * @type {number}
          */
         private minDis;
@@ -183,9 +182,6 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annie
  */
 declare namespace annie {
@@ -239,9 +235,6 @@ declare namespace annie {
         destroy(): void;
     }
 }
-/**
- * Created by saron on 16/10/19.
- */
 /**
  * @module annie
  */
@@ -413,7 +406,9 @@ declare namespace annie {
          */
         private setMask(w, h);
         /**
-         * 触摸事件
+         * 触摸事件 onMouseEvent
+         * @method
+         * @private
          * @param e
          */
         private onMouseEvent(e);
@@ -572,9 +567,6 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annie
  */
 declare namespace annie {
@@ -662,9 +654,6 @@ declare namespace annie {
         destroy(): void;
     }
 }
-/**
- * Created by anlun on 2017/5/24.
- */
 /**
  * @module annie
  */
@@ -791,9 +780,6 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 2017/5/24.
- */
-/**
  * @module annie
  */
 declare namespace annie {
@@ -829,7 +815,7 @@ declare namespace annie {
         reset(backColorObj?: any): void;
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
+         * @method cancel
          * @param step
          * @public
          * @since 1.1.1
