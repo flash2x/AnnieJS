@@ -1437,20 +1437,49 @@ declare namespace annie {
         */
         constructor(imagePath: string);
         /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
-        /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
          */
         destroy(): void;
+    }
+}
+declare var wx: any;
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * @class annie.SharedCanvas
+     * @public
+     * @extends annie.DisplayObject
+     * @since 1.0.0
+     */
+    class SharedCanvas extends DisplayObject {
+        /**
+         * 构造函数
+         * @method SharedCanvas
+         * @since 1.0.0
+         * @public
+         * @param width
+         * @param height
+         */
+        constructor(width: number, height: number);
+        destroy(): void;
+        private _openDataContext;
+        /**
+         * 设置子域的宽和高
+         * @method setWH
+         * @param {number} w
+         * @param {number} h
+         */
+        setWH(w: number, h: number): void;
+        /**
+         * 向子域传消息
+         * @method postMessage
+         * @param data
+         * @public
+         */
+        postMessage(data: any): void;
     }
 }
 /**
@@ -1775,16 +1804,6 @@ declare namespace annie {
          */
         update(isDrawUpdate?: boolean): void;
         private _draw(ctx);
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
         /**
          * @property _offsetX
          * @protected

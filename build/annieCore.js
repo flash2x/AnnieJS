@@ -2397,26 +2397,6 @@ var annie;
             s._texture.src = imagePath;
         }
         /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        Bitmap.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
-            var s = this;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            var p = s.globalToLocal(globalPoint);
-            if (s.getBounds().isPointIn(p)) {
-                return s;
-            }
-            return null;
-        };
-        /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
          */
@@ -2429,6 +2409,70 @@ var annie;
         return Bitmap;
     }(annie.DisplayObject));
     annie.Bitmap = Bitmap;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * @class annie.SharedCanvas
+     * @public
+     * @extends annie.DisplayObject
+     * @since 1.0.0
+     */
+    var SharedCanvas = (function (_super) {
+        __extends(SharedCanvas, _super);
+        /**
+         * 构造函数
+         * @method SharedCanvas
+         * @since 1.0.0
+         * @public
+         * @param width
+         * @param height
+         */
+        function SharedCanvas(width, height) {
+            _super.call(this);
+            var s = this;
+            s._instanceType = "annie.SharedCanvas";
+            s._openDataContext = wx.getOpenDataContext();
+            var sharedCanvas = s._openDataContext.canvas;
+            s._texture = sharedCanvas;
+            s.setWH(width, height);
+        }
+        SharedCanvas.prototype.destroy = function () {
+            //清除相应的数据引用
+            var s = this;
+            s._texture = null;
+            s._openDataContext = null;
+            _super.prototype.destroy.call(this);
+        };
+        /**
+         * 设置子域的宽和高
+         * @method setWH
+         * @param {number} w
+         * @param {number} h
+         */
+        SharedCanvas.prototype.setWH = function (w, h) {
+            var s = this;
+            s._texture.width = w;
+            s._texture.height = h;
+            s._bounds.width = w;
+            s._bounds.height = h;
+        };
+        /**
+         * 向子域传消息
+         * @method postMessage
+         * @param data
+         * @public
+         */
+        SharedCanvas.prototype.postMessage = function (data) {
+            //呼叫数据显示端
+            this._openDataContext.postMessage(data);
+        };
+        return SharedCanvas;
+    }(annie.DisplayObject));
+    annie.SharedCanvas = SharedCanvas;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -3152,30 +3196,6 @@ var annie;
                     ctx[data[1]] = data[2];
                 }
             }
-        };
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        Shape.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
-            var s = this;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p = globalPoint;
-            if (isMouseEvent) {
-                p = s.globalToLocal(globalPoint);
-            }
-            if (s.getBounds().isPointIn(p)) {
-                return s;
-            }
-            return null;
         };
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.

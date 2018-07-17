@@ -13,7 +13,6 @@ namespace annie {
     export class CanvasRender extends AObject implements IRender {
         public static drawCtx: any = null;
         private _stage: Stage;
-
         /**
          * @CanvasRender
          * @param {annie.Stage} stage

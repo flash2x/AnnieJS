@@ -17,6 +17,7 @@ var coreList =[
     "annie/geom/Rectangle.ts",
     "annie/display/DisplayObject.ts",
     "annie/display/bitmap.ts",
+    "annie/display/SharedCanvas.ts",
     "annie/display/Shape.ts",
     "annie/display/Sprite.ts",
     "annie/display/MovieClip.ts",
