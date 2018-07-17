@@ -5366,6 +5366,8 @@ var annie;
         __extends(TextField, _super);
         function TextField() {
             _super.call(this);
+            this._autoSize = false;
+            this._wordWrap = false;
             this._textAlign = "left";
             this._textAlpha = 1;
             this._textHeight = 0;
@@ -5383,6 +5385,42 @@ var annie;
             this._instanceType = "annie.TextField";
             this._texture = window.document.createElement("canvas");
         }
+        Object.defineProperty(TextField.prototype, "autoSize", {
+            get: function () {
+                return this._autoSize;
+            },
+            /**
+             * 自动调整文本尺寸
+             * @property autoSize
+             * @public
+             * @since 2.0.0
+             * @type {string}
+             * @default false
+             */
+            set: function (value) {
+                this._setProperty("_autoSize", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "wordWrap", {
+            get: function () {
+                return this._wordWrap;
+            },
+            /**
+             * 文本自动换行
+             * @property wordWrap
+             * @public
+             * @since 2.0.0
+             * @type {string}
+             * @default false
+             */
+            set: function (value) {
+                this._setProperty("_wordWrap", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(TextField.prototype, "textAlign", {
             get: function () {
                 return this._textAlign;
@@ -5702,25 +5740,39 @@ var annie;
                 var realLines = [];
                 s.realLines = realLines;
                 s._prepContext(ctx);
-                var lineH = s._lineSpacing;
+                var lineH = s._textHeight = s._size;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length] = hardLines[0];
                     var str = hardLines[0];
                     var lineW = s._getMeasuredWidth(str);
-                    if (lineW > s._textWidth) {
-                        var w = s._getMeasuredWidth(str[0]);
-                        var lineStr = str[0];
+                    if (s._autoSize) {
+                        s._textWidth = lineW;
+                    }
+                    else if (lineW > s._textWidth) {
+                        var w = 0;
+                        var lineStr = '';
                         var wordW = 0;
                         var strLen = str.length;
-                        for (var j = 1; j < strLen; j++) {
+                        var lineIndex = 0;
+                        for (var j = 0; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s._textWidth) {
-                                realLines[0] = lineStr;
-                                break;
+                                realLines[lineIndex++] = lineStr;
+                                j--;
+                                if (s._wordWrap) {
+                                    lineStr = '';
+                                    w = 0;
+                                }
+                                else {
+                                    break;
+                                }
                             }
                             else {
                                 lineStr += str[j];
+                                if (j == strLen - 1) {
+                                    realLines[lineIndex] = lineStr;
+                                }
                             }
                         }
                     }

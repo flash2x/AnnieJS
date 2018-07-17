@@ -2736,6 +2736,26 @@ declare namespace annie {
     class TextField extends DisplayObject {
         constructor();
         /**
+         * 自动调整文本尺寸
+         * @property autoSize
+         * @public
+         * @since 2.0.0
+         * @type {string}
+         * @default false
+         */
+        autoSize: boolean;
+        private _autoSize;
+        /**
+         * 文本自动换行
+         * @property wordWrap
+         * @public
+         * @since 2.0.0
+         * @type {string}
+         * @default false
+         */
+        wordWrap: boolean;
+        private _wordWrap;
+        /**
          * 文本的对齐方式
          * @property textAlign
          * @public

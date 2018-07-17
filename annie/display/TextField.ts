@@ -25,13 +25,32 @@ namespace annie {
          * @default false
          */
         public set autoSize(value: boolean) {
-            this._setProperty("_autoSize",value,3);
+            this._setProperty("_autoSize", value, 3);
         }
 
         public get autoSize(): boolean {
             return this._autoSize;
         }
+
         private _autoSize = false;
+
+        /**
+         * 文本自动换行
+         * @property wordWrap
+         * @public
+         * @since 2.0.0
+         * @type {string}
+         * @default false
+         */
+        public set wordWrap(value: boolean) {
+            this._setProperty("_wordWrap", value, 3);
+        }
+
+        public get wordWrap(): boolean {
+            return this._wordWrap;
+        }
+
+        private _wordWrap = false;
 
         /**
          * 文本的对齐方式
@@ -42,12 +61,13 @@ namespace annie {
          * @default left
          */
         public set textAlign(value: string) {
-            this._setProperty("_textAlign",value,3);
+            this._setProperty("_textAlign", value, 3);
         }
 
         public get textAlign(): string {
             return this._textAlign;
         }
+
         private _textAlign = "left";
 
         /**
@@ -56,13 +76,14 @@ namespace annie {
          * @public
          */
         public set textAlpha(value: number) {
-            this._setProperty("_textAlpha",value,3);
+            this._setProperty("_textAlpha", value, 3);
         }
 
         public get textAlpha(): number {
             return this._textAlpha;
         }
-        private _textAlpha:number= 1;
+
+        private _textAlpha: number = 1;
 
         /**
          * 文本的行高
@@ -73,12 +94,13 @@ namespace annie {
          * @default 0
          */
         public set textHeight(value: number) {
-            this._setProperty("_textHeight",value,3);
+            this._setProperty("_textHeight", value, 3);
         }
 
         public get textHeight(): number {
             return this._textHeight;
         }
+
         private _textHeight: number = 0;
 
         /**
@@ -87,13 +109,16 @@ namespace annie {
          * @since 1.0.0
          * @param {number} value
          */
-        public set lineSpacing(value:number){
-            this._setProperty("_lineSpacing",value,3);
+        public set lineSpacing(value: number) {
+            this._setProperty("_lineSpacing", value, 3);
         }
-        public get lineSpacing():number{
+
+        public get lineSpacing(): number {
             return this._lineSpacing;
         }
-        private _lineSpacing: number =14;
+
+        private _lineSpacing: number = 14;
+
         /**
          * 文本的宽
          * @property textWidth
@@ -103,13 +128,15 @@ namespace annie {
          * @default 0
          */
         public set textWidth(value: number) {
-            this._setProperty("_textWidth",value,3);
+            this._setProperty("_textWidth", value, 3);
         }
 
         public get textWidth(): number {
             return this._textWidth;
         }
+
         private _textWidth: number = 120;
+
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -119,13 +146,16 @@ namespace annie {
          * @default single
          */
         public set lineType(value: string) {
-            this._setProperty("_lineType",value,3);
+            this._setProperty("_lineType", value, 3);
 
         }
+
         public get lineType(): string {
             return this._lineType;
         }
+
         private _lineType: string = "single";
+
         /**
          * 文本内容
          * @property text
@@ -135,13 +165,15 @@ namespace annie {
          * @since 1.0.0
          */
         public set text(value: string) {
-            this._setProperty("_text",value,3);
+            this._setProperty("_text", value, 3);
         }
 
         public get text(): string {
             return this._text;
         }
+
         private _text: string = "";
+
         /**
          * 文本的css字体样式
          * @property font
@@ -151,13 +183,15 @@ namespace annie {
          * @default 12px Arial
          */
         public set font(value: string) {
-            this._setProperty("_font",value,3);
+            this._setProperty("_font", value, 3);
         }
 
         public get font(): string {
             return this._font;
         }
+
         private _font: string = "Arial";
+
         /**
          * 文本的size
          * @property size
@@ -167,13 +201,15 @@ namespace annie {
          * @default 12
          */
         public set size(value: number) {
-            this._setProperty("_size",value,3);
+            this._setProperty("_size", value, 3);
         }
 
         public get size(): number {
             return this._size;
         }
+
         private _size: number = 12;
+
         /**
          * 文本的颜色值
          * @property color
@@ -183,13 +219,15 @@ namespace annie {
          * @default #fff
          */
         public set color(value: string) {
-            this._setProperty("_color",value,3);
+            this._setProperty("_color", value, 3);
         }
 
         public get color(): string {
             return this._color;
         }
+
         public _color: string = "#fff";
+
         /**
          * 文本是否倾斜
          * @property italic
@@ -199,13 +237,15 @@ namespace annie {
          * @type {boolean}
          */
         public set italic(value: boolean) {
-            this._setProperty("_italic",value,3);
+            this._setProperty("_italic", value, 3);
         }
 
         public get italic(): boolean {
             return this._italic;
         }
+
         private _italic: boolean = false;
+
         /**
          * 文本是否加粗
          * @property bold
@@ -215,12 +255,15 @@ namespace annie {
          * @type {boolean}
          */
         public set bold(value: boolean) {
-            this._setProperty("_bold",value,3);
+            this._setProperty("_bold", value, 3);
         }
+
         public get bold(): boolean {
             return this._bold;
         }
+
         public _bold: boolean = false;
+
         /**
          * 设置或获取是否有边框
          * @property property
@@ -229,12 +272,13 @@ namespace annie {
          * @since 1.0.6
          */
         public set border(value: boolean) {
-            this._setProperty("_border",value,3);
+            this._setProperty("_border", value, 3);
         }
 
         public get border(): boolean {
             return this._border;
         }
+
         private _border: boolean = false;
 
         /**
@@ -259,8 +303,9 @@ namespace annie {
             ctx.font = font;
             ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
-            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha)
+            ctx.fillStyle = Shape.getRGBA(s._color, s._textAlpha)
         }
+
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
          * @method getTextWidth
@@ -269,14 +314,15 @@ namespace annie {
          * @public
          * @return {number}
          */
-        public getTextWidth(lineIndex:number=0){
-            let s=this;
+        public getTextWidth(lineIndex: number = 0) {
+            let s = this;
             s.update();
             let can = s._texture;
             let ctx = can.getContext("2d");
-            let obj:any=ctx.measureText(s.realLines[lineIndex]);
+            let obj: any = ctx.measureText(s.realLines[lineIndex]);
             return obj.width;
         }
+
         /**
          * @property _lines 获取当前文本行数
          * @type {number}
@@ -287,6 +333,7 @@ namespace annie {
         get lines(): number {
             return this.realLines.length;
         }
+
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -302,7 +349,9 @@ namespace annie {
             //ctx.restore();
             return w;
         }
-        private  realLines: any = [];
+
+        private realLines: any = [];
+
         /**
          * 重写 update
          * @method update
@@ -310,46 +359,55 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public update(isDrawUpdate:boolean=false): void {
+        public update(isDrawUpdate: boolean = false): void {
             super.update(isDrawUpdate);
             let s: any = this;
-            if(!s._visible)return;
+            if (!s._visible) return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 let can = s._texture;
                 let ctx = can.getContext("2d");
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
-                s.realLines=realLines;
+                s.realLines = realLines;
                 s._prepContext(ctx);
-                let lineH = s._textHeight;
+                let lineH = s._textHeight = s._size;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines[realLines.length]=hardLines[0];
+                    realLines[realLines.length] = hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
-                    if(s._autoSize){
+                    if (s._autoSize) {
                         s._textWidth = lineW;
-                        lineH = s._textHeight = s._size;
-                    }else if (lineW > s._textWidth){
-                        let w = s._getMeasuredWidth(str[0]);
-                        let lineStr = str[0];
+                    } else if (lineW > s._textWidth) {
+                        let w = 0;
+                        let lineStr = '';
                         let wordW = 0;
                         let strLen = str.length;
-                        for (let j = 1; j < strLen; j++) {
+                        let lineIndex = 0;
+                        for (let j = 0; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s._textWidth) {
-                                realLines[0] = lineStr;
-                                break;
+                                realLines[lineIndex++] = lineStr;
+                                j--;
+                                if (s._wordWrap) {
+                                    lineStr = '';
+                                    w = 0;
+                                } else {
+                                    break;
+                                }
                             } else {
                                 lineStr += str[j];
+                                if (j == strLen - 1) {
+                                    realLines[lineIndex] = lineStr;
+                                }
                             }
                         }
                     }
                 } else {
                     for (let i = 0, l = hardLines.length; i < l; i++) {
                         let str = hardLines[i];
-                        if (!str)continue;
+                        if (!str) continue;
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let wordW = 0;
@@ -358,14 +416,14 @@ namespace annie {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s._textWidth) {
-                                realLines[realLines.length]=lineStr;
+                                realLines[realLines.length] = lineStr;
                                 lineStr = str[j];
                                 w = wordW;
                             } else {
                                 lineStr += str[j];
                             }
                         }
-                        realLines[realLines.length]=lineStr;
+                        realLines[realLines.length] = lineStr;
                     }
                 }
                 let maxH = lineH * realLines.length;
@@ -373,7 +431,7 @@ namespace annie {
                 let tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
-                } else if (s._textAlign == "right"){
+                } else if (s._textAlign == "right") {
                     tx = maxW;
                 }
                 can.width = maxW + 20;
@@ -388,13 +446,13 @@ namespace annie {
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++){
+                for (let i = 0; i < realLines.length; i++) {
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
                 /////////////////////////////////////
                 let cf = s.cFilters;
                 let cfLen = cf.length;
-                if(cfLen>0) {
+                if (cfLen > 0) {
                     let imageData = ctx.getImageData(0, 0, maxW, maxH);
                     for (let i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
@@ -413,6 +471,7 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
+
         /**
          * 重写 getBounds
          * @method getBounds
