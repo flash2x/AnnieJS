@@ -363,11 +363,18 @@ namespace annie {
                                 } else if (curFrameChildrenObjectIdObj[item].at == 0) {
                                     s.addChild(allChildren[curFrameChildrenObjectIdObj[item].o - 1]);
                                 } else {
+                                    let isFind:boolean=false;
                                     for (let i = 0; i < s.children.length; i++) {
                                         if (s.children[i] == allChildren[curFrameChildrenObjectIdObj[item].at - 1]) {
                                             s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1], i);
+                                            isFind=true;
                                             break;
                                         }
+                                    }
+                                    if(!isFind){
+                                        //倒播的时候，有些本来先出现的元素变成了后出现，这样的话在children列表里根本找不到是在谁的上面
+                                        //所以如果找不到的话就直接添加到最上层
+                                        s.addChild(allChildren[curFrameChildrenObjectIdObj[item].o - 1]);
                                     }
                                 }
                             }
