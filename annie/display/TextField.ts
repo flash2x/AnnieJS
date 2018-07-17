@@ -449,7 +449,6 @@ namespace annie {
                 s._prepContext(ctx);
                 for (let i = 0; i < lineCount; i++) {
                     let y = i * (lineH + (i > 0 ? this._lineSpacing : 0));
-                    console.log(i, y);
                     ctx.fillText(realLines[i], 0, y, maxW);
                 }
                 /////////////////////////////////////
