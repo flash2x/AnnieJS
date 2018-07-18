@@ -440,7 +440,7 @@ namespace annie {
                     if (!isUserScript) {
                         curFrameOther = timeLineObj.a[index];
                         if (curFrameOther) {
-                            s[curFrameOther[0]](curFrameOther[1]);
+                            s[curFrameOther[0]](curFrameOther[1]==undefined?true:curFrameOther[1],curFrameOther[2]==undefined?true:curFrameOther[2]);
                         }
                     }
                     //有没有事件
