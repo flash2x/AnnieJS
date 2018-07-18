@@ -437,23 +437,22 @@ namespace annie {
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        public hitTestPoint(point: Point,isMouseEvent: boolean = false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
-            if (!s.visible)return null;
-            if (isMouseEvent && !s.mouseEnable)return null;
-            if(!isMouseEvent){
-                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
-                if (s.getBounds().isPointIn(point)){
-                    return s;
-                }
+            if (!s.visible||(!s.mouseEnable&&isMustMouseEnable))return null;
+            let p:Point;
+            if(isGlobalPoint){
+                p=s.globalToLocal(hitPoint, DisplayObject._bp);
             }else{
-                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))){
-                    return s;
-                }
+                p=hitPoint;
+            }
+            if (s.getBounds().isPointIn(p)){
+                return s;
             }
             return null;
         }

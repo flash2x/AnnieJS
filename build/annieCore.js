@@ -2022,27 +2022,26 @@ var annie;
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        DisplayObject.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (!s.visible)
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable))
                 return null;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            if (!isMouseEvent) {
-                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
-                if (s.getBounds().isPointIn(point)) {
-                    return s;
-                }
+            var p;
+            if (isGlobalPoint) {
+                p = s.globalToLocal(hitPoint, DisplayObject._bp);
             }
             else {
-                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))) {
-                    return s;
-                }
+                p = hitPoint;
+            }
+            if (s.getBounds().isPointIn(p)) {
+                return s;
             }
             return null;
         };
@@ -3620,18 +3619,16 @@ var annie;
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        Sprite.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (!s._visible)
-                return null;
-            if (isMouseEvent && !s.mouseEnable)
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable))
                 return null;
             var len = s.children.length;
             var hitDisplayObject;
@@ -3644,12 +3641,12 @@ var annie;
                 }
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
-                    if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                    if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable)) {
                         //如果都不在遮罩里面,那还检测什么直接检测下一个
                         continue;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
                 if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
@@ -4987,7 +4984,7 @@ var annie;
                             }
                             if (eLen > 0) {
                                 //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                                var d_1 = s.hitTestPoint(cp, true);
+                                var d_1 = s.hitTestPoint(cp, true, true);
                                 var displayList = [];
                                 if (d_1) {
                                     //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法

@@ -1305,11 +1305,12 @@ declare namespace annie {
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
+        hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
          * @method getBounds
@@ -1980,13 +1981,12 @@ declare namespace annie {
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 重写getBounds
          * @method getBounds
