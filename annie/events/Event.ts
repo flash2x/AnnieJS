@@ -9,7 +9,7 @@ namespace annie {
      * @public
      * @since 1.0.0
      */
-    export class Event extends AObject {
+    export class Event extends AObject{
         /**
          * 舞台尺寸发生变化时触发
          * @Event

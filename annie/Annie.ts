@@ -8,6 +8,7 @@ namespace annie {
      * @since 1.0.1
      * @property annie.version
      * @type {string}
+     * @static
      * @example
      *      //打印当前引擎的版本号
      *      trace(annie.version);
@@ -22,11 +23,12 @@ namespace annie {
      * @static
      */
     export let devicePixelRatio: number = 1;
-
     /**
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
+     * @static
+     * @example
      */
     export let globalDispatcher: EventDispatcher = new annie.EventDispatcher();
     /**
@@ -45,18 +47,15 @@ namespace annie {
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
+     *      var s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
+     *          var i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }
-     *
      */
     export let StageScaleMode: { EXACT_FIT: string, NO_BORDER: string, NO_SCALE: string, SHOW_ALL: string, FIXED_WIDTH: string, FIXED_HEIGHT: string } = {
         EXACT_FIT: "exactFit",
@@ -66,7 +65,6 @@ namespace annie {
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
     let res: any = {};
     /**
      * 创建一个声音对象
@@ -502,4 +500,5 @@ namespace annie {
             }
         }
     }
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
 }
