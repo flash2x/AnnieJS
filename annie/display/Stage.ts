@@ -491,7 +491,7 @@ namespace annie {
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            let d: any = s.hitTestPoint(cp, true);
+                            let d: any = s.hitTestPoint(cp, true,true);
                             let displayList: Array<DisplayObject> = [];
                             if (d) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法

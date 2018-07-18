@@ -324,16 +324,14 @@ namespace annie {
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
-            if (!s._visible) return null;
-            if (isMouseEvent && !s.mouseEnable) return null;
+            if (!s.visible||(!s.mouseEnable&&isMustMouseEnable))return null;
             let len = s.children.length;
             let hitDisplayObject: DisplayObject;
             let child: any;
@@ -343,12 +341,12 @@ namespace annie {
                 if (child._isUseToMask>0)continue;
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
-                    if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                    if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable)) {
                         //如果都不在遮罩里面,那还检测什么直接检测下一个
                         continue;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
                 if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
