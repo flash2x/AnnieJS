@@ -1035,7 +1035,7 @@ declare namespace annie {
          * @property stage
          * @public
          * @since 1.0.0
-         * @type {Stage}
+         * @type {annie.Stage}
          * @default null;
          * @readonly
          * */
@@ -1214,7 +1214,6 @@ declare namespace annie {
          * @type {string}
          * @default 0
          */
-        blendMode: string;
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -1290,6 +1289,7 @@ declare namespace annie {
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
+         * @return {void}
          * @public
          */
         startDrag(isCenter?: boolean, bounds?: Rectangle): void;
@@ -1298,6 +1298,7 @@ declare namespace annie {
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         stopDrag(): void;
         /**
@@ -1305,11 +1306,12 @@ declare namespace annie {
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        hitTestPoint(point: Point, isMouseEvent?: boolean): DisplayObject;
+        hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
          * @method getBounds
@@ -1333,6 +1335,7 @@ declare namespace annie {
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         protected update(isDrawUpdate?: boolean): void;
         /**
@@ -1342,6 +1345,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          * @abstract
+         * @return {void}
          */
         render(renderObj: IRender | any): void;
         /**
@@ -1352,6 +1356,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
+         * @return {void}
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
@@ -1398,13 +1403,16 @@ declare namespace annie {
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
          * @return {number}
          */
         addSound(sound: any): number;
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @return {void}
          */
         removeSound(id: number): void;
         private _a2x_sounds;
@@ -1417,11 +1425,7 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
-     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
-     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
-     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
+     * Bitmap 对象
      * @class annie.Bitmap
      * @public
      * @extends annie.DisplayObject
@@ -1436,10 +1440,6 @@ declare namespace annie {
          * @param {string} imagePath 一个图片地址
         */
         constructor(imagePath: string);
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         destroy(): void;
     }
 }
@@ -1937,13 +1937,12 @@ declare namespace annie {
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        hitTestPoint(globalPoint: Point, isMouseEvent?: boolean): DisplayObject;
+        hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 重写getBounds
          * @method getBounds
@@ -2114,10 +2113,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         destroy(): void;
     }
 }
@@ -3324,6 +3319,7 @@ declare namespace annie {
      * @since 1.0.1
      * @property annie.version
      * @type {string}
+     * @static
      * @example
      *      //打印当前引擎的版本号
      *      trace(annie.version);
@@ -3342,6 +3338,8 @@ declare namespace annie {
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
+     * @static
+     * @example
      */
     let globalDispatcher: EventDispatcher;
     /**
@@ -3360,18 +3358,15 @@ declare namespace annie {
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
+     *      var s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
+     *          var i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }
-     *
      */
     let StageScaleMode: {
         EXACT_FIT: string;

@@ -1576,7 +1576,7 @@ var annie;
              * @property stage
              * @public
              * @since 1.0.0
-             * @type {Stage}
+             * @type {annie.Stage}
              * @default null;
              * @readonly
              * */
@@ -1647,16 +1647,6 @@ var annie;
             this._anchorX = 0;
             this._anchorY = 0;
             this._visible = true;
-            /**
-             * 显示对象的混合模式
-             * 支持的混合模式大概有
-             * @property blendMode
-             * @public
-             * @since 1.0.0
-             * @type {string}
-             * @default 0
-             */
-            this.blendMode = "normal";
             this._matrix = new annie.Matrix();
             this._isUseToMask = 0;
             this._mask = null;
@@ -1884,6 +1874,16 @@ var annie;
         });
         Object.defineProperty(DisplayObject.prototype, "matrix", {
             /**
+             * 显示对象的混合模式
+             * 支持的混合模式大概有
+             * @property blendMode
+             * @public
+             * @since 1.0.0
+             * @type {string}
+             * @default 0
+             */
+            //public blendMode: string = "normal";
+            /**
              * 显示对象的变形矩阵
              * @property matrix
              * @public
@@ -1980,6 +1980,7 @@ var annie;
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
+         * @return {void}
          * @public
          */
         DisplayObject.prototype.startDrag = function (isCenter, bounds) {
@@ -2011,6 +2012,7 @@ var annie;
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         DisplayObject.prototype.stopDrag = function () {
             if (annie.Stage._dragDisplay == this) {
@@ -2022,27 +2024,26 @@ var annie;
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        DisplayObject.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (!s.visible)
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable))
                 return null;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            if (!isMouseEvent) {
-                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
-                if (s.getBounds().isPointIn(point)) {
-                    return s;
-                }
+            var p;
+            if (isGlobalPoint) {
+                p = s.globalToLocal(hitPoint, DisplayObject._bp);
             }
             else {
-                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))) {
-                    return s;
-                }
+                p = hitPoint;
+            }
+            if (s.getBounds().isPointIn(p)) {
+                return s;
             }
             return null;
         };
@@ -2096,6 +2097,7 @@ var annie;
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         DisplayObject.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -2143,6 +2145,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          * @abstract
+         * @return {void}
          */
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
@@ -2179,6 +2182,7 @@ var annie;
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
+         * @return {void}
          */
         DisplayObject.prototype._onDispatchBubbledEvent = function (type) {
             var s = this;
@@ -2295,6 +2299,7 @@ var annie;
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
          * @return {number}
          */
@@ -2309,7 +2314,9 @@ var annie;
         };
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @return {void}
          */
         DisplayObject.prototype.removeSound = function (id) {
             var s = this;
@@ -2366,11 +2373,7 @@ var annie;
 var annie;
 (function (annie) {
     /**
-     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
-     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
-     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
-     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
+     * Bitmap 对象
      * @class annie.Bitmap
      * @public
      * @extends annie.DisplayObject
@@ -2398,10 +2401,6 @@ var annie;
                 }
             });
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         Bitmap.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -3524,18 +3523,16 @@ var annie;
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        Sprite.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (!s._visible)
-                return null;
-            if (isMouseEvent && !s.mouseEnable)
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable))
                 return null;
             var len = s.children.length;
             var hitDisplayObject;
@@ -3547,12 +3544,12 @@ var annie;
                     continue;
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
-                    if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                    if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable)) {
                         //如果都不在遮罩里面,那还检测什么直接检测下一个
                         continue;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
                 if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
@@ -4138,10 +4135,6 @@ var annie;
             }
             _super.prototype.update.call(this, isDrawUpdate);
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -4890,7 +4883,7 @@ var annie;
                             }
                             if (eLen > 0) {
                                 //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                                var d_1 = s.hitTestPoint(cp, true);
+                                var d_1 = s.hitTestPoint(cp, true, true);
                                 var displayList = [];
                                 if (d_1) {
                                     //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
@@ -6710,6 +6703,7 @@ var annie;
      * @since 1.0.1
      * @property annie.version
      * @type {string}
+     * @static
      * @example
      *      //打印当前引擎的版本号
      *      trace(annie.version);
@@ -6728,6 +6722,8 @@ var annie;
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
+     * @static
+     * @example
      */
     annie.globalDispatcher = new annie.EventDispatcher();
     /**
@@ -6746,18 +6742,15 @@ var annie;
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
+     *      var s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
+     *          var i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }
-     *
      */
     annie.StageScaleMode = {
         EXACT_FIT: "exactFit",
@@ -6767,7 +6760,6 @@ var annie;
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
     var res = {};
     /**
      * 创建一个声音对象
@@ -7222,6 +7214,7 @@ var annie;
         }
     }
     annie.initRes = initRes;
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
 })(annie || (annie = {}));
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
