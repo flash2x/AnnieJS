@@ -104,7 +104,7 @@ namespace annie {
         public play(start: number=0, loop: number=0): void {
             let s = this;
             if(loop==0){
-                s._loop=this._repeate;
+                s._loop=s._repeate;
             }else{
                 s._loop=loop;
                 s._repeate=loop;

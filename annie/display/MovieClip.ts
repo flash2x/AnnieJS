@@ -121,6 +121,7 @@ namespace annie {
          * @method stop
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public stop(): void {
             let s = this;
@@ -229,11 +230,6 @@ namespace annie {
 
         private _clicked = false;
 
-        /**
-         * @method  _mouseEvent
-         * @param e
-         * @private
-         */
         private _mouseEvent(e: any): void {
             let s = this;
             if (!s._clicked) {
@@ -251,7 +247,7 @@ namespace annie {
 
         /**
          * @property _maskList
-         * @type {any[]}
+         * @type {Array}
          * @private
          * @default []
          */
@@ -277,6 +273,7 @@ namespace annie {
          * @method nextFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         public nextFrame(): void {
             let s = this;
@@ -291,6 +288,7 @@ namespace annie {
          * @method prevFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         public prevFrame(): void {
             let s = this;
@@ -306,6 +304,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
+         * @return {void}
          */
         public gotoAndStop(frameIndex: number | string): void {
             let s: any = this;
@@ -333,6 +332,7 @@ namespace annie {
          * @method play
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public play(isFront: boolean = true): void {
             let s = this;
@@ -347,6 +347,7 @@ namespace annie {
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         * @return {void}
          */
         public gotoAndPlay(frameIndex: number | string, isFront: boolean = true): void {
             let s: any = this;
@@ -375,6 +376,7 @@ namespace annie {
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;

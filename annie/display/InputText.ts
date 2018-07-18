@@ -121,7 +121,7 @@ namespace annie {
          * @property lineSpacing
          * @public
          * @since 2.0.0
-         * @param {number} value
+         * @type {number}
          */
         public set lineSpacing(value:number){
             this.htmlElement.style.lineHeight = value + "px";
@@ -133,8 +133,8 @@ namespace annie {
         /**
          * 设置文本是否为粗体
          * @property bold
-         * @param {boolean} bold true或false
          * @public
+         * @type {boolean}
          * @since 1.0.3
          */
         public set bold(bold: boolean) {
@@ -153,8 +153,8 @@ namespace annie {
         /**
          * 设置文本是否倾斜
          * @property italic
-         * @param {boolean} italic true或false
          * @public
+         * @type {boolean}
          * @since 1.0.3
          */
         public set italic(italic: boolean) {
@@ -202,7 +202,7 @@ namespace annie {
         /**
          * 设置文本颜色
          * @property color
-         * @param {boolean} italic true或false
+         * @type {string}
          * @public
          * @since 1.0.3
          */
@@ -218,7 +218,7 @@ namespace annie {
         /**
          * 设置或获取是否有边框
          * @property property
-         * @param {boolean} show true或false
+         * @type {boolean}
          * @public
          * @since 1.0.3
          */
@@ -243,7 +243,7 @@ namespace annie {
          * @property text
          * @public
          * @since 1.0.3
-         * @return {string}
+         * @type {string}
          */
         public get text(): string {
             let s = this;
@@ -264,7 +264,7 @@ namespace annie {
          * @public
          * @since 1.1.0
          * @property maxCharacters
-         * @return {number}
+         * @type {number}
          */
         public get maxCharacters():number{
             let l:any=this.htmlElement.getAttribute("maxlength");

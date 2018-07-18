@@ -2094,27 +2094,26 @@ var annie;
          * @method hitTestPoint
          * @public
          * @since 1.0.0
-         * @param {annie.Point} point 需要碰到的坐标点
-         * @param {boolean} isMouseEvent 是否是鼠标事件调用此方法,用户一般无须理会,除非你要模拟鼠标点击可以
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        DisplayObject.prototype.hitTestPoint = function (point, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        DisplayObject.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (!s.visible)
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable))
                 return null;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            if (!isMouseEvent) {
-                //如果不是系统调用则不考虑这个点是从全局来的，只认为这个点就是当前要碰撞测试同级别下的坐标点
-                if (s.getBounds().isPointIn(point)) {
-                    return s;
-                }
+            var p;
+            if (isGlobalPoint) {
+                p = s.globalToLocal(hitPoint, DisplayObject._bp);
             }
             else {
-                if (s.getBounds().isPointIn(s.globalToLocal(point, DisplayObject._bp))) {
-                    return s;
-                }
+                p = hitPoint;
+            }
+            if (s.getBounds().isPointIn(p)) {
+                return s;
             }
             return null;
         };
@@ -2502,9 +2501,9 @@ var annie;
          *          rectBitmap.y = 100;
          *          s.addChild(rectBitmap);
          *      }
-         *      imgEle.src='http://test.annie2x.com/biglong/logo.jpg';
+         *      imgEle.src='http://test.annie2x.com/test.jpg';
          *
-         * <p><a href="http://test.annie2x.com/biglong/apiDemo/annieBitmap/index.html" target="_blank">测试链接</a></p>
+         * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
         function Bitmap(bitmapData, rect) {
             if (bitmapData === void 0) { bitmapData = null; }
@@ -2671,7 +2670,7 @@ var annie;
          *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
          *          trace(singleSmallImg);
          *       }
-         *       spriteSheetImg.src = 'http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/sheet.jpg';
+         *       spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
         Bitmap.convertToImage = function (bitmap, isNeedImage) {
             if (isNeedImage === void 0) { isNeedImage = true; }
@@ -2702,22 +2701,27 @@ var annie;
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        Bitmap.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        Bitmap.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            var p = s.globalToLocal(globalPoint);
-            p.x += s._offsetX;
-            p.y += s._offsetY;
-            if (s.getBounds().isPointIn(p)) {
+            var obj = _super.prototype.hitTestPoint.call(this, hitPoint, isGlobalPoint, isMustMouseEnable);
+            if (obj) {
                 if (s.hitTestWidthPixel) {
+                    var p = void 0;
+                    if (isGlobalPoint) {
+                        p = s.globalToLocal(hitPoint);
+                    }
+                    else {
+                        p = hitPoint;
+                    }
+                    p.x += s._offsetX;
+                    p.y += s._offsetY;
                     var image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
@@ -3509,24 +3513,27 @@ var annie;
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        Shape.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        Shape.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (isMouseEvent && !s.mouseEnable)
-                return null;
-            //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            var p = globalPoint;
-            if (isMouseEvent) {
-                p = s.globalToLocal(globalPoint);
-            }
-            if (s.getBounds().isPointIn(p)) {
+            var obj = _super.prototype.hitTestPoint.call(this, hitPoint, isGlobalPoint, isMustMouseEnable);
+            if (obj) {
                 if (!s._isUseToMask && s.hitTestWidthPixel) {
+                    var p = void 0;
+                    if (isGlobalPoint) {
+                        p = s.globalToLocal(hitPoint);
+                    }
+                    else {
+                        p = hitPoint;
+                    }
+                    p.x += s._offsetX;
+                    p.y += s._offsetY;
                     var image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
@@ -3534,8 +3541,6 @@ var annie;
                     var _canvas = annie.DisplayObject["_canvas"];
                     _canvas.width = 1;
                     _canvas.height = 1;
-                    p.x -= s._offsetX;
-                    p.y -= s._offsetY;
                     var ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
@@ -4011,18 +4016,16 @@ var annie;
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        Sprite.prototype.hitTestPoint = function (globalPoint, isMouseEvent) {
-            if (isMouseEvent === void 0) { isMouseEvent = false; }
+        Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
+            if (isGlobalPoint === void 0) { isGlobalPoint = false; }
+            if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
             var s = this;
-            if (!s._visible)
-                return null;
-            if (isMouseEvent && !s.mouseEnable)
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable))
                 return null;
             if (!s._cacheAsBitmap) {
                 var len = s.children.length;
@@ -4035,20 +4038,27 @@ var annie;
                         continue;
                     if (child.mask && child.mask.parent == child.parent) {
                         //看看点是否在遮罩内
-                        if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                        if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
                             continue;
                         }
                     }
-                    hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                    hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
                     if (hitDisplayObject) {
                         return hitDisplayObject;
                     }
                 }
             }
             else {
-                //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-                var p = s.globalToLocal(globalPoint);
+                var p = void 0;
+                if (isGlobalPoint) {
+                    p = s.globalToLocal(hitPoint);
+                }
+                else {
+                    p = hitPoint;
+                }
+                p.x += s._offsetX;
+                p.y += s._offsetY;
                 var image = s._texture;
                 if (!image || image.width == 0 || image.height == 0) {
                     return null;
@@ -4056,8 +4066,6 @@ var annie;
                 var _canvas = annie.DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
-                p.x -= s._offsetX;
-                p.y -= s._offsetY;
                 var ctx = _canvas["getContext"]('2d');
                 ctx.clearRect(0, 0, 1, 1);
                 ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
@@ -4282,7 +4290,7 @@ var annie;
             if (loop === void 0) { loop = 0; }
             var s = this;
             if (loop == 0) {
-                s._loop = this._repeate;
+                s._loop = s._repeate;
             }
             else {
                 s._loop = loop;
@@ -6835,7 +6843,7 @@ var annie;
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            var d_2 = s.hitTestPoint(cp, true);
+                            var d_2 = s.hitTestPoint(cp, true, true);
                             var displayList = [];
                             if (d_2) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
@@ -10527,10 +10535,9 @@ var annie;
      *      annie.globalDispatcher.addEventListener("myTest",function(e){
      *          trace("收到了其他地方发来的消息:"+e.data);
      *      });
-     *
      *      //B代码放到任何一个可以点击的对象的构造函数中
      *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *          annie..globalDispatcher.dispatchEvent("myTest","我是小可");
+     *          annie.globalDispatcher.dispatchEvent("myTest","我是小可");
      *      });
      *
      */
@@ -10568,9 +10575,7 @@ var annie;
      *          let i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
      *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }

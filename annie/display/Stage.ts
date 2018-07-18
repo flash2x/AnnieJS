@@ -232,7 +232,6 @@ namespace annie {
          *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
          *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
-         *              state.resize();
          *              if(i>5){i=0;}
          *          }
          *      }
@@ -391,6 +390,7 @@ namespace annie {
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public update(isDrawUpdate: boolean = true): void {
             let s = this;
@@ -412,6 +412,7 @@ namespace annie {
          * 渲染函数
          * @method render
          * @param renderObj
+         * @return {void}
          */
         public render(renderObj: IRender): void {
             renderObj.begin();
@@ -438,6 +439,7 @@ namespace annie {
          * 刷新mouse或者touch事件
          * @method _initMouseEvent
          * @private
+         * @return {void}
          */
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
             event["_pd"] = false;
@@ -449,8 +451,8 @@ namespace annie {
             event.identifier = identifier;
         }
 
-        //每一个手指事件的对象池
         /**
+         * 鼠标按下事件的对象池
          * @property _mouseDownPoint
          * @type {Object}
          * @private
@@ -489,6 +491,7 @@ namespace annie {
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         public setFrameRate(fps: number): void {
             let s = this;
@@ -503,6 +506,7 @@ namespace annie {
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         public getFrameRate(): number {
             return 60 / (this._flush + 1);
@@ -546,6 +550,7 @@ namespace annie {
          * @method kill
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         public kill(): void {
             Stage.removeUpdateObj(this);
@@ -567,7 +572,7 @@ namespace annie {
         };
         /**
          * @property muliPoints
-         * @type {Object[]}
+         * @type {Array}
          * @private
          */
         private muliPoints: Array<any> = [];
@@ -575,12 +580,14 @@ namespace annie {
          * 当document有鼠标或触摸事件时调用
          * @property _mP1
          * @param e
+         * @type {annie.Point}
          */
         private _mP1: Point = new Point();
         /**
          * 当document有鼠标或触摸事件时调用
          * @property _mP2
          * @param e
+         * @type {annie.Point}
          */
         private _mP2: Point = new Point();
 
@@ -588,6 +595,7 @@ namespace annie {
          * @method onMouseEvent
          * @param e
          * @private
+         * @return {void}
          */
         private onMouseEvent(e: any): void {
             //检查是否有
@@ -715,7 +723,7 @@ namespace annie {
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            let d: any = s.hitTestPoint(cp, true);
+                            let d: any = s.hitTestPoint(cp, true,true);
                             let displayList: Array<DisplayObject> = [];
                             if (d) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
@@ -982,6 +990,7 @@ namespace annie {
          * @method resize
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public resize = function (): void {
             let s: Stage = this;
@@ -1033,6 +1042,7 @@ namespace annie {
          * @public
          * @static
          * @since
+         * @return {void}
          */
         public static addUpdateObj(target: any): void {
             let isHave: boolean = false;
@@ -1055,6 +1065,7 @@ namespace annie {
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         public static removeUpdateObj(target: any): void {
             let len = Stage.allUpdateObjList.length;
