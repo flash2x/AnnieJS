@@ -33,7 +33,7 @@ namespace annie {
          * @property stage
          * @public
          * @since 1.0.0
-         * @type {Stage}
+         * @type {annie.Stage}
          * @default null;
          * @readonly
          * */
@@ -285,7 +285,7 @@ namespace annie {
          * @type {string}
          * @default 0
          */
-        public blendMode: string = "normal";
+        //public blendMode: string = "normal";
 
         /**
          * 显示对象的变形矩阵
@@ -397,6 +397,7 @@ namespace annie {
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
+         * @return {void}
          * @public
          */
         public startDrag(isCenter:boolean=false,bounds:Rectangle=null):void{
@@ -426,6 +427,7 @@ namespace annie {
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         public stopDrag():void{
             if(Stage._dragDisplay==this) {
@@ -506,6 +508,7 @@ namespace annie {
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         protected update(isDrawUpdate:boolean=true): void{
             let s = this;
@@ -566,6 +569,7 @@ namespace annie {
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          * @abstract
+         * @return {void}
          */
         public render(renderObj: IRender|any): void{
             let s = this;
@@ -602,6 +606,7 @@ namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
+         * @return {void}
          */
         public _onDispatchBubbledEvent(type: string): void {
             let s:any = this;
@@ -717,6 +722,7 @@ namespace annie {
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
          * @return {number}
          */
@@ -732,7 +738,9 @@ namespace annie {
 
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @return {void}
          */
         public removeSound(id:number):void{
             let s=this;

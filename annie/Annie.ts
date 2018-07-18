@@ -102,7 +102,6 @@ namespace annie {
         }
         return false;
     }
-
     /**
      * 删除加载过的场景
      * @method unLoadScene
@@ -112,7 +111,6 @@ namespace annie {
         classPool[sceneName] = null;
         delete classPool[sceneName];
     }
-
     /**
      * 解析资源
      * @method parseScene

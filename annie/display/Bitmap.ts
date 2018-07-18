@@ -3,11 +3,7 @@
  */
 namespace annie {
     /**
-     * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
-     * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
-     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
-     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
+     * Bitmap 对象
      * @class annie.Bitmap
      * @public
      * @extends annie.DisplayObject
@@ -34,10 +30,6 @@ namespace annie {
                 }
             })
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy():void {
             //清除相应的数据引用
             let s = this;
