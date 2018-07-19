@@ -168,7 +168,7 @@ namespace annie {
         /**
          * 确认是不是按钮形态
          * @property isButton
-         * @return {boolean}
+         * @type {boolean}
          * @public
          * @since 2.0.0
          * @default false
