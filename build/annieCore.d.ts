@@ -2653,6 +2653,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         play(start?: number, loop?: number): void;
+        private _repeate;
         /**
          * 停止播放
          * @method stop

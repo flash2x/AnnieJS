@@ -5515,6 +5515,7 @@ var annie;
              * @type {boolean}
              */
             this.isPlaying = false;
+            this._repeate = 1;
             var s = this;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
@@ -5537,10 +5538,16 @@ var annie;
          */
         Sound.prototype.play = function (start, loop) {
             if (start === void 0) { start = 0; }
-            if (loop === void 0) { loop = 1; }
+            if (loop === void 0) { loop = 0; }
             var s = this;
             s.media.startTime = start;
-            s._loop = loop;
+            if (loop == 0) {
+                s._loop = s._repeate;
+            }
+            else {
+                s._loop = loop;
+                s._repeate = loop;
+            }
             s.media.play();
             s.isPlaying = true;
         };
