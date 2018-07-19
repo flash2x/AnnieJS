@@ -17,7 +17,7 @@ declare namespace annie {
          * @property instanceId
          * @public
          * @since 1.0.0
-         * @return {number}
+         * @type {number}
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
@@ -29,7 +29,7 @@ declare namespace annie {
          * @property instanceType
          * @since 1.0.3
          * @public
-         * @return {string}
+         * @type {string}
          * @readonly
          */
         instanceType: string;
@@ -2170,7 +2170,8 @@ declare namespace annie {
          */
         getChildIndex(child: DisplayObject): number;
         /**
-         * @method 交换两个显示对象的层级
+         * 交换两个显示对象的层级
+         * @method swapChild
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
@@ -2204,14 +2205,6 @@ declare namespace annie {
          * @return {void}
          */
         removeAllChildren(): void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         * @return {void}
-         */
         update(isDrawUpdate?: boolean): void;
         /**
          * 重写碰撞测试
@@ -2590,7 +2583,7 @@ declare namespace annie {
         /**
          * 确认是不是按钮形态
          * @property isButton
-         * @return {boolean}
+         * @type {boolean}
          * @public
          * @since 2.0.0
          * @default false
@@ -2681,14 +2674,6 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         * @return {void}
-         */
         update(isDrawUpdate?: boolean): void;
         destroy(): void;
     }

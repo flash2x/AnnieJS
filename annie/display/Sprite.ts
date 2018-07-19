@@ -364,29 +364,24 @@ namespace annie {
                 s.removeChildAt(0);
             }
         }
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         * @return {void}
-         */
+
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if(!s._visible)return;
-            if (!s._cacheAsBitmap){
-                super.update(isDrawUpdate);
-                let len = s.children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    s.children[i].update(isDrawUpdate);
+            if (!s._visible) return;
+            if(s._instanceType=="annie.Sprite") {
+                if (s.hasEventListener("onEnterFrame")) {
+                    s.dispatchEvent("onEnterFrame");
                 }
-                s._UI.UM = false;
-                s._UI.UA = false;
-                s._UI.UF = false;
             }
+            super.update(isDrawUpdate);
+            let len = s.children.length;
+            for (let i = len - 1; i >= 0; i--) {
+                s.children[i].update(isDrawUpdate);
+            }
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         }
-
         /**
          * 重写碰撞测试
          * @method hitTestPoint
