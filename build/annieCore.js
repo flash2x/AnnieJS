@@ -1867,7 +1867,12 @@ var annie;
              */
             get: function () { return this._visible; },
             set: function (value) {
-                this._setProperty("_visible", value, 0);
+                var s = this;
+                if (value != s._visible) {
+                    s._visible = value;
+                    if (!value)
+                        s._cp = true;
+                }
             },
             enumerable: true,
             configurable: true
@@ -4021,12 +4026,8 @@ var annie;
                             }
                         }
                     }
-                    //执行一系列方法过来后，再次看看自己的帧是否改变
-                    if (s._lastFrame == s._curFrame) {
-                        isNeedUpdate = false;
-                    }
                 }
-                if (isNeedUpdate) {
+                if (s._lastFrame != s._curFrame) {
                     //先确定是哪一帧
                     s._lastFrame = s._curFrame;
                     var allChildren = s._a2x_res_children;

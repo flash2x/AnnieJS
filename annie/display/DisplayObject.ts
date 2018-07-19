@@ -273,7 +273,12 @@ namespace annie {
          */
         public get visible(){return this._visible;}
         public set visible(value:boolean){
-            this._setProperty("_visible",value,0);
+            let s=this;
+            if(value!=s._visible){
+                s._visible=value;
+                if(!value)
+                    s._cp=true;
+            }
         }
         public _visible: boolean = true;
         /**

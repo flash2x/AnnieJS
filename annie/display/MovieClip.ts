@@ -357,12 +357,9 @@ namespace annie {
                             }
                         }
                     }
-                    //执行一系列方法过来后，再次看看自己的帧是否改变
-                    if(s._lastFrame==s._curFrame){
-                        isNeedUpdate=false;
-                    }
+
                 }
-                if (isNeedUpdate){
+                if (s._lastFrame!=s._curFrame){
                     //先确定是哪一帧
                     s._lastFrame = s._curFrame;
                     let allChildren = s._a2x_res_children;
