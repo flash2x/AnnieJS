@@ -49,10 +49,12 @@ namespace annie {
         }
         set visible(value: boolean) {
             let s=this;
-            s._setProperty("_visible",value,0);
+            if(value!=s._visible)
+                s._visible=value;
             if(value){
                 s.postMessage({event:"onShow"});
             }else{
+                s._cp=true;
                 s.postMessage({event:"onHide"});
             }
         }
