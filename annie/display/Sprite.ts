@@ -310,7 +310,12 @@ namespace annie {
          */
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if (!s._visible) return;
+            if(s._instanceType=="annie.Sprite") {
+                if (!s._visible) return;
+                if (s.hasEventListener("onEnterFrame")) {
+                    s.dispatchEvent("onEnterFrame");
+                }
+            }
             super.update(isDrawUpdate);
             let len = s.children.length;
             for (let i = len - 1; i >= 0; i--) {

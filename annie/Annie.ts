@@ -255,10 +255,8 @@ namespace annie {
             target._a2x_res_obj = info;
         }
     }
-
     let _textLineType: Array<string> = ["single", "multiline"];
     let _textAlign: Array<string> = ["left", "center", "right"];
-
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method annie.t

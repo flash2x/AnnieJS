@@ -3336,7 +3336,7 @@ declare namespace annie {
     let devicePixelRatio: number;
     /**
      * 全局事件侦听
-     * @property globalDispatcher
+     * @property annie.globalDispatcher
      * @type {annie.EventDispatcher}
      * @static
      * @example
@@ -3394,27 +3394,27 @@ declare namespace annie {
     let classPool: any;
     /**
      * 加载场景的方法
-     * @method loadScene
+     * @method annie.loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
      * @type {Function}
      */
     let loadScene: Function;
     /**
      * 是否已经加载过场景
-     * @method isLoadedScene
+     * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
      */
     function isLoadedScene(sceneName: string): boolean;
     /**
      * 删除加载过的场景
-     * @method unLoadScene
+     * @method annie.unLoadScene
      * @param {string} sceneName
      */
     function unLoadScene(sceneName: string): void;
     /**
      * 解析资源
-     * @method parseScene
+     * @method annie.parseScene
      * @param {string} sceneName
      * @param sceneRes
      * @param sceneData
@@ -3422,7 +3422,7 @@ declare namespace annie {
     function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
     /**
      * 获取已经加载场景中的资源
-     * @method getResource
+     * @method annie.getResource
      * @public
      * @static
      * @since 2.0.0
@@ -3433,7 +3433,7 @@ declare namespace annie {
     function getResource(sceneName: string, resName: string): any;
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
+     * @method annie.d
      * @public
      * @static
      * @since 1.0.0
