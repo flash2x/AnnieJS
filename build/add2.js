@@ -1,0 +1,1 @@
+const annie = GameGlobal.annieEngine;

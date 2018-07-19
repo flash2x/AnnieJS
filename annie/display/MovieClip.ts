@@ -149,7 +149,8 @@ namespace annie {
         }
 
         /**
-         * @property clicked 如果设置成button模式，则些方法可以将按钮定格在按下状态
+         * 如果设置成button模式，则些方法可以将按钮定格在按下状态
+         * @property clicked
          * @public
          * @param {boolean} value
          * @since 2.0.0

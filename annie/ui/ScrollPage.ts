@@ -2,14 +2,14 @@
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annie
+ * @module annieUI
  */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -165,7 +165,7 @@ namespace annie {
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             let s = this;
-            s._instanceType = "annie.ScrollPage";
+            s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;

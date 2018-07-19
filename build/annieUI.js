@@ -1,3 +1,4 @@
+const annie = GameGlobal.annieEngine;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -7,15 +8,15 @@ var __extends = (this && this.__extends) || function (d, b) {
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annie
+ * @module annieUI
  */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     var Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -172,7 +173,7 @@ var annie;
              */
             this.autoScroll = false;
             var s = this;
-            s._instanceType = "annie.ScrollPage";
+            s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
@@ -385,20 +386,20 @@ var annie;
         };
         return ScrollPage;
     }(Sprite));
-    annie.ScrollPage = ScrollPage;
-})(annie || (annie = {}));
+    annieUI.ScrollPage = ScrollPage;
+})(annieUI || (annieUI = {}));
 /**
  * Created by saron on 16/10/19.
  */
 /**
- * @module annie
+ * @module annieUI
  */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -552,6 +553,7 @@ var annie;
             this.canSlidePrev = true;
             this.paramXY = "y";
             var s = this;
+            s._instanceType = "annieUI.SlidePage";
             s.isVertical = isVertical;
             s._ease = ease;
             if (isVertical) {
@@ -828,13 +830,13 @@ var annie;
         };
         return SlidePage;
     }(Sprite));
-    annie.SlidePage = SlidePage;
-})(annie || (annie = {}));
+    annieUI.SlidePage = SlidePage;
+})(annieUI || (annieUI = {}));
 /**
- * @module annie
+ * @module annieUI
  */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     var Shape = annie.Shape;
     var Event = annie.Event;
@@ -842,7 +844,7 @@ var annie;
     var Point = annie.Point;
     /**
      * 电子杂志组件类
-     * @class annie.FlipBook
+     * @class annieUI.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -907,7 +909,7 @@ var annie;
              */
             this.canFlip = true;
             var s = this;
-            s._instanceType = "annie.FlipBook";
+            s._instanceType = "annieUI.FlipBook";
             s.getPageCallback = getPageCallBack;
             s.bW = width;
             s.bH = height;
@@ -1401,21 +1403,21 @@ var annie;
         };
         return FlipBook;
     }(Sprite));
-    annie.FlipBook = FlipBook;
-})(annie || (annie = {}));
+    annieUI.FlipBook = FlipBook;
+})(annieUI || (annieUI = {}));
 /**
  * Created by anlun on 16/8/14.
  */
 /**
- * @module annie
+ * @module annieUI
  */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annie.ScrollList
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     var ScrollList = (function (_super) {
@@ -1442,7 +1444,7 @@ var annie;
             this._lastFirstId = -1;
             var s = this;
             s._isInit = false;
-            s._instanceType = "annie.ScrollList";
+            s._instanceType = "annieUI.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
             s._items = [];
@@ -1605,8 +1607,8 @@ var annie;
             _super.prototype.destroy.call(this);
         };
         return ScrollList;
-    }(annie.ScrollPage));
-    annie.ScrollList = ScrollList;
-})(annie || (annie = {}));
+    }(annieUI.ScrollPage));
+    annieUI.ScrollList = ScrollList;
+})(annieUI || (annieUI = {}));
 
-module.exports = annie;
+module.exports = annieUI;

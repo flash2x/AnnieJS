@@ -214,7 +214,8 @@ namespace annie {
             return -1;
         }
         /**
-         * @method 交换两个显示对象的层级
+         * 交换两个显示对象的层级
+         * @method swapChild
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0

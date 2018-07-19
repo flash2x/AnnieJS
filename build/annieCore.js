@@ -3487,7 +3487,8 @@ var annie;
             return -1;
         };
         /**
-         * @method 交换两个显示对象的层级
+         * 交换两个显示对象的层级
+         * @method swapChild
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
@@ -3882,7 +3883,8 @@ var annie;
                 return this._clicked;
             },
             /**
-             * @property clicked 如果设置成button模式，则些方法可以将按钮定格在按下状态
+             * 如果设置成button模式，则些方法可以将按钮定格在按下状态
+             * @property clicked
              * @public
              * @param {boolean} value
              * @since 2.0.0
@@ -4517,7 +4519,8 @@ var annie;
         };
         Object.defineProperty(TextField.prototype, "lines", {
             /**
-             * @property _lines 获取当前文本行数
+             * 获取当前文本行数
+             * @property _lines
              * @type {number}
              * @public
              * @readonly
