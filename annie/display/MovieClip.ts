@@ -357,7 +357,12 @@ namespace annie {
                             }
                         }
                     }
-
+                    if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf&&s._isFront)) && s.hasEventListener(Event.END_FRAME)) {
+                        s.dispatchEvent(Event.END_FRAME, {
+                            frameIndex: s._curFrame,
+                            frameName: "endFrame"
+                        });
+                    }
                 }
                 if (s._lastFrame!=s._curFrame){
                     //先确定是哪一帧
@@ -465,12 +470,6 @@ namespace annie {
                             allChildren[<any>sound - 1]._repeatCount = curFrameSound[sound];
                             allChildren[<any>sound - 1].play();
                         }
-                    }
-                    if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf&&s._isFront)) && s.hasEventListener(Event.END_FRAME)) {
-                        s.dispatchEvent(Event.END_FRAME, {
-                            frameIndex: s._curFrame,
-                            frameName: "endFrame"
-                        });
                     }
                 }
             }
