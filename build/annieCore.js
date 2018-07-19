@@ -1940,7 +1940,12 @@ var annie;
              */
             get: function () { return this._visible; },
             set: function (value) {
-                this._setProperty("_visible", value, 0);
+                var s = this;
+                if (value != s._visible) {
+                    s._visible = value;
+                    if (!value)
+                        s._cp = true;
+                }
             },
             enumerable: true,
             configurable: true
@@ -4684,7 +4689,7 @@ var annie;
              * @private
              * @default 0
              */
-            this._lastFrame = 0;
+            this._lastFrame = 1;
             /**
              * @property _a2x_script
              * @type {Object}
@@ -5011,8 +5016,8 @@ var annie;
             var s = this;
             if (!s._visible)
                 return;
-            //enterFrame事件一定要放在这里，不要再移到其他地方
             if (isDrawUpdate && s.hasEventListener("onEnterFrame")) {
+                //enterFrame
                 s.dispatchEvent("onEnterFrame");
             }
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
@@ -5074,12 +5079,8 @@ var annie;
                             }
                         }
                     }
-                    //执行一系列方法过来后，再次看看自己的帧是否改变
-                    if (s._lastFrame == s._curFrame || !s._visible) {
-                        isNeedUpdate = false;
-                    }
                 }
-                if (isNeedUpdate) {
+                if (s._lastFrame != s._curFrame) {
                     //先确定是哪一帧
                     s._lastFrame = s._curFrame;
                     var allChildren = s._a2x_res_children;
@@ -5109,7 +5110,7 @@ var annie;
                         else {
                             curFrameChildrenObjectIdObj = {};
                         }
-                        //上一帧有，这一帧没有的，要执行移除事件
+                        //上一帧有，这一帧没有的，要执行移除
                         for (var item in lastFrameChildrenObjectIdObj) {
                             if (curFrameChildrenObjectIdObj[item] == undefined) {
                                 //remove

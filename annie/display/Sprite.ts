@@ -255,7 +255,6 @@ namespace annie {
                 return null;
             }
         }
-
         /**
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex

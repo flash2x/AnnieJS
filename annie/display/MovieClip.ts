@@ -102,7 +102,7 @@ namespace annie {
          * @private
          * @default 0
          */
-        private _lastFrame: number = 0;
+        private _lastFrame: number = 1;
 
         /**
          * 构造函数
@@ -339,7 +339,6 @@ namespace annie {
             s._isPlaying = true;
             s._isFront = isFront;
         }
-
         /**
          * 将播放头跳转到指定帧并从那一帧开始继续播放
          * @method gotoAndPlay
@@ -373,11 +372,11 @@ namespace annie {
         public update(isDrawUpdate: boolean = true): void{
             let s: any = this;
             if (!s._visible) return;
-            //enterFrame事件一定要放在这里，不要再移到其他地方
             if (isDrawUpdate&&s.hasEventListener("onEnterFrame")) {
+                //enterFrame
                 s.dispatchEvent("onEnterFrame");
             }
-            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (isDrawUpdate && s._a2x_res_class.tf > 1){
                 let isNeedUpdate = false;
                 if(s._mode>=0){
                     s._isPlaying=false;
@@ -390,7 +389,7 @@ namespace annie {
                         isNeedUpdate = true;
                         if (s._isFront) {
                             s._curFrame++;
-                            if (s._curFrame > s._a2x_res_class.tf) {
+                            if (s._curFrame > s._a2x_res_class.tf){
                                 s._curFrame = 1;
                             }
                         } else {
@@ -435,12 +434,8 @@ namespace annie {
                             }
                         }
                     }
-                    //执行一系列方法过来后，再次看看自己的帧是否改变
-                    if(s._lastFrame==s._curFrame){
-                        isNeedUpdate=false;
-                    }
                 }
-                if (isNeedUpdate){
+                if (s._lastFrame!=s._curFrame){
                     //先确定是哪一帧
                     s._lastFrame = s._curFrame;
                     let allChildren = s._a2x_res_children;
@@ -467,7 +462,7 @@ namespace annie {
                         } else {
                             curFrameChildrenObjectIdObj = {};
                         }
-                        //上一帧有，这一帧没有的，要执行移除事件
+                        //上一帧有，这一帧没有的，要执行移除
                         for (let item in lastFrameChildrenObjectIdObj) {
                             if (curFrameChildrenObjectIdObj[item] == undefined) {
                                 //remove
