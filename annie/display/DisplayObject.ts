@@ -543,10 +543,6 @@ namespace annie {
                     }
                 }*/
             }
-            //enterFrame事件一定要放在这里，不要再移到其他地方
-            if (s.hasEventListener("onEnterFrame")) {
-                s.dispatchEvent("onEnterFrame");
-            }
         }
         /**
          * 调用此方法将显示对象渲染到屏幕
