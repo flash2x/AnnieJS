@@ -64,7 +64,7 @@ namespace annie {
             }
             s._SBWeixin=s._weixinSB.bind(s);
             s.media.addEventListener('ended', function(){
-                if(s._loop=-1){
+                if(s._loop==-1){
                     s.play(0);
                 }else{
                     s._loop--;

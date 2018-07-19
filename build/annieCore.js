@@ -4303,7 +4303,7 @@ var annie;
             }
             s._SBWeixin = s._weixinSB.bind(s);
             s.media.addEventListener('ended', function () {
-                if (s._loop = -1) {
+                if (s._loop == -1) {
                     s.play(0);
                 }
                 else {
@@ -8829,7 +8829,6 @@ var annie;
             if (mc.t == 1) {
                 if (!mc.f) {
                     mc.f = [];
-                    mc.tf = 1;
                     continue;
                 }
                 if (mc.tf > 1) {
