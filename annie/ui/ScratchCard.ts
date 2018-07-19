@@ -1,10 +1,10 @@
 /**
- * @module annie
+ * @module annieUI
  */
-namespace annie {
+namespace annieUI {
     /**
      * 刮刮卡类
-     * @class annie.ScratchCard
+     * @class annieUI.ScratchCard
      * @public
      * @extends annie.DrawingBoard
      * @since 1.1.1

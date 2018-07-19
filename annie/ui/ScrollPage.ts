@@ -1,12 +1,12 @@
 /**
- * @module annie
+ * @module annieUI
  */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0

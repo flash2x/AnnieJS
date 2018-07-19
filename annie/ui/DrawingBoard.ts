@@ -1,10 +1,10 @@
 /**
- * @module annie
+ * @module annieUI
  */
-namespace annie {
+namespace annieUI {
     /**
      * 画板类
-     * @class annie.DrawingBoard
+     * @class annieUI.DrawingBoard
      * @public
      * @extends annie.Bitmap
      * @since 1.1.1

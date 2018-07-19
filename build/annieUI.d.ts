@@ -1,11 +1,11 @@
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -182,14 +182,14 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
-     * @class annie.FacePhoto
+     * @class annieUI.FacePhoto
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -236,13 +236,13 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -432,13 +432,13 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 电子杂志组件类
-     * @class annie.FlipBook
+     * @class annieUI.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -567,13 +567,13 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import DisplayObject = annie.DisplayObject;
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
-     * @class annie.IScrollListItem
+     * @class annieUI.IScrollListItem
      * @public
      * @extends annie.DisplayObject
      * @since 1.0.9
@@ -585,9 +585,9 @@ declare namespace annie {
     }
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annie.ScrollList
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     class ScrollList extends ScrollPage {
@@ -655,12 +655,12 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     /**
      * 画板类
-     * @class annie.DrawingBoard
+     * @class annieUI.DrawingBoard
      * @public
      * @extends annie.Bitmap
      * @since 1.1.1
@@ -780,12 +780,12 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     /**
      * 刮刮卡类
-     * @class annie.ScratchCard
+     * @class annieUI.ScratchCard
      * @public
      * @extends annie.DrawingBoard
      * @since 1.1.1
