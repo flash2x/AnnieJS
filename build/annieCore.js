@@ -4142,8 +4142,7 @@ var annie;
                     var curFrameSound = timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (var sound in curFrameSound) {
-                            allChildren[sound - 1]._repeatCount = curFrameSound[sound];
-                            allChildren[sound - 1].play();
+                            allChildren[sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
                 }
@@ -5475,13 +5474,13 @@ var annie;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
             s.media.src = src;
-            s.media.onEnded = function () {
+            s.media.onEnded(function () {
                 if (s._loop > 1) {
                     s._loop--;
                     s.media.startTime = 0;
                     s.media.play();
                 }
-            };
+            });
         }
         /**
          * 开始播放媒体

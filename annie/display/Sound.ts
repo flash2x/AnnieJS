@@ -33,13 +33,13 @@ namespace annie {
             s._instanceType="annie.Sound";
             s.media =annie.createAudio();
             s.media.src = src;
-            s.media.onEnded=function(){
+            s.media.onEnded(function(){
                 if(s._loop>1){
                     s._loop--;
                     s.media.startTime=0;
                     s.media.play();
                 }
-            }
+            });
         }
 
         /**
