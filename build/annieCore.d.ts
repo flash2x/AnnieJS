@@ -3371,6 +3371,11 @@ declare namespace annie {
      */
     let devicePixelRatio: number;
     /**
+     * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
+     * @type {string}
+     */
+    let subDomainPath: string;
+    /**
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}

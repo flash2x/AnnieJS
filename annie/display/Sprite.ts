@@ -144,7 +144,7 @@ namespace annie {
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          */
         public addChildAt(child: DisplayObject, index: number): void {
@@ -184,7 +184,7 @@ namespace annie {
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -200,7 +200,7 @@ namespace annie {
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
@@ -320,15 +320,6 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
             if (!s.visible||(!s.mouseEnable&&isMustMouseEnable))return null;
@@ -355,14 +346,6 @@ namespace annie {
             }
             return null;
         }
-
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @return {any}
-         * @since 1.0.0
-         * @public
-         */
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -395,13 +378,6 @@ namespace annie {
             return rect;
         }
 
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
         public render(renderObj: IRender): void {
             let s: any = this;
             if (s._cp) return;

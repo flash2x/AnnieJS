@@ -210,6 +210,8 @@ namespace annie {
         }
         /**
          * 触摸事件
+         * @private
+         * @method onMouseEvent
          * @param e
          */
         private onMouseEvent(e: annie.MouseEvent): void {

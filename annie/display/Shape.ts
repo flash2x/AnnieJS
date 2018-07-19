@@ -27,12 +27,12 @@ namespace annie {
 
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
-         * 一般给用户使用较少,Flash2x工具自动使用
+         * 一般给用户使用较少,Annie2x工具自动使用
          * @method getGradientColor
          * @static
          * @param points
          * @param colors
-         * @return {any}
+         * @return {Object}
          * @since 1.0.0
          * @pubic
          */
@@ -51,7 +51,7 @@ namespace annie {
         }
 
         /**
-         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
+         * 设置位图填充时需要使用的方法,一般给用户使用较少,Annie2x工具自动使用
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
@@ -93,7 +93,7 @@ namespace annie {
         private _isBitmapStroke:  Array<number>;
         private _isBitmapFill: Array<number>;
         /**
-         * 是否对矢量使用像素碰撞 默认开启
+         * 是否对图开对象使用像素碰撞 默认开启
          * @property hitTestWidthPixel
          * @type {boolean}
          * @default true
@@ -102,7 +102,7 @@ namespace annie {
         public hitTestWidthPixel: boolean = true;
 
         /**
-         * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
+         * 添加一条绘画指令,具体可以查阅Canvas画图方法
          * @method addDraw
          * @param {string} commandName ctx指令的方法名 如moveTo lineTo arcTo等
          * @param {Array} params
@@ -347,7 +347,7 @@ namespace annie {
         }
 
         /**
-         * 线性渐变填充 一般给Flash2x用
+         * 线性渐变填充 一般给Annie2x用
          * @method beginLinearGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -359,7 +359,7 @@ namespace annie {
         }
 
         /**
-         * 径向渐变填充 一般给Flash2x用
+         * 径向渐变填充 一般给Annie2x用
          * @method beginRadialGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -372,7 +372,7 @@ namespace annie {
         };
 
         /**
-         * 位图填充 一般给Flash2x用
+         * 位图填充 一般给Annie2x用
          * @method beginBitmapFill
          * @param {Image} image
          * @param { Array} matrix
@@ -412,7 +412,7 @@ namespace annie {
         private static _caps:Array<string>=["butt","round","square"];
         private static _joins:Array<string>=["miter","round","bevel"];
         /**
-         * 画线性渐变的线条 一般给Flash2x用
+         * 画线性渐变的线条 一般给Annie2x用
          * @method beginLinearGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -428,7 +428,7 @@ namespace annie {
         }
 
         /**
-         * 画径向渐变的线条 一般给Flash2x用
+         * 画径向渐变的线条 一般给Annie2x用
          * @method beginRadialGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -443,7 +443,7 @@ namespace annie {
             this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
         };
         /**
-         * 线条位图填充 一般给Flash2x用
+         * 线条位图填充 一般给Annie2x用
          * @method beginBitmapStroke
          * @param {Image} image
          * @param {Array} matrix
@@ -510,7 +510,7 @@ namespace annie {
             }*/
         }
         /**
-         * 解析一段路径 一般给Flash2x用
+         * 解析一段路径 一般给Annie2x用
          * @method decodePath
          * @param {Array} data
          * @public
@@ -530,14 +530,6 @@ namespace annie {
                 }
             }
         };
-
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
         public update(isDrawUpdate: boolean = false): void {
             let s = this;
             if (!s._visible) return;
@@ -670,7 +662,6 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-
         private _draw(ctx: any): void {
             let s = this;
             let com = s._command;
@@ -755,10 +746,6 @@ namespace annie {
         public render(renderObj: IRender|any): void{
             super.render(renderObj);
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy():void {
             //清除相应的数据引用
             let s = this;

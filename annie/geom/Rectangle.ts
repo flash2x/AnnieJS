@@ -156,6 +156,7 @@ namespace annie {
 
         /**
          * 通过两个点来确定一个矩形
+         * @method createRectform2Point
          * @param rect
          * @param p1
          * @param p2

@@ -4,6 +4,7 @@ declare var wx:any;
  */
 namespace annie {
     /**
+     * 小游戏中开放子域在主域的显示容器,小程序中无此类
      * @class annie.SharedCanvas
      * @public
      * @extends annie.DisplayObject

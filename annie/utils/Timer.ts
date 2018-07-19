@@ -104,6 +104,7 @@ namespace annie {
 
         /**
          * 执行触发Timer 的总次数
+         * @property repeatCount
          * @public
          * @since 1.0.9
          * @return {number}

@@ -26,6 +26,7 @@ namespace annie {
          * 更新信息
          * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+         * @private
          */
         protected _UI:{UD:boolean,UM: boolean, UA: boolean, UF: boolean} = {UD:false,UM: true, UA: true, UF: false};
         /**
@@ -250,7 +251,7 @@ namespace annie {
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
-         * @pubic
+         * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
@@ -340,12 +341,6 @@ namespace annie {
             this._setProperty("_filters",value,2);
         }
         private _filters: any[] = [];
-
-        /**
-         * 是否自己的父级发生的改变
-         * @type {boolean}
-         * @private
-         */
         protected _cp:boolean=true;
         /**
          *将全局坐标转换到本地坐标值
@@ -377,12 +372,7 @@ namespace annie {
             }
         }
 
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
+        // 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         public static _bp: Point = new Point();
         public static _p1: Point = new Point();
         public static _p2: Point = new Point();
@@ -501,7 +491,7 @@ namespace annie {
             return s._drawRect;
         }
         /**
-         * 更新函数
+         * 更新渲染信息函数
          * @method update
          * @public
          * @since 1.0.0
@@ -640,7 +630,7 @@ namespace annie {
          * @property  width
          * @public
          * @since 1.0.3
-         * @return {number}
+         * @type {number}
          */
         public get width(): number {
             return this.getWH().width;
@@ -659,7 +649,7 @@ namespace annie {
          * @property  height
          * @public
          * @since 1.0.3
-         * @return {number}
+         * @type {number}
          */
         public get height(): number {
             return this.getWH().height;
@@ -716,8 +706,10 @@ namespace annie {
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
          * @return {number}
+         * @public
          */
         public addSound(sound:any):number{
             let s=this;
@@ -731,7 +723,9 @@ namespace annie {
 
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @public
          */
         public removeSound(id:number):void{
             let s=this;

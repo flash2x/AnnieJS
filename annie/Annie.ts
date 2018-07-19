@@ -22,11 +22,20 @@ namespace annie {
      * @static
      */
     export let devicePixelRatio: number = 1;
-
+    /**
+     * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
+     * @property subDomainPath
+     * @type {string}
+     * @static
+     * @public
+     */
+    export let subDomainPath:string="";
     /**
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
+     * @public
+     * @static
      */
     export let globalDispatcher: EventDispatcher = new EventDispatcher();
     /**
@@ -66,29 +75,38 @@ namespace annie {
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
+    console.log("AnnieJS:https://github.com/Annie2x/annieJS");
     let res: any = {};
-    /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
     export let createAudio: Function = null;
     export let getImageInfo: Function = null;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
     export let A2xExtend: any = null;
     /**
-     * 加载后的类引用全放在这里
+     * 通过annie.loadScene加载场景后的类引用全放在这里,也就是说只要不是引擎的类和方法。所有fla加载后的命名空间都在这里面。
+     * @property classPool
      * @type {Object}
+     * @public
+     * @static
+     * @example
+     *      //如在Html5里，我们加载了一个test.fla，设置了他的命名空间为test，那么我们要初始化这里面的类，应该是下面这样。
+     *      var myTestObj=new test.Test();
+     *      var myTestXxx=new test.XXXX();
+     *      //那么在微信小程序和小游戏里我们要怎么做呢
+     *      var myTestObj=new annie.classPool.test.Test();
+     *      var myTestXxx=new annie.classPool.test.XXXX();
+     *      //对你猜到了,就是这么简单。
      */
     export let classPool: any = null;
     /**
-     * 加载场景的方法
+     * 加载场景的方法,和Html5的loadScene方法不同的是，这是一个同步方法。也就是说直接运行下，不需要填写回调就可以直接使用。
      * @method loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
+     * @static
+     * @public
+     * @return {void}
+     * @example
+     *      //如你有一个test.fla，命名空间也是test，那么你发布之后就是像下面这样加载并使用它。
+     *      annie.loadScene("test");
+     *      var myTest=new annie.classPool.test.Test();
      */
     export let loadScene: Function = null;
 
@@ -97,6 +115,7 @@ namespace annie {
      * @method isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
+     * @static
      */
     export function isLoadedScene(sceneName: string) {
         if (classPool[sceneName]) {
@@ -106,28 +125,22 @@ namespace annie {
     }
 
     /**
-     * 删除加载过的场景
+     * 删除加载过的场景,在删除场景之前，最好是将此场景里所有的类开资源回收掉，以免内存泄漏
      * @method unLoadScene
      * @param {string} sceneName
+     * @public
+     * @static
      */
     export function unLoadScene(sceneName: string) {
         classPool[sceneName] = null;
         delete classPool[sceneName];
     }
-
-    /**
-     * 解析资源
-     * @method parseScene
-     * @param {string} sceneName
-     * @param sceneRes
-     * @param sceneData
-     */
     export function parseScene(sceneName: string, sceneRes: any, sceneData: any) {
         res[sceneName] = {};
         res[sceneName]._a2x_con = sceneData;
         for (let i = 0; i < sceneRes.length; i++) {
             if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
-                res[sceneName][sceneRes[i].id] = sceneRes[i].src;
+                res[sceneName][sceneRes[i].id] = subDomainPath+sceneRes[i].src;
             }
         }
         let mc: any;
@@ -185,7 +198,7 @@ namespace annie {
     }
 
     /**
-     * 获取已经加载场景中的资源
+     * 获取已经加载场景中的资源,一般通过此方法获取fla库中的图片和声音资源路径
      * @method getResource
      * @public
      * @static
@@ -202,7 +215,7 @@ namespace annie {
     }
 
     /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
      * @method b
      * @public
      * @since 1.0.0
@@ -216,7 +229,7 @@ namespace annie {
     }
 
     /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
      * @method d
      * @public
      * @static
@@ -264,7 +277,7 @@ namespace annie {
     let _textAlign: Array<string> = ["left", "center", "right"];
 
     /**
-     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+     * 创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
      * @method t
      * @public
      * @static
@@ -310,7 +323,7 @@ namespace annie {
     }
 
     /**
-     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+     * 创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
      * @method g
      * @public
      * @static
@@ -349,16 +362,26 @@ namespace annie {
         }
         return shape;
     }
-
+    /**
+     * 创建一个Sound声音对象,此方法一般给Annie2x工具自动调用
+     * @method s
+     * @public
+     * @static
+     * @since 1.0.0
+     * @return {annie.Sound}
+     */
     function s(sceneName: string, resName: string): Sound {
         return new Sound(res[sceneName][resName]);
     }
 
     /**
      * 引擎自调用.初始化 sprite和movieClip用
+     * @method initRes
      * @param target
-     * @param {string} _resId
-     * @private
+     * @param {string} sceneName
+     * @param {string} resName
+     * @public
+     * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
         let Root: any = classPool;

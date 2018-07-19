@@ -118,6 +118,10 @@ namespace annie {
                 s._a2x_script[frameIndex] = null;
         }
 
+        /**
+         * @property isButton 目前是否是被initButton() 过成了按钮形式
+         * @return {boolean}
+         */
         public get isButton(): boolean {
             return this._mode==-1;
         }
@@ -144,6 +148,12 @@ namespace annie {
             }
         }
 
+        /**
+         * @property clicked 如果设置成button模式，则些方法可以将按钮定格在按下状态
+         * @public
+         * @param {boolean} value
+         * @since 2.0.0
+         */
         public set clicked(value: boolean) {
             let s = this;
             if (value != s._clicked) {
@@ -261,7 +271,7 @@ namespace annie {
          * @method gotoAndPlay
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
          */
         public gotoAndPlay(frameIndex: number | string, isFront: boolean = true): void {
@@ -466,11 +476,6 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
-
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

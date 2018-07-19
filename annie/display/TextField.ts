@@ -213,6 +213,7 @@ namespace annie {
         private realLines: any;
         /**
          * 设置文本在canvas里的渲染样式
+         * @method draw
          * @param ctx
          * @private
          * @since 1.0.0

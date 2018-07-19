@@ -6810,6 +6810,11 @@ var annie;
      */
     annie.devicePixelRatio = 1;
     /**
+     * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
+     * @type {string}
+     */
+    annie.subDomainPath = "";
+    /**
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
@@ -6912,7 +6917,7 @@ var annie;
         res[sceneName]._a2x_con = sceneData;
         for (var i = 0; i < sceneRes.length; i++) {
             if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
-                res[sceneName][sceneRes[i].id] = sceneRes[i].src;
+                res[sceneName][sceneRes[i].id] = annie.subDomainPath + sceneRes[i].src;
             }
         }
         var mc;

@@ -187,6 +187,7 @@ namespace annie {
         public static _dragDisplay: DisplayObject = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
+         * @property
          * @type {Array}
          * @private
          */
@@ -257,19 +258,26 @@ namespace annie {
 
         /**
          * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+         * @property _ml
          * @type {Array}
          * @private
          */
         private _ml: any = [];
         /**
          * 这个是事件中用到的Point对象池,以提高性能
+         * @property _mp
          * @type {Array}
          * @private
          */
         private _mp: any = [];
 
         /**
-         * 刷新mouse或者touch事件
+         * 初始化mouse或者touch事件
+         * @method _initMouseEvent
+         * @param {annie.MouseEvent} event
+         * @param {annie.Point} cp
+         * @param {annie.Point} sp
+         * @param {number} identifier
          * @private
          */
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
@@ -287,6 +295,8 @@ namespace annie {
 
         /**
          * 循环刷新页面的函数
+         * @method flush
+         * @private
          */
         private flush(): void {
             let s = this;
@@ -344,7 +354,8 @@ namespace annie {
         }
 
         /**
-         * html的鼠标或单点触摸对应的引擎事件类型名
+         * 单点触摸对应的引擎事件类型名
+         * @property _mouseEventTypes
          * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
          * @private
          */
@@ -360,10 +371,7 @@ namespace annie {
             ontouchend: "onMouseUp"
         };
         private muliPoints: Array<any> = [];
-        /**
-         * 当document有鼠标或触摸事件时调用
-         * @param e
-         */
+        //当document有鼠标或触摸事件时调用
         private _mP1: Point = new Point();
         private _mP2: Point = new Point();
         private _onMouseEvent = function (e: any): void {
@@ -661,6 +669,8 @@ namespace annie {
         };
         /**
          * 设置舞台的对齐模式
+         * @method setAlign
+         * @private
          */
         private setAlign = function () {
             let s = this;
