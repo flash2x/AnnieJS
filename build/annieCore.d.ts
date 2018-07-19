@@ -2638,6 +2638,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(src: string);
+        private _repeate;
         /**
          * 是否正在播放中
          * @property  isPlaying

@@ -41,7 +41,7 @@ namespace annie {
                 }
             });
         }
-
+        private _repeate:number=1;
         /**
          * 是否正在播放中
          * @property  isPlaying
@@ -56,11 +56,15 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public play(start: number=0, loop: number=1): void {
+        public play(start: number=0, loop: number=0): void {
             let s = this;
             s.media.startTime = start;
-            s._loop=loop;
-            s.media.play();
+            if(loop==0){
+                s._loop=s._repeate;
+            }else{
+                s._loop=loop;
+                s._repeate=loop;
+            }            s.media.play();
             s.isPlaying=true;
         }
         /**
