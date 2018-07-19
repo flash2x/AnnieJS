@@ -62,11 +62,11 @@ var onBuildUI = function(){
     tsResult.dts.pipe(gulp.dest(outDir));
     return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
-var onModifyCore = function(){
+var onBuildLast = function(){
     gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));
     gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("build"));
-    gulp.src(["build/annieUI.js","build/add.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("build"));
-    gulp.src(["build/annieUI.min.js","build/add.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/add2.js","build/annieUI.js","build/add3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/add2.js","build/annieUI.min.js","build/add3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("build"));
 }
 var onBuildDoc = function(){
     del([
@@ -82,7 +82,7 @@ var onBuildDoc = function(){
     tsResult.js.pipe(gulp.dest(outDir));
 };
 gulp.task('onBuildCore', onBuildCore);
-gulp.task('onModifyCore',onModifyCore);
+gulp.task('onBuildLast',onBuildLast);
 gulp.task('onBuildUI', onBuildUI);
 gulp.task("onBuildDoc", onBuildDoc);
 gulp.task('onBuildAll',['onBuildCore','onBuildUI']);
