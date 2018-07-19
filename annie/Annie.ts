@@ -24,7 +24,7 @@ namespace annie {
     export let devicePixelRatio: number = 1;
     /**
      * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
-     * @property subDomainPath
+     * @property annie.subDomainPath
      * @type {string}
      * @static
      * @public
@@ -32,7 +32,7 @@ namespace annie {
     export let subDomainPath:string="";
     /**
      * 全局事件侦听
-     * @property globalDispatcher
+     * @property annie.globalDispatcher
      * @type {annie.EventDispatcher}
      * @public
      * @static
@@ -98,7 +98,7 @@ namespace annie {
     export let classPool: any = null;
     /**
      * 加载场景的方法,和Html5的loadScene方法不同的是，这是一个同步方法。也就是说直接运行下，不需要填写回调就可以直接使用。
-     * @method loadScene
+     * @method annie.loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
      * @static
      * @public
@@ -112,7 +112,7 @@ namespace annie {
 
     /**
      * 是否已经加载过场景
-     * @method isLoadedScene
+     * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
      * @static
@@ -126,7 +126,7 @@ namespace annie {
 
     /**
      * 删除加载过的场景,在删除场景之前，最好是将此场景里所有的类开资源回收掉，以免内存泄漏
-     * @method unLoadScene
+     * @method annie.unLoadScene
      * @param {string} sceneName
      * @public
      * @static
@@ -199,7 +199,7 @@ namespace annie {
 
     /**
      * 获取已经加载场景中的资源,一般通过此方法获取fla库中的图片和声音资源路径
-     * @method getResource
+     * @method annie.getResource
      * @public
      * @static
      * @since 2.0.0
@@ -216,7 +216,7 @@ namespace annie {
 
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
-     * @method b
+     * @method annie.b
      * @public
      * @since 1.0.0
      * @static
@@ -230,7 +230,7 @@ namespace annie {
 
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
-     * @method d
+     * @method annie.d
      * @public
      * @static
      * @since 1.0.0
@@ -278,7 +278,7 @@ namespace annie {
 
     /**
      * 创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
-     * @method t
+     * @method annie.t
      * @public
      * @static
      * @since 1.0.0
@@ -324,7 +324,7 @@ namespace annie {
 
     /**
      * 创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
-     * @method g
+     * @method annie.g
      * @public
      * @static
      * @since 1.0.0
@@ -364,7 +364,7 @@ namespace annie {
     }
     /**
      * 创建一个Sound声音对象,此方法一般给Annie2x工具自动调用
-     * @method s
+     * @method annie.s
      * @public
      * @static
      * @since 1.0.0
@@ -376,7 +376,7 @@ namespace annie {
 
     /**
      * 引擎自调用.初始化 sprite和movieClip用
-     * @method initRes
+     * @method annie.initRes
      * @param target
      * @param {string} sceneName
      * @param {string} resName
