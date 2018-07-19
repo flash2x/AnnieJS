@@ -168,7 +168,7 @@ namespace annie {
          * @public
          * @param {number} volume 音量大小，从0-1
          */
-        public static setAllSoundsVolume(volume: number) {
+        public static setAllSoundsVolume(volume: number){
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
