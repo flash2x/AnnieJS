@@ -80,6 +80,7 @@ declare namespace annie {
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
@@ -91,6 +92,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {string} type
          * @param {boolean} isAdd
+         * @return {void}
          */
         private _changeMouseCount(type, isAdd);
         private _defaultEvent;
@@ -131,6 +133,7 @@ declare namespace annie {
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          */
         removeEventListener(type: string, listener: Function, useCapture?: boolean): void;
         /**
@@ -138,6 +141,7 @@ declare namespace annie {
          * @method removeAllEventListener
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeAllEventListener(): void;
         destroy(): void;
@@ -404,6 +408,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @type {any}
+         * @default null
          */
         target: any;
         /**
@@ -604,6 +609,7 @@ declare namespace annie {
          * @method updateAfterEvent
          * @since 1.0.9
          * @public
+         * @return {void}
          */
         updateAfterEvent(): void;
         destroy(): void;
@@ -671,6 +677,7 @@ declare namespace annie {
          * @method updateAfterEvent
          * @since 1.0.9
          * @public
+         * @return {void}
          */
         updateAfterEvent(): void;
         destroy(): void;
@@ -1495,7 +1502,7 @@ declare namespace annie {
     /**
      * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
      * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
+     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用
      * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
      * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
      * @class annie.Bitmap
@@ -1561,7 +1568,7 @@ declare namespace annie {
          */
         bitmapData: any;
         /**
-         * 是否对矢量使用像素碰撞 默认开启
+         * 是否对图片对象使用像素碰撞 默认开启
          * @property hitTestWidthPixel
          * @type {boolean}
          * @default false
@@ -1572,7 +1579,7 @@ declare namespace annie {
          * 重写刷新
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为 false
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
@@ -1587,13 +1594,13 @@ declare namespace annie {
          * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
-         *          rect = new annie.Rectangle(0, 0, 200, 200),
-         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
-         *       spriteSheetImg.onload=function(e){
+         *      rect = new annie.Rectangle(0, 0, 200, 200),
+         *      yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
+         *      spriteSheetImg.onload=function(e){
          *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
          *          trace(singleSmallImg);
-         *       }
-         *       spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
+         *      }
+         *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
         static convertToImage(bitmap: annie.Bitmap, isNeedImage?: boolean): any;
         /**
@@ -1667,11 +1674,13 @@ declare namespace annie {
          * @property _isBitmapStroke
          * @private
          * @since 1.0.0
+         * @type {Array}
          */
         private _isBitmapStroke;
         /**
          * @property _isBitmapFill
          * @private
+         * @type{Array}
          * @since 1.0.0
          */
         private _isBitmapFill;
@@ -1690,6 +1699,7 @@ declare namespace annie {
          * @param {Array} params
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         addDraw(commandName: string, params: Array<any>): void;
         /**
@@ -1705,6 +1715,7 @@ declare namespace annie {
          * @param {number} rBR 右上圆角半径
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         drawRoundRect(x: number, y: number, w: number, h: number, rTL?: number, rTR?: number, rBL?: number, rBR?: number): void;
         /**
@@ -1714,6 +1725,7 @@ declare namespace annie {
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         moveTo(x: number, y: number): void;
         /**
@@ -1723,6 +1735,7 @@ declare namespace annie {
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         lineTo(x: number, y: number): void;
         /**
@@ -1732,6 +1745,7 @@ declare namespace annie {
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         arcTo(x: number, y: number): void;
         /**
@@ -1744,6 +1758,7 @@ declare namespace annie {
          * @param {number} y 终点Y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void;
         /**
@@ -1758,6 +1773,7 @@ declare namespace annie {
          * @param {number} y 终点Y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void;
         /**
@@ -1765,6 +1781,7 @@ declare namespace annie {
          * @method closePath
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         closePath(): void;
         /**
@@ -1776,6 +1793,7 @@ declare namespace annie {
          * @param {number} h
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         drawRect(x: number, y: number, w: number, h: number): void;
         /**
@@ -1788,6 +1806,7 @@ declare namespace annie {
          * @param {number} end 结束角度
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         drawArc(x: number, y: number, radius: number, start: number, end: number): void;
         /**
@@ -1798,6 +1817,7 @@ declare namespace annie {
          * @param {number} radius 半径
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         drawCircle(x: number, y: number, radius: number): void;
         /**
@@ -1809,6 +1829,7 @@ declare namespace annie {
          * @param {number} h
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         drawEllipse(x: number, y: number, w: number, h: number): void;
         /**
@@ -1816,6 +1837,7 @@ declare namespace annie {
          * @method clear
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         clear(): void;
         /**
@@ -1824,6 +1846,7 @@ declare namespace annie {
          * @param {string} color 颜色值 单色和RGBA格式
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginFill(color: string): void;
         /**
@@ -1833,6 +1856,7 @@ declare namespace annie {
          * @param {Array} colors 一组颜色值
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginLinearGradientFill(points: any, colors: any): void;
         /**
@@ -1843,6 +1867,7 @@ declare namespace annie {
          * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginRadialGradientFill: (points: any, colors: any) => void;
         /**
@@ -1852,6 +1877,7 @@ declare namespace annie {
          * @param { Array} matrix
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginBitmapFill(image: any, matrix: Array<number>): void;
         private _fill(fillStyle);
@@ -1865,17 +1891,18 @@ declare namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginStroke(color: string, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
         /**
          * @property _caps
-         * @type {string[]}
+         * @type {Array}
          * @private
          */
         private static _caps;
         /**
          * @property _joins
-         * @type {string[]}
+         * @type {Array}
          * @private
          */
         private static _joins;
@@ -1890,6 +1917,7 @@ declare namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginLinearGradientStroke(points: Array<number>, colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
         /**
@@ -1903,6 +1931,7 @@ declare namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginRadialGradientStroke: (points: number[], colors: any, lineWidth?: number, cap?: number, join?: number, miter?: number) => void;
         /**
@@ -1916,6 +1945,7 @@ declare namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
         /**
@@ -1927,6 +1957,7 @@ declare namespace annie {
          * @param {number} miter
          * @private
          * @since 1.0.0
+         * @return {void}
          */
         private _stroke(strokeStyle, width, cap, join, miter);
         /**
@@ -1934,6 +1965,7 @@ declare namespace annie {
          * @method endFill
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         endFill(): void;
         /**
@@ -1941,6 +1973,7 @@ declare namespace annie {
          * @method endStroke
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         endStroke(): void;
         /**
@@ -1949,6 +1982,7 @@ declare namespace annie {
          * @param {Array} data
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         decodePath: (data: any) => void;
         /**
@@ -1957,6 +1991,7 @@ declare namespace annie {
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         update(isDrawUpdate?: boolean): void;
         /**
@@ -1984,12 +2019,14 @@ declare namespace annie {
          * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
          * @public
          * @since 1.0.2
+         * @return {void}
          */
         changeColor(infoObj: any): void;
         /**
          * 渲染
          * @method render
          * @param {annie.IRender | any} renderObj
+         * @return {void}
          */
         render(renderObj: IRender | any): void;
         destroy(): void;
@@ -2027,7 +2064,7 @@ declare namespace annie {
         private _a2x_res_class;
         /**
          * @property _a2x_res_children
-         * @type {any[]}
+         * @type {Array}
          * @private
          * @since 2.0.0
          */
@@ -2062,12 +2099,6 @@ declare namespace annie {
          * @type boolean
          */
         cacheAsBitmap: boolean;
-        /**
-         * @property
-         * @since 2.0.0
-         * @public
-         * @default false
-         */
         private _cacheAsBitmap;
         /**
          * 添加一个显示对象到Sprite
@@ -2075,6 +2106,7 @@ declare namespace annie {
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         addChild(child: DisplayObject): void;
         /**
@@ -2083,6 +2115,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         removeChild(child: DisplayObject): void;
         /**
@@ -2094,6 +2127,7 @@ declare namespace annie {
          * @param {Array<annie.DisplayObject>} resultList
          * @private
          * @static
+         * @return {void}
          */
         private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
         /**
@@ -2102,7 +2136,7 @@ declare namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -2114,6 +2148,7 @@ declare namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         addChildAt(child: DisplayObject, index: number): void;
         /**
@@ -2149,6 +2184,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
@@ -2157,6 +2193,7 @@ declare namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeChildAt(index: number): void;
         /**
@@ -2164,6 +2201,7 @@ declare namespace annie {
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeAllChildren(): void;
         /**
@@ -2172,6 +2210,7 @@ declare namespace annie {
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         update(isDrawUpdate?: boolean): void;
         /**
@@ -2186,7 +2225,7 @@ declare namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @return {any}
+         * @return {annie.Rectangle}
          * @since 1.0.0
          * @public
          */
@@ -2197,6 +2236,7 @@ declare namespace annie {
          * @param {annie.IRender} renderObj
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         render(renderObj: IRender): void;
     }
@@ -2519,6 +2559,7 @@ declare namespace annie {
          * @method stop
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         stop(): void;
         /**
@@ -2581,15 +2622,10 @@ declare namespace annie {
          */
         clicked: boolean;
         private _clicked;
-        /**
-         * @method  _mouseEvent
-         * @param e
-         * @private
-         */
         private _mouseEvent(e);
         /**
          * @property _maskList
-         * @type {any[]}
+         * @type {Array}
          * @private
          * @default []
          */
@@ -2607,6 +2643,7 @@ declare namespace annie {
          * @method nextFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         nextFrame(): void;
         /**
@@ -2614,6 +2651,7 @@ declare namespace annie {
          * @method prevFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         prevFrame(): void;
         /**
@@ -2622,6 +2660,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
+         * @return {void}
          */
         gotoAndStop(frameIndex: number | string): void;
         /**
@@ -2629,6 +2668,7 @@ declare namespace annie {
          * @method play
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         play(isFront?: boolean): void;
         /**
@@ -2638,6 +2678,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         /**
@@ -2646,6 +2687,7 @@ declare namespace annie {
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         update(isDrawUpdate?: boolean): void;
         destroy(): void;
@@ -2984,22 +3026,22 @@ declare namespace annie {
          * @property lineSpacing
          * @public
          * @since 2.0.0
-         * @param {number} value
+         * @type {number}
          */
         lineSpacing: number;
         /**
          * 设置文本是否为粗体
          * @property bold
-         * @param {boolean} bold true或false
          * @public
+         * @type {boolean}
          * @since 1.0.3
          */
         bold: boolean;
         /**
          * 设置文本是否倾斜
          * @property italic
-         * @param {boolean} italic true或false
          * @public
+         * @type {boolean}
          * @since 1.0.3
          */
         italic: boolean;
@@ -3024,7 +3066,7 @@ declare namespace annie {
         /**
          * 设置文本颜色
          * @property color
-         * @param {boolean} italic true或false
+         * @type {string}
          * @public
          * @since 1.0.3
          */
@@ -3032,7 +3074,7 @@ declare namespace annie {
         /**
          * 设置或获取是否有边框
          * @property property
-         * @param {boolean} show true或false
+         * @type {boolean}
          * @public
          * @since 1.0.3
          */
@@ -3043,7 +3085,7 @@ declare namespace annie {
          * @property text
          * @public
          * @since 1.0.3
-         * @return {string}
+         * @type {string}
          */
         text: string;
         /**
@@ -3051,7 +3093,7 @@ declare namespace annie {
          * @public
          * @since 1.1.0
          * @property maxCharacters
-         * @return {number}
+         * @type {number}
          */
         maxCharacters: number;
     }
@@ -3269,7 +3311,6 @@ declare namespace annie {
          *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
          *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
-         *              state.resize();
          *              if(i>5){i=0;}
          *          }
          *      }
@@ -3348,6 +3389,7 @@ declare namespace annie {
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         update(isDrawUpdate?: boolean): void;
         /**
@@ -3359,6 +3401,7 @@ declare namespace annie {
          * 渲染函数
          * @method render
          * @param renderObj
+         * @return {void}
          */
         render(renderObj: IRender): void;
         /**
@@ -3379,9 +3422,11 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @method _initMouseEvent
          * @private
+         * @return {void}
          */
         private _initMouseEvent(event, cp, sp, identifier);
         /**
+         * 鼠标按下事件的对象池
          * @property _mouseDownPoint
          * @type {Object}
          * @private
@@ -3400,6 +3445,7 @@ declare namespace annie {
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         setFrameRate(fps: number): void;
         /**
@@ -3407,6 +3453,7 @@ declare namespace annie {
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         getFrameRate(): number;
         /**
@@ -3426,6 +3473,7 @@ declare namespace annie {
          * @method kill
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         kill(): void;
         /**
@@ -3437,7 +3485,7 @@ declare namespace annie {
         private _mouseEventTypes;
         /**
          * @property muliPoints
-         * @type {Object[]}
+         * @type {Array}
          * @private
          */
         private muliPoints;
@@ -3445,18 +3493,21 @@ declare namespace annie {
          * 当document有鼠标或触摸事件时调用
          * @property _mP1
          * @param e
+         * @type {annie.Point}
          */
         private _mP1;
         /**
          * 当document有鼠标或触摸事件时调用
          * @property _mP2
          * @param e
+         * @type {annie.Point}
          */
         private _mP2;
         /**
          * @method onMouseEvent
          * @param e
          * @private
+         * @return {void}
          */
         private onMouseEvent(e);
         /**
@@ -3474,6 +3525,7 @@ declare namespace annie {
          * @method resize
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         resize: () => void;
         getBounds(): Rectangle;
@@ -3502,6 +3554,7 @@ declare namespace annie {
          * @public
          * @static
          * @since
+         * @return {void}
          */
         static addUpdateObj(target: any): void;
         /**
@@ -3511,6 +3564,7 @@ declare namespace annie {
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         static removeUpdateObj(target: any): void;
         destroy(): void;

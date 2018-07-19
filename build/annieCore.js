@@ -106,6 +106,7 @@ var annie;
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
@@ -139,6 +140,7 @@ var annie;
          * @since 1.0.0
          * @param {string} type
          * @param {boolean} isAdd
+         * @return {void}
          */
         EventDispatcher.prototype._changeMouseCount = function (type, isAdd) {
             var count = isAdd ? 1 : -1;
@@ -242,6 +244,7 @@ var annie;
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          */
         EventDispatcher.prototype.removeEventListener = function (type, listener, useCapture) {
             if (useCapture === void 0) { useCapture = true; }
@@ -267,6 +270,7 @@ var annie;
          * @method removeAllEventListener
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         EventDispatcher.prototype.removeAllEventListener = function () {
             var s = this;
@@ -340,6 +344,7 @@ var annie;
              * @public
              * @since 1.0.0
              * @type {any}
+             * @default null
              */
             this.target = null;
             /**
@@ -738,6 +743,7 @@ var annie;
          * @method updateAfterEvent
          * @since 1.0.9
          * @public
+         * @return {void}
          */
         MouseEvent.prototype.updateAfterEvent = function () {
             this.target.stage._cp = true;
@@ -865,6 +871,7 @@ var annie;
          * @method updateAfterEvent
          * @since 1.0.9
          * @public
+         * @return {void}
          */
         TouchEvent.prototype.updateAfterEvent = function () {
             this.target.stage._cp = true;
@@ -2285,6 +2292,13 @@ var annie;
                         sounds[i].stop();
                     }
                 }
+                //如果是mc，则还原成动画初始时的状态
+                if (timeLineObj && timeLineObj.tf > 1) {
+                    s._curFrame = 1;
+                    s._lastFrame = 0;
+                    s._isPlaying = true;
+                    s._isFront = true;
+                }
             }
             else if (type == "onAddToStage") {
                 //如果有音乐，如果是Sprite则播放音乐
@@ -2469,7 +2483,7 @@ var annie;
     /**
      * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
      * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用，
+     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用
      * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
      * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
      * @class annie.Bitmap
@@ -2530,7 +2544,7 @@ var annie;
              */
             this._isCache = false;
             /**
-             * 是否对矢量使用像素碰撞 默认开启
+             * 是否对图片对象使用像素碰撞 默认开启
              * @property hitTestWidthPixel
              * @type {boolean}
              * @default false
@@ -2573,7 +2587,7 @@ var annie;
          * 重写刷新
          * @method update
          * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
+         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为 false
          * @since 1.0.0
          */
         Bitmap.prototype.update = function (isDrawUpdate) {
@@ -2664,13 +2678,13 @@ var annie;
          * @return {Canvas|BitmapData}
          * @example
          *      var spriteSheetImg = new Image(),
-         *          rect = new annie.Rectangle(0, 0, 200, 200),
-         *          yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
-         *       spriteSheetImg.onload=function(e){
+         *      rect = new annie.Rectangle(0, 0, 200, 200),
+         *      yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
+         *      spriteSheetImg.onload=function(e){
          *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
          *          trace(singleSmallImg);
-         *       }
-         *       spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
+         *      }
+         *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
         Bitmap.convertToImage = function (bitmap, isNeedImage) {
             if (isNeedImage === void 0) { isNeedImage = true; }
@@ -2800,6 +2814,7 @@ var annie;
              * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
              * @public
              * @since 1.0.0
+             * @return {void}
              */
             this.beginRadialGradientFill = function (points, colors) {
                 this._fill(Shape.getGradientColor(points, colors));
@@ -2815,6 +2830,7 @@ var annie;
              * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
              * @public
              * @since 1.0.0
+             * @return {void}
              */
             this.beginRadialGradientStroke = function (points, colors, lineWidth, cap, join, miter) {
                 if (lineWidth === void 0) { lineWidth = 1; }
@@ -2829,6 +2845,7 @@ var annie;
              * @param {Array} data
              * @public
              * @since 1.0.0
+             * @return {void}
              */
             this.decodePath = function (data) {
                 var s = this;
@@ -2918,6 +2935,7 @@ var annie;
          * @param {Array} params
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.addDraw = function (commandName, params) {
             var s = this;
@@ -2937,6 +2955,7 @@ var annie;
          * @param {number} rBR 右上圆角半径
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.drawRoundRect = function (x, y, w, h, rTL, rTR, rBL, rBR) {
             if (rTL === void 0) { rTL = 0; }
@@ -2987,6 +3006,7 @@ var annie;
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.moveTo = function (x, y) {
             this._command[this._command.length] = [1, "moveTo", [x, y]];
@@ -2998,6 +3018,7 @@ var annie;
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.lineTo = function (x, y) {
             this._command[this._command.length] = [1, "lineTo", [x, y]];
@@ -3009,6 +3030,7 @@ var annie;
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.arcTo = function (x, y) {
             this._command[this._command.length] = [1, "arcTo", [x, y]];
@@ -3023,6 +3045,7 @@ var annie;
          * @param {number} y 终点Y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.quadraticCurveTo = function (cpX, cpY, x, y) {
             this._command[this._command.length] = [1, "quadraticCurveTo", [cpX, cpY, x, y]];
@@ -3039,6 +3062,7 @@ var annie;
          * @param {number} y 终点Y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.bezierCurveTo = function (cp1X, cp1Y, cp2X, cp2Y, x, y) {
             this._command[this._command.length] = [1, "bezierCurveTo", [cp1X, cp1Y, cp2X, cp2Y, x, y]];
@@ -3048,6 +3072,7 @@ var annie;
          * @method closePath
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.closePath = function () {
             this._command[this._command.length] = [1, "closePath", []];
@@ -3061,6 +3086,7 @@ var annie;
          * @param {number} h
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.drawRect = function (x, y, w, h) {
             var c = this._command;
@@ -3080,6 +3106,7 @@ var annie;
          * @param {number} end 结束角度
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.drawArc = function (x, y, radius, start, end) {
             this._command[this._command.length] = [1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]];
@@ -3092,6 +3119,7 @@ var annie;
          * @param {number} radius 半径
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.drawCircle = function (x, y, radius) {
             this._command[this._command.length] = [1, "arc", [x, y, radius, 0, 2 * Math.PI]];
@@ -3105,6 +3133,7 @@ var annie;
          * @param {number} h
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.drawEllipse = function (x, y, w, h) {
             var k = 0.5522848;
@@ -3126,6 +3155,7 @@ var annie;
          * @method clear
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.clear = function () {
             var s = this;
@@ -3146,6 +3176,7 @@ var annie;
          * @param {string} color 颜色值 单色和RGBA格式
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.beginFill = function (color) {
             this._fill(color);
@@ -3157,6 +3188,7 @@ var annie;
          * @param {Array} colors 一组颜色值
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.beginLinearGradientFill = function (points, colors) {
             this._fill(Shape.getGradientColor(points, colors));
@@ -3168,6 +3200,7 @@ var annie;
          * @param { Array} matrix
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.beginBitmapFill = function (image, matrix) {
             var s = this;
@@ -3192,6 +3225,7 @@ var annie;
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.beginStroke = function (color, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
@@ -3211,6 +3245,7 @@ var annie;
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.beginLinearGradientStroke = function (points, colors, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
@@ -3230,6 +3265,7 @@ var annie;
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.beginBitmapStroke = function (image, matrix, lineWidth, cap, join, miter) {
             if (lineWidth === void 0) { lineWidth = 1; }
@@ -3251,6 +3287,7 @@ var annie;
          * @param {number} miter
          * @private
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype._stroke = function (strokeStyle, width, cap, join, miter) {
             var c = this._command;
@@ -3267,6 +3304,7 @@ var annie;
          * @method endFill
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.endFill = function () {
             var s = this;
@@ -3285,6 +3323,7 @@ var annie;
          * @method endStroke
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.endStroke = function () {
             var s = this;
@@ -3305,6 +3344,7 @@ var annie;
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         Shape.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
@@ -3564,6 +3604,7 @@ var annie;
          * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
          * @public
          * @since 1.0.2
+         * @return {void}
          */
         Shape.prototype.changeColor = function (infoObj) {
             var s = this;
@@ -3590,6 +3631,7 @@ var annie;
          * 渲染
          * @method render
          * @param {annie.IRender | any} renderObj
+         * @return {void}
          */
         Shape.prototype.render = function (renderObj) {
             _super.prototype.render.call(this, renderObj);
@@ -3604,13 +3646,13 @@ var annie;
         };
         /**
          * @property _caps
-         * @type {string[]}
+         * @type {Array}
          * @private
          */
         Shape._caps = ["butt", "round", "square"];
         /**
          * @property _joins
-         * @type {string[]}
+         * @type {Array}
          * @private
          */
         Shape._joins = ["miter", "round", "bevel"];
@@ -3653,7 +3695,7 @@ var annie;
             this._a2x_res_class = { tf: 1 };
             /**
              * @property _a2x_res_children
-             * @type {any[]}
+             * @type {Array}
              * @private
              * @since 2.0.0
              */
@@ -3729,6 +3771,7 @@ var annie;
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.addChild = function (child) {
             this.addChildAt(child, this.children.length);
@@ -3739,6 +3782,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         Sprite.prototype.removeChild = function (child) {
             var s = this;
@@ -3760,6 +3804,7 @@ var annie;
          * @param {Array<annie.DisplayObject>} resultList
          * @private
          * @static
+         * @return {void}
          */
         Sprite._getElementsByName = function (rex, root, isOnlyOne, isRecursive, resultList) {
             var len = root.children.length;
@@ -3791,7 +3836,7 @@ var annie;
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -3828,6 +3873,7 @@ var annie;
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.addChildAt = function (child, index) {
             if (!child)
@@ -3940,6 +3986,7 @@ var annie;
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype._onDispatchBubbledEvent = function (type) {
             var s = this;
@@ -3958,6 +4005,7 @@ var annie;
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.removeChildAt = function (index) {
             var s = this;
@@ -3982,6 +4030,7 @@ var annie;
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.removeAllChildren = function () {
             var s = this;
@@ -3996,6 +4045,7 @@ var annie;
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -4079,7 +4129,7 @@ var annie;
         /**
          * 重写getBounds
          * @method getBounds
-         * @return {any}
+         * @return {annie.Rectangle}
          * @since 1.0.0
          * @public
          */
@@ -4130,6 +4180,7 @@ var annie;
          * @param {annie.IRender} renderObj
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
@@ -4660,7 +4711,7 @@ var annie;
             this._clicked = false;
             /**
              * @property _maskList
-             * @type {any[]}
+             * @type {Array}
              * @private
              * @default []
              */
@@ -4738,6 +4789,7 @@ var annie;
          * @method stop
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.stop = function () {
             var s = this;
@@ -4828,11 +4880,6 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        /**
-         * @method  _mouseEvent
-         * @param e
-         * @private
-         */
         MovieClip.prototype._mouseEvent = function (e) {
             var s = this;
             if (!s._clicked) {
@@ -4868,6 +4915,7 @@ var annie;
          * @method nextFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         MovieClip.prototype.nextFrame = function () {
             var s = this;
@@ -4881,6 +4929,7 @@ var annie;
          * @method prevFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         MovieClip.prototype.prevFrame = function () {
             var s = this;
@@ -4895,6 +4944,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
+         * @return {void}
          */
         MovieClip.prototype.gotoAndStop = function (frameIndex) {
             var s = this;
@@ -4923,6 +4973,7 @@ var annie;
          * @method play
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.play = function (isFront) {
             if (isFront === void 0) { isFront = true; }
@@ -4937,6 +4988,7 @@ var annie;
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         * @return {void}
          */
         MovieClip.prototype.gotoAndPlay = function (frameIndex, isFront) {
             if (isFront === void 0) { isFront = true; }
@@ -4968,6 +5020,7 @@ var annie;
          * @public
          * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -5936,7 +5989,7 @@ var annie;
              * @property lineSpacing
              * @public
              * @since 2.0.0
-             * @param {number} value
+             * @type {number}
              */
             set: function (value) {
                 this.htmlElement.style.lineHeight = value + "px";
@@ -5952,8 +6005,8 @@ var annie;
             /**
              * 设置文本是否为粗体
              * @property bold
-             * @param {boolean} bold true或false
              * @public
+             * @type {boolean}
              * @since 1.0.3
              */
             set: function (bold) {
@@ -5975,8 +6028,8 @@ var annie;
             /**
              * 设置文本是否倾斜
              * @property italic
-             * @param {boolean} italic true或false
              * @public
+             * @type {boolean}
              * @since 1.0.3
              */
             set: function (italic) {
@@ -6034,7 +6087,7 @@ var annie;
             /**
              * 设置文本颜色
              * @property color
-             * @param {boolean} italic true或false
+             * @type {string}
              * @public
              * @since 1.0.3
              */
@@ -6052,7 +6105,7 @@ var annie;
             /**
              * 设置或获取是否有边框
              * @property property
-             * @param {boolean} show true或false
+             * @type {boolean}
              * @public
              * @since 1.0.3
              */
@@ -6077,7 +6130,7 @@ var annie;
              * @property text
              * @public
              * @since 1.0.3
-             * @return {string}
+             * @type {string}
              */
             get: function () {
                 var s = this;
@@ -6100,7 +6153,7 @@ var annie;
              * @public
              * @since 1.1.0
              * @property maxCharacters
-             * @return {number}
+             * @type {number}
              */
             get: function () {
                 var l = this.htmlElement.getAttribute("maxlength");
@@ -6362,8 +6415,8 @@ var annie;
              * @private
              */
             this._mp = [];
-            //每一个手指事件的对象池
             /**
+             * 鼠标按下事件的对象池
              * @property _mouseDownPoint
              * @type {Object}
              * @private
@@ -6385,7 +6438,7 @@ var annie;
             };
             /**
              * @property muliPoints
-             * @type {Object[]}
+             * @type {Array}
              * @private
              */
             this.muliPoints = [];
@@ -6393,12 +6446,14 @@ var annie;
              * 当document有鼠标或触摸事件时调用
              * @property _mP1
              * @param e
+             * @type {annie.Point}
              */
             this._mP1 = new annie.Point();
             /**
              * 当document有鼠标或触摸事件时调用
              * @property _mP2
              * @param e
+             * @type {annie.Point}
              */
             this._mP2 = new annie.Point();
             /**
@@ -6409,6 +6464,7 @@ var annie;
              * @method resize
              * @public
              * @since 1.0.0
+             * @return {void}
              */
             this.resize = function () {
                 var s = this;
@@ -6554,7 +6610,6 @@ var annie;
              *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
              *              let state=e.currentTarget;
              *              state.scaleMode=aList[i];
-             *              state.resize();
              *              if(i>5){i=0;}
              *          }
              *      }
@@ -6578,6 +6633,7 @@ var annie;
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Stage.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -6593,6 +6649,7 @@ var annie;
          * 渲染函数
          * @method render
          * @param renderObj
+         * @return {void}
          */
         Stage.prototype.render = function (renderObj) {
             renderObj.begin();
@@ -6602,6 +6659,7 @@ var annie;
          * 刷新mouse或者touch事件
          * @method _initMouseEvent
          * @private
+         * @return {void}
          */
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
             event["_pd"] = false;
@@ -6645,6 +6703,7 @@ var annie;
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         Stage.prototype.setFrameRate = function (fps) {
             var s = this;
@@ -6658,6 +6717,7 @@ var annie;
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         Stage.prototype.getFrameRate = function () {
             return 60 / (this._flush + 1);
@@ -6701,6 +6761,7 @@ var annie;
          * @method kill
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         Stage.prototype.kill = function () {
             Stage.removeUpdateObj(this);
@@ -6709,6 +6770,7 @@ var annie;
          * @method onMouseEvent
          * @param e
          * @private
+         * @return {void}
          */
         Stage.prototype.onMouseEvent = function (e) {
             //检查是否有
@@ -7141,6 +7203,7 @@ var annie;
          * @public
          * @static
          * @since
+         * @return {void}
          */
         Stage.addUpdateObj = function (target) {
             var isHave = false;
@@ -7162,6 +7225,7 @@ var annie;
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         Stage.removeUpdateObj = function (target) {
             var len = Stage.allUpdateObjList.length;

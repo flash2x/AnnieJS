@@ -623,12 +623,12 @@ namespace annie {
                     }
                 }
                 //如果是mc，则还原成动画初始时的状态
-                // if(timeLineObj&&timeLineObj.tf>1){
-                //     s._curFrame=1;
-                //     s._lastFrame=0;
-                //     s._isPlaying=true;
-                //     s._isFront=true;
-                // }
+                if(timeLineObj&&timeLineObj.tf>1){
+                    s._curFrame=1;
+                    s._lastFrame=0;
+                    s._isPlaying=true;
+                    s._isFront=true;
+                 }
             }else if(type=="onAddToStage"){
                 //如果有音乐，如果是Sprite则播放音乐
                 if(sounds&&sounds.length>0&&timeLineObj.tf==1){
