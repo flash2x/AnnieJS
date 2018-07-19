@@ -3,14 +3,14 @@
  */
 
 /**
- * @module annie
+ * @module annieUI
  */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
 
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -170,6 +170,7 @@ namespace annie {
         constructor(vW: number, vH: number, isVertical: boolean = true, ease: Function = null) {
             super();
             var s = this;
+            s._instanceType="annieUI.SlidePage";
             s.isVertical = isVertical;
             s._ease = ease;
             if (isVertical) {

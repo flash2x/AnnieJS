@@ -1,14 +1,11 @@
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -186,13 +183,13 @@ declare namespace annie {
  * Created by saron on 16/10/19.
  */
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -380,13 +377,13 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 电子杂志组件类
-     * @class annie.FlipBook
+     * @class annieUI.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -515,12 +512,9 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     import DisplayObject = annie.DisplayObject;
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
@@ -536,9 +530,9 @@ declare namespace annie {
     }
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annie.ScrollList
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     class ScrollList extends ScrollPage {

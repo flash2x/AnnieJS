@@ -1,8 +1,8 @@
 ﻿
 /**
- * @module annie
+ * @module annieUI
  */
-namespace annie {
+namespace annieUI {
     import Sprite=annie.Sprite;
     import Shape=annie.Shape;
     import Event=annie.Event;
@@ -10,7 +10,7 @@ namespace annie {
     import Point=annie.Point;
     /**
      * 电子杂志组件类
-     * @class annie.FlipBook
+     * @class annieUI.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -89,7 +89,7 @@ namespace annie {
         public constructor(width: number, height: number, pageCount: any,getPageCallBack:Function) {
             super();
             let s = this;
-            s._instanceType = "annie.FlipBook";
+            s._instanceType = "annieUI.FlipBook";
             s.getPageCallback=getPageCallBack;
             s.bW = width;
             s.bH = height;
