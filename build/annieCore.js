@@ -5195,8 +5195,7 @@ var annie;
                     var curFrameSound = timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (var sound in curFrameSound) {
-                            allChildren[sound - 1]._repeatCount = curFrameSound[sound];
-                            allChildren[sound - 1].play();
+                            allChildren[sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
                 }
