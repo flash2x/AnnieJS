@@ -472,8 +472,7 @@ namespace annie {
                     let curFrameSound= timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (let sound in curFrameSound) {
-                            allChildren[<any>sound - 1]._repeatCount = curFrameSound[sound];
-                            allChildren[<any>sound - 1].play();
+                            allChildren[<any>sound - 1].play(0,curFrameSound[sound]);
                         }
                     }
                 }
