@@ -119,7 +119,8 @@ namespace annie {
         }
 
         /**
-         * @property isButton 目前是否是被initButton() 过成了按钮形式
+         * 目前是否是被initButton() 过成了按钮形式
+         * @property isButton
          * @return {boolean}
          */
         public get isButton(): boolean {
