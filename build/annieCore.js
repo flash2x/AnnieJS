@@ -5478,6 +5478,7 @@ var annie;
             s.media.onEnded = function () {
                 if (s._loop > 1) {
                     s._loop--;
+                    s.media.startTime = 0;
                     s.media.play();
                 }
             };
@@ -6843,7 +6844,6 @@ var annie;
             if (mc.t == 1) {
                 if (!mc.f) {
                     mc.f = [];
-                    mc.tf = 1;
                     continue;
                 }
                 if (mc.tf > 1) {

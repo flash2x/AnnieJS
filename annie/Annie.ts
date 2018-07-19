@@ -132,7 +132,6 @@ namespace annie {
             if (mc.t == 1) {
                 if (!mc.f) {
                     mc.f = [];
-                    mc.tf = 1;
                     continue;
                 }
                 if (mc.tf > 1) {

@@ -36,6 +36,7 @@ namespace annie {
             s.media.onEnded=function(){
                 if(s._loop>1){
                     s._loop--;
+                    s.media.startTime=0;
                     s.media.play();
                 }
             }
