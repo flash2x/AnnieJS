@@ -87,6 +87,8 @@ var annie;
             this.distance = 0;
             /**
              * 最小鼠标滑动距离
+             * @property minDis
+             * @private
              * @type {number}
              */
             this.minDis = 2;
@@ -590,6 +592,8 @@ var annie;
         };
         /**
          * 触摸事件
+         * @private
+         * @method onMouseEvent
          * @param e
          */
         SlidePage.prototype.onMouseEvent = function (e) {

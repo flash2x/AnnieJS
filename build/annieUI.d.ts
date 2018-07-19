@@ -61,6 +61,8 @@ declare namespace annie {
         protected distance: number;
         /**
          * 最小鼠标滑动距离
+         * @property minDis
+         * @private
          * @type {number}
          */
         private minDis;
@@ -357,6 +359,8 @@ declare namespace annie {
         private setMask(w, h);
         /**
          * 触摸事件
+         * @private
+         * @method onMouseEvent
          * @param e
          */
         private onMouseEvent(e);

@@ -13,7 +13,7 @@ namespace annie {
      * @extends annie.DisplayObject
      * @since 1.0.0
      */
-    export class Bitmap extends DisplayObject {
+    export class Bitmap extends DisplayObject{
         /**
          * 构造函数
          * @method Bitmap

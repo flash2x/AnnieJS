@@ -1498,6 +1498,7 @@ var annie;
         };
         /**
          * 通过两个点来确定一个矩形
+         * @method createRectform2Point
          * @param rect
          * @param p1
          * @param p2
@@ -1569,6 +1570,7 @@ var annie;
              * 更新信息
              * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+             * @private
              */
             this._UI = { UD: false, UM: true, UA: true, UF: false };
             /**
@@ -1661,11 +1663,6 @@ var annie;
             this._mask = null;
             this._isUseToMask = 0;
             this._filters = [];
-            /**
-             * 是否自己的父级发生的改变
-             * @type {boolean}
-             * @private
-             */
             this._cp = true;
             this._dragBounds = new annie.Rectangle();
             this._isDragCenter = false;
@@ -1852,7 +1849,7 @@ var annie;
             /**
              * 显示对象上y方向的缩放或旋转点
              * @property anchorY
-             * @pubic
+             * @public
              * @since 1.0.0
              * @type {number}
              * @default 0
@@ -2091,7 +2088,7 @@ var annie;
             return s._drawRect;
         };
         /**
-         * 更新函数
+         * 更新渲染信息函数
          * @method update
          * @public
          * @since 1.0.0
@@ -2220,7 +2217,7 @@ var annie;
              * @property  width
              * @public
              * @since 1.0.3
-             * @return {number}
+             * @type {number}
              */
             get: function () {
                 return this.getWH().width;
@@ -2243,7 +2240,7 @@ var annie;
              * @property  height
              * @public
              * @since 1.0.3
-             * @return {number}
+             * @type {number}
              */
             get: function () {
                 return this.getWH().height;
@@ -2294,8 +2291,10 @@ var annie;
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
+         * @method addSound
          * @param {annie.Sound} sound
          * @return {number}
+         * @public
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
@@ -2308,7 +2307,9 @@ var annie;
         };
         /**
          * 删除一个已经添加进来的声音
+         * @method removeSound
          * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @public
          */
         DisplayObject.prototype.removeSound = function (id) {
             var s = this;
@@ -2344,12 +2345,7 @@ var annie;
             s._texture = null;
             _super.prototype.destroy.call(this);
         };
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
+        // 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
         DisplayObject._p1 = new annie.Point();
         DisplayObject._p2 = new annie.Point();
@@ -2395,10 +2391,6 @@ var annie;
             };
             s._texture.src = imagePath;
         }
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         Bitmap.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -2415,6 +2407,7 @@ var annie;
 var annie;
 (function (annie) {
     /**
+     * 小游戏中开放子域在主域的显示容器,小程序中无此类
      * @class annie.SharedCanvas
      * @public
      * @extends annie.DisplayObject
@@ -2534,7 +2527,7 @@ var annie;
              */
             this._command = [];
             /**
-             * 是否对矢量使用像素碰撞 默认开启
+             * 是否对图开对象使用像素碰撞 默认开启
              * @property hitTestWidthPixel
              * @type {boolean}
              * @default true
@@ -2542,7 +2535,7 @@ var annie;
              */
             this.hitTestWidthPixel = true;
             /**
-             * 径向渐变填充 一般给Flash2x用
+             * 径向渐变填充 一般给Annie2x用
              * @method beginRadialGradientFill
              * @param {Array} points 一组点
              * @param {Array} colors 一组颜色值
@@ -2554,7 +2547,7 @@ var annie;
                 this._fill(Shape.getGradientColor(points, colors));
             };
             /**
-             * 画径向渐变的线条 一般给Flash2x用
+             * 画径向渐变的线条 一般给Annie2x用
              * @method beginRadialGradientStroke
              * @param {Array} points 一组点
              * @param {Array} colors 一组颜色值
@@ -2573,7 +2566,7 @@ var annie;
                 this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
             };
             /**
-             * 解析一段路径 一般给Flash2x用
+             * 解析一段路径 一般给Annie2x用
              * @method decodePath
              * @param {Array} data
              * @public
@@ -2614,12 +2607,12 @@ var annie;
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
-         * 一般给用户使用较少,Flash2x工具自动使用
+         * 一般给用户使用较少,Annie2x工具自动使用
          * @method getGradientColor
          * @static
          * @param points
          * @param colors
-         * @return {any}
+         * @return {Object}
          * @since 1.0.0
          * @pubic
          */
@@ -2638,7 +2631,7 @@ var annie;
             return colorObj;
         };
         /**
-         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
+         * 设置位图填充时需要使用的方法,一般给用户使用较少,Annie2x工具自动使用
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
@@ -2676,7 +2669,7 @@ var annie;
             return color;
         };
         /**
-         * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
+         * 添加一条绘画指令,具体可以查阅Canvas画图方法
          * @method addDraw
          * @param {string} commandName ctx指令的方法名 如moveTo lineTo arcTo等
          * @param {Array} params
@@ -2911,7 +2904,7 @@ var annie;
             this._fill(color);
         };
         /**
-         * 线性渐变填充 一般给Flash2x用
+         * 线性渐变填充 一般给Annie2x用
          * @method beginLinearGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -2922,7 +2915,7 @@ var annie;
             this._fill(Shape.getGradientColor(points, colors));
         };
         /**
-         * 位图填充 一般给Flash2x用
+         * 位图填充 一般给Annie2x用
          * @method beginBitmapFill
          * @param {Image} image
          * @param { Array} matrix
@@ -2961,7 +2954,7 @@ var annie;
             this._stroke(color, lineWidth, cap, join, miter);
         };
         /**
-         * 画线性渐变的线条 一般给Flash2x用
+         * 画线性渐变的线条 一般给Annie2x用
          * @method beginLinearGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -2980,7 +2973,7 @@ var annie;
             this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
         };
         /**
-         * 线条位图填充 一般给Flash2x用
+         * 线条位图填充 一般给Annie2x用
          * @method beginBitmapStroke
          * @param {Image} image
          * @param {Array} matrix
@@ -3048,13 +3041,6 @@ var annie;
                 s._isBitmapStroke = null;
             }*/
         };
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
         Shape.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = false; }
             var s = this;
@@ -3265,10 +3251,6 @@ var annie;
         Shape.prototype.render = function (renderObj) {
             _super.prototype.render.call(this, renderObj);
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         Shape.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -3432,7 +3414,7 @@ var annie;
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          */
         Sprite.prototype.addChildAt = function (child, index) {
@@ -3475,7 +3457,7 @@ var annie;
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -3491,7 +3473,7 @@ var annie;
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
@@ -3616,14 +3598,6 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
@@ -3653,13 +3627,6 @@ var annie;
             }
             return null;
         };
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @return {any}
-         * @since 1.0.0
-         * @public
-         */
         Sprite.prototype.getBounds = function () {
             var s = this;
             var rect = s._bounds;
@@ -3691,13 +3658,6 @@ var annie;
             }
             return rect;
         };
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             if (s._cp)
@@ -3888,6 +3848,10 @@ var annie;
                 s._a2x_script[frameIndex] = null;
         };
         Object.defineProperty(MovieClip.prototype, "isButton", {
+            /**
+             * @property isButton 目前是否是被initButton() 过成了按钮形式
+             * @return {boolean}
+             */
             get: function () {
                 return this._mode == -1;
             },
@@ -3917,6 +3881,12 @@ var annie;
             get: function () {
                 return this._clicked;
             },
+            /**
+             * @property clicked 如果设置成button模式，则些方法可以将按钮定格在按下状态
+             * @public
+             * @param {boolean} value
+             * @since 2.0.0
+             */
             set: function (value) {
                 var s = this;
                 if (value != s._clicked) {
@@ -4015,7 +3985,7 @@ var annie;
          * @method gotoAndPlay
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
          */
         MovieClip.prototype.gotoAndPlay = function (frameIndex, isFront) {
@@ -4232,10 +4202,6 @@ var annie;
             }
             _super.prototype.update.call(this, isDrawUpdate);
         };
-        /**
-         * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
-         */
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -4503,6 +4469,7 @@ var annie;
         });
         /**
          * 设置文本在canvas里的渲染样式
+         * @method draw
          * @param ctx
          * @private
          * @since 1.0.0
@@ -4816,18 +4783,21 @@ var annie;
             this._currentFlush = 0;
             /**
              * 上一次鼠标或触碰经过的显示对象列表
+             * @property
              * @type {Array}
              * @private
              */
             this._lastDpList = {};
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
+             * @property _ml
              * @type {Array}
              * @private
              */
             this._ml = [];
             /**
              * 这个是事件中用到的Point对象池,以提高性能
+             * @property _mp
              * @type {Array}
              * @private
              */
@@ -4835,7 +4805,8 @@ var annie;
             //每一个手指事件的对象池
             this._mouseDownPoint = {};
             /**
-             * html的鼠标或单点触摸对应的引擎事件类型名
+             * 单点触摸对应的引擎事件类型名
+             * @property _mouseEventTypes
              * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
              * @private
              */
@@ -4851,10 +4822,7 @@ var annie;
                 ontouchend: "onMouseUp"
             };
             this.muliPoints = [];
-            /**
-             * 当document有鼠标或触摸事件时调用
-             * @param e
-             */
+            //当document有鼠标或触摸事件时调用
             this._mP1 = new annie.Point();
             this._mP2 = new annie.Point();
             this._onMouseEvent = function (e) {
@@ -5165,6 +5133,8 @@ var annie;
             };
             /**
              * 设置舞台的对齐模式
+             * @method setAlign
+             * @private
              */
             this.setAlign = function () {
                 var s = this;
@@ -5348,7 +5318,12 @@ var annie;
             renderObj.end();
         };
         /**
-         * 刷新mouse或者touch事件
+         * 初始化mouse或者touch事件
+         * @method _initMouseEvent
+         * @param {annie.MouseEvent} event
+         * @param {annie.Point} cp
+         * @param {annie.Point} sp
+         * @param {number} identifier
          * @private
          */
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
@@ -5362,6 +5337,8 @@ var annie;
         };
         /**
          * 循环刷新页面的函数
+         * @method flush
+         * @private
          */
         Stage.prototype.flush = function () {
             var s = this;
@@ -5507,7 +5484,6 @@ var annie;
  */
 var annie;
 (function (annie) {
-    //declare let WeixinJSBridge:any;
     /**
      * 声音类
      * @class annie.Sound
@@ -5527,7 +5503,7 @@ var annie;
         function Sound(src) {
             _super.call(this);
             /**
-             * html 标签 有可能是audio 或者 video
+             * wx.createAudio()创建出来的声音对象
              * @property media
              * @type {Audio}
              * @public
@@ -5616,18 +5592,12 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        /**
-         * 停止播放，给stopAllSounds调用
-         */
         Sound.prototype.stop2 = function () {
             var s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         };
-        /**
-         * 恢复播放，给stopAllSounds调用
-         */
         Sound.prototype.play2 = function () {
             var s = this;
             if (s.isPlaying) {
@@ -5671,7 +5641,7 @@ var annie;
             }
         };
         /**
-         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
+         * 设置当前所有正在播放的音量，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
          * @since 1.1.1
          * @static
@@ -6699,6 +6669,7 @@ var annie;
         Object.defineProperty(Timer.prototype, "repeatCount", {
             /**
              * 执行触发Timer 的总次数
+             * @property repeatCount
              * @public
              * @since 1.0.9
              * @return {number}
@@ -6811,13 +6782,18 @@ var annie;
     annie.devicePixelRatio = 1;
     /**
      * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
+     * @property subDomainPath
      * @type {string}
+     * @static
+     * @public
      */
     annie.subDomainPath = "";
     /**
      * 全局事件侦听
      * @property globalDispatcher
      * @type {annie.EventDispatcher}
+     * @public
+     * @static
      */
     annie.globalDispatcher = new annie.EventDispatcher();
     /**
@@ -6857,29 +6833,38 @@ var annie;
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
+    console.log("AnnieJS:https://github.com/Annie2x/annieJS");
     var res = {};
-    /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
     annie.createAudio = null;
     annie.getImageInfo = null;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
     annie.A2xExtend = null;
     /**
-     * 加载后的类引用全放在这里
+     * 通过annie.loadScene加载场景后的类引用全放在这里,也就是说只要不是引擎的类和方法。所有fla加载后的命名空间都在这里面。
+     * @property classPool
      * @type {Object}
+     * @public
+     * @static
+     * @example
+     *      //如在Html5里，我们加载了一个test.fla，设置了他的命名空间为test，那么我们要初始化这里面的类，应该是下面这样。
+     *      var myTestObj=new test.Test();
+     *      var myTestXxx=new test.XXXX();
+     *      //那么在微信小程序和小游戏里我们要怎么做呢
+     *      var myTestObj=new annie.classPool.test.Test();
+     *      var myTestXxx=new annie.classPool.test.XXXX();
+     *      //对你猜到了,就是这么简单。
      */
     annie.classPool = null;
     /**
-     * 加载场景的方法
+     * 加载场景的方法,和Html5的loadScene方法不同的是，这是一个同步方法。也就是说直接运行下，不需要填写回调就可以直接使用。
      * @method loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
+     * @static
+     * @public
+     * @return {void}
+     * @example
+     *      //如你有一个test.fla，命名空间也是test，那么你发布之后就是像下面这样加载并使用它。
+     *      annie.loadScene("test");
+     *      var myTest=new annie.classPool.test.Test();
      */
     annie.loadScene = null;
     /**
@@ -6887,6 +6872,7 @@ var annie;
      * @method isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
+     * @static
      */
     function isLoadedScene(sceneName) {
         if (annie.classPool[sceneName]) {
@@ -6896,22 +6882,17 @@ var annie;
     }
     annie.isLoadedScene = isLoadedScene;
     /**
-     * 删除加载过的场景
+     * 删除加载过的场景,在删除场景之前，最好是将此场景里所有的类开资源回收掉，以免内存泄漏
      * @method unLoadScene
      * @param {string} sceneName
+     * @public
+     * @static
      */
     function unLoadScene(sceneName) {
         annie.classPool[sceneName] = null;
         delete annie.classPool[sceneName];
     }
     annie.unLoadScene = unLoadScene;
-    /**
-     * 解析资源
-     * @method parseScene
-     * @param {string} sceneName
-     * @param sceneRes
-     * @param sceneData
-     */
     function parseScene(sceneName, sceneRes, sceneData) {
         res[sceneName] = {};
         res[sceneName]._a2x_con = sceneData;
@@ -6977,7 +6958,7 @@ var annie;
     }
     annie.parseScene = parseScene;
     /**
-     * 获取已经加载场景中的资源
+     * 获取已经加载场景中的资源,一般通过此方法获取fla库中的图片和声音资源路径
      * @method getResource
      * @public
      * @static
@@ -6994,7 +6975,7 @@ var annie;
     }
     annie.getResource = getResource;
     /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
      * @method b
      * @public
      * @since 1.0.0
@@ -7007,7 +6988,7 @@ var annie;
         return new annie.Bitmap(res[sceneName][resName]);
     }
     /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
      * @method d
      * @public
      * @static
@@ -7056,7 +7037,7 @@ var annie;
     var _textLineType = ["single", "multiline"];
     var _textAlign = ["left", "center", "right"];
     /**
-     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+     * 创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
      * @method t
      * @public
      * @static
@@ -7101,7 +7082,7 @@ var annie;
         return textObj;
     }
     /**
-     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+     * 创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
      * @method g
      * @public
      * @static
@@ -7147,14 +7128,25 @@ var annie;
         }
         return shape;
     }
+    /**
+     * 创建一个Sound声音对象,此方法一般给Annie2x工具自动调用
+     * @method s
+     * @public
+     * @static
+     * @since 1.0.0
+     * @return {annie.Sound}
+     */
     function s(sceneName, resName) {
         return new annie.Sound(res[sceneName][resName]);
     }
     /**
      * 引擎自调用.初始化 sprite和movieClip用
+     * @method initRes
      * @param target
-     * @param {string} _resId
-     * @private
+     * @param {string} sceneName
+     * @param {string} resName
+     * @public
+     * @static
      */
     function initRes(target, sceneName, resName) {
         var Root = annie.classPool;
