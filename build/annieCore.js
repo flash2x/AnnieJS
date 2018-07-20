@@ -3797,6 +3797,12 @@ var annie;
                 s._a2x_script[frameIndex] = null;
         };
         Object.defineProperty(MovieClip.prototype, "isButton", {
+            /**
+             * MovieClip对象是否被用作按钮
+             * @property isButton
+             * @type {boolean}
+             * @since 2.0.0
+             */
             get: function () {
                 return this._mode == -1;
             },
@@ -3823,6 +3829,13 @@ var annie;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
+            /**
+             * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+             * @property clicked
+             * @return {boolean}
+             * @public
+             * @since 2.0.0
+             */
             get: function () {
                 return this._clicked;
             },

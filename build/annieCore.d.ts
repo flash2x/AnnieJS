@@ -2045,6 +2045,12 @@ declare namespace annie {
          * @param {number} frameIndex
          */
         removeFrameScript(frameIndex: number): void;
+        /**
+         * MovieClip对象是否被用作按钮
+         * @property isButton
+         * @type {boolean}
+         * @since 2.0.0
+         */
         isButton: boolean;
         private _mode;
         /**
@@ -2055,6 +2061,13 @@ declare namespace annie {
          * @since 1.0.0
          */
         initButton(): void;
+        /**
+         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+         * @property clicked
+         * @return {boolean}
+         * @public
+         * @since 2.0.0
+         */
         clicked: boolean;
         private _clicked;
         private _mouseEvent;
