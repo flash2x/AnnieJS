@@ -396,15 +396,15 @@ namespace annie {
                         } else {
                             curFrameChildrenObjectIdObj = {};
                         }
-                        //上一帧有，这一帧没有的，要执行移除事件
+                        //上一帧有，这一帧没有的，要执行移除
                         for (let item in lastFrameChildrenObjectIdObj) {
                             if (curFrameChildrenObjectIdObj[item] == undefined) {
                                 //remove
                                 s.removeChild(allChildren[lastFrameChildrenObjectIdObj[item].o - 1]);
                             }
                         }
-                        //这一帧有，上一帧没有，要执行添加到舞台
-                        for (let item in curFrameChildrenObjectIdObj) {
+                        //这一帧有，上一帧没有，要执行添加
+                        for (let item in curFrameChildrenObjectIdObj){
                             if (lastFrameChildrenObjectIdObj[item] == undefined) {
                                 //add
                                 if (curFrameChildrenObjectIdObj[item].at == undefined) {
