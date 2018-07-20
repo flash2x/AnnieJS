@@ -116,6 +116,12 @@ namespace annie {
                 s._a2x_script[frameIndex] = null;
         }
 
+        /**
+         * MovieClip对象是否被用作按钮
+         * @property isButton
+         * @type {boolean}
+         * @since 2.0.0
+         */
         public get isButton(): boolean {
             return this._mode==-1;
         }
@@ -142,7 +148,6 @@ namespace annie {
                 s._mode = -1;
             }
         }
-
         public set clicked(value: boolean) {
             let s = this;
             if (value != s._clicked) {
@@ -153,6 +158,13 @@ namespace annie {
             }
         }
 
+        /**
+         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+         * @property clicked
+         * @return {boolean}
+         * @public
+         * @since 2.0.0
+         */
         public get clicked(): boolean {
             return this._clicked;
         }
