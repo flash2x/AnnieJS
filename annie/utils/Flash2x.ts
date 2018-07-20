@@ -18,21 +18,24 @@ namespace annie {
     export let _shareSceneList: any = [];
     /**
      * 存储加载资源的总对象
-     * @property res
+     * @property annie.res
+     * @static
      * @public
      * @type {Object}
      */
     export let res: any = {};
     /**
      * 加载器是否正在加载中
-     * @property _isLoading
+     * @property annie._isLoading
+     * @static
      * @type {boolean}
      * @private
      */
     let _isLoading: boolean;
     /**
      * 加载中的场景名列表
-     * @property _loadSceneNames
+     * @property annie._loadSceneNames
+     * @static
      * @private
      * @type {string|Array}
      *
@@ -40,98 +43,111 @@ namespace annie {
     let _loadSceneNames: any;
     /**
      * 加载地址的域名地址或前缀
-     * @property _domain
+     * @property annie._domain
      * @private
+     * @static
      * @type {string}
      */
     let _domain: string;
     /**
      * 当前加载到哪一个资源
-     * @property _loadIndex
+     * @property annie._loadIndex
      * @private
+     * @static
      * @type {number}
      */
     let _loadIndex: number;
     /**
      * 当前加载的总资源数
-     * @property _totalLoadRes
+     * @property annie._totalLoadRes
      * @private
+     * @static
      * @type {number}
      */
     let _totalLoadRes: number;
     /**
      * 当前已经加载的资源数
-     * @property _loadedLoadRes
+     * @property annie._loadedLoadRes
      * @private
+     * @static
      * @type {number}
      */
     let _loadedLoadRes: number;
     /**
      * 加载资源的完成回调
-     * @property _completeCallback
+     * @property annie._completeCallback
      * @private
+     * @static
      * @type {Function}
      */
     let _completeCallback: Function;
     /**
      * 加载资源时的进度回调
-     * @property _progressCallback
+     * @property annie._progressCallback
      * @private
+     * @static
      * @type {Function}
      */
     let _progressCallback: Function;
     /**
      * 加载配置文件的加载器
-     * @property _JSONQueue
+     * @property annie._JSONQueue
      * @private
+     * @static
      * @type {annie.URLLoader}
      */
     let _JSONQueue: URLLoader;
     /**
      * 加载资源文件的加载器
-     * @property _loaderQueue
+     * @property annie._loaderQueue
      * @private
+     * @static
      * @type {annie.URLLoader}
      */
     let _loaderQueue: URLLoader;
     /**
      * 加载器是否初始化过
-     * @property _isInited
+     * @property annie._isInited
      * @private
+     * @static
      * @type {Boolean}
      */
     let _isInited: Boolean;
     /**
      * 当前加载的资源配置文件内容
-     * @property _currentConfig
+     * @property annie._currentConfig
      * @private
+     * @static
      * @type {Object}
      */
     let _currentConfig: any;
     /**
      * 获取当前加载的时间当作随机数用
-     * @property _time
+     * @property annie._time
      * @private
+     * @static
      * @type {number}
      */
     let _time: number = new Date().getTime();
     /**
      * 加载资源数和总资源数的比
-     * @property _loadPer
+     * @property annie._loadPer
      * @private
+     * @static
      * @type {number}
      */
     let _loadPer: number;
     /**
      * 单个资源占总资源数的比
-     * @property _loadSinglePer
+     * @property annie._loadSinglePer
      * @private
+     * @static
      * @type {number}
      */
     let _loadSinglePer: number;
     /**
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
-     * @method loadScene
+     * @method annie.loadScene
      * @public
      * @static
      * @since 1.0.0
@@ -225,7 +241,8 @@ namespace annie {
      * 加载配置文件,打包成released线上版时才会用到这个方法。
      * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
      * @private
-     * @method _loadConfig
+     * @method annie._loadConfig
+     * @static
      * @return {void}
      */
     function _loadConfig(): void {
@@ -235,8 +252,9 @@ namespace annie {
     /**
      * 加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
      * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
-     * @method onCFGComplete
+     * @method annie.onCFGComplete
      * @param {annie.Event} e
+     * @static
      * @return {void}
      */
     function onCFGComplete(e: Event): void {
@@ -258,9 +276,10 @@ namespace annie {
 
     /**
      * 加载资源过程中调用的回调方法。
-     * @method _onRESProgress
+     * @method annie._onRESProgress
      * @param {annie.Event} e
      * @private
+     * @static
      * @return {void}
      */
     function _onRESProgress(e: Event): void {
@@ -271,10 +290,11 @@ namespace annie {
 
     /**
      * 解析加载后的json资源数据
-     * @method _parseContent
+     * @method annie._parseContent
      * @param loadContent
      * @param rootObj
      * @private
+     * @static
      * @return {void}
      */
     function _parseContent(loadContent: any, rootObj: any = null) {
@@ -350,9 +370,10 @@ namespace annie {
 
     /**
      * 一个场景加载完成后的事件回调
-     * @method _onRESComplete
+     * @method annie._onRESComplete
      * @param {annie.Event} e
      * @private
+     * @static
      * @return {void}
      */
     function _onRESComplete(e: Event): void {
@@ -380,8 +401,9 @@ namespace annie {
 
     /**
      * 检查所有资源是否全加载完成
-     * @method _checkComplete
+     * @method annie._checkComplete
      * @private
+     * @static
      * @return {void}
      */
     function _checkComplete():void {
@@ -415,8 +437,9 @@ namespace annie {
     /**
      * 加载场景资源
      * @private
-     * @method _loadRes
+     * @method annie._loadRes
      * @return {void}
+     * @static
      */
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
@@ -431,7 +454,7 @@ namespace annie {
 
     /**
      * 判断一个场景是否已经被加载
-     * @method isLoadedScene
+     * @method annie.isLoadedScene
      * @public
      * @static
      * @since 1.0.0
@@ -448,7 +471,7 @@ namespace annie {
 
     /**
      * 删除一个场景资源,以方便系统垃圾回收
-     * @method unLoadScene
+     * @method annie.unLoadScene
      * @public
      * @static
      * @since 1.0.2
@@ -467,7 +490,7 @@ namespace annie {
 
     /**
      * 获取已经加载场景中的资源
-     * @method getResource
+     * @method annie.getResource
      * @public
      * @static
      * @since 2.0.0
@@ -485,7 +508,7 @@ namespace annie {
 
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-     * @method b
+     * @method annie.b
      * @public
      * @since 1.0.0
      * @static
@@ -499,7 +522,7 @@ namespace annie {
 
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
+     * @method annie.d
      * @public
      * @static
      * @since 1.0.0
@@ -585,21 +608,23 @@ namespace annie {
 
     /**
      * 解析数据里需要确定的文本类型
-     * @property _textLineType
+     * @property annie._textLineType
      * @type {string[]}
      * @private
+     * @static
      */
     let _textLineType: Array<string> = ["single", "multiline"];
     /**
      * 解析数据里需要确定的文本对齐方式
-     * @property _textAlign
+     * @property annie._textAlign
      * @type {string[]}
+     * @static
      * @private
      */
     let _textAlign: Array<string> = ["left", "center", "right"];
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-     * @method t
+     * @method annie.t
      * @public
      * @static
      * @since 1.0.0
@@ -643,10 +668,12 @@ namespace annie {
 
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method sb
+     * @method annie.sb
      * @param {string} sceneName
      * @param {string} resName
      * @return {annie.Bitmap}
+     * @public
+     * @static
      */
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
@@ -673,7 +700,7 @@ namespace annie {
 
     /**
      * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-     * @method g
+     * @method annie.g
      * @public
      * @static
      * @since 1.0.0
@@ -714,10 +741,12 @@ namespace annie {
 
     /**
      * 获取声音实例
-     * @method s
+     * @method annie.s
      * @param {string} sceneName
      * @param {string} resName
      * @return {annie.Sound}
+     * @public
+     * @static
      */
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
@@ -725,8 +754,9 @@ namespace annie {
 
     /**
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-     * @method ajax
+     * @method annie.ajax
      * @public
+     * @static
      * @since 1.0.0
      * @param info 向后台传送数据所需要设置的信息
      * @param {url} info.url 向后台请求的地址
@@ -737,7 +767,7 @@ namespace annie {
      * @param {string} info.responseType 后台返回数据的类型,默认为"text"
      * @example
      *      //get
-     *      Flash2x.ajax({
+     *      annie.ajax({
      *             type: "GET",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             responseType: 'json',
@@ -745,7 +775,7 @@ namespace annie {
      *             error: function (result) {trace(result)}
      *      })
      *      //post
-     *      Flash2x.ajax({
+     *      annie.ajax({
      *             type: "POST",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             data: {phone:'135******58'},
@@ -771,7 +801,7 @@ namespace annie {
 
     /**
      * jsonp调用方法
-     * @method jsonp
+     * @method annie.jsonp
      * @param url
      * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
      * @param callbackName
@@ -779,7 +809,7 @@ namespace annie {
      * @static
      * @since 1.0.4
      * @example
-     *      Flash2x.jsonp('js/testData.js', 1, 'getdata', function (result) {
+     *      annie.jsonp('js/testData.js', 1, 'getdata', function (result) {
      *          trace(result);
      *      })
      */
@@ -811,16 +841,17 @@ namespace annie {
 
     /**
      * 获取url地址中的get参数
-     * @method getQueryString
+     * @method annie.getQueryString
      * @static
      * @param name
      * @return {any}
      * @since 1.0.9
+     * @public
      * @example
      *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
      *      //通过此方法获取id和username的值
-     *      var id=Flash2x.getQueryString("id");
-     *      var userName=Flash2x.getQueryString("username");
+     *      var id=annie.getQueryString("id");
+     *      var userName=annie.getQueryString("username");
      *      trace(id,userName);
      */
     export function getQueryString(name: string) {
@@ -832,11 +863,12 @@ namespace annie {
 
     /**
      * 引擎自调用.初始化 sprite和movieClip用
-     * @method initRes
+     * @method annie.initRes
      * @param target
      * @param {string} sceneName
      * @param {string} resName
-     * @private
+     * @public
+     * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
         let Root: any = window;

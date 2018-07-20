@@ -43,7 +43,7 @@ namespace annie {
          * @param {number} inputType 0 input 1 password 2 multiline
          * @example
          *      var inputText=new annie.InputText('singleline');
-         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
+         *      inputText.initInfo('annie',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         public constructor(inputType:number=0) {
             super();

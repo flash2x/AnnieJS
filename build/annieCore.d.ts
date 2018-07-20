@@ -2717,7 +2717,7 @@ declare namespace annie {
          * @public
          * @example
          *      var floatDisplay = new annie.FloatDisplay();
-         *      floatDisplay.init(document.getElementById('Flash2x'));
+         *      floatDisplay.init(document.getElementById('annie'));
          *      s.addChild(floatDisplay);
          *
          * <p><a href="" target="_blank">测试链接</a></p>
@@ -2981,7 +2981,7 @@ declare namespace annie {
          * @param {number} inputType 0 input 1 password 2 multiline
          * @example
          *      var inputText=new annie.InputText('singleline');
-         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
+         *      inputText.initInfo('annie',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         constructor(inputType?: number);
         /**
@@ -4172,14 +4172,15 @@ declare namespace annie {
     let _shareSceneList: any;
     /**
      * 存储加载资源的总对象
-     * @property res
+     * @property annie.res
+     * @static
      * @public
      * @type {Object}
      */
     let res: any;
     /**
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
-     * @method loadScene
+     * @method annie.loadScene
      * @public
      * @static
      * @since 1.0.0
@@ -4191,7 +4192,7 @@ declare namespace annie {
     let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
     /**
      * 判断一个场景是否已经被加载
-     * @method isLoadedScene
+     * @method annie.isLoadedScene
      * @public
      * @static
      * @since 1.0.0
@@ -4201,7 +4202,7 @@ declare namespace annie {
     function isLoadedScene(sceneName: string): Boolean;
     /**
      * 删除一个场景资源,以方便系统垃圾回收
-     * @method unLoadScene
+     * @method annie.unLoadScene
      * @public
      * @static
      * @since 1.0.2
@@ -4210,7 +4211,7 @@ declare namespace annie {
     function unLoadScene(sceneName: string): void;
     /**
      * 获取已经加载场景中的资源
-     * @method getResource
+     * @method annie.getResource
      * @public
      * @static
      * @since 2.0.0
@@ -4221,7 +4222,7 @@ declare namespace annie {
     function getResource(sceneName: string, resName: string): any;
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
+     * @method annie.d
      * @public
      * @static
      * @since 1.0.0
@@ -4232,16 +4233,19 @@ declare namespace annie {
     function d(target: any, info: any, parentFrame?: number): void;
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method sb
+     * @method annie.sb
      * @param {string} sceneName
      * @param {string} resName
      * @return {annie.Bitmap}
+     * @public
+     * @static
      */
     function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-     * @method ajax
+     * @method annie.ajax
      * @public
+     * @static
      * @since 1.0.0
      * @param info 向后台传送数据所需要设置的信息
      * @param {url} info.url 向后台请求的地址
@@ -4252,7 +4256,7 @@ declare namespace annie {
      * @param {string} info.responseType 后台返回数据的类型,默认为"text"
      * @example
      *      //get
-     *      Flash2x.ajax({
+     *      annie.ajax({
      *             type: "GET",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             responseType: 'json',
@@ -4260,7 +4264,7 @@ declare namespace annie {
      *             error: function (result) {trace(result)}
      *      })
      *      //post
-     *      Flash2x.ajax({
+     *      annie.ajax({
      *             type: "POST",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             data: {phone:'135******58'},
@@ -4272,7 +4276,7 @@ declare namespace annie {
     function ajax(info: any): void;
     /**
      * jsonp调用方法
-     * @method jsonp
+     * @method annie.jsonp
      * @param url
      * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
      * @param callbackName
@@ -4280,33 +4284,35 @@ declare namespace annie {
      * @static
      * @since 1.0.4
      * @example
-     *      Flash2x.jsonp('js/testData.js', 1, 'getdata', function (result) {
+     *      annie.jsonp('js/testData.js', 1, 'getdata', function (result) {
      *          trace(result);
      *      })
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
     /**
      * 获取url地址中的get参数
-     * @method getQueryString
+     * @method annie.getQueryString
      * @static
      * @param name
      * @return {any}
      * @since 1.0.9
+     * @public
      * @example
      *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
      *      //通过此方法获取id和username的值
-     *      var id=Flash2x.getQueryString("id");
-     *      var userName=Flash2x.getQueryString("username");
+     *      var id=annie.getQueryString("id");
+     *      var userName=annie.getQueryString("username");
      *      trace(id,userName);
      */
     function getQueryString(name: string): string;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
-     * @method initRes
+     * @method annie.initRes
      * @param target
      * @param {string} sceneName
      * @param {string} resName
-     * @private
+     * @public
+     * @static
      */
     function initRes(target: any, sceneName: string, resName: string): void;
 }
@@ -4719,6 +4725,7 @@ declare namespace annie {
          * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
          * @method flush
          * @private
+         * @static
          * @since 1.0.0
          */
         private static flush();
