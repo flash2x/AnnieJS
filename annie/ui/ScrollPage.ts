@@ -1,15 +1,12 @@
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -62,6 +59,8 @@ namespace annie {
         protected distance: number = 0;
         /**
          * 最小鼠标滑动距离
+         * @property  minDis
+         * @private
          * @type {number}
          */
         private minDis: number = 2;

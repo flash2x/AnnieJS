@@ -38,7 +38,7 @@ namespace annie {
          * @public
          * @example
          *      var floatDisplay = new annie.FloatDisplay();
-         *      floatDisplay.init(document.getElementById('Flash2x'));
+         *      floatDisplay.init(document.getElementById('annie'));
          *      s.addChild(floatDisplay);
          *
          * <p><a href="" target="_blank">测试链接</a></p>

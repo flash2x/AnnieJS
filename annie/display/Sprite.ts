@@ -34,7 +34,7 @@ namespace annie {
         private _a2x_res_class:any={tf:1};
         /**
          * @property _a2x_res_children
-         * @type {any[]}
+         * @type {Array}
          * @private
          * @since 2.0.0
          */
@@ -98,12 +98,6 @@ namespace annie {
             s._cacheAsBitmap = value;
         }
 
-        /**
-         * @property
-         * @since 2.0.0
-         * @public
-         * @default false
-         */
         private _cacheAsBitmap: boolean;
 
         /**
@@ -112,6 +106,7 @@ namespace annie {
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public addChild(child: DisplayObject): void {
             this.addChildAt(child, this.children.length);
@@ -122,6 +117,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         public removeChild(child: DisplayObject): void {
             let s = this;
@@ -144,6 +140,7 @@ namespace annie {
          * @param {Array<annie.DisplayObject>} resultList
          * @private
          * @static
+         * @return {void}
          */
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
@@ -176,7 +173,7 @@ namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -208,6 +205,7 @@ namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public addChildAt(child: DisplayObject, index: number): void {
             if (!child) return;
@@ -257,7 +255,6 @@ namespace annie {
                 return null;
             }
         }
-
         /**
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
@@ -277,7 +274,8 @@ namespace annie {
             return -1;
         }
         /**
-         * @method 交换两个显示对象的层级
+         * 交换两个显示对象的层级
+         * @method swapChild
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
@@ -314,6 +312,7 @@ namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         public _onDispatchBubbledEvent(type: string): void {
             let s = this;
@@ -332,6 +331,7 @@ namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public removeChildAt(index: number): void {
             let s = this;
@@ -354,6 +354,7 @@ namespace annie {
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public removeAllChildren(): void {
             let s = this;
@@ -362,41 +363,35 @@ namespace annie {
                 s.removeChildAt(0);
             }
         }
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
+
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if(!s._visible)return;
-            if (!s._cacheAsBitmap){
-                super.update(isDrawUpdate);
-                let len = s.children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    s.children[i].update(isDrawUpdate);
+            if (!s._visible) return;
+            if(s._instanceType=="annie.Sprite") {
+                if (s.hasEventListener("onEnterFrame")) {
+                    s.dispatchEvent("onEnterFrame");
                 }
-                s._UI.UM = false;
-                s._UI.UA = false;
-                s._UI.UF = false;
             }
+            super.update(isDrawUpdate);
+            let len = s.children.length;
+            for (let i = len - 1; i >= 0; i--) {
+                s.children[i].update(isDrawUpdate);
+            }
+            s._UI.UM = false;
+            s._UI.UA = false;
+            s._UI.UF = false;
         }
-
         /**
          * 重写碰撞测试
          * @method hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
          */
-        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
-            if (!s._visible) return null;
-            if (isMouseEvent && !s.mouseEnable) return null;
+            if (!s.visible||(!s.mouseEnable&&isMustMouseEnable))return null;
             if (!s._cacheAsBitmap) {
                 let len = s.children.length;
                 let hitDisplayObject: DisplayObject;
@@ -407,19 +402,25 @@ namespace annie {
                     if(child._isUseToMask>0)continue;
                     if (child.mask&&child.mask.parent==child.parent) {
                         //看看点是否在遮罩内
-                        if (!child.mask.hitTestPoint(globalPoint, isMouseEvent)) {
+                        if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
                             continue;
                         }
                     }
-                    hitDisplayObject = child.hitTestPoint(globalPoint, isMouseEvent);
+                    hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
                     if (hitDisplayObject) {
                         return hitDisplayObject;
                     }
                 }
             } else {
-                //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-                let p = s.globalToLocal(globalPoint);
+                let p:any;
+                if(isGlobalPoint) {
+                    p = s.globalToLocal(hitPoint);
+                }else{
+                    p= hitPoint;
+                }
+                p.x += s._offsetX;
+                p.y += s._offsetY;
                 let image = s._texture;
                 if (!image || image.width == 0 || image.height == 0) {
                     return null;
@@ -427,8 +428,6 @@ namespace annie {
                 let _canvas = DisplayObject["_canvas"];
                 _canvas.width = 1;
                 _canvas.height = 1;
-                p.x -= s._offsetX;
-                p.y -= s._offsetY;
                 let ctx = _canvas["getContext"]('2d');
                 ctx.clearRect(0, 0, 1, 1);
                 ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
@@ -443,7 +442,7 @@ namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @return {any}
+         * @return {annie.Rectangle}
          * @since 1.0.0
          * @public
          */
@@ -494,6 +493,7 @@ namespace annie {
          * @param {annie.IRender} renderObj
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public render(renderObj: IRender): void {
             let s: any = this;

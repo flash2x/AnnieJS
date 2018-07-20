@@ -64,7 +64,7 @@ namespace annie {
             }
             s._SBWeixin=s._weixinSB.bind(s);
             s.media.addEventListener('ended', function(){
-                if(s._loop=-1){
+                if(s._loop==-1){
                     s.play(0);
                 }else{
                     s._loop--;
@@ -104,7 +104,7 @@ namespace annie {
         public play(start: number=0, loop: number=0): void {
             let s = this;
             if(loop==0){
-                s._loop=this._repeate;
+                s._loop=s._repeate;
             }else{
                 s._loop=loop;
                 s._repeate=loop;

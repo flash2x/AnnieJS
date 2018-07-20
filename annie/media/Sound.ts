@@ -134,6 +134,7 @@ namespace annie {
         }
 
         /**
+         * @property _volume
          * @static
          * @type {number}
          * @private

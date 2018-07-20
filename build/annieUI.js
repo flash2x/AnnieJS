@@ -4,18 +4,15 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     var Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -87,6 +84,8 @@ var annie;
             this.distance = 0;
             /**
              * 最小鼠标滑动距离
+             * @property  minDis
+             * @private
              * @type {number}
              */
             this.minDis = 2;
@@ -383,21 +382,18 @@ var annie;
         };
         return ScrollPage;
     }(Sprite));
-    annie.ScrollPage = ScrollPage;
-})(annie || (annie = {}));
+    annieUI.ScrollPage = ScrollPage;
+})(annieUI || (annieUI = {}));
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     /**
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
-     * @class annie.FacePhoto
+     * @class annieUI.FacePhoto
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -477,20 +473,17 @@ var annie;
         };
         return FacePhoto;
     }(Sprite));
-    annie.FacePhoto = FacePhoto;
-})(annie || (annie = {}));
+    annieUI.FacePhoto = FacePhoto;
+})(annieUI || (annieUI = {}));
 /**
- * Created by saron on 16/10/19.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -683,7 +676,9 @@ var annie;
             s.maskObj.endFill();
         };
         /**
-         * 触摸事件
+         * 触摸事件 onMouseEvent
+         * @method
+         * @private
          * @param e
          */
         SlidePage.prototype.onMouseEvent = function (e) {
@@ -918,13 +913,13 @@ var annie;
         };
         return SlidePage;
     }(Sprite));
-    annie.SlidePage = SlidePage;
-})(annie || (annie = {}));
+    annieUI.SlidePage = SlidePage;
+})(annieUI || (annieUI = {}));
 /**
- * @module annie
+ * @module annieUI
  */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     var Sprite = annie.Sprite;
     var Shape = annie.Shape;
     var Event = annie.Event;
@@ -932,7 +927,7 @@ var annie;
     var Point = annie.Point;
     /**
      * 电子杂志组件类
-     * @class annie.FlipBook
+     * @class annieUI.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -1491,22 +1486,18 @@ var annie;
         };
         return FlipBook;
     }(Sprite));
-    annie.FlipBook = FlipBook;
-})(annie || (annie = {}));
-/// <reference path="ScrollPage" />
+    annieUI.FlipBook = FlipBook;
+})(annieUI || (annieUI = {}));
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annie.ScrollList
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     var ScrollList = (function (_super) {
@@ -1696,20 +1687,17 @@ var annie;
             _super.prototype.destroy.call(this);
         };
         return ScrollList;
-    }(annie.ScrollPage));
-    annie.ScrollList = ScrollList;
-})(annie || (annie = {}));
+    }(annieUI.ScrollPage));
+    annieUI.ScrollList = ScrollList;
+})(annieUI || (annieUI = {}));
 /**
- * Created by anlun on 2017/5/24.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     /**
      * 画板类
-     * @class annie.DrawingBoard
+     * @class annieUI.DrawingBoard
      * @public
      * @extends annie.Bitmap
      * @since 1.1.1
@@ -1950,19 +1938,16 @@ var annie;
         };
         return DrawingBoard;
     }(annie.Bitmap));
-    annie.DrawingBoard = DrawingBoard;
-})(annie || (annie = {}));
+    annieUI.DrawingBoard = DrawingBoard;
+})(annieUI || (annieUI = {}));
 /**
- * Created by anlun on 2017/5/24.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
+var annieUI;
+(function (annieUI) {
     /**
      * 刮刮卡类
-     * @class annie.ScratchCard
+     * @class annieUI.ScratchCard
      * @public
      * @extends annie.DrawingBoard
      * @since 1.1.1
@@ -2032,7 +2017,7 @@ var annie;
         };
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
+         * @method cancel
          * @param step
          * @public
          * @since 1.1.1
@@ -2066,6 +2051,6 @@ var annie;
             _super.prototype.destroy.call(this);
         };
         return ScratchCard;
-    }(annie.DrawingBoard));
-    annie.ScratchCard = ScratchCard;
-})(annie || (annie = {}));
+    }(annieUI.DrawingBoard));
+    annieUI.ScratchCard = ScratchCard;
+})(annieUI || (annieUI = {}));

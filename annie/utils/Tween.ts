@@ -773,6 +773,7 @@ namespace annie {
          * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
          * @method flush
          * @private
+         * @static
          * @since 1.0.0
          */
         private static flush():void{

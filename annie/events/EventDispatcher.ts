@@ -21,7 +21,7 @@ namespace annie {
          * @property instanceId
          * @public
          * @since 1.0.0
-         * @return {number}
+         * @type {number}
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
@@ -36,13 +36,12 @@ namespace annie {
          * @property instanceType
          * @since 1.0.3
          * @public
-         * @return {string}
+         * @type {string}
          * @readonly
          */
         public get instanceType(): string {
             return this._instanceType;
         }
-
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -114,6 +113,7 @@ namespace annie {
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
@@ -139,7 +139,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
@@ -147,6 +146,7 @@ namespace annie {
          * @since 1.0.0
          * @param {string} type
          * @param {boolean} isAdd
+         * @return {void}
          */
         private _changeMouseCount(type: string, isAdd: boolean): void {
             let count = isAdd ? 1 : -1;
@@ -248,6 +248,7 @@ namespace annie {
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          */
         public removeEventListener(type: string, listener: Function,useCapture = true): void {
             let s = this;
@@ -273,8 +274,9 @@ namespace annie {
          * @method removeAllEventListener
          * @public
          * @since 1.0.0
+         * @return {void}
          */
-        public removeAllEventListener() {
+        public removeAllEventListener():void {
             let s = this;
             for (let type in s.eventTypes) {
                 if (type.indexOf("onMouse") == 0) {

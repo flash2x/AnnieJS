@@ -259,6 +259,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @type {any}
+         * @default null
          */
         public target:any=null;
         /**
