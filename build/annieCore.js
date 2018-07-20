@@ -4689,7 +4689,7 @@ var annie;
              * @private
              * @default 0
              */
-            this._lastFrame = 1;
+            this._lastFrame = 0;
             /**
              * @property _a2x_script
              * @type {Object}

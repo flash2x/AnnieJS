@@ -102,7 +102,7 @@ namespace annie {
          * @private
          * @default 0
          */
-        private _lastFrame: number = 1;
+        private _lastFrame: number = 0;
 
         /**
          * 构造函数
