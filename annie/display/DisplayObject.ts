@@ -825,7 +825,7 @@ namespace annie {
             if (sounds) {
                 if (typeof(id) == "string") {
                     for (let i = sounds.length - 1; i >= 0; i--) {
-                        if (sounds[i].name == "id") {
+                        if (sounds[i].name == id) {
                             newSounds.push(sounds[i]);
                         }
                     }
