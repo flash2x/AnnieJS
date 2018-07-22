@@ -474,12 +474,11 @@ namespace annie {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.render(s.renderObj);
                     s._currentFlush = s._flush;
                 } else {
-                    // if (s._currentFlush == s._flush) {
-                    //     s.render(s.renderObj);
-                    // }
+                    if (s._currentFlush == s._flush) {
+                        s.render(s.renderObj);
+                    }
                     s._currentFlush--;
                 }
             }

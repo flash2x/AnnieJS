@@ -418,6 +418,7 @@ namespace annie {
                     let objInfo: any = null;
                     let curFrameObj: any = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
                     if (s._lastFrameObj != curFrameObj) {
+                        s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
                         let maskObj: any = null;
                         let maskTillId: number = -1;
@@ -458,9 +459,8 @@ namespace annie {
                             }
                         }
                     }
-                    s._lastFrameObj = curFrameObj;
                     //有没有声音
-                    let frameIndex = s._curFrame - 1;
+                    let frameIndex = s._lastFrame - 1;
                     let curFrameSound = timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (let sound in curFrameSound) {

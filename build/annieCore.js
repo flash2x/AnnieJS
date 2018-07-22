@@ -5104,6 +5104,7 @@ var annie;
                     var objInfo = null;
                     var curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
                     if (s._lastFrameObj != curFrameObj) {
+                        s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
                         var maskObj = null;
                         var maskTillId = -1;
@@ -5146,9 +5147,8 @@ var annie;
                             }
                         }
                     }
-                    s._lastFrameObj = curFrameObj;
                     //有没有声音
-                    var frameIndex = s._curFrame - 1;
+                    var frameIndex = s._lastFrame - 1;
                     var curFrameSound = timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (var sound in curFrameSound) {
@@ -6680,13 +6680,12 @@ var annie;
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.render(s.renderObj);
                     s._currentFlush = s._flush;
                 }
                 else {
-                    // if (s._currentFlush == s._flush) {
-                    //     s.render(s.renderObj);
-                    // }
+                    if (s._currentFlush == s._flush) {
+                        s.render(s.renderObj);
+                    }
                     s._currentFlush--;
                 }
             }
