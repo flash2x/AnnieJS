@@ -34,10 +34,10 @@ namespace annie {
      * 全局事件侦听
      * @property annie.globalDispatcher
      * @type {annie.EventDispatcher}
-     * @public
      * @static
+     * @example
      */
-    export let globalDispatcher: EventDispatcher = new EventDispatcher();
+    export let globalDispatcher: EventDispatcher = new annie.EventDispatcher();
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -54,18 +54,15 @@ namespace annie {
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
+     *      var s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
+     *          var i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }
-     *
      */
     export let StageScaleMode: { EXACT_FIT: string, NO_BORDER: string, NO_SCALE: string, SHOW_ALL: string, FIXED_WIDTH: string, FIXED_HEIGHT: string } = {
         EXACT_FIT: "exactFit",
@@ -75,38 +72,28 @@ namespace annie {
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    console.log("AnnieJS:https://github.com/Annie2x/annieJS");
     let res: any = {};
+    /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
     export let createAudio: Function = null;
     export let getImageInfo: Function = null;
+    /**
+     * 继承类方法
+     * @type {Function}
+     */
     export let A2xExtend: any = null;
     /**
-     * 通过annie.loadScene加载场景后的类引用全放在这里,也就是说只要不是引擎的类和方法。所有fla加载后的命名空间都在这里面。
-     * @property classPool
+     * 加载后的类引用全放在这里
      * @type {Object}
-     * @public
-     * @static
-     * @example
-     *      //如在Html5里，我们加载了一个test.fla，设置了他的命名空间为test，那么我们要初始化这里面的类，应该是下面这样。
-     *      var myTestObj=new test.Test();
-     *      var myTestXxx=new test.XXXX();
-     *      //那么在微信小程序和小游戏里我们要怎么做呢
-     *      var myTestObj=new annie.classPool.test.Test();
-     *      var myTestXxx=new annie.classPool.test.XXXX();
-     *      //对你猜到了,就是这么简单。
      */
     export let classPool: any = null;
     /**
-     * 加载场景的方法,和Html5的loadScene方法不同的是，这是一个同步方法。也就是说直接运行下，不需要填写回调就可以直接使用。
+     * 加载场景的方法
      * @method annie.loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @static
-     * @public
-     * @return {void}
-     * @example
-     *      //如你有一个test.fla，命名空间也是test，那么你发布之后就是像下面这样加载并使用它。
-     *      annie.loadScene("test");
-     *      var myTest=new annie.classPool.test.Test();
+     * @type {Function}
      */
     export let loadScene: Function = null;
 
@@ -115,7 +102,6 @@ namespace annie {
      * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
-     * @static
      */
     export function isLoadedScene(sceneName: string) {
         if (classPool[sceneName]) {
@@ -123,24 +109,28 @@ namespace annie {
         }
         return false;
     }
-
     /**
-     * 删除加载过的场景,在删除场景之前，最好是将此场景里所有的类开资源回收掉，以免内存泄漏
+     * 删除加载过的场景
      * @method annie.unLoadScene
      * @param {string} sceneName
-     * @public
-     * @static
      */
     export function unLoadScene(sceneName: string) {
         classPool[sceneName] = null;
         delete classPool[sceneName];
     }
+    /**
+     * 解析资源
+     * @method annie.parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
     export function parseScene(sceneName: string, sceneRes: any, sceneData: any) {
         res[sceneName] = {};
         res[sceneName]._a2x_con = sceneData;
         for (let i = 0; i < sceneRes.length; i++) {
             if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
-                res[sceneName][sceneRes[i].id] = subDomainPath+sceneRes[i].src;
+                res[sceneName][sceneRes[i].id] = sceneRes[i].src;
             }
         }
         let mc: any;
@@ -155,49 +145,61 @@ namespace annie {
                     let frameList = mc.f;
                     let count = frameList.length;
                     let frameCon: any = null;
-                    let children: any = {};
-                    let children2: any = {};
+                    let lastFrameCon: any = null;
+                    let ol: any = [];
                     for (let i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
+                        //这帧是否为空
                         if (frameCon) {
                             for (let j in frameCon) {
-                                if (i == 0) {
-                                    [children[j]] = [frameCon[j]];
-                                } else {
-                                    if (frameCon[j].a != 3) {
-                                        children2[j] = frameCon[j];
+                                let at = frameCon[j].at;
+                                if (at != undefined && at != -1) {
+                                    if (at == 0) {
+                                        ol.push(j);
+                                    } else {
+                                        for (let l = 0; l < ol.length; l++) {
+                                            if (ol[l] == at) {
+                                                ol.splice(l, 0, j);
+                                                break;
+                                            }
+                                        }
                                     }
-                                    if (frameCon[j].a != 1) {
-                                        if (frameCon[j].a == 2) {
-                                            for (let o in children[j]) {
-                                                if (frameCon[j][o] == undefined) {
-                                                    frameCon[j][o] = children[j][o];
+                                    delete frameCon[j].at;
+                                }
+                            }
+                            //上一帧是否为空
+                            if (lastFrameCon) {
+                                for (let j in lastFrameCon) {
+                                    //上一帧有，这一帧没有，加进来
+                                    if (!frameCon[j]) {
+                                        frameCon[j] = lastFrameCon[j];
+                                    } else {
+                                        //上一帧有，这一帧也有那么at就只有-1一种可能
+                                        if (frameCon[j].at != -1) {
+                                            //如果不为空，则更新元素
+                                            for (let m in lastFrameCon[j]) {
+                                                if (!frameCon[j][m]) {
+                                                    frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
                                         } else {
-                                            delete  frameCon[j];
+                                            //如果为-1，删除元素
+                                            delete frameCon[j];
                                         }
-                                        children[j] = null;
-                                        delete  children[j];
                                     }
                                 }
                             }
-                            if (i > 0) {
-                                for (let o in children) {
-                                    frameCon[o] = children2[o] = children[o];
-                                }
-                                children = children2;
-                                children2 = {};
-                            }
                         }
+                        lastFrameCon = frameCon;
                     }
+                    mc.ol = ol;
                 }
             }
         }
     }
 
     /**
-     * 获取已经加载场景中的资源,一般通过此方法获取fla库中的图片和声音资源路径
+     * 获取已经加载场景中的资源
      * @method annie.getResource
      * @public
      * @static
@@ -214,7 +216,7 @@ namespace annie {
     }
 
     /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method annie.b
      * @public
      * @since 1.0.0
@@ -228,7 +230,7 @@ namespace annie {
     }
 
     /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
      * @method annie.d
      * @public
      * @static
@@ -271,12 +273,10 @@ namespace annie {
             target._a2x_res_obj = info;
         }
     }
-
     let _textLineType: Array<string> = ["single", "multiline"];
     let _textAlign: Array<string> = ["left", "center", "right"];
-
     /**
-     * 创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
+     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method annie.t
      * @public
      * @static
@@ -442,28 +442,30 @@ namespace annie {
                 resClass.label = label;
             }
         }
-        if (resClass.c) {
-            let children = resClass.c;
+        let children = resClass.c;
+        if (children) {
+            let allChildren: any = [];
             let objCount = children.length;
             let obj: any = null;
-            let objId: number = 0;
+            let objType: number = 0;
             let maskObj: any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
+                //if (children[i].indexOf("_$") == 0) {
                 if (Array.isArray(classRoot[children[i]])) {
-                    objId = classRoot[children[i]][0];
+                    objType = classRoot[children[i]][0];
                 } else {
-                    objId = classRoot[children[i]].t;
+                    objType = classRoot[children[i]].t;
                 }
-                switch (objId) {
+                switch (objType) {
                     case 1:
                     case 4:
                         //text 和 Sprite
                         //检查是否有名字，并且已经初始化过了
-                        if (resClass.n&&resClass.n[i]&&target[resClass.n[i]]) {
-                            obj=target[resClass.n[i]];
-                        }else{
-                            if (objId == 4) {
+                        if (resClass.n && resClass.n[i] && target[resClass.n[i]]) {
+                            obj = target[resClass.n[i]];
+                        } else {
+                            if (objType == 4) {
                                 obj = t(sceneName, children[i]);
                             }
                             else {
@@ -479,7 +481,7 @@ namespace annie {
                                     obj = new Root[sceneName][children[i]]();
                                 }
                             }
-                            if (resClass.n&&resClass.n[i]) {
+                            if (resClass.n && resClass.n[i]) {
                                 target[resClass.n[i]] = obj;
                                 obj.name = resClass.n[i];
                             }
@@ -496,13 +498,12 @@ namespace annie {
                     case 5:
                         //sound
                         obj = s(sceneName, children[i]);
+                        obj.name=children[i];
                         target.addSound(obj);
                 }
-                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
-                target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
                     let index: number = i + 1;
-                    if (objId == 5) {
+                    if (objType == 5) {
                         obj._repeate = resClass.s[0][index];
                     } else {
                         d(obj, resClass.f[0].c[index]);
@@ -520,8 +521,26 @@ namespace annie {
                         }
                         target.addChildAt(obj, 0);
                     }
+                } else {
+                    //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                    allChildren[allChildren.length] = obj;
+                    //如果是声音，还要把i这个顺序保存下来
+                    if(!target._a2x_sounds){
+                        target._a2x_sounds={};
+                    }
+                    target._a2x_sounds[i]=obj;
+                }
+            }
+            if (isMc) {
+                //将mc里面的实例按照时间轴上的图层排序
+                let ol = resClass.ol;
+                if (ol) {
+                    for (let o = 0; o < ol.length; o++) {
+                        target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
+                    }
                 }
             }
         }
     }
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
 }

@@ -1578,7 +1578,7 @@ var annie;
              * @property stage
              * @public
              * @since 1.0.0
-             * @type {Stage}
+             * @type {annie.Stage}
              * @default null;
              * @readonly
              * */
@@ -1649,20 +1649,15 @@ var annie;
             this._anchorX = 0;
             this._anchorY = 0;
             this._visible = true;
-            /**
-             * 显示对象的混合模式
-             * 支持的混合模式大概有
-             * @property blendMode
-             * @public
-             * @since 1.0.0
-             * @type {string}
-             * @default 0
-             */
-            this.blendMode = "normal";
             this._matrix = new annie.Matrix();
-            this._mask = null;
             this._isUseToMask = 0;
+            this._mask = null;
             this._filters = [];
+            /**
+             * 是否自己的父级发生的改变
+             * @type {boolean}
+             * @private
+             */
             this._cp = true;
             this._dragBounds = new annie.Rectangle();
             this._isDragCenter = false;
@@ -1678,7 +1673,15 @@ var annie;
             this._texture = null;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
-            this._a2x_sounds = null;
+            this._soundList = [];
+            /**
+             * 每个Flash文件生成的对象都有一个自带的初始化信息
+             * @property _a2x_res_obj
+             * @type {Object}
+             * @since 2.0.0
+             * @private
+             * @default {Object}
+             */
             this._a2x_res_obj = {};
             this._instanceType = "annie.DisplayObject";
         }
@@ -1849,7 +1852,7 @@ var annie;
             /**
              * 显示对象上y方向的缩放或旋转点
              * @property anchorY
-             * @public
+             * @pubic
              * @since 1.0.0
              * @type {number}
              * @default 0
@@ -1874,12 +1877,27 @@ var annie;
              */
             get: function () { return this._visible; },
             set: function (value) {
-                this._setProperty("_visible", value, 0);
+                var s = this;
+                if (value != s._visible) {
+                    s._visible = value;
+                    if (!value)
+                        s._cp = true;
+                }
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(DisplayObject.prototype, "matrix", {
+            /**
+             * 显示对象的混合模式
+             * 支持的混合模式大概有
+             * @property blendMode
+             * @public
+             * @since 1.0.0
+             * @type {string}
+             * @default 0
+             */
+            //public blendMode: string = "normal";
             /**
              * 显示对象的变形矩阵
              * @property matrix
@@ -1977,6 +1995,7 @@ var annie;
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
+         * @return {void}
          * @public
          */
         DisplayObject.prototype.startDrag = function (isCenter, bounds) {
@@ -2008,6 +2027,7 @@ var annie;
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         DisplayObject.prototype.stopDrag = function () {
             if (annie.Stage._dragDisplay == this) {
@@ -2088,10 +2108,11 @@ var annie;
             return s._drawRect;
         };
         /**
-         * 更新渲染信息函数
+         * 更新函数
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         DisplayObject.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -2103,15 +2124,6 @@ var annie;
             }
             if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-            }
-            if (s.parent) {
-                var PUI = s.parent._UI;
-                if (PUI.UM)
-                    UI.UM = true;
-                if (PUI.UA)
-                    UI.UA = true;
-                if (PUI.UF)
-                    UI.UF = true;
             }
             if (UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
@@ -2135,6 +2147,7 @@ var annie;
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          * @abstract
+         * @return {void}
          */
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
@@ -2171,6 +2184,7 @@ var annie;
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
+         * @return {void}
          */
         DisplayObject.prototype._onDispatchBubbledEvent = function (type) {
             var s = this;
@@ -2213,7 +2227,7 @@ var annie;
              * @property  width
              * @public
              * @since 1.0.3
-             * @type {number}
+             * @return {number}
              */
             get: function () {
                 return this.getWH().width;
@@ -2236,7 +2250,7 @@ var annie;
              * @property  height
              * @public
              * @since 1.0.3
-             * @type {number}
+             * @return {number}
              */
             get: function () {
                 return this.getWH().height;
@@ -2285,47 +2299,91 @@ var annie;
             }
         };
         /**
+         * 停止这个显示对象上的所有声音
+         * @method stopAllSounds
+         * @public
+         * @since 2.0.0
+         */
+        DisplayObject.prototype.stopAllSounds = function () {
+            var sounds = this._soundList;
+            if (sounds) {
+                for (var i = sounds.length - 1; i >= 0; i--) {
+                    sounds[i].stop();
+                }
+            }
+        };
+        /**
+         * @method getSound
+         * @param {number|string} id
+         * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         */
+        DisplayObject.prototype.getSound = function (id) {
+            var sounds = this._soundList;
+            var newSounds = [];
+            if (sounds) {
+                if (typeof (id) == "string") {
+                    for (var i = sounds.length - 1; i >= 0; i--) {
+                        if (sounds[i].name == id) {
+                            newSounds.push(sounds[i]);
+                        }
+                    }
+                }
+                else {
+                    if (id >= 0 && id < sounds.length) {
+                        newSounds.push(sounds[id]);
+                    }
+                }
+            }
+            return newSounds;
+        };
+        /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @method addSound
          * @param {annie.Sound} sound
-         * @return {number}
+         * @return {void}
+         * @since 2.0.0
          * @public
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
-            if (!s._a2x_sounds) {
-                s._a2x_sounds = [];
+            if (!s._soundList) {
+                s._soundList = [];
             }
-            var sounds = s._a2x_sounds;
+            var sounds = s._soundList;
             sounds.push(sound);
-            return sounds.length - 1;
         };
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
-         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
          * @public
+         * @since 2.0.0
+         * @param {number|string} id
+         * @return {void}
          */
         DisplayObject.prototype.removeSound = function (id) {
-            var s = this;
-            var sounds = s._a2x_sounds;
+            var sounds = this._soundList;
             if (sounds) {
-                if (id > 0) {
-                    if (sounds.length > id) {
-                        sounds.splice(id, 1);
+                if (typeof (id) == "string") {
+                    for (var i = sounds.length - 1; i >= 0; i--) {
+                        if (sounds[i].name == "id") {
+                            sounds.splice(id, 1);
+                        }
                     }
                 }
                 else {
-                    sounds.length = 0;
+                    if (id >= 0 && id < sounds.length) {
+                        sounds.splice(id, 1);
+                    }
                 }
             }
         };
         DisplayObject.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
-            s._a2x_sounds = null;
+            s.stopAllSounds();
             s._a2x_res_obj = null;
+            s._soundList = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
@@ -2341,7 +2399,12 @@ var annie;
             s._texture = null;
             _super.prototype.destroy.call(this);
         };
-        // 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+        /**
+         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+         * @type {annie.Point}
+         * @private
+         * @static
+         */
         DisplayObject._bp = new annie.Point();
         DisplayObject._p1 = new annie.Point();
         DisplayObject._p2 = new annie.Point();
@@ -3277,11 +3340,14 @@ var annie;
      */
     var Sprite = (function (_super) {
         __extends(Sprite, _super);
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         function Sprite() {
             _super.call(this);
-            //sprite 和 moveClip的类资源信息
-            this._a2x_res_class = { tf: 1 };
-            this._a2x_res_children = [];
             /**
              * 是否可以让children接收鼠标事件,如果为false
              * 鼠标事件将不会往下冒泡
@@ -3311,8 +3377,6 @@ var annie;
             for (var i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s._a2x_res_children = null;
-            s._a2x_res_class = null;
             s.children = null;
             _super.prototype.destroy.call(this);
         };
@@ -3322,6 +3386,7 @@ var annie;
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.addChild = function (child) {
             this.addChildAt(child, this.children.length);
@@ -3332,6 +3397,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         Sprite.prototype.removeChild = function (child) {
             var s = this;
@@ -3344,6 +3410,17 @@ var annie;
             }
         };
         //全局遍历
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         * @return {void}
+         */
         Sprite._getElementsByName = function (rex, root, isOnlyOne, isRecursive, resultList) {
             var len = root.children.length;
             if (len > 0) {
@@ -3374,7 +3451,7 @@ var annie;
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -3411,6 +3488,7 @@ var annie;
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.addChildAt = function (child, index) {
             if (!child)
@@ -3473,7 +3551,8 @@ var annie;
          * @return {number}
          */
         Sprite.prototype.getChildIndex = function (child) {
-            var len = this.children.length;
+            var s = this;
+            var len = s.children.length;
             for (var i = 0; i < len; i++) {
                 if (this.children[i] == child) {
                     return i;
@@ -3523,6 +3602,7 @@ var annie;
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype._onDispatchBubbledEvent = function (type) {
             var s = this;
@@ -3541,6 +3621,7 @@ var annie;
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.removeChildAt = function (index) {
             var s = this;
@@ -3565,6 +3646,7 @@ var annie;
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         Sprite.prototype.removeAllChildren = function () {
             var s = this;
@@ -3576,22 +3658,43 @@ var annie;
         Sprite.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (s._instanceType == "annie.Sprite") {
-                if (!s._visible)
-                    return;
-                if (s.hasEventListener("onEnterFrame")) {
-                    s.dispatchEvent("onEnterFrame");
-                }
-            }
+            if (!s._visible)
+                return;
             _super.prototype.update.call(this, isDrawUpdate);
-            var len = s.children.length;
-            for (var i = len - 1; i >= 0; i--) {
-                s.children[i].update(isDrawUpdate);
-            }
+            var um = s._UI.UM;
+            var ua = s._UI.UA;
+            var uf = s._UI.UF;
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
+            //更新完成后触发
+            if (s.hasEventListener("onEnterFrame")) {
+                s.dispatchEvent("onEnterFrame");
+            }
+            var len = s.children.length;
+            var child = null;
+            for (var i = len - 1; i >= 0; i--) {
+                child = s.children[i];
+                if (um) {
+                    child._UI.UM = um;
+                }
+                if (uf) {
+                    child._UI.UF = uf;
+                }
+                if (ua) {
+                    child._UI.UA = ua;
+                }
+                child.update(isDrawUpdate);
+            }
         };
+        /**
+         * 重写碰撞测试
+         * @method hitTestPoint
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
+         */
         Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
@@ -3604,9 +3707,8 @@ var annie;
             //这里特别注意是从上往下遍历
             for (var i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if (child._isUseToMask > 0) {
+                if (child._isUseToMask > 0)
                     continue;
-                }
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
                     if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable)) {
@@ -3621,6 +3723,13 @@ var annie;
             }
             return null;
         };
+        /**
+         * 重写getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @since 1.0.0
+         * @public
+         */
         Sprite.prototype.getBounds = function () {
             var s = this;
             var rect = s._bounds;
@@ -3652,6 +3761,13 @@ var annie;
             }
             return rect;
         };
+        /**
+         * 重写渲染
+         * @method render
+         * @param {annie.IRender} renderObj
+         * @public
+         * @since 1.0.0
+         */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             if (s._cp)
@@ -3662,9 +3778,8 @@ var annie;
                 var len = s.children.length;
                 for (var i = 0; i < len; i++) {
                     child = s.children[i];
-                    if (child._isUseToMask > 0) {
+                    if (child._isUseToMask > 0)
                         continue;
-                    }
                     if (child.cAlpha > 0 && child._visible) {
                         if (maskObj) {
                             if (child.mask && child.mask.parent == child.parent) {
@@ -3711,32 +3826,97 @@ var annie;
      */
     var MovieClip = (function (_super) {
         __extends(MovieClip, _super);
+        /**
+         * 构造函数
+         * @method MovieClip
+         * @public
+         * @since 1.0.0
+         */
         function MovieClip() {
             _super.call(this);
+            /**
+             * @property _curFrame
+             * @type {number}
+             * @private
+             * @since 2.0.0
+             * @default 1
+             */
             this._curFrame = 1;
+            /**
+             * @property _lastFrameObj
+             * @type {Object}
+             * @private
+             * @default null
+             */
             this._lastFrameObj = null;
+            /**
+             * @property _isPlaying
+             * @type {boolean}
+             * @private
+             * @since 2.0.0
+             * @default true
+             */
             this._isPlaying = true;
+            /**
+             * @property _isFront
+             * @type {boolean}
+             * @private
+             * @default true
+             */
             this._isFront = true;
+            /**
+             * @property _lastFrame
+             * @type {number}
+             * @private
+             * @default 0
+             */
             this._lastFrame = 0;
+            /**
+             * sprite 和 moveClip的类资源信息
+             * @property _a2x_res_class
+             * @type {Object}
+             * @since 2.0.0
+             * @private
+             */
+            this._a2x_res_class = { tf: 1 };
+            /**
+             * @property _a2x_res_children
+             * @type {Array}
+             * @private
+             * @since 2.0.0
+             */
+            this._a2x_res_children = [];
+            /**
+             * @property _a2x_script
+             * @type {Object}
+             * @default null
+             * @private
+             * @since 2.0.0
+             */
             this._a2x_script = null;
+            /**
+             * @property _mode
+             * @type {boolean}
+             * @private
+             * @default false
+             */
             this._mode = -2;
             this._clicked = false;
-            this._mouseEvent = function (e) {
-                var s = this;
-                if (!s._clicked) {
-                    var frame = 2;
-                    if (e.type == "onMouseDown") {
-                        if (s._curFrame > 2) {
-                            frame = 3;
-                        }
-                    }
-                    else {
-                        frame = 1;
-                    }
-                    s.gotoAndStop(frame);
-                }
-            };
+            /**
+             * @property _maskList
+             * @type {Array}
+             * @private
+             * @default []
+             */
             this._maskList = [];
+            /**
+             * @property _a2x_sounds
+             * @since 2.0.0
+             * @type {Object}
+             * @private
+             * @default {null}
+             */
+            this._a2x_sounds = null;
             var s = this;
             s._instanceType = "annie.MovieClip";
         }
@@ -3810,6 +3990,7 @@ var annie;
          * @method stop
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.stop = function () {
             var s = this;
@@ -3830,7 +4011,7 @@ var annie;
             s._a2x_script[frameIndex] = frameScript;
         };
         /**
-         * @移除帧上的回调方法
+         * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
@@ -3843,9 +4024,12 @@ var annie;
         };
         Object.defineProperty(MovieClip.prototype, "isButton", {
             /**
-             * 目前是否是被initButton() 过成了按钮形式
+             * 确认是不是按钮形态
              * @property isButton
-             * @return {boolean}
+             * @type {boolean}
+             * @public
+             * @since 2.0.0
+             * @default false
              */
             get: function () {
                 return this._mode == -1;
@@ -3859,6 +4043,7 @@ var annie;
          * @method initButton
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.initButton = function () {
             var s = this;
@@ -3873,15 +4058,23 @@ var annie;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
+            /**
+             * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+             * @property clicked
+             * @return {boolean}
+             * @public
+             * @since 2.0.0
+             */
             get: function () {
                 return this._clicked;
             },
             /**
-             * 如果设置成button模式，则些方法可以将按钮定格在按下状态
+             * 设置是否为点击状态
              * @property clicked
-             * @public
              * @param {boolean} value
+             * @public
              * @since 2.0.0
+             * @default false
              */
             set: function (value) {
                 var s = this;
@@ -3895,6 +4088,22 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        MovieClip.prototype._mouseEvent = function (e) {
+            var s = this;
+            if (!s._clicked) {
+                var frame = 2;
+                if (e.type == "onMouseDown") {
+                    if (s._curFrame > 2) {
+                        frame = 3;
+                    }
+                }
+                else {
+                    frame = 1;
+                }
+                s.gotoAndStop(frame);
+            }
+        };
+        ;
         /**
          * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
@@ -3914,6 +4123,7 @@ var annie;
          * @method nextFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         MovieClip.prototype.nextFrame = function () {
             var s = this;
@@ -3927,6 +4137,7 @@ var annie;
          * @method prevFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         MovieClip.prototype.prevFrame = function () {
             var s = this;
@@ -3940,7 +4151,8 @@ var annie;
          * @method gotoAndStop
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
+         * @return {void}
          */
         MovieClip.prototype.gotoAndStop = function (frameIndex) {
             var s = this;
@@ -3969,6 +4181,7 @@ var annie;
          * @method play
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         MovieClip.prototype.play = function (isFront) {
             if (isFront === void 0) { isFront = true; }
@@ -3983,6 +4196,7 @@ var annie;
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         * @return {void}
          */
         MovieClip.prototype.gotoAndPlay = function (frameIndex, isFront) {
             if (isFront === void 0) { isFront = true; }
@@ -4013,39 +4227,88 @@ var annie;
             var s = this;
             if (!s._visible)
                 return;
-            //enterFrame事件一定要放在这里，不要再移到其他地方
-            if (s.hasEventListener("onEnterFrame")) {
-                s.dispatchEvent("onEnterFrame");
-            }
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
-                var isNeedUpdate = false;
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
                 }
-                if (s._lastFrame != s._curFrame) {
-                    isNeedUpdate = true;
-                }
-                else {
-                    if (s._isPlaying) {
-                        isNeedUpdate = true;
-                        if (s._isFront) {
-                            s._curFrame++;
-                            if (s._curFrame > s._a2x_res_class.tf) {
-                                s._curFrame = 1;
-                            }
+                if (s._isPlaying) {
+                    if (s._isFront) {
+                        s._curFrame++;
+                        if (s._curFrame > s._a2x_res_class.tf) {
+                            s._curFrame = 1;
                         }
-                        else {
-                            s._curFrame--;
-                            if (s._curFrame < 1) {
-                                s._curFrame = s._a2x_res_class.tf;
-                            }
+                    }
+                    else {
+                        s._curFrame--;
+                        if (s._curFrame < 1) {
+                            s._curFrame = s._a2x_res_class.tf;
                         }
                     }
                 }
-                var timeLineObj = s._a2x_res_class;
-                var frameIndex = s._curFrame - 1;
-                if (isNeedUpdate) {
+                if (s._lastFrame != s._curFrame) {
+                    s._lastFrame = s._curFrame;
+                    var timeLineObj = s._a2x_res_class;
+                    //先确定是哪一帧
+                    var allChildren = s._a2x_res_children;
+                    var childCount = allChildren.length;
+                    var objId = 0;
+                    var obj = null;
+                    var objInfo = null;
+                    var curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
+                    if (s._lastFrameObj != curFrameObj) {
+                        s._lastFrameObj = curFrameObj;
+                        s.children.length = 0;
+                        var maskObj = null;
+                        var maskTillId = -1;
+                        for (var i = childCount - 1; i >= 0; i--) {
+                            objId = allChildren[i][0];
+                            obj = allChildren[i][1];
+                            objInfo = curFrameObj.c[objId];
+                            //证明这一帧有这个对象
+                            if (objInfo) {
+                                annie.d(obj, objInfo);
+                            }
+                            if (objInfo || objId == 0) {
+                                //如果之前没有在显示对象列表,则添加进来
+                                // 检查是否有遮罩
+                                if (objInfo.ma != undefined) {
+                                    maskObj = obj;
+                                    maskTillId = objInfo.ma;
+                                }
+                                else {
+                                    if (maskObj) {
+                                        obj.mask = maskObj;
+                                        if (objId == maskTillId) {
+                                            maskObj = null;
+                                        }
+                                    }
+                                }
+                                s.children.unshift(obj);
+                                if ((!obj.parent || s.parent != s) && s.stage) {
+                                    obj["_cp"] = true;
+                                    obj.parent = s;
+                                    obj._onDispatchBubbledEvent("onAddToStage");
+                                }
+                            }
+                            else {
+                                //这一帧没这个对象,如果之前在则删除
+                                if (obj.parent) {
+                                    obj._onDispatchBubbledEvent("onRemoveToStage");
+                                    obj.parent = null;
+                                }
+                            }
+                        }
+                    }
+                    //有没有声音
+                    var frameIndex = s._lastFrame - 1;
+                    var curFrameSound = timeLineObj.s[frameIndex];
+                    if (curFrameSound) {
+                        for (var sound in curFrameSound) {
+                            s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
+                        }
+                    }
+                    //更新完所有后再来确定事件和脚本
                     var curFrameScript = void 0;
                     //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
                     var isUserScript = false;
@@ -4083,119 +4346,6 @@ var annie;
                         });
                     }
                 }
-                if (s._lastFrame != s._curFrame) {
-                    //先确定是哪一帧
-                    s._lastFrame = s._curFrame;
-                    var allChildren = s._a2x_res_children;
-                    var curFrameObj = null;
-                    var lastFrameObj = s._lastFrameObj;
-                    if (timeLineObj.timeLine[s._curFrame - 1] >= 0) {
-                        curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
-                    }
-                    else {
-                        curFrameObj = {};
-                    }
-                    if (lastFrameObj != curFrameObj) {
-                        //更新元素
-                        var lastFrameChildrenObjectIdObj = null;
-                        if (lastFrameObj && lastFrameObj.c) {
-                            //获取上一次动画所在的帧数据
-                            lastFrameChildrenObjectIdObj = lastFrameObj.c;
-                        }
-                        else {
-                            lastFrameChildrenObjectIdObj = {};
-                        }
-                        //获取当前动画所在的帧数据
-                        var curFrameChildrenObjectIdObj = null;
-                        if (curFrameObj.c) {
-                            curFrameChildrenObjectIdObj = curFrameObj.c;
-                        }
-                        else {
-                            curFrameChildrenObjectIdObj = {};
-                        }
-                        //上一帧有，这一帧没有的，要执行移除
-                        for (var item in lastFrameChildrenObjectIdObj) {
-                            if (curFrameChildrenObjectIdObj[item] == undefined) {
-                                //remove
-                                s.removeChild(allChildren[lastFrameChildrenObjectIdObj[item].o - 1]);
-                            }
-                        }
-                        //这一帧有，上一帧没有，要执行添加
-                        for (var item in curFrameChildrenObjectIdObj) {
-                            if (lastFrameChildrenObjectIdObj[item] == undefined) {
-                                //add
-                                if (curFrameChildrenObjectIdObj[item].at == undefined) {
-                                    s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1], 0);
-                                }
-                                else if (curFrameChildrenObjectIdObj[item].at == 0) {
-                                    s.addChild(allChildren[curFrameChildrenObjectIdObj[item].o - 1]);
-                                }
-                                else {
-                                    var isFind = false;
-                                    for (var i = 0; i < s.children.length; i++) {
-                                        if (s.children[i] == allChildren[curFrameChildrenObjectIdObj[item].at - 1]) {
-                                            s.addChildAt(allChildren[curFrameChildrenObjectIdObj[item].o - 1], i);
-                                            isFind = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!isFind) {
-                                        //倒播的时候，有些本来先出现的元素变成了后出现，这样的话在children列表里根本找不到是在谁的上面
-                                        //所以如果找不到的话就直接添加到最上层
-                                        s.addChild(allChildren[curFrameChildrenObjectIdObj[item].o - 1]);
-                                    }
-                                }
-                            }
-                        }
-                        //更新child属性
-                        s._maskList.length = 0;
-                        var maskList = s._maskList;
-                        if (curFrameObj.c) {
-                            for (var i in curFrameObj.c) {
-                                annie.d(allChildren[curFrameObj.c[i].o - 1], curFrameObj.c[i]);
-                                //检查是否有遮罩
-                                if (curFrameObj.c[i].ma != undefined) {
-                                    if (curFrameObj.c[i].ma != curFrameObj.c[i].o) {
-                                        maskList.push(allChildren[curFrameObj.c[i].ma - 1], allChildren[curFrameObj.c[i].o - 1]);
-                                    }
-                                    allChildren[curFrameObj.c[i].o - 1]._isUseToMask = true;
-                                }
-                            }
-                        }
-                        //如果有遮罩则更新遮罩
-                        if (maskList.length > 0) {
-                            var isFindMask = false;
-                            for (var i = 0; i < s.children.length; i++) {
-                                if (s.children[i] == maskList[0]) {
-                                    //找到最下面的mask对象
-                                    isFindMask = true;
-                                }
-                                else if (s.children[i] == maskList[1]) {
-                                    //结束mask，并寻找下一个mask
-                                    isFindMask = false;
-                                    //同时删除maskList前两位元素
-                                    maskList.splice(0, 2);
-                                    //判断是否还有遮罩，有就继续，没有就退出循环
-                                    if (maskList.length == 0) {
-                                        break;
-                                    }
-                                }
-                                if (isFindMask) {
-                                    s.children[i].mask = maskList[1];
-                                }
-                            }
-                        }
-                    }
-                    s._lastFrameObj = curFrameObj;
-                    //有没有声音
-                    frameIndex = s._curFrame - 1;
-                    var curFrameSound = timeLineObj.s[frameIndex];
-                    if (curFrameSound) {
-                        for (var sound in curFrameSound) {
-                            allChildren[sound - 1].play(0, curFrameSound[sound]);
-                        }
-                    }
-                }
             }
             _super.prototype.update.call(this, isDrawUpdate);
         };
@@ -4205,6 +4355,9 @@ var annie;
             s._lastFrameObj = null;
             s._a2x_script = null;
             s._maskList = null;
+            s._a2x_res_children = null;
+            s._a2x_res_class = null;
+            s._a2x_sounds = null;
             _super.prototype.destroy.call(this);
         };
         return MovieClip;
@@ -5294,17 +5447,6 @@ var annie;
             configurable: true
         });
         /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        Stage.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
-            var s = this;
-            _super.prototype.update.call(this, isDrawUpdate);
-        };
-        /**
          * 渲染函数
          * @method render
          * @param renderObj
@@ -5341,20 +5483,21 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
+                //更新视觉
                 s.update(true);
+                //更新渲染
                 s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.render(s.renderObj);
                     s._currentFlush = s._flush;
                 }
                 else {
-                    // if (s._currentFlush == s._flush) {
-                    //     s.render(s.renderObj);
-                    // }
+                    if (s._currentFlush == s._flush) {
+                        s.render(s.renderObj);
+                    }
                     s._currentFlush--;
                 }
             }
@@ -5482,6 +5625,7 @@ var annie;
  */
 var annie;
 (function (annie) {
+    //declare let WeixinJSBridge:any;
     /**
      * 声音类
      * @class annie.Sound
@@ -5501,7 +5645,7 @@ var annie;
         function Sound(src) {
             _super.call(this);
             /**
-             * wx.createAudio()创建出来的声音对象
+             * html 标签 有可能是audio 或者 video
              * @property media
              * @type {Audio}
              * @public
@@ -5516,6 +5660,13 @@ var annie;
              */
             this.isPlaying = false;
             this._repeate = 1;
+            /**
+             * 每个声音可以有个名字，并且不同的声音名字可以相同
+             * @property name
+             * @type {string}
+             * @since 2.0.0
+             */
+            this.name = "";
             var s = this;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
@@ -5526,7 +5677,6 @@ var annie;
                     s.media.play();
                 }
             });
-            Sound._soundList.push(s);
         }
         /**
          * 开始播放媒体
@@ -5597,12 +5747,18 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
         Sound.prototype.stop2 = function () {
             var s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         };
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
         Sound.prototype.play2 = function () {
             var s = this;
             if (s.isPlaying) {
@@ -5646,7 +5802,7 @@ var annie;
             }
         };
         /**
-         * 设置当前所有正在播放的音量，当然一定要是annie.Sound类的声音
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
          * @since 1.1.1
          * @static
@@ -6797,8 +6953,8 @@ var annie;
      * 全局事件侦听
      * @property annie.globalDispatcher
      * @type {annie.EventDispatcher}
-     * @public
      * @static
+     * @example
      */
     annie.globalDispatcher = new annie.EventDispatcher();
     /**
@@ -6817,18 +6973,15 @@ var annie;
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
+     *      var s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
+     *          var i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }
-     *
      */
     annie.StageScaleMode = {
         EXACT_FIT: "exactFit",
@@ -6838,38 +6991,28 @@ var annie;
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
-    console.log("AnnieJS:https://github.com/Annie2x/annieJS");
     var res = {};
+    /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
     annie.createAudio = null;
     annie.getImageInfo = null;
+    /**
+     * 继承类方法
+     * @type {Function}
+     */
     annie.A2xExtend = null;
     /**
-     * 通过annie.loadScene加载场景后的类引用全放在这里,也就是说只要不是引擎的类和方法。所有fla加载后的命名空间都在这里面。
-     * @property classPool
+     * 加载后的类引用全放在这里
      * @type {Object}
-     * @public
-     * @static
-     * @example
-     *      //如在Html5里，我们加载了一个test.fla，设置了他的命名空间为test，那么我们要初始化这里面的类，应该是下面这样。
-     *      var myTestObj=new test.Test();
-     *      var myTestXxx=new test.XXXX();
-     *      //那么在微信小程序和小游戏里我们要怎么做呢
-     *      var myTestObj=new annie.classPool.test.Test();
-     *      var myTestXxx=new annie.classPool.test.XXXX();
-     *      //对你猜到了,就是这么简单。
      */
     annie.classPool = null;
     /**
-     * 加载场景的方法,和Html5的loadScene方法不同的是，这是一个同步方法。也就是说直接运行下，不需要填写回调就可以直接使用。
+     * 加载场景的方法
      * @method annie.loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @static
-     * @public
-     * @return {void}
-     * @example
-     *      //如你有一个test.fla，命名空间也是test，那么你发布之后就是像下面这样加载并使用它。
-     *      annie.loadScene("test");
-     *      var myTest=new annie.classPool.test.Test();
+     * @type {Function}
      */
     annie.loadScene = null;
     /**
@@ -6877,7 +7020,6 @@ var annie;
      * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
-     * @static
      */
     function isLoadedScene(sceneName) {
         if (annie.classPool[sceneName]) {
@@ -6887,23 +7029,28 @@ var annie;
     }
     annie.isLoadedScene = isLoadedScene;
     /**
-     * 删除加载过的场景,在删除场景之前，最好是将此场景里所有的类开资源回收掉，以免内存泄漏
+     * 删除加载过的场景
      * @method annie.unLoadScene
      * @param {string} sceneName
-     * @public
-     * @static
      */
     function unLoadScene(sceneName) {
         annie.classPool[sceneName] = null;
         delete annie.classPool[sceneName];
     }
     annie.unLoadScene = unLoadScene;
+    /**
+     * 解析资源
+     * @method annie.parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
     function parseScene(sceneName, sceneRes, sceneData) {
         res[sceneName] = {};
         res[sceneName]._a2x_con = sceneData;
         for (var i = 0; i < sceneRes.length; i++) {
             if (sceneRes[i].type == "image" || sceneRes[i].type == "sound") {
-                res[sceneName][sceneRes[i].id] = annie.subDomainPath + sceneRes[i].src;
+                res[sceneName][sceneRes[i].id] = sceneRes[i].src;
             }
         }
         var mc;
@@ -6918,51 +7065,64 @@ var annie;
                     var frameList = mc.f;
                     var count = frameList.length;
                     var frameCon = null;
-                    var children = {};
-                    var children2 = {};
+                    var lastFrameCon = null;
+                    var ol = [];
                     for (var i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
+                        //这帧是否为空
                         if (frameCon) {
                             for (var j in frameCon) {
-                                if (i == 0) {
-                                    children[j] = [frameCon[j]][0];
-                                }
-                                else {
-                                    if (frameCon[j].a != 3) {
-                                        children2[j] = frameCon[j];
+                                var at = frameCon[j].at;
+                                if (at != undefined && at != -1) {
+                                    if (at == 0) {
+                                        ol.push(j);
                                     }
-                                    if (frameCon[j].a != 1) {
-                                        if (frameCon[j].a == 2) {
-                                            for (var o in children[j]) {
-                                                if (frameCon[j][o] == undefined) {
-                                                    frameCon[j][o] = children[j][o];
+                                    else {
+                                        for (var l = 0; l < ol.length; l++) {
+                                            if (ol[l] == at) {
+                                                ol.splice(l, 0, j);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    delete frameCon[j].at;
+                                }
+                            }
+                            //上一帧是否为空
+                            if (lastFrameCon) {
+                                for (var j in lastFrameCon) {
+                                    //上一帧有，这一帧没有，加进来
+                                    if (!frameCon[j]) {
+                                        frameCon[j] = lastFrameCon[j];
+                                    }
+                                    else {
+                                        //上一帧有，这一帧也有那么at就只有-1一种可能
+                                        if (frameCon[j].at != -1) {
+                                            //如果不为空，则更新元素
+                                            for (var m in lastFrameCon[j]) {
+                                                if (!frameCon[j][m]) {
+                                                    frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
                                         }
                                         else {
+                                            //如果为-1，删除元素
                                             delete frameCon[j];
                                         }
-                                        children[j] = null;
-                                        delete children[j];
                                     }
                                 }
                             }
-                            if (i > 0) {
-                                for (var o in children) {
-                                    frameCon[o] = children2[o] = children[o];
-                                }
-                                children = children2;
-                                children2 = {};
-                            }
                         }
+                        lastFrameCon = frameCon;
                     }
+                    mc.ol = ol;
                 }
             }
         }
     }
     annie.parseScene = parseScene;
     /**
-     * 获取已经加载场景中的资源,一般通过此方法获取fla库中的图片和声音资源路径
+     * 获取已经加载场景中的资源
      * @method annie.getResource
      * @public
      * @static
@@ -6979,7 +7139,7 @@ var annie;
     }
     annie.getResource = getResource;
     /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
+     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method annie.b
      * @public
      * @since 1.0.0
@@ -6992,7 +7152,7 @@ var annie;
         return new annie.Bitmap(res[sceneName][resName]);
     }
     /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
      * @method annie.d
      * @public
      * @static
@@ -7041,7 +7201,7 @@ var annie;
     var _textLineType = ["single", "multiline"];
     var _textAlign = ["left", "center", "right"];
     /**
-     * 创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
+     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method annie.t
      * @public
      * @static
@@ -7219,21 +7379,23 @@ var annie;
                 resClass.label = label;
             }
         }
-        if (resClass.c) {
-            var children = resClass.c;
+        var children = resClass.c;
+        if (children) {
+            var allChildren = [];
             var objCount = children.length;
             var obj = null;
-            var objId = 0;
+            var objType = 0;
             var maskObj = null;
             var maskTillId = 0;
             for (i = 0; i < objCount; i++) {
+                //if (children[i].indexOf("_$") == 0) {
                 if (Array.isArray(classRoot[children[i]])) {
-                    objId = classRoot[children[i]][0];
+                    objType = classRoot[children[i]][0];
                 }
                 else {
-                    objId = classRoot[children[i]].t;
+                    objType = classRoot[children[i]].t;
                 }
-                switch (objId) {
+                switch (objType) {
                     case 1:
                     case 4:
                         //text 和 Sprite
@@ -7242,7 +7404,7 @@ var annie;
                             obj = target[resClass.n[i]];
                         }
                         else {
-                            if (objId == 4) {
+                            if (objType == 4) {
                                 obj = t(sceneName, children[i]);
                             }
                             else {
@@ -7277,13 +7439,12 @@ var annie;
                     case 5:
                         //sound
                         obj = s(sceneName, children[i]);
+                        obj.name = children[i];
                         target.addSound(obj);
                 }
-                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
-                target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
                     var index = i + 1;
-                    if (objId == 5) {
+                    if (objType == 5) {
                         obj._repeate = resClass.s[0][index];
                     }
                     else {
@@ -7304,10 +7465,29 @@ var annie;
                         target.addChildAt(obj, 0);
                     }
                 }
+                else {
+                    //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                    allChildren[allChildren.length] = obj;
+                    //如果是声音，还要把i这个顺序保存下来
+                    if (!target._a2x_sounds) {
+                        target._a2x_sounds = {};
+                    }
+                    target._a2x_sounds[i] = obj;
+                }
+            }
+            if (isMc) {
+                //将mc里面的实例按照时间轴上的图层排序
+                var ol = resClass.ol;
+                if (ol) {
+                    for (var o = 0; o < ol.length; o++) {
+                        target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
+                    }
+                }
             }
         }
     }
     annie.initRes = initRes;
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
 })(annie || (annie = {}));
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);

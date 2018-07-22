@@ -229,18 +229,6 @@ namespace annie {
             s._scaleMode = scaleMode;
             s.setAlign();
         }
-
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        public update(isDrawUpdate: boolean = true): void {
-            let s = this;
-                super.update(isDrawUpdate);
-        }
-
         private _touchEvent: annie.TouchEvent;
 
         /**
@@ -301,23 +289,24 @@ namespace annie {
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
+                //更新视觉
                 s.update(true);
+                //更新渲染
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.render(s.renderObj);
                     s._currentFlush = s._flush;
                 } else {
-                    // if (s._currentFlush == s._flush) {
-                    //     s.render(s.renderObj);
-                    // }
+                    if (s._currentFlush == s._flush) {
+                        s.render(s.renderObj);
+                        //更新事件
+                    }
                     s._currentFlush--;
                 }
             }
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate

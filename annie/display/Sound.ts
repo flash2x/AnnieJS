@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+    //declare let WeixinJSBridge:any;
     /**
      * 声音类
      * @class annie.Sound
@@ -11,7 +12,7 @@ namespace annie {
      */
     export class Sound extends annie.EventDispatcher {
         /**
-         * wx.createAudio()创建出来的声音对象
+         * html 标签 有可能是audio 或者 video
          * @property media
          * @type {Audio}
          * @public
@@ -38,9 +39,7 @@ namespace annie {
                     s.media.play();
                 }
             });
-            Sound._soundList.push(s);
         }
-
         /**
          * 是否正在播放中
          * @property  isPlaying
@@ -97,6 +96,13 @@ namespace annie {
         }
 
         /**
+         * 每个声音可以有个名字，并且不同的声音名字可以相同
+         * @property name
+         * @type {string}
+         * @since 2.0.0
+         */
+        public name:string="";
+        /**
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
@@ -108,13 +114,18 @@ namespace annie {
         public set volume(value:number){
             this.media.volume=value;
         }
-
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
         private stop2() {
             let s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         }
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
         private play2() {
             let s = this;
             if (s.isPlaying) {
@@ -160,14 +171,14 @@ namespace annie {
         }
 
         /**
-         * 设置当前所有正在播放的音量，当然一定要是annie.Sound类的声音
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
          * @since 1.1.1
          * @static
          * @public
          * @param {number} volume 音量大小，从0-1
          */
-        public static setAllSoundsVolume(volume: number) {
+        public static setAllSoundsVolume(volume: number){
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {

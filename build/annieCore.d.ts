@@ -1037,7 +1037,7 @@ declare namespace annie {
          * @property stage
          * @public
          * @since 1.0.0
-         * @type {Stage}
+         * @type {annie.Stage}
          * @default null;
          * @readonly
          * */
@@ -1190,7 +1190,7 @@ declare namespace annie {
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
-         * @public
+         * @pubic
          * @since 1.0.0
          * @type {number}
          * @default 0
@@ -1216,7 +1216,6 @@ declare namespace annie {
          * @type {string}
          * @default 0
          */
-        blendMode: string;
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -1236,8 +1235,8 @@ declare namespace annie {
          * @default null
          */
         mask: DisplayObject;
-        private _mask;
         protected _isUseToMask: number;
+        private _mask;
         /**
          * 显示对象的滤镜数组
          * @property filters
@@ -1248,6 +1247,11 @@ declare namespace annie {
          */
         filters: any[];
         private _filters;
+        /**
+         * 是否自己的父级发生的改变
+         * @type {boolean}
+         * @private
+         */
         protected _cp: boolean;
         /**
          *将全局坐标转换到本地坐标值
@@ -1267,6 +1271,12 @@ declare namespace annie {
          * @return {annie.Point}
          */
         localToGlobal(point: Point, bp?: Point): Point;
+        /**
+         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
+         * @type {annie.Point}
+         * @private
+         * @static
+         */
         static _bp: Point;
         static _p1: Point;
         static _p2: Point;
@@ -1281,6 +1291,7 @@ declare namespace annie {
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
+         * @return {void}
          * @public
          */
         startDrag(isCenter?: boolean, bounds?: Rectangle): void;
@@ -1289,6 +1300,7 @@ declare namespace annie {
          * @method stopDrag
          * @public
          * @since 1.1.2
+         * @return {void}
          */
         stopDrag(): void;
         /**
@@ -1321,10 +1333,11 @@ declare namespace annie {
          */
         getDrawRect(): Rectangle;
         /**
-         * 更新渲染信息函数
+         * 更新函数
          * @method update
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         protected update(isDrawUpdate?: boolean): void;
         /**
@@ -1334,6 +1347,7 @@ declare namespace annie {
          * @since 1.0.0
          * @param {annie.IRender} renderObj
          * @abstract
+         * @return {void}
          */
         render(renderObj: IRender | any): void;
         /**
@@ -1344,6 +1358,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @private
+         * @return {void}
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
@@ -1352,7 +1367,7 @@ declare namespace annie {
          * @property  width
          * @public
          * @since 1.0.3
-         * @type {number}
+         * @return {number}
          */
         width: number;
         /**
@@ -1361,7 +1376,7 @@ declare namespace annie {
          * @property  height
          * @public
          * @since 1.0.3
-         * @type {number}
+         * @return {number}
          */
         height: number;
         /**
@@ -1388,22 +1403,46 @@ declare namespace annie {
         protected _drawRect: Rectangle;
         protected _setProperty(property: string, value: any, type: number): void;
         /**
+         * 停止这个显示对象上的所有声音
+         * @method stopAllSounds
+         * @public
+         * @since 2.0.0
+         */
+        stopAllSounds(): void;
+        /**
+         * @method getSound
+         * @param {number|string} id
+         * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         */
+        getSound(id: any): any;
+        private _soundList;
+        /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @method addSound
          * @param {annie.Sound} sound
-         * @return {number}
+         * @return {void}
+         * @since 2.0.0
          * @public
          */
-        addSound(sound: any): number;
+        addSound(sound: annie.Sound): void;
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
-         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
          * @public
+         * @since 2.0.0
+         * @param {number|string} id
+         * @return {void}
          */
-        removeSound(id: number): void;
-        private _a2x_sounds;
+        removeSound(id: number | string): void;
+        /**
+         * 每个Flash文件生成的对象都有一个自带的初始化信息
+         * @property _a2x_res_obj
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         * @default {Object}
+         */
         private _a2x_res_obj;
         destroy(): void;
     }
@@ -1837,9 +1876,13 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Sprite extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         constructor();
-        private _a2x_res_class;
-        private _a2x_res_children;
         destroy(): void;
         /**
          * 是否可以让children接收鼠标事件,如果为false
@@ -1867,6 +1910,7 @@ declare namespace annie {
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         addChild(child: DisplayObject): void;
         /**
@@ -1875,8 +1919,20 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         removeChild(child: DisplayObject): void;
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         * @return {void}
+         */
         private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
@@ -1884,7 +1940,7 @@ declare namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -1896,6 +1952,7 @@ declare namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         addChildAt(child: DisplayObject, index: number): void;
         /**
@@ -1932,6 +1989,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
@@ -1940,6 +1998,7 @@ declare namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeChildAt(index: number): void;
         /**
@@ -1947,11 +2006,34 @@ declare namespace annie {
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeAllChildren(): void;
         update(isDrawUpdate?: boolean): void;
+        /**
+         * 重写碰撞测试
+         * @method hitTestPoint
+         * @param {annie.Point} hitPoint 要检测碰撞的点
+         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
+         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
+         * @return {annie.DisplayObject}
+         */
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
+        /**
+         * 重写getBounds
+         * @method getBounds
+         * @return {annie.Rectangle}
+         * @since 1.0.0
+         * @public
+         */
         getBounds(): Rectangle;
+        /**
+         * 重写渲染
+         * @method render
+         * @param {annie.IRender} renderObj
+         * @public
+         * @since 1.0.0
+         */
         render(renderObj: IRender): void;
     }
 }
@@ -1977,7 +2059,20 @@ declare namespace annie {
          * @readonly
          */
         currentFrame: number;
+        /**
+         * @property _curFrame
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         * @default 1
+         */
         private _curFrame;
+        /**
+         * @property _lastFrameObj
+         * @type {Object}
+         * @private
+         * @default null
+         */
         private _lastFrameObj;
         /**
          * 当前动画是否处于播放状态
@@ -1990,6 +2085,13 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
+        /**
+         * @property _isPlaying
+         * @type {boolean}
+         * @private
+         * @since 2.0.0
+         * @default true
+         */
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2001,6 +2103,12 @@ declare namespace annie {
          * @readonly
          */
         isFront: boolean;
+        /**
+         * @property _isFront
+         * @type {boolean}
+         * @private
+         * @default true
+         */
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2012,15 +2120,50 @@ declare namespace annie {
          * @readonly
          */
         totalFrames: number;
+        /**
+         * @property _lastFrame
+         * @type {number}
+         * @private
+         * @default 0
+         */
         private _lastFrame;
+        /**
+         * 构造函数
+         * @method MovieClip
+         * @public
+         * @since 1.0.0
+         */
         constructor();
+        /**
+         * sprite 和 moveClip的类资源信息
+         * @property _a2x_res_class
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         */
+        private _a2x_res_class;
+        /**
+         * @property _a2x_res_children
+         * @type {Array}
+         * @private
+         * @since 2.0.0
+         */
+        private _a2x_res_children;
         /**
          * 调用止方法将停止当前帧
          * @method stop
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         stop(): void;
+        /**
+         * @property _a2x_script
+         * @type {Object}
+         * @default null
+         * @private
+         * @since 2.0.0
+         */
         private _a2x_script;
         /**
          * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
@@ -2032,7 +2175,7 @@ declare namespace annie {
          */
         addFrameScript(frameIndex: number, frameScript: Function): void;
         /**
-         * @移除帧上的回调方法
+         * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
@@ -2040,11 +2183,20 @@ declare namespace annie {
          */
         removeFrameScript(frameIndex: number): void;
         /**
-         * 目前是否是被initButton() 过成了按钮形式
+         * 确认是不是按钮形态
          * @property isButton
-         * @return {boolean}
+         * @type {boolean}
+         * @public
+         * @since 2.0.0
+         * @default false
          */
         isButton: boolean;
+        /**
+         * @property _mode
+         * @type {boolean}
+         * @private
+         * @default false
+         */
         private _mode;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2052,18 +2204,33 @@ declare namespace annie {
          * @method initButton
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         initButton(): void;
         /**
-         * 如果设置成button模式，则些方法可以将按钮定格在按下状态
+         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
          * @property clicked
+         * @return {boolean}
          * @public
-         * @param {boolean} value
          * @since 2.0.0
+         */
+        /**
+         * 设置是否为点击状态
+         * @property clicked
+         * @param {boolean} value
+         * @public
+         * @since 2.0.0
+         * @default false
          */
         clicked: boolean;
         private _clicked;
-        private _mouseEvent;
+        private _mouseEvent(e);
+        /**
+         * @property _maskList
+         * @type {Array}
+         * @private
+         * @default []
+         */
         private _maskList;
         /**
          * movieClip的当前帧的标签数组,没有则为null
@@ -2078,6 +2245,7 @@ declare namespace annie {
          * @method nextFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         nextFrame(): void;
         /**
@@ -2085,6 +2253,7 @@ declare namespace annie {
          * @method prevFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         prevFrame(): void;
         /**
@@ -2092,7 +2261,8 @@ declare namespace annie {
          * @method gotoAndStop
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
+         * @return {void}
          */
         gotoAndStop(frameIndex: number | string): void;
         /**
@@ -2100,6 +2270,7 @@ declare namespace annie {
          * @method play
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         play(isFront?: boolean): void;
         /**
@@ -2109,9 +2280,18 @@ declare namespace annie {
          * @since 1.0.0
          * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         update(isDrawUpdate?: boolean): void;
+        /**
+         * @property _a2x_sounds
+         * @since 2.0.0
+         * @type {Object}
+         * @private
+         * @default {null}
+         */
+        private _a2x_sounds;
         destroy(): void;
     }
 }
@@ -2485,13 +2665,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        update(isDrawUpdate?: boolean): void;
         private _touchEvent;
         /**
          * 渲染函数
@@ -2622,7 +2795,7 @@ declare namespace annie {
      */
     class Sound extends annie.EventDispatcher {
         /**
-         * wx.createAudio()创建出来的声音对象
+         * html 标签 有可能是audio 或者 video
          * @property media
          * @type {Audio}
          * @public
@@ -2670,13 +2843,26 @@ declare namespace annie {
          */
         pause(isPause?: boolean): void;
         /**
+         * 每个声音可以有个名字，并且不同的声音名字可以相同
+         * @property name
+         * @type {string}
+         * @since 2.0.0
+         */
+        name: string;
+        /**
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
          * @return {number}
          */
         volume: number;
+        /**
+         * 停止播放，给stopAllSounds调用
+         */
         private stop2();
+        /**
+         * 恢复播放，给stopAllSounds调用
+         */
         private play2();
         private static _soundList;
         /**
@@ -2696,7 +2882,7 @@ declare namespace annie {
          */
         static resumePlaySounds(): void;
         /**
-         * 设置当前所有正在播放的音量，当然一定要是annie.Sound类的声音
+         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
          * @since 1.1.1
          * @static
@@ -3340,8 +3526,8 @@ declare namespace annie {
      * 全局事件侦听
      * @property annie.globalDispatcher
      * @type {annie.EventDispatcher}
-     * @public
      * @static
+     * @example
      */
     let globalDispatcher: EventDispatcher;
     /**
@@ -3360,18 +3546,15 @@ declare namespace annie {
      * @example
      *      //动态更改stage的对齐方式示例
      *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
+     *      var s=this;
      *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
+     *          var i=0;
      *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              let state=e.currentTarget;
-     *              state.scaleMode=aList[i];
-     *              state.resize();
+     *              var aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
+     *              s.stage.scaleMode=aList[i];
      *              if(i>5){i=0;}
      *          }
      *      }
-     *
      */
     let StageScaleMode: {
         EXACT_FIT: string;
@@ -3381,36 +3564,27 @@ declare namespace annie {
         FIXED_WIDTH: string;
         FIXED_HEIGHT: string;
     };
+    /**
+     * 创建一个声音对象
+     * @type {Audio}
+     */
     let createAudio: Function;
     let getImageInfo: Function;
+    /**
+     * 继承类方法
+     * @type {Function}
+     */
     let A2xExtend: any;
     /**
-     * 通过annie.loadScene加载场景后的类引用全放在这里,也就是说只要不是引擎的类和方法。所有fla加载后的命名空间都在这里面。
-     * @property classPool
+     * 加载后的类引用全放在这里
      * @type {Object}
-     * @public
-     * @static
-     * @example
-     *      //如在Html5里，我们加载了一个test.fla，设置了他的命名空间为test，那么我们要初始化这里面的类，应该是下面这样。
-     *      var myTestObj=new test.Test();
-     *      var myTestXxx=new test.XXXX();
-     *      //那么在微信小程序和小游戏里我们要怎么做呢
-     *      var myTestObj=new annie.classPool.test.Test();
-     *      var myTestXxx=new annie.classPool.test.XXXX();
-     *      //对你猜到了,就是这么简单。
      */
     let classPool: any;
     /**
-     * 加载场景的方法,和Html5的loadScene方法不同的是，这是一个同步方法。也就是说直接运行下，不需要填写回调就可以直接使用。
+     * 加载场景的方法
      * @method annie.loadScene
      * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @static
-     * @public
-     * @return {void}
-     * @example
-     *      //如你有一个test.fla，命名空间也是test，那么你发布之后就是像下面这样加载并使用它。
-     *      annie.loadScene("test");
-     *      var myTest=new annie.classPool.test.Test();
+     * @type {Function}
      */
     let loadScene: Function;
     /**
@@ -3418,20 +3592,24 @@ declare namespace annie {
      * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
-     * @static
      */
     function isLoadedScene(sceneName: string): boolean;
     /**
-     * 删除加载过的场景,在删除场景之前，最好是将此场景里所有的类开资源回收掉，以免内存泄漏
+     * 删除加载过的场景
      * @method annie.unLoadScene
      * @param {string} sceneName
-     * @public
-     * @static
      */
     function unLoadScene(sceneName: string): void;
+    /**
+     * 解析资源
+     * @method annie.parseScene
+     * @param {string} sceneName
+     * @param sceneRes
+     * @param sceneData
+     */
     function parseScene(sceneName: string, sceneRes: any, sceneData: any): void;
     /**
-     * 获取已经加载场景中的资源,一般通过此方法获取fla库中的图片和声音资源路径
+     * 获取已经加载场景中的资源
      * @method annie.getResource
      * @public
      * @static
@@ -3442,7 +3620,7 @@ declare namespace annie {
      */
     function getResource(sceneName: string, resName: string): any;
     /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
+     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
      * @method annie.d
      * @public
      * @static
