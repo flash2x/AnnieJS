@@ -21,35 +21,20 @@ namespace annie {
          */
         public constructor() {
             super();
-            let s=this;
+            let s = this;
             s._instanceType = "annie.Sprite";
         }
-        /**
-         * sprite 和 moveClip的类资源信息
-         * @property _a2x_res_class
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         */
-        private _a2x_res_class:any={tf:1};
-        /**
-         * @property _a2x_res_children
-         * @type {Array}
-         * @private
-         * @since 2.0.0
-         */
-        private _a2x_res_children:any=[];
-        public destroy():void {
-            let s=this;
+
+        public destroy(): void {
+            let s = this;
             //让子级也destroy
-            for(let i=0;i<s.children.length;i++){
+            for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s._a2x_res_children=null;
-            s._a2x_res_class=null;
-            s.children=null;
+            s.children = null;
             super.destroy();
         }
+
         /**
          * 是否可以让children接收鼠标事件,如果为false
          * 鼠标事件将不会往下冒泡
@@ -70,6 +55,7 @@ namespace annie {
          * @readonly
          */
         public children: DisplayObject[] = [];
+
         /**
          * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
          * @property  cacheAsBitmap
@@ -92,8 +78,8 @@ namespace annie {
                 s._texture.src = annie.toDisplayDataURL(s);
             } else {
                 s._texture.src = "";
-                s._offsetX=0;
-                s._offsetY=0;
+                s._offsetX = 0;
+                s._offsetY = 0;
             }
             s._cacheAsBitmap = value;
         }
@@ -111,6 +97,7 @@ namespace annie {
         public addChild(child: DisplayObject): void {
             this.addChildAt(child, this.children.length);
         }
+
         /**
          * 从Sprite中移除一个child
          * @method removeChild
@@ -152,7 +139,7 @@ namespace annie {
                     name = child.name;
                     if (name && name != "") {
                         if (rex.test(name)) {
-                            resultList[resultList.length]=child;
+                            resultList[resultList.length] = child;
                             if (isOnlyOne) {
                                 return;
                             }
@@ -228,7 +215,7 @@ namespace annie {
             child.parent = s;
             len = s.children.length;
             if (index >= len) {
-                s.children[s.children.length]=child;
+                s.children[s.children.length] = child;
             } else if (index == 0) {
                 s.children.unshift(child);
             } else {
@@ -255,6 +242,7 @@ namespace annie {
                 return null;
             }
         }
+
         /**
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
@@ -264,7 +252,7 @@ namespace annie {
          * @return {number}
          */
         public getChildIndex(child: DisplayObject): number {
-            let s=this;
+            let s = this;
             let len = s.children.length;
             for (let i: number = 0; i < len; i++) {
                 if (s.children[i] == child) {
@@ -273,6 +261,7 @@ namespace annie {
             }
             return -1;
         }
+
         /**
          * 交换两个显示对象的层级
          * @method swapChild
@@ -281,30 +270,31 @@ namespace annie {
          * @since 2.0.0
          * @return {boolean}
          */
-        public swapChild(child1:any,child2:any):boolean{
-            let s=this;
-            let id1=-1;
-            let id2=-1;
-            let childCount=s.children.length;
-            if(typeof(child1)=="number"){
-               id1=child1;
-            }else{
-                id1=s.getChildIndex(child1);
+        public swapChild(child1: any, child2: any): boolean {
+            let s = this;
+            let id1 = -1;
+            let id2 = -1;
+            let childCount = s.children.length;
+            if (typeof(child1) == "number") {
+                id1 = child1;
+            } else {
+                id1 = s.getChildIndex(child1);
             }
-            if(typeof(child2)=="number"){
-                id2=child2;
-            }else{
-                id2=s.getChildIndex(child2);
+            if (typeof(child2) == "number") {
+                id2 = child2;
+            } else {
+                id2 = s.getChildIndex(child2);
             }
-            if(id1==id2||id1<0||id1>=childCount||id2<0||id2>=childCount){
+            if (id1 == id2 || id1 < 0 || id1 >= childCount || id2 < 0 || id2 >= childCount) {
                 return false;
-            }else{
-                let temp:any=s.children[id1];
-                s.children[id1]=s.children[id2];
-                s.children[id2]=temp;
+            } else {
+                let temp: any = s.children[id1];
+                s.children[id1] = s.children[id2];
+                s.children[id2] = temp;
                 return true;
             }
         }
+
         /**
          * 调用此方法对Sprite及其child触发一次指定事件
          * @method _onDispatchBubbledEvent
@@ -367,20 +357,34 @@ namespace annie {
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if (!s._visible) return;
-            if(s._instanceType=="annie.Sprite") {
-                if (s.hasEventListener("onEnterFrame")) {
-                    s.dispatchEvent("onEnterFrame");
-                }
-            }
             super.update(isDrawUpdate);
-            let len = s.children.length;
-            for (let i = len - 1; i >= 0; i--) {
-                s.children[i].update(isDrawUpdate);
-            }
+            let um: boolean = s._UI.UM;
+            let ua: boolean = s._UI.UA;
+            let uf: boolean = s._UI.UF;
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
+            //更新完成后触发
+            if (s.hasEventListener("onEnterFrame")) {
+                s.dispatchEvent("onEnterFrame");
+            }
+            let len = s.children.length;
+            let child: any = null;
+            for (let i = len - 1; i >= 0; i--) {
+                child = s.children[i];
+                if (um) {
+                    child._UI.UM = um;
+                }
+                if (uf) {
+                    child._UI.UF = uf;
+                }
+                if (ua) {
+                    child._UI.UA = ua;
+                }
+                child.update(isDrawUpdate);
+            }
         }
+
         /**
          * 重写碰撞测试
          * @method hitTestPoint
@@ -389,9 +393,9 @@ namespace annie {
          * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
          * @return {annie.DisplayObject}
          */
-        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
             let s = this;
-            if (!s.visible||(!s.mouseEnable&&isMustMouseEnable))return null;
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable)) return null;
             if (!s._cacheAsBitmap) {
                 let len = s.children.length;
                 let hitDisplayObject: DisplayObject;
@@ -399,25 +403,25 @@ namespace annie {
                 //这里特别注意是从上往下遍历
                 for (let i = len - 1; i >= 0; i--) {
                     child = s.children[i];
-                    if(child._isUseToMask>0)continue;
-                    if (child.mask&&child.mask.parent==child.parent) {
+                    if (child._isUseToMask > 0) continue;
+                    if (child.mask && child.mask.parent == child.parent) {
                         //看看点是否在遮罩内
-                        if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable)) {
+                        if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
                             continue;
                         }
                     }
-                    hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
+                    hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
                     if (hitDisplayObject) {
                         return hitDisplayObject;
                     }
                 }
             } else {
-                let p:any;
-                if(isGlobalPoint) {
+                let p: any;
+                if (isGlobalPoint) {
                     p = s.globalToLocal(hitPoint);
-                }else{
-                    p= hitPoint;
+                } else {
+                    p = hitPoint;
                 }
                 p.x += s._offsetX;
                 p.y += s._offsetY;
@@ -455,12 +459,12 @@ namespace annie {
             rect.height = 0;
             if (!s._cacheAsBitmap) {
                 let len: number = s.children.length;
-                if(len>0) {
+                if (len > 0) {
                     for (let i = 0; i < len; i++) {
                         if (s.children[i].visible)
                             Rectangle.createFromRects(rect, s.children[i].getDrawRect());
                     }
-                    if (s.mask&&s.mask.parent==s.parent) {
+                    if (s.mask && s.mask.parent == s.parent) {
                         let maskRect = s.mask.getDrawRect();
                         if (rect.x < maskRect.x) {
                             rect.x = maskRect.x;
@@ -507,10 +511,10 @@ namespace annie {
                     let len: number = s.children.length;
                     for (let i = 0; i < len; i++) {
                         child = s.children[i];
-                        if(child._isUseToMask>0) continue;
-                        if (child.cAlpha > 0 && child._visible){
+                        if (child._isUseToMask > 0) continue;
+                        if (child.cAlpha > 0 && child._visible) {
                             if (maskObj) {
-                                if (child.mask&&child.mask.parent==child.parent) {
+                                if (child.mask && child.mask.parent == child.parent) {
                                     if (child.mask != maskObj) {
                                         renderObj.endMask();
                                         maskObj = child.mask;
@@ -521,7 +525,7 @@ namespace annie {
                                     maskObj = null;
                                 }
                             } else {
-                                if (child.mask&&child.mask.parent==child.parent) {
+                                if (child.mask && child.mask.parent == child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }

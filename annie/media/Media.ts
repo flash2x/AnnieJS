@@ -34,6 +34,12 @@ namespace annie {
          */
         public isPlaying:boolean=false;
         /**
+         * 给一个声音取一个名字，方便获取
+         * @property name
+         * @type {string}
+         */
+        public name:string="";
+        /**
          * @property _loop
          * @type {number}
          * @private

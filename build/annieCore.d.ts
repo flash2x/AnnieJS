@@ -1458,33 +1458,40 @@ declare namespace annie {
          */
         protected _setProperty(property: string, value: any, type: number): void;
         /**
+         * 停止这个显示对象上的所有声音
+         * @method stopAllSounds
+         * @public
+         * @since 2.0.0
+         */
+        stopAllSounds(): void;
+        /**
+         * @method getSound
+         * @param {number|string} id
+         * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         */
+        getSound(id: any): any;
+        private _soundList;
+        /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @method addSound
          * @param {annie.Sound} sound
-         * @return {number}
+         * @return {void}
          * @since 2.0.0
          * @public
          */
-        addSound(sound: annie.Sound): number;
+        addSound(sound: annie.Sound): void;
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
          * @public
          * @since 2.0.0
-         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @param {number|string} id
          * @return {void}
          */
-        removeSound(id: number): void;
+        removeSound(id: number | string): void;
         /**
-         * @property _a2x_sounds
-         * @since 2.0.0
-         * @type {Object}
-         * @private
-         * @default {null}
-         */
-        private _a2x_sounds;
-        /**
+         * 每个Flash文件生成的对象都有一个自带的初始化信息
          * @property _a2x_res_obj
          * @type {Object}
          * @since 2.0.0
@@ -2054,21 +2061,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor();
-        /**
-         * sprite 和 moveClip的类资源信息
-         * @property _a2x_res_class
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         */
-        private _a2x_res_class;
-        /**
-         * @property _a2x_res_children
-         * @type {Array}
-         * @private
-         * @since 2.0.0
-         */
-        private _a2x_res_children;
         destroy(): void;
         /**
          * 是否可以让children接收鼠标事件,如果为false
@@ -2268,6 +2260,12 @@ declare namespace annie {
          * @default false
          */
         isPlaying: boolean;
+        /**
+         * 给一个声音取一个名字，方便获取
+         * @property name
+         * @type {string}
+         */
+        name: string;
         /**
          * @property _loop
          * @type {number}
@@ -2548,6 +2546,21 @@ declare namespace annie {
          */
         constructor();
         /**
+         * sprite 和 moveClip的类资源信息
+         * @property _a2x_res_class
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         */
+        private _a2x_res_class;
+        /**
+         * @property _a2x_res_children
+         * @type {Array}
+         * @private
+         * @since 2.0.0
+         */
+        private _a2x_res_children;
+        /**
          * 调用止方法将停止当前帧
          * @method stop
          * @public
@@ -2675,6 +2688,14 @@ declare namespace annie {
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         update(isDrawUpdate?: boolean): void;
+        /**
+         * @property _a2x_sounds
+         * @since 2.0.0
+         * @type {Object}
+         * @private
+         * @default {null}
+         */
+        private _a2x_sounds;
         destroy(): void;
     }
 }

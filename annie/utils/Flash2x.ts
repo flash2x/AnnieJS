@@ -196,7 +196,7 @@ namespace annie {
             return;
         }
         if (!_isInited) {
-            if (_isReleased){
+            if (_isReleased) {
                 trace("AnnieJS:https://github.com/flash2x/annieJS");
             }
             _JSONQueue = new URLLoader();
@@ -312,42 +312,54 @@ namespace annie {
                     let frameList = mc.f;
                     let count = frameList.length;
                     let frameCon: any = null;
-                    let children: any = {};
-                    let children2: any = {};
+                    let lastFrameCon: any = null;
+                    let ol: any = [];
                     for (let i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
+                        //这帧是否为空
                         if (frameCon) {
                             for (let j in frameCon) {
-                                if (i == 0) {
-                                    [children[j]] = [frameCon[j]];
-                                } else {
-                                    if (frameCon[j].a != 3) {
-                                        children2[j] = frameCon[j];
+                                let at = frameCon[j].at;
+                                if (at != undefined && at != -1) {
+                                    if (at == 0) {
+                                        ol.push(j);
+                                    } else {
+                                        for (let l = 0; l < ol.length; l++) {
+                                            if (ol[l] == at) {
+                                                ol.splice(l, 0, j);
+                                                break;
+                                            }
+                                        }
                                     }
-                                    if (frameCon[j].a != 1) {
-                                        if (frameCon[j].a == 2) {
-                                            for (let o in children[j]) {
-                                                if (frameCon[j][o] == undefined) {
-                                                    frameCon[j][o] = children[j][o];
+                                    delete frameCon[j].at;
+                                }
+                            }
+                            //上一帧是否为空
+                            if (lastFrameCon) {
+                                for (let j in lastFrameCon) {
+                                    //上一帧有，这一帧没有，加进来
+                                    if (!frameCon[j]) {
+                                        frameCon[j] = lastFrameCon[j];
+                                    } else {
+                                        //上一帧有，这一帧也有那么at就只有-1一种可能
+                                        if (frameCon[j].at != -1) {
+                                            //如果不为空，则更新元素
+                                            for (let m in lastFrameCon[j]) {
+                                                if (!frameCon[j][m]) {
+                                                    frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
                                         } else {
-                                            delete  frameCon[j];
+                                            //如果为-1，删除元素
+                                            delete frameCon[j];
                                         }
-                                        children[j] = null;
-                                        delete  children[j];
                                     }
                                 }
                             }
-                            if (i > 0) {
-                                for (let o in children) {
-                                    frameCon[o] = children2[o] = children[o];
-                                }
-                                children = children2;
-                                children2 = {};
-                            }
                         }
+                        lastFrameCon = frameCon;
                     }
+                    mc.ol = ol;
                 }
             } else {
                 //如果是released版本，则需要更新资源数据
@@ -406,7 +418,7 @@ namespace annie {
      * @static
      * @return {void}
      */
-    function _checkComplete():void {
+    function _checkComplete(): void {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         _currentConfig[_loadIndex].shift();
@@ -547,10 +559,6 @@ namespace annie {
             if (lastInfo.tr != info.tr) {
                 [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
             }
-            /*if (info.v == undefined) {
-                info.v = 1;
-            }*/
-            //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
             if (info.t != undefined) {
@@ -572,28 +580,29 @@ namespace annie {
                     for (let i = 0; i < info.fi.length; i++) {
                         switch (info.fi[i].t) {
                             case 0:
-                                blur = (info.fi[i].bx + info.fi[i].by) * 0.5;
-                                color = Shape.getRGBA(info.fi[i].c, info.fi[i].a);
-                                let offsetX = info.fi[i].by * Math.cos(info.fi[i].r / 180 * Math.PI);
-                                let offsetY = info.fi[i].by * Math.sin(info.fi[i].r / 180 * Math.PI);
+                                blur = (info.fi[i][2] + info.fi[i][3]) * 0.5;
+                                color = Shape.getRGBA(info.fi[i][10], info.fi[i][11]);
+                                let offsetX = info.fi[i][4] * Math.cos(info.fi[i][1]);
+                                let offsetY = info.fi[i][4] * Math.sin(info.fi[i][1]);
                                 filters[filters.length] = new ShadowFilter(color, offsetX, offsetY, blur);
                                 break;
                             case 1:
                                 //模糊滤镜
-                                filters[filters.length] = new BlurFilter(info.fi[i].bx, info.fi[i].by, info.fi[i].q);
+                                filters[filters.length] = new BlurFilter(info.fi[i][1], info.fi[i][2], info.fi[i][3]);
                                 break;
                             case 2:
-                                blur = (info.fi[i].bx + info.fi[i].by) * 0.5;
-                                color = Shape.getRGBA(info.fi[i].c, info.fi[i].a);
+                                blur = (info.fi[i][1] + info.fi[i][2]) * 0.5;
+                                color = Shape.getRGBA(info.fi[i][7], info.fi[i][6]);
                                 filters[filters.length] = new ShadowFilter(color, 0, 0, blur);
                                 break;
                             case 6:
-                                filters[filters.length] = new ColorMatrixFilter(info.fi[i].b, info.fi[i].c, info.fi[i].s, info.fi[i].h);
+                                filters[filters.length] = new ColorMatrixFilter(info.fi[i][1], info.fi[i][2], info.fi[i][3], info.fi[i][4]);
                                 break;
                             case 7:
-                                filters[filters.length] = new ColorFilter(info.fi[i].cm);
+                                filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
+                                trace("部分滤镜效果未实现");
                             //其他还示实现
                         }
                     }
@@ -622,6 +631,7 @@ namespace annie {
      * @private
      */
     let _textAlign: Array<string> = ["left", "center", "right"];
+
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method annie.t
@@ -913,7 +923,6 @@ namespace annie {
                 resClass.timeLine = timeLine;
                 //初始化标签对象方便gotoAndStop gotoAndPlay
                 if (!resClass.f) resClass.f = [];
-                if (!resClass.c) resClass.c = [];
                 if (!resClass.a) resClass.a = {};
                 if (!resClass.s) resClass.s = {};
                 if (!resClass.e) resClass.e = {};
@@ -930,29 +939,30 @@ namespace annie {
                 resClass.label = label;
             }
         }
-        if (resClass.c) {
-            let children = resClass.c;
+        let children = resClass.c;
+        if (children) {
+            let allChildren: any = [];
             let objCount = children.length;
             let obj: any = null;
-            let objId: number = 0;
+            let objType: number = 0;
             let maskObj: any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
                 if (Array.isArray(classRoot[children[i]])) {
-                    objId = classRoot[children[i]][0];
+                    objType = classRoot[children[i]][0];
                 } else {
-                    objId = classRoot[children[i]].t;
+                    objType = classRoot[children[i]].t;
                 }
-                switch (objId) {
+                switch (objType) {
                     case 1:
                     case 4:
                         //text 和 Sprite
                         //检查是否有名字，并且已经初始化过了
-                        if (resClass.n&&resClass.n[i]&&target[resClass.n[i]]) {
-                            obj=target[resClass.n[i]];
-                        }else{
-                            if (objId == 4) {
+                        if (resClass.n && resClass.n[i] && target[resClass.n[i]]) {
+                            obj = target[resClass.n[i]];
+                        } else {
+                            if (objType == 4) {
                                 obj = t(sceneName, children[i]);
                             }
                             else {
@@ -968,7 +978,7 @@ namespace annie {
                                     obj = new Root[sceneName][children[i]]();
                                 }
                             }
-                            if (resClass.n&&resClass.n[i]) {
+                            if (resClass.n && resClass.n[i]) {
                                 target[resClass.n[i]] = obj;
                                 obj.name = resClass.n[i];
                             }
@@ -985,13 +995,12 @@ namespace annie {
                     case 5:
                         //sound
                         obj = s(sceneName, children[i]);
+                        obj.name=children[i];
                         target.addSound(obj);
                 }
-                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
-                target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
                     let index: number = i + 1;
-                    if (objId == 5) {
+                    if (objType == 5) {
                         obj._repeate = resClass.s[0][index];
                     } else {
                         d(obj, resClass.f[0].c[index]);
@@ -1008,6 +1017,23 @@ namespace annie {
                             }
                         }
                         target.addChildAt(obj, 0);
+                    }
+                } else {
+                    //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                    allChildren[allChildren.length] = obj;
+                    //如果是声音，还要把i这个顺序保存下来
+                    if(!target._a2x_sounds){
+                        target._a2x_sounds={};
+                    }
+                    target._a2x_sounds[i]=obj;
+                }
+            }
+            if (isMc) {
+                //将mc里面的实例按照时间轴上的图层排序
+                let ol = resClass.ol;
+                if (ol) {
+                    for (let o = 0; o < ol.length; o++) {
+                        target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
                     }
                 }
             }
