@@ -97,6 +97,13 @@ namespace annie {
         }
 
         /**
+         * 每个声音可以有个名字，并且不同的声音名字可以相同
+         * @property name
+         * @type {string}
+         * @since 2.0.0
+         */
+        public name:string="";
+        /**
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume

@@ -1401,21 +1401,46 @@ declare namespace annie {
         protected _drawRect: Rectangle;
         protected _setProperty(property: string, value: any, type: number): void;
         /**
+         * 停止这个显示对象上的所有声音
+         * @method stopAllSounds
+         * @public
+         * @since 2.0.0
+         */
+        stopAllSounds(): void;
+        /**
+         * @method getSound
+         * @param {number|string} id
+         * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         */
+        getSound(id: any): any;
+        private _soundList;
+        /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @method addSound
          * @param {annie.Sound} sound
-         * @return {number}
+         * @return {void}
+         * @since 2.0.0
+         * @public
          */
-        addSound(sound: any): number;
+        addSound(sound: annie.Sound): void;
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
-         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @public
+         * @since 2.0.0
+         * @param {number|string} id
          * @return {void}
          */
-        removeSound(id: number): void;
-        private _a2x_sounds;
+        removeSound(id: number | string): void;
+        /**
+         * 每个Flash文件生成的对象都有一个自带的初始化信息
+         * @property _a2x_res_obj
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         * @default {Object}
+         */
         private _a2x_res_obj;
         destroy(): void;
     }
@@ -1815,9 +1840,13 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Sprite extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         constructor();
-        private _a2x_res_class;
-        private _a2x_res_children;
         destroy(): void;
         /**
          * 是否可以让children接收鼠标事件,如果为false
@@ -1845,6 +1874,7 @@ declare namespace annie {
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         addChild(child: DisplayObject): void;
         /**
@@ -1853,8 +1883,20 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         removeChild(child: DisplayObject): void;
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         * @return {void}
+         */
         private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
@@ -1862,7 +1904,7 @@ declare namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -1872,15 +1914,16 @@ declare namespace annie {
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
+         * @return {void}
          */
         addChildAt(child: DisplayObject, index: number): void;
         /**
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -1889,13 +1932,14 @@ declare namespace annie {
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
         getChildIndex(child: DisplayObject): number;
         /**
-         * @method 交换两个显示对象的层级
+         * 交换两个显示对象的层级
+         * @method swapChild
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
@@ -1909,6 +1953,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         _onDispatchBubbledEvent(type: string): void;
         /**
@@ -1917,6 +1962,7 @@ declare namespace annie {
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeChildAt(index: number): void;
         /**
@@ -1924,15 +1970,9 @@ declare namespace annie {
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         removeAllChildren(): void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
         update(isDrawUpdate?: boolean): void;
         /**
          * 重写碰撞测试
@@ -1946,7 +1986,7 @@ declare namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @return {any}
+         * @return {annie.Rectangle}
          * @since 1.0.0
          * @public
          */
@@ -1983,7 +2023,20 @@ declare namespace annie {
          * @readonly
          */
         currentFrame: number;
+        /**
+         * @property _curFrame
+         * @type {number}
+         * @private
+         * @since 2.0.0
+         * @default 1
+         */
         private _curFrame;
+        /**
+         * @property _lastFrameObj
+         * @type {Object}
+         * @private
+         * @default null
+         */
         private _lastFrameObj;
         /**
          * 当前动画是否处于播放状态
@@ -1996,6 +2049,13 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
+        /**
+         * @property _isPlaying
+         * @type {boolean}
+         * @private
+         * @since 2.0.0
+         * @default true
+         */
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2007,6 +2067,12 @@ declare namespace annie {
          * @readonly
          */
         isFront: boolean;
+        /**
+         * @property _isFront
+         * @type {boolean}
+         * @private
+         * @default true
+         */
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2018,15 +2084,50 @@ declare namespace annie {
          * @readonly
          */
         totalFrames: number;
+        /**
+         * @property _lastFrame
+         * @type {number}
+         * @private
+         * @default 0
+         */
         private _lastFrame;
+        /**
+         * 构造函数
+         * @method MovieClip
+         * @public
+         * @since 1.0.0
+         */
         constructor();
+        /**
+         * sprite 和 moveClip的类资源信息
+         * @property _a2x_res_class
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         */
+        private _a2x_res_class;
+        /**
+         * @property _a2x_res_children
+         * @type {Array}
+         * @private
+         * @since 2.0.0
+         */
+        private _a2x_res_children;
         /**
          * 调用止方法将停止当前帧
          * @method stop
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         stop(): void;
+        /**
+         * @property _a2x_script
+         * @type {Object}
+         * @default null
+         * @private
+         * @since 2.0.0
+         */
         private _a2x_script;
         /**
          * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
@@ -2038,7 +2139,7 @@ declare namespace annie {
          */
         addFrameScript(frameIndex: number, frameScript: Function): void;
         /**
-         * @移除帧上的回调方法
+         * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
@@ -2046,12 +2147,20 @@ declare namespace annie {
          */
         removeFrameScript(frameIndex: number): void;
         /**
-         * MovieClip对象是否被用作按钮
+         * 确认是不是按钮形态
          * @property isButton
          * @type {boolean}
+         * @public
          * @since 2.0.0
+         * @default false
          */
         isButton: boolean;
+        /**
+         * @property _mode
+         * @type {boolean}
+         * @private
+         * @default false
+         */
         private _mode;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2059,6 +2168,7 @@ declare namespace annie {
          * @method initButton
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         initButton(): void;
         /**
@@ -2068,9 +2178,23 @@ declare namespace annie {
          * @public
          * @since 2.0.0
          */
+        /**
+         * 设置是否为点击状态
+         * @property clicked
+         * @param {boolean} value
+         * @public
+         * @since 2.0.0
+         * @default false
+         */
         clicked: boolean;
         private _clicked;
-        private _mouseEvent;
+        private _mouseEvent(e);
+        /**
+         * @property _maskList
+         * @type {Array}
+         * @private
+         * @default []
+         */
         private _maskList;
         /**
          * movieClip的当前帧的标签数组,没有则为null
@@ -2085,6 +2209,7 @@ declare namespace annie {
          * @method nextFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         nextFrame(): void;
         /**
@@ -2092,6 +2217,7 @@ declare namespace annie {
          * @method prevFrame
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         prevFrame(): void;
         /**
@@ -2099,7 +2225,8 @@ declare namespace annie {
          * @method gotoAndStop
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex{number|string} 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
+         * @return {void}
          */
         gotoAndStop(frameIndex: number | string): void;
         /**
@@ -2107,6 +2234,7 @@ declare namespace annie {
          * @method play
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         play(isFront?: boolean): void;
         /**
@@ -2114,18 +2242,20 @@ declare namespace annie {
          * @method gotoAndPlay
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex 批定帧的帧数或指定帧的标签名
+         * @param {number|string} frameIndex 批定帧的帧数或指定帧的标签名
          * @param {boolean} isFront 跳到指定帧后是向前播放, 还是向后播放.不设置些参数将默认向前播放
+         * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
         update(isDrawUpdate?: boolean): void;
+        /**
+         * @property _a2x_sounds
+         * @since 2.0.0
+         * @type {Object}
+         * @private
+         * @default {null}
+         */
+        private _a2x_sounds;
         destroy(): void;
     }
 }
@@ -2682,6 +2812,13 @@ declare namespace annie {
          * @since 1.0.4
          */
         pause(isPause?: boolean): void;
+        /**
+         * 每个声音可以有个名字，并且不同的声音名字可以相同
+         * @property name
+         * @type {string}
+         * @since 2.0.0
+         */
+        name: string;
         /**
          * 设置或者获取音量 从0-1
          * @since 1.1.0

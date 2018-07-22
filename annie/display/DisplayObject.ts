@@ -525,12 +525,6 @@ namespace annie {
             if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
             }
-            if(s.parent) {
-                let PUI = s.parent._UI;
-                if (PUI.UM) UI.UM = true;
-                if (PUI.UA) UI.UA = true;
-                if (PUI.UF) UI.UF = true;
-            }
             if (UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
@@ -719,63 +713,115 @@ namespace annie {
                 }
             }
         }
-
+        /**
+         * 停止这个显示对象上的所有声音
+         * @method stopAllSounds
+         * @public
+         * @since 2.0.0
+         */
+        public stopAllSounds(): void {
+            let sounds = this._soundList;
+            if (sounds) {
+                for (let i = sounds.length - 1; i >= 0; i--) {
+                    sounds[i].stop();
+                }
+            }
+        }
+        /**
+         * @method getSound
+         * @param {number|string} id
+         * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         */
+        public getSound(id:any):any{
+            let sounds = this._soundList;
+            let newSounds:any=[];
+            if (sounds) {
+                if (typeof(id) == "string") {
+                    for (let i = sounds.length - 1; i >= 0; i--) {
+                        if (sounds[i].name == id) {
+                            newSounds.push(sounds[i]);
+                        }
+                    }
+                } else {
+                    if (id >= 0 && id < sounds.length) {
+                        newSounds.push(sounds[id]);
+                    }
+                }
+            }
+            return newSounds;
+        }
+        private _soundList:any=[];
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
          * @method addSound
          * @param {annie.Sound} sound
-         * @return {number}
+         * @return {void}
+         * @since 2.0.0
+         * @public
          */
-        public addSound(sound:any):number{
-            let s=this;
-            if(!s._a2x_sounds){
-                s._a2x_sounds=[];
+        public addSound(sound: annie.Sound): void {
+            let s = this;
+            if (!s._soundList) {
+                s._soundList = [];
             }
-            let sounds=s._a2x_sounds;
+            let sounds = s._soundList;
             sounds.push(sound);
-            return sounds.length-1;
         }
 
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
-         * @param {number} id -1 删除所有 0 1 2 3...删除对应的声音
+         * @public
+         * @since 2.0.0
+         * @param {number|string} id
          * @return {void}
          */
-        public removeSound(id:number):void{
-            let s=this;
-            let sounds=s._a2x_sounds;
-            if(sounds){
-                if(id>0) {
-                    if (sounds.length > id) {
+        public removeSound(id: number | string): void {
+            let sounds = this._soundList;
+            if (sounds) {
+                if (typeof(id) == "string") {
+                    for (let i = sounds.length - 1; i >= 0; i--) {
+                        if (sounds[i].name == "id") {
+                            sounds.splice(id, 1);
+                        }
+                    }
+                } else {
+                    if (id >= 0 && id < sounds.length) {
                         sounds.splice(id, 1);
                     }
-                }else{
-                    sounds.length=0;
                 }
             }
         }
-        private _a2x_sounds:any=null;
-        private _a2x_res_obj:any={};
-        public destroy():void {
+
+        /**
+         * 每个Flash文件生成的对象都有一个自带的初始化信息
+         * @property _a2x_res_obj
+         * @type {Object}
+         * @since 2.0.0
+         * @private
+         * @default {Object}
+         */
+        private _a2x_res_obj: any = {};
+        public destroy(): void {
             //清除相应的数据引用
             let s = this;
-            s._a2x_sounds = null;
+            s.stopAllSounds();
             s._a2x_res_obj = null;
-            s.mask=null;
-            s.filters=null;
-            s.parent=null;
-            s.stage=null;
-            s._bounds=null;
-            s._drawRect=null;
-            s._dragBounds=null;
-            s._lastDragPoint=null;
-            s.cFilters=null;
-            s._matrix=null;
-            s.cMatrix=null;
-            s._UI=null;
-            s._texture=null;
+            s._soundList=null;
+            s.mask = null;
+            s.filters = null;
+            s.parent = null;
+            s.stage = null;
+            s._bounds = null;
+            s._drawRect = null;
+            s._dragBounds = null;
+            s._lastDragPoint = null;
+            s.cFilters = null;
+            s._matrix = null;
+            s.cMatrix = null;
+            s._UI = null;
+            s._texture = null;
             super.destroy();
         }
     }

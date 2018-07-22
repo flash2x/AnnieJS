@@ -13,25 +13,28 @@ namespace annie {
      * @since 1.0.0
      */
     export class Sprite extends DisplayObject {
+        /**
+         * 构造函数
+         * @method Sprite
+         * @public
+         * @since 1.0.0
+         */
         public constructor() {
             super();
             let s = this;
             s._instanceType = "annie.Sprite";
         }
-        //sprite 和 moveClip的类资源信息
-        private _a2x_res_class: any = {tf: 1};
-        private _a2x_res_children: any = [];
+
         public destroy(): void {
             let s = this;
             //让子级也destroy
             for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s._a2x_res_children = null;
-            s._a2x_res_class = null;
             s.children = null;
             super.destroy();
         }
+
         /**
          * 是否可以让children接收鼠标事件,如果为false
          * 鼠标事件将不会往下冒泡
@@ -59,6 +62,7 @@ namespace annie {
          * @param {annie.DisplayObject} child
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public addChild(child: DisplayObject): void {
             this.addChildAt(child, this.children.length);
@@ -70,6 +74,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.DisplayObject} child
+         * @return {void}
          */
         public removeChild(child: DisplayObject): void {
             let s = this;
@@ -83,6 +88,17 @@ namespace annie {
         }
 
         //全局遍历
+        /**
+         * @method _getElementsByName
+         * @param {RegExp} rex
+         * @param {annie.Sprite} root
+         * @param {boolean} isOnlyOne
+         * @param {boolean} isRecursive
+         * @param {Array<annie.DisplayObject>} resultList
+         * @private
+         * @static
+         * @return {void}
+         */
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
             if (len > 0) {
@@ -114,7 +130,7 @@ namespace annie {
          * @param {string} name 对象的具体名字或是一个正则表达式
          * @param {boolean} isOnlyOne 默认为true,如果为true,只返回最先找到的对象,如果为false则会找到所有匹配的对象数组
          * @param {boolean} isRecursive false,如果为true,则会递归查找下去,而不只是查找当前对象中的child,child里的child也会找,依此类推
-         * @return {any} 返回一个对象,或者一个对象数组,没有找到则返回空
+         * @return {string|Array} 返回一个对象,或者一个对象数组,没有找到则返回空
          * @public
          * @since 1.0.0
          */
@@ -144,8 +160,9 @@ namespace annie {
          * @method addChildAt
          * @param {annie.DisplayObject} child
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
+         * @return {void}
          */
         public addChildAt(child: DisplayObject, index: number): void {
             if (!child) return;
@@ -184,7 +201,7 @@ namespace annie {
          * 获取Sprite中指定层级一个child
          * @method getChildAt
          * @param {number} index 从0开始
-         * @pubic
+         * @public
          * @since 1.0.0
          * @return {annie.DisplayObject}
          */
@@ -200,12 +217,13 @@ namespace annie {
          * 获取Sprite中一个child所在的层级索引，找到则返回索引数，未找到则返回-1
          * @method getChildIndex
          * @param {annie.DisplayObject} child 子对象
-         * @pubic
+         * @public
          * @since 1.0.2
          * @return {number}
          */
         public getChildIndex(child: DisplayObject): number {
-            let len = this.children.length;
+            let s = this;
+            let len = s.children.length;
             for (let i: number = 0; i < len; i++) {
                 if (this.children[i] == child) {
                     return i;
@@ -215,33 +233,34 @@ namespace annie {
         }
 
         /**
-         * @method 交换两个显示对象的层级
+         * 交换两个显示对象的层级
+         * @method swapChild
          * @param child1 显示对象，或者显示对象的索引
          * @param child2 显示对象，或者显示对象的索引
          * @since 2.0.0
          * @return {boolean}
          */
-        public swapChild(child1:any,child2:any):boolean{
-            let s=this;
-            let id1=-1;
-            let id2=-1;
-            let childCount=s.children.length;
-            if(typeof(child1)=="number"){
-                id1=child1;
-            }else{
-                id1=s.getChildIndex(child1);
+        public swapChild(child1: any, child2: any): boolean {
+            let s = this;
+            let id1 = -1;
+            let id2 = -1;
+            let childCount = s.children.length;
+            if (typeof(child1) == "number") {
+                id1 = child1;
+            } else {
+                id1 = s.getChildIndex(child1);
             }
-            if(typeof(child2)=="number"){
-                id2=child2;
-            }else{
-                id2=s.getChildIndex(child2);
+            if (typeof(child2) == "number") {
+                id2 = child2;
+            } else {
+                id2 = s.getChildIndex(child2);
             }
-            if(id1==id2||id1<0||id1>=childCount||id2<0||id2>=childCount){
+            if (id1 == id2 || id1 < 0 || id1 >= childCount || id2 < 0 || id2 >= childCount) {
                 return false;
-            }else{
-                let temp:any=s.children[id1];
-                s.children[id1]=s.children[id2];
-                s.children[id2]=temp;
+            } else {
+                let temp: any = s.children[id1];
+                s.children[id1] = s.children[id2];
+                s.children[id2] = temp;
                 return true;
             }
         }
@@ -253,6 +272,7 @@ namespace annie {
          * @param {string} type
          * @param {boolean} updateMc 是否更新movieClip时间轴信息
          * @since 1.0.0
+         * @return {void}
          */
         public _onDispatchBubbledEvent(type: string): void {
             let s = this;
@@ -264,12 +284,14 @@ namespace annie {
             }
             super._onDispatchBubbledEvent(type);
         }
+
         /**
          * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public removeChildAt(index: number): void {
             let s = this;
@@ -292,6 +314,7 @@ namespace annie {
          * @method removeAllChildren
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public removeAllChildren(): void {
             let s = this;
@@ -301,29 +324,35 @@ namespace annie {
             }
         }
 
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if(s._instanceType=="annie.Sprite") {
-                if (!s._visible) return;
-                if (s.hasEventListener("onEnterFrame")) {
-                    s.dispatchEvent("onEnterFrame");
-                }
-            }
+            if (!s._visible) return;
             super.update(isDrawUpdate);
-            let len = s.children.length;
-            for (let i = len - 1; i >= 0; i--) {
-                s.children[i].update(isDrawUpdate);
-            }
+            let um: boolean = s._UI.UM;
+            let ua: boolean = s._UI.UA;
+            let uf: boolean = s._UI.UF;
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
+            //更新完成后触发
+            if (s.hasEventListener("onEnterFrame")) {
+                s.dispatchEvent("onEnterFrame");
+            }
+            let len = s.children.length;
+            let child: any = null;
+            for (let i = len - 1; i >= 0; i--) {
+                child = s.children[i];
+                if (um) {
+                    child._UI.UM = um;
+                }
+                if (uf) {
+                    child._UI.UF = uf;
+                }
+                if (ua) {
+                    child._UI.UA = ua;
+                }
+                child.update(isDrawUpdate);
+            }
         }
 
         /**
@@ -362,7 +391,7 @@ namespace annie {
         /**
          * 重写getBounds
          * @method getBounds
-         * @return {any}
+         * @return {annie.Rectangle}
          * @since 1.0.0
          * @public
          */
