@@ -6975,44 +6975,57 @@ var annie;
                     var frameList = mc.f;
                     var count = frameList.length;
                     var frameCon = null;
-                    var children = {};
-                    var children2 = {};
+                    var lastFrameCon = null;
+                    var ol = [];
                     for (var i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
+                        //这帧是否为空
                         if (frameCon) {
                             for (var j in frameCon) {
-                                if (i == 0) {
-                                    children[j] = [frameCon[j]][0];
-                                }
-                                else {
-                                    if (frameCon[j].a != 3) {
-                                        children2[j] = frameCon[j];
+                                var at = frameCon[j].at;
+                                if (at != undefined && at != -1) {
+                                    if (at == 0) {
+                                        ol.push(j);
                                     }
-                                    if (frameCon[j].a != 1) {
-                                        if (frameCon[j].a == 2) {
-                                            for (var o in children[j]) {
-                                                if (frameCon[j][o] == undefined) {
-                                                    frameCon[j][o] = children[j][o];
+                                    else {
+                                        for (var l = 0; l < ol.length; l++) {
+                                            if (ol[l] == at) {
+                                                ol.splice(l, 0, j);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    delete frameCon[j].at;
+                                }
+                            }
+                            //上一帧是否为空
+                            if (lastFrameCon) {
+                                for (var j in lastFrameCon) {
+                                    //上一帧有，这一帧没有，加进来
+                                    if (!frameCon[j]) {
+                                        frameCon[j] = lastFrameCon[j];
+                                    }
+                                    else {
+                                        //上一帧有，这一帧也有那么at就只有-1一种可能
+                                        if (frameCon[j].at != -1) {
+                                            //如果不为空，则更新元素
+                                            for (var m in lastFrameCon[j]) {
+                                                if (!frameCon[j][m]) {
+                                                    frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
                                         }
                                         else {
+                                            //如果为-1，删除元素
                                             delete frameCon[j];
                                         }
-                                        children[j] = null;
-                                        delete children[j];
                                     }
                                 }
                             }
-                            if (i > 0) {
-                                for (var o in children) {
-                                    frameCon[o] = children2[o] = children[o];
-                                }
-                                children = children2;
-                                children2 = {};
-                            }
                         }
+                        lastFrameCon = frameCon;
                     }
+                    mc.ol = ol;
                 }
             }
         }
@@ -7243,8 +7256,6 @@ var annie;
                 //初始化标签对象方便gotoAndStop gotoAndPlay
                 if (!resClass.f)
                     resClass.f = [];
-                if (!resClass.c)
-                    resClass.c = [];
                 if (!resClass.a)
                     resClass.a = {};
                 if (!resClass.s)
@@ -7265,21 +7276,23 @@ var annie;
                 resClass.label = label;
             }
         }
-        if (resClass.c) {
-            var children = resClass.c;
+        var children = resClass.c;
+        if (children) {
+            var allChildren = [];
             var objCount = children.length;
             var obj = null;
-            var objId = 0;
+            var objType = 0;
             var maskObj = null;
             var maskTillId = 0;
             for (i = 0; i < objCount; i++) {
+                //if (children[i].indexOf("_$") == 0) {
                 if (Array.isArray(classRoot[children[i]])) {
-                    objId = classRoot[children[i]][0];
+                    objType = classRoot[children[i]][0];
                 }
                 else {
-                    objId = classRoot[children[i]].t;
+                    objType = classRoot[children[i]].t;
                 }
-                switch (objId) {
+                switch (objType) {
                     case 1:
                     case 4:
                         //text 和 Sprite
@@ -7288,7 +7301,7 @@ var annie;
                             obj = target[resClass.n[i]];
                         }
                         else {
-                            if (objId == 4) {
+                            if (objType == 4) {
                                 obj = t(sceneName, children[i]);
                             }
                             else {
@@ -7323,13 +7336,12 @@ var annie;
                     case 5:
                         //sound
                         obj = s(sceneName, children[i]);
+                        obj.name = children[i];
                         target.addSound(obj);
                 }
-                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
-                target._a2x_res_children[target._a2x_res_children.length] = obj;
                 if (!isMc) {
                     var index = i + 1;
-                    if (objId == 5) {
+                    if (objType == 5) {
                         obj._repeate = resClass.s[0][index];
                     }
                     else {
@@ -7350,6 +7362,24 @@ var annie;
                         target.addChildAt(obj, 0);
                     }
                 }
+                else {
+                    //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                    allChildren[allChildren.length] = obj;
+                    //如果是声音，还要把i这个顺序保存下来
+                    if (!target._a2x_sounds) {
+                        target._a2x_sounds = {};
+                    }
+                    target._a2x_sounds[i] = obj;
+                }
+            }
+            if (isMc) {
+                //将mc里面的实例按照时间轴上的图层排序
+                var ol = resClass.ol;
+                if (ol) {
+                    for (var o = 0; o < ol.length; o++) {
+                        target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
+                    }
+                }
             }
         }
     }
@@ -7359,3 +7389,5 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+
+module.exports = annie;
