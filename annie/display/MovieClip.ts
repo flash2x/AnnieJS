@@ -407,7 +407,7 @@ namespace annie {
                         s._wantFrame=0;
                     }
                 }
-                if (s._isPlaying) {
+                if (s._lastFrame == s._curFrame&&s._isPlaying) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -438,7 +438,11 @@ namespace annie {
                         for (let i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            objInfo = curFrameObj.c[objId];
+                            if(curFrameObj&&curFrameObj.c){
+                                objInfo = curFrameObj.c[objId];
+                            }else{
+                                objInfo=null;
+                            }
                             //证明这一帧有这个对象
                             if (objInfo) {
                                 annie.d(obj, objInfo);
@@ -465,7 +469,7 @@ namespace annie {
                             } else {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
-                                  s._removeChildren.push(obj);
+                                    s._removeChildren.push(obj);
                                 }
                             }
                         }

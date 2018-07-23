@@ -4237,15 +4237,17 @@ var annie;
             if (!s._visible)
                 return;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
-                if (s._wantFrame != 0) {
-                    s._curFrame = s._wantFrame;
-                    s._wantFrame = 0;
-                }
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
                 }
-                if (s._isPlaying) {
+                else {
+                    if (s._wantFrame != 0) {
+                        s._curFrame = s._wantFrame;
+                        s._wantFrame = 0;
+                    }
+                }
+                if (s._lastFrame == s._curFrame && s._isPlaying) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -4277,7 +4279,12 @@ var annie;
                         for (var i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            objInfo = curFrameObj.c[objId];
+                            if (curFrameObj && curFrameObj.c) {
+                                objInfo = curFrameObj.c[objId];
+                            }
+                            else {
+                                objInfo = null;
+                            }
                             //证明这一帧有这个对象
                             if (objInfo) {
                                 annie.d(obj, objInfo);
