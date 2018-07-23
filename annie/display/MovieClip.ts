@@ -386,6 +386,7 @@ namespace annie {
             }
             s._curFrame = <number>frameIndex;
         }
+        private _isNeedToCallEvent=false;
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if (!s._visible) return;
@@ -407,7 +408,8 @@ namespace annie {
                         }
                     }
                 }
-                if (s._lastFrame != s._curFrame) {
+                if(s._lastFrame != s._curFrame){
+                    s._isNeedToCallEvent=true;
                     s._lastFrame = s._curFrame;
                     let timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
@@ -420,6 +422,7 @@ namespace annie {
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
+                        s.removeChild.length=0;
                         let maskObj: any = null;
                         let maskTillId: number = -1;
                         for (let i = childCount - 1; i >= 0; i--) {
@@ -445,70 +448,32 @@ namespace annie {
                                     }
                                 }
                                 s.children.unshift(obj);
-                                if ((!obj.parent || s.parent != s) && s.stage) {
+                                if (!obj.parent || s.parent != s) {
                                     obj["_cp"] = true;
                                     obj.parent = s;
-                                    obj._onDispatchBubbledEvent("onAddToStage");
                                 }
                             } else {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
-                                    obj._onDispatchBubbledEvent("onRemoveToStage");
-                                    obj.parent = null;
+                                  s._removeChildren.push(obj);
                                 }
                             }
                         }
                     }
                     //有没有声音
-                    let frameIndex = s._lastFrame - 1;
+                    let frameIndex = s._curFrame - 1;
                     let curFrameSound = timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (let sound in curFrameSound) {
                             s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
-                    //更新完所有后再来确定事件和脚本
-                    let curFrameScript: any;
-                    //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
-                    let isUserScript = false;
-                    if (s._a2x_script) {
-                        curFrameScript = s._a2x_script[frameIndex];
-                        if (curFrameScript != undefined) {
-                            if (curFrameScript != null)
-                                curFrameScript();
-                            isUserScript = true;
-                        }
-                    }
-                    if (!isUserScript) {
-                        curFrameScript = timeLineObj.a[frameIndex];
-                        if (curFrameScript) {
-                            s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
-                        }
-                    }
-                    //有没有事件
-                    if (s.hasEventListener(Event.CALL_FRAME)) {
-                        curFrameScript = timeLineObj.e[frameIndex];
-                        if (curFrameScript) {
-                            for (let i = 0; i < curFrameScript.length; i++) {
-                                //抛事件
-                                s.dispatchEvent(Event.CALL_FRAME, {
-                                    frameIndex: s._curFrame,
-                                    frameName: curFrameScript[i]
-                                });
-                            }
-                        }
-                    }
-                    if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(Event.END_FRAME)) {
-                        s.dispatchEvent(Event.END_FRAME, {
-                            frameIndex: s._curFrame,
-                            frameName: "endFrame"
-                        });
-                    }
+                }else{
+                    s._isNeedToCallEvent=false;
                 }
             }
             super.update(isDrawUpdate);
         }
-
         /**
          * @property _a2x_sounds
          * @since 2.0.0
@@ -517,7 +482,52 @@ namespace annie {
          * @default {null}
          */
         private _a2x_sounds: any = null;
-
+        protected callEventAndFrameScript(callState: number):void{
+            let s:any=this;
+            if( s._isNeedToCallEvent){
+                s._isNeedToCallEvent=false;
+                let timeLineObj = s._a2x_res_class;
+                let frameIndex = s._lastFrame - 1;
+                //更新完所有后再来确定事件和脚本
+                let curFrameScript: any;
+                //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
+                let isUserScript = false;
+                if (s._a2x_script) {
+                    curFrameScript = s._a2x_script[frameIndex];
+                    if (curFrameScript != undefined) {
+                        if (curFrameScript != null)
+                            curFrameScript();
+                        isUserScript = true;
+                    }
+                }
+                if (!isUserScript) {
+                    curFrameScript = timeLineObj.a[frameIndex];
+                    if (curFrameScript) {
+                        s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
+                    }
+                }
+                //有没有事件
+                if (s.hasEventListener(Event.CALL_FRAME)) {
+                    curFrameScript = timeLineObj.e[frameIndex];
+                    if (curFrameScript) {
+                        for (let i = 0; i < curFrameScript.length; i++) {
+                            //抛事件
+                            s.dispatchEvent(Event.CALL_FRAME, {
+                                frameIndex: s._curFrame,
+                                frameName: curFrameScript[i]
+                            });
+                        }
+                    }
+                }
+                if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(Event.END_FRAME)) {
+                    s.dispatchEvent(Event.END_FRAME, {
+                        frameIndex: s._curFrame,
+                        frameName: "endFrame"
+                    });
+                }
+            }
+            super.callEventAndFrameScript(callState);
+        }
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

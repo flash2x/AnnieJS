@@ -1364,16 +1364,6 @@ declare namespace annie {
          */
         render(renderObj: IRender | any): void;
         /**
-         * 调用些方法会冒泡的将事件向显示列表下方传递
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @return {void}
-         */
-        _onDispatchBubbledEvent(type: string): void;
-        /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
          * @property  width
@@ -1500,6 +1490,12 @@ declare namespace annie {
          */
         private _a2x_res_obj;
         destroy(): void;
+        /**
+         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * @method callEventAndFrameScript
+         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         */
+        protected callEventAndFrameScript(callState: number): void;
     }
 }
 /**
@@ -2082,6 +2078,7 @@ declare namespace annie {
          * @readonly
          */
         children: DisplayObject[];
+        _removeChildren: DisplayObject[];
         /**
          * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
          * @property  cacheAsBitmap
@@ -2171,16 +2168,6 @@ declare namespace annie {
          */
         swapChild(child1: any, child2: any): boolean;
         /**
-         * 调用此方法对Sprite及其child触发一次指定事件
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @since 1.0.0
-         * @return {void}
-         */
-        _onDispatchBubbledEvent(type: string): void;
-        /**
          * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
@@ -2224,6 +2211,7 @@ declare namespace annie {
          * @return {void}
          */
         render(renderObj: IRender): void;
+        protected callEventAndFrameScript(callState: number): void;
     }
 }
 /**
@@ -2687,6 +2675,7 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
+        private _isNeedToCallEvent;
         update(isDrawUpdate?: boolean): void;
         /**
          * @property _a2x_sounds
@@ -2696,6 +2685,7 @@ declare namespace annie {
          * @default {null}
          */
         private _a2x_sounds;
+        protected callEventAndFrameScript(callState: number): void;
         destroy(): void;
     }
 }

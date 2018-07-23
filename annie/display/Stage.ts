@@ -469,11 +469,13 @@ namespace annie {
             let s = this;
             if (s._flush == 0) {
                 s.update(true);
+                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
+                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
