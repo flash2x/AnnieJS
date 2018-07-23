@@ -2018,6 +2018,7 @@ declare namespace annie {
          * @default 1
          */
         private _curFrame;
+        private _wantFrame;
         /**
          * @property _lastFrameObj
          * @type {Object}
@@ -2234,7 +2235,6 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
-        private _isNeedToCallEvent;
         update(isDrawUpdate?: boolean): void;
         /**
          * @property _a2x_sounds

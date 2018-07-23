@@ -31,6 +31,7 @@ namespace annie {
          * @default 1
          */
         private _curFrame: number = 1;
+        private _wantFrame: number = 0;
         /**
          * @property _lastFrameObj
          * @type {Object}
@@ -301,7 +302,7 @@ namespace annie {
         public nextFrame(): void {
             let s = this;
             if (s._curFrame < s.totalFrames) {
-                s._curFrame++;
+                s._wantFrame=s._curFrame+1;
             }
             s._isPlaying = false;
         }
@@ -316,7 +317,7 @@ namespace annie {
         public prevFrame(): void {
             let s = this;
             if (s._curFrame > 1) {
-                s._curFrame--;
+                s._wantFrame=s._curFrame-1;
             }
             s._isPlaying = false;
         }
@@ -347,7 +348,7 @@ namespace annie {
                     frameIndex = 1;
                 }
             }
-            s._curFrame = <number>frameIndex;
+            s._wantFrame = <number>frameIndex;
         }
 
         /**
@@ -391,19 +392,22 @@ namespace annie {
                     frameIndex = 1;
                 }
             }
-            s._curFrame = <number>frameIndex;
+            s._wantFrame = <number>frameIndex;
         }
-        private _isNeedToCallEvent=false;
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if (!s._visible) return;
-            s._isNeedToCallEvent=false;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
+                }else{
+                    if(s._wantFrame!=0){
+                        s._curFrame=s._wantFrame;
+                        s._wantFrame=0;
+                    }
                 }
-                if (s._isPlaying) {
+                if (s._lastFrame == s._curFrame&&s._isPlaying) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -417,8 +421,6 @@ namespace annie {
                     }
                 }
                 if(s._lastFrame != s._curFrame){
-                    s._isNeedToCallEvent=true;
-                    s._lastFrame = s._curFrame;
                     let timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
@@ -436,7 +438,11 @@ namespace annie {
                         for (let i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            objInfo = curFrameObj.c[objId];
+                            if(curFrameObj&&curFrameObj.c){
+                                objInfo = curFrameObj.c[objId];
+                            }else{
+                                objInfo=null;
+                            }
                             //证明这一帧有这个对象
                             if (objInfo) {
                                 annie.d(obj, objInfo);
@@ -463,7 +469,7 @@ namespace annie {
                             } else {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
-                                  s._removeChildren.push(obj);
+                                    s._removeChildren.push(obj);
                                 }
                             }
                         }
@@ -490,10 +496,10 @@ namespace annie {
         private _a2x_sounds: any = null;
         protected callEventAndFrameScript(callState: number):void{
             let s:any=this;
-            if( s._isNeedToCallEvent){
-                s._isNeedToCallEvent=false;
+            if( s._lastFrame!=s._curFrame){
+                s._lastFrame=s._curFrame;
                 let timeLineObj = s._a2x_res_class;
-                let frameIndex = s._lastFrame - 1;
+                let frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本
                 let curFrameScript: any;
                 //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
