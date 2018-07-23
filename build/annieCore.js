@@ -4269,7 +4269,7 @@ var annie;
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s.removeChild.length = 0;
+                        s._removeChildren.length = 0;
                         var maskObj = null;
                         var maskTillId = -1;
                         for (var i = childCount - 1; i >= 0; i--) {
