@@ -2466,6 +2466,7 @@ declare namespace annie {
          * @default 1
          */
         private _curFrame;
+        private _wantFrame;
         /**
          * @property _lastFrameObj
          * @type {Object}
@@ -2607,6 +2608,13 @@ declare namespace annie {
          */
         initButton(): void;
         /**
+         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+         * @property clicked
+         * @return {boolean}
+         * @public
+         * @since 2.0.0
+         */
+        /**
          * 设置是否为点击状态
          * @property clicked
          * @param {boolean} value
@@ -2675,7 +2683,6 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
-        private _isNeedToCallEvent;
         update(isDrawUpdate?: boolean): void;
         /**
          * @property _a2x_sounds

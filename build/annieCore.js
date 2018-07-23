@@ -4729,6 +4729,7 @@ var annie;
              * @default 1
              */
             this._curFrame = 1;
+            this._wantFrame = 0;
             /**
              * @property _lastFrameObj
              * @type {Object}
@@ -4796,7 +4797,6 @@ var annie;
              * @default []
              */
             this._maskList = [];
-            this._isNeedToCallEvent = false;
             /**
              * @property _a2x_sounds
              * @since 2.0.0
@@ -4946,6 +4946,13 @@ var annie;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
+            /**
+             * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+             * @property clicked
+             * @return {boolean}
+             * @public
+             * @since 2.0.0
+             */
             get: function () {
                 return this._clicked;
             },
@@ -5009,7 +5016,7 @@ var annie;
         MovieClip.prototype.nextFrame = function () {
             var s = this;
             if (s._curFrame < s.totalFrames) {
-                s._curFrame++;
+                s._wantFrame = s._curFrame + 1;
             }
             s._isPlaying = false;
         };
@@ -5023,7 +5030,7 @@ var annie;
         MovieClip.prototype.prevFrame = function () {
             var s = this;
             if (s._curFrame > 1) {
-                s._curFrame--;
+                s._wantFrame = s._curFrame - 1;
             }
             s._isPlaying = false;
         };
@@ -5055,7 +5062,7 @@ var annie;
                     frameIndex = 1;
                 }
             }
-            s._curFrame = frameIndex;
+            s._wantFrame = frameIndex;
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -5101,7 +5108,7 @@ var annie;
                     frameIndex = 1;
                 }
             }
-            s._curFrame = frameIndex;
+            s._wantFrame = frameIndex;
         };
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
@@ -5113,7 +5120,13 @@ var annie;
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
                 }
-                if (s._isPlaying) {
+                else {
+                    if (s._wantFrame != 0) {
+                        s._curFrame = s._wantFrame;
+                        s._wantFrame = 0;
+                    }
+                }
+                if (s._lastFrame == s._curFrame && s._isPlaying) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -5128,8 +5141,6 @@ var annie;
                     }
                 }
                 if (s._lastFrame != s._curFrame) {
-                    s._isNeedToCallEvent = true;
-                    s._lastFrame = s._curFrame;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     var allChildren = s._a2x_res_children;
@@ -5141,13 +5152,18 @@ var annie;
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s.removeChild.length = 0;
+                        s._removeChildren.length = 0;
                         var maskObj = null;
                         var maskTillId = -1;
                         for (var i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            objInfo = curFrameObj.c[objId];
+                            if (curFrameObj && curFrameObj.c) {
+                                objInfo = curFrameObj.c[objId];
+                            }
+                            else {
+                                objInfo = null;
+                            }
                             //证明这一帧有这个对象
                             if (objInfo) {
                                 annie.d(obj, objInfo);
@@ -5190,18 +5206,15 @@ var annie;
                         }
                     }
                 }
-                else {
-                    s._isNeedToCallEvent = false;
-                }
             }
             _super.prototype.update.call(this, isDrawUpdate);
         };
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
-            if (s._isNeedToCallEvent) {
-                s._isNeedToCallEvent = false;
+            if (s._lastFrame != s._curFrame) {
+                s._lastFrame = s._curFrame;
                 var timeLineObj = s._a2x_res_class;
-                var frameIndex = s._lastFrame - 1;
+                var frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本
                 var curFrameScript = void 0;
                 //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
