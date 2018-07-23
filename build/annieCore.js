@@ -4145,6 +4145,7 @@ var annie;
             var s = this;
             if (!s._visible)
                 return;
+            s._isNeedToCallEvent = false;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
@@ -4178,7 +4179,7 @@ var annie;
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s.removeChild.length = 0;
+                        s._removeChildren.length = 0;
                         var maskObj = null;
                         var maskTillId = -1;
                         for (var i = childCount - 1; i >= 0; i--) {
@@ -4226,9 +4227,6 @@ var annie;
                             s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
-                }
-                else {
-                    s._isNeedToCallEvent = false;
                 }
             }
             _super.prototype.update.call(this, isDrawUpdate);

@@ -397,6 +397,7 @@ namespace annie {
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if (!s._visible) return;
+            s._isNeedToCallEvent=false;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
@@ -429,7 +430,7 @@ namespace annie {
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s.removeChild.length=0;
+                        s._removeChildren.length=0;
                         let maskObj: any = null;
                         let maskTillId: number = -1;
                         for (let i = childCount - 1; i >= 0; i--) {
@@ -475,8 +476,6 @@ namespace annie {
                             s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
-                }else{
-                    s._isNeedToCallEvent=false;
                 }
             }
             super.update(isDrawUpdate);
