@@ -234,17 +234,6 @@ namespace annie {
             s.setAlign();
         }
 
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         */
-        public update(isDrawUpdate: boolean = true): void {
-            let s = this;
-            super.update(isDrawUpdate);
-        }
-
         private _touchEvent: annie.TouchEvent;
 
         /**
@@ -286,21 +275,31 @@ namespace annie {
             event.identifier = identifier;
         }
 
-        //每一个手指事件的对象池
+        /**
+         * 鼠标按下事件的对象池
+         * @property _mouseDownPoint
+         * @type {Object}
+         * @private
+         */
         private _mouseDownPoint: any = {};
 
         /**
          * 循环刷新页面的函数
+         * @method flush
+         * @private
+         * @return {void}
          */
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
                 s.update(true);
+                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
+                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
@@ -317,6 +316,7 @@ namespace annie {
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         public setFrameRate(fps: number): void {
             let s = this;
@@ -331,6 +331,7 @@ namespace annie {
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         public getFrameRate(): number {
             return 60 / (this._flush + 1);
