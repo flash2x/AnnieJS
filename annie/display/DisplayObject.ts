@@ -568,73 +568,7 @@ namespace annie {
          * @return {void}
          */
         public render(renderObj: IRender|any): void{
-            let s = this;
-            /*let cf = s.cFilters;
-            let cfLen = cf.length;
-            let fId=-1;
-            if(cfLen) {
-                for (let i = 0; i < cfLen; i++) {
-                    if (s.cFilters[i].type == "Shadow") {
-                        fId=i;
-                        break;
-                    }
-                }
-            }
-            if(fId>=0){
-                let ctx: any = renderObj["_ctx"];
-                ctx.shadowBlur = cf[fId].blur;
-                ctx.shadowColor = cf[fId].color;
-                ctx.shadowOffsetX = cf[fId].offsetX;
-                ctx.shadowOffsetY = cf[fId].offsetY;
-                renderObj.draw(s);
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-            }else {*/
-                renderObj.draw(s);
-            //}
-        }
-        /**
-         * 调用些方法会冒泡的将事件向显示列表下方传递
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
-         * @return {void}
-         */
-        public _onDispatchBubbledEvent(type: string): void {
-            let s:any = this;
-            if (type == "onRemoveToStage"&&!s.stage)return;
-            s.stage = s.parent.stage;
-            let sounds=s._a2x_sounds;
-            let timeLineObj=s._a2x_res_class;
-            if (type == "onRemoveToStage"){
-                s.dispatchEvent(type);
-                s.stage = null;
-                //如果有音乐。则关闭音乐
-                if(sounds&&sounds.length>0){
-                    for(let i=0;i<sounds.length;i++){
-                        sounds[i].stop();
-                    }
-                }
-                //如果是mc，则还原成动画初始时的状态
-                if(timeLineObj&&timeLineObj.tf>1){
-                    s._curFrame=1;
-                    s._lastFrame=0;
-                    s._isPlaying=true;
-                    s._isFront=true;
-                }
-            }else if(type=="onAddToStage"){
-                //如果有音乐，如果是Sprite则播放音乐
-                if(sounds&&sounds.length>0&&timeLineObj.tf==1){
-                    for(let i=0;i<sounds.length;i++){
-                        sounds[i].play(0);
-                    }
-                }
-                s.dispatchEvent(type);
-            }
+            renderObj.draw(this);
         }
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
@@ -647,14 +581,16 @@ namespace annie {
         public get width(): number {
             return this.getWH().width;
         }
-        public set width(value: number){
+
+        public set width(value: number) {
             let s = this;
             let w = s.width;
-            if (value > 0&&w>0) {
+            if (value > 0 && w > 0) {
                 let sx = value / w;
                 s.scaleX *= sx;
             }
         }
+
         /**
          * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
          * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
@@ -824,6 +760,47 @@ namespace annie {
             s._UI = null;
             s._texture = null;
             super.destroy();
+        }
+
+        /**
+         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * @method callEventAndFrameScript
+         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         */
+        protected callEventAndFrameScript(callState: number): void {
+            let s: any = this;
+            if(!s.stage)return;
+            let sounds = s._a2x_sounds;
+            let timeLineObj = s._a2x_res_class;
+            if (callState == 0) {
+                s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
+                //如果有音乐。则关闭音乐
+                if (sounds && sounds.length > 0) {
+                    for (let i = 0; i < sounds.length; i++) {
+                        sounds[i].stop();
+                    }
+                }
+                //如果是mc，则还原成动画初始时的状态
+                if (timeLineObj && timeLineObj.tf > 1) {
+                    s._curFrame = 1;
+                    s._lastFrame = 0;
+                    s._isPlaying = true;
+                    s._isFront = true;
+                }
+            } else {
+                if (callState == 1) {
+                    //如果有音乐，如果是Sprite则播放音乐
+                    if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
+                        for (let i = 0; i < sounds.length; i++) {
+                            sounds[i].play(0);
+                        }
+                    }
+                    s.dispatchEvent(annie.Event.ADD_TO_STAGE);
+                }
+                if (s._visible){
+                    s.dispatchEvent(annie.Event.ENTER_FRAME);
+                }
+            }
         }
     }
 }

@@ -1351,17 +1351,6 @@ declare namespace annie {
          */
         render(renderObj: IRender | any): void;
         /**
-         * 调用些方法会冒泡的将事件向显示列表下方传递
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
-         * @return {void}
-         */
-        _onDispatchBubbledEvent(type: string): void;
-        /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
          * @property  width
@@ -1445,6 +1434,12 @@ declare namespace annie {
          */
         private _a2x_res_obj;
         destroy(): void;
+        /**
+         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * @method callEventAndFrameScript
+         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         */
+        protected callEventAndFrameScript(callState: number): void;
     }
 }
 /**
@@ -1904,6 +1899,7 @@ declare namespace annie {
          * @readonly
          */
         children: DisplayObject[];
+        _removeChildren: DisplayObject[];
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -1983,16 +1979,6 @@ declare namespace annie {
          */
         swapChild(child1: any, child2: any): boolean;
         /**
-         * 调用此方法对Sprite及其child触发一次指定事件
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @since 1.0.0
-         * @return {void}
-         */
-        _onDispatchBubbledEvent(type: string): void;
-        /**
          * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
@@ -2035,6 +2021,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         render(renderObj: IRender): void;
+        protected callEventAndFrameScript(callState: number): void;
     }
 }
 /**
@@ -2283,6 +2270,7 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
+        private _isNeedToCallEvent;
         update(isDrawUpdate?: boolean): void;
         /**
          * @property _a2x_sounds
@@ -2292,6 +2280,7 @@ declare namespace annie {
          * @default {null}
          */
         private _a2x_sounds;
+        protected callEventAndFrameScript(callState: number): void;
         destroy(): void;
     }
 }
@@ -2505,11 +2494,13 @@ declare namespace annie {
          */
         renderObj: IRender;
         /**
-         * 暂停
+         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
+         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
+         * 对象视觉暂停更新
          * @property pause
-         * @static
          * @type {boolean}
          * @public
+         * @static
          * @since 1.0.0
          * @default false
          */
@@ -2644,7 +2635,6 @@ declare namespace annie {
         static _dragDisplay: DisplayObject;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
-         * @property
          * @type {Array}
          * @private
          */
@@ -2696,11 +2686,18 @@ declare namespace annie {
          * @private
          */
         private _initMouseEvent(event, cp, sp, identifier);
+        /**
+         * 鼠标按下事件的对象池
+         * @property _mouseDownPoint
+         * @type {Object}
+         * @private
+         */
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数
          * @method flush
          * @private
+         * @return {void}
          */
         private flush();
         /**
@@ -2709,6 +2706,7 @@ declare namespace annie {
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         setFrameRate(fps: number): void;
         /**
@@ -2716,6 +2714,7 @@ declare namespace annie {
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         getFrameRate(): number;
         /**
@@ -2733,6 +2732,10 @@ declare namespace annie {
          */
         private _mouseEventTypes;
         private muliPoints;
+        /**
+         * 当document有鼠标或触摸事件时调用
+         * @param e
+         */
         private _mP1;
         private _mP2;
         private _onMouseEvent;

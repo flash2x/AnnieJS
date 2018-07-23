@@ -1,3 +1,4 @@
+
 /**
  * @module annie
  */
@@ -22,27 +23,31 @@ namespace annie {
          */
         public renderObj: IRender = null;
         /**
-         * 暂停
+         * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
+         * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
+         * 对象视觉暂停更新
          * @property pause
-         * @static
          * @type {boolean}
          * @public
+         * @static
          * @since 1.0.0
          * @default false
          */
         static get pause(): boolean {
             return this._pause;
         }
-
         static set pause(value: boolean) {
             let s=this;
-            if(s._pause!=value) {
-                if(value){
-                    Sound.stopAllSounds();
-                }else{
-                    Sound.resumePlaySounds();
-                }
-                this._pause = value;
+            s._pause = value;
+            if(value){
+                //关闭声音
+                Sound.stopAllSounds();
+            }else{
+                //恢复声音
+                Sound.resumePlaySounds();
+            }
+            if(value!=s._pause) {
+                annie.globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }
         private static _pause: boolean = false;
@@ -187,7 +192,6 @@ namespace annie {
         public static _dragDisplay: DisplayObject = null;
         /**
          * 上一次鼠标或触碰经过的显示对象列表
-         * @property
          * @type {Array}
          * @private
          */
@@ -229,6 +233,7 @@ namespace annie {
             s._scaleMode = scaleMode;
             s.setAlign();
         }
+
         private _touchEvent: annie.TouchEvent;
 
         /**
@@ -238,10 +243,9 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s = this;
-                renderObj.begin();
-                super.render(renderObj);
-                renderObj.end();
-
+            renderObj.begin();
+            super.render(renderObj);
+            renderObj.end();
         }
 
         /**
@@ -278,41 +282,48 @@ namespace annie {
             event.identifier = identifier;
         }
 
-        //每一个手指事件的对象池
+        /**
+         * 鼠标按下事件的对象池
+         * @property _mouseDownPoint
+         * @type {Object}
+         * @private
+         */
         private _mouseDownPoint: any = {};
 
         /**
          * 循环刷新页面的函数
          * @method flush
          * @private
+         * @return {void}
          */
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
-                //更新视觉
                 s.update(true);
-                //更新渲染
+                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
+                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
                         s.render(s.renderObj);
-                        //更新事件
                     }
                     s._currentFlush--;
                 }
             }
         }
+
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         public setFrameRate(fps: number): void {
             let s = this;
@@ -327,6 +338,7 @@ namespace annie {
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         public getFrameRate(): number {
             return 60 / (this._flush + 1);
@@ -360,7 +372,10 @@ namespace annie {
             ontouchend: "onMouseUp"
         };
         private muliPoints: Array<any> = [];
-        //当document有鼠标或触摸事件时调用
+        /**
+         * 当document有鼠标或触摸事件时调用
+         * @param e
+         */
         private _mP1: Point = new Point();
         private _mP2: Point = new Point();
         private _onMouseEvent = function (e: any): void {

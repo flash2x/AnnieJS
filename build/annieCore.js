@@ -2150,75 +2150,7 @@ var annie;
          * @return {void}
          */
         DisplayObject.prototype.render = function (renderObj) {
-            var s = this;
-            /*let cf = s.cFilters;
-            let cfLen = cf.length;
-            let fId=-1;
-            if(cfLen) {
-                for (let i = 0; i < cfLen; i++) {
-                    if (s.cFilters[i].type == "Shadow") {
-                        fId=i;
-                        break;
-                    }
-                }
-            }
-            if(fId>=0){
-                let ctx: any = renderObj["_ctx"];
-                ctx.shadowBlur = cf[fId].blur;
-                ctx.shadowColor = cf[fId].color;
-                ctx.shadowOffsetX = cf[fId].offsetX;
-                ctx.shadowOffsetY = cf[fId].offsetY;
-                renderObj.draw(s);
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-            }else {*/
-            renderObj.draw(s);
-            //}
-        };
-        /**
-         * 调用些方法会冒泡的将事件向显示列表下方传递
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @private
-         * @return {void}
-         */
-        DisplayObject.prototype._onDispatchBubbledEvent = function (type) {
-            var s = this;
-            if (type == "onRemoveToStage" && !s.stage)
-                return;
-            s.stage = s.parent.stage;
-            var sounds = s._a2x_sounds;
-            var timeLineObj = s._a2x_res_class;
-            if (type == "onRemoveToStage") {
-                s.dispatchEvent(type);
-                s.stage = null;
-                //如果有音乐。则关闭音乐
-                if (sounds && sounds.length > 0) {
-                    for (var i = 0; i < sounds.length; i++) {
-                        sounds[i].stop();
-                    }
-                }
-                //如果是mc，则还原成动画初始时的状态
-                if (timeLineObj && timeLineObj.tf > 1) {
-                    s._curFrame = 1;
-                    s._lastFrame = 0;
-                    s._isPlaying = true;
-                    s._isFront = true;
-                }
-            }
-            else if (type == "onAddToStage") {
-                //如果有音乐，如果是Sprite则播放音乐
-                if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
-                    for (var i = 0; i < sounds.length; i++) {
-                        sounds[i].play(0);
-                    }
-                }
-                s.dispatchEvent(type);
-            }
+            renderObj.draw(this);
         };
         Object.defineProperty(DisplayObject.prototype, "width", {
             /**
@@ -2398,6 +2330,48 @@ var annie;
             s._UI = null;
             s._texture = null;
             _super.prototype.destroy.call(this);
+        };
+        /**
+         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * @method callEventAndFrameScript
+         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         */
+        DisplayObject.prototype.callEventAndFrameScript = function (callState) {
+            var s = this;
+            if (!s.stage)
+                return;
+            var sounds = s._a2x_sounds;
+            var timeLineObj = s._a2x_res_class;
+            if (callState == 0) {
+                s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
+                //如果有音乐。则关闭音乐
+                if (sounds && sounds.length > 0) {
+                    for (var i = 0; i < sounds.length; i++) {
+                        sounds[i].stop();
+                    }
+                }
+                //如果是mc，则还原成动画初始时的状态
+                if (timeLineObj && timeLineObj.tf > 1) {
+                    s._curFrame = 1;
+                    s._lastFrame = 0;
+                    s._isPlaying = true;
+                    s._isFront = true;
+                }
+            }
+            else {
+                if (callState == 1) {
+                    //如果有音乐，如果是Sprite则播放音乐
+                    if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
+                        for (var i = 0; i < sounds.length; i++) {
+                            sounds[i].play(0);
+                        }
+                    }
+                    s.dispatchEvent(annie.Event.ADD_TO_STAGE);
+                }
+                if (s._visible) {
+                    s.dispatchEvent(annie.Event.ENTER_FRAME);
+                }
+            }
         };
         /**
          * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
@@ -3368,6 +3342,7 @@ var annie;
              * @readonly
              */
             this.children = [];
+            this._removeChildren = [];
             var s = this;
             s._instanceType = "annie.Sprite";
         }
@@ -3510,7 +3485,10 @@ var annie;
                     }
                 }
             }
-            child.parent = s;
+            if (!child.parent || s.parent != s) {
+                child["_cp"] = true;
+                child.parent = s;
+            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -3520,10 +3498,6 @@ var annie;
             }
             else {
                 s.children.splice(index, 0, child);
-            }
-            if (s.stage && !sameParent) {
-                child["_cp"] = true;
-                child._onDispatchBubbledEvent("onAddToStage");
             }
         };
         /**
@@ -3596,26 +3570,6 @@ var annie;
             }
         };
         /**
-         * 调用此方法对Sprite及其child触发一次指定事件
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @since 1.0.0
-         * @return {void}
-         */
-        Sprite.prototype._onDispatchBubbledEvent = function (type) {
-            var s = this;
-            var len = s.children.length;
-            if (type == "onRemoveToStage" && !s.stage)
-                return;
-            s.stage = s.parent.stage;
-            for (var i = 0; i < len; i++) {
-                s.children[i]._onDispatchBubbledEvent(type);
-            }
-            _super.prototype._onDispatchBubbledEvent.call(this, type);
-        };
-        /**
          * 移除指定层级上的孩子
          * @method removeChildAt
          * @param {number} index 从0开始
@@ -3638,8 +3592,7 @@ var annie;
             else {
                 child = s.children.splice(index, 1)[0];
             }
-            child._onDispatchBubbledEvent("onRemoveToStage");
-            child.parent = null;
+            s._removeChildren.push(child);
         };
         /**
          * 移除Sprite上的所有child
@@ -3667,10 +3620,6 @@ var annie;
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
-            //更新完成后触发
-            if (s.hasEventListener("onEnterFrame")) {
-                s.dispatchEvent("onEnterFrame");
-            }
             var len = s.children.length;
             var child = null;
             for (var i = len - 1; i >= 0; i--) {
@@ -3808,6 +3757,65 @@ var annie;
                 }
             }
         };
+        Sprite.prototype.callEventAndFrameScript = function (callState) {
+            var s = this;
+            _super.prototype.callEventAndFrameScript.call(this, callState);
+            var child = null;
+            var children = null;
+            var len = 0;
+            if (callState == 0) {
+                //上级被移除了，这一层上的所有元素都要执行移除事件
+                children = s._removeChildren;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                    child.parent = null;
+                }
+                children = s.children;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                }
+            }
+            else if (callState == 1) {
+                //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
+                children = s.children;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.stage = s.stage;
+                    child.callEventAndFrameScript(callState);
+                }
+            }
+            else if (callState == 2) {
+                //上级没有任何变化，执行对应的移除事件和添加事件
+                children = s._removeChildren;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(0);
+                    child.stage = null;
+                    child.parent = null;
+                }
+                children = s.children;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    if (child.stage) {
+                        child.callEventAndFrameScript(2);
+                    }
+                    else {
+                        child.stage = s.stage;
+                        child.callEventAndFrameScript(1);
+                    }
+                }
+            }
+            s._removeChildren.length = 0;
+        };
         return Sprite;
     }(annie.DisplayObject));
     annie.Sprite = Sprite;
@@ -3909,6 +3917,7 @@ var annie;
              * @default []
              */
             this._maskList = [];
+            this._isNeedToCallEvent = false;
             /**
              * @property _a2x_sounds
              * @since 2.0.0
@@ -4247,6 +4256,7 @@ var annie;
                     }
                 }
                 if (s._lastFrame != s._curFrame) {
+                    s._isNeedToCallEvent = true;
                     s._lastFrame = s._curFrame;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
@@ -4259,6 +4269,7 @@ var annie;
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
+                        s.removeChild.length = 0;
                         var maskObj = null;
                         var maskTillId = -1;
                         for (var i = childCount - 1; i >= 0; i--) {
@@ -4285,69 +4296,79 @@ var annie;
                                     }
                                 }
                                 s.children.unshift(obj);
-                                if ((!obj.parent || s.parent != s) && s.stage) {
+                                if (!obj.parent || s.parent != s) {
                                     obj["_cp"] = true;
                                     obj.parent = s;
-                                    obj._onDispatchBubbledEvent("onAddToStage");
                                 }
                             }
                             else {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
-                                    obj._onDispatchBubbledEvent("onRemoveToStage");
-                                    obj.parent = null;
+                                    s._removeChildren.push(obj);
                                 }
                             }
                         }
                     }
                     //有没有声音
-                    var frameIndex = s._lastFrame - 1;
+                    var frameIndex = s._curFrame - 1;
                     var curFrameSound = timeLineObj.s[frameIndex];
                     if (curFrameSound) {
                         for (var sound in curFrameSound) {
                             s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
-                    //更新完所有后再来确定事件和脚本
-                    var curFrameScript = void 0;
-                    //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
-                    var isUserScript = false;
-                    if (s._a2x_script) {
-                        curFrameScript = s._a2x_script[frameIndex];
-                        if (curFrameScript != undefined) {
-                            if (curFrameScript != null)
-                                curFrameScript();
-                            isUserScript = true;
-                        }
-                    }
-                    if (!isUserScript) {
-                        curFrameScript = timeLineObj.a[frameIndex];
-                        if (curFrameScript) {
-                            s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
-                        }
-                    }
-                    //有没有事件
-                    if (s.hasEventListener(annie.Event.CALL_FRAME)) {
-                        curFrameScript = timeLineObj.e[frameIndex];
-                        if (curFrameScript) {
-                            for (var i = 0; i < curFrameScript.length; i++) {
-                                //抛事件
-                                s.dispatchEvent(annie.Event.CALL_FRAME, {
-                                    frameIndex: s._curFrame,
-                                    frameName: curFrameScript[i]
-                                });
-                            }
-                        }
-                    }
-                    if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
-                        s.dispatchEvent(annie.Event.END_FRAME, {
-                            frameIndex: s._curFrame,
-                            frameName: "endFrame"
-                        });
-                    }
+                }
+                else {
+                    s._isNeedToCallEvent = false;
                 }
             }
             _super.prototype.update.call(this, isDrawUpdate);
+        };
+        MovieClip.prototype.callEventAndFrameScript = function (callState) {
+            var s = this;
+            if (s._isNeedToCallEvent) {
+                s._isNeedToCallEvent = false;
+                var timeLineObj = s._a2x_res_class;
+                var frameIndex = s._lastFrame - 1;
+                //更新完所有后再来确定事件和脚本
+                var curFrameScript = void 0;
+                //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
+                var isUserScript = false;
+                if (s._a2x_script) {
+                    curFrameScript = s._a2x_script[frameIndex];
+                    if (curFrameScript != undefined) {
+                        if (curFrameScript != null)
+                            curFrameScript();
+                        isUserScript = true;
+                    }
+                }
+                if (!isUserScript) {
+                    curFrameScript = timeLineObj.a[frameIndex];
+                    if (curFrameScript) {
+                        s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
+                    }
+                }
+                //有没有事件
+                if (s.hasEventListener(annie.Event.CALL_FRAME)) {
+                    curFrameScript = timeLineObj.e[frameIndex];
+                    if (curFrameScript) {
+                        for (var i = 0; i < curFrameScript.length; i++) {
+                            //抛事件
+                            s.dispatchEvent(annie.Event.CALL_FRAME, {
+                                frameIndex: s._curFrame,
+                                frameName: curFrameScript[i]
+                            });
+                        }
+                    }
+                }
+                if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
+                    s.dispatchEvent(annie.Event.END_FRAME, {
+                        frameIndex: s._curFrame,
+                        frameName: "endFrame"
+                    });
+                }
+            }
+            _super.prototype.callEventAndFrameScript.call(this, callState);
         };
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
@@ -4934,7 +4955,6 @@ var annie;
             this._currentFlush = 0;
             /**
              * 上一次鼠标或触碰经过的显示对象列表
-             * @property
              * @type {Array}
              * @private
              */
@@ -4953,7 +4973,12 @@ var annie;
              * @private
              */
             this._mp = [];
-            //每一个手指事件的对象池
+            /**
+             * 鼠标按下事件的对象池
+             * @property _mouseDownPoint
+             * @type {Object}
+             * @private
+             */
             this._mouseDownPoint = {};
             /**
              * 单点触摸对应的引擎事件类型名
@@ -4973,7 +4998,10 @@ var annie;
                 ontouchend: "onMouseUp"
             };
             this.muliPoints = [];
-            //当document有鼠标或触摸事件时调用
+            /**
+             * 当document有鼠标或触摸事件时调用
+             * @param e
+             */
             this._mP1 = new annie.Point();
             this._mP2 = new annie.Point();
             this._onMouseEvent = function (e) {
@@ -5378,11 +5406,13 @@ var annie;
         }
         Object.defineProperty(Stage, "pause", {
             /**
-             * 暂停
+             * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
+             * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
+             * 对象视觉暂停更新
              * @property pause
-             * @static
              * @type {boolean}
              * @public
+             * @static
              * @since 1.0.0
              * @default false
              */
@@ -5391,14 +5421,17 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (s._pause != value) {
-                    if (value) {
-                        annie.Sound.stopAllSounds();
-                    }
-                    else {
-                        annie.Sound.resumePlaySounds();
-                    }
-                    this._pause = value;
+                s._pause = value;
+                if (value) {
+                    //关闭声音
+                    annie.Sound.stopAllSounds();
+                }
+                else {
+                    //恢复声音
+                    annie.Sound.resumePlaySounds();
+                }
+                if (value != s._pause) {
+                    annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
                 }
             },
             enumerable: true,
@@ -5479,19 +5512,20 @@ var annie;
          * 循环刷新页面的函数
          * @method flush
          * @private
+         * @return {void}
          */
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
-                //更新视觉
                 s.update(true);
-                //更新渲染
+                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
+                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 }
                 else {
@@ -5508,6 +5542,7 @@ var annie;
          * @param {number} fps 最好是60的倍数如 1 2 3 6 10 12 15 20 30 60
          * @since 1.0.0
          * @public
+         * @return {void}
          */
         Stage.prototype.setFrameRate = function (fps) {
             var s = this;
@@ -5521,6 +5556,7 @@ var annie;
          * @method getFrameRate
          * @since 1.0.0
          * @public
+         * @return {number}
          */
         Stage.prototype.getFrameRate = function () {
             return 60 / (this._flush + 1);

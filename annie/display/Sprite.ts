@@ -55,7 +55,7 @@ namespace annie {
          * @readonly
          */
         public children: DisplayObject[] = [];
-
+        public _removeChildren: DisplayObject[] = [];
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -182,7 +182,10 @@ namespace annie {
                     }
                 }
             }
-            child.parent = s;
+            if (!child.parent || s.parent != s) {
+                child["_cp"] = true;
+                child.parent = s;
+            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -190,10 +193,6 @@ namespace annie {
                 s.children.unshift(child);
             } else {
                 s.children.splice(index, 0, child);
-            }
-            if (s.stage && !sameParent) {
-                child["_cp"] = true;
-                child._onDispatchBubbledEvent("onAddToStage");
             }
         }
 
@@ -264,27 +263,6 @@ namespace annie {
                 return true;
             }
         }
-
-        /**
-         * 调用此方法对Sprite及其child触发一次指定事件
-         * @method _onDispatchBubbledEvent
-         * @private
-         * @param {string} type
-         * @param {boolean} updateMc 是否更新movieClip时间轴信息
-         * @since 1.0.0
-         * @return {void}
-         */
-        public _onDispatchBubbledEvent(type: string): void {
-            let s = this;
-            let len = s.children.length;
-            if (type == "onRemoveToStage" && !s.stage) return;
-            s.stage = s.parent.stage;
-            for (let i = 0; i < len; i++) {
-                s.children[i]._onDispatchBubbledEvent(type);
-            }
-            super._onDispatchBubbledEvent(type);
-        }
-
         /**
          * 移除指定层级上的孩子
          * @method removeChildAt
@@ -305,8 +283,7 @@ namespace annie {
             } else {
                 child = s.children.splice(index, 1)[0];
             }
-            child._onDispatchBubbledEvent("onRemoveToStage");
-            child.parent = null;
+            s._removeChildren.push(child);
         }
 
         /**
@@ -334,10 +311,6 @@ namespace annie {
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
-            //更新完成后触发
-            if (s.hasEventListener("onEnterFrame")) {
-                s.dispatchEvent("onEnterFrame");
-            }
             let len = s.children.length;
             let child: any = null;
             for (let i = len - 1; i >= 0; i--) {
@@ -469,6 +442,62 @@ namespace annie {
                     renderObj.endMask();
                 }
             }
+        }
+        protected callEventAndFrameScript(callState: number):void{
+            let s=this;
+            super.callEventAndFrameScript(callState);
+            let child: any = null;
+            let children:any=null;
+            let len=0;
+            if(callState==0){
+                //上级被移除了，这一层上的所有元素都要执行移除事件
+                children=s._removeChildren;
+                len=children.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                    child.parent=null;
+                }
+                children=s.children;
+                len=children.length;
+                for (let i = len - 1; i >= 0; i--){
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                }
+            }else if(callState==1){
+                //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
+                children=s.children;
+                len=children.length;
+                for (let i = len - 1; i >= 0; i--){
+                    child = children[i];
+                    child.stage=s.stage;
+                    child.callEventAndFrameScript(callState);
+                }
+            }else if(callState==2){
+                //上级没有任何变化，执行对应的移除事件和添加事件
+                children=s._removeChildren;
+                len=children.length;
+                for (let i = len - 1; i >= 0; i--){
+                    child = children[i];
+                    child.callEventAndFrameScript(0);
+                    child.stage = null;
+                    child.parent=null;
+                }
+                children=s.children;
+                len=children.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    child =children[i];
+                    if(child.stage){
+                        child.callEventAndFrameScript(2);
+                    }else{
+                        child.stage=s.stage;
+                        child.callEventAndFrameScript(1);
+                    }
+                }
+            }
+            s._removeChildren.length=0;
         }
     }
 }
