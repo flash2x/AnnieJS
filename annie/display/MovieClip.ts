@@ -302,7 +302,7 @@ namespace annie {
         public nextFrame(): void {
             let s = this;
             if (s._curFrame < s.totalFrames) {
-                s._wantFrame=s._curFrame+1;
+                s._wantFrame = s._curFrame + 1;
             }
             s._isPlaying = false;
         }
@@ -317,7 +317,7 @@ namespace annie {
         public prevFrame(): void {
             let s = this;
             if (s._curFrame > 1) {
-                s._wantFrame=s._curFrame-1;
+                s._wantFrame = s._curFrame - 1;
             }
             s._isPlaying = false;
         }
@@ -394,20 +394,21 @@ namespace annie {
             }
             s._wantFrame = <number>frameIndex;
         }
+        private isUpdateFrame:boolean=false;
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if (!s._visible) return;
-            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
+            s.isUpdateFrame=false;
+            if(isDrawUpdate && s._a2x_res_class.tf > 1){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
-                }else{
-                    if(s._wantFrame!=0){
-                        s._curFrame=s._wantFrame;
-                        s._wantFrame=0;
+                } else {
+                    if (s._wantFrame != 0) {
+                        s._curFrame = s._wantFrame;
+                        s._wantFrame = 0;
                     }
                 }
-                if (s._lastFrame == s._curFrame&&s._isPlaying) {
+                if(s._lastFrame == s._curFrame&&s._isPlaying){
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -420,7 +421,8 @@ namespace annie {
                         }
                     }
                 }
-                if(s._lastFrame != s._curFrame){
+                if (s._lastFrame != s._curFrame) {
+                    s.isUpdateFrame=true;
                     let timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
@@ -432,16 +434,16 @@ namespace annie {
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s._removeChildren.length=0;
+                        s._removeChildren.length = 0;
                         let maskObj: any = null;
                         let maskTillId: number = -1;
                         for (let i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            if(curFrameObj&&curFrameObj.c){
+                            if (curFrameObj && curFrameObj.c) {
                                 objInfo = curFrameObj.c[objId];
-                            }else{
-                                objInfo=null;
+                            } else {
+                                objInfo = null;
                             }
                             //证明这一帧有这个对象
                             if (objInfo) {
@@ -494,10 +496,11 @@ namespace annie {
          * @default {null}
          */
         private _a2x_sounds: any = null;
-        protected callEventAndFrameScript(callState: number):void{
-            let s:any=this;
-            if( s._lastFrame!=s._curFrame){
-                s._lastFrame=s._curFrame;
+        protected callEventAndFrameScript(callState: number): void {
+            let s: any = this;
+            if (s.isUpdateFrame){
+                //因为update在visible中更新并停止了，所以这里不需要再判断visible
+                s._lastFrame = s._curFrame;
                 let timeLineObj = s._a2x_res_class;
                 let frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本

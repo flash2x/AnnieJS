@@ -299,8 +299,8 @@ namespace annie {
             let s = this;
             if (value != s._visible) {
                 s._visible = value;
-                if (!value)
-                    s._cp = true;
+                // if (!value)
+                //     s._cp = true;
             }
         }
 
@@ -314,9 +314,7 @@ namespace annie {
          * @type {string}
          * @default 0
          */
-
         //public blendMode: string = "normal";
-
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -554,6 +552,7 @@ namespace annie {
          */
         protected update(isDrawUpdate: boolean = true): void {
             let s = this;
+            if(!s._visible)return;
             let UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
@@ -630,6 +629,7 @@ namespace annie {
                 renderObj.draw(s);
             }
         }
+
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
@@ -841,7 +841,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 每个Flash文件生成的对象都有一个自带的初始化信息
          * @property _a2x_res_obj
@@ -851,7 +850,6 @@ namespace annie {
          * @default {Object}
          */
         private _a2x_res_obj: any = {};
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;
@@ -873,15 +871,14 @@ namespace annie {
             s._texture = null;
             super.destroy();
         }
-
         /**
          * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
          * @method callEventAndFrameScript
          * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
          */
-        protected callEventAndFrameScript(callState: number): void {
+        protected callEventAndFrameScript(callState: number):void {
             let s: any = this;
-            if(!s.stage)return;
+            if (!s.stage) return;
             let sounds = s._a2x_sounds;
             let timeLineObj = s._a2x_res_class;
             if (callState == 0) {
@@ -909,9 +906,8 @@ namespace annie {
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if (s._visible){
-                    s.dispatchEvent(annie.Event.ENTER_FRAME);
-                }
+                if(s._visible)
+                s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         }
     }

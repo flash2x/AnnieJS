@@ -147,7 +147,6 @@ namespace annie {
             let c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
         }
-
         /**
          * 当舞台尺寸改变时会调用
          * @public
@@ -162,7 +161,6 @@ namespace annie {
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
         }
-
         destroy(): void {
             let s = this;
             s.rootContainer = null;

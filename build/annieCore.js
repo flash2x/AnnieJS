@@ -1944,8 +1944,6 @@ var annie;
                 var s = this;
                 if (value != s._visible) {
                     s._visible = value;
-                    if (!value)
-                        s._cp = true;
                 }
             },
             enumerable: true,
@@ -2184,6 +2182,8 @@ var annie;
         DisplayObject.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
+            if (!s._visible)
+                return;
             var UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
@@ -2484,9 +2484,8 @@ var annie;
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if (s._visible) {
+                if (s._visible)
                     s.dispatchEvent(annie.Event.ENTER_FRAME);
-                }
             }
         };
         //为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
@@ -4038,12 +4037,10 @@ var annie;
         Sprite.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s._visible)
-                return;
-            _super.prototype.update.call(this, isDrawUpdate);
             var um = s._UI.UM;
             var ua = s._UI.UA;
             var uf = s._UI.UF;
+            _super.prototype.update.call(this, isDrawUpdate);
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
@@ -4797,6 +4794,7 @@ var annie;
              * @default []
              */
             this._maskList = [];
+            this.isUpdateFrame = false;
             /**
              * @property _a2x_sounds
              * @since 2.0.0
@@ -5113,8 +5111,7 @@ var annie;
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s._visible)
-                return;
+            s.isUpdateFrame = false;
             if (isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
@@ -5141,6 +5138,7 @@ var annie;
                     }
                 }
                 if (s._lastFrame != s._curFrame) {
+                    s.isUpdateFrame = true;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     var allChildren = s._a2x_res_children;
@@ -5211,7 +5209,8 @@ var annie;
         };
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
-            if (s._lastFrame != s._curFrame) {
+            if (s.isUpdateFrame) {
+                //因为update在visible中更新并停止了，所以这里不需要再判断visible
                 s._lastFrame = s._curFrame;
                 var timeLineObj = s._a2x_res_class;
                 var frameIndex = s._curFrame - 1;
@@ -6733,19 +6732,19 @@ var annie;
             var s = this;
             if (s._flush == 0) {
                 s.update(true);
-                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
+                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
                         s.render(s.renderObj);
+                        s.callEventAndFrameScript(2);
                     }
                     s._currentFlush--;
                 }
@@ -7242,7 +7241,7 @@ var annie;
         Stage.flushAll = function () {
             if (!Stage._pause) {
                 var len = Stage.allUpdateObjList.length;
-                for (var i = 0; i < len; i++) {
+                for (var i = len - 1; i >= 0; i--) {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                 }
             }

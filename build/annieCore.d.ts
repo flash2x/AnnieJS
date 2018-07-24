@@ -2683,6 +2683,7 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
+        private isUpdateFrame;
         update(isDrawUpdate?: boolean): void;
         /**
          * @property _a2x_sounds
