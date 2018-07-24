@@ -9668,6 +9668,7 @@ var annie;
         }
     }
     annie.initRes = initRes;
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
 })(annie || (annie = {}));
 /**
  * @module annie

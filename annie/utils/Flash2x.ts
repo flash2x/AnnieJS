@@ -1039,4 +1039,5 @@ namespace annie {
             }
         }
     }
+    console.log("AnnieJS:https://github.com/flash2x/annieJS");
 }
