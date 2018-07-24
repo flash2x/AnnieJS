@@ -371,6 +371,7 @@ namespace annie {
                 let realLines: any = [];
                 s.realLines = realLines;
                 s._prepContext(ctx);
+                let wordW = 0;
                 let lineH = s._textHeight = s._size;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length] = hardLines[0];
@@ -381,7 +382,7 @@ namespace annie {
                     } else if (lineW > s._textWidth) {
                         let w = 0;
                         let lineStr = '';
-                        let wordW = 0;
+                        wordW = 0;
                         let strLen = str.length;
                         let lineIndex = 0;
                         for (let j = 0; j < strLen; j++) {
@@ -410,7 +411,7 @@ namespace annie {
                         if (!str) continue;
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
-                        let wordW = 0;
+                        wordW = 0;
                         let strLen = str.length;
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
