@@ -5906,7 +5906,6 @@ var annie;
                             continue;
                         var w = s._getMeasuredWidth(str[0]);
                         var lineStr = str[0];
-                        var wordW = 0;
                         var strLen = str.length;
                         for (var j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;

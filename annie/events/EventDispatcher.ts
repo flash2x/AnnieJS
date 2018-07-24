@@ -42,7 +42,6 @@ namespace annie {
         public get instanceType(): string {
             return this._instanceType;
         }
-
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -202,7 +201,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
