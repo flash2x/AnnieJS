@@ -42,6 +42,7 @@ namespace annie {
         public get instanceType(): string {
             return this._instanceType;
         }
+
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -51,6 +52,22 @@ namespace annie {
          * @return {void}
          */
         abstract destroy(): void;
+
+        /**
+         * 批量设置属性
+         * @property valueMap 键值对
+         * @public
+         * @since 2.0.0
+         * @type {any}
+         */
+        attrs(valueMap: any) {
+            let s: any = this;
+            if (valueMap) {
+                for (let key in valueMap) {
+                    s[key] = valueMap[key];
+                }
+            }
+        }
     }
 
     /**
@@ -105,6 +122,17 @@ namespace annie {
             return count;
         }
 
+        private listenerExist(eventTypes: any, listener: Function) {
+            let exist = false;
+            eventTypes.some((item: any) => {
+                if (item.listener == listener) {
+                    exist = true;
+                    return true;
+                }
+            });
+            return exist;
+        }
+
         /**
          * 给对象添加一个侦听
          * @method addEventListener
@@ -117,7 +145,7 @@ namespace annie {
          * @example
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
-        public addEventListener(type: string, listener: Function,useCapture = true): void {
+        public addEventListener(type: string, listener: Function, useCapture = true): void {
             if (!type) {
                 throw new Error("添加侦听的type值为undefined");
             }
@@ -125,20 +153,56 @@ namespace annie {
                 throw new Error("侦听回调函数不能为null");
             }
             let s = this;
-            let eventTypes=s.eventTypes;
-            if(!useCapture){
-                eventTypes=s.eventTypes1;
+            let eventTypes = s.eventTypes;
+            if (!useCapture) {
+                eventTypes = s.eventTypes1;
             }
             if (!eventTypes[type]) {
                 eventTypes[type] = [];
             }
-            if (eventTypes[type].indexOf(listener) < 0) {
-                eventTypes[type].unshift(listener);
+            if (!this.listenerExist(eventTypes[type], listener)) {
+                eventTypes[type].unshift({listener});
                 if (type.indexOf("onMouse") == 0) {
                     s._changeMouseCount(type, true);
                 }
             }
         }
+
+        /**
+         * 给对象添加一个单次侦听
+         * @method once
+         * @public
+         * @since 1.0.0
+         * @param {string} type 侦听类形
+         * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
+         * @example
+         *      this.once(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         */
+        public once(type: string, listener: Function, useCapture = true): void {
+            if (!type) {
+                throw new Error("添加侦听的type值为undefined");
+            }
+            if (!listener) {
+                throw new Error("侦听回调函数不能为null");
+            }
+            let s = this;
+            let eventTypes = s.eventTypes;
+            if (!useCapture) {
+                eventTypes = s.eventTypes1;
+            }
+            if (!eventTypes[type]) {
+                eventTypes[type] = [];
+            }
+            if (!this.listenerExist(eventTypes[type], listener)) {
+                eventTypes[type].unshift({listener, once: true});
+                if (type.indexOf("onMouse") == 0) {
+                    s._changeMouseCount(type, true);
+                }
+            }
+        }
+
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
@@ -180,7 +244,7 @@ namespace annie {
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
-        public dispatchEvent(event: any, data: any = null,useCapture = true): boolean {
+        public dispatchEvent(event: any, data: any = null, useCapture = true): boolean {
             let s = this;
             if (typeof(event) == "string") {
                 if (!s._defaultEvent) {
@@ -191,8 +255,8 @@ namespace annie {
                 event = s._defaultEvent;
             }
             let listeners = s.eventTypes[event.type];
-            if(!useCapture){
-                listeners=s.eventTypes1[event.type];
+            if (!useCapture) {
+                listeners = s.eventTypes1[event.type];
             }
             if (listeners) {
                 let len = listeners.length;
@@ -203,9 +267,13 @@ namespace annie {
                     event.data = data;
                 }
                 for (let i = len - 1; i >= 0; i--) {
-                    if(!event["_pd"]) {
+                    if (!event["_pd"]) {
                         if (listeners[i]) {
-                            listeners[i](event);
+                            let {listener, once} = listeners[i];
+                            listener(event);
+                            if (once) {
+                                listeners.splice(i, 1);
+                            }
                         } else {
                             listeners.splice(i, 1);
                         }
@@ -250,16 +318,16 @@ namespace annie {
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {void}
          */
-        public removeEventListener(type: string, listener: Function,useCapture = true): void {
+        public removeEventListener(type: string, listener: Function, useCapture = true): void {
             let s = this;
             let listeners = s.eventTypes[type];
-            if(!useCapture){
-                listeners=s.eventTypes1[type];
+            if (!useCapture) {
+                listeners = s.eventTypes1[type];
             }
             if (listeners) {
                 let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    if (listeners[i] === listener) {
+                    if (listeners[i].listener === listener) {
                         listeners.splice(i, 1);
                         if (type.indexOf("onMouse") == 0) {
                             s._changeMouseCount(type, false);
@@ -276,7 +344,7 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public removeAllEventListener():void {
+        public removeAllEventListener(): void {
             let s = this;
             for (let type in s.eventTypes) {
                 if (type.indexOf("onMouse") == 0) {

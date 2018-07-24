@@ -42,6 +42,14 @@ declare namespace annie {
          * @return {void}
          */
         abstract destroy(): void;
+        /**
+         * 批量设置属性
+         * @property valueMap 键值对
+         * @public
+         * @since 2.0.0
+         * @type {any}
+         */
+        attrs(valueMap: any): void;
     }
     /**
      * 事件触发基类
@@ -72,6 +80,7 @@ declare namespace annie {
          * @param {string} type 获取事件类型，默认是所有
          */
         static getMouseEventCount(type?: string): number;
+        private listenerExist(eventTypes, listener);
         /**
          * 给对象添加一个侦听
          * @method addEventListener
@@ -85,6 +94,19 @@ declare namespace annie {
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
          */
         addEventListener(type: string, listener: Function, useCapture?: boolean): void;
+        /**
+         * 给对象添加一个单次侦听
+         * @method once
+         * @public
+         * @since 1.0.0
+         * @param {string} type 侦听类形
+         * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
+         * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
+         * @example
+         *      this.once(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         */
+        once(type: string, listener: Function, useCapture?: boolean): void;
         /**
          * 增加或删除相应mouse或touch侦听记数
          * @method _changeMouseCount
