@@ -409,95 +409,99 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._cp) return;
-            if (s.cAlpha > 0 && s._visible) {
-                let maskObj: any;
-                let child: any;
-                let len: number = s.children.length;
-                for (let i = 0; i < len; i++) {
-                    child = s.children[i];
-                    if (child._isUseToMask>0)continue;
-                    if (child.cAlpha > 0 && child._visible) {
-                        if (maskObj) {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
+            if (s._cp||!s._visible) return;
+            if (s._cacheAsBitmap) {
+                super.render(renderObj);
+            } else {
+                if (s.cAlpha > 0 && s._visible) {
+                    let maskObj: any;
+                    let child: any;
+                    let len: number = s.children.length;
+                    for (let i = 0; i < len; i++) {
+                        child = s.children[i];
+                        if (child._isUseToMask > 0) continue;
+                        if (child.cAlpha > 0 && child._visible) {
+                            if (maskObj) {
+                                if (child.mask && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        renderObj.endMask();
+                                        maskObj = child.mask;
+                                        renderObj.beginMask(maskObj);
+                                    }
+                                } else {
                                     renderObj.endMask();
+                                    maskObj = null;
+                                }
+                            } else {
+                                if (child.mask && child.mask.parent == child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }
-                            } else {
-                                renderObj.endMask();
-                                maskObj = null;
                             }
-                        } else {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
-                            }
+                            child.render(renderObj);
                         }
-                        child.render(renderObj);
                     }
-                }
-                if (maskObj) {
-                    renderObj.endMask();
+                    if (maskObj) {
+                        renderObj.endMask();
+                    }
                 }
             }
         }
-        protected callEventAndFrameScript(callState: number):void{
-            let s=this;
+        protected callEventAndFrameScript(callState: number): void {
+            let s = this;
             super.callEventAndFrameScript(callState);
             let child: any = null;
-            let children:any=null;
-            let len=0;
-            if(callState==0){
+            let children: any = null;
+            let len = 0;
+            if (callState == 0) {
                 //上级被移除了，这一层上的所有元素都要执行移除事件
-                children=s._removeChildren;
-                len=children.length;
+                children = s._removeChildren;
+                len = children.length;
                 for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.callEventAndFrameScript(callState);
                     child.stage = null;
-                    child.parent=null;
+                    child.parent = null;
                 }
-                children=s.children;
-                len=children.length;
-                for (let i = len - 1; i >= 0; i--){
+                children = s.children;
+                len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.callEventAndFrameScript(callState);
                     child.stage = null;
                 }
-            }else if(callState==1){
+            } else if (callState == 1) {
                 //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
-                children=s.children;
-                len=children.length;
-                for (let i = len - 1; i >= 0; i--){
+                children = s.children;
+                len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.stage=s.stage;
+                    child.stage = s.stage;
                     child.callEventAndFrameScript(callState);
                 }
-            }else if(callState==2){
+            } else if (callState == 2) {
                 //上级没有任何变化，执行对应的移除事件和添加事件
-                children=s._removeChildren;
-                len=children.length;
-                for (let i = len - 1; i >= 0; i--){
+                children = s._removeChildren;
+                len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.callEventAndFrameScript(0);
                     child.stage = null;
-                    child.parent=null;
+                    child.parent = null;
                 }
-                children=s.children;
-                len=children.length;
+                children = s.children;
+                len = children.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    child =children[i];
-                    if(child.stage){
+                    child = children[i];
+                    if (child.stage) {
                         child.callEventAndFrameScript(2);
-                    }else{
-                        child.stage=s.stage;
+                    } else {
+                        child.stage = s.stage;
                         child.callEventAndFrameScript(1);
                     }
                 }
             }
-            s._removeChildren.length=0;
+            s._removeChildren.length = 0;
         }
     }
 }

@@ -1570,7 +1570,12 @@ var annie;
              * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
              */
-            this._UI = { UD: false, UM: true, UA: true, UF: false };
+            this._UI = {
+                UD: false,
+                UM: true,
+                UA: true,
+                UF: false
+            };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -1873,7 +1878,9 @@ var annie;
              * @type {boolean}
              * @default 0
              */
-            get: function () { return this._visible; },
+            get: function () {
+                return this._visible;
+            },
             set: function (value) {
                 var s = this;
                 if (value != s._visible) {
@@ -2366,9 +2373,8 @@ var annie;
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if (s._visible) {
+                if (s._visible)
                     s.dispatchEvent(annie.Event.ENTER_FRAME);
-                }
             }
         };
         /**
@@ -3628,41 +3634,46 @@ var annie;
          */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cp)
+            if (s._cp || !s._visible)
                 return;
-            if (s.cAlpha > 0 && s._visible) {
-                var maskObj = void 0;
-                var child = void 0;
-                var len = s.children.length;
-                for (var i = 0; i < len; i++) {
-                    child = s.children[i];
-                    if (child._isUseToMask > 0)
-                        continue;
-                    if (child.cAlpha > 0 && child._visible) {
-                        if (maskObj) {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
+            if (s._cacheAsBitmap) {
+                _super.prototype.render.call(this, renderObj);
+            }
+            else {
+                if (s.cAlpha > 0 && s._visible) {
+                    var maskObj = void 0;
+                    var child = void 0;
+                    var len = s.children.length;
+                    for (var i = 0; i < len; i++) {
+                        child = s.children[i];
+                        if (child._isUseToMask > 0)
+                            continue;
+                        if (child.cAlpha > 0 && child._visible) {
+                            if (maskObj) {
+                                if (child.mask && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        renderObj.endMask();
+                                        maskObj = child.mask;
+                                        renderObj.beginMask(maskObj);
+                                    }
+                                }
+                                else {
                                     renderObj.endMask();
+                                    maskObj = null;
+                                }
+                            }
+                            else {
+                                if (child.mask && child.mask.parent == child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }
                             }
-                            else {
-                                renderObj.endMask();
-                                maskObj = null;
-                            }
+                            child.render(renderObj);
                         }
-                        else {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
-                            }
-                        }
-                        child.render(renderObj);
                     }
-                }
-                if (maskObj) {
-                    renderObj.endMask();
+                    if (maskObj) {
+                        renderObj.endMask();
+                    }
                 }
             }
         };
@@ -3827,6 +3838,7 @@ var annie;
              * @default []
              */
             this._maskList = [];
+            this.isUpdateFrame = false;
             /**
              * @property _a2x_sounds
              * @since 2.0.0
@@ -4143,9 +4155,7 @@ var annie;
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s._visible)
-                return;
-            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -4170,7 +4180,9 @@ var annie;
                         }
                     }
                 }
+                s.isUpdateFrame = false;
                 if (s._lastFrame != s._curFrame) {
+                    s.isUpdateFrame = true;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     var allChildren = s._a2x_res_children;
@@ -4241,7 +4253,7 @@ var annie;
         };
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
-            if (s._lastFrame != s._curFrame) {
+            if (s.isUpdateFrame) {
                 s._lastFrame = s._curFrame;
                 var timeLineObj = s._a2x_res_class;
                 var frameIndex = s._curFrame - 1;
@@ -5419,19 +5431,19 @@ var annie;
             var s = this;
             if (s._flush == 0) {
                 s.update(true);
-                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
+                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
                         s.render(s.renderObj);
+                        s.callEventAndFrameScript(2);
                     }
                     s._currentFlush--;
                 }
