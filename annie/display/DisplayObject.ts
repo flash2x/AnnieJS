@@ -17,7 +17,7 @@ namespace annie {
          * @since 1.0.0
          * @public
          */
-        constructor() {
+        constructor(){
             super();
             this._instanceType = "annie.DisplayObject";
         }
