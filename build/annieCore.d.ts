@@ -2271,6 +2271,7 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
+        private isUpdateFrame;
         update(isDrawUpdate?: boolean): void;
         /**
          * @property _a2x_sounds
@@ -3517,14 +3518,6 @@ declare namespace annie {
      * @static
      */
     let devicePixelRatio: number;
-    /**
-     * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
-     * @property annie.subDomainPath
-     * @type {string}
-     * @static
-     * @public
-     */
-    let subDomainPath: string;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher

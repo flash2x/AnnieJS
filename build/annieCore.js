@@ -3528,7 +3528,7 @@ var annie;
             var s = this;
             var len = s.children.length;
             for (var i = 0; i < len; i++) {
-                if (this.children[i] == child) {
+                if (s.children[i] == child) {
                     return i;
                 }
             }
@@ -3613,10 +3613,10 @@ var annie;
             var s = this;
             if (!s._visible)
                 return;
-            _super.prototype.update.call(this, isDrawUpdate);
             var um = s._UI.UM;
             var ua = s._UI.UA;
             var uf = s._UI.UF;
+            _super.prototype.update.call(this, isDrawUpdate);
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
@@ -3719,7 +3719,7 @@ var annie;
          */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cp)
+            if (s._cp || !s._visible)
                 return;
             if (s.cAlpha > 0 && s._visible) {
                 var maskObj = void 0;
@@ -3918,6 +3918,7 @@ var annie;
              * @default []
              */
             this._maskList = [];
+            this.isUpdateFrame = false;
             /**
              * @property _a2x_sounds
              * @since 2.0.0
@@ -4234,9 +4235,7 @@ var annie;
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (!s._visible)
-                return;
-            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -4261,7 +4260,9 @@ var annie;
                         }
                     }
                 }
+                s.isUpdateFrame = false;
                 if (s._lastFrame != s._curFrame) {
+                    s.isUpdateFrame = true;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     var allChildren = s._a2x_res_children;
@@ -4332,7 +4333,7 @@ var annie;
         };
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
-            if (s._lastFrame != s._curFrame) {
+            if (s.isUpdateFrame) {
                 s._lastFrame = s._curFrame;
                 var timeLineObj = s._a2x_res_class;
                 var frameIndex = s._curFrame - 1;
@@ -6983,14 +6984,6 @@ var annie;
      * @static
      */
     annie.devicePixelRatio = 1;
-    /**
-     * 引擎是否在开放子域中运行，如果是，请设置开放域路径，在主域千万不要设置这个，
-     * @property annie.subDomainPath
-     * @type {string}
-     * @static
-     * @public
-     */
-    annie.subDomainPath = "";
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
