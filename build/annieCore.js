@@ -3759,7 +3759,6 @@ var annie;
         };
         Sprite.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
-            _super.prototype.callEventAndFrameScript.call(this, callState);
             var child = null;
             var children = null;
             var len = 0;
@@ -3815,6 +3814,7 @@ var annie;
                 }
             }
             s._removeChildren.length = 0;
+            _super.prototype.callEventAndFrameScript.call(this, callState);
         };
         return Sprite;
     }(annie.DisplayObject));
@@ -4260,9 +4260,10 @@ var annie;
                         }
                     }
                 }
-                s.isUpdateFrame = false;
                 if (s._lastFrame != s._curFrame) {
-                    s.isUpdateFrame = true;
+                    if (s._mode < 0)
+                        s.isUpdateFrame = true;
+                    s._lastFrame = s._curFrame;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     var allChildren = s._a2x_res_children;
@@ -4334,7 +4335,7 @@ var annie;
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
             if (s.isUpdateFrame) {
-                s._lastFrame = s._curFrame;
+                s.isUpdateFrame = false;
                 var timeLineObj = s._a2x_res_class;
                 var frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本
@@ -5753,7 +5754,7 @@ var annie;
         Sound.prototype.stop = function () {
             var s = this;
             s.media.stop();
-            s.isPlaying = true;
+            s.isPlaying = false;
         };
         /**
          * 暂停播放,或者恢复播放
