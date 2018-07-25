@@ -4037,6 +4037,8 @@ var annie;
         Sprite.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
+            if (!s._visible)
+                return;
             var um = s._UI.UM;
             var ua = s._UI.UA;
             var uf = s._UI.UF;
@@ -4181,7 +4183,7 @@ var annie;
          */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cp)
+            if (s._cp || !s._visible)
                 return;
             if (s._cacheAsBitmap) {
                 _super.prototype.render.call(this, renderObj);
@@ -5111,8 +5113,7 @@ var annie;
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            s.isUpdateFrame = false;
-            if (isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -5137,6 +5138,7 @@ var annie;
                         }
                     }
                 }
+                s.isUpdateFrame = false;
                 if (s._lastFrame != s._curFrame) {
                     s.isUpdateFrame = true;
                     var timeLineObj = s._a2x_res_class;
@@ -5210,7 +5212,6 @@ var annie;
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
             if (s.isUpdateFrame) {
-                //因为update在visible中更新并停止了，所以这里不需要再判断visible
                 s._lastFrame = s._curFrame;
                 var timeLineObj = s._a2x_res_class;
                 var frameIndex = s._curFrame - 1;

@@ -397,8 +397,7 @@ namespace annie {
         private isUpdateFrame:boolean=false;
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            s.isUpdateFrame=false;
-            if(isDrawUpdate && s._a2x_res_class.tf > 1){
+            if(s._visible&&isDrawUpdate && s._a2x_res_class.tf > 1){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -421,6 +420,7 @@ namespace annie {
                         }
                     }
                 }
+                s.isUpdateFrame=false;
                 if (s._lastFrame != s._curFrame) {
                     s.isUpdateFrame=true;
                     let timeLineObj = s._a2x_res_class;
@@ -499,7 +499,6 @@ namespace annie {
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame){
-                //因为update在visible中更新并停止了，所以这里不需要再判断visible
                 s._lastFrame = s._curFrame;
                 let timeLineObj = s._a2x_res_class;
                 let frameIndex = s._curFrame - 1;

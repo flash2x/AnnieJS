@@ -299,8 +299,6 @@ namespace annie {
             let s = this;
             if (value != s._visible) {
                 s._visible = value;
-                // if (!value)
-                //     s._cp = true;
             }
         }
 

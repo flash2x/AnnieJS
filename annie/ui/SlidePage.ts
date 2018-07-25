@@ -339,7 +339,8 @@ namespace annieUI {
          * @method slideTo
          * @public
          * @since 1.1.1
-         * @param {number} index 是向上还是向下
+         * @param {number} index 要跳到页的索引
+         * @param {boolean} noTween 是否需要动画过渡，如果不需要设置成true
          */
         public slideTo(index: number,noTween:boolean=false): void {
             let s: any = this;

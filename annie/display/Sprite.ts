@@ -334,6 +334,7 @@ namespace annie {
         }
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
+            if(!s._visible)return;
             let um: boolean = s._UI.UM;
             let ua: boolean = s._UI.UA;
             let uf: boolean = s._UI.UF;
@@ -474,7 +475,7 @@ namespace annie {
          */
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._cp) return;
+            if (s._cp||!s._visible) return;
             if (s._cacheAsBitmap) {
                 super.render(renderObj);
             } else {
