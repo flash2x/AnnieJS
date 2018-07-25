@@ -112,7 +112,7 @@ namespace annie {
          * @default true
          * @since 1.1.0
          */
-        public hitTestWidthPixel: boolean = true;
+        public hitTestWidthPixel: boolean = false;
 
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
