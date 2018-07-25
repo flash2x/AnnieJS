@@ -420,9 +420,9 @@ namespace annie {
                         }
                     }
                 }
-                s.isUpdateFrame=false;
                 if (s._lastFrame != s._curFrame) {
-                    s.isUpdateFrame=true;
+                    if(s._mode<0)s.isUpdateFrame=true;
+                    s._lastFrame=s._curFrame;
                     let timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
@@ -499,7 +499,7 @@ namespace annie {
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame){
-                s._lastFrame = s._curFrame;
+                s.isUpdateFrame=false;
                 let timeLineObj = s._a2x_res_class;
                 let frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本
