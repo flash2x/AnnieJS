@@ -64,7 +64,8 @@ namespace annie {
             }else{
                 s._loop=loop;
                 s._repeate=loop;
-            }            s.media.play();
+            }
+            s.media.play();
             s.isPlaying=true;
         }
         /**
@@ -76,7 +77,7 @@ namespace annie {
         public stop(): void {
             let s=this;
             s.media.stop();
-            s.isPlaying=true;
+            s.isPlaying=false;
         }
         /**
          * 暂停播放,或者恢复播放
