@@ -2837,7 +2837,7 @@ var annie;
              * @default true
              * @since 1.1.0
              */
-            this.hitTestWidthPixel = false;
+            this.hitTestWidthPixel = true;
             /**
              * 径向渐变填充 一般给Flash2x用
              * @method beginRadialGradientFill
@@ -3604,8 +3604,6 @@ var annie;
                     else {
                         p = hitPoint;
                     }
-                    p.x += s._offsetX;
-                    p.y += s._offsetY;
                     var image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
@@ -3613,6 +3611,8 @@ var annie;
                     var _canvas = annie.DisplayObject["_canvas"];
                     _canvas.width = 1;
                     _canvas.height = 1;
+                    p.x -= s._offsetX;
+                    p.y -= s._offsetY;
                     var ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);

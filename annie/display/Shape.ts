@@ -112,7 +112,7 @@ namespace annie {
          * @default true
          * @since 1.1.0
          */
-        public hitTestWidthPixel: boolean = false;
+        public hitTestWidthPixel: boolean = true;
 
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
@@ -818,8 +818,6 @@ namespace annie {
                     }else{
                         p= hitPoint;
                     }
-                    p.x += s._offsetX;
-                    p.y += s._offsetY;
                     let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
@@ -827,6 +825,8 @@ namespace annie {
                     let _canvas = DisplayObject["_canvas"];
                     _canvas.width = 1;
                     _canvas.height = 1;
+                    p.x -= s._offsetX;
+                    p.y -= s._offsetY;
                     let ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
