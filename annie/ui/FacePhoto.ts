@@ -6,6 +6,7 @@ namespace annieUI {
     import Bitmap = annie.Bitmap;
     import Shape = annie.Shape;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
      * @class annieUI.FacePhoto
@@ -59,11 +60,6 @@ namespace annieUI {
             s.addChild(s.bitmap);
             s.bitmap.mask = s.maskObj;
         }
-
-        /**
-         * @property photo
-         * @private
-         */
         private photo: any;
         private bitmap: Bitmap;
         private maskType: number = 0;

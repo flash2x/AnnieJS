@@ -4,6 +4,7 @@
 namespace annie {
     declare let WeixinJSBridge:any;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 抽象类 一般不直接使用
      * @class annie.Media
      * @extends annie.EventDispatcher
@@ -39,12 +40,6 @@ namespace annie {
          * @type {string}
          */
         public name:string="";
-        /**
-         * @property _loop
-         * @type {number}
-         * @private
-         * @since 2.0.0
-         */
         private _loop: number = 1;
         /**
          * 构造函数
@@ -118,7 +113,7 @@ namespace annie {
             try {
                 s.media.currentTime = start;
             } catch (e) {
-                trace(e);
+                console.log(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
             let wsb:any=  window;

@@ -16,16 +16,8 @@ namespace annie {
             this._texture = window.document.createElement("canvas");
         }
 
-        /**
-         * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
-         * @property _command
-         * @private
-         * @since 1.0.0
-         * @type {Array}
-         * @default []
-         */
+       //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
         private _command: any = [];
-
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
          * 一般给用户使用较少,Flash2x工具自动使用
@@ -91,21 +83,10 @@ namespace annie {
             return color;
         }
 
-        /**
-         * @property _isBitmapStroke
-         * @private
-         * @since 1.0.0
-         * @type {Array}
-         */
         private _isBitmapStroke:  Array<number>;
-        /**
-         * @property _isBitmapFill
-         * @private
-         * @type{Array}
-         * @since 1.0.0
-         */
         private _isBitmapFill: Array<number>;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对矢量使用像素碰撞 默认开启
          * @property hitTestWidthPixel
          * @type {boolean}
@@ -443,18 +424,7 @@ namespace annie {
         public beginStroke(color: string, lineWidth: number = 1, cap: number=0, join: number = 0, miter: number = 0): void {
             this._stroke(color, lineWidth, cap,join, miter);
         }
-
-        /**
-         * @property _caps
-         * @type {Array}
-         * @private
-         */
         private static _caps:Array<string>=["butt","round","square"];
-        /**
-         * @property _joins
-         * @type {Array}
-         * @private
-         */
         private static _joins:Array<string>=["miter","round","bevel"];
         /**
          * 画线性渐变的线条 一般给Flash2x用
@@ -509,18 +479,6 @@ namespace annie {
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth, cap,join, miter);
         }
-
-        /**
-         * @method _stroke
-         * @param strokeStyle
-         * @param {number} width
-         * @param {number} cap
-         * @param {number} join
-         * @param {number} miter
-         * @private
-         * @since 1.0.0
-         * @return {void}
-         */
         private _stroke(strokeStyle: any, width: number, cap: number, join: number, miter: number): void {
             let c = this._command;
             c[c.length]=[0, "lineWidth", width];
@@ -593,15 +551,6 @@ namespace annie {
                 }
             }
         };
-
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         * @return {void}
-         */
         public update(isDrawUpdate: boolean = false): void {
             let s = this;
             if (!s._visible) return;
@@ -758,13 +707,6 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-
-        /**
-         * @method _drawShape
-         * @param ctx
-         * @private
-         * @return {void}
-         */
         private _drawShape(ctx: any): void {
             let s = this;
             let com = s._command;
@@ -799,14 +741,6 @@ namespace annie {
                 }
             }
         }
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
             let obj = super.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);

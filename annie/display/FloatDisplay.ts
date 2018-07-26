@@ -3,6 +3,7 @@
  */
 namespace annie {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 此类对于需要在canvas上放置html其他类型元素的时候非常有用<br/>
      * 比如有时候我们需要放置一个注册,登录或者其他的内容.这些内容包含了输入框<br/>
      * 或者下拉框什么的,无法在canvas里实现,但这些元素又跟canvas里面的元素<br/>
@@ -22,13 +23,8 @@ namespace annie {
          * @type{HtmlElement}
          */
         public htmlElement:any=null;
-        /**
-         * 是否已经添加了舞台事件
-         * @property _isAdded
-         * @since 1.0.0
-         * @type {boolean}
-         * @private
-         */
+
+        // 是否已经添加了舞台事件
         private _isAdded: boolean = false;
 
         /**

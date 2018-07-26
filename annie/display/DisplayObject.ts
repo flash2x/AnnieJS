@@ -59,7 +59,7 @@ namespace annie {
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
-         * @private
+         * @protected
          * @type {number}
          * @since 1.0.0
          * @default 1
@@ -85,6 +85,7 @@ namespace annie {
          */
         public mouseEnable: boolean = true;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 显示对象上对显示列表上的最终的所有滤镜组
          * @property cFilters
          * @protected
@@ -356,6 +357,7 @@ namespace annie {
         private _mask: DisplayObject = null;
 
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 显示对象的滤镜数组
          * @property filters
          * @since 1.0.0
@@ -373,14 +375,7 @@ namespace annie {
 
         private _filters: any[] = [];
 
-        /**
-         * 是否自己的父级发生的改变
-         * @property _cp
-         * @type {boolean}
-         * @private
-         * @since 1.1.2
-         * @default true
-         */
+        //是否自己的父级发生的改变
         protected _cp: boolean = true;
 
         /**
@@ -436,7 +431,7 @@ namespace annie {
         public startDrag(isCenter: boolean = false, bounds: Rectangle = null): void {
             let s = this;
             if (!s.stage) {
-                trace("The DisplayObject is not on stage");
+                console.log("The DisplayObject is not on stage");
                 return;
             }
             Stage._dragDisplay = s;
@@ -684,14 +679,8 @@ namespace annie {
             return {width: dr.width, height: dr.height};
         }
 
-        /**
-         * 画缓存位图的时候需要使用
-         * @property _bitmapCanvas
-         * @private
-         * @static
-         * @since 1.0.0
-         * @type {Canvas}
-         */
+        //画缓存位图的时候需要使用
+        //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
         public static _canvas: any = window.document.createElement("canvas");
         /**
          * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
@@ -718,27 +707,12 @@ namespace annie {
          * @default 0
          */
         protected _offsetY: number = 0;
-        /**
-         * @property _bounds
-         * @type {annie.Rectangle}
-         * @private
-         */
+
         protected _bounds: Rectangle = new Rectangle();
-        /**
-         * @property _drawRect
-         * @type {annie.Rectangle}
-         * @private
-         */
+
         protected _drawRect: Rectangle = new Rectangle();
 
-        /**
-         * 设置属性
-         * @method _setProperty
-         * @param {string} property
-         * @param value
-         * @param {number} type
-         * @private
-         */
+        //设置属性
         protected _setProperty(property: string, value: any, type: number) {
             let s: any = this;
             if (s[property] != value) {
@@ -839,14 +813,8 @@ namespace annie {
                 }
             }
         }
-        /**
-         * 每个Flash文件生成的对象都有一个自带的初始化信息
-         * @property _a2x_res_obj
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         * @default {Object}
-         */
+
+        //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
         public destroy(): void {
             //清除相应的数据引用
@@ -870,36 +838,29 @@ namespace annie {
             super.destroy();
         }
         /**
-         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * 更新流程走完之后再执行脚本和事件执行流程
+         * @protected
          * @method callEventAndFrameScript
-         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         * @param {number} callState 0是上级被移除，执行removeStage事件 1是上级被添加到舞台执行addStage事件 2是常规刷新运行
          */
         protected callEventAndFrameScript(callState: number):void {
             let s: any = this;
             if (!s.stage) return;
-            let sounds = s._a2x_sounds;
-            let timeLineObj = s._a2x_res_class;
+            let sounds = s._soundList;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
-                //如果有音乐。则关闭音乐
-                if (sounds && sounds.length > 0) {
+                //如果有音乐,则关闭音乐
+                if (sounds.length > 0) {
                     for (let i = 0; i < sounds.length; i++) {
-                        sounds[i].stop();
+                        sounds[i].stop2();
                     }
                 }
-                //如果是mc，则还原成动画初始时的状态
-                if (timeLineObj && timeLineObj.tf > 1) {
-                    s._curFrame = 1;
-                    s._lastFrame = 0;
-                    s._isPlaying = true;
-                    s._isFront = true;
-                }
             } else {
-                if (callState == 1) {
-                    //如果有音乐，如果是Sprite则播放音乐
-                    if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
+                if (callState == 1){
+                    //如果有音乐，则播放音乐
+                    if (sounds.length > 0) {
                         for (let i = 0; i < sounds.length; i++) {
-                            sounds[i].play(0);
+                            sounds[i].play2();
                         }
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);

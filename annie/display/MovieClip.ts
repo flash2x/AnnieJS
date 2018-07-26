@@ -23,21 +23,8 @@ namespace annie {
             return this._curFrame;
         }
 
-        /**
-         * @property _curFrame
-         * @type {number}
-         * @private
-         * @since 2.0.0
-         * @default 1
-         */
         private _curFrame: number = 1;
         private _wantFrame: number = 0;
-        /**
-         * @property _lastFrameObj
-         * @type {Object}
-         * @private
-         * @default null
-         */
         private _lastFrameObj: any = null;
 
         /**
@@ -54,13 +41,6 @@ namespace annie {
             return this._isPlaying;
         }
 
-        /**
-         * @property _isPlaying
-         * @type {boolean}
-         * @private
-         * @since 2.0.0
-         * @default true
-         */
         private _isPlaying: boolean = true;
 
         /**
@@ -76,12 +56,6 @@ namespace annie {
             return this._isFront;
         }
 
-        /**
-         * @property _isFront
-         * @type {boolean}
-         * @private
-         * @default true
-         */
         private _isFront: boolean = true;
 
         /**
@@ -97,12 +71,6 @@ namespace annie {
             return (<any>this)._a2x_res_class.tf;
         }
 
-        /**
-         * @property _lastFrame
-         * @type {number}
-         * @private
-         * @default 0
-         */
         private _lastFrame: number = 0;
 
         /**
@@ -117,20 +85,8 @@ namespace annie {
             s._instanceType = "annie.MovieClip";
         }
 
-        /**
-         * sprite 和 moveClip的类资源信息
-         * @property _a2x_res_class
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         */
+        //sprite 和 moveClip的类资源信息
         private _a2x_res_class: any = {tf: 1};
-        /**
-         * @property _a2x_res_children
-         * @type {Array}
-         * @private
-         * @since 2.0.0
-         */
         private _a2x_res_children: any = [];
 
         /**
@@ -145,13 +101,6 @@ namespace annie {
             s._isPlaying = false;
         }
 
-        /**
-         * @property _a2x_script
-         * @type {Object}
-         * @default null
-         * @private
-         * @since 2.0.0
-         */
         private _a2x_script: any = null;
 
         /**
@@ -194,12 +143,7 @@ namespace annie {
             return this._mode == -1;
         }
 
-        /**
-         * @property _mode
-         * @type {boolean}
-         * @private
-         * @default false
-         */
+        //动画模式 按钮 剪辑 图形
         private _mode: number = -2;
 
         /**
@@ -268,14 +212,6 @@ namespace annie {
                 s.gotoAndStop(frame);
             }
         };
-
-        /**
-         * @property _maskList
-         * @type {Array}
-         * @private
-         * @default []
-         */
-        private _maskList: any = [];
 
         /**
          * movieClip的当前帧的标签数组,没有则为null
@@ -394,10 +330,12 @@ namespace annie {
             }
             s._wantFrame = <number>frameIndex;
         }
-        private isUpdateFrame:boolean=false;
+
+        private isUpdateFrame: boolean = false;
+
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if(s._visible&&isDrawUpdate && s._a2x_res_class.tf > 1){
+            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -407,7 +345,7 @@ namespace annie {
                         s._wantFrame = 0;
                     }
                 }
-                if(s._lastFrame == s._curFrame&&s._isPlaying){
+                if (s._lastFrame == s._curFrame && s._isPlaying) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -421,8 +359,8 @@ namespace annie {
                     }
                 }
                 if (s._lastFrame != s._curFrame) {
-                    if(s._mode<0)s.isUpdateFrame=true;
-                    s._lastFrame=s._curFrame;
+                    if (s._mode < 0) s.isUpdateFrame = true;
+                    s._lastFrame = s._curFrame;
                     let timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
                     let allChildren = s._a2x_res_children;
@@ -472,6 +410,16 @@ namespace annie {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
+                                    //判断obj是否是动画,是的话则还原成动画初始时的状态
+                                    if(obj._instanceType=="annie.MovieClip") {
+                                        s._wantFrame = 1;
+                                        s._isFront = true;
+                                        if (obj._mode < -1) {
+                                            s._isPlaying = true;
+                                        } else {
+                                            s._isPlaying = false;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -488,19 +436,13 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
-        /**
-         * @property _a2x_sounds
-         * @since 2.0.0
-         * @type {Object}
-         * @private
-         * @default {null}
-         */
+        //flash声音管理
         private _a2x_sounds: any = null;
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
-            if (s.isUpdateFrame){
-                s.isUpdateFrame=false;
+            if (s.isUpdateFrame) {
                 let timeLineObj = s._a2x_res_class;
+                s.isUpdateFrame = false;
                 let frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本
                 let curFrameScript: any;
@@ -542,12 +484,12 @@ namespace annie {
             }
             super.callEventAndFrameScript(callState);
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;
             s._lastFrameObj = null;
             s._a2x_script = null;
-            s._maskList = null;
             s._a2x_res_children = null;
             s._a2x_res_class = null;
             s._a2x_sounds = null;

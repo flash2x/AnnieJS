@@ -41,7 +41,7 @@ var annieUI;
              * 横向还是纵向 默认为纵向
              * @property isVertical
              * @type {boolean}
-             * @private
+             * @protected
              * @since 1.0.0
              * @default true
              */
@@ -50,7 +50,7 @@ var annieUI;
              * 可见区域的宽
              * @property viewWidth
              * @type {number}
-             * @private
+             * @protected
              * @since 1.0.0
              * @default 0
              */
@@ -59,7 +59,7 @@ var annieUI;
              * 可见区域的高
              * @property viewHeight
              * @type {number}
-             * @private
+             * @protected
              * @since 1.0.0
              * @default 0
              */
@@ -85,17 +85,11 @@ var annieUI;
             /**
              * 最小鼠标滑动距离
              * @property  minDis
-             * @private
+             * @protected
              * @type {number}
              */
             this.minDis = 2;
-            /**
-             * 遮罩对象
-             * @property maskObj
-             * @since 1.0.0
-             * @private
-             * @type {annie.Shape}
-             */
+            // 遮罩对象
             this.maskObj = new Shape();
             /**
              * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
@@ -105,13 +99,7 @@ var annieUI;
              * @type {annie.Sprite}
              */
             this.view = new Sprite();
-            /**
-             * 最后鼠标经过的坐标值
-             * @property lastValue
-             * @private
-             * @since 1.0.0
-             * @type {number}
-             */
+            // 最后鼠标经过的坐标值
             this.lastValue = 0;
             /**
              * 速度
@@ -124,7 +112,7 @@ var annieUI;
             /**
              * 加速度
              * @property addSpeed
-             * @private
+             * @protected
              * @since 1.0.0
              * @type {number}
              */
@@ -159,14 +147,7 @@ var annieUI;
             this.paramXY = "y";
             this.stopTimes = -1;
             this.isMouseDownState = 0;
-            /**
-             * 是否是通过scrollTo方法在滑动中
-             * @property autoScroll
-             * @since 1.0.2
-             * @type {boolean}
-             * @private
-             * @default false
-             */
+            //是否是通过scrollTo方法在滑动中
             this.autoScroll = false;
             var s = this;
             s._instanceType = "annie.ScrollPage";
@@ -391,6 +372,7 @@ var annieUI;
 (function (annieUI) {
     var Sprite = annie.Sprite;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
      * @class annieUI.FacePhoto
@@ -506,7 +488,7 @@ var annieUI;
              * 页面个数
              * @property listLen
              * @type {number}
-             * @private
+             * @protected
              * @default 0
              */
             this.listLen = 0;
@@ -527,12 +509,7 @@ var annieUI;
              * @default 0.2
              */
             this.slideSpeed = 0.2;
-            /**
-             * 是否滑动中断
-             * @property _isBreak
-             * @private
-             * @type {boolean}
-             */
+            //是否滑动中断
             this._isBreak = false;
             /**
              * 滚动距离
@@ -543,25 +520,12 @@ var annieUI;
              * @since 1.0.0
              */
             this.distance = 0;
-            /**
-             * 触摸点结束点X
-             * @property touchEndX
-             * @type {number}
-             * @private
-             */
+            //触摸点结束点X
             this.touchEndX = 0;
             this.movingX = 0;
             this.movingY = 0;
             this._moveDis = 0;
-            /**
-             * 触摸点结束点Y
-             * @property touchEndY
-             * @type {number}
-             * @private
-             * @since
-             * @public
-             * @default 0
-             */
+            //触摸点结束点Y
             this.touchEndY = 0;
             /**
              * 当前页面索引ID 默认从0开始
@@ -591,21 +555,21 @@ var annieUI;
              * 页面宽
              * @property viewWidth
              * @type {number}
-             * @private
+             * @protected
              */
             this.viewWidth = 0;
             /**
              * 页面高
              * @property viewHeight
              * @type {number}
-             * @private
+             * @protected
              */
             this.viewHeight = 0;
             /**
              * 页面列表
              * @property pageList
              * @type {Array}
-             * @private
+             * @public
              */
             this.pageList = [];
             this.pageClassList = [];
@@ -615,7 +579,7 @@ var annieUI;
              * 是否点击了鼠标
              * @property isMouseDown
              * @type {boolean}
-             * @private
+             * @public
              */
             this.isMouseDown = false;
             /**
@@ -675,12 +639,7 @@ var annieUI;
             s.viewHeight = h;
             s.maskObj.endFill();
         };
-        /**
-         * 触摸事件 onMouseEvent
-         * @method
-         * @private
-         * @param e
-         */
+        //触摸事件 onMouseEvent
         SlidePage.prototype.onMouseEvent = function (e) {
             var s = this;
             if (s.isMoving)
@@ -1697,6 +1656,7 @@ var annieUI;
 var annieUI;
 (function (annieUI) {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 画板类
      * @class annieUI.DrawingBoard
      * @public
@@ -1804,11 +1764,6 @@ var annieUI;
             configurable: true
         });
         ;
-        /**
-         * @method onMouseDown
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         DrawingBoard.prototype.onMouseDown = function (e) {
             var s = this;
             s._isMouseDown = true;
@@ -1827,11 +1782,6 @@ var annieUI;
             s.addStepObj.ps = [];
         };
         ;
-        /**
-         * @method onMouseUp
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         DrawingBoard.prototype.onMouseUp = function (e) {
             var s = this;
             if (s._isMouseDown) {
@@ -1843,11 +1793,6 @@ var annieUI;
             }
         };
         ;
-        /**
-         * @method onMouseMove
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         DrawingBoard.prototype.onMouseMove = function (e) {
             var s = this;
             if (s._isMouseDown) {
@@ -2026,7 +1971,7 @@ var annieUI;
          */
         ScratchCard.prototype.cancel = function (step) {
             if (step === void 0) { step = 0; }
-            trace("no support");
+            console.log("no support");
             return false;
         };
         Object.defineProperty(ScratchCard.prototype, "drawRadius", {

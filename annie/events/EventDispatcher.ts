@@ -25,7 +25,7 @@ namespace annie {
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
-         *      trace(this.instanceId);
+         *      console.log(this.instanceId);
          */
         public get instanceId(): number {
             return this._instanceId;
@@ -69,25 +69,11 @@ namespace annie {
             this._instanceType = "annie.EventDispatcher";
         }
 
-        /**
-         * 全局的鼠标事件的监听数对象表
-         * @property _MECO
-         * @private
-         * @since 1.0.0
-         */
-
+        //全局的鼠标事件的监听数对象表
         private static _MECO: any = {};
         public static _totalMEC: number = 0;
 
-        /**
-         * 看看有多少mouse或者touch侦听数
-         * @method getMouseEventCount
-         * @return {number}
-         * @static
-         * @private
-         * @since 1.0.0
-         * @param {string} type 获取事件类型，默认是所有
-         */
+        //看看有多少mouse或者touch侦听数
         public static getMouseEventCount(type: string = ""): number {
             let count: number = 0;
             if (type == "") {
@@ -115,7 +101,7 @@ namespace annie {
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {void}
          * @example
-         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         public addEventListener(type: string, listener: Function,useCapture = true): void {
             if (!type) {
@@ -139,15 +125,7 @@ namespace annie {
                 }
             }
         }
-        /**
-         * 增加或删除相应mouse或touch侦听记数
-         * @method _changeMouseCount
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} isAdd
-         * @return {void}
-         */
+        //增加或删除相应mouse或touch侦听记数
         private _changeMouseCount(type: string, isAdd: boolean): void {
             let count = isAdd ? 1 : -1;
             if (!EventDispatcher._MECO[type]) {
@@ -176,7 +154,7 @@ namespace annie {
          *          yourEvent=new annie.Event("yourCustomerEvent");
          *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
-         *          trace(e.data);
+         *          console.log(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */

@@ -220,13 +220,7 @@ namespace annie {
         }
         private _border: boolean = false;
 
-        /**
-         * 设置文本在canvas里的渲染样式
-         * @method _prepContext
-         * @param ctx
-         * @private
-         * @since 1.0.0
-         */
+        //设置文本在canvas里的渲染样式
         private _prepContext(ctx: any): void {
             let s = this;
             let font: any = s.size || 12;
@@ -270,14 +264,8 @@ namespace annie {
         get lines(): number {
             return this.realLines.length;
         }
-        /**
-         * 获取文本宽
-         * @method _getMeasuredWidth
-         * @param text
-         * @return {number}
-         * @private
-         * @since 1.0.0
-         */
+
+        // 获取文本宽
         private _getMeasuredWidth(text: string): number {
             let ctx = this._texture.getContext("2d");
             //ctx.save();
@@ -286,13 +274,6 @@ namespace annie {
             return w;
         }
         private  realLines: any = [];
-        /**
-         * 重写 update
-         * @method update
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
         public update(isDrawUpdate:boolean=false): void {
             super.update(isDrawUpdate);
             let s: any = this;
@@ -391,16 +372,6 @@ namespace annie {
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
-        }
-        /**
-         * 重写 getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        public getBounds(): Rectangle {
-            return this._bounds;
         }
     }
 }

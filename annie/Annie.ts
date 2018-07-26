@@ -3,6 +3,7 @@
  */
 namespace annie {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
      * @public
      * @property annie.Eval
@@ -12,6 +13,7 @@ namespace annie {
      */
     export let Eval: any = eval.bind(window);
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 是否开启调试模式
      * @public
      * @since 1.0.1
@@ -31,12 +33,13 @@ namespace annie {
      * @type {string}
      * @example
      *      //打印当前引擎的版本号
-     *      trace(annie.version);
+     *      console.log(annie.version);
      */
 
     export let version:string="2.0.0";
 
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
      * @property annie.osType
      * @since 1.0.0
@@ -45,7 +48,7 @@ namespace annie {
      * @static
      * @example
      *      //获取当前设备类型
-     *      trace(annie.osType);
+     *      console.log(annie.osType);
      */
     export let osType: string = (function () {
         let n = navigator.userAgent.toLocaleLowerCase();
@@ -69,7 +72,7 @@ namespace annie {
      * @example
      *      //A代码放到任何合适的地方
      *      annie.globalDispatcher.addEventListener("myTest",function(e){
-     *          trace("收到了其他地方发来的消息:"+e.data);
+     *          console.log("收到了其他地方发来的消息:"+e.data);
      *      });
      *      //B代码放到任何一个可以点击的对象的构造函数中
      *      this.addEventListener(annie.MouseEvent.CLICK,function(e){
@@ -87,7 +90,7 @@ namespace annie {
      * @static
      * @example
      *      //打印当前设备的retina值
-     *      trace(annie.devicePixelRatio);
+     *      console.log(annie.devicePixelRatio);
      */
     export let devicePixelRatio: number = window.devicePixelRatio ? window.devicePixelRatio : 1;
     /**
@@ -127,6 +130,7 @@ namespace annie {
     };
 
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 跳转到指定网址
      * @method annie.navigateToURL
      * @public
@@ -144,6 +148,7 @@ namespace annie {
     }
 
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 向后台发送数据,但不会理会任何的后台反馈
      * @method annie.sendToURL
      * @public
@@ -163,6 +168,7 @@ namespace annie {
     // 作为将显示对象导出成图片的render渲染器
     let _dRender: any = null;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据
      * @method annie.toDisplayDataURL
      * @static
@@ -242,6 +248,7 @@ namespace annie {
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组
      * @method annie.getStagePixels
      * @param {annie.Stage} stage

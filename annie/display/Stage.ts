@@ -12,6 +12,7 @@ namespace annie {
      */
     export class Stage extends Sprite {
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
          * 所以需要自己灵活设置,默认阻止.
          * @property iosTouchendPreventDefault
@@ -22,6 +23,7 @@ namespace annie {
          */
         public iosTouchendPreventDefault: boolean = true;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
          * @property isPreventDefaultEvent
          * @since 1.0.9
@@ -30,6 +32,7 @@ namespace annie {
          */
         public isPreventDefaultEvent: boolean = true;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 整个引擎的最上层的div元素,
          * 承载canvas的那个div html元素
          * @property rootDiv
@@ -72,12 +75,6 @@ namespace annie {
             return annie.Stage._stageList[stageName];
         }
 
-        /**
-         * @property _stageList
-         * @static
-         * @type {Object}
-         * @private
-         */
         private static _stageList: any = {};
         /**
          * 是否暂停
@@ -106,12 +103,6 @@ namespace annie {
             }
         }
 
-        /**
-         * @property _pause
-         * @type {boolean}
-         * @private
-         * @static
-         */
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
@@ -141,6 +132,7 @@ namespace annie {
          */
         public isMultiMouse: boolean = false;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
          * 端默认不开启
          * @property autoSteering
@@ -151,6 +143,7 @@ namespace annie {
          */
         public autoSteering: boolean = false;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
          * @property autoResize
          * @public
@@ -249,57 +242,16 @@ namespace annie {
             }
         }
         private _scaleMode: string = "onScale";
-        /**
-         * 原始为60的刷新速度时的计数器
-         * @property _flush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
+
+        //原始为60的刷新速度时的计数器
         private _flush: number = 0;
-        /**
-         * 当前的刷新次数计数器
-         * @property _currentFlush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
+
+        // 当前的刷新次数计数器
         private _currentFlush: number = 0;
-        /**
-         * @property _dragDisplay
-         * @private
-         * @type {null}
-         * @private
-         * @static
-         */
         public static _dragDisplay: DisplayObject = null;
-        /**
-         * 上一次鼠标或触碰经过的显示对象列表
-         * @property _isLoadedVConsole
-         * @type {Array}
-         * @private
-         * @static
-         */
         private static _isLoadedVConsole: boolean = false;
-        /**
-         * @property _lastDpList
-         * @type {Object}
-         * @private
-         */
         private _lastDpList: any = {};
-        /**
-         * @property _rid
-         * @type {number}
-         * @private
-         */
         private _rid = -1;
-        /**
-         * @property _floatDisplayList
-         * @type {any[]}
-         * @private
-         */
         private _floatDisplayList: Array<FloatDisplay> = [];
 
         /**
@@ -385,13 +337,6 @@ namespace annie {
             }
         }
 
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @since 1.0.0
-         * @return {void}
-         */
         public update(isDrawUpdate: boolean = true): void {
             let s = this;
             super.update(isDrawUpdate);
@@ -402,45 +347,20 @@ namespace annie {
             }
         }
 
-        /**
-         * @property _touchEvent
-         * @private
-         */
         private _touchEvent: annie.TouchEvent;
-
-        /**
-         * 渲染函数
-         * @method render
-         * @param renderObj
-         * @return {void}
-         */
         public render(renderObj: IRender): void {
             renderObj.begin();
             super.render(renderObj);
 
         }
 
-        /**
-         * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-         * @property _ml
-         * @type {Array}
-         * @private
-         */
+        //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
         private _ml: any = [];
-        /**
-         * 这个是事件中用到的Point对象池,以提高性能
-         * @property _mp
-         * @type {Array}
-         * @private
-         */
+
+        //这个是事件中用到的Point对象池,以提高性能
         private _mp: any = [];
 
-        /**
-         * 刷新mouse或者touch事件
-         * @method _initMouseEvent
-         * @private
-         * @return {void}
-         */
+        //刷新mouse或者touch事件
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
             event["_pd"] = false;
             event["_bpd"] = false;
@@ -451,20 +371,10 @@ namespace annie {
             event.identifier = identifier;
         }
 
-        /**
-         * 鼠标按下事件的对象池
-         * @property _mouseDownPoint
-         * @type {Object}
-         * @private
-         */
+        // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
 
-        /**
-         * 循环刷新页面的函数
-         * @method flush
-         * @private
-         * @return {void}
-         */
+        //循环刷新页面的函数
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
@@ -514,6 +424,7 @@ namespace annie {
         }
 
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 获取引擎所在的div宽高
          * @method getRootDivWH
          * @public
@@ -557,12 +468,7 @@ namespace annie {
             Stage.removeUpdateObj(this);
         }
 
-        /**
-         * html的鼠标或单点触摸对应的引擎事件类型名
-         * @property _mouseEventTypes
-         * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
-         * @private
-         */
+        //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
             mouseup: "onMouseUp",
@@ -571,33 +477,11 @@ namespace annie {
             touchmove: "onMouseMove",
             touchend: "onMouseUp"
         };
-        /**
-         * @property muliPoints
-         * @type {Array}
-         * @private
-         */
         private muliPoints: Array<any> = [];
-        /**
-         * 当document有鼠标或触摸事件时调用
-         * @property _mP1
-         * @param e
-         * @type {annie.Point}
-         */
+        //当document有鼠标或触摸事件时调用
         private _mP1: Point = new Point();
-        /**
-         * 当document有鼠标或触摸事件时调用
-         * @property _mP2
-         * @param e
-         * @type {annie.Point}
-         */
+        //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
-
-        /**
-         * @method onMouseEvent
-         * @param e
-         * @private
-         * @return {void}
-         */
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this;
@@ -905,12 +789,7 @@ namespace annie {
             }
         };
 
-        /**
-         * 设置舞台的对齐模式
-         * @method setAlign
-         * @private
-         * @return {void}
-         */
+        //设置舞台的对齐模式
         private setAlign():void {
             let s = this;
             let divH = s.divHeight * devicePixelRatio;
@@ -1017,13 +896,7 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
 
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
+        //刷新所有定时器
         private static flushAll(): void {
             if(!Stage._pause) {
                 let len = Stage.allUpdateObjList.length;

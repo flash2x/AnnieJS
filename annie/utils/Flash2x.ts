@@ -24,128 +24,39 @@ namespace annie {
      * @type {Object}
      */
     export let res: any = {};
-    /**
-     * 加载器是否正在加载中
-     * @property annie._isLoading
-     * @static
-     * @type {boolean}
-     * @private
-     */
+    // 加载器是否正在加载中
     let _isLoading: boolean;
-    /**
-     * 加载中的场景名列表
-     * @property annie._loadSceneNames
-     * @static
-     * @private
-     * @type {string|Array}
-     *
-     */
+
+    // 加载中的场景名列表
     let _loadSceneNames: any;
-    /**
-     * 加载地址的域名地址或前缀
-     * @property annie._domain
-     * @private
-     * @static
-     * @type {string}
-     */
+    //加载地址的域名地址或前缀
     let _domain: string;
-    /**
-     * 当前加载到哪一个资源
-     * @property annie._loadIndex
-     * @private
-     * @static
-     * @type {number}
-     */
+    //当前加载到哪一个资源
     let _loadIndex: number;
-    /**
-     * 当前加载的总资源数
-     * @property annie._totalLoadRes
-     * @private
-     * @static
-     * @type {number}
-     */
+    // 当前加载的总资源数
     let _totalLoadRes: number;
-    /**
-     * 当前已经加载的资源数
-     * @property annie._loadedLoadRes
-     * @private
-     * @static
-     * @type {number}
-     */
+    //当前已经加载的资源数
     let _loadedLoadRes: number;
-    /**
-     * 加载资源的完成回调
-     * @property annie._completeCallback
-     * @private
-     * @static
-     * @type {Function}
-     */
+    //加载资源的完成回调
     let _completeCallback: Function;
-    /**
-     * 加载资源时的进度回调
-     * @property annie._progressCallback
-     * @private
-     * @static
-     * @type {Function}
-     */
+    //加载资源时的进度回调
     let _progressCallback: Function;
-    /**
-     * 加载配置文件的加载器
-     * @property annie._JSONQueue
-     * @private
-     * @static
-     * @type {annie.URLLoader}
-     */
+    //加载配置文件的加载器
     let _JSONQueue: URLLoader;
-    /**
-     * 加载资源文件的加载器
-     * @property annie._loaderQueue
-     * @private
-     * @static
-     * @type {annie.URLLoader}
-     */
+    //加载资源文件的加载器
     let _loaderQueue: URLLoader;
-    /**
-     * 加载器是否初始化过
-     * @property annie._isInited
-     * @private
-     * @static
-     * @type {Boolean}
-     */
+    // 加载器是否初始化过
     let _isInited: Boolean;
-    /**
-     * 当前加载的资源配置文件内容
-     * @property annie._currentConfig
-     * @private
-     * @static
-     * @type {Object}
-     */
+    // 当前加载的资源配置文件内容
     let _currentConfig: any;
-    /**
-     * 获取当前加载的时间当作随机数用
-     * @property annie._time
-     * @private
-     * @static
-     * @type {number}
-     */
+    //获取当前加载的时间当作随机数用
     let _time: number = new Date().getTime();
-    /**
-     * 加载资源数和总资源数的比
-     * @property annie._loadPer
-     * @private
-     * @static
-     * @type {number}
-     */
+    // 加载资源数和总资源数的比
     let _loadPer: number;
-    /**
-     * 单个资源占总资源数的比
-     * @property annie._loadSinglePer
-     * @private
-     * @static
-     * @type {number}
-     */
+    //单个资源占总资源数的比
     let _loadSinglePer: number;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
      * @method annie.loadScene
      * @public
@@ -197,7 +108,7 @@ namespace annie {
         }
         if (!_isInited) {
             if (_isReleased) {
-                trace("AnnieJS:https://github.com/flash2x/annieJS");
+                console.log("AnnieJS:https://github.com/flash2x/annieJS");
             }
             _JSONQueue = new URLLoader();
             _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
@@ -237,14 +148,8 @@ namespace annie {
         }
     };
 
-    /**
-     * 加载配置文件,打包成released线上版时才会用到这个方法。
-     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
-     * @private
-     * @method annie._loadConfig
-     * @static
-     * @return {void}
-     */
+    //加载配置文件,打包成released线上版时才会用到这个方法。
+    //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
@@ -274,29 +179,15 @@ namespace annie {
         }
     }
 
-    /**
-     * 加载资源过程中调用的回调方法。
-     * @method annie._onRESProgress
-     * @param {annie.Event} e
-     * @private
-     * @static
-     * @return {void}
-     */
+    // 加载资源过程中调用的回调方法。
+
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
 
-    /**
-     * 解析加载后的json资源数据
-     * @method annie._parseContent
-     * @param loadContent
-     * @param rootObj
-     * @private
-     * @static
-     * @return {void}
-     */
+    //解析加载后的json资源数据
     function _parseContent(loadContent: any, rootObj: any = null) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
@@ -380,14 +271,7 @@ namespace annie {
         }
     }
 
-    /**
-     * 一个场景加载完成后的事件回调
-     * @method annie._onRESComplete
-     * @param {annie.Event} e
-     * @private
-     * @static
-     * @return {void}
-     */
+    // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
         if (!_isReleased) {
@@ -410,14 +294,7 @@ namespace annie {
         }
         _checkComplete();
     }
-
-    /**
-     * 检查所有资源是否全加载完成
-     * @method annie._checkComplete
-     * @private
-     * @static
-     * @return {void}
-     */
+    //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -446,13 +323,7 @@ namespace annie {
         }
     }
 
-    /**
-     * 加载场景资源
-     * @private
-     * @method annie._loadRes
-     * @return {void}
-     * @static
-     */
+    //加载场景资源
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
         if (_isReleased) {
@@ -602,7 +473,7 @@ namespace annie {
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
-                                trace("部分滤镜效果未实现");
+                                console.log("部分滤镜效果未实现");
                             //其他还示实现
                         }
                     }
@@ -615,21 +486,9 @@ namespace annie {
         }
     }
 
-    /**
-     * 解析数据里需要确定的文本类型
-     * @property annie._textLineType
-     * @type {string[]}
-     * @private
-     * @static
-     */
+    // 解析数据里需要确定的文本类型
     let _textLineType: Array<string> = ["single", "multiline"];
-    /**
-     * 解析数据里需要确定的文本对齐方式
-     * @property annie._textAlign
-     * @type {string[]}
-     * @static
-     * @private
-     */
+    //解析数据里需要确定的文本对齐方式
     let _textAlign: Array<string> = ["left", "center", "right"];
 
     /**
@@ -702,7 +561,7 @@ namespace annie {
                 res[sceneName][sbName] = bitmapData;
                 return bitmapData;
             } else {
-                trace("error:矢量位图填充时,未找到位图资源!");
+                console.log("error:矢量位图填充时,未找到位图资源!");
                 return null;
             }
         }
@@ -781,8 +640,8 @@ namespace annie {
      *             type: "GET",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
      *      })
      *      //post
      *      annie.ajax({
@@ -790,8 +649,8 @@ namespace annie {
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             data: {phone:'135******58'},
      *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
      *      })
      */
     export function ajax(info: any): void {
@@ -820,7 +679,7 @@ namespace annie {
      * @since 1.0.4
      * @example
      *      annie.jsonp('js/testData.js', 1, 'getdata', function (result) {
-     *          trace(result);
+     *          console.log(result);
      *      })
      */
     export function jsonp(url: string, type: number, callbackName: string, callbackFun: any) {
@@ -862,7 +721,7 @@ namespace annie {
      *      //通过此方法获取id和username的值
      *      var id=annie.getQueryString("id");
      *      var userName=annie.getQueryString("username");
-     *      trace(id,userName);
+     *      console.log(id,userName);
      */
     export function getQueryString(name: string) {
         let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -1039,5 +898,5 @@ namespace annie {
             }
         }
     }
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
+    console.log("https://github.com/flash2x/AnnieJS");
 }

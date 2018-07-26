@@ -46,22 +46,14 @@ namespace annie {
             super.destroy();
         }
 
-        /**
-         * 停止播放，给stopAllSounds调用
-         * @method stop2
-         * @private
-         */
+        //停止播放，给stopAllSounds调用
         private stop2() {
             let s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         }
-        /**
-         * 恢复播放，给stopAllSounds调用
-         * @method play2
-         * @private
-         */
+        //恢复播放，给stopAllSounds调用
         private play2() {
             let s = this;
             if (s.isPlaying) {
@@ -69,14 +61,8 @@ namespace annie {
             }
         }
 
-        /**
-         * 音对象池
-         * @property _soundList
-         * @type {any[]}
-         * @private
-         */
+        //声音对象池
         private static _soundList: any = [];
-
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method stopAllSounds
@@ -132,13 +118,6 @@ namespace annie {
             }
             Sound._volume = volume;
         }
-
-        /**
-         * @property _volume
-         * @static
-         * @type {number}
-         * @private
-         */
         private static _volume: number = 1;
     }
 }

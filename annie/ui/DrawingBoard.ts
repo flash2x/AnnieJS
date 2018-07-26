@@ -3,6 +3,7 @@
  */
 namespace annieUI {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 画板类
      * @class annieUI.DrawingBoard
      * @public
@@ -114,12 +115,6 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
         }
-
-        /**
-         * @method onMouseDown
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         private onMouseDown(e: annie.MouseEvent): void {
             let s = this;
             s._isMouseDown = true;
@@ -137,11 +132,6 @@ namespace annieUI {
             s.addStepObj.sy = ly;
             s.addStepObj.ps = [];
         };
-        /**
-         * @method onMouseUp
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         private onMouseUp(e: annie.MouseEvent): void {
             let s = this;
             if(s._isMouseDown) {
@@ -152,11 +142,6 @@ namespace annieUI {
                 }
             }
         };
-        /**
-         * @method onMouseMove
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         private onMouseMove(e: annie.MouseEvent): void {
             let s = this;
             if (s._isMouseDown) {

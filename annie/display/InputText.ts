@@ -3,6 +3,7 @@
  */
 namespace annie {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 输入文本,此文本类是annie.FloatDisplay对象的典型代表
      * @class annie.InputText
      * @public
@@ -28,13 +29,6 @@ namespace annie {
          * @default true
          */
         public isAutoDownKeyBoard: boolean = true;
-        /**
-         * @property _inputTypeList
-         * @static
-         * @type {string[]}
-         * @private
-         * @since 2.0.0
-         */
         private static _inputTypeList:Array<string>=["input","password","textarea"];
         /**
          * @method InputText

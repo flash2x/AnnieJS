@@ -24,7 +24,6 @@ namespace annie {
             let s = this;
             s._instanceType = "annie.Sprite";
         }
-
         public destroy(): void {
             let s = this;
             //让子级也destroy
@@ -34,9 +33,8 @@ namespace annie {
             s.children = null;
             super.destroy();
         }
-
         /**
-         * 是否可以让children接收鼠标事件,如果为false
+         * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
          * @property mouseChildren
          * @type {boolean}
@@ -58,6 +56,7 @@ namespace annie {
         public _removeChildren: DisplayObject[] = [];
 
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否缓存为位图，注意一但缓存为位图，它的所有子级对象上的事件侦听都将无效
          * @property  cacheAsBitmap
          * @public
@@ -118,18 +117,7 @@ namespace annie {
             }
         }
 
-        //全局遍历
-        /**
-         * @method _getElementsByName
-         * @param {RegExp} rex
-         * @param {annie.Sprite} root
-         * @param {boolean} isOnlyOne
-         * @param {boolean} isRecursive
-         * @param {Array<annie.DisplayObject>} resultList
-         * @private
-         * @static
-         * @return {void}
-         */
+        //全局遍历查找
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
             if (len > 0) {
@@ -359,14 +347,6 @@ namespace annie {
             }
         }
 
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || (!s.mouseEnable && isMustMouseEnable)) return null;
@@ -416,14 +396,6 @@ namespace annie {
             }
             return null;
         }
-
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @since 1.0.0
-         * @public
-         */
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -464,15 +436,6 @@ namespace annie {
             }
             return rect;
         }
-
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         * @return {void}
-         */
         public render(renderObj: IRender): void {
             let s: any = this;
             if (s._cp||!s._visible) return;

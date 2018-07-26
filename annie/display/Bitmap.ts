@@ -5,9 +5,6 @@ namespace annie {
     /**
      * 利用 Bitmap() 构造函数，可以创建包含对 BitmapData 对象的引用的 Bitmap 对象。
      * 创建了 Bitmap 对象后，使用父 Sprite 实例的 addChild() 或 addChildAt() 方法将位图放在显示列表中。
-     * 一个 Bitmap 对象可在若干 Bitmap 对象之中共享其 BitmapData 引用
-     * 与转换属性或旋转属性无关。由于能够创建引用相同 BitmapData 对象的多个 Bitmap 对象，
-     * 因此，多个显示对象可以使用相同的复杂 BitmapData 对象，而不会因为每个显示对象实例使用一个 BitmapData 对象而产生内存开销。
      * @class annie.Bitmap
      * @public
      * @extends annie.DisplayObject
@@ -26,15 +23,7 @@ namespace annie {
          * @default null
          */
         public rect: Rectangle = null;
-        /**
-         * @property _isCache
-         * @private
-         * @since 1.0.0
-         * @type {boolean}
-         * @default false
-         */
         private _isCache: boolean = false;
-
         /**
          * 构造函数
          * @method Bitmap
@@ -43,6 +32,7 @@ namespace annie {
          * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
          * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
          * @example
+         *      //html5
          *      var imgEle=new Image();
          *      imgEle.onload=function (e) {
          *          var bitmap = new annie.Bitmap(imgEle)
@@ -68,8 +58,8 @@ namespace annie {
             s.rect = rect;
             s.bitmapData = bitmapData;
         }
-
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
          * @property bitmapData
          * @public
@@ -93,7 +83,8 @@ namespace annie {
         }
 
         /**
-         * 是否对图片对象使用像素碰撞 默认开启
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+         * 是否对图片对象使用像素碰撞检测透明度，默认关闭
          * @property hitTestWidthPixel
          * @type {boolean}
          * @default false
@@ -101,13 +92,6 @@ namespace annie {
          */
         public hitTestWidthPixel: boolean = false;
 
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为 false
-         * @since 1.0.0
-         */
         public update(isDrawUpdate: boolean = false): void {
             let s = this;
             if (!s._visible) return;
@@ -183,6 +167,7 @@ namespace annie {
         }
 
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
          * @method convertToImage
          * @static
@@ -197,7 +182,7 @@ namespace annie {
          *      yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
          *      spriteSheetImg.onload=function(e){
          *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
-         *          trace(singleSmallImg);
+         *          console.log(singleSmallImg);
          *      }
          *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
@@ -224,15 +209,6 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
             let obj = super.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);

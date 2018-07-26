@@ -80,7 +80,7 @@ namespace annieUI {
          * @return {boolean}
          */
         public cancel(step: number = 0): boolean {
-            trace("no support");
+            console.log("no support");
             return false;
         }
 
