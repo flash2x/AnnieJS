@@ -11,7 +11,7 @@ namespace annie {
      * @static
      * @example
      *      //打印当前引擎的版本号
-     *      trace(annie.version);
+     *      console.log(annie.version);
      */
     export let version: string = "2.0.0";
     /**
@@ -524,5 +524,5 @@ namespace annie {
             }
         }
     }
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
+    console.log("https://github.com/flash2x/AnnieJS");
 }

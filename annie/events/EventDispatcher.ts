@@ -25,7 +25,7 @@ namespace annie {
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
-         *      trace(this.instanceId);
+         *      console.log(this.instanceId);
          */
         public get instanceId(): number {
             return this._instanceId;
@@ -115,7 +115,7 @@ namespace annie {
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @example
-         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         public addEventListener(type: string, listener: Function,useCapture = true): void {
             if (!type) {
@@ -176,7 +176,7 @@ namespace annie {
          *          yourEvent=new annie.Event("yourCustomerEvent");
          *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
-         *          trace(e.data);
+         *          console.log(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */

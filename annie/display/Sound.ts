@@ -40,6 +40,7 @@ namespace annie {
                     s.media.play();
                 }
             });
+            annie.Sound._soundList.push(s);
         }
         private _repeate:number=1;
         /**
@@ -192,5 +193,17 @@ namespace annie {
             Sound._volume = volume;
         }
         private static _volume: number = 1;
+        public destroy(){
+            let s=this;
+            let len: number = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]==s) {
+                    annie.Sound._soundList[i].stop();
+                    annie.Sound._soundList.splice(i,1);
+                    break;
+                }
+            }
+            s.media=null;
+        }
     }
 }

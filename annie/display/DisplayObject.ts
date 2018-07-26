@@ -812,29 +812,22 @@ namespace annie {
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (!s.stage) return;
-            let sounds = s._a2x_sounds;
+            let sounds = s._soundList;
             let timeLineObj = s._a2x_res_class;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 //如果有音乐。则关闭音乐
                 if (sounds && sounds.length > 0) {
                     for (let i = 0; i < sounds.length; i++) {
-                        sounds[i].stop();
+                        sounds[i].stop2();
                     }
-                }
-                //如果是mc，则还原成动画初始时的状态
-                if (timeLineObj && timeLineObj.tf > 1) {
-                    s._curFrame = 1;
-                    s._lastFrame = 0;
-                    s._isPlaying = true;
-                    s._isFront = true;
                 }
             } else {
                 if (callState == 1) {
                     //如果有音乐，如果是Sprite则播放音乐
                     if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
                         for (let i = 0; i < sounds.length; i++) {
-                            sounds[i].play(0);
+                            sounds[i].play2();
                         }
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);

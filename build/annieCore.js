@@ -29,7 +29,7 @@ var annie;
              * @readonly
              * @example
              *      //获取 annie引擎类对象唯一码
-             *      trace(this.instanceId);
+             *      console.log(this.instanceId);
              */
             get: function () {
                 return this._instanceId;
@@ -107,7 +107,7 @@ var annie;
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @example
-         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         EventDispatcher.prototype.addEventListener = function (type, listener, useCapture) {
             if (useCapture === void 0) { useCapture = true; }
@@ -165,7 +165,7 @@ var annie;
          *          yourEvent=new annie.Event("yourCustomerEvent");
          *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
-         *          trace(e.data);
+         *          console.log(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
@@ -2345,22 +2345,15 @@ var annie;
             var s = this;
             if (!s.stage)
                 return;
-            var sounds = s._a2x_sounds;
+            var sounds = s._soundList;
             var timeLineObj = s._a2x_res_class;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 //如果有音乐。则关闭音乐
                 if (sounds && sounds.length > 0) {
                     for (var i = 0; i < sounds.length; i++) {
-                        sounds[i].stop();
+                        sounds[i].stop2();
                     }
-                }
-                //如果是mc，则还原成动画初始时的状态
-                if (timeLineObj && timeLineObj.tf > 1) {
-                    s._curFrame = 1;
-                    s._lastFrame = 0;
-                    s._isPlaying = true;
-                    s._isFront = true;
                 }
             }
             else {
@@ -2368,7 +2361,7 @@ var annie;
                     //如果有音乐，如果是Sprite则播放音乐
                     if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
                         for (var i = 0; i < sounds.length; i++) {
-                            sounds[i].play(0);
+                            sounds[i].play2();
                         }
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
@@ -3786,66 +3779,17 @@ var annie;
              * @default true
              */
             this._isPlaying = true;
-            /**
-             * @property _isFront
-             * @type {boolean}
-             * @private
-             * @default true
-             */
             this._isFront = true;
-            /**
-             * @property _lastFrame
-             * @type {number}
-             * @private
-             * @default 0
-             */
             this._lastFrame = 0;
-            /**
-             * sprite 和 moveClip的类资源信息
-             * @property _a2x_res_class
-             * @type {Object}
-             * @since 2.0.0
-             * @private
-             */
+            //sprite 和 moveClip的类资源信息
             this._a2x_res_class = { tf: 1 };
-            /**
-             * @property _a2x_res_children
-             * @type {Array}
-             * @private
-             * @since 2.0.0
-             */
             this._a2x_res_children = [];
-            /**
-             * @property _a2x_script
-             * @type {Object}
-             * @default null
-             * @private
-             * @since 2.0.0
-             */
             this._a2x_script = null;
-            /**
-             * @property _mode
-             * @type {boolean}
-             * @private
-             * @default false
-             */
+            //动画模式 按钮 剪辑 图形
             this._mode = -2;
             this._clicked = false;
-            /**
-             * @property _maskList
-             * @type {Array}
-             * @private
-             * @default []
-             */
-            this._maskList = [];
             this.isUpdateFrame = false;
-            /**
-             * @property _a2x_sounds
-             * @since 2.0.0
-             * @type {Object}
-             * @private
-             * @default {null}
-             */
+            //flash声音管理
             this._a2x_sounds = null;
             var s = this;
             s._instanceType = "annie.MovieClip";
@@ -4236,6 +4180,17 @@ var annie;
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
+                                    //判断obj是否是动画,是的话则还原成动画初始时的状态
+                                    if (obj._instanceType == "annie.MovieClip") {
+                                        s._wantFrame = 1;
+                                        s._isFront = true;
+                                        if (obj._mode < -1) {
+                                            s._isPlaying = true;
+                                        }
+                                        else {
+                                            s._isPlaying = false;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4255,8 +4210,8 @@ var annie;
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
             if (s.isUpdateFrame) {
-                s.isUpdateFrame = false;
                 var timeLineObj = s._a2x_res_class;
+                s.isUpdateFrame = false;
                 var frameIndex = s._curFrame - 1;
                 //更新完所有后再来确定事件和脚本
                 var curFrameScript = void 0;
@@ -4303,7 +4258,6 @@ var annie;
             var s = this;
             s._lastFrameObj = null;
             s._a2x_script = null;
-            s._maskList = null;
             s._a2x_res_children = null;
             s._a2x_res_class = null;
             s._a2x_sounds = null;
@@ -4720,16 +4674,6 @@ var annie;
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
-        };
-        /**
-         * 重写 getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        TextField.prototype.getBounds = function () {
-            return this._bounds;
         };
         return TextField;
     }(annie.DisplayObject));
@@ -5641,6 +5585,7 @@ var annie;
                     s.media.play();
                 }
             });
+            annie.Sound._soundList.push(s);
         }
         /**
          * 开始播放媒体
@@ -5784,6 +5729,18 @@ var annie;
                 }
             }
             Sound._volume = volume;
+        };
+        Sound.prototype.destroy = function () {
+            var s = this;
+            var len = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i] == s) {
+                    annie.Sound._soundList[i].stop();
+                    annie.Sound._soundList.splice(i, 1);
+                    break;
+                }
+            }
+            s.media = null;
         };
         //声音对象池
         Sound._soundList = [];
@@ -6692,10 +6649,10 @@ var annie;
          * @example
          *      var timer=new annie.Timer(1000,10);
          *      timer.addEventListener(annie.Event.TIMER,function (e) {
-         *          trace("once");
+         *          console.log("once");
          *      })
          *      timer.addEventListener(annie.Event.TIMER_COMPLETE, function (e) {
-         *          trace("complete");
+         *          console.log("complete");
          *          e.target.kill();
          *      })
          *      timer.start();
@@ -6887,7 +6844,7 @@ var annie;
      * @static
      * @example
      *      //打印当前引擎的版本号
-     *      trace(annie.version);
+     *      console.log(annie.version);
      */
     annie.version = "2.0.0";
     /**
@@ -7424,7 +7381,7 @@ var annie;
         }
     }
     annie.initRes = initRes;
-    console.log("AnnieJS:https://github.com/flash2x/annieJS");
+    console.log("https://github.com/flash2x/AnnieJS");
 })(annie || (annie = {}));
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
