@@ -473,11 +473,15 @@ namespace annie {
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
-                                console.log("部分滤镜效果未实现");
+                                //console.log("部分滤镜效果未实现");
                             //其他还示实现
                         }
                     }
-                    target.filters = filters;
+                    if(filters.length>0){
+                        target.filters = filters;
+                    }else{
+                        target.filters = null;
+                    }
                 } else {
                     target.filters = null;
                 }
