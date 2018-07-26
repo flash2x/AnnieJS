@@ -21,7 +21,7 @@ declare namespace annie {
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
-         *      trace(this.instanceId);
+         *      console.log(this.instanceId);
          */
         instanceId: number;
         /**
@@ -81,7 +81,7 @@ declare namespace annie {
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @example
-         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         addEventListener(type: string, listener: Function, useCapture?: boolean): void;
         /**
@@ -108,7 +108,7 @@ declare namespace annie {
          *          yourEvent=new annie.Event("yourCustomerEvent");
          *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
-         *          trace(e.data);
+         *          console.log(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
@@ -1424,20 +1424,13 @@ declare namespace annie {
          * @return {void}
          */
         removeSound(id: number | string): void;
-        /**
-         * 每个Flash文件生成的对象都有一个自带的初始化信息
-         * @property _a2x_res_obj
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         * @default {Object}
-         */
         private _a2x_res_obj;
         destroy(): void;
         /**
-         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * 更新流程走完之后再执行脚本和事件执行流程
+         * @protected
          * @method callEventAndFrameScript
-         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         * @param {number} callState 0是上级被移除，执行removeStage事件 1是上级被添加到舞台执行addStage事件 2是常规刷新运行
          */
         protected callEventAndFrameScript(callState: number): void;
     }
@@ -2046,21 +2039,8 @@ declare namespace annie {
          * @readonly
          */
         currentFrame: number;
-        /**
-         * @property _curFrame
-         * @type {number}
-         * @private
-         * @since 2.0.0
-         * @default 1
-         */
         private _curFrame;
         private _wantFrame;
-        /**
-         * @property _lastFrameObj
-         * @type {Object}
-         * @private
-         * @default null
-         */
         private _lastFrameObj;
         /**
          * 当前动画是否处于播放状态
@@ -2073,13 +2053,6 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
-        /**
-         * @property _isPlaying
-         * @type {boolean}
-         * @private
-         * @since 2.0.0
-         * @default true
-         */
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2091,12 +2064,6 @@ declare namespace annie {
          * @readonly
          */
         isFront: boolean;
-        /**
-         * @property _isFront
-         * @type {boolean}
-         * @private
-         * @default true
-         */
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2108,12 +2075,6 @@ declare namespace annie {
          * @readonly
          */
         totalFrames: number;
-        /**
-         * @property _lastFrame
-         * @type {number}
-         * @private
-         * @default 0
-         */
         private _lastFrame;
         /**
          * 构造函数
@@ -2122,20 +2083,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor();
-        /**
-         * sprite 和 moveClip的类资源信息
-         * @property _a2x_res_class
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         */
         private _a2x_res_class;
-        /**
-         * @property _a2x_res_children
-         * @type {Array}
-         * @private
-         * @since 2.0.0
-         */
         private _a2x_res_children;
         /**
          * 调用止方法将停止当前帧
@@ -2145,13 +2093,6 @@ declare namespace annie {
          * @return {void}
          */
         stop(): void;
-        /**
-         * @property _a2x_script
-         * @type {Object}
-         * @default null
-         * @private
-         * @since 2.0.0
-         */
         private _a2x_script;
         /**
          * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
@@ -2179,12 +2120,6 @@ declare namespace annie {
          * @default false
          */
         isButton: boolean;
-        /**
-         * @property _mode
-         * @type {boolean}
-         * @private
-         * @default false
-         */
         private _mode;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2213,13 +2148,6 @@ declare namespace annie {
         clicked: boolean;
         private _clicked;
         private _mouseEvent(e);
-        /**
-         * @property _maskList
-         * @type {Array}
-         * @private
-         * @default []
-         */
-        private _maskList;
         /**
          * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
@@ -2273,13 +2201,6 @@ declare namespace annie {
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         private isUpdateFrame;
         update(isDrawUpdate?: boolean): void;
-        /**
-         * @property _a2x_sounds
-         * @since 2.0.0
-         * @type {Object}
-         * @private
-         * @default {null}
-         */
         private _a2x_sounds;
         protected callEventAndFrameScript(callState: number): void;
         destroy(): void;
@@ -2461,14 +2382,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        /**
-         * 重写 getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        getBounds(): Rectangle;
     }
 }
 /**
@@ -2815,6 +2728,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(src: string);
+        private _repeate;
         /**
          * 是否正在播放中
          * @property  isPlaying
@@ -2830,7 +2744,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         play(start?: number, loop?: number): void;
-        private _repeate;
         /**
          * 停止播放
          * @method stop
@@ -2895,6 +2808,7 @@ declare namespace annie {
          */
         static setAllSoundsVolume(volume: number): void;
         private static _volume;
+        destroy(): void;
     }
 }
 /**
@@ -3413,10 +3327,10 @@ declare namespace annie {
          * @example
          *      var timer=new annie.Timer(1000,10);
          *      timer.addEventListener(annie.Event.TIMER,function (e) {
-         *          trace("once");
+         *          console.log("once");
          *      })
          *      timer.addEventListener(annie.Event.TIMER_COMPLETE, function (e) {
-         *          trace("complete");
+         *          console.log("complete");
          *          e.target.kill();
          *      })
          *      timer.start();
@@ -3506,7 +3420,7 @@ declare namespace annie {
      * @type {string}
      * @example
      *      //打印当前引擎的版本号
-     *      trace(annie.version);
+     *      console.log(annie.version);
      */
     let version: string;
     /**

@@ -356,15 +356,5 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-        /**
-         * 重写 getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        public getBounds(): Rectangle {
-            return this._bounds;
-        }
     }
 }

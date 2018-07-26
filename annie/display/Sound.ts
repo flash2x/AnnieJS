@@ -36,10 +36,13 @@ namespace annie {
             s.media.onEnded(function(){
                 if(s._loop>1){
                     s._loop--;
+                    s.media.startTime=0;
                     s.media.play();
                 }
             });
+            annie.Sound._soundList.push(s);
         }
+        private _repeate:number=1;
         /**
          * 是否正在播放中
          * @property  isPlaying
@@ -62,10 +65,10 @@ namespace annie {
             }else{
                 s._loop=loop;
                 s._repeate=loop;
-            }            s.media.play();
+            }
+            s.media.play();
             s.isPlaying=true;
         }
-        private _repeate:number=1;
         /**
          * 停止播放
          * @method stop
@@ -190,5 +193,17 @@ namespace annie {
             Sound._volume = volume;
         }
         private static _volume: number = 1;
+        public destroy(){
+            let s=this;
+            let len: number = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]==s) {
+                    annie.Sound._soundList[i].stop();
+                    annie.Sound._soundList.splice(i,1);
+                    break;
+                }
+            }
+            s.media=null;
+        }
     }
 }

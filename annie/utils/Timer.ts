@@ -17,10 +17,10 @@ namespace annie {
          * @example
          *      var timer=new annie.Timer(1000,10);
          *      timer.addEventListener(annie.Event.TIMER,function (e) {
-         *          trace("once");
+         *          console.log("once");
          *      })
          *      timer.addEventListener(annie.Event.TIMER_COMPLETE, function (e) {
-         *          trace("complete");
+         *          console.log("complete");
          *          e.target.kill();
          *      })
          *      timer.start();
