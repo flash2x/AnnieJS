@@ -7339,7 +7339,7 @@ var annie;
                 if (!isMc) {
                     var index = i + 1;
                     if (objType == 5) {
-                        obj._repeate = resClass.s[0][index];
+                        obj._loop = obj._repeate = resClass.s[0][index];
                     }
                     else {
                         d(obj, resClass.f[0].c[index]);
