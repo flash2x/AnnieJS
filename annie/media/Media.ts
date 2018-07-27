@@ -31,9 +31,9 @@ namespace annie {
          * @property isPlaying
          * @type {boolean}
          * @since 2.0.0
-         * @default false
+         * @default true
          */
-        public isPlaying:boolean=false;
+        public isPlaying:boolean=true;
         /**
          * 给一个声音取一个名字，方便获取
          * @property name

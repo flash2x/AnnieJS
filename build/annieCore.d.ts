@@ -2061,7 +2061,7 @@ declare namespace annie {
          * @property isPlaying
          * @type {boolean}
          * @since 2.0.0
-         * @default false
+         * @default true
          */
         isPlaying: boolean;
         /**
