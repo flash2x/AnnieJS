@@ -4182,13 +4182,13 @@ var annie;
                                     s._removeChildren.push(obj);
                                     //判断obj是否是动画,是的话则还原成动画初始时的状态
                                     if (obj._instanceType == "annie.MovieClip") {
-                                        s._wantFrame = 1;
-                                        s._isFront = true;
+                                        obj._wantFrame = 1;
+                                        obj._isFront = true;
                                         if (obj._mode < -1) {
-                                            s._isPlaying = true;
+                                            obj._isPlaying = true;
                                         }
                                         else {
-                                            s._isPlaying = false;
+                                            obj._isPlaying = false;
                                         }
                                     }
                                 }
