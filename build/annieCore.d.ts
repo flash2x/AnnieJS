@@ -2989,6 +2989,12 @@ declare namespace annie {
          */
         static killAll(): void;
         /**
+         * fps
+         * @property fps
+         * @type {number}
+         */
+        static fps: number;
+        /**
          * @通过创建Tween对象返回时的唯一id来销毁对应的Tween对象
          * @method kill
          * @static

@@ -166,14 +166,12 @@ namespace annie {
                 s._mode = -1;
             }
         }
-
         /**
-         * 设置是否为点击状态
+         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
          * @property clicked
-         * @param {boolean} value
+         * @return {boolean}
          * @public
          * @since 2.0.0
-         * @default false
          */
         public set clicked(value: boolean) {
             let s = this;
@@ -185,17 +183,9 @@ namespace annie {
             }
         }
 
-        /**
-         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
-         * @property clicked
-         * @return {boolean}
-         * @public
-         * @since 2.0.0
-         */
         public get clicked(): boolean {
             return this._clicked;
         }
-
         private _clicked = false;
 
         private _mouseEvent(e: any): void {

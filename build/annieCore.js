@@ -5959,7 +5959,7 @@ var annie;
             }
             var s = this;
             s.currentFrame = 1;
-            var tTime = times * 60 >> 0;
+            var tTime = times * Tween.fps >> 0;
             s.totalFrames = tTime > 0 ? tTime : 1;
             s.target = target;
             s._isTo = isTo;
@@ -5996,7 +5996,7 @@ var annie;
                             s._delay = data[item];
                         }
                         else {
-                            s._delay = data[item] * 60 >> 0;
+                            s._delay = data[item] * Tween.fps >> 0;
                         }
                         break;
                     case "ease":
@@ -6681,6 +6681,12 @@ var annie;
             }
             isUpdateTween = !isUpdateTween;
         };
+        /**
+         * fps
+         * @property fps
+         * @type {number}
+         */
+        Tween.fps = 30;
         Tween._tweenPool = [];
         Tween._tweenList = [];
         return Tween;
@@ -7458,5 +7464,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-
-module.exports = annie;
