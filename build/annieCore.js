@@ -4681,14 +4681,6 @@ var annie;
             get: function () {
                 return this._clicked;
             },
-            /**
-             * 设置是否为点击状态
-             * @property clicked
-             * @param {boolean} value
-             * @public
-             * @since 2.0.0
-             * @default false
-             */
             set: function (value) {
                 var s = this;
                 if (value != s._clicked) {
@@ -4921,13 +4913,13 @@ var annie;
                                     s._removeChildren.push(obj);
                                     //判断obj是否是动画,是的话则还原成动画初始时的状态
                                     if (obj._instanceType == "annie.MovieClip") {
-                                        s._wantFrame = 1;
-                                        s._isFront = true;
+                                        obj._wantFrame = 1;
+                                        obj._isFront = true;
                                         if (obj._mode < -1) {
-                                            s._isPlaying = true;
+                                            obj._isPlaying = true;
                                         }
                                         else {
-                                            s._isPlaying = false;
+                                            obj._isPlaying = false;
                                         }
                                     }
                                 }
@@ -8166,13 +8158,7 @@ var annie;
     annie._isReleased = false;
     //打包swf用
     annie._shareSceneList = [];
-    /**
-     * 存储加载资源的总对象
-     * @property annie.res
-     * @static
-     * @public
-     * @type {Object}
-     */
+    //存储加载资源的总对象
     annie.res = {};
     // 加载器是否正在加载中
     var _isLoading;
@@ -8305,14 +8291,8 @@ var annie;
     function _loadConfig() {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
-    /**
-     * 加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
-     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
-     * @method annie.onCFGComplete
-     * @param {annie.Event} e
-     * @static
-     * @return {void}
-     */
+    //加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
+    //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function onCFGComplete(e) {
         //配置文件加载完成
         var resList = e.data.response;
@@ -8545,29 +8525,11 @@ var annie;
         return null;
     }
     annie.getResource = getResource;
-    /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-     * @method annie.b
-     * @public
-     * @since 1.0.0
-     * @static
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {any}
-     */
+    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
     function b(sceneName, resName) {
         return new annie.Bitmap(annie.res[sceneName][resName]);
     }
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method annie.d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     * @param {number} parentFrame
-     */
+    //用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
     function d(target, info, parentFrame) {
         if (parentFrame === void 0) { parentFrame = 1; }
         if (target._a2x_res_obj == info) {
@@ -8652,14 +8614,7 @@ var annie;
     var _textLineType = ["single", "multiline"];
     //解析数据里需要确定的文本对齐方式
     var _textAlign = ["left", "center", "right"];
-    /**
-     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-     * @method annie.t
-     * @public
-     * @static
-     * @since 1.0.0
-     * @return {annie.TextFiled|annie.InputText}
-     */
+    //创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
     function t(sceneName, resName) {
         var textDate = annie.res[sceneName]._a2x_con[resName];
         var textObj;
@@ -8696,15 +8651,7 @@ var annie;
         }
         return textObj;
     }
-    /**
-     * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method annie.sb
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {annie.Bitmap}
-     * @public
-     * @static
-     */
+    //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
     function sb(sceneName, resName) {
         var sbName = "_f2x_s" + resName;
         if (annie.res[sceneName][sbName]) {
@@ -8731,14 +8678,7 @@ var annie;
         }
     }
     annie.sb = sb;
-    /**
-     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-     * @method annie.g
-     * @public
-     * @static
-     * @since 1.0.0
-     * @return {annie.Shape}
-     */
+    //创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
     function g(sceneName, resName) {
         var shapeDate = annie.res[sceneName]._a2x_con[resName][1];
         var shape = new annie.Shape();
@@ -8778,19 +8718,12 @@ var annie;
         }
         return shape;
     }
-    /**
-     * 获取声音实例
-     * @method annie.s
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {annie.Sound}
-     * @public
-     * @static
-     */
+    // 获取声音实例
     function s(sceneName, resName) {
         return new annie.Sound(annie.res[sceneName][resName]);
     }
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public
@@ -8838,6 +8771,7 @@ var annie;
     }
     annie.ajax = ajax;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * jsonp调用方法
      * @method annie.jsonp
      * @param url
@@ -8879,6 +8813,7 @@ var annie;
     }
     annie.jsonp = jsonp;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 获取url地址中的get参数
      * @method annie.getQueryString
      * @static

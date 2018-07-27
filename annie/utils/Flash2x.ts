@@ -16,17 +16,10 @@ namespace annie {
     export let _isReleased = false;
     //打包swf用
     export let _shareSceneList: any = [];
-    /**
-     * 存储加载资源的总对象
-     * @property annie.res
-     * @static
-     * @public
-     * @type {Object}
-     */
+    //存储加载资源的总对象
     export let res: any = {};
     // 加载器是否正在加载中
     let _isLoading: boolean;
-
     // 加载中的场景名列表
     let _loadSceneNames: any;
     //加载地址的域名地址或前缀
@@ -153,15 +146,8 @@ namespace annie {
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
-
-    /**
-     * 加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
-     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
-     * @method annie.onCFGComplete
-     * @param {annie.Event} e
-     * @static
-     * @return {void}
-     */
+    //加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
+    //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function onCFGComplete(e: Event): void {
         //配置文件加载完成
         let resList: any = e.data.response;
@@ -178,15 +164,12 @@ namespace annie {
             _loadRes();
         }
     }
-
     // 加载资源过程中调用的回调方法。
-
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
-
     //解析加载后的json资源数据
     function _parseContent(loadContent: any, rootObj: any = null) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
@@ -270,7 +253,6 @@ namespace annie {
             }
         }
     }
-
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
@@ -322,7 +304,6 @@ namespace annie {
             }
         }
     }
-
     //加载场景资源
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
@@ -389,30 +370,11 @@ namespace annie {
         return null;
     }
 
-    /**
-     * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-     * @method annie.b
-     * @public
-     * @since 1.0.0
-     * @static
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {any}
-     */
+    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
     }
-
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method annie.d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     * @param {number} parentFrame
-     */
+    //用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
     export function d(target: any, info: any, parentFrame: number = 1): void {
         if (target._a2x_res_obj == info) {
             return;
@@ -495,14 +457,7 @@ namespace annie {
     //解析数据里需要确定的文本对齐方式
     let _textAlign: Array<string> = ["left", "center", "right"];
 
-    /**
-     * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-     * @method annie.t
-     * @public
-     * @static
-     * @since 1.0.0
-     * @return {annie.TextFiled|annie.InputText}
-     */
+    //创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
     function t(sceneName: string, resName: string): any {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
@@ -539,15 +494,7 @@ namespace annie {
         return textObj;
     }
 
-    /**
-     * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method annie.sb
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {annie.Bitmap}
-     * @public
-     * @static
-     */
+    //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
         if (res[sceneName][sbName]) {
@@ -571,14 +518,7 @@ namespace annie {
         }
     }
 
-    /**
-     * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-     * @method annie.g
-     * @public
-     * @static
-     * @since 1.0.0
-     * @return {annie.Shape}
-     */
+    //创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
         let shape: annie.Shape = new annie.Shape();
@@ -612,20 +552,13 @@ namespace annie {
         return shape;
     }
 
-    /**
-     * 获取声音实例
-     * @method annie.s
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {annie.Sound}
-     * @public
-     * @static
-     */
+    // 获取声音实例
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
     }
 
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public
@@ -673,6 +606,7 @@ namespace annie {
     }
 
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * jsonp调用方法
      * @method annie.jsonp
      * @param url
@@ -713,6 +647,7 @@ namespace annie {
     }
 
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 获取url地址中的get参数
      * @method annie.getQueryString
      * @static
