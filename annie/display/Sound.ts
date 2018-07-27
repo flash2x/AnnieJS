@@ -48,7 +48,7 @@ namespace annie {
          * @property  isPlaying
          * @type {boolean}
          */
-        public isPlaying:boolean=false;
+        public isPlaying:boolean=true;
         /**
          * 开始播放媒体
          * @method play

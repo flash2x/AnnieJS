@@ -5611,7 +5611,7 @@ var annie;
              * @property  isPlaying
              * @type {boolean}
              */
-            this.isPlaying = false;
+            this.isPlaying = true;
             /**
              * 每个声音可以有个名字，并且不同的声音名字可以相同
              * @property name
