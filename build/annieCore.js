@@ -3984,23 +3984,15 @@ var annie;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
+            get: function () {
+                return this._clicked;
+            },
             /**
              * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
              * @property clicked
              * @return {boolean}
              * @public
              * @since 2.0.0
-             */
-            get: function () {
-                return this._clicked;
-            },
-            /**
-             * 设置是否为点击状态
-             * @property clicked
-             * @param {boolean} value
-             * @public
-             * @since 2.0.0
-             * @default false
              */
             set: function (value) {
                 var s = this;
@@ -4234,13 +4226,13 @@ var annie;
                                     s._removeChildren.push(obj);
                                     //判断obj是否是动画,是的话则还原成动画初始时的状态
                                     if (obj._instanceType == "annie.MovieClip") {
-                                        s._wantFrame = 1;
-                                        s._isFront = true;
+                                        obj._wantFrame = 1;
+                                        obj._isFront = true;
                                         if (obj._mode < -1) {
-                                            s._isPlaying = true;
+                                            obj._isPlaying = true;
                                         }
                                         else {
-                                            s._isPlaying = false;
+                                            obj._isPlaying = false;
                                         }
                                     }
                                 }
@@ -5959,7 +5951,7 @@ var annie;
             }
             var s = this;
             s.currentFrame = 1;
-            var tTime = times * Tween.fps >> 0;
+            var tTime = times * 60 >> 0;
             s.totalFrames = tTime > 0 ? tTime : 1;
             s.target = target;
             s._isTo = isTo;
@@ -5996,7 +5988,7 @@ var annie;
                             s._delay = data[item];
                         }
                         else {
-                            s._delay = data[item] * Tween.fps >> 0;
+                            s._delay = data[item] * 60 >> 0;
                         }
                         break;
                     case "ease":
@@ -6681,12 +6673,6 @@ var annie;
             }
             isUpdateTween = !isUpdateTween;
         };
-        /**
-         * fps
-         * @property fps
-         * @type {number}
-         */
-        Tween.fps = 30;
         Tween._tweenPool = [];
         Tween._tweenList = [];
         return Tween;
@@ -7464,3 +7450,5 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+
+module.exports = annie;

@@ -2137,14 +2137,6 @@ declare namespace annie {
          * @public
          * @since 2.0.0
          */
-        /**
-         * 设置是否为点击状态
-         * @property clicked
-         * @param {boolean} value
-         * @public
-         * @since 2.0.0
-         * @default false
-         */
         clicked: boolean;
         private _clicked;
         private _mouseEvent(e);
@@ -2988,12 +2980,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         static killAll(): void;
-        /**
-         * fps
-         * @property fps
-         * @type {number}
-         */
-        static fps: number;
         /**
          * @通过创建Tween对象返回时的唯一id来销毁对应的Tween对象
          * @method kill
