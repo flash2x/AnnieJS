@@ -133,6 +133,7 @@ namespace annie {
             let s = this;
             if (s.isPlaying) {
                 s.media.play();
+                s._loop=s._repeate;
             }
         }
         //声音对象池

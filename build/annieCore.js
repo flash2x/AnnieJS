@@ -5717,6 +5717,7 @@ var annie;
             var s = this;
             if (s.isPlaying) {
                 s.media.play();
+                s._loop = s._repeate;
             }
         };
         /**
