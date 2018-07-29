@@ -4152,7 +4152,7 @@ var annie;
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
-                                    s._resetMC(obj);
+                                    MovieClip._resetMC(obj);
                                 }
                             }
                         }
@@ -4215,7 +4215,7 @@ var annie;
             }
             _super.prototype.callEventAndFrameScript.call(this, callState);
         };
-        MovieClip.prototype._resetMC = function (obj) {
+        MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             var isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
@@ -4234,7 +4234,7 @@ var annie;
             }
             if (isNeedToReset) {
                 for (var i = 0; i < obj.children.length; i++) {
-                    this._resetMC(obj.children[i]);
+                    MovieClip._resetMC(obj.children[i]);
                 }
             }
         };
