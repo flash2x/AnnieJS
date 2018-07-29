@@ -166,6 +166,7 @@ namespace annie {
                 s._mode = -1;
             }
         }
+
         public set clicked(value: boolean) {
             let s = this;
             if (value != s._clicked) {
@@ -401,16 +402,7 @@ namespace annie {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
-                                    //判断obj是否是动画,是的话则还原成动画初始时的状态
-                                    if(obj._instanceType=="annie.MovieClip") {
-                                        obj._wantFrame = 1;
-                                        obj._isFront = true;
-                                        if (obj._mode < -1) {
-                                            obj._isPlaying = true;
-                                        } else {
-                                            obj._isPlaying = false;
-                                        }
-                                    }
+                                    s._resetMC(obj);
                                 }
                             }
                         }
@@ -427,8 +419,10 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
+
         //flash声音管理
         private _a2x_sounds: any = null;
+
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame) {
@@ -474,6 +468,28 @@ namespace annie {
                 }
             }
             super.callEventAndFrameScript(callState);
+        }
+
+        private _resetMC(obj: any) {
+            //判断obj是否是动画,是的话则还原成动画初始时的状态
+            let isNeedToReset = false;
+            if (obj._instanceType == "annie.MovieClip") {
+                obj._wantFrame = 1;
+                obj._isFront = true;
+                if (obj._mode < -1) {
+                    obj._isPlaying = true;
+                } else {
+                    obj._isPlaying = false;
+                }
+                isNeedToReset = true;
+            }else if(obj._instanceType=="annie.Sprite") {
+                isNeedToReset=true;
+            }
+            if (isNeedToReset) {
+                for (let i = 0; i < obj.children.length; i++) {
+                    this._resetMC(obj.children[i]);
+                }
+            }
         }
 
         public destroy(): void {

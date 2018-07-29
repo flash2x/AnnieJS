@@ -411,7 +411,7 @@ namespace annie {
                     let blur: any;
                     let color: any;
                     for (let i = 0; i < info.fi.length; i++) {
-                        switch (info.fi[i].t) {
+                        switch (info.fi[i][0]) {
                             case 0:
                                 blur = (info.fi[i][2] + info.fi[i][3]) * 0.5;
                                 color = Shape.getRGBA(info.fi[i][10], info.fi[i][11]);
@@ -645,7 +645,6 @@ namespace annie {
         }
         jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
     }
-
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 获取url地址中的get参数
@@ -809,7 +808,7 @@ namespace annie {
                         } else {
                             if (maskObj && i <= maskTillId) {
                                 obj.mask = maskObj;
-                                if (i == maskTillId) {
+                                if (i == maskTillId){
                                     maskObj = null;
                                 }
                             }
@@ -826,7 +825,7 @@ namespace annie {
                     target._a2x_sounds[i]=obj;
                 }
             }
-            if (isMc) {
+            if (isMc){
                 //将mc里面的实例按照时间轴上的图层排序
                 let ol = resClass.ol;
                 if (ol) {
