@@ -3984,9 +3984,6 @@ var annie;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
-            get: function () {
-                return this._clicked;
-            },
             /**
              * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
              * @property clicked
@@ -3994,6 +3991,9 @@ var annie;
              * @public
              * @since 2.0.0
              */
+            get: function () {
+                return this._clicked;
+            },
             set: function (value) {
                 var s = this;
                 if (value != s._clicked) {
@@ -4224,17 +4224,7 @@ var annie;
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
-                                    //判断obj是否是动画,是的话则还原成动画初始时的状态
-                                    if (obj._instanceType == "annie.MovieClip") {
-                                        obj._wantFrame = 1;
-                                        obj._isFront = true;
-                                        if (obj._mode < -1) {
-                                            obj._isPlaying = true;
-                                        }
-                                        else {
-                                            obj._isPlaying = false;
-                                        }
-                                    }
+                                    MovieClip._resetMC(obj);
                                 }
                             }
                         }
@@ -4296,6 +4286,29 @@ var annie;
                 }
             }
             _super.prototype.callEventAndFrameScript.call(this, callState);
+        };
+        MovieClip._resetMC = function (obj) {
+            //判断obj是否是动画,是的话则还原成动画初始时的状态
+            var isNeedToReset = false;
+            if (obj._instanceType == "annie.MovieClip") {
+                obj._wantFrame = 1;
+                obj._isFront = true;
+                if (obj._mode < -1) {
+                    obj._isPlaying = true;
+                }
+                else {
+                    obj._isPlaying = false;
+                }
+                isNeedToReset = true;
+            }
+            else if (obj._instanceType == "annie.Sprite") {
+                isNeedToReset = true;
+            }
+            if (isNeedToReset) {
+                for (var i = 0; i < obj.children.length; i++) {
+                    MovieClip._resetMC(obj.children[i]);
+                }
+            }
         };
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用

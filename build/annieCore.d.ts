@@ -2195,6 +2195,7 @@ declare namespace annie {
         update(isDrawUpdate?: boolean): void;
         private _a2x_sounds;
         protected callEventAndFrameScript(callState: number): void;
+        private static _resetMC(obj);
         destroy(): void;
     }
 }
