@@ -125,21 +125,7 @@ var annie;
                 }
             }
         };
-<<<<<<< HEAD
-        EventDispatcher.prototype.on = function (type, listener) {
-            this.addEventListener.apply(this, arguments);
-        };
-        /**
-         * 增加或删除相应mouse或touch侦听记数
-         * @method _changeMouseCount
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} isAdd
-         */
-=======
         //增加或删除相应mouse或touch侦听记数
->>>>>>> flash2x/master
         EventDispatcher.prototype._changeMouseCount = function (type, isAdd) {
             var count = isAdd ? 1 : -1;
             if (!EventDispatcher._MECO[type]) {

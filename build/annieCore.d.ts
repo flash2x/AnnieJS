@@ -70,18 +70,6 @@ declare namespace annie {
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         addEventListener(type: string, listener: Function, useCapture?: boolean): void;
-<<<<<<< HEAD
-        on(type: string, listener: Function): void;
-        /**
-         * 增加或删除相应mouse或touch侦听记数
-         * @method _changeMouseCount
-         * @private
-         * @since 1.0.0
-         * @param {string} type
-         * @param {boolean} isAdd
-         */
-=======
->>>>>>> flash2x/master
         private _changeMouseCount(type, isAdd);
         private _defaultEvent;
         /**
