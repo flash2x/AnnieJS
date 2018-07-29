@@ -2010,21 +2010,8 @@ declare namespace annie {
          * @readonly
          */
         currentFrame: number;
-        /**
-         * @property _curFrame
-         * @type {number}
-         * @private
-         * @since 2.0.0
-         * @default 1
-         */
         private _curFrame;
         private _wantFrame;
-        /**
-         * @property _lastFrameObj
-         * @type {Object}
-         * @private
-         * @default null
-         */
         private _lastFrameObj;
         /**
          * 当前动画是否处于播放状态
@@ -2037,13 +2024,6 @@ declare namespace annie {
          * @readonly
          */
         isPlaying: boolean;
-        /**
-         * @property _isPlaying
-         * @type {boolean}
-         * @private
-         * @since 2.0.0
-         * @default true
-         */
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2128,14 +2108,6 @@ declare namespace annie {
          * @public
          * @since 2.0.0
          */
-        /**
-         * 设置是否为点击状态
-         * @property clicked
-         * @param {boolean} value
-         * @public
-         * @since 2.0.0
-         * @default false
-         */
         clicked: boolean;
         private _clicked;
         private _mouseEvent(e);
@@ -2194,6 +2166,7 @@ declare namespace annie {
         update(isDrawUpdate?: boolean): void;
         private _a2x_sounds;
         protected callEventAndFrameScript(callState: number): void;
+        private _resetMC(obj);
         destroy(): void;
     }
 }

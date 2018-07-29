@@ -3755,29 +3755,9 @@ var annie;
          */
         function MovieClip() {
             _super.call(this);
-            /**
-             * @property _curFrame
-             * @type {number}
-             * @private
-             * @since 2.0.0
-             * @default 1
-             */
             this._curFrame = 1;
             this._wantFrame = 0;
-            /**
-             * @property _lastFrameObj
-             * @type {Object}
-             * @private
-             * @default null
-             */
             this._lastFrameObj = null;
-            /**
-             * @property _isPlaying
-             * @type {boolean}
-             * @private
-             * @since 2.0.0
-             * @default true
-             */
             this._isPlaying = true;
             this._isFront = true;
             this._lastFrame = 0;
@@ -3942,14 +3922,6 @@ var annie;
             get: function () {
                 return this._clicked;
             },
-            /**
-             * 设置是否为点击状态
-             * @property clicked
-             * @param {boolean} value
-             * @public
-             * @since 2.0.0
-             * @default false
-             */
             set: function (value) {
                 var s = this;
                 if (value != s._clicked) {
@@ -4180,17 +4152,7 @@ var annie;
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
-                                    //判断obj是否是动画,是的话则还原成动画初始时的状态
-                                    if (obj._instanceType == "annie.MovieClip") {
-                                        obj._wantFrame = 1;
-                                        obj._isFront = true;
-                                        if (obj._mode < -1) {
-                                            obj._isPlaying = true;
-                                        }
-                                        else {
-                                            obj._isPlaying = false;
-                                        }
-                                    }
+                                    s._resetMC(obj);
                                 }
                             }
                         }
@@ -4252,6 +4214,29 @@ var annie;
                 }
             }
             _super.prototype.callEventAndFrameScript.call(this, callState);
+        };
+        MovieClip.prototype._resetMC = function (obj) {
+            //判断obj是否是动画,是的话则还原成动画初始时的状态
+            var isNeedToReset = false;
+            if (obj._instanceType == "annie.MovieClip") {
+                obj._wantFrame = 1;
+                obj._isFront = true;
+                if (obj._mode < -1) {
+                    obj._isPlaying = true;
+                }
+                else {
+                    obj._isPlaying = false;
+                }
+                isNeedToReset = true;
+            }
+            else if (obj._instanceType == "annie.Sprite") {
+                isNeedToReset = true;
+            }
+            if (isNeedToReset) {
+                for (var i = 0; i < obj.children.length; i++) {
+                    this._resetMC(obj.children[i]);
+                }
+            }
         };
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用

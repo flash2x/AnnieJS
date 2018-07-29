@@ -23,21 +23,8 @@ namespace annie {
             return this._curFrame;
         }
 
-        /**
-         * @property _curFrame
-         * @type {number}
-         * @private
-         * @since 2.0.0
-         * @default 1
-         */
         private _curFrame: number = 1;
         private _wantFrame: number = 0;
-        /**
-         * @property _lastFrameObj
-         * @type {Object}
-         * @private
-         * @default null
-         */
         private _lastFrameObj: any = null;
 
         /**
@@ -54,13 +41,6 @@ namespace annie {
             return this._isPlaying;
         }
 
-        /**
-         * @property _isPlaying
-         * @type {boolean}
-         * @private
-         * @since 2.0.0
-         * @default true
-         */
         private _isPlaying: boolean = true;
 
         /**
@@ -187,14 +167,6 @@ namespace annie {
             }
         }
 
-        /**
-         * 设置是否为点击状态
-         * @property clicked
-         * @param {boolean} value
-         * @public
-         * @since 2.0.0
-         * @default false
-         */
         public set clicked(value: boolean) {
             let s = this;
             if (value != s._clicked) {
@@ -430,16 +402,7 @@ namespace annie {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
-                                    //判断obj是否是动画,是的话则还原成动画初始时的状态
-                                    if(obj._instanceType=="annie.MovieClip") {
-                                        obj._wantFrame = 1;
-                                        obj._isFront = true;
-                                        if (obj._mode < -1) {
-                                            obj._isPlaying = true;
-                                        } else {
-                                            obj._isPlaying = false;
-                                        }
-                                    }
+                                    s._resetMC(obj);
                                 }
                             }
                         }
@@ -456,8 +419,10 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
+
         //flash声音管理
         private _a2x_sounds: any = null;
+
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame) {
@@ -503,6 +468,28 @@ namespace annie {
                 }
             }
             super.callEventAndFrameScript(callState);
+        }
+
+        private _resetMC(obj: any) {
+            //判断obj是否是动画,是的话则还原成动画初始时的状态
+            let isNeedToReset = false;
+            if (obj._instanceType == "annie.MovieClip") {
+                obj._wantFrame = 1;
+                obj._isFront = true;
+                if (obj._mode < -1) {
+                    obj._isPlaying = true;
+                } else {
+                    obj._isPlaying = false;
+                }
+                isNeedToReset = true;
+            }else if(obj._instanceType=="annie.Sprite") {
+                isNeedToReset=true;
+            }
+            if (isNeedToReset) {
+                for (let i = 0; i < obj.children.length; i++) {
+                    this._resetMC(obj.children[i]);
+                }
+            }
         }
 
         public destroy(): void {
