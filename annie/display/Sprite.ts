@@ -30,7 +30,8 @@ namespace annie {
             for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s.children = null;
+            s.children.length=0;
+            s._removeChildren.length=0;
             super.destroy();
         }
         /**

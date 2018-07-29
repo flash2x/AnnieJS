@@ -52,6 +52,15 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 销毁一个对象
+         * 销毁之前一定要做完其他善后工作，否则有可能会出错
+         * @method destroy
+         * @since 2.0.0
+         * @public
+         * @return {void}
+         */
+        AObject.prototype.destroy = function () { };
         AObject._object_id = 0;
         return AObject;
     }());
@@ -3597,7 +3606,8 @@ var annie;
             for (var i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s.children = null;
+            s.children.length = 0;
+            s._removeChildren.length = 0;
             _super.prototype.destroy.call(this);
         };
         Object.defineProperty(Sprite.prototype, "cacheAsBitmap", {
@@ -5071,7 +5081,7 @@ var annie;
                     }
                     else {
                         if (s.htmlElement && s.visible) {
-                            style.display = "block";
+                            style.display = "inline";
                         }
                     }
                 }
@@ -5146,16 +5156,21 @@ var annie;
                 var style = o.style;
                 var visible = s._visible;
                 if (visible) {
-                    var parent_1 = s.parent;
-                    while (parent_1) {
-                        if (!parent_1._visible) {
-                            visible = false;
-                            break;
+                    if (!s.stage) {
+                        visible = false;
+                    }
+                    else {
+                        var parent_1 = s._parent;
+                        while (parent_1) {
+                            if (!parent_1._visible) {
+                                visible = false;
+                                break;
+                            }
+                            parent_1 = parent_1.parent;
                         }
-                        parent_1 = parent_1.parent;
                     }
                 }
-                var show = visible ? "block" : "none";
+                var show = visible ? "inline" : "none";
                 if (show != style.display) {
                     style.display = show;
                 }
