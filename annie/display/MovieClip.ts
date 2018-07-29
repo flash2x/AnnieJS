@@ -402,7 +402,7 @@ namespace annie {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent) {
                                     s._removeChildren.push(obj);
-                                    s._resetMC(obj);
+                                    MovieClip._resetMC(obj);
                                 }
                             }
                         }
@@ -470,7 +470,7 @@ namespace annie {
             super.callEventAndFrameScript(callState);
         }
 
-        private _resetMC(obj: any) {
+        private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             let isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
@@ -487,7 +487,7 @@ namespace annie {
             }
             if (isNeedToReset) {
                 for (let i = 0; i < obj.children.length; i++) {
-                    this._resetMC(obj.children[i]);
+                    MovieClip._resetMC(obj.children[i]);
                 }
             }
         }
