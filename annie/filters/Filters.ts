@@ -3,6 +3,7 @@
  */
 namespace annie{
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 投影或者发光滤镜
      * @class annie.ShadowFilter
      * @extends annie.AObject
@@ -103,6 +104,7 @@ namespace annie{
         }
     }
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 普通变色滤镜
      * @class annie.ColorFilter
      * @extends annie.AObject
@@ -235,6 +237,7 @@ namespace annie{
         }
     }
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 矩阵变色滤镜
      * @class annie.ColorMatrixFilter
      * @extends annie.AObject
@@ -450,6 +453,7 @@ namespace annie{
         }
     }
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 模糊滤镜
      * @class annie.BlurFilter
      * @extends annie.AOjbect
@@ -494,6 +498,7 @@ namespace annie{
          */
         public quality:number=1;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * @method BlurFilter
          * @public
          * @since 1.0.0

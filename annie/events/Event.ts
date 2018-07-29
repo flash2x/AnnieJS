@@ -11,6 +11,7 @@ namespace annie {
      */
     export class Event extends AObject {
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 舞台尺寸发生变化时触发
          * @Event
          * @property RESIZE
@@ -259,6 +260,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @type {any}
+         * @default null
          */
         public target:any=null;
         /**
@@ -305,13 +307,7 @@ namespace annie {
             this._bpd=true;
         }
         private  _bpd:boolean=false;
-        /**
-         * 是否阻止事件向下冒泡
-         * @property _pd
-         * @type {boolean}
-         * @private
-         * @since 1.0.0
-         */
+        //是否阻止事件向下冒泡
         private _pd:boolean=false;
 
         public destroy(): void {

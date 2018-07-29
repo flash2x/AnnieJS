@@ -16,16 +16,8 @@ namespace annie {
             this._texture = window.document.createElement("canvas");
         }
 
-        /**
-         * 一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
-         * @property _command
-         * @private
-         * @since 1.0.0
-         * @type {Array}
-         * @default []
-         */
+       //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
         private _command: any = [];
-
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
          * 一般给用户使用较少,Flash2x工具自动使用
@@ -91,19 +83,10 @@ namespace annie {
             return color;
         }
 
-        /**
-         * @property _isBitmapStroke
-         * @private
-         * @since 1.0.0
-         */
         private _isBitmapStroke:  Array<number>;
-        /**
-         * @property _isBitmapFill
-         * @private
-         * @since 1.0.0
-         */
         private _isBitmapFill: Array<number>;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对矢量使用像素碰撞 默认开启
          * @property hitTestWidthPixel
          * @type {boolean}
@@ -119,6 +102,7 @@ namespace annie {
          * @param {Array} params
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
@@ -139,6 +123,7 @@ namespace annie {
          * @param {number} rBR 右上圆角半径
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public drawRoundRect(x: number, y: number, w: number, h: number, rTL: number = 0, rTR: number = 0, rBL: number = 0, rBR: number = 0): void {
             let max = (w < h ? w : h) / 2;
@@ -186,6 +171,7 @@ namespace annie {
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public moveTo(x: number, y: number): void {
             this._command[this._command.length]=[1, "moveTo", [x, y]];
@@ -198,6 +184,7 @@ namespace annie {
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public lineTo(x: number, y: number): void {
             this._command[this._command.length]=[1, "lineTo", [x, y]];
@@ -210,6 +197,7 @@ namespace annie {
          * @param {number} y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public arcTo(x: number, y: number): void {
             this._command[this._command.length]=[1, "arcTo", [x, y]];
@@ -225,6 +213,7 @@ namespace annie {
          * @param {number} y 终点Y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
             this._command[this._command.length]=[1, "quadraticCurveTo", [cpX, cpY, x, y]];
@@ -242,6 +231,7 @@ namespace annie {
          * @param {number} y 终点Y
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
             this._command[this._command.length]=[1, "bezierCurveTo", [cp1X, cp1Y, cp2X, cp2Y, x, y]];
@@ -252,6 +242,7 @@ namespace annie {
          * @method closePath
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public closePath(): void {
             this._command[this._command.length]=[1, "closePath", []];
@@ -266,6 +257,7 @@ namespace annie {
          * @param {number} h
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public drawRect(x: number, y: number, w: number, h: number): void {
             let c = this._command;
@@ -286,6 +278,7 @@ namespace annie {
          * @param {number} end 结束角度
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public drawArc(x: number, y: number, radius: number, start: number, end: number): void {
             this._command[this._command.length]=[1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]];
@@ -299,6 +292,7 @@ namespace annie {
          * @param {number} radius 半径
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public drawCircle(x: number, y: number, radius: number): void {
             this._command[this._command.length]=[1, "arc", [x, y, radius, 0, 2 * Math.PI]];
@@ -313,6 +307,7 @@ namespace annie {
          * @param {number} h
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public drawEllipse(x: number, y: number, w: number, h: number): void {
             let k = 0.5522848;
@@ -335,6 +330,7 @@ namespace annie {
          * @method clear
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public clear(): void {
             let s = this;
@@ -356,6 +352,7 @@ namespace annie {
          * @param {string} color 颜色值 单色和RGBA格式
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginFill(color: string): void {
             this._fill(color);
@@ -368,6 +365,7 @@ namespace annie {
          * @param {Array} colors 一组颜色值
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginLinearGradientFill(points: any,colors:any): void {
             this._fill(Shape.getGradientColor( points,colors));
@@ -381,8 +379,9 @@ namespace annie {
          * @param {Object} matrixDate 如果渐变填充有矩阵变形信息
          * @public
          * @since 1.0.0
+         * @return {void}
          */
-        public beginRadialGradientFill = function (points: any,colors:any) {
+        public beginRadialGradientFill = function (points: any,colors:any):void {
             this._fill(Shape.getGradientColor(points,colors));
         };
 
@@ -393,6 +392,7 @@ namespace annie {
          * @param { Array} matrix
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginBitmapFill(image: any, matrix:  Array<number>): void {
             let s = this;
@@ -419,22 +419,12 @@ namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginStroke(color: string, lineWidth: number = 1, cap: number=0, join: number = 0, miter: number = 0): void {
             this._stroke(color, lineWidth, cap,join, miter);
         }
-
-        /**
-         * @property _caps
-         * @type {string[]}
-         * @private
-         */
         private static _caps:Array<string>=["butt","round","square"];
-        /**
-         * @property _joins
-         * @type {string[]}
-         * @private
-         */
         private static _joins:Array<string>=["miter","round","bevel"];
         /**
          * 画线性渐变的线条 一般给Flash2x用
@@ -447,6 +437,7 @@ namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginLinearGradientStroke(points: Array<number>,colors:any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10): void {
             this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
@@ -463,6 +454,7 @@ namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginRadialGradientStroke = function (points: Array<number>,colors:any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10) {
             this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
@@ -478,6 +470,7 @@ namespace annie {
          * @param {number} miter 正数,规定最大斜接长度,如果斜接长度超过 miterLimit 的值，边角会以 lineJoin 的 "bevel" 类型来显示 默认10
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public beginBitmapStroke(image: any, matrix: Array<number>, lineWidth: number = 1,  cap: number=0, join: number=0, miter: number = 10): void {
             let s = this;
@@ -486,17 +479,6 @@ namespace annie {
             }
             s._stroke(Shape.getBitmapStyle(image), lineWidth, cap,join, miter);
         }
-
-        /**
-         * @method _stroke
-         * @param strokeStyle
-         * @param {number} width
-         * @param {number} cap
-         * @param {number} join
-         * @param {number} miter
-         * @private
-         * @since 1.0.0
-         */
         private _stroke(strokeStyle: any, width: number, cap: number, join: number, miter: number): void {
             let c = this._command;
             c[c.length]=[0, "lineWidth", width];
@@ -513,6 +495,7 @@ namespace annie {
          * @method endFill
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public endFill(): void {
             let s = this;
@@ -526,12 +509,12 @@ namespace annie {
                 s._isBitmapFill = null;
             }
         }
-        protected _isUseToMask:boolean=false;
         /**
          * 结束画线
          * @method endStroke
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public endStroke(): void {
             let s = this;
@@ -552,6 +535,7 @@ namespace annie {
          * @param {Array} data
          * @public
          * @since 1.0.0
+         * @return {void}
          */
         public decodePath = function (data: any): void {
             let s = this;
@@ -567,14 +551,6 @@ namespace annie {
                 }
             }
         };
-
-        /**
-         * 重写刷新
-         * @method update
-         * @public
-         * @param isDrawUpdate 不是因为渲染目的而调用的更新，比如有些时候的强制刷新 默认为true
-         * @since 1.0.0
-         */
         public update(isDrawUpdate: boolean = false): void {
             let s = this;
             if (!s._visible) return;
@@ -731,13 +707,6 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-
-        /**
-         * @method _drawShape
-         * @param ctx
-         * @private
-         * @return {void}
-         */
         private _drawShape(ctx: any): void {
             let s = this;
             let com = s._command;
@@ -772,26 +741,17 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 重写hitTestPoint
-         * @method  hitTestPoint
-         * @param {annie.Point} globalPoint
-         * @param {boolean} isMouseEvent
-         * @return {any}
-         * @public
-         * @since 1.0.0
-         */
-        public hitTestPoint(globalPoint: Point, isMouseEvent: boolean = false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
             let s = this;
-            if (isMouseEvent && !s.mouseEnable) return null;
-            //如果都不在缓存范围内,那就更不在矢量范围内了;如果在则继续看
-            let p: Point = globalPoint;
-            if (isMouseEvent) {
-                p = s.globalToLocal(globalPoint);
-            }
-            if (s.getBounds().isPointIn(p)){
+            let obj = super.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
+            if (obj) {
                 if (!s._isUseToMask&&s.hitTestWidthPixel) {
+                    let p:any;
+                    if(isGlobalPoint) {
+                        p = s.globalToLocal(hitPoint);
+                    }else{
+                        p= hitPoint;
+                    }
                     let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
                         return null;
@@ -824,6 +784,7 @@ namespace annie {
          * @param {number} infoObj.lineWidth 线条的粗细，如"1,2,3...";
          * @public
          * @since 1.0.2
+         * @return {void}
          */
         public changeColor(infoObj: any): void {
             let s = this;
@@ -851,11 +812,10 @@ namespace annie {
          * 渲染
          * @method render
          * @param {annie.IRender | any} renderObj
+         * @return {void}
          */
         public render(renderObj: IRender|any): void{
-            if(!this._isUseToMask){
-                super.render(renderObj);
-            }
+            super.render(renderObj);
         }
         public destroy():void {
             //清除相应的数据引用

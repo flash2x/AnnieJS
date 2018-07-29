@@ -1,13 +1,10 @@
 /**
- * Created by anlun on 2017/5/24.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-namespace annie {
+namespace annieUI {
     /**
      * 刮刮卡类
-     * @class annie.ScratchCard
+     * @class annieUI.ScratchCard
      * @public
      * @extends annie.DrawingBoard
      * @since 1.1.1
@@ -76,14 +73,14 @@ namespace annie {
 
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
+         * @method cancel
          * @param step
          * @public
          * @since 1.1.1
          * @return {boolean}
          */
         public cancel(step: number = 0): boolean {
-            trace("no support");
+            console.log("no support");
             return false;
         }
 

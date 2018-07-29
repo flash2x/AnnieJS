@@ -4,6 +4,7 @@
 namespace annie {
     declare let WeixinJSBridge:any;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 抽象类 一般不直接使用
      * @class annie.Media
      * @extends annie.EventDispatcher
@@ -34,11 +35,11 @@ namespace annie {
          */
         public isPlaying:boolean=false;
         /**
-         * @property _loop
-         * @type {number}
-         * @private
-         * @since 2.0.0
+         * 给一个声音取一个名字，方便获取
+         * @property name
+         * @type {string}
          */
+        public name:string="";
         private _loop: number = 1;
         /**
          * 构造函数
@@ -64,7 +65,7 @@ namespace annie {
             }
             s._SBWeixin=s._weixinSB.bind(s);
             s.media.addEventListener('ended', function(){
-                if(s._loop=-1){
+                if(s._loop==-1){
                     s.play(0);
                 }else{
                     s._loop--;
@@ -104,7 +105,7 @@ namespace annie {
         public play(start: number=0, loop: number=0): void {
             let s = this;
             if(loop==0){
-                s._loop=this._repeate;
+                s._loop=s._repeate;
             }else{
                 s._loop=loop;
                 s._repeate=loop;
@@ -112,7 +113,7 @@ namespace annie {
             try {
                 s.media.currentTime = start;
             } catch (e) {
-                trace(e);
+                console.log(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
             let wsb:any=  window;

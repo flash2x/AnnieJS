@@ -1,17 +1,15 @@
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
     import Bitmap = annie.Bitmap;
     import Shape = annie.Shape;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
-     * @class annie.FacePhoto
+     * @class annieUI.FacePhoto
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -62,11 +60,6 @@ namespace annie {
             s.addChild(s.bitmap);
             s.bitmap.mask = s.maskObj;
         }
-
-        /**
-         * @property photo
-         * @private
-         */
         private photo: any;
         private bitmap: Bitmap;
         private maskType: number = 0;

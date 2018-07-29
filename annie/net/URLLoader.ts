@@ -3,6 +3,7 @@
  */
 namespace annie {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
      * @extends annie.EventDispatcher
@@ -11,7 +12,7 @@ namespace annie {
      * @example
      *      var urlLoader = new annie.URLLoader();
      *      urlLoader.addEventListener('onComplete', function (e) {
-     *      //trace(e.data.response);
+     *      //console.log(e.data.response);
      *      var bitmapData = e.data.response,//bitmap图片数据
      *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
      *      //居中对齐
@@ -46,17 +47,7 @@ namespace annie {
             }
         }
 
-        /**
-         * @property _req
-         * @type {null}
-         * @private
-         */
         private _req: XMLHttpRequest = null;
-        /**
-         * @property headers
-         * @private
-         * @type {any[]}
-         */
         private headers: Array<string> = [];
 
         /**
@@ -323,15 +314,7 @@ namespace annie {
          * @type {Object}
          */
         public data: Object = null;
-        /**
-         * 格式化post请求参数
-         * @method _fqs
-         * @param data
-         * @param query
-         * @return {string}
-         * @private
-         * @since 1.0.0
-         */
+        //格式化post请求参数
         private _fqs = function (data: any, query: any): string {
             let params: any = [];
             if (data) {
@@ -345,14 +328,7 @@ namespace annie {
             return params.join("&");
         };
         //formatURIString
-        /**
-         * 格式化get 请求参数
-         * @method _fus
-         * @param src
-         * @param data
-         * @return {any}
-         * @private
-         */
+        //格式化get 请求参数
         private _fus = function (src: any, data: any): string {
             let s = this;
             if (data == null || data == "") {

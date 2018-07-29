@@ -769,12 +769,7 @@ namespace annie {
             }
             return Tween.bounceOut(k * 2 - 1) * 0.5 + 0.5;
         }
-        /**
-         * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
-         * @method flush
-         * @private
-         * @since 1.0.0
-         */
+        //这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
         private static flush():void{
             if(isUpdateTween){
                 let len:number = Tween._tweenList.length;

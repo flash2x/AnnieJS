@@ -3,6 +3,7 @@
  */
 namespace annie {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 视频类
      * @class annie.Video
      * @extends annie.Media

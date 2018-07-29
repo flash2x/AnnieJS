@@ -8,12 +8,6 @@ namespace annie {
     let TwoPI:number = PI<<1;
     let DEG_TO_RAD:number = Math.PI / 180;
 
-    /**
-     * @method cos
-     * @private
-     * @param {number} angle
-     * @return {number}
-     */
     function cos(angle:number):number {
         switch (angle) {
             case HalfPI:
@@ -29,13 +23,6 @@ namespace annie {
                 return Math.cos(angle);
         }
     }
-
-    /**
-     * @method sin
-     * @param {number} angle
-     * @return {number}
-     * @private
-     */
     function sin(angle:number):number {
         switch (angle) {
             case HalfPI:

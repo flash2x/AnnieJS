@@ -74,10 +74,24 @@ namespace annie {
             let s: CanvasRender = this;
             s._ctx.save();
             s._ctx.globalAlpha = 0;
+            s.drawMask(target);
+            s._ctx.clip();
+        }
+
+        private drawMask(target: any): void {
+            let s = this;
             let tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            target._drawShape(s._ctx);
-            s._ctx.clip();
+            if (target._instanceType == "annie.Shape") {
+                target._drawShape(s._ctx);
+            } else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+                for (let i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i]);
+                }
+            } else {
+                let bounds = target._bounds;
+                s._ctx.rect(0, 0, bounds.width, bounds.height);
+            }
         }
 
         /**
@@ -133,7 +147,6 @@ namespace annie {
             let c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
         }
-
         /**
          * 当舞台尺寸改变时会调用
          * @public
@@ -148,7 +161,6 @@ namespace annie {
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
         }
-
         destroy(): void {
             let s = this;
             s.rootContainer = null;

@@ -1,16 +1,12 @@
 /**
- * Created by saron on 16/10/19.
+ * @module annieUI
  */
-
-/**
- * @module annie
- */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
 
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -20,10 +16,10 @@ namespace annie {
          * 页面个数
          * @property listLen
          * @type {number}
-         * @private
+         * @protected
          * @default 0
          */
-        private listLen: number = 0;
+        protected listLen: number = 0;
         /**
          * 页面滑动容器
          * @property view
@@ -37,9 +33,9 @@ namespace annie {
          * 滑动方向
          * @property isVertical
          * @type {boolean}
-         * @private
+         * @protected
          */
-        private isVertical: boolean;
+        protected isVertical: boolean;
         /**
          * 容器活动速度
          * @property slideSpeed
@@ -48,12 +44,8 @@ namespace annie {
          * @default 0.2
          */
         public slideSpeed: number = 0.2;
-        /**
-         * 是否滑动中断
-         * @property _isBreak
-         * @private
-         * @type {boolean}
-         */
+
+        //是否滑动中断
         private _isBreak: boolean = false;
         /**
          * 滚动距离
@@ -64,25 +56,14 @@ namespace annie {
          * @since 1.0.0
          */
         protected distance: number = 0;
-        /**
-         * 触摸点结束点X
-         * @property touchEndX
-         * @type {number}
-         * @private
-         */
+
+        //触摸点结束点X
         private touchEndX: number = 0;
         private movingX: number = 0;
         private movingY: number = 0;
         private _moveDis: number = 0;
-        /**
-         * 触摸点结束点Y
-         * @property touchEndY
-         * @type {number}
-         * @private
-         * @since
-         * @public
-         * @default 0
-         */
+
+        //触摸点结束点Y
         private touchEndY: number = 0;
         /**
          * 当前页面索引ID 默认从0开始
@@ -112,33 +93,33 @@ namespace annie {
          * 页面宽
          * @property viewWidth
          * @type {number}
-         * @private
+         * @protected
          */
-        public viewWidth: number = 0;
+        protected viewWidth: number = 0;
         /**
          * 页面高
          * @property viewHeight
          * @type {number}
-         * @private
+         * @protected
          */
-        public viewHeight: number = 0;
+        protected viewHeight: number = 0;
         /**
          * 页面列表
          * @property pageList
          * @type {Array}
-         * @private
+         * @public
          */
-        private pageList: Array<any> = [];
-        private pageClassList: Array<any> = [];
+        public pageList: Array<any> = [];
+        public pageClassList: Array<any> = [];
         private lastX: number = 0;
         private lastY: number = 0;
         /**
          * 是否点击了鼠标
          * @property isMouseDown
          * @type {boolean}
-         * @private
+         * @public
          */
-        private isMouseDown: boolean = false;
+        public isMouseDown: boolean = false;
         /**
          * 是否可以下一页
          * @property canSlideNext
@@ -182,7 +163,7 @@ namespace annie {
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.maskObj["_isUseToMask"]=false;
+            s.maskObj["_isUseToMask"]=0;
             s.maskObj.alpha=0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
@@ -208,10 +189,8 @@ namespace annie {
             s.viewHeight = h;
             s.maskObj.endFill();
         }
-        /**
-         * 触摸事件
-         * @param e
-         */
+
+        //触摸事件 onMouseEvent
         private onMouseEvent(e: annie.MouseEvent): void {
             let s: any = this;
             if (s.isMoving) return;
@@ -341,7 +320,8 @@ namespace annie {
          * @method slideTo
          * @public
          * @since 1.1.1
-         * @param {number} index 是向上还是向下
+         * @param {number} index 要跳到页的索引
+         * @param {boolean} noTween 是否需要动画过渡，如果不需要设置成true
          */
         public slideTo(index: number,noTween:boolean=false): void {
             let s: any = this;

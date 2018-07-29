@@ -21,11 +21,11 @@ namespace annie {
          * @property instanceId
          * @public
          * @since 1.0.0
-         * @return {number}
+         * @type {number}
          * @readonly
          * @example
          *      //获取 annie引擎类对象唯一码
-         *      trace(this.instanceId);
+         *      console.log(this.instanceId);
          */
         public get instanceId(): number {
             return this._instanceId;
@@ -36,13 +36,12 @@ namespace annie {
          * @property instanceType
          * @since 1.0.3
          * @public
-         * @return {string}
+         * @type {string}
          * @readonly
          */
         public get instanceType(): string {
             return this._instanceType;
         }
-
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -70,25 +69,11 @@ namespace annie {
             this._instanceType = "annie.EventDispatcher";
         }
 
-        /**
-         * 全局的鼠标事件的监听数对象表
-         * @property _MECO
-         * @private
-         * @since 1.0.0
-         */
-
+        //全局的鼠标事件的监听数对象表
         private static _MECO: any = {};
         public static _totalMEC: number = 0;
 
-        /**
-         * 看看有多少mouse或者touch侦听数
-         * @method getMouseEventCount
-         * @return {number}
-         * @static
-         * @private
-         * @since 1.0.0
-         * @param {string} type 获取事件类型，默认是所有
-         */
+        //看看有多少mouse或者touch侦听数
         public static getMouseEventCount(type: string = ""): number {
             let count: number = 0;
             if (type == "") {
@@ -114,8 +99,9 @@ namespace annie {
          * @param {string} type 侦听类形
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          * @example
-         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){trace(this);}.bind(this));
+         *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         public addEventListener(type: string, listener: Function,useCapture = true): void {
             if (!type) {
@@ -139,6 +125,7 @@ namespace annie {
                 }
             }
         }
+<<<<<<< HEAD
         public on(type: string, listener: Function): void {
             this.addEventListener.apply(this,arguments);
         }
@@ -151,6 +138,9 @@ namespace annie {
          * @param {string} type
          * @param {boolean} isAdd
          */
+=======
+        //增加或删除相应mouse或touch侦听记数
+>>>>>>> flash2x/master
         private _changeMouseCount(type: string, isAdd: boolean): void {
             let count = isAdd ? 1 : -1;
             if (!EventDispatcher._MECO[type]) {
@@ -179,7 +169,7 @@ namespace annie {
          *          yourEvent=new annie.Event("yourCustomerEvent");
          *       yourEvent.data='false2x';
          *       mySprite.addEventListener("yourCustomerEvent",function(e){
-         *          trace(e.data);
+         *          console.log(e.data);
          *        })
          *       mySprite.dispatchEvent(yourEvent);
          */
@@ -254,6 +244,7 @@ namespace annie {
          * @param {string} type 要移除的侦听类型
          * @param {Function} listener 及侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
+         * @return {void}
          */
         public removeEventListener(type: string, listener: Function,useCapture = true): void {
             let s = this;
@@ -278,8 +269,9 @@ namespace annie {
          * @method removeAllEventListener
          * @public
          * @since 1.0.0
+         * @return {void}
          */
-        public removeAllEventListener() {
+        public removeAllEventListener():void {
             let s = this;
             for (let type in s.eventTypes) {
                 if (type.indexOf("onMouse") == 0) {

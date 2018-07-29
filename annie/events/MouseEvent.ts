@@ -144,8 +144,9 @@ namespace annie {
          * @method updateAfterEvent
          * @since 1.0.9
          * @public
+         * @return {void}
          */
-        public updateAfterEvent(){
+        public updateAfterEvent():void{
             this.target.stage._cp=true;
         }
         public destroy():void {

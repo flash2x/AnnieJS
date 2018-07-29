@@ -1,15 +1,12 @@
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-namespace annie {
+namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -19,7 +16,7 @@ namespace annie {
          * 横向还是纵向 默认为纵向
          * @property isVertical
          * @type {boolean}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default true
          */
@@ -28,20 +25,20 @@ namespace annie {
          * 可见区域的宽
          * @property viewWidth
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewWidth: number = 0;
+        protected viewWidth: number = 0;
         /**
          * 可见区域的高
          * @property viewHeight
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewHeight: number = 0;
+        protected viewHeight: number = 0;
         private _tweenId:number=0;
         /**
          * 整个滚动的最大距离值
@@ -62,16 +59,12 @@ namespace annie {
         protected distance: number = 0;
         /**
          * 最小鼠标滑动距离
+         * @property  minDis
+         * @protected
          * @type {number}
          */
-        private minDis: number = 2;
-        /**
-         * 遮罩对象
-         * @property maskObj
-         * @since 1.0.0
-         * @private
-         * @type {annie.Shape}
-         */
+        protected minDis: number = 2;
+        // 遮罩对象
         private maskObj: Shape = new Shape();
         /**
          * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
@@ -81,13 +74,7 @@ namespace annie {
          * @type {annie.Sprite}
          */
         public view: Sprite = new Sprite();
-        /**
-         * 最后鼠标经过的坐标值
-         * @property lastValue
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         */
+        // 最后鼠标经过的坐标值
         private lastValue: number = 0;
         /**
          * 速度
@@ -100,11 +87,11 @@ namespace annie {
         /**
          * 加速度
          * @property addSpeed
-         * @private
+         * @protected
          * @since 1.0.0
          * @type {number}
          */
-        private addSpeed: number = 0;
+        protected addSpeed: number = 0;
         /**
          * 是否是停止滚动状态
          * @property isStop
@@ -135,14 +122,7 @@ namespace annie {
         protected paramXY: string = "y";
         private stopTimes: number = -1;
         private isMouseDownState: number = 0;
-        /**
-         * 是否是通过scrollTo方法在滑动中
-         * @property autoScroll
-         * @since 1.0.2
-         * @type {boolean}
-         * @private
-         * @default false
-         */
+        //是否是通过scrollTo方法在滑动中
         private autoScroll: boolean = false;
 
         /**
@@ -167,7 +147,7 @@ namespace annie {
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.maskObj["_isUseToMask"]=false;
+            s.maskObj["_isUseToMask"]=0;
             s.maskObj.alpha=0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH,isVertical);

@@ -220,13 +220,7 @@ namespace annie {
         }
         private _border: boolean = false;
 
-        /**
-         * 设置文本在canvas里的渲染样式
-         * @method _prepContext
-         * @param ctx
-         * @private
-         * @since 1.0.0
-         */
+        //设置文本在canvas里的渲染样式
         private _prepContext(ctx: any): void {
             let s = this;
             let font: any = s.size || 12;
@@ -270,14 +264,8 @@ namespace annie {
         get lines(): number {
             return this.realLines.length;
         }
-        /**
-         * 获取文本宽
-         * @method _getMeasuredWidth
-         * @param text
-         * @return {number}
-         * @private
-         * @since 1.0.0
-         */
+
+        // 获取文本宽
         private _getMeasuredWidth(text: string): number {
             let ctx = this._texture.getContext("2d");
             //ctx.save();
@@ -286,13 +274,6 @@ namespace annie {
             return w;
         }
         private  realLines: any = [];
-        /**
-         * 重写 update
-         * @method update
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
         public update(isDrawUpdate:boolean=false): void {
             super.update(isDrawUpdate);
             let s: any = this;
@@ -305,6 +286,7 @@ namespace annie {
                 let realLines: any = [];
                 s.realLines=realLines;
                 s._prepContext(ctx);
+                let wordW = 0;
                 let lineH = s._lineSpacing;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length]=hardLines[0];
@@ -313,7 +295,6 @@ namespace annie {
                     if (lineW > s._textWidth){
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
-                        let wordW = 0;
                         let strLen = str.length;
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
@@ -332,7 +313,6 @@ namespace annie {
                         if (!str)continue;
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
-                        let wordW = 0;
                         let strLen = str.length;
                         for (let j = 1; j < strLen; j++) {
                             wordW = ctx.measureText(str[j]).width;
@@ -353,7 +333,7 @@ namespace annie {
                 let tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
-                } else if (s._textAlign == "right") {
+                } else if (s._textAlign == "right"){
                     tx = maxW;
                 }
                 can.width = maxW + 20;
@@ -368,10 +348,10 @@ namespace annie {
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
+                for (let i = 0; i < realLines.length; i++){
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
                 }
-                /////////////////////
+                /////////////////////////////////////
                 let cf = s.cFilters;
                 let cfLen = cf.length;
                 if(cfLen>0) {
@@ -392,16 +372,6 @@ namespace annie {
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
-        }
-        /**
-         * 重写 getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @public
-         * @since 1.0.0
-         */
-        public getBounds(): Rectangle {
-            return this._bounds;
         }
     }
 }

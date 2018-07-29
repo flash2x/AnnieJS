@@ -3,6 +3,7 @@
  */
 namespace annie {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 输入文本,此文本类是annie.FloatDisplay对象的典型代表
      * @class annie.InputText
      * @public
@@ -28,13 +29,6 @@ namespace annie {
          * @default true
          */
         public isAutoDownKeyBoard: boolean = true;
-        /**
-         * @property _inputTypeList
-         * @static
-         * @type {string[]}
-         * @private
-         * @since 2.0.0
-         */
         private static _inputTypeList:Array<string>=["input","password","textarea"];
         /**
          * @method InputText
@@ -43,7 +37,7 @@ namespace annie {
          * @param {number} inputType 0 input 1 password 2 multiline
          * @example
          *      var inputText=new annie.InputText('singleline');
-         *      inputText.initInfo('Flash2x',100,100,'#ffffff','left',14,'微软雅黑',false,2);
+         *      inputText.initInfo('annie',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
         public constructor(inputType:number=0) {
             super();
@@ -59,7 +53,7 @@ namespace annie {
                 input.style.overflow = "hidden";
             }
             s.inputType = inputType;
-            var remove = function () {
+            var remove = function (){
                 if (s.isAutoDownKeyBoard&&annie.osType!="pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
@@ -121,10 +115,11 @@ namespace annie {
          * @property lineSpacing
          * @public
          * @since 2.0.0
-         * @param {number} value
+         * @type {number}
          */
         public set lineSpacing(value:number){
             this.htmlElement.style.lineHeight = value + "px";
+            this.htmlElement.style.height = value + "px";
         }
         public get lineSpacing():number{
             return parseInt(this.htmlElement.style.lineHeight);
@@ -132,8 +127,8 @@ namespace annie {
         /**
          * 设置文本是否为粗体
          * @property bold
-         * @param {boolean} bold true或false
          * @public
+         * @type {boolean}
          * @since 1.0.3
          */
         public set bold(bold: boolean) {
@@ -152,8 +147,8 @@ namespace annie {
         /**
          * 设置文本是否倾斜
          * @property italic
-         * @param {boolean} italic true或false
          * @public
+         * @type {boolean}
          * @since 1.0.3
          */
         public set italic(italic: boolean) {
@@ -201,7 +196,7 @@ namespace annie {
         /**
          * 设置文本颜色
          * @property color
-         * @param {boolean} italic true或false
+         * @type {string}
          * @public
          * @since 1.0.3
          */
@@ -217,7 +212,7 @@ namespace annie {
         /**
          * 设置或获取是否有边框
          * @property property
-         * @param {boolean} show true或false
+         * @type {boolean}
          * @public
          * @since 1.0.3
          */
@@ -242,7 +237,7 @@ namespace annie {
          * @property text
          * @public
          * @since 1.0.3
-         * @return {string}
+         * @type {string}
          */
         public get text(): string {
             let s = this;
@@ -263,7 +258,7 @@ namespace annie {
          * @public
          * @since 1.1.0
          * @property maxCharacters
-         * @return {number}
+         * @type {number}
          */
         public get maxCharacters():number{
             let l:any=this.htmlElement.getAttribute("maxlength");

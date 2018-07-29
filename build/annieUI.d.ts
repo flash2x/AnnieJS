@@ -1,14 +1,11 @@
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
-     * @class annie.ScrollPage
+     * @class annieUI.ScrollPage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -18,7 +15,7 @@ declare namespace annie {
          * 横向还是纵向 默认为纵向
          * @property isVertical
          * @type {boolean}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default true
          */
@@ -27,20 +24,20 @@ declare namespace annie {
          * 可见区域的宽
          * @property viewWidth
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewWidth;
+        protected viewWidth: number;
         /**
          * 可见区域的高
          * @property viewHeight
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewHeight;
+        protected viewHeight: number;
         private _tweenId;
         /**
          * 整个滚动的最大距离值
@@ -61,16 +58,11 @@ declare namespace annie {
         protected distance: number;
         /**
          * 最小鼠标滑动距离
+         * @property  minDis
+         * @protected
          * @type {number}
          */
-        private minDis;
-        /**
-         * 遮罩对象
-         * @property maskObj
-         * @since 1.0.0
-         * @private
-         * @type {annie.Shape}
-         */
+        protected minDis: number;
         private maskObj;
         /**
          * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
@@ -80,13 +72,6 @@ declare namespace annie {
          * @type {annie.Sprite}
          */
         view: Sprite;
-        /**
-         * 最后鼠标经过的坐标值
-         * @property lastValue
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         */
         private lastValue;
         /**
          * 速度
@@ -99,11 +84,11 @@ declare namespace annie {
         /**
          * 加速度
          * @property addSpeed
-         * @private
+         * @protected
          * @since 1.0.0
          * @type {number}
          */
-        private addSpeed;
+        protected addSpeed: number;
         /**
          * 是否是停止滚动状态
          * @property isStop
@@ -134,14 +119,6 @@ declare namespace annie {
         protected paramXY: string;
         private stopTimes;
         private isMouseDownState;
-        /**
-         * 是否是通过scrollTo方法在滑动中
-         * @property autoScroll
-         * @since 1.0.2
-         * @type {boolean}
-         * @private
-         * @default false
-         */
         private autoScroll;
         /**
          * 构造函数
@@ -183,17 +160,15 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 有时我们需要从外部获取一张个人头像，将它变成方形或者圆形展示出来。
      * 又希望他能按照我们的尺寸展示，这个时候你就需要用到FacePhoto类啦。
-     * @class annie.FacePhoto
+     * @class annieUI.FacePhoto
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -219,10 +194,6 @@ declare namespace annie {
          *          s.addChild(rectFace);
          */
         constructor();
-        /**
-         * @property photo
-         * @private
-         */
         private photo;
         private bitmap;
         private maskType;
@@ -240,16 +211,13 @@ declare namespace annie {
     }
 }
 /**
- * Created by saron on 16/10/19.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 滑动页面类
-     * @class annie.SlidePage
+     * @class annieUI.SlidePage
      * @public
      * @extends annie.Sprite
      * @since 1.0.0
@@ -259,10 +227,10 @@ declare namespace annie {
          * 页面个数
          * @property listLen
          * @type {number}
-         * @private
+         * @protected
          * @default 0
          */
-        private listLen;
+        protected listLen: number;
         /**
          * 页面滑动容器
          * @property view
@@ -276,9 +244,9 @@ declare namespace annie {
          * 滑动方向
          * @property isVertical
          * @type {boolean}
-         * @private
+         * @protected
          */
-        private isVertical;
+        protected isVertical: boolean;
         /**
          * 容器活动速度
          * @property slideSpeed
@@ -287,12 +255,6 @@ declare namespace annie {
          * @default 0.2
          */
         slideSpeed: number;
-        /**
-         * 是否滑动中断
-         * @property _isBreak
-         * @private
-         * @type {boolean}
-         */
         private _isBreak;
         /**
          * 滚动距离
@@ -303,25 +265,10 @@ declare namespace annie {
          * @since 1.0.0
          */
         protected distance: number;
-        /**
-         * 触摸点结束点X
-         * @property touchEndX
-         * @type {number}
-         * @private
-         */
         private touchEndX;
         private movingX;
         private movingY;
         private _moveDis;
-        /**
-         * 触摸点结束点Y
-         * @property touchEndY
-         * @type {number}
-         * @private
-         * @since
-         * @public
-         * @default 0
-         */
         private touchEndY;
         /**
          * 当前页面索引ID 默认从0开始
@@ -348,33 +295,33 @@ declare namespace annie {
          * 页面宽
          * @property viewWidth
          * @type {number}
-         * @private
+         * @protected
          */
-        viewWidth: number;
+        protected viewWidth: number;
         /**
          * 页面高
          * @property viewHeight
          * @type {number}
-         * @private
+         * @protected
          */
-        viewHeight: number;
+        protected viewHeight: number;
         /**
          * 页面列表
          * @property pageList
          * @type {Array}
-         * @private
+         * @public
          */
-        private pageList;
-        private pageClassList;
+        pageList: Array<any>;
+        pageClassList: Array<any>;
         private lastX;
         private lastY;
         /**
          * 是否点击了鼠标
          * @property isMouseDown
          * @type {boolean}
-         * @private
+         * @public
          */
-        private isMouseDown;
+        isMouseDown: boolean;
         /**
          * 是否可以下一页
          * @property canSlideNext
@@ -412,17 +359,14 @@ declare namespace annie {
          * @since 1.0.0
          */
         private setMask(w, h);
-        /**
-         * 触摸事件
-         * @param e
-         */
         private onMouseEvent(e);
         /**
          * 滑动到指定页
          * @method slideTo
          * @public
          * @since 1.1.1
-         * @param {number} index 是向上还是向下
+         * @param {number} index 要跳到页的索引
+         * @param {boolean} noTween 是否需要动画过渡，如果不需要设置成true
          */
         slideTo(index: number, noTween?: boolean): void;
         /**
@@ -437,13 +381,13 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
+ * @module annieUI
  */
-declare namespace annie {
+declare namespace annieUI {
     import Sprite = annie.Sprite;
     /**
      * 电子杂志组件类
-     * @class annie.FlipBook
+     * @class annieUI.FlipBook
      * @public
      * @extends annie.Sprite
      * @since 1.0.3
@@ -572,16 +516,13 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 16/8/14.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     import DisplayObject = annie.DisplayObject;
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
-     * @class annie.IScrollListItem
+     * @class annieUI.IScrollListItem
      * @public
      * @extends annie.DisplayObject
      * @since 1.0.9
@@ -593,9 +534,9 @@ declare namespace annie {
     }
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
-     * @class annie.ScrollList
+     * @class annieUI.ScrollList
      * @public
-     * @extends annie.ScrollPage
+     * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
     class ScrollList extends ScrollPage {
@@ -663,15 +604,13 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 2017/5/24.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 画板类
-     * @class annie.DrawingBoard
+     * @class annieUI.DrawingBoard
      * @public
      * @extends annie.Bitmap
      * @since 1.1.1
@@ -753,23 +692,8 @@ declare namespace annie {
          * @since 1.1.1
          */
         constructor(width: number, height: number, bgColor?: any);
-        /**
-         * @method onMouseDown
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         private onMouseDown(e);
-        /**
-         * @method onMouseUp
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         private onMouseUp(e);
-        /**
-         * @method onMouseMove
-         * @private
-         * @param {annie.MouseEvent} e
-         */
         private onMouseMove(e);
         /**
          * 重置画板
@@ -791,15 +715,12 @@ declare namespace annie {
     }
 }
 /**
- * Created by anlun on 2017/5/24.
+ * @module annieUI
  */
-/**
- * @module annie
- */
-declare namespace annie {
+declare namespace annieUI {
     /**
      * 刮刮卡类
-     * @class annie.ScratchCard
+     * @class annieUI.ScratchCard
      * @public
      * @extends annie.DrawingBoard
      * @since 1.1.1
@@ -829,7 +750,7 @@ declare namespace annie {
         reset(backColorObj?: any): void;
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
-         * method cancel
+         * @method cancel
          * @param step
          * @public
          * @since 1.1.1

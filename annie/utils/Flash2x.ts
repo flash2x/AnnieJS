@@ -18,78 +18,47 @@ namespace annie {
     export let _shareSceneList: any = [];
     /**
      * 存储加载资源的总对象
-     * @property res
+     * @property annie.res
+     * @static
      * @public
      * @type {Object}
      */
     export let res: any = {};
-    /**
-     * 加载器是否正在加载中
-     * @property _isLoading
-     * @type {boolean}
-     * @private
-     */
+    // 加载器是否正在加载中
     let _isLoading: boolean;
-    /**
-     * 加载中的场景名列表
-     *
-     */
+
+    // 加载中的场景名列表
     let _loadSceneNames: any;
-    /**
-     * 加载地址的域名地址或前缀
-     */
+    //加载地址的域名地址或前缀
     let _domain: string;
-    /**
-     * 当前加载到哪一个资源
-     */
+    //当前加载到哪一个资源
     let _loadIndex: number;
-    /**
-     * 当前加载的总资源数
-     */
+    // 当前加载的总资源数
     let _totalLoadRes: number;
-    /**
-     * 当前已经加载的资源数
-     */
+    //当前已经加载的资源数
     let _loadedLoadRes: number;
-    /**
-     * 加载资源的完成回调
-     */
+    //加载资源的完成回调
     let _completeCallback: Function;
-    /**
-     * 加载资源时的进度回调
-     */
+    //加载资源时的进度回调
     let _progressCallback: Function;
-    /**
-     * 加载配置文件的加载器
-     */
+    //加载配置文件的加载器
     let _JSONQueue: URLLoader;
-    /**
-     * 加载资源文件的加载器
-     */
+    //加载资源文件的加载器
     let _loaderQueue: URLLoader;
-    /**
-     * 加载器是否初始化过
-     */
+    // 加载器是否初始化过
     let _isInited: Boolean;
-    /**
-     * 当前加载的资源配置文件内容
-     */
+    // 当前加载的资源配置文件内容
     let _currentConfig: any;
-    /**
-     * 获取当前加载的时间当作随机数用
-     */
-    let _time: number=new Date().getTime();
-    /**
-     * 加载资源数和总资源数的比
-     */
+    //获取当前加载的时间当作随机数用
+    let _time: number = new Date().getTime();
+    // 加载资源数和总资源数的比
     let _loadPer: number;
-    /**
-     * 单个资源占总资源数的比
-     */
+    //单个资源占总资源数的比
     let _loadSinglePer: number;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
-     * @method loadScene
+     * @method annie.loadScene
      * @public
      * @static
      * @since 1.0.0
@@ -138,8 +107,8 @@ namespace annie {
             return;
         }
         if (!_isInited) {
-            if(_isReleased){
-                trace("AnnieJS:https://github.com/flash2x/annieJS");
+            if (_isReleased) {
+                console.log("AnnieJS:https://github.com/flash2x/annieJS");
             }
             _JSONQueue = new URLLoader();
             _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
@@ -179,10 +148,20 @@ namespace annie {
         }
     };
 
+    //加载配置文件,打包成released线上版时才会用到这个方法。
+    //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
 
+    /**
+     * 加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
+     * 打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
+     * @method annie.onCFGComplete
+     * @param {annie.Event} e
+     * @static
+     * @return {void}
+     */
     function onCFGComplete(e: Event): void {
         //配置文件加载完成
         let resList: any = e.data.response;
@@ -213,12 +192,15 @@ namespace annie {
         }
     }
 
+    // 加载资源过程中调用的回调方法。
+
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
 
+    //解析加载后的json资源数据
     function _parseContent(loadContent: any, rootObj: any = null) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
@@ -226,56 +208,67 @@ namespace annie {
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
-                if(!mc.f){
-                    mc.f=[];
-                    mc.tf=1;
+                if (!mc.f) {
+                    mc.f = [];
                     continue;
                 }
-                if(mc.tf > 1) {
+                if (mc.tf > 1) {
                     let frameList = mc.f;
                     let count = frameList.length;
-                    let frameCon:any = null;
-                    let children: any = {};
-                    let children2: any = {};
+                    let frameCon: any = null;
+                    let lastFrameCon: any = null;
+                    let ol: any = [];
                     for (let i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
+                        //这帧是否为空
                         if (frameCon) {
                             for (let j in frameCon) {
-                                if (i == 0) {
-                                    [children[j]] = [frameCon[j]];
-                                } else {
-                                    if (frameCon[j].a != 3) {
-                                        children2[j] = frameCon[j];
+                                let at = frameCon[j].at;
+                                if (at != undefined && at != -1) {
+                                    if (at == 0) {
+                                        ol.push(j);
+                                    } else {
+                                        for (let l = 0; l < ol.length; l++) {
+                                            if (ol[l] == at) {
+                                                ol.splice(l, 0, j);
+                                                break;
+                                            }
+                                        }
                                     }
-                                    if (frameCon[j].a != 1) {
-                                        if (frameCon[j].a == 2) {
-                                            for (let o in children[j]) {
-                                                if (frameCon[j][o] == undefined) {
-                                                    frameCon[j][o] = children[j][o];
+                                    delete frameCon[j].at;
+                                }
+                            }
+                            //上一帧是否为空
+                            if (lastFrameCon) {
+                                for (let j in lastFrameCon) {
+                                    //上一帧有，这一帧没有，加进来
+                                    if (!frameCon[j]) {
+                                        frameCon[j] = lastFrameCon[j];
+                                    } else {
+                                        //上一帧有，这一帧也有那么at就只有-1一种可能
+                                        if (frameCon[j].at != -1) {
+                                            //如果不为空，则更新元素
+                                            for (let m in lastFrameCon[j]) {
+                                                if (!frameCon[j][m]) {
+                                                    frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
                                         } else {
-                                            delete  frameCon[j];
+                                            //如果为-1，删除元素
+                                            delete frameCon[j];
                                         }
-                                        children[j] = null;
-                                        delete  children[j];
                                     }
                                 }
                             }
-                            if (i > 0) {
-                                for (let o in children) {
-                                    frameCon[o] = children2[o] = children[o];
-                                }
-                                children = children2;
-                                children2 = {};
-                            }
                         }
+                        lastFrameCon = frameCon;
                     }
+                    mc.ol = ol;
                 }
             } else {
                 //如果是released版本，则需要更新资源数据
                 if (_isReleased) {
-                    if (loadContent[item]== 2) {
+                    if (loadContent[item] == 2) {
                         //图片
                         var image = new Image();
                         image.src = rootObj[item];
@@ -291,6 +284,7 @@ namespace annie {
         }
     }
 
+    // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
         if (!_isReleased) {
@@ -303,7 +297,7 @@ namespace annie {
             }
         } else {
             if (scene != "f2xShare") {
-               _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
+                _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
             } else {
                 _currentConfig.shift();
                 _loadSceneNames.shift();
@@ -313,8 +307,8 @@ namespace annie {
         }
         _checkComplete();
     }
-
-    function _checkComplete() {
+    //检查所有资源是否全加载完成
+    function _checkComplete(): void {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         _currentConfig[_loadIndex].shift();
@@ -342,12 +336,13 @@ namespace annie {
         }
     }
 
+    //加载场景资源
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
         if (_isReleased) {
             _loaderQueue.responseType = "js";
             url += "?v=" + _isReleased;
-        }else{
+        } else {
             url += "?v=" + _time;
         }
         _loaderQueue.load(url);
@@ -355,7 +350,7 @@ namespace annie {
 
     /**
      * 判断一个场景是否已经被加载
-     * @method isLoadedScene
+     * @method annie.isLoadedScene
      * @public
      * @static
      * @since 1.0.0
@@ -372,7 +367,7 @@ namespace annie {
 
     /**
      * 删除一个场景资源,以方便系统垃圾回收
-     * @method unLoadScene
+     * @method annie.unLoadScene
      * @public
      * @static
      * @since 1.0.2
@@ -391,7 +386,7 @@ namespace annie {
 
     /**
      * 获取已经加载场景中的资源
-     * @method getResource
+     * @method annie.getResource
      * @public
      * @static
      * @since 2.0.0
@@ -409,7 +404,7 @@ namespace annie {
 
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
-     * @method b
+     * @method annie.b
      * @public
      * @since 1.0.0
      * @static
@@ -423,82 +418,83 @@ namespace annie {
 
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method d
+     * @method annie.d
      * @public
      * @static
      * @since 1.0.0
      * @param {Object} target
      * @param {Object} info
+     * @param {number} parentFrame
      */
-    export function d(target: any, info: any): void {
+    export function d(target: any, info: any, parentFrame: number = 1): void {
         if (target._a2x_res_obj == info) {
             return;
         } else {
             //是不是文本
+            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+            if (info.tr == undefined || info.tr.length == 1) {
+                info.tr = [0, 0, 1, 1, 0, 0];
+            }
             let lastInfo = target._a2x_res_obj;
             if (info.w != undefined) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
             }
-            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr == undefined||info.tr.length==1) {
-                info.tr = [0, 0, 1, 1, 0, 0];
-            }
             if (lastInfo.tr != info.tr) {
                 [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
             }
-            /*if (info.v == undefined) {
-                info.v = 1;
-            }*/
-            //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if(info.t) {
-                if (info.t == 1) {
+            if (info.t != undefined) {
+                if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();
                     }
-                } else if (info.t == 2) {
-                    target._isGraphics = true;
                 }
+                target._mode = info.t;
             }
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {
                 if (info.fi != undefined) {
-                    let filters:any = [];
-                    let blur:any;
-                    let color:any;
+                    let filters: any = [];
+                    let blur: any;
+                    let color: any;
                     for (let i = 0; i < info.fi.length; i++) {
                         switch (info.fi[i].t) {
                             case 0:
-                                blur = (info.fi[i].bx + info.fi[i].by) * 0.5;
-                                color = Shape.getRGBA(info.fi[i].c, info.fi[i].a);
-                                let offsetX = info.fi[i].by * Math.cos(info.fi[i].r / 180 * Math.PI);
-                                let offsetY = info.fi[i].by * Math.sin(info.fi[i].r / 180 * Math.PI);
+                                blur = (info.fi[i][2] + info.fi[i][3]) * 0.5;
+                                color = Shape.getRGBA(info.fi[i][10], info.fi[i][11]);
+                                let offsetX = info.fi[i][4] * Math.cos(info.fi[i][1]);
+                                let offsetY = info.fi[i][4] * Math.sin(info.fi[i][1]);
                                 filters[filters.length] = new ShadowFilter(color, offsetX, offsetY, blur);
                                 break;
                             case 1:
                                 //模糊滤镜
-                                filters[filters.length] = new BlurFilter(info.fi[i].bx, info.fi[i].by, info.fi[i].q);
+                                filters[filters.length] = new BlurFilter(info.fi[i][1], info.fi[i][2], info.fi[i][3]);
                                 break;
                             case 2:
-                                blur = (info.fi[i].bx + info.fi[i].by) * 0.5;
-                                color = Shape.getRGBA(info.fi[i].c, info.fi[i].a);
+                                blur = (info.fi[i][1] + info.fi[i][2]) * 0.5;
+                                color = Shape.getRGBA(info.fi[i][7], info.fi[i][6]);
                                 filters[filters.length] = new ShadowFilter(color, 0, 0, blur);
                                 break;
                             case 6:
-                                filters[filters.length] = new ColorMatrixFilter(info.fi[i].b, info.fi[i].c, info.fi[i].s, info.fi[i].h);
+                                filters[filters.length] = new ColorMatrixFilter(info.fi[i][1], info.fi[i][2], info.fi[i][3], info.fi[i][4]);
                                 break;
                             case 7:
-                                filters[filters.length] = new ColorFilter(info.fi[i].cm);
+                                filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
+                                //console.log("部分滤镜效果未实现");
                             //其他还示实现
                         }
                     }
-                    target.filters = filters;
+                    if(filters.length>0){
+                        target.filters = filters;
+                    }else{
+                        target.filters = null;
+                    }
                 } else {
                     target.filters = null;
                 }
@@ -507,12 +503,14 @@ namespace annie {
         }
     }
 
+    // 解析数据里需要确定的文本类型
     let _textLineType: Array<string> = ["single", "multiline"];
+    //解析数据里需要确定的文本对齐方式
     let _textAlign: Array<string> = ["left", "center", "right"];
 
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
-     * @method t
+     * @method annie.t
      * @public
      * @static
      * @since 1.0.0
@@ -556,7 +554,12 @@ namespace annie {
 
     /**
      * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method sb
+     * @method annie.sb
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Bitmap}
+     * @public
+     * @static
      */
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
@@ -575,7 +578,7 @@ namespace annie {
                 res[sceneName][sbName] = bitmapData;
                 return bitmapData;
             } else {
-                trace("error:矢量位图填充时,未找到位图资源!");
+                console.log("error:矢量位图填充时,未找到位图资源!");
                 return null;
             }
         }
@@ -583,7 +586,7 @@ namespace annie {
 
     /**
      * 创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
-     * @method g
+     * @method annie.g
      * @public
      * @static
      * @since 1.0.0
@@ -622,14 +625,24 @@ namespace annie {
         return shape;
     }
 
+    /**
+     * 获取声音实例
+     * @method annie.s
+     * @param {string} sceneName
+     * @param {string} resName
+     * @return {annie.Sound}
+     * @public
+     * @static
+     */
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
     }
 
     /**
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-     * @method ajax
+     * @method annie.ajax
      * @public
+     * @static
      * @since 1.0.0
      * @param info 向后台传送数据所需要设置的信息
      * @param {url} info.url 向后台请求的地址
@@ -640,21 +653,21 @@ namespace annie {
      * @param {string} info.responseType 后台返回数据的类型,默认为"text"
      * @example
      *      //get
-     *      Flash2x.ajax({
+     *      annie.ajax({
      *             type: "GET",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
      *      })
      *      //post
-     *      Flash2x.ajax({
+     *      annie.ajax({
      *             type: "POST",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             data: {phone:'135******58'},
      *             responseType: 'json',
-     *             success: function (result) {trace(result)},
-     *             error: function (result) {trace(result)}
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
      *      })
      */
     export function ajax(info: any): void {
@@ -674,7 +687,7 @@ namespace annie {
 
     /**
      * jsonp调用方法
-     * @method jsonp
+     * @method annie.jsonp
      * @param url
      * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
      * @param callbackName
@@ -682,8 +695,8 @@ namespace annie {
      * @static
      * @since 1.0.4
      * @example
-     *      Flash2x.jsonp('js/testData.js', 1, 'getdata', function (result) {
-     *          trace(result);
+     *      annie.jsonp('js/testData.js', 1, 'getdata', function (result) {
+     *          console.log(result);
      *      })
      */
     export function jsonp(url: string, type: number, callbackName: string, callbackFun: any) {
@@ -714,17 +727,18 @@ namespace annie {
 
     /**
      * 获取url地址中的get参数
-     * @method getQueryString
+     * @method annie.getQueryString
      * @static
      * @param name
      * @return {any}
      * @since 1.0.9
+     * @public
      * @example
      *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
      *      //通过此方法获取id和username的值
-     *      var id=Flash2x.getQueryString("id");
-     *      var userName=Flash2x.getQueryString("username");
-     *      trace(id,userName);
+     *      var id=annie.getQueryString("id");
+     *      var userName=annie.getQueryString("username");
+     *      console.log(id,userName);
      */
     export function getQueryString(name: string) {
         let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -735,9 +749,12 @@ namespace annie {
 
     /**
      * 引擎自调用.初始化 sprite和movieClip用
+     * @method annie.initRes
      * @param target
-     * @param {string} _resId
-     * @private
+     * @param {string} sceneName
+     * @param {string} resName
+     * @public
+     * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
         let Root: any = window;
@@ -782,7 +799,6 @@ namespace annie {
                 resClass.timeLine = timeLine;
                 //初始化标签对象方便gotoAndStop gotoAndPlay
                 if (!resClass.f) resClass.f = [];
-                if (!resClass.c) resClass.c = [];
                 if (!resClass.a) resClass.a = {};
                 if (!resClass.s) resClass.s = {};
                 if (!resClass.e) resClass.e = {};
@@ -799,59 +815,68 @@ namespace annie {
                 resClass.label = label;
             }
         }
-        if (resClass.c) {
-            let children = resClass.c;
+        let children = resClass.c;
+        if (children) {
+            let allChildren: any = [];
             let objCount = children.length;
             let obj: any = null;
-            let objId: number = 0;
-            let maskObj:any = null;
+            let objType: number = 0;
+            let maskObj: any = null;
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
-                    if (Array.isArray(classRoot[children[i]])) {
-                        objId = classRoot[children[i]][0];
-                    } else {
-                        objId = classRoot[children[i]].t;
-                    }
-                    switch (objId) {
-                        case 1:
-                            //displayObject
-                            if (children[i].indexOf("_$") == 0){
-                                if (classRoot[children[i]].tf > 1) {
-                                    obj = new annie.MovieClip();
-                                } else {
-                                    obj = new annie.Sprite();
-                                }
-                                initRes(obj, sceneName, children[i]);
-                            }else{
-                                obj = new Root[sceneName][children[i]]();
+                if (Array.isArray(classRoot[children[i]])) {
+                    objType = classRoot[children[i]][0];
+                } else {
+                    objType = classRoot[children[i]].t;
+                }
+                switch (objType) {
+                    case 1:
+                    case 4:
+                        //text 和 Sprite
+                        //检查是否有名字，并且已经初始化过了
+                        if (resClass.n && resClass.n[i] && target[resClass.n[i]]) {
+                            obj = target[resClass.n[i]];
+                        } else {
+                            if (objType == 4) {
+                                obj = t(sceneName, children[i]);
                             }
-                            break;
-                        case 2:
-                            //bitmap
-                            obj = b(sceneName, children[i]);
-                            break;
-                        case 3:
-                            //shape
-                            obj = g(sceneName, children[i]);
-                            break;
-                        case 4:
-                            //text
-                            obj = t(sceneName, children[i]);
-                            break;
-                        case 5:
-                            //sound
-                            obj = s(sceneName, children[i]);
-                            target.addSound(obj);
-                    }
-                //} else {
-                    //obj = new Root[sceneName][children[i]]();
-               // }
-                //这里一定把要声音添加到里面，以保证objectId与数组下标对应
-                target._a2x_res_children[target._a2x_res_children.length] = obj;
+                            else {
+                                //displayObject
+                                if (children[i].indexOf("_$") == 0) {
+                                    if (classRoot[children[i]].tf > 1) {
+                                        obj = new annie.MovieClip();
+                                    } else {
+                                        obj = new annie.Sprite();
+                                    }
+                                    initRes(obj, sceneName, children[i]);
+                                } else {
+                                    obj = new Root[sceneName][children[i]]();
+                                }
+                            }
+                            if (resClass.n && resClass.n[i]) {
+                                target[resClass.n[i]] = obj;
+                                obj.name = resClass.n[i];
+                            }
+                        }
+                        break;
+                    case 2:
+                        //bitmap
+                        obj = b(sceneName, children[i]);
+                        break;
+                    case 3:
+                        //shape
+                        obj = g(sceneName, children[i]);
+                        break;
+                    case 5:
+                        //sound
+                        obj = s(sceneName, children[i]);
+                        obj.name=children[i];
+                        target.addSound(obj);
+                }
                 if (!isMc) {
                     let index: number = i + 1;
-                    if (objId == 5) {
+                    if (objType == 5) {
                         obj._repeate = resClass.s[0][index];
                     } else {
                         d(obj, resClass.f[0].c[index]);
@@ -867,15 +892,28 @@ namespace annie {
                                 }
                             }
                         }
-                        //检查是否有名字
-                        if (resClass.f[0].c[index].n != undefined) {
-                            target[resClass.f[0].c[index].n] = obj;
-                            obj.name=resClass.f[0].c[index].n;
-                        }
                         target.addChildAt(obj, 0);
+                    }
+                } else {
+                    //这里一定把要声音添加到里面，以保证objectId与数组下标对应
+                    allChildren[allChildren.length] = obj;
+                    //如果是声音，还要把i这个顺序保存下来
+                    if(!target._a2x_sounds){
+                        target._a2x_sounds={};
+                    }
+                    target._a2x_sounds[i]=obj;
+                }
+            }
+            if (isMc) {
+                //将mc里面的实例按照时间轴上的图层排序
+                let ol = resClass.ol;
+                if (ol) {
+                    for (let o = 0; o < ol.length; o++) {
+                        target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
                     }
                 }
             }
         }
     }
+    console.log("https://github.com/flash2x/AnnieJS");
 }
