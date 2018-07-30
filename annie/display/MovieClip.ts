@@ -419,8 +419,10 @@ namespace annie {
             }
             super.update(isDrawUpdate);
         }
+
         //flash声音管理
         private _a2x_sounds: any = null;
+
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame) {
@@ -489,16 +491,15 @@ namespace annie {
                 }
             }
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;
+            super.destroy();
             s._lastFrameObj = null;
             s._a2x_script = null;
             s._a2x_res_children = null;
             s._a2x_res_class = null;
             s._a2x_sounds = null;
-            super.destroy();
         }
     }
 }

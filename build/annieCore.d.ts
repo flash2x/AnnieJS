@@ -1021,10 +1021,12 @@ declare namespace annie {
          */
         constructor();
         /**
-         * 更新信息
+         * 更新信息对象
          * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-         * @private
+         * @since 1.0.0
+         * @protected
+         * @readonly
          */
         protected _UI: {
             UD: boolean;
@@ -1055,7 +1057,7 @@ declare namespace annie {
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
-         * @private
+         * @protected
          * @type {number}
          * @since 1.0.0
          * @default 1
@@ -1064,7 +1066,7 @@ declare namespace annie {
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
-         * @private
+         * @protected
          * @type {annie.Matrix}
          * @default null
          * @since 1.0.0
@@ -1080,9 +1082,10 @@ declare namespace annie {
          */
         mouseEnable: boolean;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 显示对象上对显示列表上的最终的所有滤镜组
          * @property cFilters
-         * @private
+         * @protected
          * @default []
          * @since 1.0.0
          * @type {Array}
@@ -1190,7 +1193,7 @@ declare namespace annie {
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
-         * @pubic
+         * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
@@ -1235,9 +1238,9 @@ declare namespace annie {
          * @default null
          */
         mask: DisplayObject;
-        protected _isUseToMask: number;
         private _mask;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 显示对象的滤镜数组
          * @property filters
          * @since 1.0.0
@@ -1247,11 +1250,6 @@ declare namespace annie {
          */
         filters: any[];
         private _filters;
-        /**
-         * 是否自己的父级发生的改变
-         * @type {boolean}
-         * @private
-         */
         protected _cp: boolean;
         /**
          *将全局坐标转换到本地坐标值
@@ -1271,12 +1269,6 @@ declare namespace annie {
          * @return {annie.Point}
          */
         localToGlobal(point: Point, bp?: Point): Point;
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
         static _bp: Point;
         static _p1: Point;
         static _p2: Point;
@@ -1291,10 +1283,11 @@ declare namespace annie {
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
-         * @return {void}
          * @public
+         * @return {void}
          */
         startDrag(isCenter?: boolean, bounds?: Rectangle): void;
+        protected _isUseToMask: number;
         /**
          * 停止鼠标或者触摸拖动
          * @method stopDrag
@@ -1320,7 +1313,6 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @return {annie.Rectangle}
-         * @abstract
          */
         getBounds(): Rectangle;
         /**
@@ -1346,7 +1338,6 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
-         * @abstract
          * @return {void}
          */
         render(renderObj: IRender | any): void;
@@ -1388,6 +1379,22 @@ declare namespace annie {
          * @default null
          */
         protected _texture: any;
+        /**
+         * @property _offsetX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetX: number;
+        /**
+         * @property _offsetY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetY: number;
         protected _bounds: Rectangle;
         protected _drawRect: Rectangle;
         protected _setProperty(property: string, value: any, type: number): void;
@@ -1873,7 +1880,7 @@ declare namespace annie {
         constructor();
         destroy(): void;
         /**
-         * 是否可以让children接收鼠标事件,如果为false
+         * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
          * @property mouseChildren
          * @type {boolean}
@@ -1911,17 +1918,6 @@ declare namespace annie {
          * @return {void}
          */
         removeChild(child: DisplayObject): void;
-        /**
-         * @method _getElementsByName
-         * @param {RegExp} rex
-         * @param {annie.Sprite} root
-         * @param {boolean} isOnlyOne
-         * @param {boolean} isRecursive
-         * @param {Array<annie.DisplayObject>} resultList
-         * @private
-         * @static
-         * @return {void}
-         */
         private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
@@ -1989,30 +1985,8 @@ declare namespace annie {
          */
         removeAllChildren(): void;
         update(isDrawUpdate?: boolean): void;
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @since 1.0.0
-         * @public
-         */
         getBounds(): Rectangle;
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
         render(renderObj: IRender): void;
         protected callEventAndFrameScript(callState: number): void;
     }
@@ -2405,9 +2379,9 @@ declare namespace annie {
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
          * 对象视觉暂停更新
          * @property pause
+         * @static
          * @type {boolean}
          * @public
-         * @static
          * @since 1.0.0
          * @default false
          */
@@ -2513,7 +2487,6 @@ declare namespace annie {
          *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
          *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
-         *              state.resize();
          *              if(i>5){i=0;}
          *          }
          *      }
@@ -2521,14 +2494,6 @@ declare namespace annie {
          */
         scaleMode: string;
         private _scaleMode;
-        /**
-         * 原始为60的刷新速度时的计数器
-         * @property _flush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
         private _flush;
         /**
          * 当前的刷新次数计数器
@@ -2571,25 +2536,18 @@ declare namespace annie {
         render(renderObj: IRender): void;
         /**
          * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-         * @property _ml
          * @type {Array}
          * @private
          */
         private _ml;
         /**
          * 这个是事件中用到的Point对象池,以提高性能
-         * @property _mp
          * @type {Array}
          * @private
          */
         private _mp;
         /**
-         * 初始化mouse或者touch事件
-         * @method _initMouseEvent
-         * @param {annie.MouseEvent} event
-         * @param {annie.Point} cp
-         * @param {annie.Point} sp
-         * @param {number} identifier
+         * 刷新mouse或者touch事件
          * @private
          */
         private _initMouseEvent(event, cp, sp, identifier);
@@ -2632,8 +2590,7 @@ declare namespace annie {
          */
         kill(): void;
         /**
-         * 单点触摸对应的引擎事件类型名
-         * @property _mouseEventTypes
+         * html的鼠标或单点触摸对应的引擎事件类型名
          * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
          * @private
          */
@@ -2648,8 +2605,6 @@ declare namespace annie {
         private _onMouseEvent;
         /**
          * 设置舞台的对齐模式
-         * @method setAlign
-         * @private
          */
         private setAlign;
         getBounds(): Rectangle;
@@ -2661,13 +2616,6 @@ declare namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList;
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
         private static flushAll();
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -2678,6 +2626,7 @@ declare namespace annie {
          * @public
          * @static
          * @since
+         * @return {void}
          */
         static addUpdateObj(target: any): void;
         /**
@@ -2687,6 +2636,7 @@ declare namespace annie {
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         static removeUpdateObj(target: any): void;
         destroy(): void;

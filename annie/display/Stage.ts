@@ -27,29 +27,31 @@ namespace annie {
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
          * 对象视觉暂停更新
          * @property pause
+         * @static
          * @type {boolean}
          * @public
-         * @static
          * @since 1.0.0
          * @default false
          */
         static get pause(): boolean {
             return this._pause;
         }
+
         static set pause(value: boolean) {
-            let s=this;
-            s._pause = value;
-            if(value){
-                //关闭声音
-                Sound.stopAllSounds();
-            }else{
-                //恢复声音
-                Sound.resumePlaySounds();
-            }
-            if(value!=s._pause) {
-                annie.globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
+            this._pause = value;
+            if (value != this._pause) {
+                if (value) {
+                    //停止声音
+                    Sound.stopAllSounds();
+                } else {
+                    //恢复声音
+                    Sound.resumePlaySounds();
+                }
+                //触发事件
+                globalDispatcher.dispatchEvent("onStagePause", {pause: value});
             }
         }
+
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
@@ -152,7 +154,6 @@ namespace annie {
          *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
          *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
-         *              state.resize();
          *              if(i>5){i=0;}
          *          }
          *      }
@@ -171,14 +172,8 @@ namespace annie {
         }
 
         private _scaleMode: string = "onScale";
-        /**
-         * 原始为60的刷新速度时的计数器
-         * @property _flush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
+
+        //原始为60的刷新速度时的计数器
         private _flush: number = 0;
         /**
          * 当前的刷新次数计数器
@@ -250,26 +245,19 @@ namespace annie {
 
         /**
          * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-         * @property _ml
          * @type {Array}
          * @private
          */
         private _ml: any = [];
         /**
          * 这个是事件中用到的Point对象池,以提高性能
-         * @property _mp
          * @type {Array}
          * @private
          */
         private _mp: any = [];
 
         /**
-         * 初始化mouse或者touch事件
-         * @method _initMouseEvent
-         * @param {annie.MouseEvent} event
-         * @param {annie.Point} cp
-         * @param {annie.Point} sp
-         * @param {number} identifier
+         * 刷新mouse或者touch事件
          * @private
          */
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
@@ -300,17 +288,17 @@ namespace annie {
             let s = this;
             if (s._flush == 0) {
                 s.update(true);
-                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
+                s.callEventAndFrameScript(2);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
                         s.render(s.renderObj);
+                        s.callEventAndFrameScript(2);
                     }
                     s._currentFlush--;
                 }
@@ -355,8 +343,7 @@ namespace annie {
         }
 
         /**
-         * 单点触摸对应的引擎事件类型名
-         * @property _mouseEventTypes
+         * html的鼠标或单点触摸对应的引擎事件类型名
          * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
          * @private
          */
@@ -452,7 +439,7 @@ namespace annie {
                     for (let o = 0; o < points.length; o++) {
                         eLen = 0;
                         events = [];
-                        identifier = "m" + points[o].identifier;
+                        identifier = points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         } else {
@@ -548,8 +535,6 @@ namespace annie {
                                     }
                                 }
                             }
-                            //这里一定要反转一下，因为会影响mouseOut mouseOver
-                            displayList.reverse();
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                             if (item != "onMouseDown") {
                                 if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
@@ -653,7 +638,7 @@ namespace annie {
                                 sd.x = x1;
                                 sd.y = y1;
                             }
-                            if (item == "onMouseUp"){
+                            if (item == "onMouseUp") {
                                 if (sd) {
                                     sd._lastDragPoint.x = Number.MAX_VALUE;
                                     sd._lastDragPoint.y = Number.MAX_VALUE;
@@ -673,8 +658,6 @@ namespace annie {
         };
         /**
          * 设置舞台的对齐模式
-         * @method setAlign
-         * @private
          */
         private setAlign = function () {
             let s = this;
@@ -756,13 +739,7 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
 
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
+        //刷新所有定时器
         private static flushAll(): void {
             if(!Stage._pause) {
                 let len = Stage.allUpdateObjList.length;
@@ -782,6 +759,7 @@ namespace annie {
          * @public
          * @static
          * @since
+         * @return {void}
          */
         public static addUpdateObj(target: any): void {
             let isHave: boolean = false;
@@ -804,6 +782,7 @@ namespace annie {
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         public static removeUpdateObj(target: any): void {
             let len = Stage.allUpdateObjList.length;
@@ -814,18 +793,9 @@ namespace annie {
                 }
             }
         }
-
-        public destroy(): void {
+        public destroy():void{
             let s = this;
             Stage.removeUpdateObj(s);
-            s.renderObj = null;
-            s.viewRect = null;
-            s._lastDpList = null;
-            s._touchEvent = null;
-            s.muliPoints = null;
-            s._mP1 = null;
-            s._mP2 = null;
-            s._ml = null;
             super.destroy();
         }
     }

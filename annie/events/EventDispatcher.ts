@@ -297,7 +297,6 @@ namespace annie {
         destroy(): void {
             let s = this;
             s.removeAllEventListener();
-            s.eventTypes = null;
         }
     }
 }

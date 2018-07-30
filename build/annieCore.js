@@ -290,7 +290,6 @@ var annie;
         EventDispatcher.prototype.destroy = function () {
             var s = this;
             s.removeAllEventListener();
-            s.eventTypes = null;
         };
         /**
          * 全局的鼠标事件的监听数对象表
@@ -1567,12 +1566,19 @@ var annie;
         function DisplayObject() {
             _super.call(this);
             /**
-             * 更新信息
+             * 更新信息对象
              * @property _UI
              * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-             * @private
+             * @since 1.0.0
+             * @protected
+             * @readonly
              */
-            this._UI = { UD: false, UM: true, UA: true, UF: false };
+            this._UI = {
+                UD: false,
+                UM: true,
+                UA: true,
+                UF: false
+            };
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -1596,7 +1602,7 @@ var annie;
             /**
              * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
              * @property cAlpha
-             * @private
+             * @protected
              * @type {number}
              * @since 1.0.0
              * @default 1
@@ -1605,7 +1611,7 @@ var annie;
             /**
              * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
              * @property cMatrix
-             * @private
+             * @protected
              * @type {annie.Matrix}
              * @default null
              * @since 1.0.0
@@ -1621,9 +1627,10 @@ var annie;
              */
             this.mouseEnable = true;
             /**
+             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 显示对象上对显示列表上的最终的所有滤镜组
              * @property cFilters
-             * @private
+             * @protected
              * @default []
              * @since 1.0.0
              * @type {Array}
@@ -1650,18 +1657,14 @@ var annie;
             this._anchorY = 0;
             this._visible = true;
             this._matrix = new annie.Matrix();
-            this._isUseToMask = 0;
             this._mask = null;
             this._filters = [];
-            /**
-             * 是否自己的父级发生的改变
-             * @type {boolean}
-             * @private
-             */
+            //是否自己的父级发生的改变
             this._cp = true;
             this._dragBounds = new annie.Rectangle();
             this._isDragCenter = false;
             this._lastDragPoint = new annie.Point();
+            this._isUseToMask = 0;
             /**
              * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
              * @property _texture
@@ -1671,6 +1674,22 @@ var annie;
              * @default null
              */
             this._texture = null;
+            /**
+             * @property _offsetX
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            this._offsetX = 0;
+            /**
+             * @property _offsetY
+             * @protected
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            this._offsetY = 0;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
             this._soundList = [];
@@ -1845,7 +1864,7 @@ var annie;
             /**
              * 显示对象上y方向的缩放或旋转点
              * @property anchorY
-             * @pubic
+             * @public
              * @since 1.0.0
              * @type {number}
              * @default 0
@@ -1868,13 +1887,13 @@ var annie;
              * @type {boolean}
              * @default 0
              */
-            get: function () { return this._visible; },
+            get: function () {
+                return this._visible;
+            },
             set: function (value) {
                 var s = this;
                 if (value != s._visible) {
                     s._visible = value;
-                    if (!value)
-                        s._cp = true;
                 }
             },
             enumerable: true,
@@ -1920,12 +1939,14 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s.mask) {
+                if (value != s._mask) {
                     if (value) {
                         value["_isUseToMask"]++;
                     }
-                    if (s._mask) {
-                        s._mask["_isUseToMask"]--;
+                    else {
+                        if (s._mask != null) {
+                            s["_isUseToMask"]--;
+                        }
                     }
                     s._mask = value;
                 }
@@ -1935,6 +1956,7 @@ var annie;
         });
         Object.defineProperty(DisplayObject.prototype, "filters", {
             /**
+             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 显示对象的滤镜数组
              * @property filters
              * @since 1.0.0
@@ -1973,13 +1995,14 @@ var annie;
          */
         DisplayObject.prototype.localToGlobal = function (point, bp) {
             if (bp === void 0) { bp = null; }
-            if (this.parent) {
+            var s = this;
+            if (s.parent) {
                 //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
-                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.parent.cMatrix.transformPoint(point.x, point.y, bp);
             }
             else {
                 //没有父级
-                return this.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.cMatrix.transformPoint(point.x, point.y, bp);
             }
         };
         /**
@@ -1988,14 +2011,15 @@ var annie;
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
-         * @return {void}
          * @public
+         * @return {void}
          */
         DisplayObject.prototype.startDrag = function (isCenter, bounds) {
             if (isCenter === void 0) { isCenter = false; }
             if (bounds === void 0) { bounds = null; }
             var s = this;
             if (!s.stage) {
+                console.log("The DisplayObject is not on stage");
                 return;
             }
             annie.Stage._dragDisplay = s;
@@ -2061,7 +2085,6 @@ var annie;
          * @public
          * @since 1.0.0
          * @return {annie.Rectangle}
-         * @abstract
          */
         DisplayObject.prototype.getBounds = function () {
             return this._bounds;
@@ -2110,6 +2133,8 @@ var annie;
         DisplayObject.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
+            if (!s._visible)
+                return;
             var UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
@@ -2139,7 +2164,6 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
-         * @abstract
          * @return {void}
          */
         DisplayObject.prototype.render = function (renderObj) {
@@ -2204,6 +2228,7 @@ var annie;
             var dr = s.getDrawRect();
             return { width: dr.width, height: dr.height };
         };
+        //设置属性
         DisplayObject.prototype._setProperty = function (property, value, type) {
             var s = this;
             if (s[property] != value) {
@@ -2307,8 +2332,10 @@ var annie;
             //清除相应的数据引用
             var s = this;
             s.stopAllSounds();
+            for (var i = 0; i < s._soundList.length; i++) {
+                s._soundList[i].destroy();
+            }
             s._a2x_res_obj = null;
-            s._soundList = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
@@ -2322,6 +2349,7 @@ var annie;
             s.cMatrix = null;
             s._UI = null;
             s._texture = null;
+            s._visible = false;
             _super.prototype.destroy.call(this);
         };
         /**
@@ -2358,12 +2386,7 @@ var annie;
                     s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         };
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
+        //为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
         DisplayObject._p1 = new annie.Point();
         DisplayObject._p2 = new annie.Point();
@@ -3308,7 +3331,7 @@ var annie;
         function Sprite() {
             _super.call(this);
             /**
-             * 是否可以让children接收鼠标事件,如果为false
+             * 是否可以让children接收鼠标事件
              * 鼠标事件将不会往下冒泡
              * @property mouseChildren
              * @type {boolean}
@@ -3337,7 +3360,12 @@ var annie;
             for (var i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s.children = null;
+            s.removeAllChildren();
+            if (s._parent)
+                s._parent.removeChild(s);
+            s.callEventAndFrameScript(0);
+            s.children.length = 0;
+            s._removeChildren.length = 0;
             _super.prototype.destroy.call(this);
         };
         /**
@@ -3369,18 +3397,7 @@ var annie;
                 }
             }
         };
-        //全局遍历
-        /**
-         * @method _getElementsByName
-         * @param {RegExp} rex
-         * @param {annie.Sprite} root
-         * @param {boolean} isOnlyOne
-         * @param {boolean} isRecursive
-         * @param {Array<annie.DisplayObject>} resultList
-         * @private
-         * @static
-         * @return {void}
-         */
+        //全局遍历查找
         Sprite._getElementsByName = function (rex, root, isOnlyOne, isRecursive, resultList) {
             var len = root.children.length;
             if (len > 0) {
@@ -3621,14 +3638,6 @@ var annie;
                 child.update(isDrawUpdate);
             }
         };
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
         Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
@@ -3657,13 +3666,6 @@ var annie;
             }
             return null;
         };
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @since 1.0.0
-         * @public
-         */
         Sprite.prototype.getBounds = function () {
             var s = this;
             var rect = s._bounds;
@@ -3695,50 +3697,48 @@ var annie;
             }
             return rect;
         };
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             if (s._cp || !s._visible)
                 return;
-            if (s.cAlpha > 0 && s._visible) {
-                var maskObj = void 0;
-                var child = void 0;
-                var len = s.children.length;
-                for (var i = 0; i < len; i++) {
-                    child = s.children[i];
-                    if (child._isUseToMask > 0)
-                        continue;
-                    if (child.cAlpha > 0 && child._visible) {
-                        if (maskObj) {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
+            if (s._cacheAsBitmap) {
+                _super.prototype.render.call(this, renderObj);
+            }
+            else {
+                if (s.cAlpha > 0 && s._visible) {
+                    var maskObj = void 0;
+                    var child = void 0;
+                    var len = s.children.length;
+                    for (var i = 0; i < len; i++) {
+                        child = s.children[i];
+                        if (child._isUseToMask > 0)
+                            continue;
+                        if (child.cAlpha > 0 && child._visible) {
+                            if (maskObj) {
+                                if (child.mask && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        renderObj.endMask();
+                                        maskObj = child.mask;
+                                        renderObj.beginMask(maskObj);
+                                    }
+                                }
+                                else {
                                     renderObj.endMask();
+                                    maskObj = null;
+                                }
+                            }
+                            else {
+                                if (child.mask && child.mask.parent == child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }
                             }
-                            else {
-                                renderObj.endMask();
-                                maskObj = null;
-                            }
+                            child.render(renderObj);
                         }
-                        else {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
-                            }
-                        }
-                        child.render(renderObj);
                     }
-                }
-                if (maskObj) {
-                    renderObj.endMask();
+                    if (maskObj) {
+                        renderObj.endMask();
+                    }
                 }
             }
         };
@@ -4313,12 +4313,12 @@ var annie;
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
+            _super.prototype.destroy.call(this);
             s._lastFrameObj = null;
             s._a2x_script = null;
             s._a2x_res_children = null;
             s._a2x_res_class = null;
             s._a2x_sounds = null;
-            _super.prototype.destroy.call(this);
         };
         return MovieClip;
     }(annie.Sprite));
@@ -4864,14 +4864,7 @@ var annie;
              */
             this.bgColor = "";
             this._scaleMode = "onScale";
-            /**
-             * 原始为60的刷新速度时的计数器
-             * @property _flush
-             * @private
-             * @since 1.0.0
-             * @default 0
-             * @type {number}
-             */
+            //原始为60的刷新速度时的计数器
             this._flush = 0;
             /**
              * 当前的刷新次数计数器
@@ -4890,14 +4883,12 @@ var annie;
             this._lastDpList = {};
             /**
              * 这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-             * @property _ml
              * @type {Array}
              * @private
              */
             this._ml = [];
             /**
              * 这个是事件中用到的Point对象池,以提高性能
-             * @property _mp
              * @type {Array}
              * @private
              */
@@ -4910,8 +4901,7 @@ var annie;
              */
             this._mouseDownPoint = {};
             /**
-             * 单点触摸对应的引擎事件类型名
-             * @property _mouseEventTypes
+             * html的鼠标或单点触摸对应的引擎事件类型名
              * @type {{mousedown: string, mouseup: string, mousemove: string, touchstart: string, touchmove: string, touchend: string}}
              * @private
              */
@@ -5010,7 +5000,7 @@ var annie;
                         for (var o = 0; o < points.length; o++) {
                             eLen = 0;
                             events = [];
-                            identifier = "m" + points[o].identifier;
+                            identifier = points[o].identifier;
                             if (s._mp.length > 0) {
                                 cp = s._mp.shift();
                             }
@@ -5110,8 +5100,6 @@ var annie;
                                         }
                                     }
                                 }
-                                //这里一定要反转一下，因为会影响mouseOut mouseOver
-                                displayList.reverse();
                                 //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                                 if (item != "onMouseDown") {
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
@@ -5241,8 +5229,6 @@ var annie;
             };
             /**
              * 设置舞台的对齐模式
-             * @method setAlign
-             * @private
              */
             this.setAlign = function () {
                 var s = this;
@@ -5339,9 +5325,9 @@ var annie;
              * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
              * 对象视觉暂停更新
              * @property pause
+             * @static
              * @type {boolean}
              * @public
-             * @static
              * @since 1.0.0
              * @default false
              */
@@ -5349,18 +5335,18 @@ var annie;
                 return this._pause;
             },
             set: function (value) {
-                var s = this;
-                s._pause = value;
-                if (value) {
-                    //关闭声音
-                    annie.Sound.stopAllSounds();
-                }
-                else {
-                    //恢复声音
-                    annie.Sound.resumePlaySounds();
-                }
-                if (value != s._pause) {
-                    annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
+                this._pause = value;
+                if (value != this._pause) {
+                    if (value) {
+                        //停止声音
+                        annie.Sound.stopAllSounds();
+                    }
+                    else {
+                        //恢复声音
+                        annie.Sound.resumePlaySounds();
+                    }
+                    //触发事件
+                    annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
                 }
             },
             enumerable: true,
@@ -5389,7 +5375,6 @@ var annie;
              *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
              *              let state=e.currentTarget;
              *              state.scaleMode=aList[i];
-             *              state.resize();
              *              if(i>5){i=0;}
              *          }
              *      }
@@ -5420,12 +5405,7 @@ var annie;
             renderObj.end();
         };
         /**
-         * 初始化mouse或者touch事件
-         * @method _initMouseEvent
-         * @param {annie.MouseEvent} event
-         * @param {annie.Point} cp
-         * @param {annie.Point} sp
-         * @param {number} identifier
+         * 刷新mouse或者touch事件
          * @private
          */
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
@@ -5447,19 +5427,19 @@ var annie;
             var s = this;
             if (s._flush == 0) {
                 s.update(true);
-                s.callEventAndFrameScript(2);
                 s.render(s.renderObj);
+                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s.update(true);
-                    s.callEventAndFrameScript(2);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
                         s.render(s.renderObj);
+                        s.callEventAndFrameScript(2);
                     }
                     s._currentFlush--;
                 }
@@ -5502,13 +5482,7 @@ var annie;
         Stage.prototype.getBounds = function () {
             return this.viewRect;
         };
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
+        //刷新所有定时器
         Stage.flushAll = function () {
             if (!Stage._pause) {
                 var len = Stage.allUpdateObjList.length;
@@ -5527,6 +5501,7 @@ var annie;
          * @public
          * @static
          * @since
+         * @return {void}
          */
         Stage.addUpdateObj = function (target) {
             var isHave = false;
@@ -5548,6 +5523,7 @@ var annie;
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         Stage.removeUpdateObj = function (target) {
             var len = Stage.allUpdateObjList.length;
@@ -5561,14 +5537,6 @@ var annie;
         Stage.prototype.destroy = function () {
             var s = this;
             Stage.removeUpdateObj(s);
-            s.renderObj = null;
-            s.viewRect = null;
-            s._lastDpList = null;
-            s._touchEvent = null;
-            s.muliPoints = null;
-            s._mP1 = null;
-            s._mP2 = null;
-            s._ml = null;
             _super.prototype.destroy.call(this);
         };
         Stage._pause = false;

@@ -26,17 +26,21 @@ namespace annie {
         }
 
         public destroy(): void {
-            let s = this;
+            let s: any = this;
             //让子级也destroy
             for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s.children = null;
+            s.removeAllChildren();
+            if (s._parent) s._parent.removeChild(s);
+            s.callEventAndFrameScript(0);
+            s.children.length = 0;
+            s._removeChildren.length = 0;
             super.destroy();
         }
 
         /**
-         * 是否可以让children接收鼠标事件,如果为false
+         * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
          * @property mouseChildren
          * @type {boolean}
@@ -56,6 +60,7 @@ namespace annie {
          */
         public children: DisplayObject[] = [];
         public _removeChildren: DisplayObject[] = [];
+
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -87,18 +92,7 @@ namespace annie {
             }
         }
 
-        //全局遍历
-        /**
-         * @method _getElementsByName
-         * @param {RegExp} rex
-         * @param {annie.Sprite} root
-         * @param {boolean} isOnlyOne
-         * @param {boolean} isRecursive
-         * @param {Array<annie.DisplayObject>} resultList
-         * @private
-         * @static
-         * @return {void}
-         */
+        //全局遍历查找
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
             if (len > 0) {
@@ -301,9 +295,10 @@ namespace annie {
                 s.removeChildAt(0);
             }
         }
+
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if(!s._visible)return;
+            if (!s._visible) return;
             let um: boolean = s._UI.UM;
             let ua: boolean = s._UI.UA;
             let uf: boolean = s._UI.UF;
@@ -328,32 +323,24 @@ namespace annie {
             }
         }
 
-        /**
-         * 重写碰撞测试
-         * @method hitTestPoint
-         * @param {annie.Point} hitPoint 要检测碰撞的点
-         * @param {boolean} isGlobalPoint 是不是全局坐标的点,默认false是本地坐标
-         * @param {boolean} isMustMouseEnable 是不是一定要MouseEnable为true的显示对象才接受点击测试,默认为不需要 false
-         * @return {annie.DisplayObject}
-         */
-        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
             let s = this;
-            if (!s.visible||(!s.mouseEnable&&isMustMouseEnable))return null;
+            if (!s.visible || (!s.mouseEnable && isMustMouseEnable)) return null;
             let len = s.children.length;
             let hitDisplayObject: DisplayObject;
             let child: any;
             //这里特别注意是从上往下遍历
             for (let i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if (child._isUseToMask>0)continue;
+                if (child._isUseToMask > 0) continue;
                 if (child.mask && child.mask.parent == child.parent) {
                     //看看点是否在遮罩内
-                    if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable)) {
+                    if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable)) {
                         //如果都不在遮罩里面,那还检测什么直接检测下一个
                         continue;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
+                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
                 if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
@@ -361,13 +348,6 @@ namespace annie {
             return null;
         }
 
-        /**
-         * 重写getBounds
-         * @method getBounds
-         * @return {annie.Rectangle}
-         * @since 1.0.0
-         * @public
-         */
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -400,49 +380,47 @@ namespace annie {
             return rect;
         }
 
-        /**
-         * 重写渲染
-         * @method render
-         * @param {annie.IRender} renderObj
-         * @public
-         * @since 1.0.0
-         */
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._cp||!s._visible) return;
-            if (s.cAlpha > 0 && s._visible) {
-                let maskObj: any;
-                let child: any;
-                let len: number = s.children.length;
-                for (let i = 0; i < len; i++) {
-                    child = s.children[i];
-                    if (child._isUseToMask>0)continue;
-                    if (child.cAlpha > 0 && child._visible) {
-                        if (maskObj) {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
+            if (s._cp || !s._visible) return;
+            if (s._cacheAsBitmap) {
+                super.render(renderObj);
+            } else {
+                if (s.cAlpha > 0 && s._visible) {
+                    let maskObj: any;
+                    let child: any;
+                    let len: number = s.children.length;
+                    for (let i = 0; i < len; i++) {
+                        child = s.children[i];
+                        if (child._isUseToMask > 0) continue;
+                        if (child.cAlpha > 0 && child._visible) {
+                            if (maskObj) {
+                                if (child.mask && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        renderObj.endMask();
+                                        maskObj = child.mask;
+                                        renderObj.beginMask(maskObj);
+                                    }
+                                } else {
                                     renderObj.endMask();
+                                    maskObj = null;
+                                }
+                            } else {
+                                if (child.mask && child.mask.parent == child.parent) {
                                     maskObj = child.mask;
                                     renderObj.beginMask(maskObj);
                                 }
-                            } else {
-                                renderObj.endMask();
-                                maskObj = null;
                             }
-                        } else {
-                            if (child.mask && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
-                            }
+                            child.render(renderObj);
                         }
-                        child.render(renderObj);
                     }
-                }
-                if (maskObj) {
-                    renderObj.endMask();
+                    if (maskObj) {
+                        renderObj.endMask();
+                    }
                 }
             }
         }
+
         protected callEventAndFrameScript(callState: number): void {
             let s = this;
             let child: any = null;
