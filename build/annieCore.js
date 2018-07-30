@@ -3609,7 +3609,6 @@ var annie;
                 s.children[i].destroy();
             }
             s.removeAllChildren();
-            s.removeAllEventListener();
             if (s._parent)
                 s._parent.removeChild(s);
             s.callEventAndFrameScript(0);
