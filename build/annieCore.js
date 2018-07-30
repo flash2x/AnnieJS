@@ -2330,7 +2330,6 @@ var annie;
         DisplayObject.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
-            s.removeAllEventListener();
             s.stopAllSounds();
             for (var i = 0; i < s._soundList.length; i++) {
                 s._soundList[i].destroy();

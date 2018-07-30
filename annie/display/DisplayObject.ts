@@ -789,7 +789,6 @@ namespace annie {
         public destroy(): void {
             //清除相应的数据引用
             let s:any = this;
-            s.removeAllEventListener();
             s.stopAllSounds();
             for(let i=0;i<s._soundList.length;i++){
                 s._soundList[i].destroy();
