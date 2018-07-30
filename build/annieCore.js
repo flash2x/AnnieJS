@@ -2486,16 +2486,7 @@ var annie;
             _super.call(this);
             this._bitmapData = null;
             this._realCacheImg = null;
-            /**
-             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-             * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
-             * @property rect
-             * @public
-             * @since 1.0.0
-             * @type {annie.Rectangle}
-             * @default null
-             */
-            this.rect = null;
+            this._rect = null;
             this._isCache = false;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -2508,9 +2499,30 @@ var annie;
             this.hitTestWidthPixel = false;
             var s = this;
             s._instanceType = "annie.Bitmap";
-            s.rect = rect;
+            s._rect = rect;
             s.bitmapData = bitmapData;
         }
+        Object.defineProperty(Bitmap.prototype, "rect", {
+            /**
+             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+             * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
+             * @property rect
+             * @public
+             * @since 1.0.0
+             * @type {annie.Rectangle}
+             * @default null
+             */
+            get: function () {
+                return this._rect;
+            },
+            set: function (value) {
+                var s = this;
+                s._rect = value;
+                s._UI.UD = true;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -2531,8 +2543,8 @@ var annie;
                     s._bounds.width = s._bounds.height = 0;
                 }
                 else {
-                    s._bounds.width = s.rect ? s.rect.width : value.width;
-                    s._bounds.height = s.rect ? s.rect.height : value.height;
+                    s._bounds.width = s._rect ? s._rect.width : value.width;
+                    s._bounds.height = s._rect ? s._rect.height : value.height;
                 }
             },
             enumerable: true,
@@ -2556,7 +2568,7 @@ var annie;
                         s._realCacheImg = window.document.createElement("canvas");
                     }
                     var _canvas = s._realCacheImg;
-                    var tr = s.rect;
+                    var tr = s._rect;
                     var w = tr ? tr.width : bitmapData.width;
                     var h = tr ? tr.height : bitmapData.height;
                     var newW = w + 20;
@@ -2601,9 +2613,9 @@ var annie;
                 }
                 var bw = void 0;
                 var bh = void 0;
-                if (s.rect) {
-                    bw = s.rect.width;
-                    bh = s.rect.height;
+                if (s._rect) {
+                    bw = s._rect.width;
+                    bh = s._rect.height;
                 }
                 else {
                     bw = s._texture.width + s._offsetX * 2;
@@ -2638,19 +2650,19 @@ var annie;
          */
         Bitmap.convertToImage = function (bitmap, isNeedImage) {
             if (isNeedImage === void 0) { isNeedImage = true; }
-            if (!bitmap.rect) {
+            if (!bitmap._rect) {
                 return bitmap.bitmapData;
             }
             else {
                 var _canvas = window.document.createElement("canvas");
-                var w = bitmap.rect.width;
-                var h = bitmap.rect.height;
+                var w = bitmap._rect.width;
+                var h = bitmap._rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
                 // _canvas.style.width = w / devicePixelRatio + "px";
                 // _canvas.style.height = h / devicePixelRatio + "px";
                 var ctx = _canvas.getContext("2d");
-                var tr = bitmap.rect;
+                var tr = bitmap._rect;
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
                 if (isNeedImage) {
                     var img = new Image();
@@ -2687,9 +2699,9 @@ var annie;
                     _canvas.height = 1;
                     var ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
-                    if (s.rect) {
-                        p.x += s.rect.x;
-                        p.y += s.rect.y;
+                    if (s._rect) {
+                        p.x += s._rect.x;
+                        p.y += s._rect.y;
                     }
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
                     ctx.drawImage(image, 0, 0);
@@ -2708,7 +2720,7 @@ var annie;
             var s = this;
             s._bitmapData = null;
             s._realCacheImg = null;
-            s.rect = null;
+            s._rect = null;
             _super.prototype.destroy.call(this);
         };
         return Bitmap;
@@ -4706,6 +4718,9 @@ var annie;
                     if (value) {
                         s._mouseEvent({ type: "onMouseDown" });
                     }
+                    else {
+                        s.gotoAndStop(1);
+                    }
                     s._clicked = value;
                 }
             },
@@ -4957,6 +4972,8 @@ var annie;
                 var curFrameScript = void 0;
                 //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
                 var isUserScript = false;
+                //因为脚本有可能改变Front，所以提前存起来
+                var isFront = s._isFront;
                 if (s._a2x_script) {
                     curFrameScript = s._a2x_script[frameIndex];
                     if (curFrameScript != undefined) {
@@ -4984,7 +5001,7 @@ var annie;
                         }
                     }
                 }
-                if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
+                if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
                     s.dispatchEvent(annie.Event.END_FRAME, {
                         frameIndex: s._curFrame,
                         frameName: "endFrame"

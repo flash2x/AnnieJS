@@ -1453,7 +1453,8 @@ declare namespace annie {
          * @type {annie.Rectangle}
          * @default null
          */
-        rect: Rectangle;
+        rect: annie.Rectangle;
+        private _rect;
         private _isCache;
         /**
          * 构造函数

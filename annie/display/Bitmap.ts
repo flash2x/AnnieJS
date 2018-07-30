@@ -11,6 +11,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class Bitmap extends DisplayObject {
+
         private _bitmapData: any = null;
         private _realCacheImg: any = null;
         /**
@@ -22,7 +23,16 @@ namespace annie {
          * @type {annie.Rectangle}
          * @default null
          */
-        public rect: Rectangle = null;
+        get rect(): annie.Rectangle {
+            return this._rect;
+        }
+
+        set rect(value: annie.Rectangle) {
+            let s:any=this;
+            s._rect = value;
+            s._UI.UD=true;
+        }
+        private _rect: Rectangle = null;
         private _isCache: boolean = false;
         /**
          * 构造函数
@@ -51,11 +61,11 @@ namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        public constructor(bitmapData: any = null, rect: Rectangle = null) {
+        public constructor(bitmapData: any = null, rect: Rectangle = null){
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s.rect = rect;
+            s._rect = rect;
             s.bitmapData = bitmapData;
         }
         /**
@@ -77,8 +87,8 @@ namespace annie {
             if (!value) {
                 s._bounds.width = s._bounds.height = 0;
             } else {
-                s._bounds.width = s.rect ? s.rect.width : value.width;
-                s._bounds.height = s.rect ? s.rect.height : value.height;
+                s._bounds.width = s._rect ? s._rect.width : value.width;
+                s._bounds.height = s._rect ? s._rect.height : value.height;
             }
         }
 
@@ -106,7 +116,7 @@ namespace annie {
                         s._realCacheImg = window.document.createElement("canvas");
                     }
                     let _canvas = s._realCacheImg;
-                    let tr = s.rect;
+                    let tr = s._rect;
                     let w = tr ? tr.width : bitmapData.width;
                     let h = tr ? tr.height : bitmapData.height;
                     let newW = w + 20;
@@ -149,9 +159,9 @@ namespace annie {
                 }
                 let bw: number;
                 let bh: number;
-                if (s.rect) {
-                    bw = s.rect.width;
-                    bh = s.rect.height;
+                if (s._rect) {
+                    bw = s._rect.width;
+                    bh = s._rect.height;
                 } else {
                     bw = s._texture.width + s._offsetX * 2;
                     bh = s._texture.height + s._offsetY * 2;
@@ -187,18 +197,18 @@ namespace annie {
          *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
         public static convertToImage(bitmap: annie.Bitmap, isNeedImage: boolean = true): any {
-            if (!bitmap.rect) {
+            if (!bitmap._rect) {
                 return bitmap.bitmapData;
             } else {
                 let _canvas = window.document.createElement("canvas");
-                let w: number = bitmap.rect.width;
-                let h: number = bitmap.rect.height;
+                let w: number = bitmap._rect.width;
+                let h: number = bitmap._rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
                 // _canvas.style.width = w / devicePixelRatio + "px";
                 // _canvas.style.height = h / devicePixelRatio + "px";
                 let ctx = _canvas.getContext("2d");
-                let tr = bitmap.rect;
+                let tr = bitmap._rect;
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
                 if (isNeedImage) {
                     var img = new Image();
@@ -231,9 +241,9 @@ namespace annie {
                     _canvas.height = 1;
                     let ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
-                    if (s.rect) {
-                        p.x += s.rect.x;
-                        p.y += s.rect.y;
+                    if (s._rect) {
+                        p.x += s._rect.x;
+                        p.y += s._rect.y;
                     }
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
                     ctx.drawImage(image, 0, 0);
@@ -252,7 +262,7 @@ namespace annie {
             let s = this;
             s._bitmapData = null;
             s._realCacheImg = null;
-            s.rect = null;
+            s._rect = null;
             super.destroy();
         }
     }
