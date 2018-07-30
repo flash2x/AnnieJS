@@ -273,11 +273,9 @@ namespace annie {
             s.eventTypes1 = {};
             s.eventTypes = {};
         }
-
         destroy(): void {
             let s = this;
             s.removeAllEventListener();
-            s.eventTypes = null;
         }
     }
 }

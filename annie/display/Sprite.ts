@@ -25,11 +25,15 @@ namespace annie {
             s._instanceType = "annie.Sprite";
         }
         public destroy(): void {
-            let s = this;
+            let s:any = this;
             //让子级也destroy
             for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
+            s.removeAllChildren();
+            s.removeAllEventListener();
+            if(s._parent)s._parent.removeChild(s);
+            s.callEventAndFrameScript(0);
             s.children.length=0;
             s._removeChildren.length=0;
             super.destroy();

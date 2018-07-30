@@ -287,7 +287,6 @@ var annie;
         EventDispatcher.prototype.destroy = function () {
             var s = this;
             s.removeAllEventListener();
-            s.eventTypes = null;
         };
         //全局的鼠标事件的监听数对象表
         EventDispatcher._MECO = {};
@@ -2372,8 +2371,10 @@ var annie;
             //清除相应的数据引用
             var s = this;
             s.stopAllSounds();
+            for (var i = 0; i < s._soundList.length; i++) {
+                s._soundList[i].destroy();
+            }
             s._a2x_res_obj = null;
-            s._soundList = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
@@ -2387,6 +2388,7 @@ var annie;
             s.cMatrix = null;
             s._UI = null;
             s._texture = null;
+            s._visible = false;
             _super.prototype.destroy.call(this);
         };
         /**
@@ -3606,6 +3608,11 @@ var annie;
             for (var i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
+            s.removeAllChildren();
+            s.removeAllEventListener();
+            if (s._parent)
+                s._parent.removeChild(s);
+            s.callEventAndFrameScript(0);
             s.children.length = 0;
             s._removeChildren.length = 0;
             _super.prototype.destroy.call(this);
@@ -4191,7 +4198,7 @@ var annie;
                 s.media = src;
             }
             s._SBWeixin = s._weixinSB.bind(s);
-            s.media.addEventListener('ended', function () {
+            s.media.addEventListener('ended', s._endEvent = function () {
                 if (s._loop == -1) {
                     s.play(0);
                 }
@@ -4207,10 +4214,10 @@ var annie;
                 s.dispatchEvent("onPlayEnd");
             }.bind(s));
             s.type = type.toLocaleUpperCase();
-            s.media.addEventListener("timeupdate", function () {
+            s.media.addEventListener("timeupdate", s._updateEvent = function () {
                 s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
             });
-            s.media.addEventListener("play", function () {
+            s.media.addEventListener("play", s._playEvent = function () {
                 s.dispatchEvent("onPlayStart");
             });
         }
@@ -4314,6 +4321,9 @@ var annie;
         Media.prototype.destroy = function () {
             var s = this;
             s.media.pause();
+            s.media.removeEventListener("ended", s._endEvent);
+            s.media.removeEventListener("onPlayStart", s._playEvent);
+            s.media.removeEventListener("timeupdate", s._updateEvent);
             s.media = null;
             _super.prototype.destroy.call(this);
         };
@@ -5010,12 +5020,12 @@ var annie;
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
+            _super.prototype.destroy.call(this);
             s._lastFrameObj = null;
             s._a2x_script = null;
             s._a2x_res_children = null;
             s._a2x_res_class = null;
             s._a2x_sounds = null;
-            _super.prototype.destroy.call(this);
         };
         return MovieClip;
     }(annie.Sprite));
@@ -6145,6 +6155,7 @@ var annie;
             this._lastDpList = {};
             this._rid = -1;
             this._floatDisplayList = [];
+            this._resizeEvent = null;
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
             this._ml = [];
             //这个是事件中用到的Point对象池,以提高性能
@@ -6165,6 +6176,7 @@ var annie;
             this._mP1 = new annie.Point();
             //当document有鼠标或触摸事件时调用
             this._mP2 = new annie.Point();
+            this.mouseEvent = null;
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
              * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -6189,7 +6201,6 @@ var annie;
             this._instanceType = "annie.Stage";
             annie.Stage._stageList[rootDivId] = s;
             s.stage = this;
-            var resizeEvent = "resize";
             s.name = "stageInstance_" + s.instanceId;
             var div = document.getElementById(rootDivId);
             s.renderType = renderType;
@@ -6211,7 +6222,7 @@ var annie;
                 s.renderObj = new WGRender(s);
             }*/
             s.renderObj.init();
-            window.addEventListener(resizeEvent, function (e) {
+            window.addEventListener("resize", s._resizeEvent = function (e) {
                 clearTimeout(s._rid);
                 s._rid = setTimeout(function () {
                     if (s.autoResize) {
@@ -6242,16 +6253,16 @@ var annie;
             }, 100);
             // let rc = s.renderObj.rootContainer;
             var rc = s.rootDiv;
-            var mouseEvent = s.onMouseEvent.bind(s);
+            s.mouseEvent = s.onMouseEvent.bind(s);
             if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent, false);
-                rc.addEventListener('touchmove', mouseEvent, false);
-                rc.addEventListener('touchend', mouseEvent, false);
+                rc.addEventListener("touchstart", s.mouseEvent, false);
+                rc.addEventListener('touchmove', s.mouseEvent, false);
+                rc.addEventListener('touchend', s.mouseEvent, false);
             }
             else {
-                rc.addEventListener("mousedown", mouseEvent, false);
-                rc.addEventListener('mousemove', mouseEvent, false);
-                rc.addEventListener('mouseup', mouseEvent, false);
+                rc.addEventListener("mousedown", s.mouseEvent, false);
+                rc.addEventListener('mousemove', s.mouseEvent, false);
+                rc.addEventListener('mouseup', s.mouseEvent, false);
             }
         }
         /**
@@ -6908,19 +6919,26 @@ var annie;
             }
         };
         Stage.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
             var s = this;
             Stage.removeUpdateObj(s);
-            s.rootDiv = null;
-            s._floatDisplayList = null;
+            var rc = s.rootDiv;
+            if (annie.osType != "pc") {
+                rc.removeEventListener("touchstart", s.mouseEvent, false);
+                rc.removeEventListener('touchmove', s.mouseEvent, false);
+                rc.removeEventListener('touchend', s.mouseEvent, false);
+            }
+            else {
+                rc.removeEventListener("mousedown", s.mouseEvent, false);
+                rc.removeEventListener('mousemove', s.mouseEvent, false);
+                rc.removeEventListener('mouseup', s.mouseEvent, false);
+            }
+            window.addEventListener("resize", s._resizeEvent);
+            rc.style.display = "none";
+            if (rc.parentNode) {
+                rc.parentNode.removeChild(rc);
+            }
             s.renderObj = null;
-            s.viewRect = null;
-            s._lastDpList = null;
-            s._touchEvent = null;
-            s.muliPoints = null;
-            s._mP1 = null;
-            s._mP2 = null;
-            s._ml = null;
-            _super.prototype.destroy.call(this);
         };
         Stage._stageList = {};
         Stage._pause = false;

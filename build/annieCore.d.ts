@@ -2084,6 +2084,9 @@ declare namespace annie {
          *          //media.stop();//停止播放
          */
         constructor(src: any, type: string);
+        private _playEvent;
+        private _updateEvent;
+        private _endEvent;
         /**
          * @property _repeate
          * @type {number}
@@ -3004,6 +3007,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
+        private _resizeEvent;
         update(isDrawUpdate?: boolean): void;
         private _touchEvent;
         render(renderObj: IRender): void;
@@ -3054,6 +3058,7 @@ declare namespace annie {
         private muliPoints;
         private _mP1;
         private _mP2;
+        private mouseEvent;
         private onMouseEvent(e);
         private setAlign();
         /**

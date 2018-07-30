@@ -655,7 +655,6 @@ namespace annie {
         public get height(): number {
             return this.getWH().height;
         }
-
         public set height(value: number) {
             let s = this;
             let h = s.height;
@@ -744,7 +743,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * @method getSound
          * @param {number|string} id
@@ -788,7 +786,6 @@ namespace annie {
             let sounds = s._soundList;
             sounds.push(sound);
         }
-
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
@@ -818,10 +815,12 @@ namespace annie {
         private _a2x_res_obj: any = {};
         public destroy(): void {
             //清除相应的数据引用
-            let s = this;
+            let s:any = this;
             s.stopAllSounds();
+            for(let i=0;i<s._soundList.length;i++){
+                s._soundList[i].destroy();
+            }
             s._a2x_res_obj = null;
-            s._soundList = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
@@ -835,6 +834,7 @@ namespace annie {
             s.cMatrix = null;
             s._UI = null;
             s._texture = null;
+            s._visible=false;
             super.destroy();
         }
         /**
