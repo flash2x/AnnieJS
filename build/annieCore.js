@@ -4000,6 +4000,9 @@ var annie;
                     if (value) {
                         s._mouseEvent({ type: "onMouseDown" });
                     }
+                    else {
+                        s.gotoAndStop(1);
+                    }
                     s._clicked = value;
                 }
             },
@@ -4251,6 +4254,8 @@ var annie;
                 var curFrameScript = void 0;
                 //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
                 var isUserScript = false;
+                //因为脚本有可能改变Front，所以提前存起来
+                var isFront = s._isFront;
                 if (s._a2x_script) {
                     curFrameScript = s._a2x_script[frameIndex];
                     if (curFrameScript != undefined) {
@@ -4278,7 +4283,7 @@ var annie;
                         }
                     }
                 }
-                if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
+                if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
                     s.dispatchEvent(annie.Event.END_FRAME, {
                         frameIndex: s._curFrame,
                         frameName: "endFrame"
@@ -7431,5 +7436,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-
-module.exports = annie;
