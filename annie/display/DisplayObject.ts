@@ -17,15 +17,18 @@ namespace annie {
          * @since 1.0.0
          * @public
          */
-        constructor() {
+        constructor(){
             super();
             this._instanceType = "annie.DisplayObject";
         }
 
         /**
-         * 更新信息
+         * 更新信息对象
          * @property _UI
          * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
+         * @since 1.0.0
+         * @protected
+         * @readonly
          */
         protected _UI: { UD: boolean, UM: boolean, UA: boolean, UF: boolean } = {
             UD: false,
@@ -56,7 +59,7 @@ namespace annie {
         /**
          * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
          * @property cAlpha
-         * @private
+         * @protected
          * @type {number}
          * @since 1.0.0
          * @default 1
@@ -65,12 +68,13 @@ namespace annie {
         /**
          * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
          * @property cMatrix
-         * @private
+         * @protected
          * @type {annie.Matrix}
          * @default null
          * @since 1.0.0
          */
         protected cMatrix: Matrix = new Matrix();
+
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -81,9 +85,10 @@ namespace annie {
          */
         public mouseEnable: boolean = true;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 显示对象上对显示列表上的最终的所有滤镜组
          * @property cFilters
-         * @private
+         * @protected
          * @default []
          * @since 1.0.0
          * @type {Array}
@@ -264,7 +269,7 @@ namespace annie {
         /**
          * 显示对象上y方向的缩放或旋转点
          * @property anchorY
-         * @pubic
+         * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
@@ -295,8 +300,6 @@ namespace annie {
             let s = this;
             if (value != s._visible) {
                 s._visible = value;
-                if (!value)
-                    s._cp = true;
             }
         }
 
@@ -310,9 +313,7 @@ namespace annie {
          * @type {string}
          * @default 0
          */
-
         //public blendMode: string = "normal";
-
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -341,21 +342,22 @@ namespace annie {
 
         public set mask(value: DisplayObject) {
             let s = this;
-            if (value != s.mask) {
+            if (value != s._mask) {
                 if (value) {
                     value["_isUseToMask"]++;
-                }
-                if (s._mask) {
-                    s._mask["_isUseToMask"]--;
+                } else {
+                    if (s._mask != null) {
+                        s["_isUseToMask"]--;
+                    }
                 }
                 s._mask = value;
             }
         }
 
-        protected _isUseToMask: number = 0;
         private _mask: DisplayObject = null;
 
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 显示对象的滤镜数组
          * @property filters
          * @since 1.0.0
@@ -373,11 +375,7 @@ namespace annie {
 
         private _filters: any[] = [];
 
-        /**
-         * 是否自己的父级发生的改变
-         * @type {boolean}
-         * @private
-         */
+        //是否自己的父级发生的改变
         protected _cp: boolean = true;
 
         /**
@@ -401,21 +399,17 @@ namespace annie {
          * @return {annie.Point}
          */
         public localToGlobal(point: Point, bp: Point = null): Point {
-            if (this.parent) {
+            let s = this;
+            if (s.parent) {
                 //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
-                return this.parent.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.parent.cMatrix.transformPoint(point.x, point.y, bp);
             } else {
                 //没有父级
-                return this.cMatrix.transformPoint(point.x, point.y, bp);
+                return s.cMatrix.transformPoint(point.x, point.y, bp);
             }
         }
 
-        /**
-         * 为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-         * @type {annie.Point}
-         * @private
-         * @static
-         */
+        //为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         public static _bp: Point = new Point();
         public static _p1: Point = new Point();
         public static _p2: Point = new Point();
@@ -431,12 +425,13 @@ namespace annie {
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
          * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
-         * @return {void}
          * @public
+         * @return {void}
          */
         public startDrag(isCenter: boolean = false, bounds: Rectangle = null): void {
             let s = this;
             if (!s.stage) {
+                console.log("The DisplayObject is not on stage");
                 return;
             }
             Stage._dragDisplay = s;
@@ -455,6 +450,8 @@ namespace annie {
                 s._dragBounds.height = 0;
             }
         }
+
+        protected _isUseToMask: number = 0;
 
         /**
          * 停止鼠标或者触摸拖动
@@ -500,7 +497,6 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @return {annie.Rectangle}
-         * @abstract
          */
         public getBounds(): Rectangle {
             return this._bounds;
@@ -549,6 +545,7 @@ namespace annie {
          */
         protected update(isDrawUpdate: boolean = true): void {
             let s = this;
+            if(!s._visible)return;
             let UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
@@ -596,7 +593,6 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {annie.IRender} renderObj
-         * @abstract
          * @return {void}
          */
         public render(renderObj: IRender | any): void {
@@ -635,7 +631,6 @@ namespace annie {
         public get height(): number {
             return this.getWH().height;
         }
-
         public set height(value: number) {
             let s = this;
             let h = s.height;
@@ -668,9 +663,28 @@ namespace annie {
          * @default null
          */
         protected _texture: any = null;
+        /**
+         * @property _offsetX
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetX: number = 0;
+        /**
+         * @property _offsetY
+         * @protected
+         * @since 1.0.0
+         * @type {number}
+         * @default 0
+         */
+        protected _offsetY: number = 0;
+
         protected _bounds: Rectangle = new Rectangle();
+
         protected _drawRect: Rectangle = new Rectangle();
 
+        //设置属性
         protected _setProperty(property: string, value: any, type: number) {
             let s: any = this;
             if (s[property] != value) {
@@ -702,7 +716,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * @method getSound
          * @param {number|string} id
@@ -746,7 +759,6 @@ namespace annie {
             let sounds = s._soundList;
             sounds.push(sound);
         }
-
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
@@ -772,22 +784,17 @@ namespace annie {
             }
         }
 
-        /**
-         * 每个Flash文件生成的对象都有一个自带的初始化信息
-         * @property _a2x_res_obj
-         * @type {Object}
-         * @since 2.0.0
-         * @private
-         * @default {Object}
-         */
+        //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
-
         public destroy(): void {
             //清除相应的数据引用
-            let s = this;
+            let s:any = this;
+            s.removeAllEventListener();
             s.stopAllSounds();
+            for(let i=0;i<s._soundList.length;i++){
+                s._soundList[i].destroy();
+            }
             s._a2x_res_obj = null;
-            s._soundList = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
@@ -801,39 +808,39 @@ namespace annie {
             s.cMatrix = null;
             s._UI = null;
             s._texture = null;
+            s._visible=false;
             super.destroy();
         }
-
         /**
-         * 更新流程走完之后再执行脚本和事件执行流程，这样会更好一点
+         * 更新流程走完之后再执行脚本和事件执行流程
+         * @protected
          * @method callEventAndFrameScript
-         * @param {number} callState 0是执行removeStage事件 1是执行addStage事件 2是只执行enterFrame事件
+         * @param {number} callState 0是上级被移除，执行removeStage事件 1是上级被添加到舞台执行addStage事件 2是常规刷新运行
          */
-        protected callEventAndFrameScript(callState: number): void {
+        protected callEventAndFrameScript(callState: number):void {
             let s: any = this;
             if (!s.stage) return;
             let sounds = s._soundList;
-            let timeLineObj = s._a2x_res_class;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
-                //如果有音乐。则关闭音乐
-                if (sounds && sounds.length > 0) {
+                //如果有音乐,则关闭音乐
+                if (sounds.length > 0) {
                     for (let i = 0; i < sounds.length; i++) {
                         sounds[i].stop2();
                     }
                 }
             } else {
-                if (callState == 1) {
-                    //如果有音乐，如果是Sprite则播放音乐
-                    if (sounds && sounds.length > 0 && timeLineObj.tf == 1) {
+                if (callState == 1){
+                    //如果有音乐，则播放音乐
+                    if (sounds.length > 0) {
                         for (let i = 0; i < sounds.length; i++) {
                             sounds[i].play2();
                         }
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if (s._visible)
-                    s.dispatchEvent(annie.Event.ENTER_FRAME);
+                if(s._visible)
+                s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         }
     }

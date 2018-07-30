@@ -27,29 +27,31 @@ namespace annie {
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
          * 对象视觉暂停更新
          * @property pause
+         * @static
          * @type {boolean}
          * @public
-         * @static
          * @since 1.0.0
          * @default false
          */
         static get pause(): boolean {
             return this._pause;
         }
+
         static set pause(value: boolean) {
-            let s=this;
-            s._pause = value;
-            if(value){
-                //关闭声音
-                Sound.stopAllSounds();
-            }else{
-                //恢复声音
-                Sound.resumePlaySounds();
-            }
-            if(value!=s._pause) {
-                annie.globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
+            this._pause = value;
+            if (value != this._pause) {
+                if (value) {
+                    //停止声音
+                    Sound.stopAllSounds();
+                } else {
+                    //恢复声音
+                    Sound.resumePlaySounds();
+                }
+                //触发事件
+                globalDispatcher.dispatchEvent("onStagePause", {pause: value});
             }
         }
+
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
@@ -152,7 +154,6 @@ namespace annie {
          *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
          *              let state=e.currentTarget;
          *              state.scaleMode=aList[i];
-         *              state.resize();
          *              if(i>5){i=0;}
          *          }
          *      }
@@ -171,14 +172,8 @@ namespace annie {
         }
 
         private _scaleMode: string = "onScale";
-        /**
-         * 原始为60的刷新速度时的计数器
-         * @property _flush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
+
+        //原始为60的刷新速度时的计数器
         private _flush: number = 0;
         /**
          * 当前的刷新次数计数器
@@ -744,13 +739,7 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
 
-        /**
-         * 刷新所有定时器
-         * @static
-         * @private
-         * @since 1.0.0
-         * @method flushAll
-         */
+        //刷新所有定时器
         private static flushAll(): void {
             Stage._runIntervalId=setInterval(function () {
                 if (!Stage._pause) {
@@ -783,6 +772,7 @@ namespace annie {
          * @public
          * @static
          * @since
+         * @return {void}
          */
         public static addUpdateObj(target: any): void {
             let isHave: boolean = false;
@@ -805,6 +795,7 @@ namespace annie {
          * @public
          * @static
          * @since 1.0.0
+         * @return {void}
          */
         public static removeUpdateObj(target: any): void {
             let len = Stage.allUpdateObjList.length;
@@ -815,17 +806,9 @@ namespace annie {
                 }
             }
         }
-        public destroy(): void {
+        public destroy():void{
             let s = this;
             Stage.removeUpdateObj(s);
-            s.renderObj = null;
-            s.viewRect = null;
-            s._lastDpList = null;
-            s._touchEvent = null;
-            s.muliPoints = null;
-            s._mP1 = null;
-            s._mP2 = null;
-            s._ml = null;
             super.destroy();
         }
     }
