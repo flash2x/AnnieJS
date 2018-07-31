@@ -91,7 +91,6 @@ declare namespace annie {
          *       mySprite.dispatchEvent(yourEvent);
          */
         dispatchEvent(event: any, data?: any, useCapture?: boolean): boolean;
-        trigger(event: any, data?: any): boolean;
         /**
          * 是否有添加过此类形的侦听
          * @method hasEventListener

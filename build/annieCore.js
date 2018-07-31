@@ -196,10 +196,6 @@ var annie;
                 return false;
             }
         };
-        EventDispatcher.prototype.trigger = function (event, data) {
-            if (data === void 0) { data = null; }
-            return this.dispatchEvent.apply(this, arguments);
-        };
         /**
          * 是否有添加过此类形的侦听
          * @method hasEventListener
@@ -279,6 +275,15 @@ var annie;
             s.eventTypes1 = {};
             s.eventTypes = {};
         };
+        // public on(type: string, listener: Function,useCapture = true): void {
+        //     return this.addEventListener.apply(this, arguments);
+        // }
+        // public off(type: string, listener: Function,useCapture = true): void {
+        //     return this.removeEventListener.apply(this, arguments);
+        // }
+        // public trigger(event: any, data: any = null): boolean {
+        //     return this.dispatchEvent.apply(this, arguments);
+        // }
         EventDispatcher.prototype.destroy = function () {
             var s = this;
             s.removeAllEventListener();
@@ -8383,10 +8388,12 @@ var annie;
             _currentConfig.map(function (list) {
                 list.map(function (resource) {
                     if (resource.type == 'image') {
-                        var _img = document.createElement('img');
-                        _img.setAttribute('crossorigin', 'anonymous');
-                        _img.src = _domain + resource.src;
-                        theOnload_1.appendChild(_img);
+                        requestAnimationFrame(function () {
+                            var _img = document.createElement('img');
+                            _img.setAttribute('crossorigin', 'anonymous');
+                            _img.src = _domain + resource.src;
+                            theOnload_1.appendChild(_img);
+                        });
                     }
                 });
             });
@@ -8547,10 +8554,8 @@ var annie;
         var url = _domain + _currentConfig[_loadIndex][0].src;
         if (annie._isReleased) {
             _loaderQueue.responseType = "js";
-            url += "?v=" + annie._isReleased;
         }
         else {
-            url += "?v=" + _time;
         }
         _loaderQueue.load(url);
     }

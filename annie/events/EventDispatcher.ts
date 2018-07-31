@@ -194,9 +194,6 @@ namespace annie {
                 return false;
             }
         }
-        public trigger(event: any, data: any = null): boolean {
-            return this.dispatchEvent.apply(this, arguments);
-        }
 
         /**
          * 是否有添加过此类形的侦听
@@ -274,6 +271,17 @@ namespace annie {
             }
             s.eventTypes1 = {};
             s.eventTypes = {};
+        }
+
+
+        public on(type: string, listener: Function,useCapture = true): void {
+            return this.addEventListener.apply(this, arguments);
+        }
+        public off(type: string, listener: Function,useCapture = true): void {
+            return this.removeEventListener.apply(this, arguments);
+        }
+        public trigger(event: any, data: any = null): boolean {
+            return this.dispatchEvent.apply(this, arguments);
         }
 
         destroy(): void {

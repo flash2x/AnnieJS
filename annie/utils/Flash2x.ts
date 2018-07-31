@@ -181,10 +181,12 @@ namespace annie {
             _currentConfig.map(function (list: any) {
                 list.map(function (resource: any) {
                     if (resource.type == 'image') {
-                        let _img: any = document.createElement('img');
-                        _img.setAttribute('crossorigin','anonymous');
-                        _img.src = _domain + resource.src;
-                        theOnload.appendChild(_img);
+                        requestAnimationFrame(function(){
+                            let _img: any = document.createElement('img');
+                            _img.setAttribute('crossorigin','anonymous');
+                            _img.src = _domain + resource.src;
+                            theOnload.appendChild(_img);
+                        })
                     }
                 });
             })
@@ -341,9 +343,9 @@ namespace annie {
         let url = _domain + _currentConfig[_loadIndex][0].src;
         if (_isReleased) {
             _loaderQueue.responseType = "js";
-            url += "?v=" + _isReleased;
+            // url += "?v=" + _isReleased;
         } else {
-            url += "?v=" + _time;
+            // url += "?v=" + _time;
         }
         _loaderQueue.load(url);
     }
