@@ -462,18 +462,6 @@ namespace annie {
             }
             return {w: vW, h: vH};
         }
-
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         * @return {void}
-         */
-        public kill(): void {
-            Stage.removeUpdateObj(this);
-        }
-
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",

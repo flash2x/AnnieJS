@@ -1398,7 +1398,15 @@ declare namespace annie {
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
         getSound(id: any): any;
-        private _soundList;
+        /**
+         * 当前对象包含的声音列表
+         * @property soundList
+         * @public
+         * @since 2.0.0
+         * @type {Array}
+         * @default []
+         */
+        soundList: any;
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
@@ -3047,14 +3055,6 @@ declare namespace annie {
             w: number;
             h: number;
         };
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         * @return {void}
-         */
-        kill(): void;
         private _mouseEventTypes;
         private muliPoints;
         private _mP1;

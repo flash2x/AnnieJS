@@ -1689,7 +1689,15 @@ var annie;
             this._offsetY = 0;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
-            this._soundList = [];
+            /**
+             * 当前对象包含的声音列表
+             * @property soundList
+             * @public
+             * @since 2.0.0
+             * @type {Array}
+             * @default []
+             */
+            this.soundList = [];
             //每个Flash文件生成的对象都有一个自带的初始化信息
             this._a2x_res_obj = {};
             this._instanceType = "annie.DisplayObject";
@@ -2294,7 +2302,7 @@ var annie;
          * @since 2.0.0
          */
         DisplayObject.prototype.stopAllSounds = function () {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             if (sounds) {
                 for (var i = sounds.length - 1; i >= 0; i--) {
                     sounds[i].stop();
@@ -2307,7 +2315,7 @@ var annie;
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
         DisplayObject.prototype.getSound = function (id) {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             var newSounds = [];
             if (sounds) {
                 if (typeof (id) == "string") {
@@ -2336,10 +2344,10 @@ var annie;
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
-            if (!s._soundList) {
-                s._soundList = [];
+            if (!s.soundList) {
+                s.soundList = [];
             }
-            var sounds = s._soundList;
+            var sounds = s.soundList;
             sounds.push(sound);
         };
         /**
@@ -2351,7 +2359,7 @@ var annie;
          * @return {void}
          */
         DisplayObject.prototype.removeSound = function (id) {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             if (sounds) {
                 if (typeof (id) == "string") {
                     for (var i = sounds.length - 1; i >= 0; i--) {
@@ -2371,8 +2379,8 @@ var annie;
             //清除相应的数据引用
             var s = this;
             s.stopAllSounds();
-            for (var i = 0; i < s._soundList.length; i++) {
-                s._soundList[i].destroy();
+            for (var i = 0; i < s.soundList.length; i++) {
+                s.soundList[i].destroy();
             }
             s._a2x_res_obj = null;
             s.mask = null;
@@ -2401,7 +2409,7 @@ var annie;
             var s = this;
             if (!s.stage)
                 return;
-            var sounds = s._soundList;
+            var sounds = s.soundList;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 //如果有音乐,则关闭音乐
@@ -6471,16 +6479,6 @@ var annie;
             }
             return { w: vW, h: vH };
         };
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         * @return {void}
-         */
-        Stage.prototype.kill = function () {
-            Stage.removeUpdateObj(this);
-        };
         Stage.prototype.onMouseEvent = function (e) {
             //检查是否有
             var s = this;
@@ -9087,7 +9085,6 @@ var annie;
  */
 var annie;
 (function (annie) {
-    var isUpdateTween = true;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
@@ -9821,18 +9818,15 @@ var annie;
         };
         //这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
         Tween.flush = function () {
-            if (isUpdateTween) {
-                var len = Tween._tweenList.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    if (Tween._tweenList[i]) {
-                        Tween._tweenList[i].update();
-                    }
-                    else {
-                        Tween._tweenList.splice(i, 1);
-                    }
+            var len = Tween._tweenList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (Tween._tweenList[i]) {
+                    Tween._tweenList[i].update();
+                }
+                else {
+                    Tween._tweenList.splice(i, 1);
                 }
             }
-            isUpdateTween = !isUpdateTween;
         };
         Tween._tweenPool = [];
         Tween._tweenList = [];

@@ -736,7 +736,7 @@ namespace annie {
          * @since 2.0.0
          */
         public stopAllSounds(): void {
-            let sounds = this._soundList;
+            let sounds = this.soundList;
             if (sounds) {
                 for (let i = sounds.length - 1; i >= 0; i--) {
                     sounds[i].stop();
@@ -749,7 +749,7 @@ namespace annie {
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
         public getSound(id: any): any {
-            let sounds = this._soundList;
+            let sounds = this.soundList;
             let newSounds: any = [];
             if (sounds) {
                 if (typeof(id) == "string") {
@@ -767,7 +767,15 @@ namespace annie {
             return newSounds;
         }
 
-        private _soundList: any = [];
+        /**
+         * 当前对象包含的声音列表
+         * @property soundList
+         * @public
+         * @since 2.0.0
+         * @type {Array}
+         * @default []
+         */
+        public soundList: any = [];
 
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
@@ -780,10 +788,10 @@ namespace annie {
          */
         public addSound(sound: annie.Sound): void {
             let s = this;
-            if (!s._soundList) {
-                s._soundList = [];
+            if (!s.soundList) {
+                s.soundList = [];
             }
-            let sounds = s._soundList;
+            let sounds = s.soundList;
             sounds.push(sound);
         }
         /**
@@ -795,7 +803,7 @@ namespace annie {
          * @return {void}
          */
         public removeSound(id: number | string): void {
-            let sounds = this._soundList;
+            let sounds = this.soundList;
             if (sounds) {
                 if (typeof(id) == "string") {
                     for (let i = sounds.length - 1; i >= 0; i--) {
@@ -817,8 +825,8 @@ namespace annie {
             //清除相应的数据引用
             let s:any = this;
             s.stopAllSounds();
-            for(let i=0;i<s._soundList.length;i++){
-                s._soundList[i].destroy();
+            for(let i=0;i<s.soundList.length;i++){
+                s.soundList[i].destroy();
             }
             s._a2x_res_obj = null;
             s.mask = null;
@@ -846,7 +854,7 @@ namespace annie {
         protected callEventAndFrameScript(callState: number):void {
             let s: any = this;
             if (!s.stage) return;
-            let sounds = s._soundList;
+            let sounds = s.soundList;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 //如果有音乐,则关闭音乐
