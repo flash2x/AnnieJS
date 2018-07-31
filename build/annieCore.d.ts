@@ -1405,12 +1405,20 @@ declare namespace annie {
          */
         stopAllSounds(): void;
         /**
-         * @method getSound
+         * @method getSounds
          * @param {number|string} id
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
-        getSound(id: any): any;
-        private _soundList;
+        getSounds(id: any): any;
+        /**
+         * 当前对象包含的声音列表
+         * @property soundList
+         * @public
+         * @since 2.0.0
+         * @type {Array}
+         * @default []
+         */
+        soundList: any;
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
