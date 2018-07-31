@@ -18,5 +18,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "anlun214",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "gulp-strip-debug": "^3.0.0"
+  }
 }

@@ -144,7 +144,7 @@ namespace annie {
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
-        _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
+        _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json");
     }
     //加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
@@ -168,14 +168,15 @@ namespace annie {
                 list.map(function (resource: any) {
                     if (resource.type == 'image') {
                         requestAnimationFrame(function(){
-                            let _img: any = document.createElement('img');
+                            let _img: any = new Image();
                             _img.setAttribute('crossorigin','anonymous');
                             _img.src = _domain + resource.src;
                             theOnload.appendChild(_img);
                         })
                     }
                 });
-            })
+            });
+            document.querySelector('body').removeChild(theOnload);
             _loadRes();
         }
     }

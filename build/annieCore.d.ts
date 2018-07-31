@@ -120,6 +120,9 @@ declare namespace annie {
          * @return {void}
          */
         removeAllEventListener(): void;
+        on(type: string, listener: Function, useCapture?: boolean): void;
+        off(type: string, listener: Function, useCapture?: boolean): void;
+        trigger(event: any, data?: any): boolean;
         destroy(): void;
     }
 }

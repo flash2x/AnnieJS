@@ -6,6 +6,7 @@ var ts = require('gulp-typescript');
 var del = require('del');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+var stripDebug = require('gulp-strip-debug');
 var coreList =[
     "annie/events/EventDispatcher.ts",
     "annie/events/Event.ts",
@@ -59,7 +60,7 @@ var onBuildCore = function(){
     var outDir = "build";
     var tsResult = gulp.src(coreList).pipe(ts(op));
         tsResult.dts.pipe(gulp.dest(outDir));
-        tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+        tsResult.js.pipe(gulp.dest(outDir)).pipe(stripDebug()).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 var onBuildUI = function(){
     var op = {

@@ -284,15 +284,18 @@ var annie;
             s.eventTypes1 = {};
             s.eventTypes = {};
         };
-        // public on(type: string, listener: Function,useCapture = true): void {
-        //     return this.addEventListener.apply(this, arguments);
-        // }
-        // public off(type: string, listener: Function,useCapture = true): void {
-        //     return this.removeEventListener.apply(this, arguments);
-        // }
-        // public trigger(event: any, data: any = null): boolean {
-        //     return this.dispatchEvent.apply(this, arguments);
-        // }
+        EventDispatcher.prototype.on = function (type, listener, useCapture) {
+            if (useCapture === void 0) { useCapture = true; }
+            return this.addEventListener.apply(this, arguments);
+        };
+        EventDispatcher.prototype.off = function (type, listener, useCapture) {
+            if (useCapture === void 0) { useCapture = true; }
+            return this.removeEventListener.apply(this, arguments);
+        };
+        EventDispatcher.prototype.trigger = function (event, data) {
+            if (data === void 0) { data = null; }
+            return this.dispatchEvent.apply(this, arguments);
+        };
         EventDispatcher.prototype.destroy = function () {
             var s = this;
             s.removeAllEventListener();
@@ -8390,7 +8393,7 @@ var annie;
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig() {
-        _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
+        _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json");
     }
     //加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
@@ -8414,7 +8417,7 @@ var annie;
                 list.map(function (resource) {
                     if (resource.type == 'image') {
                         requestAnimationFrame(function () {
-                            var _img = document.createElement('img');
+                            var _img = new Image();
                             _img.setAttribute('crossorigin', 'anonymous');
                             _img.src = _domain + resource.src;
                             theOnload_1.appendChild(_img);
@@ -8422,6 +8425,7 @@ var annie;
                     }
                 });
             });
+            document.querySelector('body').removeChild(theOnload_1);
             _loadRes();
         }
     }

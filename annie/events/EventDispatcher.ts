@@ -272,7 +272,6 @@ namespace annie {
             s.eventTypes1 = {};
             s.eventTypes = {};
         }
-<<<<<<< HEAD
 
 
         public on(type: string, listener: Function,useCapture = true): void {
@@ -285,8 +284,6 @@ namespace annie {
             return this.dispatchEvent.apply(this, arguments);
         }
 
-=======
->>>>>>> flash2x/master
         destroy(): void {
             let s = this;
             s.removeAllEventListener();
