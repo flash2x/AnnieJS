@@ -2474,7 +2474,7 @@ var annie;
                 s_1.setWH(width, height);
                 s_1.postMessage({
                     event: "initSharedCanvasStage",
-                    data: { w: width, h: height, fps: fps, scaleMode: scaleMode, devicePixelRatio: annie.devicePixelRatio }
+                    data: { w: width, h: height, fps: fps, scaleMode: scaleMode, }
                 });
                 SharedCanvas._isInit = true;
                 s_1.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
@@ -3487,7 +3487,7 @@ var annie;
                     }
                 }
             }
-            if (!child.parent || s.parent != s) {
+            if (!child.parent || child.parent != s) {
                 child["_cp"] = true;
                 child.parent = s;
             }
@@ -3753,7 +3753,7 @@ var annie;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.callEventAndFrameScript(callState);
+                    child.callEventAndFrameScript(0);
                     child.stage = null;
                     child.parent = null;
                 }
@@ -3761,7 +3761,7 @@ var annie;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.callEventAndFrameScript(callState);
+                    child.callEventAndFrameScript(0);
                     child.stage = null;
                 }
             }
@@ -3772,7 +3772,7 @@ var annie;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
-                    child.callEventAndFrameScript(callState);
+                    child.callEventAndFrameScript(1);
                 }
             }
             else if (callState == 2) {

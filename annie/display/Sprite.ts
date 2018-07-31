@@ -176,7 +176,7 @@ namespace annie {
                     }
                 }
             }
-            if (!child.parent || s.parent != s) {
+            if (!child.parent || child.parent != s) {
                 child["_cp"] = true;
                 child.parent = s;
             }
@@ -442,7 +442,6 @@ namespace annie {
                     child = children[i];
                     child.callEventAndFrameScript(0);
                     child.stage = null;
-                    child.parent = null;
                 }
             } else if (callState == 1) {
                 //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
