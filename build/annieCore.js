@@ -5827,7 +5827,6 @@ var annie;
  */
 var annie;
 (function (annie) {
-    var isUpdateTween = true;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
@@ -6566,18 +6565,15 @@ var annie;
          * @since 1.0.0
          */
         Tween.flush = function () {
-            if (isUpdateTween) {
-                var len = Tween._tweenList.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    if (Tween._tweenList[i]) {
-                        Tween._tweenList[i].update();
-                    }
-                    else {
-                        Tween._tweenList.splice(i, 1);
-                    }
+            var len = Tween._tweenList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (Tween._tweenList[i]) {
+                    Tween._tweenList[i].update();
+                }
+                else {
+                    Tween._tweenList.splice(i, 1);
                 }
             }
-            isUpdateTween = !isUpdateTween;
         };
         Tween.destroy = function () {
             Tween.killAll();
