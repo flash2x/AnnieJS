@@ -32,7 +32,7 @@ namespace annie {
                 s.setWH(width, height);
                 s.postMessage({
                     event: "initSharedCanvasStage",
-                    data: {w: width, h: height, fps: fps, scaleMode: scaleMode}
+                    data: {w: width, h: height, fps: fps, scaleMode: scaleMode,}
                 });
                 SharedCanvas._isInit=true;
                 s.addEventListener(annie.Event.ADD_TO_STAGE,function(e:any){

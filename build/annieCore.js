@@ -2474,7 +2474,7 @@ var annie;
                 s_1.setWH(width, height);
                 s_1.postMessage({
                     event: "initSharedCanvasStage",
-                    data: { w: width, h: height, fps: fps, scaleMode: scaleMode }
+                    data: { w: width, h: height, fps: fps, scaleMode: scaleMode, devicePixelRatio: annie.devicePixelRatio }
                 });
                 SharedCanvas._isInit = true;
                 s_1.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
@@ -7436,3 +7436,5 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+
+module.exports = annie;
