@@ -76,6 +76,7 @@ namespace annie {
         }
 
         private static _stageList: any = {};
+
         /**
          * 是否暂停
          * @property pause
@@ -88,18 +89,19 @@ namespace annie {
         static get pause(): boolean {
             return this._pause;
         }
+
         static set pause(value: boolean) {
             this._pause = value;
-            if(value!=this._pause){
-                if(value){
+            if (value != this._pause) {
+                if (value) {
                     //停止声音
                     Sound.stopAllSounds();
-                }else{
+                } else {
                     //恢复声音
                     Sound.resumePlaySounds();
                 }
                 //触发事件
-                globalDispatcher.dispatchEvent("onStagePause",{pause:value});
+                globalDispatcher.dispatchEvent("onStagePause", {pause: value});
             }
         }
 
@@ -203,6 +205,7 @@ namespace annie {
          * @default "";
          */
         public bgColor: string = "";
+
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -235,12 +238,13 @@ namespace annie {
         }
 
         set scaleMode(value: string) {
-            let s=this;
-            if(value!=s._scaleMode) {
+            let s = this;
+            if (value != s._scaleMode) {
                 s._scaleMode = value;
                 s.setAlign();
             }
         }
+
         private _scaleMode: string = "onScale";
 
         //原始为60的刷新速度时的计数器
@@ -273,7 +277,6 @@ namespace annie {
             this._instanceType = "annie.Stage";
             annie.Stage._stageList[rootDivId] = s;
             s.stage = this;
-            let resizeEvent = "resize";
             s.name = "stageInstance_" + s.instanceId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;
@@ -295,7 +298,7 @@ namespace annie {
                 s.renderObj = new WGRender(s);
             }*/
             s.renderObj.init();
-            window.addEventListener(resizeEvent, function (e: any) {
+            window.addEventListener("resize", s._resizeEvent = function (e: any) {
                 clearTimeout(s._rid);
                 s._rid = setTimeout(function () {
                     if (s.autoResize) {
@@ -325,17 +328,19 @@ namespace annie {
             }, 100);
             // let rc = s.renderObj.rootContainer;
             let rc = s.rootDiv;
-            let mouseEvent = s.onMouseEvent.bind(s);
+            s.mouseEvent = s.onMouseEvent.bind(s);
             if (osType != "pc") {
-                rc.addEventListener("touchstart", mouseEvent, false);
-                rc.addEventListener('touchmove', mouseEvent, false);
-                rc.addEventListener('touchend', mouseEvent, false);
+                rc.addEventListener("touchstart", s.mouseEvent, false);
+                rc.addEventListener('touchmove', s.mouseEvent, false);
+                rc.addEventListener('touchend', s.mouseEvent, false);
             } else {
-                rc.addEventListener("mousedown", mouseEvent, false);
-                rc.addEventListener('mousemove', mouseEvent, false);
-                rc.addEventListener('mouseup', mouseEvent, false);
+                rc.addEventListener("mousedown", s.mouseEvent, false);
+                rc.addEventListener('mousemove', s.mouseEvent, false);
+                rc.addEventListener('mouseup', s.mouseEvent, false);
             }
         }
+
+        private _resizeEvent: any = null;
 
         public update(isDrawUpdate: boolean = true): void {
             let s = this;
@@ -348,6 +353,7 @@ namespace annie {
         }
 
         private _touchEvent: annie.TouchEvent;
+
         public render(renderObj: IRender): void {
             renderObj.begin();
             super.render(renderObj);
@@ -482,6 +488,8 @@ namespace annie {
         private _mP1: Point = new Point();
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
+        private mouseEvent: any = null;
+
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this;
@@ -572,16 +580,16 @@ namespace annie {
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
-                            if (!s._ml[eLen]) {
-                                event = new MouseEvent(item);
-                                s._ml[eLen] = event;
-                            } else {
-                                event = s._ml[eLen];
-                                event.type = item;
-                            }
-                            events[events.length] = event;
-                            s._initMouseEvent(event, cp, sp, identifier);
-                            eLen++;
+                        if (!s._ml[eLen]) {
+                            event = new MouseEvent(item);
+                            s._ml[eLen] = event;
+                        } else {
+                            event = s._ml[eLen];
+                            event.type = item;
+                        }
+                        events[events.length] = event;
+                        s._initMouseEvent(event, cp, sp, identifier);
+                        eLen++;
                         //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -608,7 +616,7 @@ namespace annie {
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            let d: any = s.hitTestPoint(cp, true,true);
+                            let d: any = s.hitTestPoint(cp, true, true);
                             let displayList: Array<DisplayObject> = [];
                             if (d) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
@@ -625,9 +633,9 @@ namespace annie {
                                 displayList[displayList.length] = s;
                             }
                             let len: number = displayList.length;
-                            for (let i =len-1; i >=0; i--) {
+                            for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
-                                for (let j = 0; j <eLen; j++) {
+                                for (let j = 0; j < eLen; j++) {
                                     if (!events[j]["_bpd"]) {
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
@@ -642,17 +650,17 @@ namespace annie {
                             }
                             //这里一定要反转一下，因为会影响mouseOut mouseOver
                             displayList.reverse();
-                            for (let i =len-1; i >=0; i--) {
+                            for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
-                                for (let j = 0; j <eLen; j++) {
-                                    if (!events[j]["_bpd"]){
+                                for (let j = 0; j < eLen; j++) {
+                                    if (!events[j]["_bpd"]) {
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
-                                            events[j].target = displayList[eLen-1];
+                                            events[j].target = displayList[eLen - 1];
                                             lp = d.globalToLocal(cp, DisplayObject._bp);
                                             events[j].localX = lp.x;
                                             events[j].localY = lp.y;
-                                            d.dispatchEvent(events[j],null,false);
+                                            d.dispatchEvent(events[j], null, false);
                                         }
                                     }
                                 }
@@ -790,7 +798,7 @@ namespace annie {
         };
 
         //设置舞台的对齐模式
-        private setAlign():void {
+        private setAlign(): void {
             let s = this;
             let divH = s.divHeight * devicePixelRatio;
             let divW = s.divWidth * devicePixelRatio;
@@ -862,6 +870,7 @@ namespace annie {
                 s.rotation = 0;
             }
         };
+
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -898,9 +907,9 @@ namespace annie {
 
         //刷新所有定时器
         private static flushAll(): void {
-            if(!Stage._pause) {
+            if (!Stage._pause) {
                 let len = Stage.allUpdateObjList.length;
-                for (let i = len-1; i >=0; i--) {
+                for (let i = len - 1; i >= 0; i--) {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                 }
             }
@@ -950,21 +959,26 @@ namespace annie {
                 }
             }
         }
-
-        public destroy(): void {
+        public destroy():void{
+            super.destroy();
             let s = this;
             Stage.removeUpdateObj(s);
-            s.rootDiv = null;
-            s._floatDisplayList = null;
-            s.renderObj = null;
-            s.viewRect = null;
-            s._lastDpList = null;
-            s._touchEvent = null;
-            s.muliPoints = null;
-            s._mP1 = null;
-            s._mP2 = null;
-            s._ml = null;
-            super.destroy();
+            let rc = s.rootDiv;
+            if (osType != "pc") {
+                rc.removeEventListener("touchstart", s.mouseEvent, false);
+                rc.removeEventListener('touchmove', s.mouseEvent, false);
+                rc.removeEventListener('touchend', s.mouseEvent, false);
+            } else {
+                rc.removeEventListener("mousedown", s.mouseEvent, false);
+                rc.removeEventListener('mousemove', s.mouseEvent, false);
+                rc.removeEventListener('mouseup', s.mouseEvent, false);
+            }
+            window.addEventListener("resize", s._resizeEvent);
+            rc.style.display = "none";
+            if (rc.parentNode) {
+                rc.parentNode.removeChild(rc);
+            }
+            s.renderObj=null;
         }
     }
 }

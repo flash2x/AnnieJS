@@ -35,13 +35,13 @@ declare namespace annie {
         instanceType: string;
         /**
          * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
+         * 销毁之前一定要做完其他善后工作，否则有可能会出错
          * @method destroy
          * @since 2.0.0
          * @public
          * @return {void}
          */
-        abstract destroy(): void;
+        destroy(): void;
     }
     /**
      * 事件触发基类
@@ -2061,7 +2061,7 @@ declare namespace annie {
          * @property isPlaying
          * @type {boolean}
          * @since 2.0.0
-         * @default false
+         * @default true
          */
         isPlaying: boolean;
         /**
@@ -2084,6 +2084,9 @@ declare namespace annie {
          *          //media.stop();//停止播放
          */
         constructor(src: any, type: string);
+        private _playEvent;
+        private _updateEvent;
+        private _endEvent;
         /**
          * @property _repeate
          * @type {number}
@@ -2345,14 +2348,6 @@ declare namespace annie {
          * @public
          * @since 2.0.0
          */
-        /**
-         * 设置是否为点击状态
-         * @property clicked
-         * @param {boolean} value
-         * @public
-         * @since 2.0.0
-         * @default false
-         */
         clicked: boolean;
         private _clicked;
         private _mouseEvent(e);
@@ -2411,6 +2406,7 @@ declare namespace annie {
         update(isDrawUpdate?: boolean): void;
         private _a2x_sounds;
         protected callEventAndFrameScript(callState: number): void;
+        private static _resetMC(obj);
         destroy(): void;
     }
 }
@@ -3011,6 +3007,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
+        private _resizeEvent;
         update(isDrawUpdate?: boolean): void;
         private _touchEvent;
         render(renderObj: IRender): void;
@@ -3061,6 +3058,7 @@ declare namespace annie {
         private muliPoints;
         private _mP1;
         private _mP2;
+        private mouseEvent;
         private onMouseEvent(e);
         private setAlign();
         /**
@@ -3703,13 +3701,6 @@ declare namespace annie {
 declare namespace annie {
     let _isReleased: boolean;
     let _shareSceneList: any;
-    /**
-     * 存储加载资源的总对象
-     * @property annie.res
-     * @static
-     * @public
-     * @type {Object}
-     */
     let res: any;
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
@@ -3754,28 +3745,10 @@ declare namespace annie {
      * @return {any}
      */
     function getResource(sceneName: string, resName: string): any;
-    /**
-     * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
-     * @method annie.d
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param {Object} target
-     * @param {Object} info
-     * @param {number} parentFrame
-     */
     function d(target: any, info: any, parentFrame?: number): void;
-    /**
-     * 获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-     * @method annie.sb
-     * @param {string} sceneName
-     * @param {string} resName
-     * @return {annie.Bitmap}
-     * @public
-     * @static
-     */
     function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public
@@ -3809,6 +3782,7 @@ declare namespace annie {
      */
     function ajax(info: any): void;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * jsonp调用方法
      * @method annie.jsonp
      * @param url
@@ -3824,6 +3798,7 @@ declare namespace annie {
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
     /**
+     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 获取url地址中的get参数
      * @method annie.getQueryString
      * @static

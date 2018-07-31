@@ -31,9 +31,9 @@ namespace annie {
          * @property isPlaying
          * @type {boolean}
          * @since 2.0.0
-         * @default false
+         * @default true
          */
-        public isPlaying:boolean=false;
+        public isPlaying:boolean=true;
         /**
          * 给一个声音取一个名字，方便获取
          * @property name
@@ -64,7 +64,7 @@ namespace annie {
                 s.media = src;
             }
             s._SBWeixin=s._weixinSB.bind(s);
-            s.media.addEventListener('ended', function(){
+            s.media.addEventListener('ended', s._endEvent=function(){
                 if(s._loop==-1){
                     s.play(0);
                 }else{
@@ -78,15 +78,17 @@ namespace annie {
                 s.dispatchEvent("onPlayEnd");
             }.bind(s));
             s.type = type.toLocaleUpperCase();
-            s.media.addEventListener("timeupdate",function(){
+            s.media.addEventListener("timeupdate",s._updateEvent=function(){
                 s.dispatchEvent("onPlayUpdate", {currentTime: s.media.currentTime});
             });
-            s.media.addEventListener("play",function()
+            s.media.addEventListener("play",s._playEvent=function()
             {
                 s.dispatchEvent("onPlayStart");
             });
         }
-
+        private _playEvent:any;
+        private _updateEvent:any;
+        private _endEvent:any;
         /**
          * @property _repeate
          * @type {number}
@@ -185,6 +187,9 @@ namespace annie {
         public destroy(): void {
             let s=this;
             s.media.pause();
+            s.media.removeEventListener("ended",s._endEvent);
+            s.media.removeEventListener("onPlayStart",s._playEvent);
+            s.media.removeEventListener("timeupdate",s._updateEvent);
             s.media=null;
             super.destroy();
         }

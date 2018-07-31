@@ -57,7 +57,7 @@ namespace annie {
                         s.stage["_floatDisplayList"].push(s);
                     } else {
                         if (s.htmlElement && s.visible) {
-                            style.display = "block";
+                            style.display = "inline";
                         }
                     }
                 }
@@ -129,22 +129,26 @@ namespace annie {
          * @since 1.1.4
          */
         public updateStyle(): void {
-            let s = this;
+            let s:any = this;
             let o = s.htmlElement;
             if (o) {
                 let style = o.style;
                 let visible = s._visible;
                 if(visible){
-                    let parent = s.parent;
-                    while (parent) {
-                        if(!parent._visible){
-                            visible=false;
-                            break;
+                    if(!s.stage){
+                        visible=false;
+                    }else {
+                        let parent = s._parent;
+                        while (parent) {
+                            if (!parent._visible) {
+                                visible = false;
+                                break;
+                            }
+                            parent = parent.parent;
                         }
-                        parent=parent.parent;
                     }
                 }
-                let show = visible ? "block" : "none";
+                let show = visible ? "inline" : "none";
                 if (show != style.display) {
                     style.display = show;
                 }

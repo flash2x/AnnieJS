@@ -44,13 +44,13 @@ namespace annie {
         }
         /**
          * 销毁一个对象
-         * 销毁之前一定要从显示对象移除，否则将会出错
+         * 销毁之前一定要做完其他善后工作，否则有可能会出错
          * @method destroy
          * @since 2.0.0
          * @public
          * @return {void}
          */
-        abstract destroy(): void;
+        public destroy(): void{}
     }
 
     /**
@@ -272,6 +272,7 @@ namespace annie {
             s.eventTypes1 = {};
             s.eventTypes = {};
         }
+<<<<<<< HEAD
 
 
         public on(type: string, listener: Function,useCapture = true): void {
@@ -284,10 +285,11 @@ namespace annie {
             return this.dispatchEvent.apply(this, arguments);
         }
 
+=======
+>>>>>>> flash2x/master
         destroy(): void {
             let s = this;
             s.removeAllEventListener();
-            s.eventTypes = null;
         }
     }
 }
