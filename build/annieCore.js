@@ -3779,7 +3779,7 @@ var annie;
                     }
                 }
             }
-            if (!child.parent || s.parent != s) {
+            if (!child.parent || child.parent != s) {
                 child["_cp"] = true;
                 child.parent = s;
             }
