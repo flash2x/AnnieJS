@@ -4409,7 +4409,7 @@ var annie;
         Sound.prototype.play2 = function () {
             var s = this;
             if (s.isPlaying) {
-                s.media.play();
+                s.play();
             }
         };
         /**
