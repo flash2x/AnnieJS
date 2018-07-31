@@ -1692,7 +1692,15 @@ var annie;
             this._offsetY = 0;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
-            this._soundList = [];
+            /**
+             * 当前对象包含的声音列表
+             * @property soundList
+             * @public
+             * @since 2.0.0
+             * @type {Array}
+             * @default []
+             */
+            this.soundList = [];
             //每个Flash文件生成的对象都有一个自带的初始化信息
             this._a2x_res_obj = {};
             this._instanceType = "annie.DisplayObject";
@@ -2255,7 +2263,7 @@ var annie;
          * @since 2.0.0
          */
         DisplayObject.prototype.stopAllSounds = function () {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             if (sounds) {
                 for (var i = sounds.length - 1; i >= 0; i--) {
                     sounds[i].stop();
@@ -2268,7 +2276,7 @@ var annie;
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
         DisplayObject.prototype.getSound = function (id) {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             var newSounds = [];
             if (sounds) {
                 if (typeof (id) == "string") {
@@ -2297,10 +2305,10 @@ var annie;
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
-            if (!s._soundList) {
-                s._soundList = [];
+            if (!s.soundList) {
+                s.soundList = [];
             }
-            var sounds = s._soundList;
+            var sounds = s.soundList;
             sounds.push(sound);
         };
         /**
@@ -2312,7 +2320,7 @@ var annie;
          * @return {void}
          */
         DisplayObject.prototype.removeSound = function (id) {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             if (sounds) {
                 if (typeof (id) == "string") {
                     for (var i = sounds.length - 1; i >= 0; i--) {
@@ -2332,8 +2340,8 @@ var annie;
             //清除相应的数据引用
             var s = this;
             s.stopAllSounds();
-            for (var i = 0; i < s._soundList.length; i++) {
-                s._soundList[i].destroy();
+            for (var i = 0; i < s.soundList.length; i++) {
+                s.soundList[i].destroy();
             }
             s._a2x_res_obj = null;
             s.mask = null;
@@ -2362,7 +2370,7 @@ var annie;
             var s = this;
             if (!s.stage)
                 return;
-            var sounds = s._soundList;
+            var sounds = s.soundList;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 //如果有音乐,则关闭音乐
