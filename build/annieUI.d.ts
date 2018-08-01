@@ -518,7 +518,7 @@ declare namespace annieUI {
     import DisplayObject = annie.DisplayObject;
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
-     * @class annie.IScrollListItem
+     * @class annieUI.IScrollListItem
      * @public
      * @extends annie.DisplayObject
      * @since 1.0.9
@@ -573,7 +573,7 @@ declare namespace annieUI {
          * 更新列表数据
          * @method updateData
          * @param {Array} data
-         * @param {boolean} isReset 是否重围数据列表。
+         * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
         updateData(data: Array<any>, isReset?: boolean): void;
