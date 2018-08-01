@@ -370,11 +370,11 @@ namespace annie {
         return null;
     }
 
-    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
     }
-    //用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+    //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
     export function d(target: any, info: any, parentFrame: number = 1): void {
         if (target._a2x_res_obj == info) {
             return;
@@ -457,7 +457,7 @@ namespace annie {
     //解析数据里需要确定的文本对齐方式
     let _textAlign: Array<string> = ["left", "center", "right"];
 
-    //创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+    //创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
     function t(sceneName: string, resName: string): any {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
@@ -518,7 +518,7 @@ namespace annie {
         }
     }
 
-    //创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+    //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
         let shape: annie.Shape = new annie.Shape();
