@@ -1,3 +1,4 @@
+const annie = GameGlobal.annieEngine;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1405,9 +1406,6 @@ var annieUI;
     annieUI.FlipBook = FlipBook;
 })(annieUI || (annieUI = {}));
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annieUI
  */
 var annieUI;
@@ -1438,12 +1436,12 @@ var annieUI;
             if (cols === void 0) { cols = 1; }
             _super.call(this, vW, vH, 0, isVertical);
             this._items = null;
+            this._isInit = 0;
             this.data = [];
             this.downL = null;
             this._lastFirstId = -1;
             var s = this;
-            s._isInit = false;
-            s._instanceType = "annieUI.ScrollList";
+            s._instanceType = "annie.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
             s._items = [];
@@ -1470,7 +1468,7 @@ var annieUI;
          * 更新列表数据
          * @method updateData
          * @param {Array} data
-         * @param {boolean} isReset 是否重围数据列表。
+         * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
         ScrollList.prototype.updateData = function (data, isReset) {
@@ -1478,7 +1476,7 @@ var annieUI;
             var s = this;
             if (!s._isInit || isReset) {
                 s.data = data;
-                s._isInit = true;
+                s._isInit = 1;
             }
             else {
                 s.data = s.data.concat(data);
@@ -1493,8 +1491,9 @@ var annieUI;
         };
         ScrollList.prototype.flushData = function () {
             var s = this;
-            if (s._isInit) {
-                if (s.view._UI.UM) {
+            if (s._isInit > 0) {
+                if (s.view._UI.UM || s._isInit == 1) {
+                    s._isInit = 2;
                     var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                     id = id < 0 ? 0 : id;
                     if (id != s._lastFirstId) {
@@ -1609,3 +1608,5 @@ var annieUI;
     }(annieUI.ScrollPage));
     annieUI.ScrollList = ScrollList;
 })(annieUI || (annieUI = {}));
+
+module.exports = annieUI;

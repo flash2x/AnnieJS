@@ -519,9 +519,6 @@ declare namespace annieUI {
     }
 }
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annieUI
  */
 declare namespace annieUI {
@@ -583,7 +580,7 @@ declare namespace annieUI {
          * 更新列表数据
          * @method updateData
          * @param {Array} data
-         * @param {boolean} isReset 是否重围数据列表。
+         * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
         updateData(data: Array<any>, isReset?: boolean): void;

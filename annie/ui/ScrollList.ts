@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annieUI
  */
 namespace annieUI {
@@ -16,7 +13,6 @@ namespace annieUI {
      */
     export interface IScrollListItem extends DisplayObject {
         initData(id: number, data: Array<any>): void;
-
         id: number;
         data: number;
     }
@@ -36,7 +32,7 @@ namespace annieUI {
         private _itemCol: number;
         private _itemCount: number;
         private _itemClass: any;
-        private _isInit: boolean;
+        private _isInit: number=0;
         public data: Array<any> = [];
         private downL: DisplayObject = null;
         private _cols: number;
@@ -68,8 +64,7 @@ namespace annieUI {
         constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical: boolean = true, cols: number = 1) {
             super(vW, vH, 0, isVertical);
             let s = this;
-            s._isInit = false;
-            s._instanceType = "annieUI.ScrollList";
+            s._instanceType = "annie.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
             s._items = [];
@@ -84,14 +79,14 @@ namespace annieUI {
          * 更新列表数据
          * @method updateData
          * @param {Array} data
-         * @param {boolean} isReset 是否重围数据列表。
+         * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
         public updateData(data: Array<any>, isReset: boolean = false): void {
             let s: any = this;
             if (!s._isInit || isReset) {
                 s.data = data;
-                s._isInit = true;
+                s._isInit = 1;
             } else {
                 s.data = s.data.concat(data);
             }
@@ -103,11 +98,11 @@ namespace annieUI {
                 s.maxDistance += (s.paramXY == "x" ? wh.width : wh.height);
             }
         }
-
         private flushData() {
             let s: any = this;
-            if (s._isInit) {
-                if(s.view._UI.UM) {
+            if (s._isInit>0) {
+                if(s.view._UI.UM||s._isInit==1){
+                    s._isInit=2;
                     let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                     id = id < 0 ? 0 : id;
                     if (id != s._lastFirstId) {
