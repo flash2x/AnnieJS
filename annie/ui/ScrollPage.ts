@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annieUI
  */
 namespace annieUI {
@@ -19,7 +16,7 @@ namespace annieUI {
          * 横向还是纵向 默认为纵向
          * @property isVertical
          * @type {boolean}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default true
          */
@@ -28,20 +25,20 @@ namespace annieUI {
          * 可见区域的宽
          * @property viewWidth
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewWidth: number = 0;
+        protected viewWidth: number = 0;
         /**
          * 可见区域的高
          * @property viewHeight
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewHeight: number = 0;
+        protected viewHeight: number = 0;
         private _tweenId:number=0;
         /**
          * 整个滚动的最大距离值
@@ -62,18 +59,12 @@ namespace annieUI {
         protected distance: number = 0;
         /**
          * 最小鼠标滑动距离
-         * @property minDis
-         * @private
+         * @property  minDis
+         * @protected
          * @type {number}
          */
-        private minDis: number = 2;
-        /**
-         * 遮罩对象
-         * @property maskObj
-         * @since 1.0.0
-         * @private
-         * @type {annie.Shape}
-         */
+        protected minDis: number = 2;
+        // 遮罩对象
         private maskObj: Shape = new Shape();
         /**
          * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
@@ -83,13 +74,7 @@ namespace annieUI {
          * @type {annie.Sprite}
          */
         public view: Sprite = new Sprite();
-        /**
-         * 最后鼠标经过的坐标值
-         * @property lastValue
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         */
+        // 最后鼠标经过的坐标值
         private lastValue: number = 0;
         /**
          * 速度
@@ -102,11 +87,11 @@ namespace annieUI {
         /**
          * 加速度
          * @property addSpeed
-         * @private
+         * @protected
          * @since 1.0.0
          * @type {number}
          */
-        private addSpeed: number = 0;
+        protected addSpeed: number = 0;
         /**
          * 是否是停止滚动状态
          * @property isStop
@@ -137,14 +122,7 @@ namespace annieUI {
         protected paramXY: string = "y";
         private stopTimes: number = -1;
         private isMouseDownState: number = 0;
-        /**
-         * 是否是通过scrollTo方法在滑动中
-         * @property autoScroll
-         * @since 1.0.2
-         * @type {boolean}
-         * @private
-         * @default false
-         */
+        //是否是通过scrollTo方法在滑动中
         private autoScroll: boolean = false;
 
         /**
@@ -165,7 +143,7 @@ namespace annieUI {
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             let s = this;
-            s._instanceType = "annieUI.ScrollPage";
+            s._instanceType = "annie.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
@@ -194,7 +172,7 @@ namespace annieUI {
                             s.dispatchEvent("onScrollStop");
                             s.speed = 0;
                         }
-                    } else {
+                    }else {
                         //检测是否超出了边界,如果超出了边界则回弹
                         if (s.addSpeed != 0) {
                             if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
@@ -341,19 +319,23 @@ namespace annieUI {
             }else if(dis>s.maxDistance-newDis){
                 dis=s.maxDistance-newDis;
             }
-            if(Math.abs(s.view[s.paramXY]+dis)>2) {
-                s.autoScroll = true;
-                s.isStop = true;
-                s.isMouseDownState = 0;
-                let obj: any = {};
-                obj.onComplete = function () {
-                    s.autoScroll = false;
-                };
-                obj[s.paramXY] = -dis;
-                s._tweenId=annie.Tween.to(s.view, time, obj);
-                if(s.speed==0){
-                    s.dispatchEvent("onScrollStart");
+            if(time>0) {
+                if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                    s.autoScroll = true;
+                    s.isStop = true;
+                    s.isMouseDownState = 0;
+                    let obj: any = {};
+                    obj.onComplete = function () {
+                        s.autoScroll = false;
+                    };
+                    obj[s.paramXY] = -dis;
+                    s._tweenId = annie.Tween.to(s.view, time, obj);
+                    if (s.speed == 0) {
+                        s.dispatchEvent("onScrollStart");
+                    }
                 }
+            }else{
+                s.view[s.paramXY]=-dis;
             }
         }
         public destroy(): void {

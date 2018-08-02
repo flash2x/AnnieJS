@@ -1,7 +1,4 @@
 /**
- * Created by anlun on 16/8/14.
- */
-/**
  * @module annieUI
  */
 declare namespace annieUI {
@@ -18,7 +15,7 @@ declare namespace annieUI {
          * 横向还是纵向 默认为纵向
          * @property isVertical
          * @type {boolean}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default true
          */
@@ -27,20 +24,20 @@ declare namespace annieUI {
          * 可见区域的宽
          * @property viewWidth
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewWidth;
+        protected viewWidth: number;
         /**
          * 可见区域的高
          * @property viewHeight
          * @type {number}
-         * @private
+         * @protected
          * @since 1.0.0
          * @default 0
          */
-        private viewHeight;
+        protected viewHeight: number;
         private _tweenId;
         /**
          * 整个滚动的最大距离值
@@ -61,18 +58,11 @@ declare namespace annieUI {
         protected distance: number;
         /**
          * 最小鼠标滑动距离
-         * @property minDis
-         * @private
+         * @property  minDis
+         * @protected
          * @type {number}
          */
-        private minDis;
-        /**
-         * 遮罩对象
-         * @property maskObj
-         * @since 1.0.0
-         * @private
-         * @type {annie.Shape}
-         */
+        protected minDis: number;
         private maskObj;
         /**
          * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
@@ -82,13 +72,6 @@ declare namespace annieUI {
          * @type {annie.Sprite}
          */
         view: Sprite;
-        /**
-         * 最后鼠标经过的坐标值
-         * @property lastValue
-         * @private
-         * @since 1.0.0
-         * @type {number}
-         */
         private lastValue;
         /**
          * 速度
@@ -101,11 +84,11 @@ declare namespace annieUI {
         /**
          * 加速度
          * @property addSpeed
-         * @private
+         * @protected
          * @since 1.0.0
          * @type {number}
          */
-        private addSpeed;
+        protected addSpeed: number;
         /**
          * 是否是停止滚动状态
          * @property isStop
@@ -136,14 +119,6 @@ declare namespace annieUI {
         protected paramXY: string;
         private stopTimes;
         private isMouseDownState;
-        /**
-         * 是否是通过scrollTo方法在滑动中
-         * @property autoScroll
-         * @since 1.0.2
-         * @type {boolean}
-         * @private
-         * @default false
-         */
         private autoScroll;
         /**
          * 构造函数
