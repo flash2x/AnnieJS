@@ -3390,10 +3390,30 @@ var annie;
                 return;
             var s = this;
             var sameParent = (s == child.parent);
+            var cp = child.parent;
             var len;
-            if (child.parent) {
+            if (cp) {
                 if (!sameParent) {
-                    child.parent.removeChild(child);
+                    var cpc = cp.children;
+                    len = cpc.length;
+                    var isRemove = true;
+                    for (var i = 0; i < len; i++) {
+                        if (cpc[i] == child) {
+                            cpc.splice(i, 1);
+                            isRemove = false;
+                            break;
+                        }
+                    }
+                    if (isRemove) {
+                        var cpc_1 = cp._removeChildren;
+                        len = cpc_1.length;
+                        for (var i = 0; i < len; i++) {
+                            if (cpc_1[i] == child) {
+                                cpc_1.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
                 }
                 else {
                     len = s.children.length;
@@ -3405,10 +3425,6 @@ var annie;
                     }
                 }
             }
-            if (!child.parent || child.parent != s) {
-                child["_cp"] = true;
-                child.parent = s;
-            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -3418,6 +3434,10 @@ var annie;
             }
             else {
                 s.children.splice(index, 0, child);
+            }
+            if (cp != s) {
+                child["_cp"] = true;
+                child.parent = s;
             }
         };
         /**
@@ -3690,6 +3710,7 @@ var annie;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
+                    child.parent = s;
                     child.callEventAndFrameScript(callState);
                 }
             }
@@ -3712,6 +3733,7 @@ var annie;
                     }
                     else {
                         child.stage = s.stage;
+                        child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
                 }

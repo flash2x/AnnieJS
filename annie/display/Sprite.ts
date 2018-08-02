@@ -162,11 +162,31 @@ namespace annie {
             if (!child) return;
             let s = this;
             let sameParent = (s == child.parent);
+            let cp=child.parent;
             let len: number;
-            if (child.parent) {
+            if (cp) {
                 if (!sameParent) {
-                    child.parent.removeChild(child);
-                } else {
+                    let cpc=cp.children;
+                    len = cpc.length;
+                    let isRemove = true;
+                    for (let i = 0; i < len; i++) {
+                        if (cpc[i] == child) {
+                            cpc.splice(i, 1);
+                            isRemove = false;
+                            break;
+                        }
+                    }
+                    if(isRemove){
+                        let cpc=cp._removeChildren;
+                        len = cpc.length;
+                        for (let i = 0; i < len; i++){
+                            if (cpc[i] == child) {
+                                cpc.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                }else {
                     len = s.children.length;
                     for (let i = 0; i < len; i++) {
                         if (s.children[i] == child) {
@@ -176,10 +196,6 @@ namespace annie {
                     }
                 }
             }
-            if (!child.parent || child.parent != s) {
-                child["_cp"] = true;
-                child.parent = s;
-            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -187,6 +203,10 @@ namespace annie {
                 s.children.unshift(child);
             } else {
                 s.children.splice(index, 0, child);
+            }
+            if (cp != s) {
+                child["_cp"] = true;
+                child.parent = s;
             }
         }
 
@@ -450,6 +470,7 @@ namespace annie {
                 for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
+                    child.parent=s;
                     child.callEventAndFrameScript(callState);
                 }
             } else if (callState == 2) {
@@ -470,6 +491,7 @@ namespace annie {
                         child.callEventAndFrameScript(2);
                     } else {
                         child.stage = s.stage;
+                        child.parent=s;
                         child.callEventAndFrameScript(1);
                     }
                 }

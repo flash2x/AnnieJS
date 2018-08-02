@@ -1,5 +1,4 @@
-﻿
-/**
+﻿/**
  * @module annieUI
  */
 namespace annieUI {
@@ -89,7 +88,7 @@ namespace annieUI {
         public constructor(width: number, height: number, pageCount: any,getPageCallBack:Function) {
             super();
             let s = this;
-            s._instanceType = "annieUI.FlipBook";
+            s._instanceType = "annie.FlipBook";
             s.getPageCallback=getPageCallBack;
             s.bW = width;
             s.bH = height;
@@ -104,21 +103,23 @@ namespace annieUI {
             s.limitP2 = new Point(s.bW, s.bH);
             s.toPosArr = [s.p3, s.p4, s.p1, s.p2];
             s.myPosArr = [s.p1, s.p2, s.p3, s.p4];
-            s.addChild(s.pageMC);
-            s.addChild(s.rPage0);
-            s.addChild(s.shadow0);
-            s.addChild(s.rPage1);
-            s.addChild(s.shadow1);
             s.rPage0.mouseEnable=false;
             s.rPage1.mouseEnable=false;
             s.shadow0.mouseEnable=false;
             s.shadow1.mouseEnable=false;
             s.setShadowMask(s.shadow0,s.sMask0, s.bW * 1.5, s.bH * 3);
             s.setShadowMask(s.shadow1,s.sMask1, s.bW * 1.5, s.bH * 3);
-            s.shadow0.visible = false;
-            s.shadow1.visible = false;
             s.rPage1.mask=s.rMask1;
             s.rPage0.mask=s.rMask0;
+            s.shadow0.visible = false;
+            s.shadow1.visible = false;
+            s.addChild(s.pageMC);
+            s.addChild(s.rPage0);
+            s.addChild(s.shadow0);
+            s.addChild(s.rPage1);
+            s.addChild(s.shadow1);
+            s.addChild(s.rMask0);
+            s.addChild(s.rMask1);
             s.setPage(s.currPage);
             let md=s.onMouseDown.bind(s);
             let mu=s.onMouseUp.bind(s);
@@ -279,10 +280,10 @@ namespace annieUI {
             shape.endFill();
         }
         private setShadowMask(shape:Shape,maskShape:Shape,g_width: number, g_height: number):void{
-            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4],[{o:0,c:"#000000",a:0}, {o:1,c:"#000000",a:0.6}]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4],[[0,"#000000",0],[1,"#000000",0.6]]);
             shape.drawRect(-g_width * 0.5, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.beginLinearGradientFill( [-g_width * 0.5, 4, g_width * 0.5, 4],[{o:1,c:"#000000",a:0}, {o:0,c:"#000000",a:0.6}]);
+            shape.beginLinearGradientFill( [-g_width * 0.5, 4, g_width * 0.5, 4],[[1,"#000000",0], [0,"#000000",0.6]]);
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.mask = maskShape;
@@ -330,7 +331,7 @@ namespace annieUI {
                 if((s.timerArg0<3&&s.currPage>0)||(s.timerArg0>2&&s.currPage<=s.totalPage-2)){
                     s.state = "start";
                     s.flushPage();
-                    e.updateAfterEvent();
+                    //e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart");
                 }
             }
