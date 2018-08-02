@@ -39,7 +39,7 @@ namespace annie {
          *      var inputText=new annie.InputText('singleline');
          *      inputText.initInfo('annie',100,100,'#ffffff','left',14,'微软雅黑',false,2);
          */
-        public constructor(inputType:number=0) {
+        public constructor(inputType:number=0){
             super();
             var input: any = null;
             let s: InputText = this;

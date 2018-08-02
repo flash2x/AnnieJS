@@ -340,19 +340,24 @@ var annieUI;
             else if (dis > s.maxDistance - newDis) {
                 dis = s.maxDistance - newDis;
             }
-            if (Math.abs(s.view[s.paramXY] + dis) > 2) {
-                s.autoScroll = true;
-                s.isStop = true;
-                s.isMouseDownState = 0;
-                var obj = {};
-                obj.onComplete = function () {
-                    s.autoScroll = false;
-                };
-                obj[s.paramXY] = -dis;
-                s._tweenId = annie.Tween.to(s.view, time, obj);
-                if (s.speed == 0) {
-                    s.dispatchEvent("onScrollStart");
+            if (time > 0) {
+                if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                    s.autoScroll = true;
+                    s.isStop = true;
+                    s.isMouseDownState = 0;
+                    var obj = {};
+                    obj.onComplete = function () {
+                        s.autoScroll = false;
+                    };
+                    obj[s.paramXY] = -dis;
+                    s._tweenId = annie.Tween.to(s.view, time, obj);
+                    if (s.speed == 0) {
+                        s.dispatchEvent("onScrollStart");
+                    }
                 }
+            }
+            else {
+                s.view[s.paramXY] = -dis;
             }
         };
         ScrollPage.prototype.destroy = function () {
@@ -427,6 +432,7 @@ var annieUI;
                 s.dispatchEvent("onComplete");
             };
             s.addChild(s.bitmap);
+            s.addChild(s.maskObj);
             s.bitmap.mask = s.maskObj;
         }
         /**
@@ -967,21 +973,23 @@ var annieUI;
             s.limitP2 = new Point(s.bW, s.bH);
             s.toPosArr = [s.p3, s.p4, s.p1, s.p2];
             s.myPosArr = [s.p1, s.p2, s.p3, s.p4];
-            s.addChild(s.pageMC);
-            s.addChild(s.rPage0);
-            s.addChild(s.shadow0);
-            s.addChild(s.rPage1);
-            s.addChild(s.shadow1);
             s.rPage0.mouseEnable = false;
             s.rPage1.mouseEnable = false;
             s.shadow0.mouseEnable = false;
             s.shadow1.mouseEnable = false;
             s.setShadowMask(s.shadow0, s.sMask0, s.bW * 1.5, s.bH * 3);
             s.setShadowMask(s.shadow1, s.sMask1, s.bW * 1.5, s.bH * 3);
-            s.shadow0.visible = false;
-            s.shadow1.visible = false;
             s.rPage1.mask = s.rMask1;
             s.rPage0.mask = s.rMask0;
+            s.shadow0.visible = false;
+            s.shadow1.visible = false;
+            s.addChild(s.pageMC);
+            s.addChild(s.rPage0);
+            s.addChild(s.shadow0);
+            s.addChild(s.rPage1);
+            s.addChild(s.shadow1);
+            s.addChild(s.rMask0);
+            s.addChild(s.rMask1);
             s.setPage(s.currPage);
             var md = s.onMouseDown.bind(s);
             var mu = s.onMouseUp.bind(s);
@@ -1146,10 +1154,10 @@ var annieUI;
             shape.endFill();
         };
         FlipBook.prototype.setShadowMask = function (shape, maskShape, g_width, g_height) {
-            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [{ o: 0, c: "#000000", a: 0 }, { o: 1, c: "#000000", a: 0.6 }]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [[0, "#000000", 0], [1, "#000000", 0.6]]);
             shape.drawRect(-g_width * 0.5, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [{ o: 1, c: "#000000", a: 0 }, { o: 0, c: "#000000", a: 0.6 }]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [[1, "#000000", 0], [0, "#000000", 0.6]]);
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.mask = maskShape;
@@ -1197,7 +1205,7 @@ var annieUI;
                 if ((s.timerArg0 < 3 && s.currPage > 0) || (s.timerArg0 > 2 && s.currPage <= s.totalPage - 2)) {
                     s.state = "start";
                     s.flushPage();
-                    e.updateAfterEvent();
+                    //e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart");
                 }
             }

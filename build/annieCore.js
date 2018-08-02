@@ -2763,7 +2763,7 @@ var annie;
              */
             this.hitTestWidthPixel = true;
             /**
-             * 径向渐变填充 一般给Flash2x用
+             * 径向渐变填充 一般给Annie2x用
              * @method beginRadialGradientFill
              * @param {Array} points 一组点
              * @param {Array} colors 一组颜色值
@@ -2776,7 +2776,7 @@ var annie;
                 this._fill(Shape.getGradientColor(points, colors));
             };
             /**
-             * 画径向渐变的线条 一般给Flash2x用
+             * 画径向渐变的线条 一般给Annie2x用
              * @method beginRadialGradientStroke
              * @param {Array} points 一组点
              * @param {Array} colors 一组颜色值
@@ -2796,7 +2796,7 @@ var annie;
                 this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
             };
             /**
-             * 解析一段路径 一般给Flash2x用
+             * 解析一段路径 一般给Annie2x用
              * @method decodePath
              * @param {Array} data
              * @public
@@ -2823,7 +2823,7 @@ var annie;
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
-         * 一般给用户使用较少,Flash2x工具自动使用
+         * 一般给用户使用较少,Annie2x工具自动使用
          * @method getGradientColor
          * @static
          * @param points
@@ -2847,7 +2847,7 @@ var annie;
             return colorObj;
         };
         /**
-         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
+         * 设置位图填充时需要使用的方法,一般给用户使用较少,Annie2x工具自动使用
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
@@ -3138,7 +3138,7 @@ var annie;
             this._fill(color);
         };
         /**
-         * 线性渐变填充 一般给Flash2x用
+         * 线性渐变填充 一般给Annie2x用
          * @method beginLinearGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -3150,7 +3150,7 @@ var annie;
             this._fill(Shape.getGradientColor(points, colors));
         };
         /**
-         * 位图填充 一般给Flash2x用
+         * 位图填充 一般给Annie2x用
          * @method beginBitmapFill
          * @param {Image} image
          * @param { Array} matrix
@@ -3191,7 +3191,7 @@ var annie;
             this._stroke(color, lineWidth, cap, join, miter);
         };
         /**
-         * 画线性渐变的线条 一般给Flash2x用
+         * 画线性渐变的线条 一般给Annie2x用
          * @method beginLinearGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -3211,7 +3211,7 @@ var annie;
             this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
         };
         /**
-         * 线条位图填充 一般给Flash2x用
+         * 线条位图填充 一般给Annie2x用
          * @method beginBitmapStroke
          * @param {Image} image
          * @param {Array} matrix
@@ -3772,10 +3772,30 @@ var annie;
                 return;
             var s = this;
             var sameParent = (s == child.parent);
+            var cp = child.parent;
             var len;
-            if (child.parent) {
+            if (cp) {
                 if (!sameParent) {
-                    child.parent.removeChild(child);
+                    var cpc = cp.children;
+                    len = cpc.length;
+                    var isRemove = true;
+                    for (var i = 0; i < len; i++) {
+                        if (cpc[i] == child) {
+                            cpc.splice(i, 1);
+                            isRemove = false;
+                            break;
+                        }
+                    }
+                    if (isRemove) {
+                        var cpc_1 = cp._removeChildren;
+                        len = cpc_1.length;
+                        for (var i = 0; i < len; i++) {
+                            if (cpc_1[i] == child) {
+                                cpc_1.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
                 }
                 else {
                     len = s.children.length;
@@ -3787,10 +3807,6 @@ var annie;
                     }
                 }
             }
-            if (!child.parent || child.parent != s) {
-                child["_cp"] = true;
-                child.parent = s;
-            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -3800,6 +3816,10 @@ var annie;
             }
             else {
                 s.children.splice(index, 0, child);
+            }
+            if (cp != s) {
+                child["_cp"] = true;
+                child.parent = s;
             }
         };
         /**
@@ -4109,6 +4129,7 @@ var annie;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
+                    child.parent = s;
                     child.callEventAndFrameScript(callState);
                 }
             }
@@ -4131,6 +4152,7 @@ var annie;
                     }
                     else {
                         child.stage = s.stage;
+                        child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
                 }
@@ -8585,11 +8607,11 @@ var annie;
         return null;
     }
     annie.getResource = getResource;
-    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName, resName) {
         return new annie.Bitmap(annie.res[sceneName][resName]);
     }
-    //用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+    //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
     function d(target, info, parentFrame) {
         if (parentFrame === void 0) { parentFrame = 1; }
         if (target._a2x_res_obj == info) {
@@ -8674,7 +8696,7 @@ var annie;
     var _textLineType = ["single", "multiline"];
     //解析数据里需要确定的文本对齐方式
     var _textAlign = ["left", "center", "right"];
-    //创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+    //创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
     function t(sceneName, resName) {
         var textDate = annie.res[sceneName]._a2x_con[resName];
         var textObj;
@@ -8738,7 +8760,7 @@ var annie;
         }
     }
     annie.sb = sb;
-    //创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+    //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName, resName) {
         var shapeDate = annie.res[sceneName]._a2x_con[resName][1];
         var shape = new annie.Shape();

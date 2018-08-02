@@ -172,7 +172,7 @@ namespace annieUI {
                             s.dispatchEvent("onScrollStop");
                             s.speed = 0;
                         }
-                    } else {
+                    }else {
                         //检测是否超出了边界,如果超出了边界则回弹
                         if (s.addSpeed != 0) {
                             if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
@@ -319,19 +319,23 @@ namespace annieUI {
             }else if(dis>s.maxDistance-newDis){
                 dis=s.maxDistance-newDis;
             }
-            if(Math.abs(s.view[s.paramXY]+dis)>2) {
-                s.autoScroll = true;
-                s.isStop = true;
-                s.isMouseDownState = 0;
-                let obj: any = {};
-                obj.onComplete = function () {
-                    s.autoScroll = false;
-                };
-                obj[s.paramXY] = -dis;
-                s._tweenId=annie.Tween.to(s.view, time, obj);
-                if(s.speed==0){
-                    s.dispatchEvent("onScrollStart");
+            if(time>0) {
+                if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                    s.autoScroll = true;
+                    s.isStop = true;
+                    s.isMouseDownState = 0;
+                    let obj: any = {};
+                    obj.onComplete = function () {
+                        s.autoScroll = false;
+                    };
+                    obj[s.paramXY] = -dis;
+                    s._tweenId = annie.Tween.to(s.view, time, obj);
+                    if (s.speed == 0) {
+                        s.dispatchEvent("onScrollStart");
+                    }
                 }
+            }else{
+                s.view[s.paramXY]=-dis;
             }
         }
         public destroy(): void {
