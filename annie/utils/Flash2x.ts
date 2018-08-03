@@ -728,7 +728,7 @@ namespace annie {
                 } else {
                     for (let index in resClass.l) {
                         for (let n = 0; n < resClass.l[index].length; n++) {
-                            label[resClass.l[index][n]] = parseInt(index);
+                            label[resClass.l[index][n]] = parseInt(index)+1;
                         }
                     }
                 }
