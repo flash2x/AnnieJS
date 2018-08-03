@@ -249,7 +249,6 @@ namespace annie {
             }
             s._isPlaying = false;
         }
-
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
          * @method gotoAndStop
@@ -324,10 +323,9 @@ namespace annie {
         }
 
         private isUpdateFrame: boolean = false;
-
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -422,7 +420,6 @@ namespace annie {
 
         //flash声音管理
         private _a2x_sounds: any = null;
-
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame) {
