@@ -107,9 +107,11 @@ namespace annieUI {
             s.rPage1.mouseEnable=false;
             s.shadow0.mouseEnable=false;
             s.shadow1.mouseEnable=false;
-            s.setShadowMask(s.shadow0,s.sMask0, s.bW * 1.5, s.bH * 3);
-            s.setShadowMask(s.shadow1,s.sMask1, s.bW * 1.5, s.bH * 3);
+            s.setShadowMask(s.shadow0, s.bW * 1.5, s.bH * 3);
+            s.setShadowMask(s.shadow1, s.bW * 1.5, s.bH * 3);
             s.rPage1.mask=s.rMask1;
+            s.shadow1.mask=s.rMask1;
+            s.shadow0.mask=s.rMask0;
             s.rPage0.mask=s.rMask0;
             s.shadow0.visible = false;
             s.shadow1.visible = false;
@@ -148,8 +150,8 @@ namespace annieUI {
                 bArr = s.getBookArr(movePoint, s.p1, s.p2);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p1, s.p2, s.limitP1, s.limitP2);
-                s.getShadow(s.shadow0, s.sMask0,s.p1, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1,s.p1, movePoint, s.layer1Arr, 0.45);
+                s.getShadow(s.shadow0,s.p1, movePoint, 0.5);
+                s.getShadow(s.shadow1,s.p1, movePoint, 0.45);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) + 90;
                 s.rPage1.x = bArr[3].x;
                 s.rPage1.y = bArr[3].y;
@@ -161,8 +163,8 @@ namespace annieUI {
                 bArr = s.getBookArr(movePoint, s.p2, s.p1);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p2, s.p1, s.limitP2, s.limitP1);
-                s.getShadow(s.shadow0, s.sMask0, s.p2, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p2, movePoint, s.layer1Arr, 0.45);
+                s.getShadow(s.shadow0, s.p2, movePoint,  0.5);
+                s.getShadow(s.shadow1, s.p2, movePoint, 0.45);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) - 90;
                 s.rPage1.x = bArr[2].x;
                 s.rPage1.y = bArr[2].y;
@@ -174,8 +176,8 @@ namespace annieUI {
                 bArr = s.getBookArr(movePoint, s.p3, s.p4);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p3, s.p4, s.limitP1, s.limitP2);
-                s.getShadow(s.shadow0, s.sMask0, s.p3, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p3, movePoint, s.layer1Arr, 0.4);
+                s.getShadow(s.shadow0, s.p3, movePoint,  0.5);
+                s.getShadow(s.shadow1, s.p3, movePoint, 0.4);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) + 90;
                 s.rPage1.x = movePoint.x;
                 s.rPage1.y = movePoint.y;
@@ -187,8 +189,8 @@ namespace annieUI {
                 bArr = s.getBookArr(movePoint, s.p4, s.p3);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p4, s.p3, s.limitP2, s.limitP1);
-                s.getShadow(s.shadow0, s.sMask0, s.p4, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p4, movePoint, s.layer1Arr, 0.4);
+                s.getShadow(s.shadow0, s.p4, movePoint, 0.5);
+                s.getShadow(s.shadow1, s.p4, movePoint, 0.4);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) - 90;
                 s.rPage1.x = actionPoint.x;
                 s.rPage1.y = actionPoint.y;
@@ -279,16 +281,15 @@ namespace annieUI {
             }
             shape.endFill();
         }
-        private setShadowMask(shape:Shape,maskShape:Shape,g_width: number, g_height: number):void{
+        private setShadowMask(shape:Shape,g_width: number, g_height: number):void{
             shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4],[[0,"#000000",0],[1,"#000000",0.6]]);
             shape.drawRect(-g_width * 0.5, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
             shape.beginLinearGradientFill( [-g_width * 0.5, 4, g_width * 0.5, 4],[[1,"#000000",0], [0,"#000000",0.6]]);
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.mask = maskShape;
         }
-        private getShadow(shape: Shape, maskShape: Shape, point1: Point, point2: Point, maskArray: any, arg: number): void {
+        private getShadow(shape: Shape, point1: Point, point2: Point, arg: number): void {
             let myScale: number;
             let myAlpha: number;
             let s = this;
@@ -300,7 +301,6 @@ namespace annieUI {
             myAlpha = 1 - myScale * myScale;
             shape.scaleX = myScale + 0.1;
             shape.alpha = myAlpha + 0.1;
-            s.getShape(maskShape, maskArray);
         }
         private setPage(pageNum: number): void {
             let s = this;
@@ -331,7 +331,6 @@ namespace annieUI {
                 if((s.timerArg0<3&&s.currPage>0)||(s.timerArg0>2&&s.currPage<=s.totalPage-2)){
                     s.state = "start";
                     s.flushPage();
-                    //e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart");
                 }
             }

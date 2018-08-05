@@ -2503,14 +2503,6 @@ declare namespace annie {
         scaleMode: string;
         private _scaleMode;
         private _flush;
-        /**
-         * 当前的刷新次数计数器
-         * @property _currentFlush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
         private _currentFlush;
         static _dragDisplay: DisplayObject;
         /**
@@ -2559,19 +2551,7 @@ declare namespace annie {
          * @private
          */
         private _initMouseEvent(event, cp, sp, identifier);
-        /**
-         * 鼠标按下事件的对象池
-         * @property _mouseDownPoint
-         * @type {Object}
-         * @private
-         */
         private _mouseDownPoint;
-        /**
-         * 循环刷新页面的函数
-         * @method flush
-         * @private
-         * @return {void}
-         */
         private flush();
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新

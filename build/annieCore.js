@@ -1953,7 +1953,7 @@ var annie;
                     }
                     else {
                         if (s._mask != null) {
-                            s["_isUseToMask"]--;
+                            s._mask["_isUseToMask"]--;
                         }
                     }
                     s._mask = value;
@@ -4901,14 +4901,7 @@ var annie;
             this._scaleMode = "onScale";
             //原始为60的刷新速度时的计数器
             this._flush = 0;
-            /**
-             * 当前的刷新次数计数器
-             * @property _currentFlush
-             * @private
-             * @since 1.0.0
-             * @default 0
-             * @type {number}
-             */
+            // 当前的刷新次数计数器
             this._currentFlush = 0;
             /**
              * 上一次鼠标或触碰经过的显示对象列表
@@ -4928,12 +4921,7 @@ var annie;
              * @private
              */
             this._mp = [];
-            /**
-             * 鼠标按下事件的对象池
-             * @property _mouseDownPoint
-             * @type {Object}
-             * @private
-             */
+            // 鼠标按下事件的对象池
             this._mouseDownPoint = {};
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
@@ -5452,29 +5440,24 @@ var annie;
             event.stageY = sp.y;
             event.identifier = identifier;
         };
-        /**
-         * 循环刷新页面的函数
-         * @method flush
-         * @private
-         * @return {void}
-         */
+        //循环刷新页面的函数
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
+                s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(true);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
                         s.callEventAndFrameScript(2);
+                        s.update(true);
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
@@ -5909,8 +5892,10 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp)
-                return;
+            if (target._cp) {
+                this._stage.update(false);
+            }
+            ;
             var ctx = CanvasRender.drawCtx;
             ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;

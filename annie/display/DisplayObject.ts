@@ -347,7 +347,7 @@ namespace annie {
                     value["_isUseToMask"]++;
                 } else {
                     if (s._mask != null) {
-                        s["_isUseToMask"]--;
+                        s._mask["_isUseToMask"]--;
                     }
                 }
                 s._mask = value;
@@ -749,6 +749,7 @@ namespace annie {
          * @default []
          */
         public soundList: any = [];
+
         /**
          * 返回一个id，这个id你要留着作为删除他时使用。
          * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
