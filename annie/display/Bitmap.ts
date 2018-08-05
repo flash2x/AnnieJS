@@ -36,5 +36,12 @@ namespace annie {
             s._texture="";
             super.destroy();
         }
+        public update(isDrawUpdate: boolean = true){
+            let s=this;
+            if (!s._visible) return;
+            super.update(isDrawUpdate);
+            let UI=s._UI;
+            UI.UM = UI.UA = UI.UF=false;
+        }
     }
 }

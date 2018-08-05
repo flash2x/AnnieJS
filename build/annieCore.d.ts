@@ -1470,6 +1470,7 @@ declare namespace annie {
         */
         constructor(imagePath: string);
         destroy(): void;
+        update(isDrawUpdate?: boolean): void;
     }
 }
 /**

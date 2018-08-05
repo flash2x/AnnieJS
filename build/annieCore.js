@@ -2443,6 +2443,15 @@ var annie;
             s._texture = "";
             _super.prototype.destroy.call(this);
         };
+        Bitmap.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
+            var s = this;
+            if (!s._visible)
+                return;
+            _super.prototype.update.call(this, isDrawUpdate);
+            var UI = s._UI;
+            UI.UM = UI.UA = UI.UF = false;
+        };
         return Bitmap;
     }(annie.DisplayObject));
     annie.Bitmap = Bitmap;
@@ -4857,13 +4866,13 @@ var annie;
                 var s = this;
                 //判断是否有drag的显示对象
                 var sd = Stage._dragDisplay;
-                if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
-                    if (e.targetTouches.length == 2) {
+                if (s.isMultiTouch && e.changedTouches && e.changedTouches.length > 1) {
+                    if (e.changedTouches.length == 2) {
                         //求角度和距离
-                        s._mP1.x = e.targetTouches[0].pageX;
-                        s._mP1.y = e.targetTouches[0].pageY;
-                        s._mP2.x = e.targetTouches[1].pageX;
-                        s._mP2.y = e.targetTouches[1].pageY;
+                        s._mP1.x = e.changedTouches[0].pageX;
+                        s._mP1.y = e.changedTouches[0].pageY;
+                        s._mP2.x = e.changedTouches[1].pageX;
+                        s._mP2.y = e.changedTouches[1].pageY;
                         var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                         var dis = annie.Point.distance(s._mP1, s._mP2);
                         s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -5151,9 +5160,6 @@ var annie;
                             }
                         }
                     }
-                }
-                if (s._cp) {
-                    s.update();
                 }
             };
             /**
