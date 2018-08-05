@@ -1952,7 +1952,7 @@ var annie;
                     }
                     else {
                         if (s._mask != null) {
-                            s["_isUseToMask"]--;
+                            s._mask["_isUseToMask"]--;
                         }
                     }
                     s._mask = value;
@@ -2270,11 +2270,11 @@ var annie;
             }
         };
         /**
-         * @method getSounds
+         * @method getSound
          * @param {number|string} id
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
-        DisplayObject.prototype.getSounds = function (id) {
+        DisplayObject.prototype.getSound = function (id) {
             var sounds = this.soundList;
             var newSounds = [];
             if (sounds) {
@@ -3637,13 +3637,11 @@ var annie;
         };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cp || !s._visible)
-                return;
-            if (s._cacheAsBitmap) {
-                _super.prototype.render.call(this, renderObj);
-            }
-            else {
-                if (s.cAlpha > 0 && s._visible) {
+            if (s.cAlpha > 0 && s._visible) {
+                if (s._cacheAsBitmap) {
+                    _super.prototype.render.call(this, renderObj);
+                }
+                else {
                     var maskObj = void 0;
                     var child = void 0;
                     var len = s.children.length;
@@ -4809,14 +4807,7 @@ var annie;
             this._scaleMode = "onScale";
             //原始为60的刷新速度时的计数器
             this._flush = 0;
-            /**
-             * 当前的刷新次数计数器
-             * @property _currentFlush
-             * @private
-             * @since 1.0.0
-             * @default 0
-             * @type {number}
-             */
+            // 当前的刷新次数计数器
             this._currentFlush = 0;
             /**
              * 上一次鼠标或触碰经过的显示对象列表
@@ -4836,12 +4827,7 @@ var annie;
              * @private
              */
             this._mp = [];
-            /**
-             * 鼠标按下事件的对象池
-             * @property _mouseDownPoint
-             * @type {Object}
-             * @private
-             */
+            // 鼠标按下事件的对象池
             this._mouseDownPoint = {};
             /**
              * html的鼠标或单点触摸对应的引擎事件类型名
@@ -5360,29 +5346,24 @@ var annie;
             event.stageY = sp.y;
             event.identifier = identifier;
         };
-        /**
-         * 循环刷新页面的函数
-         * @method flush
-         * @private
-         * @return {void}
-         */
+        //循环刷新页面的函数
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
+                s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(true);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
                         s.callEventAndFrameScript(2);
+                        s.update(true);
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
@@ -5821,8 +5802,10 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp)
-                return;
+            if (target._cp) {
+                this._stage.update(false);
+            }
+            ;
             var ctx = CanvasRender.drawCtx;
             ctx.globalAlpha = target.cAlpha;
             var tm = target.cMatrix;

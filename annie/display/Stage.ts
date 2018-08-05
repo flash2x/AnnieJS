@@ -175,14 +175,8 @@ namespace annie {
 
         //原始为60的刷新速度时的计数器
         private _flush: number = 0;
-        /**
-         * 当前的刷新次数计数器
-         * @property _currentFlush
-         * @private
-         * @since 1.0.0
-         * @default 0
-         * @type {number}
-         */
+
+        // 当前的刷新次数计数器
         private _currentFlush: number = 0;
         public static _dragDisplay: DisplayObject = null;
         /**
@@ -269,42 +263,29 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
-
-        /**
-         * 鼠标按下事件的对象池
-         * @property _mouseDownPoint
-         * @type {Object}
-         * @private
-         */
+        // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
-
-        /**
-         * 循环刷新页面的函数
-         * @method flush
-         * @private
-         * @return {void}
-         */
+        //循环刷新页面的函数
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
+                s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.callEventAndFrameScript(2);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(true);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
                         s.callEventAndFrameScript(2);
+                        s.update(true);
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
             }
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate

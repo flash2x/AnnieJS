@@ -162,11 +162,11 @@ namespace annie {
             if (!child) return;
             let s = this;
             let sameParent = (s == child.parent);
-            let cp=child.parent;
+            let cp = child.parent;
             let len: number;
             if (cp) {
                 if (!sameParent) {
-                    let cpc=cp.children;
+                    let cpc = cp.children;
                     len = cpc.length;
                     let isRemove = true;
                     for (let i = 0; i < len; i++) {
@@ -176,17 +176,17 @@ namespace annie {
                             break;
                         }
                     }
-                    if(isRemove){
-                        let cpc=cp._removeChildren;
+                    if (isRemove) {
+                        let cpc = cp._removeChildren;
                         len = cpc.length;
-                        for (let i = 0; i < len; i++){
+                        for (let i = 0; i < len; i++) {
                             if (cpc[i] == child) {
                                 cpc.splice(i, 1);
                                 break;
                             }
                         }
                     }
-                }else {
+                } else {
                     len = s.children.length;
                     for (let i = 0; i < len; i++) {
                         if (s.children[i] == child) {
@@ -402,11 +402,10 @@ namespace annie {
 
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._cp || !s._visible) return;
-            if (s._cacheAsBitmap) {
-                super.render(renderObj);
-            } else {
-                if (s.cAlpha > 0 && s._visible) {
+            if (s.cAlpha > 0 && s._visible) {
+                if (s._cacheAsBitmap) {
+                    super.render(renderObj);
+                } else {
                     let maskObj: any;
                     let child: any;
                     let len: number = s.children.length;
@@ -434,7 +433,7 @@ namespace annie {
                             child.render(renderObj);
                         }
                     }
-                    if (maskObj) {
+                    if (maskObj){
                         renderObj.endMask();
                     }
                 }
@@ -470,7 +469,7 @@ namespace annie {
                 for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
-                    child.parent=s;
+                    child.parent = s;
                     child.callEventAndFrameScript(callState);
                 }
             } else if (callState == 2) {
@@ -491,7 +490,7 @@ namespace annie {
                         child.callEventAndFrameScript(2);
                     } else {
                         child.stage = s.stage;
-                        child.parent=s;
+                        child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
                 }

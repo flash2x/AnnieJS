@@ -347,7 +347,7 @@ namespace annie {
                     value["_isUseToMask"]++;
                 } else {
                     if (s._mask != null) {
-                        s["_isUseToMask"]--;
+                        s._mask["_isUseToMask"]--;
                     }
                 }
                 s._mask = value;
@@ -717,11 +717,11 @@ namespace annie {
             }
         }
         /**
-         * @method getSounds
+         * @method getSound
          * @param {number|string} id
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
          */
-        public getSounds(id: any): any {
+        public getSound(id: any): any {
             let sounds = this.soundList;
             let newSounds: any = [];
             if (sounds) {

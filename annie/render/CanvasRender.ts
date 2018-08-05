@@ -90,7 +90,9 @@ namespace annie {
          */
         public draw(target: any): void {
             //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp) return;
+            if (target._cp){
+                this._stage.update(false);
+            };
             let ctx = CanvasRender.drawCtx;
             ctx.globalAlpha = target.cAlpha;
             let tm = target.cMatrix;
