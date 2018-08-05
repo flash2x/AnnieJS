@@ -1944,13 +1944,13 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s.mask) {
+                if (value != s._mask) {
                     if (value) {
                         value["_isUseToMask"]++;
                     }
                     else {
-                        if (s.mask != null) {
-                            s["_isUseToMask"]--;
+                        if (s._mask != null) {
+                            s._mask["_isUseToMask"]--;
                         }
                     }
                     s._mask = value;
@@ -4056,13 +4056,11 @@ var annie;
         };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cp || !s._visible)
-                return;
-            if (s._cacheAsBitmap) {
-                _super.prototype.render.call(this, renderObj);
-            }
-            else {
-                if (s.cAlpha > 0 && s._visible) {
+            if (s.cAlpha > 0 && s._visible) {
+                if (s._cacheAsBitmap) {
+                    _super.prototype.render.call(this, renderObj);
+                }
+                else {
                     var maskObj = void 0;
                     var child = void 0;
                     var len = s.children.length;
@@ -6422,20 +6420,20 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
+                s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(true);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
                         s.callEventAndFrameScript(2);
+                        s.update(true);
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
@@ -6816,9 +6814,6 @@ var annie;
                         e.preventDefault();
                     }
                 }
-            }
-            if (s._cp) {
-                s.update();
             }
         };
         ;
@@ -7829,9 +7824,10 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this;
-            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp)
-                return;
+            //由于某些原因导致有些元件没来的及更新就开始渲染了
+            if (target._cp) {
+                s._stage.update(false);
+            }
             var texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 var ctx = s._ctx;

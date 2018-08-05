@@ -469,8 +469,8 @@ declare namespace annieUI {
         private getBookArr(point, actionPoint1, actionPoint2);
         private getLayerArr(point1, point2, actionPoint1, actionPoint2, limitPoint1, limitPoint2);
         private getShape(shape, pointArr);
-        private setShadowMask(shape, maskShape, g_width, g_height);
-        private getShadow(shape, maskShape, point1, point2, maskArray, arg);
+        private setShadowMask(shape, g_width, g_height);
+        private getShadow(shape, point1, point2, arg);
         private setPage(pageNum);
         private onMouseDown(e);
         private onMouseUp(e);

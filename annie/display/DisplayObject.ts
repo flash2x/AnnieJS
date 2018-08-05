@@ -342,12 +342,12 @@ namespace annie {
 
         public set mask(value: DisplayObject) {
             let s = this;
-            if (value != s.mask) {
+            if (value != s._mask) {
                 if (value) {
                     value["_isUseToMask"]++;
                 } else {
-                    if (s.mask != null) {
-                        s["_isUseToMask"]--;
+                    if (s._mask != null) {
+                        s._mask["_isUseToMask"]--;
                     }
                 }
                 s._mask = value;

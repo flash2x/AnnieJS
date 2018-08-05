@@ -806,7 +806,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 渲染
          * @method render
