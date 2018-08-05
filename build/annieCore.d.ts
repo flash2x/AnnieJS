@@ -1472,50 +1472,7 @@ declare namespace annie {
         */
         constructor(imagePath: string);
         destroy(): void;
-    }
-}
-declare var wx: any;
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * 小游戏中开放子域在主域的显示容器,小程序中无此类
-     * @class annie.SharedCanvas
-     * @public
-     * @extends annie.DisplayObject
-     * @since 1.0.0
-     */
-    class SharedCanvas extends DisplayObject {
-        /**
-         * 构造函数
-         * @method SharedCanvas
-         * @since 1.0.0
-         * @public
-         * @param width
-         * @param height
-         * @param fps
-         * @param scaleMode
-         */
-        constructor(width: number, height: number, fps: number, scaleMode: string);
-        visible: boolean;
-        destroy(): void;
-        private static _isInit;
-        private _openDataContext;
-        /**
-         * 设置子域的宽和高
-         * @method setWH
-         * @param {number} w
-         * @param {number} h
-         */
-        setWH(w: number, h: number): void;
-        /**
-         * 向子域传消息
-         * @method postMessage
-         * @param data
-         * @public
-         */
-        postMessage(data: any): void;
+        update(isDrawUpdate?: boolean): void;
     }
 }
 /**
@@ -2746,89 +2703,6 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
-    interface IRender {
-        /**
-         * 渲染循环
-         * @param target
-         */
-        draw(target: any): void;
-        /**
-         * 开始遮罩
-         * @param target
-         */
-        beginMask(target: any): void;
-        /**
-         * 结束遮罩
-         */
-        endMask(): void;
-        end(): void;
-        /**
-         * 开始渲染
-         */
-        begin(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * Canvas 渲染器
-     * @class annie.CanvasRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.0
-     */
-    class CanvasRender extends AObject implements IRender {
-        static drawCtx: any;
-        private _stage;
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.0
-         */
-        constructor(stage: Stage, ctx: any);
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.0
-         * @public
-         */
-        begin(): void;
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.0
-         */
-        beginMask(target: any): void;
-        private drawMask(target, ctx);
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.0
-         */
-        endMask(): void;
-        end(): void;
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        draw(target: any): void;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
     class TweenObj extends AObject {
         constructor();
         currentFrame: number;
@@ -3336,6 +3210,122 @@ declare namespace annie {
         private update();
         private static _timerList;
         private static flush();
+        destroy(): void;
+    }
+}
+declare var wx: any;
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 小游戏中开放子域在主域的显示容器,小程序中无此类
+     * @class annie.SharedCanvas
+     * @public
+     * @extends annie.AObject
+     * @since 1.0.0
+     */
+    class SharedCanvas {
+        constructor();
+        static init(stage: Stage): void;
+        static destroy(): void;
+        static canvas: any;
+        static context: any;
+        private static width;
+        private static height;
+        /**
+         * 向子域传消息
+         * @method postMessage
+         * @param data
+         * @public
+         */
+        static postMessage(data: any): void;
+        static show(): void;
+        static hide(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    interface IRender {
+        /**
+         * 渲染循环
+         * @param target
+         */
+        draw(target: any): void;
+        /**
+         * 开始遮罩
+         * @param target
+         */
+        beginMask(target: any): void;
+        /**
+         * 结束遮罩
+         */
+        endMask(): void;
+        end(): void;
+        /**
+         * 开始渲染
+         */
+        begin(): void;
+        drawSharedCanvas(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.CanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class CanvasRender extends AObject implements IRender {
+        static drawCtx: any;
+        private _stage;
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        constructor(stage: Stage, ctx: any);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        private drawMask(target, ctx);
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        end(): void;
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        drawSharedCanvas(): void;
         destroy(): void;
     }
 }

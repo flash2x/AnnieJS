@@ -110,7 +110,14 @@ namespace annie {
                 target._draw(ctx);
             }
         }
-
+        public drawSharedCanvas():void{
+            if(SharedCanvas.canvas) {
+                let ctx = CanvasRender.drawCtx;
+                ctx.globalAlpha = 1;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.drawImage(SharedCanvas.canvas, 0, 0);
+            }
+        }
         destroy(): void {
             let s = this;
             s._stage = null;

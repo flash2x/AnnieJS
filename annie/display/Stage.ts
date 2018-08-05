@@ -272,6 +272,7 @@ namespace annie {
                 s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
+                s.renderObj.drawSharedCanvas();
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
@@ -281,6 +282,7 @@ namespace annie {
                         s.callEventAndFrameScript(2);
                         s.update(true);
                         s.render(s.renderObj);
+                        s.renderObj.drawSharedCanvas();
                     }
                     s._currentFlush--;
                 }
@@ -351,13 +353,13 @@ namespace annie {
             let s: any = this;
             //判断是否有drag的显示对象
             let sd: any = Stage._dragDisplay;
-            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
-                if (e.targetTouches.length == 2) {
+            if (s.isMultiTouch && e.changedTouches && e.changedTouches.length > 1) {
+                if (e.changedTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX;
-                    s._mP1.y = e.targetTouches[0].clientY;
-                    s._mP2.x = e.targetTouches[1].clientX;
-                    s._mP2.y = e.targetTouches[1].clientY;
+                    s._mP1.x = e.changedTouches[0].clientX;
+                    s._mP1.y = e.changedTouches[0].clientY;
+                    s._mP2.x = e.changedTouches[1].clientX;
+                    s._mP2.y = e.changedTouches[1].clientY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -633,9 +635,6 @@ namespace annie {
                     }
                 }
             }
-            if (s._cp) {
-                s.update();
-            }
         };
         /**
          * 设置舞台的对齐模式
@@ -719,7 +718,6 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
-
         //刷新所有定时器
         private static flushAll(): void {
             if(!Stage._pause) {

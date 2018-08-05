@@ -3,7 +3,6 @@
  */
 namespace annieUI {
     import DisplayObject = annie.DisplayObject;
-
     /**
      * 有些时候需要大量的有规则的滚动内容。这个是滚动类的Item类接口
      * @class annieUI.IScrollListItem
@@ -16,7 +15,6 @@ namespace annieUI {
         id: number;
         data: number;
     }
-
     /**
      * 有些时候需要大量的有规则的滚动内容。这个时候就应该用到这个类了
      * @class annieUI.ScrollList

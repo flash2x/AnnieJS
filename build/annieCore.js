@@ -2443,111 +2443,18 @@ var annie;
             s._texture = "";
             _super.prototype.destroy.call(this);
         };
+        Bitmap.prototype.update = function (isDrawUpdate) {
+            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
+            var s = this;
+            if (!s._visible)
+                return;
+            _super.prototype.update.call(this, isDrawUpdate);
+            var UI = s._UI;
+            UI.UM = UI.UA = UI.UF = false;
+        };
         return Bitmap;
     }(annie.DisplayObject));
     annie.Bitmap = Bitmap;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 小游戏中开放子域在主域的显示容器,小程序中无此类
-     * @class annie.SharedCanvas
-     * @public
-     * @extends annie.DisplayObject
-     * @since 1.0.0
-     */
-    var SharedCanvas = (function (_super) {
-        __extends(SharedCanvas, _super);
-        /**
-         * 构造函数
-         * @method SharedCanvas
-         * @since 1.0.0
-         * @public
-         * @param width
-         * @param height
-         * @param fps
-         * @param scaleMode
-         */
-        function SharedCanvas(width, height, fps, scaleMode) {
-            _super.call(this);
-            if (!SharedCanvas._isInit) {
-                var s_1 = this;
-                s_1._instanceType = "annie.SharedCanvas";
-                s_1._openDataContext = wx.getOpenDataContext();
-                var sharedCanvas = s_1._openDataContext.canvas;
-                s_1._texture = sharedCanvas;
-                s_1.setWH(width, height);
-                s_1.postMessage({
-                    event: "initSharedCanvasStage",
-                    data: { w: width, h: height, fps: fps, scaleMode: scaleMode, }
-                });
-                SharedCanvas._isInit = true;
-                s_1.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
-                    if (s_1._visible)
-                        s_1.postMessage({ event: "onShow" });
-                });
-                s_1.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
-                    if (s_1._visible)
-                        s_1.postMessage({ event: "onHide" });
-                });
-            }
-            else {
-                throw new Error("annie.SharedCanvas只能初始化一次");
-            }
-        }
-        Object.defineProperty(SharedCanvas.prototype, "visible", {
-            set: function (value) {
-                var s = this;
-                if (value != s._visible)
-                    s._visible = value;
-                if (value) {
-                    s.postMessage({ event: "onShow" });
-                }
-                else {
-                    s._cp = true;
-                    s.postMessage({ event: "onHide" });
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        SharedCanvas.prototype.destroy = function () {
-            //清除相应的数据引用
-            var s = this;
-            s._texture = null;
-            s._openDataContext = null;
-            _super.prototype.destroy.call(this);
-        };
-        /**
-         * 设置子域的宽和高
-         * @method setWH
-         * @param {number} w
-         * @param {number} h
-         */
-        SharedCanvas.prototype.setWH = function (w, h) {
-            var s = this;
-            s._texture.width = w;
-            s._texture.height = h;
-            s._bounds.width = w;
-            s._bounds.height = h;
-        };
-        /**
-         * 向子域传消息
-         * @method postMessage
-         * @param data
-         * @public
-         */
-        SharedCanvas.prototype.postMessage = function (data) {
-            //呼叫数据显示端
-            this._openDataContext.postMessage(data);
-        };
-        SharedCanvas._isInit = false;
-        return SharedCanvas;
-    }(annie.DisplayObject));
-    annie.SharedCanvas = SharedCanvas;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -4951,13 +4858,13 @@ var annie;
                 var s = this;
                 //判断是否有drag的显示对象
                 var sd = Stage._dragDisplay;
-                if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
-                    if (e.targetTouches.length == 2) {
+                if (s.isMultiTouch && e.changedTouches && e.changedTouches.length > 1) {
+                    if (e.changedTouches.length == 2) {
                         //求角度和距离
-                        s._mP1.x = e.targetTouches[0].clientX;
-                        s._mP1.y = e.targetTouches[0].clientY;
-                        s._mP2.x = e.targetTouches[1].clientX;
-                        s._mP2.y = e.targetTouches[1].clientY;
+                        s._mP1.x = e.changedTouches[0].clientX;
+                        s._mP1.y = e.changedTouches[0].clientY;
+                        s._mP2.x = e.changedTouches[1].clientX;
+                        s._mP2.y = e.changedTouches[1].clientY;
                         var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                         var dis = annie.Point.distance(s._mP1, s._mP2);
                         s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -5246,9 +5153,6 @@ var annie;
                         }
                     }
                 }
-                if (s._cp) {
-                    s.update();
-                }
             };
             /**
              * 设置舞台的对齐模式
@@ -5447,6 +5351,7 @@ var annie;
                 s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
+                s.renderObj.drawSharedCanvas();
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
@@ -5458,6 +5363,7 @@ var annie;
                         s.callEventAndFrameScript(2);
                         s.update(true);
                         s.render(s.renderObj);
+                        s.renderObj.drawSharedCanvas();
                     }
                     s._currentFlush--;
                 }
@@ -5792,130 +5698,6 @@ var annie;
         return Sound;
     }(annie.EventDispatcher));
     annie.Sound = Sound;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * Canvas 渲染器
-     * @class annie.CanvasRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.0
-     */
-    var CanvasRender = (function (_super) {
-        __extends(CanvasRender, _super);
-        /**
-         * @CanvasRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.0
-         */
-        function CanvasRender(stage, ctx) {
-            _super.call(this);
-            var s = this;
-            s._instanceType = "annie.CanvasRender";
-            s._stage = stage;
-            CanvasRender.drawCtx = ctx;
-        }
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.0
-         * @public
-         */
-        CanvasRender.prototype.begin = function () {
-            var s = this;
-            CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
-            var _ctx = CanvasRender.drawCtx;
-            if (s._stage.bgColor != "") {
-                _ctx.fillStyle = s._stage.bgColor;
-                _ctx.fillRect(0, 0, s._stage.divWidth, s._stage.divHeight);
-            }
-            else {
-                _ctx.clearRect(0, 0, s._stage.divWidth, s._stage.divHeight);
-            }
-        };
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.0
-         */
-        CanvasRender.prototype.beginMask = function (target) {
-            var s = this;
-            var ctx = CanvasRender.drawCtx;
-            ctx.save();
-            ctx.globalAlpha = 0;
-            s.drawMask(target, ctx);
-            ctx.clip();
-        };
-        CanvasRender.prototype.drawMask = function (target, ctx) {
-            var s = this;
-            var tm = target.cMatrix;
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target._instanceType == "annie.Shape") {
-                target._draw(ctx);
-            }
-            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
-                for (var i = 0; i < target.children.length; i++) {
-                    s.drawMask(target.children[i], ctx);
-                }
-            }
-            else {
-                var bounds = target._bounds;
-                ctx.rect(0, 0, bounds.width, bounds.height);
-            }
-        };
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.0
-         */
-        CanvasRender.prototype.endMask = function () {
-            CanvasRender.drawCtx.restore();
-        };
-        CanvasRender.prototype.end = function () {
-            //CanvasRender.drawCtx.draw();
-        };
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        CanvasRender.prototype.draw = function (target) {
-            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp) {
-                this._stage.update(false);
-            }
-            ;
-            var ctx = CanvasRender.drawCtx;
-            ctx.globalAlpha = target.cAlpha;
-            var tm = target.cMatrix;
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            var texture = target._texture;
-            if (texture) {
-                ctx.drawImage(texture, 0, 0);
-            }
-            else {
-                target._draw(ctx);
-            }
-        };
-        CanvasRender.prototype.destroy = function () {
-            var s = this;
-            s._stage = null;
-        };
-        CanvasRender.drawCtx = null;
-        return CanvasRender;
-    }(annie.AObject));
-    annie.CanvasRender = CanvasRender;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -6878,6 +6660,213 @@ var annie;
         return Timer;
     }(annie.EventDispatcher));
     annie.Timer = Timer;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * 小游戏中开放子域在主域的显示容器,小程序中无此类
+     * @class annie.SharedCanvas
+     * @public
+     * @extends annie.AObject
+     * @since 1.0.0
+     */
+    var SharedCanvas = (function () {
+        function SharedCanvas() {
+        }
+        ;
+        SharedCanvas.init = function (stage) {
+            var s = SharedCanvas;
+            s.context = wx.getOpenDataContext();
+            s.postMessage({
+                event: "initSharedCanvasStage",
+                data: {
+                    dw: stage.divWidth,
+                    dh: stage.divHeight,
+                    w: stage.desWidth,
+                    h: stage.desHeight,
+                    fps: stage.getFrameRate(),
+                    scaleMode: stage.scaleMode,
+                    devicePixelRatio: annie.devicePixelRatio
+                }
+            });
+            s.width = stage.divWidth;
+            s.height = stage.divHeight;
+        };
+        SharedCanvas.destroy = function () {
+            //清除相应的数据引用
+            var s = SharedCanvas;
+            s.context = null;
+            s.canvas = null;
+        };
+        /**
+         * 向子域传消息
+         * @method postMessage
+         * @param data
+         * @public
+         */
+        SharedCanvas.postMessage = function (data) {
+            //呼叫数据显示端
+            var s = SharedCanvas;
+            if (s.context) {
+                s.context.postMessage(data);
+            }
+        };
+        SharedCanvas.show = function () {
+            var s = SharedCanvas;
+            if (s.context) {
+                s.context.postMessage({ event: "onShow" });
+                s.canvas = s.context.canvas;
+                s.canvas.width = s.width;
+                s.canvas.height = s.height;
+            }
+        };
+        SharedCanvas.hide = function () {
+            var s = SharedCanvas;
+            if (s.context) {
+                s.context.postMessage({ event: "onHide" });
+                s.canvas = null;
+            }
+        };
+        SharedCanvas.width = 0;
+        SharedCanvas.height = 0;
+        return SharedCanvas;
+    }());
+    annie.SharedCanvas = SharedCanvas;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * Canvas 渲染器
+     * @class annie.CanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    var CanvasRender = (function (_super) {
+        __extends(CanvasRender, _super);
+        /**
+         * @CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        function CanvasRender(stage, ctx) {
+            _super.call(this);
+            var s = this;
+            s._instanceType = "annie.CanvasRender";
+            s._stage = stage;
+            CanvasRender.drawCtx = ctx;
+        }
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        CanvasRender.prototype.begin = function () {
+            var s = this;
+            CanvasRender.drawCtx.setTransform(1, 0, 0, 1, 0, 0);
+            var _ctx = CanvasRender.drawCtx;
+            if (s._stage.bgColor != "") {
+                _ctx.fillStyle = s._stage.bgColor;
+                _ctx.fillRect(0, 0, s._stage.divWidth, s._stage.divHeight);
+            }
+            else {
+                _ctx.clearRect(0, 0, s._stage.divWidth, s._stage.divHeight);
+            }
+        };
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        CanvasRender.prototype.beginMask = function (target) {
+            var s = this;
+            var ctx = CanvasRender.drawCtx;
+            ctx.save();
+            ctx.globalAlpha = 0;
+            s.drawMask(target, ctx);
+            ctx.clip();
+        };
+        CanvasRender.prototype.drawMask = function (target, ctx) {
+            var s = this;
+            var tm = target.cMatrix;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if (target._instanceType == "annie.Shape") {
+                target._draw(ctx);
+            }
+            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+                for (var i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i], ctx);
+                }
+            }
+            else {
+                var bounds = target._bounds;
+                ctx.rect(0, 0, bounds.width, bounds.height);
+            }
+        };
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        CanvasRender.prototype.endMask = function () {
+            CanvasRender.drawCtx.restore();
+        };
+        CanvasRender.prototype.end = function () {
+            //CanvasRender.drawCtx.draw();
+        };
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        CanvasRender.prototype.draw = function (target) {
+            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
+            if (target._cp) {
+                this._stage.update(false);
+            }
+            ;
+            var ctx = CanvasRender.drawCtx;
+            ctx.globalAlpha = target.cAlpha;
+            var tm = target.cMatrix;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            var texture = target._texture;
+            if (texture) {
+                ctx.drawImage(texture, 0, 0);
+            }
+            else {
+                target._draw(ctx);
+            }
+        };
+        CanvasRender.prototype.drawSharedCanvas = function () {
+            if (annie.SharedCanvas.canvas) {
+                var ctx = CanvasRender.drawCtx;
+                ctx.globalAlpha = 1;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.drawImage(annie.SharedCanvas.canvas, 0, 0);
+            }
+        };
+        CanvasRender.prototype.destroy = function () {
+            var s = this;
+            s._stage = null;
+        };
+        CanvasRender.drawCtx = null;
+        return CanvasRender;
+    }(annie.AObject));
+    annie.CanvasRender = CanvasRender;
 })(annie || (annie = {}));
 /**
  * @class annie
