@@ -5267,7 +5267,7 @@ var annie;
              * @default false
              */
             get: function () {
-                return this._pause;
+                return Stage._pause;
             },
             set: function (value) {
                 var s = Stage;

@@ -34,7 +34,7 @@ namespace annie {
          * @default false
          */
         static get pause(): boolean {
-            return this._pause;
+            return Stage._pause;
         }
 
         static set pause(value: boolean) {
