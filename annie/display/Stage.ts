@@ -87,12 +87,13 @@ namespace annie {
          * @default false
          */
         static get pause(): boolean {
-            return this._pause;
+            return Stage._pause;
         }
 
         static set pause(value: boolean) {
-            this._pause = value;
-            if (value != this._pause) {
+            let s:any=Stage;
+            s._pause = value;
+            if (value != s._pause) {
                 if (value) {
                     //停止声音
                     Sound.stopAllSounds();
@@ -104,7 +105,6 @@ namespace annie {
                 globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }
-
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。

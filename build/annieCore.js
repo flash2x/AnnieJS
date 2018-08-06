@@ -1562,14 +1562,7 @@ var annie;
          */
         function DisplayObject() {
             _super.call(this);
-            /**
-             * 更新信息对象
-             * @property _UI
-             * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-             * @since 1.0.0
-             * @protected
-             * @readonly
-             */
+            //更新信息对象是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
             this._UI = {
                 UD: false,
                 UM: true,
@@ -1596,23 +1589,9 @@ var annie;
              * @readonly
              */
             this.parent = null;
-            /**
-             * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
-             * @property cAlpha
-             * @protected
-             * @type {number}
-             * @since 1.0.0
-             * @default 1
-             */
+            //显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
             this.cAlpha = 1;
-            /**
-             * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
-             * @property cMatrix
-             * @protected
-             * @type {annie.Matrix}
-             * @default null
-             * @since 1.0.0
-             */
+            //显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
             this.cMatrix = new annie.Matrix();
             /**
              * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
@@ -1623,15 +1602,7 @@ var annie;
              * @default false
              */
             this.mouseEnable = true;
-            /**
-             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 显示对象上对显示列表上的最终的所有滤镜组
-             * @property cFilters
-             * @protected
-             * @default []
-             * @since 1.0.0
-             * @type {Array}
-             */
+            //显示对象上对显示列表上的最终的所有滤镜组
             this.cFilters = [];
             /**
              * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
@@ -1662,30 +1633,9 @@ var annie;
             this._isDragCenter = false;
             this._lastDragPoint = new annie.Point();
             this._isUseToMask = 0;
-            /**
-             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-             * @property _texture
-             * @protected
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
+            // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
             this._texture = null;
-            /**
-             * @property _offsetX
-             * @protected
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
             this._offsetX = 0;
-            /**
-             * @property _offsetY
-             * @protected
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
             this._offsetY = 0;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
@@ -2300,6 +2250,7 @@ var annie;
          * @method stopAllSounds
          * @public
          * @since 2.0.0
+         * @return {void}
          */
         DisplayObject.prototype.stopAllSounds = function () {
             var sounds = this.soundList;
@@ -2313,6 +2264,7 @@ var annie;
          * @method getSound
          * @param {number|string} id
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         * @since 2.0.0
          */
         DisplayObject.prototype.getSound = function (id) {
             var sounds = this.soundList;
@@ -2399,12 +2351,7 @@ var annie;
             s._visible = false;
             _super.prototype.destroy.call(this);
         };
-        /**
-         * 更新流程走完之后再执行脚本和事件执行流程
-         * @protected
-         * @method callEventAndFrameScript
-         * @param {number} callState 0是上级被移除，执行removeStage事件 1是上级被添加到舞台执行addStage事件 2是常规刷新运行
-         */
+        //更新流程走完之后再执行脚本和事件执行流程
         DisplayObject.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
             if (!s.stage)
@@ -2466,8 +2413,8 @@ var annie;
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
-         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
+         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
+         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容，小程序或者小游戏里没有这个参数
          * @example
          *      //html5
          *      var imgEle=new Image();
@@ -2485,6 +2432,10 @@ var annie;
          *          s.addChild(rectBitmap);
          *      }
          *      imgEle.src='http://test.annie2x.com/test.jpg';
+         *      //小程序或者小游戏
+         *      var imgEle="http://test.annie2x.com/test.jpg";
+         *      var bitmap=new annie.Bitmap(imgEle);
+         *      s.addChild(bitmap);
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
@@ -2512,6 +2463,7 @@ var annie;
         }
         Object.defineProperty(Bitmap.prototype, "rect", {
             /**
+             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
              * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
              * @property rect
@@ -5177,12 +5129,6 @@ var annie;
             s._bounds.height = h;
             s.htmlElement = she;
         };
-        /**
-         * @method getStyle
-         * @param {HTMLElement} elem
-         * @param cssName
-         * @return {any}
-         */
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
             if (elem.style[cssName]) {
@@ -5198,11 +5144,6 @@ var annie;
             }
             return null;
         };
-        /**
-         * @method updateStyle
-         * @public
-         * @since 1.1.4
-         */
         FloatDisplay.prototype.updateStyle = function () {
             var s = this;
             var o = s.htmlElement;
@@ -6331,11 +6272,12 @@ var annie;
              * @default false
              */
             get: function () {
-                return this._pause;
+                return Stage._pause;
             },
             set: function (value) {
-                this._pause = value;
-                if (value != this._pause) {
+                var s = Stage;
+                s._pause = value;
+                if (value != s._pause) {
                     if (value) {
                         //停止声音
                         annie.Sound.stopAllSounds();
@@ -6345,7 +6287,7 @@ var annie;
                         annie.Sound.resumePlaySounds();
                     }
                     //触发事件
-                    annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
+                    annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
                 }
             },
             enumerable: true,
