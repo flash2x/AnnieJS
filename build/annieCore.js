@@ -5270,8 +5270,9 @@ var annie;
                 return this._pause;
             },
             set: function (value) {
-                this._pause = value;
-                if (value != this._pause) {
+                var s = Stage;
+                s._pause = value;
+                if (value != s._pause) {
                     if (value) {
                         //停止声音
                         annie.Sound.stopAllSounds();
@@ -5281,7 +5282,7 @@ var annie;
                         annie.Sound.resumePlaySounds();
                     }
                     //触发事件
-                    annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
+                    annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
                 }
             },
             enumerable: true,
