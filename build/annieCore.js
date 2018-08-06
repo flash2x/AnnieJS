@@ -4854,6 +4854,9 @@ var annie;
             this._mP1 = new annie.Point();
             this._mP2 = new annie.Point();
             this._onMouseEvent = function (e) {
+                //如果有开放域在，则不触发主舞台事件,如果隐藏了开放域，则不触发开放域事件。这里逻辑有点绕，要仔细分析
+                if ((annie.SharedCanvas.canvas && annie.SharedCanvas.canvas.width > 0) || (annie.CanvasRender.drawCtx.canvas.width == 0))
+                    return;
                 //检查是否有
                 var s = this;
                 //判断是否有drag的显示对象
@@ -6723,11 +6726,18 @@ var annie;
                 s.canvas.height = s.height;
             }
         };
-        SharedCanvas.hide = function () {
-            var s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage({ event: "onHide" });
-                s.canvas = null;
+        SharedCanvas.hide = function (isSharedDomain) {
+            if (isSharedDomain === void 0) { isSharedDomain = true; }
+            if (!isSharedDomain) {
+                var s = SharedCanvas;
+                if (s.context) {
+                    s.context.postMessage({ event: "onHide" });
+                    s.canvas = null;
+                }
+            }
+            else {
+                annie.Stage.pause = true;
+                annie.CanvasRender.drawCtx.canvas.width = annie.CanvasRender.drawCtx.canvas.height = 0;
             }
         };
         SharedCanvas.width = 0;

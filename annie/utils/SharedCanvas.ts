@@ -56,18 +56,23 @@ namespace annie {
 
         public static show(): void {
             let s = SharedCanvas;
-            if(s.context) {
+            if(s.context){
                 s.context.postMessage({event: "onShow"});
                 s.canvas = s.context.canvas;
                 s.canvas.width=s.width;
                 s.canvas.height=s.height;
             }
         }
-        public static hide(): void {
-            let s = SharedCanvas;
-            if(s.context) {
-                s.context.postMessage({event: "onHide"});
-                s.canvas = null;
+        public static hide(isSharedDomain:boolean=true): void {
+            if(!isSharedDomain) {
+                let s = SharedCanvas;
+                if (s.context) {
+                    s.context.postMessage({event: "onHide"});
+                    s.canvas = null;
+                }
+            }else{
+                annie.Stage.pause=true;
+                CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;
             }
         }
     }

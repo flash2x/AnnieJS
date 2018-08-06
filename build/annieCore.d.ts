@@ -3241,7 +3241,7 @@ declare namespace annie {
          */
         static postMessage(data: any): void;
         static show(): void;
-        static hide(): void;
+        static hide(isSharedDomain?: boolean): void;
     }
 }
 /**
