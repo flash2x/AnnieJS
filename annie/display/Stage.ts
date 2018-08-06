@@ -101,7 +101,7 @@ namespace annie {
                     Sound.resumePlaySounds();
                 }
                 //触发事件
-                globalDispatcher.dispatchEvent("onStagePause", {pause: value});
+                globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }
 

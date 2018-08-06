@@ -331,7 +331,6 @@ namespace annie {
             }
             s._removeChildren.push(child);
         }
-
         /**
          * 移除Sprite上的所有child
          * @method removeAllChildren

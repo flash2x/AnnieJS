@@ -22,14 +22,7 @@ namespace annie {
             this._instanceType = "annie.DisplayObject";
         }
 
-        /**
-         * 更新信息对象
-         * @property _UI
-         * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-         * @since 1.0.0
-         * @protected
-         * @readonly
-         */
+        //更新信息对象是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
         protected _UI: { UD: boolean, UM: boolean, UA: boolean, UF: boolean } = {
             UD: false,
             UM: true,
@@ -56,23 +49,11 @@ namespace annie {
          * @readonly
          */
         public parent: Sprite = null;
-        /**
-         * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
-         * @property cAlpha
-         * @protected
-         * @type {number}
-         * @since 1.0.0
-         * @default 1
-         */
+
+        //显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
         protected cAlpha: number = 1;
-        /**
-         * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
-         * @property cMatrix
-         * @protected
-         * @type {annie.Matrix}
-         * @default null
-         * @since 1.0.0
-         */
+
+        //显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
         protected cMatrix: Matrix = new Matrix();
 
         /**
@@ -84,15 +65,7 @@ namespace annie {
          * @default false
          */
         public mouseEnable: boolean = true;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 显示对象上对显示列表上的最终的所有滤镜组
-         * @property cFilters
-         * @protected
-         * @default []
-         * @since 1.0.0
-         * @type {Array}
-         */
+        //显示对象上对显示列表上的最终的所有滤镜组
         protected cFilters: any = [];
         /**
          * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
@@ -681,30 +654,12 @@ namespace annie {
         //画缓存位图的时候需要使用
         //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
         public static _canvas: any = window.document.createElement("canvas");
-        /**
-         * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-         * @property _texture
-         * @protected
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
+
+        // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
         protected _texture: any = null;
-        /**
-         * @property _offsetX
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
+
         protected _offsetX: number = 0;
-        /**
-         * @property _offsetY
-         * @protected
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
+
         protected _offsetY: number = 0;
 
         protected _bounds: Rectangle = new Rectangle();
@@ -734,6 +689,7 @@ namespace annie {
          * @method stopAllSounds
          * @public
          * @since 2.0.0
+         * @return {void}
          */
         public stopAllSounds(): void {
             let sounds = this.soundList;
@@ -747,6 +703,7 @@ namespace annie {
          * @method getSound
          * @param {number|string} id
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         * @since 2.0.0
          */
         public getSound(id: any): any {
             let sounds = this.soundList;
@@ -845,12 +802,7 @@ namespace annie {
             s._visible=false;
             super.destroy();
         }
-        /**
-         * 更新流程走完之后再执行脚本和事件执行流程
-         * @protected
-         * @method callEventAndFrameScript
-         * @param {number} callState 0是上级被移除，执行removeStage事件 1是上级被添加到舞台执行addStage事件 2是常规刷新运行
-         */
+        //更新流程走完之后再执行脚本和事件执行流程
         protected callEventAndFrameScript(callState: number):void {
             let s: any = this;
             if (!s.stage) return;

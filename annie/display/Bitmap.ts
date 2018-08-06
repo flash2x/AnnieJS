@@ -15,6 +15,7 @@ namespace annie {
         private _bitmapData: any = null;
         private _realCacheImg: any = null;
         /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
          * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
          * @property rect
@@ -39,8 +40,8 @@ namespace annie {
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
-         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
+         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
+         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容，小程序或者小游戏里没有这个参数
          * @example
          *      //html5
          *      var imgEle=new Image();
@@ -58,6 +59,10 @@ namespace annie {
          *          s.addChild(rectBitmap);
          *      }
          *      imgEle.src='http://test.annie2x.com/test.jpg';
+         *      //小程序或者小游戏
+         *      var imgEle="http://test.annie2x.com/test.jpg";
+         *      var bitmap=new annie.Bitmap(imgEle);
+         *      s.addChild(bitmap);
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
@@ -101,7 +106,6 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
-
         public update(isDrawUpdate: boolean = false): void {
             let s = this;
             if (!s._visible) return;
