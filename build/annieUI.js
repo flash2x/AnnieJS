@@ -1460,11 +1460,11 @@ var annieUI;
             var s = this;
             if (!s._isInit || isReset) {
                 s.data = data;
-                s._isInit = 1;
             }
             else {
                 s.data = s.data.concat(data);
             }
+            s._isInit = 1;
             s._lastFirstId = -1;
             s.maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -1475,41 +1475,39 @@ var annieUI;
         };
         ScrollList.prototype.flushData = function () {
             var s = this;
-            if (s._isInit > 0) {
-                if (s.view._UI.UM || s._isInit == 1) {
-                    s._isInit = 2;
-                    var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
-                    id = id < 0 ? 0 : id;
-                    if (id != s._lastFirstId) {
-                        s._lastFirstId = id;
-                        if (id != s._items[0].id) {
-                            for (var r = 0; r < s._cols; r++) {
-                                if (s.speed > 0) {
-                                    s._items.unshift(s._items.pop());
-                                }
-                                else {
-                                    s._items.push(s._items.shift());
-                                }
-                            }
-                        }
-                    }
-                    for (var i = 0; i < s._itemCount; i++) {
-                        var item = s._items[i];
-                        if (item._a2x_sl_id != id) {
-                            item.initData(s.data[id] ? id : -1, s.data[id]);
-                            item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
-                            item[s._disParam] = (id % s._cols) * s._itemCol;
-                            if (s.data[id]) {
-                                item._a2x_sl_id = id;
-                                item.visible = true;
+            if (s.view._UI.UM || s._isInit == 1) {
+                s._isInit = 2;
+                var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
+                id = id < 0 ? 0 : id;
+                if (id != s._lastFirstId) {
+                    s._lastFirstId = id;
+                    if (id != s._items[0].id) {
+                        for (var r = 0; r < s._cols; r++) {
+                            if (s.speed > 0) {
+                                s._items.unshift(s._items.pop());
                             }
                             else {
-                                item._a2x_sl_id = -1;
-                                item.visible = false;
+                                s._items.push(s._items.shift());
                             }
                         }
-                        id++;
                     }
+                }
+                for (var i = 0; i < s._itemCount; i++) {
+                    var item = s._items[i];
+                    if (item._a2x_sl_id != id) {
+                        item.initData(s.data[id] ? id : -1, s.data[id]);
+                        item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                        item[s._disParam] = (id % s._cols) * s._itemCol;
+                        if (s.data[id]) {
+                            item._a2x_sl_id = id;
+                            item.visible = true;
+                        }
+                        else {
+                            item._a2x_sl_id = -1;
+                            item.visible = false;
+                        }
+                    }
+                    id++;
                 }
             }
         };
