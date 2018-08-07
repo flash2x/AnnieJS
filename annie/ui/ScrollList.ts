@@ -123,6 +123,7 @@ namespace annieUI {
                             item.initData(s.data[id] ? id : -1, s.data[id]);
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
+                            //如果没有数据则隐藏
                             if(s.data[id]) {
                                 item._a2x_sl_id = id;
                                 item.visible =true;
