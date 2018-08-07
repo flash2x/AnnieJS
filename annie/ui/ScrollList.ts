@@ -119,11 +119,15 @@ namespace annieUI {
                         let item: any = s._items[i];
                         if (item._a2x_sl_id != id) {
                             item.initData(s.data[id] ? id : -1, s.data[id]);
-                            item.visible = s.data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
-                            item._a2x_sl_id = id;
-                        }
+                            if(s.data[id]) {
+                                item._a2x_sl_id = id;
+                                item.visible =true;
+                            }else{
+                                item._a2x_sl_id = -1;
+                                item.visible =false;
+                            }                        }
                         id++;
                     }
                 }
