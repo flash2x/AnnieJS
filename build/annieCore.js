@@ -3679,7 +3679,6 @@ var annie;
         };
         Sprite.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
-            _super.prototype.callEventAndFrameScript.call(this, callState);
             var child = null;
             var children = null;
             var len = 0;
@@ -3737,6 +3736,7 @@ var annie;
                 }
             }
             s._removeChildren.length = 0;
+            _super.prototype.callEventAndFrameScript.call(this, callState);
         };
         return Sprite;
     }(annie.DisplayObject));
