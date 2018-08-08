@@ -4930,14 +4930,6 @@ var annie;
                             }
                         }
                     }
-                    //有没有声音
-                    var frameIndex = s._curFrame - 1;
-                    var curFrameSound = timeLineObj.s[frameIndex];
-                    if (curFrameSound) {
-                        for (var sound in curFrameSound) {
-                            s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
-                        }
-                    }
                 }
             }
             _super.prototype.update.call(this, isDrawUpdate);
@@ -4986,6 +4978,13 @@ var annie;
                         frameIndex: s._curFrame,
                         frameName: "endFrame"
                     });
+                }
+                //有没有声音
+                var curFrameSound = timeLineObj.s[frameIndex];
+                if (curFrameSound) {
+                    for (var sound in curFrameSound) {
+                        s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
+                    }
                 }
             }
             _super.prototype.callEventAndFrameScript.call(this, callState);
