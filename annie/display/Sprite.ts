@@ -440,7 +440,6 @@ namespace annie {
                 }
             }
         }
-
         protected callEventAndFrameScript(callState: number): void {
             let s = this;
             super.callEventAndFrameScript(callState);
