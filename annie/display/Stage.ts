@@ -92,8 +92,8 @@ namespace annie {
 
         static set pause(value: boolean) {
             let s:any=Stage;
-            s._pause = value;
             if (value != s._pause) {
+                s._pause = value;
                 if (value) {
                     //停止声音
                     Sound.stopAllSounds();
