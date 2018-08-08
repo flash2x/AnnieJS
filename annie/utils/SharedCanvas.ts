@@ -14,6 +14,7 @@ namespace annie {
         public constructor(){};
         public static init(stage:Stage): void{
             let s = SharedCanvas;
+            if(s.context)return;
             s.context = wx.getOpenDataContext();
             s.postMessage({
                 event: "initSharedCanvasStage",

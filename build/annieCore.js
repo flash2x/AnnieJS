@@ -6683,6 +6683,8 @@ var annie;
         ;
         SharedCanvas.init = function (stage) {
             var s = SharedCanvas;
+            if (s.context)
+                return;
             s.context = wx.getOpenDataContext();
             s.postMessage({
                 event: "initSharedCanvasStage",
