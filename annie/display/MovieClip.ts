@@ -477,6 +477,7 @@ namespace annie {
             let isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
                 obj._wantFrame = 1;
+                obj._lastFrame = 0;
                 obj._isFront = true;
                 if (obj._mode < -1) {
                     obj._isPlaying = true;
