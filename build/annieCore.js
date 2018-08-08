@@ -5273,6 +5273,7 @@ var annie;
             set: function (value) {
                 var s = Stage;
                 if (value != s._pause) {
+                    s._pause = value;
                     if (value) {
                         //停止声音
                         annie.Sound.stopAllSounds();
@@ -5282,7 +5283,6 @@ var annie;
                         annie.Sound.resumePlaySounds();
                     }
                     //触发事件
-                    s._pause = value;
                     annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
                 }
             },
