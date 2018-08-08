@@ -5534,6 +5534,8 @@ var annie;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
             s.media.src = src;
+            s.media.autoplay = false;
+            s.media.loop = false;
             s.media.onEnded(function () {
                 if (s._loop > 1) {
                     s._loop--;
@@ -7428,10 +7430,13 @@ var annie;
                     //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                     allChildren[allChildren.length] = obj;
                     //如果是声音，还要把i这个顺序保存下来
-                    if (!target._a2x_sounds) {
-                        target._a2x_sounds = {};
+                    if (objType == 5) {
+                        obj.isPlaying = false;
+                        if (!target._a2x_sounds) {
+                            target._a2x_sounds = {};
+                        }
+                        target._a2x_sounds[i] = obj;
                     }
-                    target._a2x_sounds[i] = obj;
                 }
             }
             if (isMc) {

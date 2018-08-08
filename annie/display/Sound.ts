@@ -33,6 +33,8 @@ namespace annie {
             s._instanceType="annie.Sound";
             s.media =annie.createAudio();
             s.media.src = src;
+            s.media.autoplay=false;
+            s.media.loop=false;
             s.media.onEnded(function(){
                 if(s._loop>1){
                     s._loop--;
