@@ -5267,7 +5267,6 @@ var annie;
             },
             set: function (value) {
                 var s = Stage;
-                s._pause = value;
                 if (value != s._pause) {
                     if (value) {
                         //停止声音
@@ -5279,6 +5278,7 @@ var annie;
                     }
                     //触发事件
                     annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
+                    s._pause = value;
                 }
             },
             enumerable: true,
@@ -5519,6 +5519,8 @@ var annie;
             /**
              * 是否正在播放中
              * @property  isPlaying
+             * @public
+             * @since 2.0.0
              * @type {boolean}
              */
             this.isPlaying = true;

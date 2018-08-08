@@ -46,6 +46,8 @@ namespace annie {
         /**
          * 是否正在播放中
          * @property  isPlaying
+         * @public
+         * @since 2.0.0
          * @type {boolean}
          */
         public isPlaying:boolean=true;
