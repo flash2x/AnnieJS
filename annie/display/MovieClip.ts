@@ -405,14 +405,6 @@ namespace annie {
                             }
                         }
                     }
-                    //有没有声音
-                    let frameIndex = s._curFrame - 1;
-                    let curFrameSound = timeLineObj.s[frameIndex];
-                    if (curFrameSound) {
-                        for (let sound in curFrameSound) {
-                            s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
-                        }
-                    }
                 }
             }
             super.update(isDrawUpdate);
@@ -464,6 +456,13 @@ namespace annie {
                         frameIndex: s._curFrame,
                         frameName: "endFrame"
                     });
+                }
+                //有没有声音
+                let curFrameSound = timeLineObj.s[frameIndex];
+                if (curFrameSound) {
+                    for (let sound in curFrameSound) {
+                        s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
+                    }
                 }
             }
             super.callEventAndFrameScript(callState);
