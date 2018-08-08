@@ -39,7 +39,6 @@ namespace annie {
 
         static set pause(value: boolean) {
             let s:any=Stage;
-            s._pause = value;
             if (value != s._pause) {
                 if (value) {
                     //停止声音
@@ -49,6 +48,7 @@ namespace annie {
                     Sound.resumePlaySounds();
                 }
                 //触发事件
+                s._pause = value;
                 globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }

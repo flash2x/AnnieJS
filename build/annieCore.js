@@ -5272,7 +5272,6 @@ var annie;
             },
             set: function (value) {
                 var s = Stage;
-                s._pause = value;
                 if (value != s._pause) {
                     if (value) {
                         //停止声音
@@ -5283,6 +5282,7 @@ var annie;
                         annie.Sound.resumePlaySounds();
                     }
                     //触发事件
+                    s._pause = value;
                     annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
                 }
             },
