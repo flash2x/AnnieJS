@@ -473,8 +473,7 @@ namespace annie {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             let isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
-                obj._wantFrame = 0;
-                obj._curFrame = 1;
+                obj._wantFrame = 1;
                 obj._lastFrame = 0;
                 obj._isFront = true;
                 if (obj._mode < -1) {
