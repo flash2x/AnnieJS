@@ -422,7 +422,7 @@ namespace annie {
         private _a2x_sounds: any = null;
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
-            if (s.isUpdateFrame) {
+            if (s.isUpdateFrame){
                 let timeLineObj = s._a2x_res_class;
                 s.isUpdateFrame = false;
                 let frameIndex = s._curFrame - 1;
@@ -473,7 +473,9 @@ namespace annie {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             let isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
-                obj._wantFrame = 1;
+                obj._wantFrame = 0;
+                obj._curFrame = 1;
+                obj._lastFrame = 0;
                 obj._isFront = true;
                 if (obj._mode < -1) {
                     obj._isPlaying = true;

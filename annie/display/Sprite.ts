@@ -443,6 +443,7 @@ namespace annie {
 
         protected callEventAndFrameScript(callState: number): void {
             let s = this;
+            super.callEventAndFrameScript(callState);
             let child: any = null;
             let children: any = null;
             let len = 0;
@@ -497,7 +498,6 @@ namespace annie {
                 }
             }
             s._removeChildren.length = 0;
-            super.callEventAndFrameScript(callState);
         }
     }
 }

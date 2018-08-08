@@ -3679,6 +3679,7 @@ var annie;
         };
         Sprite.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
+            _super.prototype.callEventAndFrameScript.call(this, callState);
             var child = null;
             var children = null;
             var len = 0;
@@ -3736,7 +3737,6 @@ var annie;
                 }
             }
             s._removeChildren.length = 0;
-            _super.prototype.callEventAndFrameScript.call(this, callState);
         };
         return Sprite;
     }(annie.DisplayObject));
@@ -4233,7 +4233,9 @@ var annie;
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             var isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
-                obj._wantFrame = 1;
+                obj._wantFrame = 0;
+                obj._curFrame = 1;
+                obj._lastFrame = 0;
                 obj._isFront = true;
                 if (obj._mode < -1) {
                     obj._isPlaying = true;
