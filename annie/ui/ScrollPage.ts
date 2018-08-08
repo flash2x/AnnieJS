@@ -151,10 +151,11 @@ namespace annieUI {
             s.maskObj.alpha=0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH,isVertical);
-           // s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
+            let mouseEvent=s.onMouseEvent.bind(s);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN,mouseEvent );
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 let view: any = s.view;
                 if (s.autoScroll)return;
@@ -242,24 +243,23 @@ namespace annieUI {
             let s = this;
             let view: any = s.view;
             // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState<1){
-                    if (!s.isStop) {
-                        s.isStop = true;
-                    }
-                    if (s.autoScroll){
-                        s.autoScroll=false;
-                        annie.Tween.kill(s._tweenId);
-                    }
-                    if (s.isVertical) {
-                        s.lastValue = e.localY;
-                    } else {
-                        s.lastValue = e.localX;
-                    }
-                    s.speed = 0;
-                    s.isMouseDownState = 1;
-                    return;
-                };
+            if (e.type == annie.MouseEvent.MOUSE_DOWN){
+                if (!s.isStop) {
+                    s.isStop = true;
+                }
+                if (s.autoScroll){
+                    s.autoScroll=false;
+                    annie.Tween.kill(s._tweenId);
+                }
+                if (s.isVertical) {
+                    s.lastValue = e.localY;
+                } else {
+                    s.lastValue = e.localX;
+                }
+                s.speed = 0;
+                s.isMouseDownState = 1;
+            }else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState<1)return;
                 if(s.isMouseDownState==1){
                     s.dispatchEvent("onScrollStart");
                 }
