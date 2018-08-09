@@ -170,7 +170,7 @@ namespace annie {
                                         if (frameCon[j].at != -1) {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
-                                                if (!frameCon[j][m]) {
+                                                if (frameCon[j][m]==undefined) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
