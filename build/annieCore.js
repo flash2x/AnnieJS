@@ -8387,7 +8387,8 @@ var annie;
                                         if (frameCon[j].at != -1) {
                                             //如果不为空，则更新元素
                                             for (var m in lastFrameCon[j]) {
-                                                if (!frameCon[j][m]) {
+                                                //这个地方一定要用undefined。因为有些元素可能为0.
+                                                if (frameCon[j][m] == undefined) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
