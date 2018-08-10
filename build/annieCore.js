@@ -10336,7 +10336,7 @@ var annie;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
         obj._cp = true;
-        obj.update();
+        // obj.update();
         obj.render(_dRender);
         obj._cp = true;
         obj.parent = objInfo.p;
