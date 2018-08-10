@@ -58,6 +58,7 @@ namespace annieUI {
                 s.dispatchEvent("onComplete");
             };
             s.addChild(s.bitmap);
+            s.addChild(s.maskObj);
             s.bitmap.mask = s.maskObj;
         }
         private photo: any;

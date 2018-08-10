@@ -151,10 +151,11 @@ namespace annieUI {
             s.maskObj.alpha=0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH,isVertical);
-           // s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
+            let mouseEvent=s.onMouseEvent.bind(s);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN,mouseEvent );
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 let view: any = s.view;
                 if (s.autoScroll)return;
@@ -172,7 +173,7 @@ namespace annieUI {
                             s.dispatchEvent("onScrollStop");
                             s.speed = 0;
                         }
-                    } else {
+                    }else {
                         //检测是否超出了边界,如果超出了边界则回弹
                         if (s.addSpeed != 0) {
                             if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
@@ -242,24 +243,23 @@ namespace annieUI {
             let s = this;
             let view: any = s.view;
             // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState<1){
-                    if (!s.isStop) {
-                        s.isStop = true;
-                    }
-                    if (s.autoScroll){
-                        s.autoScroll=false;
-                        annie.Tween.kill(s._tweenId);
-                    }
-                    if (s.isVertical) {
-                        s.lastValue = e.localY;
-                    } else {
-                        s.lastValue = e.localX;
-                    }
-                    s.speed = 0;
-                    s.isMouseDownState = 1;
-                    return;
-                };
+            if (e.type == annie.MouseEvent.MOUSE_DOWN){
+                if (!s.isStop) {
+                    s.isStop = true;
+                }
+                if (s.autoScroll){
+                    s.autoScroll=false;
+                    annie.Tween.kill(s._tweenId);
+                }
+                if (s.isVertical) {
+                    s.lastValue = e.localY;
+                } else {
+                    s.lastValue = e.localX;
+                }
+                s.speed = 0;
+                s.isMouseDownState = 1;
+            }else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState<1)return;
                 if(s.isMouseDownState==1){
                     s.dispatchEvent("onScrollStart");
                 }
@@ -319,19 +319,23 @@ namespace annieUI {
             }else if(dis>s.maxDistance-newDis){
                 dis=s.maxDistance-newDis;
             }
-            if(Math.abs(s.view[s.paramXY]+dis)>2) {
-                s.autoScroll = true;
-                s.isStop = true;
-                s.isMouseDownState = 0;
-                let obj: any = {};
-                obj.onComplete = function () {
-                    s.autoScroll = false;
-                };
-                obj[s.paramXY] = -dis;
-                s._tweenId=annie.Tween.to(s.view, time, obj);
-                if(s.speed==0){
-                    s.dispatchEvent("onScrollStart");
+            if(time>0) {
+                if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                    s.autoScroll = true;
+                    s.isStop = true;
+                    s.isMouseDownState = 0;
+                    let obj: any = {};
+                    obj.onComplete = function () {
+                        s.autoScroll = false;
+                    };
+                    obj[s.paramXY] = -dis;
+                    s._tweenId = annie.Tween.to(s.view, time, obj);
+                    if (s.speed == 0) {
+                        s.dispatchEvent("onScrollStart");
+                    }
                 }
+            }else{
+                s.view[s.paramXY]=-dis;
             }
         }
         public destroy(): void {

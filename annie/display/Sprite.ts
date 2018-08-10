@@ -24,19 +24,21 @@ namespace annie {
             let s = this;
             s._instanceType = "annie.Sprite";
         }
+
         public destroy(): void {
-            let s:any = this;
+            let s: any = this;
             //让子级也destroy
             for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
             s.removeAllChildren();
-            if(s._parent)s._parent.removeChild(s);
+            if (s._parent) s._parent.removeChild(s);
             s.callEventAndFrameScript(0);
-            s.children.length=0;
-            s._removeChildren.length=0;
+            s.children.length = 0;
+            s._removeChildren.length = 0;
             super.destroy();
         }
+
         /**
          * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
@@ -191,10 +193,30 @@ namespace annie {
             if (!child) return;
             let s = this;
             let sameParent = (s == child.parent);
+            let cp = child.parent;
             let len: number;
-            if (child.parent) {
+            if (cp) {
                 if (!sameParent) {
-                    child.parent.removeChild(child);
+                    let cpc = cp.children;
+                    len = cpc.length;
+                    let isRemove = true;
+                    for (let i = 0; i < len; i++) {
+                        if (cpc[i] == child) {
+                            cpc.splice(i, 1);
+                            isRemove = false;
+                            break;
+                        }
+                    }
+                    if (isRemove) {
+                        let cpc = cp._removeChildren;
+                        len = cpc.length;
+                        for (let i = 0; i < len; i++) {
+                            if (cpc[i] == child) {
+                                cpc.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
                 } else {
                     len = s.children.length;
                     for (let i = 0; i < len; i++) {
@@ -205,10 +227,6 @@ namespace annie {
                     }
                 }
             }
-            if (!child.parent || s.parent != s) {
-                child["_cp"] = true;
-                child.parent = s;
-            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -216,6 +234,10 @@ namespace annie {
                 s.children.unshift(child);
             } else {
                 s.children.splice(index, 0, child);
+            }
+            if (cp != s) {
+                child["_cp"] = true;
+                child.parent = s;
             }
         }
 
@@ -309,7 +331,6 @@ namespace annie {
             }
             s._removeChildren.push(child);
         }
-
         /**
          * 移除Sprite上的所有child
          * @method removeAllChildren
@@ -324,9 +345,10 @@ namespace annie {
                 s.removeChildAt(0);
             }
         }
+
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if(!s._visible)return;
+            if (!s._visible) return;
             let um: boolean = s._UI.UM;
             let ua: boolean = s._UI.UA;
             let uf: boolean = s._UI.UF;
@@ -400,6 +422,7 @@ namespace annie {
             }
             return null;
         }
+
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -440,13 +463,13 @@ namespace annie {
             }
             return rect;
         }
+
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._cp||!s._visible) return;
-            if (s._cacheAsBitmap) {
-                super.render(renderObj);
-            } else {
-                if (s.cAlpha > 0 && s._visible) {
+            if (s.cAlpha > 0 && s._visible) {
+                if (s._cacheAsBitmap) {
+                    super.render(renderObj);
+                } else {
                     let maskObj: any;
                     let child: any;
                     let len: number = s.children.length;
@@ -474,12 +497,13 @@ namespace annie {
                             child.render(renderObj);
                         }
                     }
-                    if (maskObj) {
+                    if (maskObj){
                         renderObj.endMask();
                     }
                 }
             }
         }
+
         protected callEventAndFrameScript(callState: number): void {
             let s = this;
             let child: any = null;
@@ -509,6 +533,7 @@ namespace annie {
                 for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
+                    child.parent = s;
                     child.callEventAndFrameScript(callState);
                 }
             } else if (callState == 2) {
@@ -529,6 +554,7 @@ namespace annie {
                         child.callEventAndFrameScript(2);
                     } else {
                         child.stage = s.stage;
+                        child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
                 }

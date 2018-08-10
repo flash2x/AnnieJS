@@ -1574,14 +1574,7 @@ var annie;
          */
         function DisplayObject() {
             _super.call(this);
-            /**
-             * 更新信息对象
-             * @property _UI
-             * @param UM 是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-             * @since 1.0.0
-             * @protected
-             * @readonly
-             */
+            //更新信息对象是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
             this._UI = {
                 UD: false,
                 UM: true,
@@ -1608,23 +1601,9 @@ var annie;
              * @readonly
              */
             this.parent = null;
-            /**
-             * 显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
-             * @property cAlpha
-             * @protected
-             * @type {number}
-             * @since 1.0.0
-             * @default 1
-             */
+            //显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
             this.cAlpha = 1;
-            /**
-             * 显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
-             * @property cMatrix
-             * @protected
-             * @type {annie.Matrix}
-             * @default null
-             * @since 1.0.0
-             */
+            //显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
             this.cMatrix = new annie.Matrix();
             /**
              * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
@@ -1635,15 +1614,7 @@ var annie;
              * @default false
              */
             this.mouseEnable = true;
-            /**
-             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 显示对象上对显示列表上的最终的所有滤镜组
-             * @property cFilters
-             * @protected
-             * @default []
-             * @since 1.0.0
-             * @type {Array}
-             */
+            //显示对象上对显示列表上的最终的所有滤镜组
             this.cFilters = [];
             /**
              * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
@@ -1674,34 +1645,21 @@ var annie;
             this._isDragCenter = false;
             this._lastDragPoint = new annie.Point();
             this._isUseToMask = 0;
-            /**
-             * 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-             * @property _texture
-             * @protected
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
+            // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
             this._texture = null;
-            /**
-             * @property _offsetX
-             * @protected
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
             this._offsetX = 0;
-            /**
-             * @property _offsetY
-             * @protected
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             */
             this._offsetY = 0;
             this._bounds = new annie.Rectangle();
             this._drawRect = new annie.Rectangle();
-            this._soundList = [];
+            /**
+             * 当前对象包含的声音列表
+             * @property soundList
+             * @public
+             * @since 2.0.0
+             * @type {Array}
+             * @default []
+             */
+            this.soundList = [];
             //每个Flash文件生成的对象都有一个自带的初始化信息
             this._a2x_res_obj = {};
             this._instanceType = "annie.DisplayObject";
@@ -1948,13 +1906,13 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s.mask) {
+                if (value != s._mask) {
                     if (value) {
                         value["_isUseToMask"]++;
                     }
                     else {
-                        if (s.mask != null) {
-                            s["_isUseToMask"]--;
+                        if (s._mask != null) {
+                            s._mask["_isUseToMask"]--;
                         }
                     }
                     s._mask = value;
@@ -2304,9 +2262,10 @@ var annie;
          * @method stopAllSounds
          * @public
          * @since 2.0.0
+         * @return {void}
          */
         DisplayObject.prototype.stopAllSounds = function () {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             if (sounds) {
                 for (var i = sounds.length - 1; i >= 0; i--) {
                     sounds[i].stop();
@@ -2317,9 +2276,10 @@ var annie;
          * @method getSound
          * @param {number|string} id
          * @return {Array} 这个对象里所有叫这个名字的声音引用数组
+         * @since 2.0.0
          */
         DisplayObject.prototype.getSound = function (id) {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             var newSounds = [];
             if (sounds) {
                 if (typeof (id) == "string") {
@@ -2348,10 +2308,10 @@ var annie;
          */
         DisplayObject.prototype.addSound = function (sound) {
             var s = this;
-            if (!s._soundList) {
-                s._soundList = [];
+            if (!s.soundList) {
+                s.soundList = [];
             }
-            var sounds = s._soundList;
+            var sounds = s.soundList;
             sounds.push(sound);
         };
         /**
@@ -2363,7 +2323,7 @@ var annie;
          * @return {void}
          */
         DisplayObject.prototype.removeSound = function (id) {
-            var sounds = this._soundList;
+            var sounds = this.soundList;
             if (sounds) {
                 if (typeof (id) == "string") {
                     for (var i = sounds.length - 1; i >= 0; i--) {
@@ -2383,8 +2343,8 @@ var annie;
             //清除相应的数据引用
             var s = this;
             s.stopAllSounds();
-            for (var i = 0; i < s._soundList.length; i++) {
-                s._soundList[i].destroy();
+            for (var i = 0; i < s.soundList.length; i++) {
+                s.soundList[i].destroy();
             }
             s._a2x_res_obj = null;
             s.mask = null;
@@ -2403,17 +2363,12 @@ var annie;
             s._visible = false;
             _super.prototype.destroy.call(this);
         };
-        /**
-         * 更新流程走完之后再执行脚本和事件执行流程
-         * @protected
-         * @method callEventAndFrameScript
-         * @param {number} callState 0是上级被移除，执行removeStage事件 1是上级被添加到舞台执行addStage事件 2是常规刷新运行
-         */
+        //更新流程走完之后再执行脚本和事件执行流程
         DisplayObject.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
             if (!s.stage)
                 return;
-            var sounds = s._soundList;
+            var sounds = s.soundList;
             if (callState == 0) {
                 s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 //如果有音乐,则关闭音乐
@@ -2470,8 +2425,8 @@ var annie;
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例
-         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容
+         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
+         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容，小程序或者小游戏里没有这个参数
          * @example
          *      //html5
          *      var imgEle=new Image();
@@ -2489,6 +2444,10 @@ var annie;
          *          s.addChild(rectBitmap);
          *      }
          *      imgEle.src='http://test.annie2x.com/test.jpg';
+         *      //小程序或者小游戏
+         *      var imgEle="http://test.annie2x.com/test.jpg";
+         *      var bitmap=new annie.Bitmap(imgEle);
+         *      s.addChild(bitmap);
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
@@ -2498,16 +2457,7 @@ var annie;
             _super.call(this);
             this._bitmapData = null;
             this._realCacheImg = null;
-            /**
-             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-             * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
-             * @property rect
-             * @public
-             * @since 1.0.0
-             * @type {annie.Rectangle}
-             * @default null
-             */
-            this.rect = null;
+            this._rect = null;
             this._isCache = false;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -2520,9 +2470,31 @@ var annie;
             this.hitTestWidthPixel = false;
             var s = this;
             s._instanceType = "annie.Bitmap";
-            s.rect = rect;
+            s._rect = rect;
             s.bitmapData = bitmapData;
         }
+        Object.defineProperty(Bitmap.prototype, "rect", {
+            /**
+             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+             * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
+             * @property rect
+             * @public
+             * @since 1.0.0
+             * @type {annie.Rectangle}
+             * @default null
+             */
+            get: function () {
+                return this._rect;
+            },
+            set: function (value) {
+                var s = this;
+                s._rect = value;
+                s._UI.UD = true;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -2543,8 +2515,8 @@ var annie;
                     s._bounds.width = s._bounds.height = 0;
                 }
                 else {
-                    s._bounds.width = s.rect ? s.rect.width : value.width;
-                    s._bounds.height = s.rect ? s.rect.height : value.height;
+                    s._bounds.width = s._rect ? s._rect.width : value.width;
+                    s._bounds.height = s._rect ? s._rect.height : value.height;
                 }
             },
             enumerable: true,
@@ -2568,7 +2540,7 @@ var annie;
                         s._realCacheImg = window.document.createElement("canvas");
                     }
                     var _canvas = s._realCacheImg;
-                    var tr = s.rect;
+                    var tr = s._rect;
                     var w = tr ? tr.width : bitmapData.width;
                     var h = tr ? tr.height : bitmapData.height;
                     var newW = w + 20;
@@ -2613,9 +2585,9 @@ var annie;
                 }
                 var bw = void 0;
                 var bh = void 0;
-                if (s.rect) {
-                    bw = s.rect.width;
-                    bh = s.rect.height;
+                if (s._rect) {
+                    bw = s._rect.width;
+                    bh = s._rect.height;
                 }
                 else {
                     bw = s._texture.width + s._offsetX * 2;
@@ -2650,19 +2622,19 @@ var annie;
          */
         Bitmap.convertToImage = function (bitmap, isNeedImage) {
             if (isNeedImage === void 0) { isNeedImage = true; }
-            if (!bitmap.rect) {
+            if (!bitmap._rect) {
                 return bitmap.bitmapData;
             }
             else {
                 var _canvas = window.document.createElement("canvas");
-                var w = bitmap.rect.width;
-                var h = bitmap.rect.height;
+                var w = bitmap._rect.width;
+                var h = bitmap._rect.height;
                 _canvas.width = w;
                 _canvas.height = h;
                 // _canvas.style.width = w / devicePixelRatio + "px";
                 // _canvas.style.height = h / devicePixelRatio + "px";
                 var ctx = _canvas.getContext("2d");
-                var tr = bitmap.rect;
+                var tr = bitmap._rect;
                 ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
                 if (isNeedImage) {
                     var img = new Image();
@@ -2699,9 +2671,9 @@ var annie;
                     _canvas.height = 1;
                     var ctx = _canvas["getContext"]('2d');
                     ctx.clearRect(0, 0, 1, 1);
-                    if (s.rect) {
-                        p.x += s.rect.x;
-                        p.y += s.rect.y;
+                    if (s._rect) {
+                        p.x += s._rect.x;
+                        p.y += s._rect.y;
                     }
                     ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
                     ctx.drawImage(image, 0, 0);
@@ -2720,7 +2692,7 @@ var annie;
             var s = this;
             s._bitmapData = null;
             s._realCacheImg = null;
-            s.rect = null;
+            s._rect = null;
             _super.prototype.destroy.call(this);
         };
         return Bitmap;
@@ -2755,7 +2727,7 @@ var annie;
              */
             this.hitTestWidthPixel = true;
             /**
-             * 径向渐变填充 一般给Flash2x用
+             * 径向渐变填充 一般给Annie2x用
              * @method beginRadialGradientFill
              * @param {Array} points 一组点
              * @param {Array} colors 一组颜色值
@@ -2768,7 +2740,7 @@ var annie;
                 this._fill(Shape.getGradientColor(points, colors));
             };
             /**
-             * 画径向渐变的线条 一般给Flash2x用
+             * 画径向渐变的线条 一般给Annie2x用
              * @method beginRadialGradientStroke
              * @param {Array} points 一组点
              * @param {Array} colors 一组颜色值
@@ -2788,7 +2760,7 @@ var annie;
                 this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
             };
             /**
-             * 解析一段路径 一般给Flash2x用
+             * 解析一段路径 一般给Annie2x用
              * @method decodePath
              * @param {Array} data
              * @public
@@ -2815,7 +2787,7 @@ var annie;
         }
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
-         * 一般给用户使用较少,Flash2x工具自动使用
+         * 一般给用户使用较少,Annie2x工具自动使用
          * @method getGradientColor
          * @static
          * @param points
@@ -2839,7 +2811,7 @@ var annie;
             return colorObj;
         };
         /**
-         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
+         * 设置位图填充时需要使用的方法,一般给用户使用较少,Annie2x工具自动使用
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
@@ -3130,7 +3102,7 @@ var annie;
             this._fill(color);
         };
         /**
-         * 线性渐变填充 一般给Flash2x用
+         * 线性渐变填充 一般给Annie2x用
          * @method beginLinearGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -3142,7 +3114,7 @@ var annie;
             this._fill(Shape.getGradientColor(points, colors));
         };
         /**
-         * 位图填充 一般给Flash2x用
+         * 位图填充 一般给Annie2x用
          * @method beginBitmapFill
          * @param {Image} image
          * @param { Array} matrix
@@ -3183,7 +3155,7 @@ var annie;
             this._stroke(color, lineWidth, cap, join, miter);
         };
         /**
-         * 画线性渐变的线条 一般给Flash2x用
+         * 画线性渐变的线条 一般给Annie2x用
          * @method beginLinearGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -3203,7 +3175,7 @@ var annie;
             this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
         };
         /**
-         * 线条位图填充 一般给Flash2x用
+         * 线条位图填充 一般给Annie2x用
          * @method beginBitmapStroke
          * @param {Image} image
          * @param {Array} matrix
@@ -3764,10 +3736,30 @@ var annie;
                 return;
             var s = this;
             var sameParent = (s == child.parent);
+            var cp = child.parent;
             var len;
-            if (child.parent) {
+            if (cp) {
                 if (!sameParent) {
-                    child.parent.removeChild(child);
+                    var cpc = cp.children;
+                    len = cpc.length;
+                    var isRemove = true;
+                    for (var i = 0; i < len; i++) {
+                        if (cpc[i] == child) {
+                            cpc.splice(i, 1);
+                            isRemove = false;
+                            break;
+                        }
+                    }
+                    if (isRemove) {
+                        var cpc_1 = cp._removeChildren;
+                        len = cpc_1.length;
+                        for (var i = 0; i < len; i++) {
+                            if (cpc_1[i] == child) {
+                                cpc_1.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
                 }
                 else {
                     len = s.children.length;
@@ -3779,10 +3771,6 @@ var annie;
                     }
                 }
             }
-            if (!child.parent || s.parent != s) {
-                child["_cp"] = true;
-                child.parent = s;
-            }
             len = s.children.length;
             if (index >= len) {
                 s.children[s.children.length] = child;
@@ -3792,6 +3780,10 @@ var annie;
             }
             else {
                 s.children.splice(index, 0, child);
+            }
+            if (cp != s) {
+                child["_cp"] = true;
+                child.parent = s;
             }
         };
         /**
@@ -4028,13 +4020,11 @@ var annie;
         };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._cp || !s._visible)
-                return;
-            if (s._cacheAsBitmap) {
-                _super.prototype.render.call(this, renderObj);
-            }
-            else {
-                if (s.cAlpha > 0 && s._visible) {
+            if (s.cAlpha > 0 && s._visible) {
+                if (s._cacheAsBitmap) {
+                    _super.prototype.render.call(this, renderObj);
+                }
+                else {
                     var maskObj = void 0;
                     var child = void 0;
                     var len = s.children.length;
@@ -4101,6 +4091,7 @@ var annie;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
                     child.stage = s.stage;
+                    child.parent = s;
                     child.callEventAndFrameScript(callState);
                 }
             }
@@ -4123,6 +4114,7 @@ var annie;
                     }
                     else {
                         child.stage = s.stage;
+                        child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
                 }
@@ -4401,7 +4393,7 @@ var annie;
         Sound.prototype.play2 = function () {
             var s = this;
             if (s.isPlaying) {
-                s.media.play();
+                s.play();
             }
         };
         /**
@@ -4718,6 +4710,9 @@ var annie;
                     if (value) {
                         s._mouseEvent({ type: "onMouseDown" });
                     }
+                    else {
+                        s.gotoAndStop(1);
+                    }
                     s._clicked = value;
                 }
             },
@@ -4947,14 +4942,6 @@ var annie;
                             }
                         }
                     }
-                    //有没有声音
-                    var frameIndex = s._curFrame - 1;
-                    var curFrameSound = timeLineObj.s[frameIndex];
-                    if (curFrameSound) {
-                        for (var sound in curFrameSound) {
-                            s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
-                        }
-                    }
                 }
             }
             _super.prototype.update.call(this, isDrawUpdate);
@@ -4969,6 +4956,8 @@ var annie;
                 var curFrameScript = void 0;
                 //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
                 var isUserScript = false;
+                //因为脚本有可能改变Front，所以提前存起来
+                var isFront = s._isFront;
                 if (s._a2x_script) {
                     curFrameScript = s._a2x_script[frameIndex];
                     if (curFrameScript != undefined) {
@@ -4996,11 +4985,18 @@ var annie;
                         }
                     }
                 }
-                if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
+                if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
                     s.dispatchEvent(annie.Event.END_FRAME, {
                         frameIndex: s._curFrame,
                         frameName: "endFrame"
                     });
+                }
+                //有没有声音
+                var curFrameSound = timeLineObj.s[frameIndex];
+                if (curFrameSound) {
+                    for (var sound in curFrameSound) {
+                        s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
+                    }
                 }
             }
             _super.prototype.callEventAndFrameScript.call(this, callState);
@@ -5010,6 +5006,7 @@ var annie;
             var isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
                 obj._wantFrame = 1;
+                obj._lastFrame = 0;
                 obj._isFront = true;
                 if (obj._mode < -1) {
                     obj._isPlaying = true;
@@ -5144,12 +5141,6 @@ var annie;
             s._bounds.height = h;
             s.htmlElement = she;
         };
-        /**
-         * @method getStyle
-         * @param {HTMLElement} elem
-         * @param cssName
-         * @return {any}
-         */
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
             if (elem.style[cssName]) {
@@ -5165,11 +5156,6 @@ var annie;
             }
             return null;
         };
-        /**
-         * @method updateStyle
-         * @public
-         * @since 1.1.4
-         */
         FloatDisplay.prototype.updateStyle = function () {
             var s = this;
             var o = s.htmlElement;
@@ -6298,11 +6284,12 @@ var annie;
              * @default false
              */
             get: function () {
-                return this._pause;
+                return Stage._pause;
             },
             set: function (value) {
-                this._pause = value;
-                if (value != this._pause) {
+                var s = Stage;
+                if (value != s._pause) {
+                    s._pause = value;
                     if (value) {
                         //停止声音
                         annie.Sound.stopAllSounds();
@@ -6312,7 +6299,7 @@ var annie;
                         annie.Sound.resumePlaySounds();
                     }
                     //触发事件
-                    annie.globalDispatcher.dispatchEvent("onStagePause", { pause: value });
+                    annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
                 }
             },
             enumerable: true,
@@ -6387,20 +6374,20 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             if (s._flush == 0) {
+                s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.callEventAndFrameScript(2);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(true);
                     s._currentFlush = s._flush;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
                         s.callEventAndFrameScript(2);
+                        s.update(true);
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
@@ -6465,16 +6452,6 @@ var annie;
                 }
             }
             return { w: vW, h: vH };
-        };
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         * @return {void}
-         */
-        Stage.prototype.kill = function () {
-            Stage.removeUpdateObj(this);
         };
         Stage.prototype.onMouseEvent = function (e) {
             //检查是否有
@@ -6791,9 +6768,6 @@ var annie;
                         e.preventDefault();
                     }
                 }
-            }
-            if (s._cp) {
-                s.update();
             }
         };
         ;
@@ -7804,9 +7778,10 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this;
-            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp)
-                return;
+            //由于某些原因导致有些元件没来的及更新就开始渲染了
+            if (target._cp) {
+                s._stage.update(false);
+            }
             var texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 var ctx = s._ctx;
@@ -8643,11 +8618,11 @@ var annie;
         return null;
     }
     annie.getResource = getResource;
-    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName, resName) {
         return new annie.Bitmap(annie.res[sceneName][resName]);
     }
-    //用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+    //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
     function d(target, info, parentFrame) {
         if (parentFrame === void 0) { parentFrame = 1; }
         if (target._a2x_res_obj == info) {
@@ -8732,7 +8707,7 @@ var annie;
     var _textLineType = ["single", "multiline"];
     //解析数据里需要确定的文本对齐方式
     var _textAlign = ["left", "center", "right"];
-    //创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+    //创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
     function t(sceneName, resName) {
         var textDate = annie.res[sceneName]._a2x_con[resName];
         var textObj;
@@ -8796,7 +8771,7 @@ var annie;
         }
     }
     annie.sb = sb;
-    //创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+    //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName, resName) {
         var shapeDate = annie.res[sceneName]._a2x_con[resName][1];
         var shape = new annie.Shape();
@@ -9021,7 +8996,7 @@ var annie;
                 else {
                     for (var index in resClass.l) {
                         for (var n = 0; n < resClass.l[index].length; n++) {
-                            label[resClass.l[index][n]] = parseInt(index);
+                            label[resClass.l[index][n]] = parseInt(index) + 1;
                         }
                     }
                 }
@@ -9143,7 +9118,6 @@ var annie;
  */
 var annie;
 (function (annie) {
-    var isUpdateTween = true;
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
@@ -9877,18 +9851,15 @@ var annie;
         };
         //这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
         Tween.flush = function () {
-            if (isUpdateTween) {
-                var len = Tween._tweenList.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    if (Tween._tweenList[i]) {
-                        Tween._tweenList[i].update();
-                    }
-                    else {
-                        Tween._tweenList.splice(i, 1);
-                    }
+            var len = Tween._tweenList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (Tween._tweenList[i]) {
+                    Tween._tweenList[i].update();
+                }
+                else {
+                    Tween._tweenList.splice(i, 1);
                 }
             }
-            isUpdateTween = !isUpdateTween;
         };
         Tween._tweenPool = [];
         Tween._tweenList = [];

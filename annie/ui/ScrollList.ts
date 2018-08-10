@@ -13,7 +13,6 @@ namespace annieUI {
      */
     export interface IScrollListItem extends DisplayObject {
         initData(id: number, data: Array<any>): void;
-
         id: number;
         data: number;
     }
@@ -33,7 +32,7 @@ namespace annieUI {
         private _itemCol: number;
         private _itemCount: number;
         private _itemClass: any;
-        private _isInit: boolean;
+        private _isInit: number=0;
         public data: Array<any> = [];
         private downL: DisplayObject = null;
         private _cols: number;
@@ -65,7 +64,6 @@ namespace annieUI {
         constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical: boolean = true, cols: number = 1) {
             super(vW, vH, 0, isVertical);
             let s = this;
-            s._isInit = false;
             s._instanceType = "annie.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
@@ -81,17 +79,17 @@ namespace annieUI {
          * 更新列表数据
          * @method updateData
          * @param {Array} data
-         * @param {boolean} isReset 是否重围数据列表。
+         * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
         public updateData(data: Array<any>, isReset: boolean = false): void {
             let s: any = this;
             if (!s._isInit || isReset) {
                 s.data = data;
-                s._isInit = true;
             } else {
                 s.data = s.data.concat(data);
             }
+            s._isInit = 1;
             s._lastFirstId = -1;
             s.maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -100,11 +98,11 @@ namespace annieUI {
                 s.maxDistance += (s.paramXY == "x" ? wh.width : wh.height);
             }
         }
-
         private flushData() {
             let s: any = this;
-            if (s._isInit) {
-                if(s.view._UI.UM) {
+            if (s._isInit>0) {
+                if(s.view._UI.UM||s._isInit==1){
+                    s._isInit=2;
                     let id: number = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                     id = id < 0 ? 0 : id;
                     if (id != s._lastFirstId) {
@@ -123,10 +121,16 @@ namespace annieUI {
                         let item: any = s._items[i];
                         if (item._a2x_sl_id != id) {
                             item.initData(s.data[id] ? id : -1, s.data[id]);
-                            item.visible = s.data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
-                            item._a2x_sl_id = id;
+                            //如果没有数据则隐藏
+                            if(s.data[id]) {
+                                item._a2x_sl_id = id;
+                                item.visible =true;
+                            }else{
+                                item._a2x_sl_id = -1;
+                                item.visible =false;
+                            }
                         }
                         id++;
                     }

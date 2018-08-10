@@ -113,8 +113,10 @@ namespace annie {
          */
         public draw(target: any): void {
             let s = this;
-            //由于某些原因导致有些元件没来的及更新就开始渲染了,就不渲染，过滤它
-            if (target._cp) return;
+            //由于某些原因导致有些元件没来的及更新就开始渲染了
+            if (target._cp){
+                s._stage.update(false);
+            }
             let texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 let ctx = s._ctx;

@@ -23,10 +23,8 @@ namespace annie {
          * @type{HtmlElement}
          */
         public htmlElement:any=null;
-
         // 是否已经添加了舞台事件
         private _isAdded: boolean = false;
-
         /**
          * 构造函数
          * @method FloatDisplay
@@ -99,12 +97,6 @@ namespace annie {
             s.htmlElement=she;
         }
 
-        /**
-         * @method getStyle
-         * @param {HTMLElement} elem
-         * @param cssName
-         * @return {any}
-         */
         private getStyle(elem:HTMLElement, cssName:any ):any
         {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
@@ -123,11 +115,6 @@ namespace annie {
             }
             return null;
         }
-        /**
-         * @method updateStyle
-         * @public
-         * @since 1.1.4
-         */
         public updateStyle(): void {
             let s:any = this;
             let o = s.htmlElement;

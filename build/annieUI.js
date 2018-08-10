@@ -158,10 +158,11 @@ var annieUI;
             s.maskObj.alpha = 0;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH, isVertical);
-            // s.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent.bind(s));
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent.bind(s));
+            var mouseEvent = s.onMouseEvent.bind(s);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view = s.view;
                 if (s.autoScroll)
@@ -255,26 +256,26 @@ var annieUI;
             var s = this;
             var view = s.view;
             // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState < 1) {
-                    if (!s.isStop) {
-                        s.isStop = true;
-                    }
-                    if (s.autoScroll) {
-                        s.autoScroll = false;
-                        annie.Tween.kill(s._tweenId);
-                    }
-                    if (s.isVertical) {
-                        s.lastValue = e.localY;
-                    }
-                    else {
-                        s.lastValue = e.localX;
-                    }
-                    s.speed = 0;
-                    s.isMouseDownState = 1;
-                    return;
+            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                if (!s.isStop) {
+                    s.isStop = true;
                 }
-                ;
+                if (s.autoScroll) {
+                    s.autoScroll = false;
+                    annie.Tween.kill(s._tweenId);
+                }
+                if (s.isVertical) {
+                    s.lastValue = e.localY;
+                }
+                else {
+                    s.lastValue = e.localX;
+                }
+                s.speed = 0;
+                s.isMouseDownState = 1;
+            }
+            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState < 1)
+                    return;
                 if (s.isMouseDownState == 1) {
                     s.dispatchEvent("onScrollStart");
                 }
@@ -340,19 +341,24 @@ var annieUI;
             else if (dis > s.maxDistance - newDis) {
                 dis = s.maxDistance - newDis;
             }
-            if (Math.abs(s.view[s.paramXY] + dis) > 2) {
-                s.autoScroll = true;
-                s.isStop = true;
-                s.isMouseDownState = 0;
-                var obj = {};
-                obj.onComplete = function () {
-                    s.autoScroll = false;
-                };
-                obj[s.paramXY] = -dis;
-                s._tweenId = annie.Tween.to(s.view, time, obj);
-                if (s.speed == 0) {
-                    s.dispatchEvent("onScrollStart");
+            if (time > 0) {
+                if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                    s.autoScroll = true;
+                    s.isStop = true;
+                    s.isMouseDownState = 0;
+                    var obj = {};
+                    obj.onComplete = function () {
+                        s.autoScroll = false;
+                    };
+                    obj[s.paramXY] = -dis;
+                    s._tweenId = annie.Tween.to(s.view, time, obj);
+                    if (s.speed == 0) {
+                        s.dispatchEvent("onScrollStart");
+                    }
                 }
+            }
+            else {
+                s.view[s.paramXY] = -dis;
             }
         };
         ScrollPage.prototype.destroy = function () {
@@ -427,6 +433,7 @@ var annieUI;
                 s.dispatchEvent("onComplete");
             };
             s.addChild(s.bitmap);
+            s.addChild(s.maskObj);
             s.bitmap.mask = s.maskObj;
         }
         /**
@@ -967,21 +974,25 @@ var annieUI;
             s.limitP2 = new Point(s.bW, s.bH);
             s.toPosArr = [s.p3, s.p4, s.p1, s.p2];
             s.myPosArr = [s.p1, s.p2, s.p3, s.p4];
+            s.rPage0.mouseEnable = false;
+            s.rPage1.mouseEnable = false;
+            s.shadow0.mouseEnable = false;
+            s.shadow1.mouseEnable = false;
+            s.setShadowMask(s.shadow0, s.bW * 1.5, s.bH * 3);
+            s.setShadowMask(s.shadow1, s.bW * 1.5, s.bH * 3);
+            s.rPage1.mask = s.rMask1;
+            s.shadow1.mask = s.rMask1;
+            s.shadow0.mask = s.rMask0;
+            s.rPage0.mask = s.rMask0;
+            s.shadow0.visible = false;
+            s.shadow1.visible = false;
             s.addChild(s.pageMC);
             s.addChild(s.rPage0);
             s.addChild(s.shadow0);
             s.addChild(s.rPage1);
             s.addChild(s.shadow1);
-            s.rPage0.mouseEnable = false;
-            s.rPage1.mouseEnable = false;
-            s.shadow0.mouseEnable = false;
-            s.shadow1.mouseEnable = false;
-            s.setShadowMask(s.shadow0, s.sMask0, s.bW * 1.5, s.bH * 3);
-            s.setShadowMask(s.shadow1, s.sMask1, s.bW * 1.5, s.bH * 3);
-            s.shadow0.visible = false;
-            s.shadow1.visible = false;
-            s.rPage1.mask = s.rMask1;
-            s.rPage0.mask = s.rMask0;
+            s.addChild(s.rMask0);
+            s.addChild(s.rMask1);
             s.setPage(s.currPage);
             var md = s.onMouseDown.bind(s);
             var mu = s.onMouseUp.bind(s);
@@ -1010,8 +1021,8 @@ var annieUI;
                 bArr = s.getBookArr(movePoint, s.p1, s.p2);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p1, s.p2, s.limitP1, s.limitP2);
-                s.getShadow(s.shadow0, s.sMask0, s.p1, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p1, movePoint, s.layer1Arr, 0.45);
+                s.getShadow(s.shadow0, s.p1, movePoint, 0.5);
+                s.getShadow(s.shadow1, s.p1, movePoint, 0.45);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) + 90;
                 s.rPage1.x = bArr[3].x;
                 s.rPage1.y = bArr[3].y;
@@ -1024,8 +1035,8 @@ var annieUI;
                 bArr = s.getBookArr(movePoint, s.p2, s.p1);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p2, s.p1, s.limitP2, s.limitP1);
-                s.getShadow(s.shadow0, s.sMask0, s.p2, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p2, movePoint, s.layer1Arr, 0.45);
+                s.getShadow(s.shadow0, s.p2, movePoint, 0.5);
+                s.getShadow(s.shadow1, s.p2, movePoint, 0.45);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) - 90;
                 s.rPage1.x = bArr[2].x;
                 s.rPage1.y = bArr[2].y;
@@ -1038,8 +1049,8 @@ var annieUI;
                 bArr = s.getBookArr(movePoint, s.p3, s.p4);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p3, s.p4, s.limitP1, s.limitP2);
-                s.getShadow(s.shadow0, s.sMask0, s.p3, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p3, movePoint, s.layer1Arr, 0.4);
+                s.getShadow(s.shadow0, s.p3, movePoint, 0.5);
+                s.getShadow(s.shadow1, s.p3, movePoint, 0.4);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) + 90;
                 s.rPage1.x = movePoint.x;
                 s.rPage1.y = movePoint.y;
@@ -1052,8 +1063,8 @@ var annieUI;
                 bArr = s.getBookArr(movePoint, s.p4, s.p3);
                 actionPoint = bArr[1];
                 s.getLayerArr(movePoint, actionPoint, s.p4, s.p3, s.limitP2, s.limitP1);
-                s.getShadow(s.shadow0, s.sMask0, s.p4, movePoint, [s.p1, s.p3, s.p4, s.p2], 0.5);
-                s.getShadow(s.shadow1, s.sMask1, s.p4, movePoint, s.layer1Arr, 0.4);
+                s.getShadow(s.shadow0, s.p4, movePoint, 0.5);
+                s.getShadow(s.shadow1, s.p4, movePoint, 0.4);
                 s.rPage1.rotation = s.angle(movePoint, actionPoint) - 90;
                 s.rPage1.x = actionPoint.x;
                 s.rPage1.y = actionPoint.y;
@@ -1145,16 +1156,15 @@ var annieUI;
             }
             shape.endFill();
         };
-        FlipBook.prototype.setShadowMask = function (shape, maskShape, g_width, g_height) {
-            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [{ o: 0, c: "#000000", a: 0 }, { o: 1, c: "#000000", a: 0.6 }]);
+        FlipBook.prototype.setShadowMask = function (shape, g_width, g_height) {
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [[0, "#000000", 0], [1, "#000000", 0.6]]);
             shape.drawRect(-g_width * 0.5, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [{ o: 1, c: "#000000", a: 0 }, { o: 0, c: "#000000", a: 0.6 }]);
+            shape.beginLinearGradientFill([-g_width * 0.5, 4, g_width * 0.5, 4], [[1, "#000000", 0], [0, "#000000", 0.6]]);
             shape.drawRect(0, -g_height * 0.5, g_width * 0.5, g_height);
             shape.endFill();
-            shape.mask = maskShape;
         };
-        FlipBook.prototype.getShadow = function (shape, maskShape, point1, point2, maskArray, arg) {
+        FlipBook.prototype.getShadow = function (shape, point1, point2, arg) {
             var myScale;
             var myAlpha;
             var s = this;
@@ -1166,7 +1176,6 @@ var annieUI;
             myAlpha = 1 - myScale * myScale;
             shape.scaleX = myScale + 0.1;
             shape.alpha = myAlpha + 0.1;
-            s.getShape(maskShape, maskArray);
         };
         FlipBook.prototype.setPage = function (pageNum) {
             var s = this;
@@ -1197,7 +1206,6 @@ var annieUI;
                 if ((s.timerArg0 < 3 && s.currPage > 0) || (s.timerArg0 > 2 && s.currPage <= s.totalPage - 2)) {
                     s.state = "start";
                     s.flushPage();
-                    e.updateAfterEvent();
                     s.dispatchEvent("onFlipStart");
                 }
             }
@@ -1479,11 +1487,11 @@ var annieUI;
             if (cols === void 0) { cols = 1; }
             _super.call(this, vW, vH, 0, isVertical);
             this._items = null;
+            this._isInit = 0;
             this.data = [];
             this.downL = null;
             this._lastFirstId = -1;
             var s = this;
-            s._isInit = false;
             s._instanceType = "annie.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
@@ -1511,7 +1519,7 @@ var annieUI;
          * 更新列表数据
          * @method updateData
          * @param {Array} data
-         * @param {boolean} isReset 是否重围数据列表。
+         * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
         ScrollList.prototype.updateData = function (data, isReset) {
@@ -1519,11 +1527,11 @@ var annieUI;
             var s = this;
             if (!s._isInit || isReset) {
                 s.data = data;
-                s._isInit = true;
             }
             else {
                 s.data = s.data.concat(data);
             }
+            s._isInit = 1;
             s._lastFirstId = -1;
             s.maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -1534,8 +1542,9 @@ var annieUI;
         };
         ScrollList.prototype.flushData = function () {
             var s = this;
-            if (s._isInit) {
-                if (s.view._UI.UM) {
+            if (s._isInit > 0) {
+                if (s.view._UI.UM || s._isInit == 1) {
+                    s._isInit = 2;
                     var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                     id = id < 0 ? 0 : id;
                     if (id != s._lastFirstId) {
@@ -1555,10 +1564,17 @@ var annieUI;
                         var item = s._items[i];
                         if (item._a2x_sl_id != id) {
                             item.initData(s.data[id] ? id : -1, s.data[id]);
-                            item.visible = s.data[id] ? true : false;
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
                             item[s._disParam] = (id % s._cols) * s._itemCol;
-                            item._a2x_sl_id = id;
+                            //如果没有数据则隐藏
+                            if (s.data[id]) {
+                                item._a2x_sl_id = id;
+                                item.visible = true;
+                            }
+                            else {
+                                item._a2x_sl_id = -1;
+                                item.visible = false;
+                            }
                         }
                         id++;
                     }

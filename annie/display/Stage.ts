@@ -87,12 +87,13 @@ namespace annie {
          * @default false
          */
         static get pause(): boolean {
-            return this._pause;
+            return Stage._pause;
         }
 
         static set pause(value: boolean) {
-            this._pause = value;
-            if (value != this._pause) {
+            let s:any=Stage;
+            if (value != s._pause) {
+                s._pause = value;
                 if (value) {
                     //停止声音
                     Sound.stopAllSounds();
@@ -101,10 +102,9 @@ namespace annie {
                     Sound.resumePlaySounds();
                 }
                 //触发事件
-                globalDispatcher.dispatchEvent("onStagePause", {pause: value});
+                globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }
-
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
@@ -376,32 +376,29 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
-
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
-
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
+                s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.callEventAndFrameScript(2);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
-                    s.update(true);
                     s._currentFlush = s._flush;
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
                         s.callEventAndFrameScript(2);
+                        s.update(true);
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
             }
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -462,18 +459,6 @@ namespace annie {
             }
             return {w: vW, h: vH};
         }
-
-        /**
-         * 当一个stage不再需要使用,或者要从浏览器移除之前,请先停止它,避免内存泄漏
-         * @method kill
-         * @since 1.0.0
-         * @public
-         * @return {void}
-         */
-        public kill(): void {
-            Stage.removeUpdateObj(this);
-        }
-
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -791,9 +776,6 @@ namespace annie {
                         e.preventDefault();
                     }
                 }
-            }
-            if (s._cp) {
-                s.update();
             }
         };
 

@@ -386,11 +386,11 @@ namespace annie {
         return null;
     }
 
-    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
+    // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
     }
-    //用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
+    //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
     export function d(target: any, info: any, parentFrame: number = 1): void {
         if (target._a2x_res_obj == info) {
             return;
@@ -473,7 +473,7 @@ namespace annie {
     //解析数据里需要确定的文本对齐方式
     let _textAlign: Array<string> = ["left", "center", "right"];
 
-    //创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
+    //创建一个动态文本或输入文本,此方法一般给Annie2x工具自动调用
     function t(sceneName: string, resName: string): any {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
@@ -509,7 +509,6 @@ namespace annie {
         }
         return textObj;
     }
-
     //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
@@ -534,7 +533,7 @@ namespace annie {
         }
     }
 
-    //创建一个Shape矢量对象,此方法一般给Flash2x工具自动调用
+    //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
         let shape: annie.Shape = new annie.Shape();
@@ -745,7 +744,7 @@ namespace annie {
                 } else {
                     for (let index in resClass.l) {
                         for (let n = 0; n < resClass.l[index].length; n++) {
-                            label[resClass.l[index][n]] = parseInt(index);
+                            label[resClass.l[index][n]] = parseInt(index)+1;
                         }
                     }
                 }

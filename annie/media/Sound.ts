@@ -57,7 +57,7 @@ namespace annie {
         private play2() {
             let s = this;
             if (s.isPlaying) {
-                s.media.play();
+                s.play();
             }
         }
 

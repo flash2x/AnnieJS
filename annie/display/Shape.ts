@@ -20,7 +20,7 @@ namespace annie {
         private _command: any = [];
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
-         * 一般给用户使用较少,Flash2x工具自动使用
+         * 一般给用户使用较少,Annie2x工具自动使用
          * @method getGradientColor
          * @static
          * @param points
@@ -44,7 +44,7 @@ namespace annie {
         }
 
         /**
-         * 设置位图填充时需要使用的方法,一般给用户使用较少,Flash2x工具自动使用
+         * 设置位图填充时需要使用的方法,一般给用户使用较少,Annie2x工具自动使用
          * @method getBitmapStyle
          * @static
          * @param {Image} image HTML Image元素
@@ -359,7 +359,7 @@ namespace annie {
         }
 
         /**
-         * 线性渐变填充 一般给Flash2x用
+         * 线性渐变填充 一般给Annie2x用
          * @method beginLinearGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -372,7 +372,7 @@ namespace annie {
         }
 
         /**
-         * 径向渐变填充 一般给Flash2x用
+         * 径向渐变填充 一般给Annie2x用
          * @method beginRadialGradientFill
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -386,7 +386,7 @@ namespace annie {
         };
 
         /**
-         * 位图填充 一般给Flash2x用
+         * 位图填充 一般给Annie2x用
          * @method beginBitmapFill
          * @param {Image} image
          * @param { Array} matrix
@@ -427,7 +427,7 @@ namespace annie {
         private static _caps:Array<string>=["butt","round","square"];
         private static _joins:Array<string>=["miter","round","bevel"];
         /**
-         * 画线性渐变的线条 一般给Flash2x用
+         * 画线性渐变的线条 一般给Annie2x用
          * @method beginLinearGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -444,7 +444,7 @@ namespace annie {
         }
 
         /**
-         * 画径向渐变的线条 一般给Flash2x用
+         * 画径向渐变的线条 一般给Annie2x用
          * @method beginRadialGradientStroke
          * @param {Array} points 一组点
          * @param {Array} colors 一组颜色值
@@ -460,7 +460,7 @@ namespace annie {
             this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
         };
         /**
-         * 线条位图填充 一般给Flash2x用
+         * 线条位图填充 一般给Annie2x用
          * @method beginBitmapStroke
          * @param {Image} image
          * @param {Array} matrix
@@ -530,7 +530,7 @@ namespace annie {
             }
         }
         /**
-         * 解析一段路径 一般给Flash2x用
+         * 解析一段路径 一般给Annie2x用
          * @method decodePath
          * @param {Array} data
          * @public
@@ -806,7 +806,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 渲染
          * @method render

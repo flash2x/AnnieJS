@@ -1,15 +1,12 @@
-# AnnieJS(官方交流探讨QQ群:185090134)
-## [AnnieJS 官网:http://www.annie2x.com](http://www.annie2x.com)
-## [Flash2x 官网:http://www.flash2x.org](http://www.flash2x.org)
-## [AnnieJS API文档:http://api.annie2x.com](http://api.annie2x.com) 
-## [AnnieJS demo演示:http://test.annie2x.com](http://test.annie2x.com)
+# Annie2x(官方交流探讨QQ群:185090134)
+## [Annie2x 官网:http://www.annie2x.com](http://www.annie2x.com)
+    Annie2x 是一款优秀的Adobe Flash插件,与AnnieJS无缝集成。
+    Annie2x 借助于Adobe Flash将以前开发as3项目的工作流程完美延续下来。
     AnnieJS 是一款专注于将Flash交互技术扩展到任何需要交互的应用领域的2d动画引擎。目前支持导出制作Html5 微信小程序 微信小游戏
     AnnieJS 完全仿照as3的语法和架构，动画效果流畅,制作视觉震撼,但学习简单,安装方便！
     AnnieJS 支持ts和js两种开发语言环境，使用你熟悉的语言开发事半功倍。
     AnnieJS 最大的优势就是短小精悍。全部核心代码压缩后不到70k，该有的功能都有了。
-    AnnieJS 需要结合Adobe 及 Flash2x工具使用才能发挥它最大的优势。
-    Flash2x 是一款优秀的Adobe Flash插件,与AnnieJS无缝集成。
-    Flash2x 借助于Adobe Flash以及Flash2x工具将以前开发as3项目的工作流程完美延续下来。
+    AnnieJS 需要结合Adobe 及 Annie2x工具使用才能发挥它最大的优势。
 # 相比Flash自带的CreateJs有什么区别和优势
     不得不承认CreateJs非常的优秀，但是它当初不是以移动优先的原则设计的，大量的逻辑和判断代码针对移动端没有任何意义。
     CreateJs鼠标穿透非常让人头疼，上层的显示对象无法阻断事件会一直往下冒泡，非常讨厌。
@@ -19,17 +16,16 @@
     那么AnnieJS的作者经过了长期使用CreateJs经验之后，做了大量的优化和工作才做出了现在的这款AnnieJS引擎
     重新定义了Flash开发H5的工作流程,具体优势各位看官接着往下看
 # 使用前准备工作
-    1.安装 Ant 或者 Gulp 构建工具，选一种你熟悉的就行
+    1.安装Gulp 构建工具
     2.如果使用typeScript开发，则需要安装 node.js typeScript 运行环境
     3.强烈推荐WebStorm，我们所有的源码和项目也是使用此工具制作
-    4.安装Adobe Flash CS6 及以上版本
+    4.安装Adobe Flash CC 2015 及以上版本或者 Adobe Animate CC 2015 以上版本
     5.强烈推荐google Chrome浏览器，调试利器
-    6.下载并安装Flash2xManager管理软件,用此软件一健配置工具和引擎(支持Mac和win)
-## [点击下载Flash2xManager工具](http://flash2x.org)
+    6.去官网下载Annie2x插件
+    7.下载插件安装器[ZXPInstaller](http://zxpinstaller.com/)安装Annie2x插件
 # 小试牛刀
-    1.安装好以上所说的相关工具后，打开Adobe Flash软件 随便新建一个Fla文件制作些东西保存(一定要保存)。
-    2.打开Flash的菜单->窗口->扩展(cs6是[其他])->Flash2x，这时就启动了我们的Flash2x工具。
-    3.选择一个你熟悉的语言简单设置或者不需要任何设置，点击发布，直到提示发布成功。
+    1.安装好以上所说的相关工具后，打开Adobe Flash 软件 新建一个Annie2x 的Fla文件-注意文件类型是Annie2x(Custom)
+    3.Ctrl+Shift+F12 调出设置面板选择一个你熟悉的语言简单设置或者不需要任何设置，Ctrl+Enter发布成功。
     4.发布的项目在你使用的Fla文件的同目录下，用WebStorm打开此项目。这个很重要，如果发布后直接双击index.html是看不到任何效果的。
     5.如果是发布的TS语言项目，则需要在WebStorm下方的Terminal命令窗口输入 tsc,等待编译完成，再执行第6步。如果是js项目，则跳过这一步。
     6.在打开的webStorm项目里找到index.html 右键点击绿色三角箭头的按钮 Run'index.html'，就可以看到你的成果啦。
@@ -38,10 +34,10 @@
 ### 确定好开发语言后，大家应该都使用相同语言,如果对flash2x构架特别熟悉，也可以混合开发的那另说。开发大致分为两种情况。
 #### A.一个人整合并制作步骤如下:
     1.将所有的制作好的fla文件放在同一个目录下
-    2.用flash打开每个fla文件，在Flash2x工具面板里点击设置按钮，将各个fla的发布目录设置成同一目录名。
-    3.点击Flash2x 面板的发布按钮，将所有的fla发布到你设置的目录里，但又不会相互干扰和覆盖
-    4.针对不同模块进行相应的开发。
-    5.通过Flash2x.loadScene进行分布加载或同时加载所有项目模块
+    2.用flash打开每个fla文件，在Annie2x工具面板里将各个fla的发布目录设置成同一目录名。
+    3.这样发布的时候所有的fla发布到你设置的目录里，但又不会相互干扰和覆盖
+    4.同时你又可以针对不同模块进行相应的开发。
+    5.通过annie.loadScene方法进行分布加载或同时加载所有项目模块
     6.加上loading及其他代码。
     7.如果中途需要修改fla文件内容，则可以将相应fla文件给到动画师制作，完成后再覆盖回来发布就行。
     8.最后测试打包上线
@@ -53,13 +49,9 @@
     5.打开所有fla文件用Flash2x 工具重新发布一次。
     6.以下步骤和一个人整合并制作的步骤相同
 # 打包压缩资源并发布成最终版
-## 打包的构建工具目前支持两种，一种是Ant,一种是Gulp.
-### A.Ant打包构建方案
-    1.配置好Ant，并能全局使用。所谓的全局使用就是在命令终端只要输入ant三个字母，终端就会有相应的提示，这就表示全局安装成功。没有成功的百度下。
-    2.在WebStorm里，一般在下面有个Terminal，打开它，在里面输入 'ant'，等待片刻，打包完成。
-    3.打包完成后，会在项目目录里生成一个released目录，这个目录里的内容就是最终你可以发布出去的内容。
-### B.Gulp打包构建方案
-    1.配置好Glup,并能全局使用，什么是全局和Ant一样。
+## 打包的构建工具目前是Gulp.
+### Gulp打包构建方案
+    1.配置好Glup
     2.在WebStorm里，打开Terminal 输入 'npm install'，这时会安装相应的node.js组件，等待安装完成
     3.安装完成后，在Terminal 输入 'gulp' 打包将会进行。
     4.如果打包的过程中出现错误，一般是项目目录下的tools文件夹没有执行权限，更改一下tools的目录执行权限，再次运行 'gulp'
@@ -67,7 +59,7 @@
 ### 在手机上调出vConsole调试面板查看调试信息
     在main.js或者main.ts中将'annie.debug=false;'设成 'annie.debug=true;'
 # 如何更新引擎及工具
-    下载的Falsh2xManager管理软件不要删除了，引擎及工具的更新和升级都需要用到，长期保留会有惊喜。
+    如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
 ## AnnieJS 2.0.0 版本
     变更:需要Flash2x 4.0工具及以上版本的支持
@@ -76,6 +68,7 @@
     变更:fla时间轴上只允许有play,stop,gotoAndStop,gotoAndPlay方法
     优化:代码进行大量优化，性能进一步提升
     优化:优化完善了鼠标的事件冒泡机制
+# 以下版本已经成为历史，如果不是老项目维护，建议不要使用AnnieJS 2.x以下进行项目开发。
 ## AnnieJS 1.1.3 版本
     修复annie.InputText类在pc端无法输入的bug
     修复有时获取Sprite.getWH()方法返回宽高为0的bug
@@ -253,7 +246,7 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
-## Flash2x 4.0.0
+## Annie2x 4.0.0(全新更名)
     全新的版本,同步AnnieJS 2.0.0
     支持导出Html5
     支持导出微信小程序

@@ -172,6 +172,8 @@ namespace annie {
             if (value != s._clicked) {
                 if (value) {
                     s._mouseEvent({type: "onMouseDown"});
+                }else{
+                    s.gotoAndStop(1);
                 }
                 s._clicked = value;
             }
@@ -327,7 +329,7 @@ namespace annie {
 
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -407,22 +409,12 @@ namespace annie {
                             }
                         }
                     }
-                    //有没有声音
-                    let frameIndex = s._curFrame - 1;
-                    let curFrameSound = timeLineObj.s[frameIndex];
-                    if (curFrameSound) {
-                        for (let sound in curFrameSound) {
-                            s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
-                        }
-                    }
                 }
             }
             super.update(isDrawUpdate);
         }
-
         //flash声音管理
         private _a2x_sounds: any = null;
-
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (s.isUpdateFrame) {
@@ -433,6 +425,8 @@ namespace annie {
                 let curFrameScript: any;
                 //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
                 let isUserScript = false;
+                //因为脚本有可能改变Front，所以提前存起来
+                let isFront=s._isFront;
                 if (s._a2x_script) {
                     curFrameScript = s._a2x_script[frameIndex];
                     if (curFrameScript != undefined) {
@@ -460,11 +454,18 @@ namespace annie {
                         }
                     }
                 }
-                if (((s._curFrame == 1 && !s._isFront) || (s._curFrame == s._a2x_res_class.tf && s._isFront)) && s.hasEventListener(Event.END_FRAME)) {
+                if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(Event.END_FRAME)) {
                     s.dispatchEvent(Event.END_FRAME, {
                         frameIndex: s._curFrame,
                         frameName: "endFrame"
                     });
+                }
+                //有没有声音
+                let curFrameSound = timeLineObj.s[frameIndex];
+                if (curFrameSound) {
+                    for (let sound in curFrameSound) {
+                        s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
+                    }
                 }
             }
             super.callEventAndFrameScript(callState);
@@ -475,6 +476,7 @@ namespace annie {
             let isNeedToReset = false;
             if (obj._instanceType == "annie.MovieClip") {
                 obj._wantFrame = 1;
+                obj._lastFrame = 0;
                 obj._isFront = true;
                 if (obj._mode < -1) {
                     obj._isPlaying = true;
