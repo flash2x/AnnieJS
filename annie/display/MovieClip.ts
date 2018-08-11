@@ -292,6 +292,18 @@ namespace annie {
             let s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            let wf=s._curFrame;
+            if(s._isFront){
+                wf++;
+            }else{
+                wf--;
+            }
+            if(wf>s.totalFrames){
+                wf=1;
+            }else if(wf<1){
+                wf=s.totalFrames;
+            }
+            s._wantFrame=wf;
         }
 
         /**

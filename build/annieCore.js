@@ -4807,6 +4807,20 @@ var annie;
             var s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            var wf = s._curFrame;
+            if (s._isFront) {
+                wf++;
+            }
+            else {
+                wf--;
+            }
+            if (wf > s.totalFrames) {
+                wf = 1;
+            }
+            else if (wf < 1) {
+                wf = s.totalFrames;
+            }
+            s._wantFrame = wf;
         };
         /**
          * 将播放头跳转到指定帧并从那一帧开始继续播放
@@ -10217,10 +10231,6 @@ var annie;
             skY: obj.skewY
         };
         obj.parent = null;
-        // obj.x=obj.y=0;
-        // obj.scaleX = obj.scaleY = 1/annie.devicePixelRatio;
-        // obj.rotation = obj.skewX = obj.skewY = 0;
-        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
         if (!rect)
             rect = obj.getBounds();
         var w = rect.width;
