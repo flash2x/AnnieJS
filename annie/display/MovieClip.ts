@@ -277,7 +277,6 @@ namespace annie {
             }
             s._wantFrame = <number>frameIndex;
         }
-
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
          * @method play
@@ -289,6 +288,18 @@ namespace annie {
             let s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            let wf=s._curFrame;
+            if(s._isFront){
+                wf++;
+            }else{
+                wf--;
+            }
+            if(wf>s.totalFrames){
+                wf=1;
+            }else if(wf<1){
+                wf=s.totalFrames;
+            }
+            s._wantFrame=wf;
         }
 
         /**

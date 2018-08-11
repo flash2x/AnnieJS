@@ -4046,6 +4046,20 @@ var annie;
             var s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            var wf = s._curFrame;
+            if (s._isFront) {
+                wf++;
+            }
+            else {
+                wf--;
+            }
+            if (wf > s.totalFrames) {
+                wf = 1;
+            }
+            else if (wf < 1) {
+                wf = s.totalFrames;
+            }
+            s._wantFrame = wf;
         };
         /**
          * 将播放头跳转到指定帧并从那一帧开始继续播放
