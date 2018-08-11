@@ -819,7 +819,6 @@ namespace annie {
                     //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                     allChildren[allChildren.length] = obj;
                     //如果是声音，还要把i这个顺序保存下来
-                    //如果是声音，还要把i这个顺序保存下来
                     if (objType == 5) {
                         obj.isPlaying=false;
                         if (!target._a2x_sounds) {

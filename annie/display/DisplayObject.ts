@@ -548,7 +548,7 @@ namespace annie {
                         s.cFilters.push(sf[i]);
                     }
                 }
-                if (s.parent) {
+                if (s.parent){
                     if (s.parent.cFilters.length > 0) {
                         let len = s.parent.cFilters.length;
                         let pf = s.parent.cFilters;

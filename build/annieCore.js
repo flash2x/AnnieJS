@@ -6226,11 +6226,12 @@ var annie;
                 if (annie.debug && !Stage._isLoadedVConsole) {
                     var script_1 = document.createElement("script");
                     script_1.onload = function () {
+                        new VConsole();
                         s.dispatchEvent(new annie.Event("onInitStage"));
                         script_1.onload = null;
                     };
                     document.head.appendChild(script_1);
-                    script_1.src = "libs/vConsole.min.js";
+                    script_1.src = "libs/vconsole.min.js";
                 }
                 else {
                     s.dispatchEvent(new annie.Event("onInitStage"));
@@ -8028,6 +8029,8 @@ var annie;
                     }
                 };
                 req_1.onreadystatechange = function (event) {
+                    if (!event)
+                        return;
                     var t = event.target;
                     if (t["readyState"] == 4) {
                         if (req_1.status == 200 || req_1.status == 0) {
@@ -9020,7 +9023,6 @@ var annie;
                 else {
                     //这里一定把要声音添加到里面，以保证objectId与数组下标对应
                     allChildren[allChildren.length] = obj;
-                    //如果是声音，还要把i这个顺序保存下来
                     //如果是声音，还要把i这个顺序保存下来
                     if (objType == 5) {
                         obj.isPlaying = false;
@@ -10215,17 +10217,18 @@ var annie;
             skY: obj.skewY
         };
         obj.parent = null;
-        obj.x = obj.y = 0;
-        obj.scaleX = obj.scaleY = 1;
-        obj.rotation = obj.skewX = obj.skewY = 0;
+        // obj.x=obj.y=0;
+        // obj.scaleX = obj.scaleY = 1/annie.devicePixelRatio;
+        // obj.rotation = obj.skewX = obj.skewY = 0;
         //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        var whObj = obj.getBounds();
-        var w = rect ? rect.width : whObj.width;
-        var h = rect ? rect.height : whObj.height;
-        obj.x = rect ? -rect.x : -whObj.x;
-        obj.y = rect ? -rect.y : -whObj.y;
-        obj._offsetX = rect ? rect.x : whObj.x;
-        obj._offsetY = rect ? rect.y : whObj.y;
+        if (!rect)
+            rect = obj.getBounds();
+        var w = rect.width;
+        var h = rect.height;
+        obj.x = -rect.x;
+        obj.y = -rect.y;
+        obj._offsetX = rect.x;
+        obj._offsetY = rect.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
         // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
@@ -10239,9 +10242,8 @@ var annie;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
         obj._cp = true;
-        obj.update();
+        obj.update(false);
         obj.render(_dRender);
-        obj._cp = true;
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
@@ -10250,9 +10252,15 @@ var annie;
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
-        obj.update();
+        obj._cp = true;
+        obj.update(false);
         if (!typeInfo) {
             typeInfo = { type: "png" };
+        }
+        else {
+            if (typeInfo.quality) {
+                typeInfo.quality /= 10;
+            }
         }
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };

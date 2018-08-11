@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+    declare let VConsole:any;
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
@@ -317,11 +318,12 @@ namespace annie {
                 if (debug && !Stage._isLoadedVConsole) {
                     let script: HTMLScriptElement = document.createElement("script");
                     script.onload = function () {
+                        new VConsole();
                         s.dispatchEvent(new annie.Event("onInitStage"));
                         script.onload = null;
                     };
                     document.head.appendChild(script);
-                    script.src = "libs/vConsole.min.js";
+                    script.src = "libs/vconsole.min.js";
                 } else {
                     s.dispatchEvent(new annie.Event("onInitStage"));
                 }

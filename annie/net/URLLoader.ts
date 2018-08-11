@@ -123,6 +123,7 @@ namespace annie {
                     }
                 };
                 req.onreadystatechange = function (event: any): void {
+                    if(!event)return;
                     let t = event.target;
                     if (t["readyState"] == 4) {
                         if (req.status == 200||req.status==0) {
