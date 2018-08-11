@@ -9,7 +9,7 @@ namespace annie {
      */
     export class TouchEvent extends Event {
         /**
-         * @property ON_MULTI_TOUCH
+         * @event ON_MULTI_TOUCH
          * @static
          * @public
          * @since 1.0.3

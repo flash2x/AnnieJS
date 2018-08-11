@@ -12,8 +12,7 @@ namespace annie {
     export class Event extends AObject {
         /**
          * 舞台尺寸发生变化时触发
-         * @Event
-         * @property RESIZE
+         * @Event RESIZE
          * @type {string}
          * @static
          * @public
@@ -22,8 +21,7 @@ namespace annie {
         public static RESIZE:string = "onResize";
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
-         * @Event
-         * @property RESIZE
+         * @Event ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -32,7 +30,7 @@ namespace annie {
         public static ON_RUN_CHANGED:string = "onRunChanged";
         /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_UPDATE
+         * @Event ON_PLAY_UPDATE
          * @static
          * @since 1.1.0
          * @type {string}
@@ -40,7 +38,7 @@ namespace annie {
         public static ON_PLAY_UPDATE="onPlayUpdate";
         /**
          * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_END
+         * @Event ON_PLAY_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -48,7 +46,7 @@ namespace annie {
         public static ON_PLAY_END="onPlayEnd";
         /**
          * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_START
+         * @Event ON_PLAY_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -56,7 +54,7 @@ namespace annie {
         public static ON_PLAY_START="onPlayStart";
         /**
          * annie.FlipBook组件翻页开始事件
-         * @property ON_FLIP_START
+         * @Event ON_FLIP_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -64,7 +62,7 @@ namespace annie {
         public static ON_FLIP_START="onFlipStart";
         /**
          * annie.FlipBook组件翻页结束事件
-         * @property ON_FLIP_STOP
+         * @Event ON_FLIP_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -72,7 +70,7 @@ namespace annie {
         public static ON_FLIP_STOP="onFlipStop";
         /**
          * annie.ScrollPage组件滑动到开始位置事件
-         * @property ON_SCROLL_TO_HEAD
+         * @Event ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
@@ -80,7 +78,7 @@ namespace annie {
         public static ON_SCROLL_TO_HEAD="onScrollToHead";
         /**
          * annie.ScrollPage组件停止滑动事件
-         * @property ON_SCROLL_STOP
+         * @Event ON_SCROLL_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -88,7 +86,7 @@ namespace annie {
         public static ON_SCROLL_STOP="onScrollStop";
         /**
          * annie.ScrollPage组件开始滑动事件
-         * @property ON_SCROLL_START
+         * @Event ON_SCROLL_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -96,7 +94,7 @@ namespace annie {
         public static ON_SCROLL_START="onScrollStart";
         /**
          * annie.ScrollPage组件滑动到结束位置事件
-         * @property ON_SCROLL_TO_END
+         * @Event ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -104,7 +102,7 @@ namespace annie {
         public static ON_SCROLL_TO_END="onScrollToEnd";
         /**
          * annie.Slide 组件开始滑动事件
-         * @property ON_SLIDE_START
+         * @Event ON_SLIDE_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -112,7 +110,7 @@ namespace annie {
         public static ON_SLIDE_START="onSlideStart";
         /**
          * annie.Slide 组件结束滑动事件
-         * @property ON_SLIDE_END
+         * @Event ON_SLIDE_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -120,8 +118,7 @@ namespace annie {
         public static ON_SLIDE_END="onSlideEnd";
         /**
          * 舞台初始化完成后会触发的事件
-         * @Event
-         * @property ON_STAGE_INIT
+         * @Event ON_STAGE_INIT
          * @type {string}
          * @static
          * @public
@@ -130,8 +127,7 @@ namespace annie {
         public static INIT_TO_STAGE:string = "onInitStage";
         /**
          * 显示对象加入到舞台事件
-         * @Event
-         * @property ADD_TO_STAGE
+         * @Event ADD_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -140,8 +136,7 @@ namespace annie {
         public static ADD_TO_STAGE:string = "onAddToStage";
         /**
          * 显示对象从舞台移出事件
-         * @Event
-         * @property REMOVE_TO_STAGE
+         * @Event REMOVE_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -150,8 +145,7 @@ namespace annie {
         public static REMOVE_TO_STAGE:string = "onRemoveToStage";
         /**
          * 显示对象 循环帧事件
-         * @Event
-         * @property ENTER_FRAME
+         * @Event ENTER_FRAME
          * @type {string}
          * @static
          * @public
@@ -160,8 +154,7 @@ namespace annie {
         public static ENTER_FRAME:string = "onEnterFrame";
         /**
          * MovieClip 播放完成事件
-         * @Event
-         * @property END_FRAME
+         * @Event END_FRAME
          * @type {string}
          * @static
          * @public
@@ -170,8 +163,7 @@ namespace annie {
         public static END_FRAME:string = "onEndFrame";
         /**
          * MovieClip 帧标签事件
-         * @Event
-         * @property CALL_FRAME
+         * @Event CALL_FRAME
          * @type {string}
          * @static
          * @public
@@ -180,8 +172,7 @@ namespace annie {
         public static CALL_FRAME:string = "onCallFrame";
         /**
          * 完成事件
-         * @Event
-         * @property COMPLETE
+         * @Event COMPLETE
          * @type {string}
          * @static
          * @public
@@ -190,8 +181,7 @@ namespace annie {
         public static COMPLETE:string = "onComplete";
         /**
          * 加载过程事件
-         * @Event
-         * @property PROGRESS
+         * @Event PROGRESS
          * @type {string}
          * @static
          * @public
@@ -200,8 +190,7 @@ namespace annie {
         public static PROGRESS:string = "onProgress";
         /**
          * 出错事件
-         * @Event
-         * @property ERROR
+         * @Event ERROR
          * @type {string}
          * @static
          * @public
@@ -210,8 +199,7 @@ namespace annie {
         public static ERROR:string = "onError";
         /**
          * 中断事件
-         * @Event
-         * @property ABORT
+         * @Event ABORT
          * @type {string}
          * @static
          * @public
@@ -220,8 +208,7 @@ namespace annie {
         public static ABORT:string = "onAbort";
         /**
          * 开始事件
-         * @Event
-         * @property START
+         * @Event START
          * @type {string}
          * @static
          * @public
@@ -230,7 +217,7 @@ namespace annie {
         public static START:string = "onStart";
         /**
          * 定时器触发事件
-         * @property TIMER
+         * @Event TIMER
          * @static
          * @since 1.0.9
          * @public
@@ -239,7 +226,7 @@ namespace annie {
         public static TIMER:string="onTimer";
         /**
          * 定时器完成事件
-         * @property TIMER_COMPLETE
+         * @Event TIMER_COMPLETE
          * @since 1.0.9
          * @static
          * @public
