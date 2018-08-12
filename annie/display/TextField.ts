@@ -255,7 +255,8 @@ namespace annie {
             return obj.width;
         }
         /**
-         * @property _lines 获取当前文本行数
+         * 获取当前文本行数
+         * @property lines
          * @type {number}
          * @public
          * @readonly

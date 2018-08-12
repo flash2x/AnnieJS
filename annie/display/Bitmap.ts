@@ -11,7 +11,6 @@ namespace annie {
      * @since 1.0.0
      */
     export class Bitmap extends DisplayObject {
-
         private _bitmapData: any = null;
         private _realCacheImg: any = null;
         /**
