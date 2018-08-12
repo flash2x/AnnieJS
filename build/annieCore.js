@@ -398,8 +398,7 @@ var annie;
         };
         /**
          * 舞台尺寸发生变化时触发
-         * @Event
-         * @property RESIZE
+         * @Event RESIZE
          * @type {string}
          * @static
          * @public
@@ -408,8 +407,7 @@ var annie;
         Event.RESIZE = "onResize";
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
-         * @Event
-         * @property RESIZE
+         * @Event ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -418,7 +416,7 @@ var annie;
         Event.ON_RUN_CHANGED = "onRunChanged";
         /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_UPDATE
+         * @Event ON_PLAY_UPDATE
          * @static
          * @since 1.1.0
          * @type {string}
@@ -426,7 +424,7 @@ var annie;
         Event.ON_PLAY_UPDATE = "onPlayUpdate";
         /**
          * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_END
+         * @Event ON_PLAY_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -434,7 +432,7 @@ var annie;
         Event.ON_PLAY_END = "onPlayEnd";
         /**
          * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_START
+         * @Event ON_PLAY_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -442,7 +440,7 @@ var annie;
         Event.ON_PLAY_START = "onPlayStart";
         /**
          * annie.FlipBook组件翻页开始事件
-         * @property ON_FLIP_START
+         * @Event ON_FLIP_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -450,7 +448,7 @@ var annie;
         Event.ON_FLIP_START = "onFlipStart";
         /**
          * annie.FlipBook组件翻页结束事件
-         * @property ON_FLIP_STOP
+         * @Event ON_FLIP_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -458,7 +456,7 @@ var annie;
         Event.ON_FLIP_STOP = "onFlipStop";
         /**
          * annie.ScrollPage组件滑动到开始位置事件
-         * @property ON_SCROLL_TO_HEAD
+         * @Event ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
@@ -466,7 +464,7 @@ var annie;
         Event.ON_SCROLL_TO_HEAD = "onScrollToHead";
         /**
          * annie.ScrollPage组件停止滑动事件
-         * @property ON_SCROLL_STOP
+         * @Event ON_SCROLL_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -474,7 +472,7 @@ var annie;
         Event.ON_SCROLL_STOP = "onScrollStop";
         /**
          * annie.ScrollPage组件开始滑动事件
-         * @property ON_SCROLL_START
+         * @Event ON_SCROLL_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -482,7 +480,7 @@ var annie;
         Event.ON_SCROLL_START = "onScrollStart";
         /**
          * annie.ScrollPage组件滑动到结束位置事件
-         * @property ON_SCROLL_TO_END
+         * @Event ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -490,7 +488,7 @@ var annie;
         Event.ON_SCROLL_TO_END = "onScrollToEnd";
         /**
          * annie.Slide 组件开始滑动事件
-         * @property ON_SLIDE_START
+         * @Event ON_SLIDE_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -498,7 +496,7 @@ var annie;
         Event.ON_SLIDE_START = "onSlideStart";
         /**
          * annie.Slide 组件结束滑动事件
-         * @property ON_SLIDE_END
+         * @Event ON_SLIDE_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -506,8 +504,7 @@ var annie;
         Event.ON_SLIDE_END = "onSlideEnd";
         /**
          * 舞台初始化完成后会触发的事件
-         * @Event
-         * @property ON_STAGE_INIT
+         * @Event ON_STAGE_INIT
          * @type {string}
          * @static
          * @public
@@ -516,8 +513,7 @@ var annie;
         Event.INIT_TO_STAGE = "onInitStage";
         /**
          * 显示对象加入到舞台事件
-         * @Event
-         * @property ADD_TO_STAGE
+         * @Event ADD_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -526,8 +522,7 @@ var annie;
         Event.ADD_TO_STAGE = "onAddToStage";
         /**
          * 显示对象从舞台移出事件
-         * @Event
-         * @property REMOVE_TO_STAGE
+         * @Event REMOVE_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -536,8 +531,7 @@ var annie;
         Event.REMOVE_TO_STAGE = "onRemoveToStage";
         /**
          * 显示对象 循环帧事件
-         * @Event
-         * @property ENTER_FRAME
+         * @Event ENTER_FRAME
          * @type {string}
          * @static
          * @public
@@ -546,8 +540,7 @@ var annie;
         Event.ENTER_FRAME = "onEnterFrame";
         /**
          * MovieClip 播放完成事件
-         * @Event
-         * @property END_FRAME
+         * @Event END_FRAME
          * @type {string}
          * @static
          * @public
@@ -556,8 +549,7 @@ var annie;
         Event.END_FRAME = "onEndFrame";
         /**
          * MovieClip 帧标签事件
-         * @Event
-         * @property CALL_FRAME
+         * @Event CALL_FRAME
          * @type {string}
          * @static
          * @public
@@ -566,8 +558,7 @@ var annie;
         Event.CALL_FRAME = "onCallFrame";
         /**
          * 完成事件
-         * @Event
-         * @property COMPLETE
+         * @Event COMPLETE
          * @type {string}
          * @static
          * @public
@@ -576,8 +567,7 @@ var annie;
         Event.COMPLETE = "onComplete";
         /**
          * 加载过程事件
-         * @Event
-         * @property PROGRESS
+         * @Event PROGRESS
          * @type {string}
          * @static
          * @public
@@ -586,8 +576,7 @@ var annie;
         Event.PROGRESS = "onProgress";
         /**
          * 出错事件
-         * @Event
-         * @property ERROR
+         * @Event ERROR
          * @type {string}
          * @static
          * @public
@@ -596,8 +585,7 @@ var annie;
         Event.ERROR = "onError";
         /**
          * 中断事件
-         * @Event
-         * @property ABORT
+         * @Event ABORT
          * @type {string}
          * @static
          * @public
@@ -606,8 +594,7 @@ var annie;
         Event.ABORT = "onAbort";
         /**
          * 开始事件
-         * @Event
-         * @property START
+         * @Event START
          * @type {string}
          * @static
          * @public
@@ -616,7 +603,7 @@ var annie;
         Event.START = "onStart";
         /**
          * 定时器触发事件
-         * @property TIMER
+         * @Event TIMER
          * @static
          * @since 1.0.9
          * @public
@@ -625,7 +612,7 @@ var annie;
         Event.TIMER = "onTimer";
         /**
          * 定时器完成事件
-         * @property TIMER_COMPLETE
+         * @Event TIMER_COMPLETE
          * @since 1.0.9
          * @static
          * @public
@@ -742,7 +729,7 @@ var annie;
         };
         /**
          * 鼠标或者手指按下事件
-         * @property MOUSE_DOWN
+         * @event MOUSE_DOWN
          * @static
          * @public
          * @since 1.0.0
@@ -751,7 +738,7 @@ var annie;
         MouseEvent.MOUSE_DOWN = "onMouseDown";
         /**
          * 鼠标或者手指抬起事件
-         * @property MOUSE_UP
+         * @event MOUSE_UP
          * @static
          * @public
          * @since 1.0.0
@@ -760,7 +747,7 @@ var annie;
         MouseEvent.MOUSE_UP = "onMouseUp";
         /**
          * 鼠标或者手指单击
-         * @property CLICK
+         * @event CLICK
          * @static
          * @public
          * @since 1.0.0
@@ -769,7 +756,7 @@ var annie;
         MouseEvent.CLICK = "onMouseClick";
         /**
          * 鼠标或者手指移动事件
-         * @property MOUSE_MOVE
+         * @event MOUSE_MOVE
          * @static
          * @public
          * @since 1.0.0
@@ -778,7 +765,7 @@ var annie;
         MouseEvent.MOUSE_MOVE = "onMouseMove";
         /**
          * 鼠标或者手指移入到显示对象上里触发的事件
-         * @property MOUSE_OVER
+         * @event MOUSE_OVER
          * @static
          * @public
          * @since 1.0.0
@@ -787,7 +774,7 @@ var annie;
         MouseEvent.MOUSE_OVER = "onMouseOver";
         /**
          * 鼠标或者手指移出显示对象边界触发的事件
-         * @property MOUSE_OUT
+         * @event MOUSE_OUT
          * @static
          * @public
          * @since 1.0.0
@@ -869,7 +856,7 @@ var annie;
             _super.prototype.destroy.call(this);
         };
         /**
-         * @property ON_MULTI_TOUCH
+         * @event ON_MULTI_TOUCH
          * @static
          * @public
          * @since 1.0.3
@@ -5550,12 +5537,19 @@ var annie;
             s.media.src = src;
             s.media.autoplay = false;
             s.media.loop = false;
-            s.media.onEnded(function () {
+            s.media.onEnded(function (e) {
+                s.dispatchEvent("onPlayEnd", e);
                 if (s._loop > 1) {
                     s._loop--;
                     s.media.startTime = 0;
                     s.media.play();
                 }
+            });
+            s.media.onPlay(function (e) {
+                s.dispatchEvent("onPlayStart", e);
+            });
+            s.media.onTimeUpdate(function (e) {
+                s.dispatchEvent("onPlayUpdate", e);
             });
             annie.Sound._soundList.push(s);
         }
@@ -5712,6 +5706,9 @@ var annie;
                     break;
                 }
             }
+            s.media.offTimeUpdate();
+            s.media.offPlay();
+            s.media.offEnded();
             s.media = null;
         };
         //声音对象池

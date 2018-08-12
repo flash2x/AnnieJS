@@ -157,8 +157,7 @@ declare namespace annie {
     class Event extends AObject {
         /**
          * 舞台尺寸发生变化时触发
-         * @Event
-         * @property RESIZE
+         * @Event RESIZE
          * @type {string}
          * @static
          * @public
@@ -167,8 +166,7 @@ declare namespace annie {
         static RESIZE: string;
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
-         * @Event
-         * @property RESIZE
+         * @Event ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -177,7 +175,7 @@ declare namespace annie {
         static ON_RUN_CHANGED: string;
         /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_UPDATE
+         * @Event ON_PLAY_UPDATE
          * @static
          * @since 1.1.0
          * @type {string}
@@ -185,7 +183,7 @@ declare namespace annie {
         static ON_PLAY_UPDATE: string;
         /**
          * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_END
+         * @Event ON_PLAY_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -193,7 +191,7 @@ declare namespace annie {
         static ON_PLAY_END: string;
         /**
          * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @property ON_PLAY_START
+         * @Event ON_PLAY_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -201,7 +199,7 @@ declare namespace annie {
         static ON_PLAY_START: string;
         /**
          * annie.FlipBook组件翻页开始事件
-         * @property ON_FLIP_START
+         * @Event ON_FLIP_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -209,7 +207,7 @@ declare namespace annie {
         static ON_FLIP_START: string;
         /**
          * annie.FlipBook组件翻页结束事件
-         * @property ON_FLIP_STOP
+         * @Event ON_FLIP_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -217,7 +215,7 @@ declare namespace annie {
         static ON_FLIP_STOP: string;
         /**
          * annie.ScrollPage组件滑动到开始位置事件
-         * @property ON_SCROLL_TO_HEAD
+         * @Event ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
@@ -225,7 +223,7 @@ declare namespace annie {
         static ON_SCROLL_TO_HEAD: string;
         /**
          * annie.ScrollPage组件停止滑动事件
-         * @property ON_SCROLL_STOP
+         * @Event ON_SCROLL_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -233,7 +231,7 @@ declare namespace annie {
         static ON_SCROLL_STOP: string;
         /**
          * annie.ScrollPage组件开始滑动事件
-         * @property ON_SCROLL_START
+         * @Event ON_SCROLL_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -241,7 +239,7 @@ declare namespace annie {
         static ON_SCROLL_START: string;
         /**
          * annie.ScrollPage组件滑动到结束位置事件
-         * @property ON_SCROLL_TO_END
+         * @Event ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -249,7 +247,7 @@ declare namespace annie {
         static ON_SCROLL_TO_END: string;
         /**
          * annie.Slide 组件开始滑动事件
-         * @property ON_SLIDE_START
+         * @Event ON_SLIDE_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -257,7 +255,7 @@ declare namespace annie {
         static ON_SLIDE_START: string;
         /**
          * annie.Slide 组件结束滑动事件
-         * @property ON_SLIDE_END
+         * @Event ON_SLIDE_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -265,8 +263,7 @@ declare namespace annie {
         static ON_SLIDE_END: string;
         /**
          * 舞台初始化完成后会触发的事件
-         * @Event
-         * @property ON_STAGE_INIT
+         * @Event ON_STAGE_INIT
          * @type {string}
          * @static
          * @public
@@ -275,8 +272,7 @@ declare namespace annie {
         static INIT_TO_STAGE: string;
         /**
          * 显示对象加入到舞台事件
-         * @Event
-         * @property ADD_TO_STAGE
+         * @Event ADD_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -285,8 +281,7 @@ declare namespace annie {
         static ADD_TO_STAGE: string;
         /**
          * 显示对象从舞台移出事件
-         * @Event
-         * @property REMOVE_TO_STAGE
+         * @Event REMOVE_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -295,8 +290,7 @@ declare namespace annie {
         static REMOVE_TO_STAGE: string;
         /**
          * 显示对象 循环帧事件
-         * @Event
-         * @property ENTER_FRAME
+         * @Event ENTER_FRAME
          * @type {string}
          * @static
          * @public
@@ -305,8 +299,7 @@ declare namespace annie {
         static ENTER_FRAME: string;
         /**
          * MovieClip 播放完成事件
-         * @Event
-         * @property END_FRAME
+         * @Event END_FRAME
          * @type {string}
          * @static
          * @public
@@ -315,8 +308,7 @@ declare namespace annie {
         static END_FRAME: string;
         /**
          * MovieClip 帧标签事件
-         * @Event
-         * @property CALL_FRAME
+         * @Event CALL_FRAME
          * @type {string}
          * @static
          * @public
@@ -325,8 +317,7 @@ declare namespace annie {
         static CALL_FRAME: string;
         /**
          * 完成事件
-         * @Event
-         * @property COMPLETE
+         * @Event COMPLETE
          * @type {string}
          * @static
          * @public
@@ -335,8 +326,7 @@ declare namespace annie {
         static COMPLETE: string;
         /**
          * 加载过程事件
-         * @Event
-         * @property PROGRESS
+         * @Event PROGRESS
          * @type {string}
          * @static
          * @public
@@ -345,8 +335,7 @@ declare namespace annie {
         static PROGRESS: string;
         /**
          * 出错事件
-         * @Event
-         * @property ERROR
+         * @Event ERROR
          * @type {string}
          * @static
          * @public
@@ -355,8 +344,7 @@ declare namespace annie {
         static ERROR: string;
         /**
          * 中断事件
-         * @Event
-         * @property ABORT
+         * @Event ABORT
          * @type {string}
          * @static
          * @public
@@ -365,8 +353,7 @@ declare namespace annie {
         static ABORT: string;
         /**
          * 开始事件
-         * @Event
-         * @property START
+         * @Event START
          * @type {string}
          * @static
          * @public
@@ -375,7 +362,7 @@ declare namespace annie {
         static START: string;
         /**
          * 定时器触发事件
-         * @property TIMER
+         * @Event TIMER
          * @static
          * @since 1.0.9
          * @public
@@ -384,7 +371,7 @@ declare namespace annie {
         static TIMER: string;
         /**
          * 定时器完成事件
-         * @property TIMER_COMPLETE
+         * @Event TIMER_COMPLETE
          * @since 1.0.9
          * @static
          * @public
@@ -469,7 +456,7 @@ declare namespace annie {
     class MouseEvent extends Event {
         /**
          * 鼠标或者手指按下事件
-         * @property MOUSE_DOWN
+         * @event MOUSE_DOWN
          * @static
          * @public
          * @since 1.0.0
@@ -478,7 +465,7 @@ declare namespace annie {
         static MOUSE_DOWN: string;
         /**
          * 鼠标或者手指抬起事件
-         * @property MOUSE_UP
+         * @event MOUSE_UP
          * @static
          * @public
          * @since 1.0.0
@@ -487,7 +474,7 @@ declare namespace annie {
         static MOUSE_UP: string;
         /**
          * 鼠标或者手指单击
-         * @property CLICK
+         * @event CLICK
          * @static
          * @public
          * @since 1.0.0
@@ -496,7 +483,7 @@ declare namespace annie {
         static CLICK: string;
         /**
          * 鼠标或者手指移动事件
-         * @property MOUSE_MOVE
+         * @event MOUSE_MOVE
          * @static
          * @public
          * @since 1.0.0
@@ -505,7 +492,7 @@ declare namespace annie {
         static MOUSE_MOVE: string;
         /**
          * 鼠标或者手指移入到显示对象上里触发的事件
-         * @property MOUSE_OVER
+         * @event MOUSE_OVER
          * @static
          * @public
          * @since 1.0.0
@@ -514,7 +501,7 @@ declare namespace annie {
         static MOUSE_OVER: string;
         /**
          * 鼠标或者手指移出显示对象边界触发的事件
-         * @property MOUSE_OUT
+         * @event MOUSE_OUT
          * @static
          * @public
          * @since 1.0.0
@@ -614,7 +601,7 @@ declare namespace annie {
      */
     class TouchEvent extends Event {
         /**
-         * @property ON_MULTI_TOUCH
+         * @event ON_MULTI_TOUCH
          * @static
          * @public
          * @since 1.0.3
