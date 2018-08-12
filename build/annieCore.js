@@ -5562,12 +5562,19 @@ var annie;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
             s.media.src = src;
-            s.media.onEnded(function () {
+            s.media.onEnded(function (e) {
+                s.dispatchEvent("onPlayEnd", e);
                 if (s._loop > 1) {
                     s._loop--;
                     s.media.startTime = 0;
                     s.media.play();
                 }
+            });
+            s.media.onPlay(function (e) {
+                s.dispatchEvent("onPlayStart", e);
+            });
+            s.media.onTimeUpdate(function (e) {
+                s.dispatchEvent("onPlayUpdate", e);
             });
             annie.Sound._soundList.push(s);
         }
@@ -5724,6 +5731,9 @@ var annie;
                     break;
                 }
             }
+            s.media.offTimeUpdate();
+            s.media.offPlay();
+            s.media.offEnded();
             s.media = null;
         };
         //声音对象池
