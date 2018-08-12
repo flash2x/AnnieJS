@@ -5535,8 +5535,6 @@ var annie;
             s._instanceType = "annie.Sound";
             s.media = annie.createAudio();
             s.media.src = src;
-            s.media.autoplay = false;
-            s.media.loop = false;
             s.media.onEnded(function (e) {
                 s.dispatchEvent("onPlayEnd", e);
                 if (s._loop > 1) {
@@ -7467,5 +7465,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-
-module.exports = annie;
