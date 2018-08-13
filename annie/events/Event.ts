@@ -181,7 +181,7 @@ namespace annie {
          */
         public static COMPLETE:string = "onComplete";
         /**
-         * 加载过程事件
+         * annie.URLLoader加载过程事件
          * @event PROGRESS
          * @type {string}
          * @static
@@ -190,7 +190,7 @@ namespace annie {
          */
         public static PROGRESS:string = "onProgress";
         /**
-         * 出错事件
+         * annie.URLLoader出错事件
          * @event ERROR
          * @type {string}
          * @static
@@ -199,7 +199,7 @@ namespace annie {
          */
         public static ERROR:string = "onError";
         /**
-         * 中断事件
+         * annie.URLLoader中断事件
          * @event ABORT
          * @type {string}
          * @static
@@ -208,7 +208,7 @@ namespace annie {
          */
         public static ABORT:string = "onAbort";
         /**
-         * 开始事件
+         * annie.URLLoader开始事件
          * @event START
          * @type {string}
          * @static

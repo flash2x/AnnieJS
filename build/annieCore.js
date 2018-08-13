@@ -562,7 +562,7 @@ var annie;
          */
         Event.COMPLETE = "onComplete";
         /**
-         * 加载过程事件
+         * annie.URLLoader加载过程事件
          * @event PROGRESS
          * @type {string}
          * @static
@@ -571,7 +571,7 @@ var annie;
          */
         Event.PROGRESS = "onProgress";
         /**
-         * 出错事件
+         * annie.URLLoader出错事件
          * @event ERROR
          * @type {string}
          * @static
@@ -580,7 +580,7 @@ var annie;
          */
         Event.ERROR = "onError";
         /**
-         * 中断事件
+         * annie.URLLoader中断事件
          * @event ABORT
          * @type {string}
          * @static
@@ -589,7 +589,7 @@ var annie;
          */
         Event.ABORT = "onAbort";
         /**
-         * 开始事件
+         * annie.URLLoader开始事件
          * @event START
          * @type {string}
          * @static
@@ -608,7 +608,7 @@ var annie;
         Event.TIMER = "onTimer";
         /**
          * annie.Timer定时器完成事件
-         * @property TIMER_COMPLETE
+         * @event TIMER_COMPLETE
          * @since 1.0.9
          * @static
          * @public
@@ -5511,7 +5511,8 @@ var annie;
         };
         Object.defineProperty(TextField.prototype, "lines", {
             /**
-             * @property _lines 获取当前文本行数
+             * 获取当前文本行数
+             * @property lines
              * @type {number}
              * @public
              * @readonly
@@ -10221,13 +10222,11 @@ var annie;
         };
         obj.parent = null;
         if (!rect)
-            rect = obj.getBounds();
+            rect = obj.getDrawRect();
         var w = rect.width;
         var h = rect.height;
-        obj.x = -rect.x;
-        obj.y = -rect.y;
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
+        obj.x = -rect.x + 0.00001;
+        obj.y = -rect.y + 0.00001;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
         // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";

@@ -306,7 +306,7 @@ declare namespace annie {
          */
         static COMPLETE: string;
         /**
-         * 加载过程事件
+         * annie.URLLoader加载过程事件
          * @event PROGRESS
          * @type {string}
          * @static
@@ -315,7 +315,7 @@ declare namespace annie {
          */
         static PROGRESS: string;
         /**
-         * 出错事件
+         * annie.URLLoader出错事件
          * @event ERROR
          * @type {string}
          * @static
@@ -324,7 +324,7 @@ declare namespace annie {
          */
         static ERROR: string;
         /**
-         * 中断事件
+         * annie.URLLoader中断事件
          * @event ABORT
          * @type {string}
          * @static
@@ -333,7 +333,7 @@ declare namespace annie {
          */
         static ABORT: string;
         /**
-         * 开始事件
+         * annie.URLLoader开始事件
          * @event START
          * @type {string}
          * @static
@@ -352,7 +352,7 @@ declare namespace annie {
         static TIMER: string;
         /**
          * annie.Timer定时器完成事件
-         * @property TIMER_COMPLETE
+         * @event TIMER_COMPLETE
          * @since 1.0.9
          * @static
          * @public
@@ -2554,7 +2554,8 @@ declare namespace annie {
          */
         getTextWidth(lineIndex?: number): any;
         /**
-         * @property _lines 获取当前文本行数
+         * 获取当前文本行数
+         * @property lines
          * @type {number}
          * @public
          * @readonly

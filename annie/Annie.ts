@@ -208,13 +208,11 @@ namespace annie {
         };
         obj.parent = null;
         if(!rect)
-        rect = obj.getBounds();
+        rect = obj.getDrawRect();
         let w: number =rect.width;
         let h: number =rect.height;
-        obj.x = -rect.x;
-        obj.y = -rect.y;
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
+        obj.x = -rect.x+0.00001;
+        obj.y = -rect.y+0.00001;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
         // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
