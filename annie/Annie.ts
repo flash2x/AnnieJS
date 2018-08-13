@@ -167,9 +167,10 @@ namespace annie {
     }
     // 作为将显示对象导出成图片的render渲染器
     let _dRender: any = null;
+    let _dSprite: any = null;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 将显示对象转成base64的图片数据
+     * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，测需要要截图之前手动执行更新方法一次。如:this.update(true);
      * @method annie.toDisplayDataURL
      * @static
      * @param {annie.DisplayObject} obj 显示对象
@@ -194,6 +195,53 @@ namespace annie {
         if (!_dRender) {
             _dRender = new CanvasRender(null);
         }
+        _dRender.rootContainer = DisplayObject["_canvas"];
+        let objParent=obj.parent;
+        if(!_dSprite){
+            _dSprite=new annie.Sprite();
+        }
+        obj.parent=_dSprite;
+        _dSprite.children[0]=obj;
+        if(!rect){
+            rect = obj.getDrawRect();
+        }
+        let w: number =rect.width;
+        let h: number =rect.height;
+        _dSprite.x=-rect.x;
+        _dSprite.y=-rect.y;
+        obj._offsetX=rect.x;
+        obj._offsetY=rect.y;
+        _dRender.rootContainer.width = w;
+        _dRender.rootContainer.height = h;
+        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
+        if (bgColor == "") {
+            _dRender._ctx.clearRect(0, 0, w, h);
+        } else {
+            _dRender._ctx.fillStyle = bgColor;
+            _dRender._ctx.fillRect(0, 0, w, h);
+        }
+        _dSprite._UI.UM=true;
+        _dSprite.update(false);
+        _dSprite.render(_dRender);
+        _dSprite.children.length=0;
+        obj.parent = objParent;
+        obj._UI.UM=true;
+        obj.update(false);
+        if (!typeInfo) {
+            typeInfo = {type: "png"};
+        }else{
+            if(typeInfo.quality){
+                typeInfo.quality/=10;
+            }
+        }
+        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+    };
+    export let toDisplayCache = function (obj: any): string {
+        if (!_dRender) {
+            _dRender = new CanvasRender(null);
+        }
         _dRender._stage = obj;
         _dRender.rootContainer = DisplayObject["_canvas"];
         let objInfo = {
@@ -207,24 +255,24 @@ namespace annie {
             skY: obj.skewY
         };
         obj.parent = null;
-        if(!rect)
-        rect = obj.getDrawRect();
-        let w: number =rect.width;
-        let h: number =rect.height;
-        obj.x = -rect.x+0.00001;
-        obj.y = -rect.y+0.00001;
+        obj.x=obj.y=0;
+        obj.scaleX = obj.scaleY = 1;
+        obj.rotation = obj.skewX = obj.skewY = 0;
+        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
+        let whObj: any = obj.getBounds();
+        let w: number =  whObj.width;
+        let h: number =  whObj.height;
+        obj.x =-whObj.x;
+        obj.y = -whObj.y;
+        obj._offsetX = whObj.x;
+        obj._offsetY = whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
         // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
         // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if (bgColor == "") {
-            _dRender._ctx.clearRect(0, 0, w, h);
-        } else {
-            _dRender._ctx.fillStyle = bgColor;
-            _dRender._ctx.fillRect(0, 0, w, h);
-        }
-        obj._cp=true;
+        _dRender._ctx.clearRect(0, 0, w, h);
+        obj._UI.UM=true;
         obj.update(false);
         obj.render(_dRender);
         obj.parent = objInfo.p;
@@ -235,16 +283,9 @@ namespace annie {
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
-        obj._cp=true;
+        obj._UI.UM=true;
         obj.update(false);
-        if (!typeInfo) {
-            typeInfo = {type: "png"};
-        }else{
-            if(typeInfo.quality){
-                typeInfo.quality/=10;
-            }
-        }
-        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+        return _dRender.rootContainer.toDataURL("image/png");
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>

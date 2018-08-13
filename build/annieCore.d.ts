@@ -4407,7 +4407,7 @@ declare namespace annie {
     function sendToURL(url: string): void;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 将显示对象转成base64的图片数据
+     * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，测需要要截图之前手动执行更新方法一次。如:this.update(true);
      * @method annie.toDisplayDataURL
      * @static
      * @param {annie.DisplayObject} obj 显示对象
@@ -4429,6 +4429,7 @@ declare namespace annie {
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
      */
     let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
+    let toDisplayCache: (obj: any) => string;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组

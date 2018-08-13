@@ -81,7 +81,7 @@ namespace annie {
                 s._texture = new Image();
             }
             if (value) {
-                s._texture.src = annie.toDisplayDataURL(s);
+                s._texture.src = annie.toDisplayCache(s);
             } else {
                 s._texture.src = "";
                 s._offsetX = 0;
@@ -89,7 +89,6 @@ namespace annie {
             }
             s._cacheAsBitmap = value;
         }
-
         private _cacheAsBitmap: boolean;
 
         /**
@@ -349,10 +348,10 @@ namespace annie {
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if (!s._visible) return;
+            super.update(isDrawUpdate);
             let um: boolean = s._UI.UM;
             let ua: boolean = s._UI.UA;
             let uf: boolean = s._UI.UF;
-            super.update(isDrawUpdate);
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
@@ -463,7 +462,6 @@ namespace annie {
             }
             return rect;
         }
-
         public render(renderObj: IRender): void {
             let s: any = this;
             if (s.cAlpha > 0 && s._visible) {
