@@ -3537,10 +3537,10 @@ var annie;
             var s = this;
             if (!s._visible)
                 return;
+            _super.prototype.update.call(this, isDrawUpdate);
             var um = s._UI.UM;
             var ua = s._UI.UA;
             var uf = s._UI.UF;
-            _super.prototype.update.call(this, isDrawUpdate);
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
@@ -7465,3 +7465,5 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+
+module.exports = annie;

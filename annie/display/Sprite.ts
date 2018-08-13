@@ -319,10 +319,10 @@ namespace annie {
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
             if (!s._visible) return;
+            super.update(isDrawUpdate);
             let um: boolean = s._UI.UM;
             let ua: boolean = s._UI.UA;
             let uf: boolean = s._UI.UF;
-            super.update(isDrawUpdate);
             s._UI.UM = false;
             s._UI.UA = false;
             s._UI.UF = false;
