@@ -10223,8 +10223,6 @@ var annie;
         var h = rect.height;
         _dSprite.x = -rect.x;
         _dSprite.y = -rect.y;
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
         // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
