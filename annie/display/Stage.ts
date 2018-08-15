@@ -2,7 +2,8 @@
  * @module annie
  */
 namespace annie {
-    declare let VConsole:any;
+    declare let VConsole: any;
+
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
@@ -92,7 +93,7 @@ namespace annie {
         }
 
         static set pause(value: boolean) {
-            let s:any=Stage;
+            let s: any = Stage;
             if (value != s._pause) {
                 s._pause = value;
                 if (value) {
@@ -106,6 +107,7 @@ namespace annie {
                 globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }
+
         private static _pause: boolean = false;
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
@@ -378,8 +380,10 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
+
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
+
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
@@ -401,6 +405,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -461,6 +466,7 @@ namespace annie {
             }
             return {w: vW, h: vH};
         }
+
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -943,7 +949,8 @@ namespace annie {
                 }
             }
         }
-        public destroy():void{
+
+        public destroy(): void {
             super.destroy();
             let s = this;
             Stage.removeUpdateObj(s);
@@ -962,7 +969,7 @@ namespace annie {
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
             }
-            s.renderObj=null;
+            s.renderObj = null;
         }
     }
 }
