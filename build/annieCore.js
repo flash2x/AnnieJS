@@ -10215,6 +10215,7 @@ var annie;
             _dSprite = new annie.Sprite();
         }
         obj.parent = _dSprite;
+        _dRender._stage = _dSprite;
         _dSprite.children[0] = obj;
         if (!rect) {
             rect = obj.getDrawRect();
