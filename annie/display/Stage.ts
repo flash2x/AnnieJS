@@ -351,7 +351,8 @@ namespace annie {
         private _mP2: Point = new Point();
         private _onMouseEvent = function (e: any): void {
             //如果有开放域在，则不触发主舞台事件,如果隐藏了开放域，则不触发开放域事件。这里逻辑有点绕，要仔细分析
-            // if((SharedCanvas.canvas&&SharedCanvas.canvas.width>0)||(CanvasRender.drawCtx.canvas.width==0))return;
+            console.log(SharedCanvas.canvas);
+            if((SharedCanvas.canvas&&SharedCanvas.canvas.width>5)||(CanvasRender.drawCtx.canvas.width<5))return;
             //检查是否有
             let s: any = this;
             //判断是否有drag的显示对象
