@@ -334,6 +334,7 @@ namespace annie {
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._beginPath=false;
         }
 
         /**
@@ -388,11 +389,16 @@ namespace annie {
             s._fill(Shape.getBitmapStyle(image));
         }
 
+        private _beginPath:boolean=false;
         private _fill(fillStyle: any): void {
-            let c = this._command;
+            let s=this;
+            let c = s._command;
             c[c.length]=[0, "fillStyle", fillStyle];
-            c[c.length]=[1, "beginPath", []];
-            this._UI.UD = true;
+            if(!s._beginPath){
+                c[c.length] = [1, "beginPath", []];
+                s._beginPath=true;
+            }
+            s._UI.UD = true;
         }
 
         /**
