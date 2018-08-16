@@ -333,6 +333,7 @@ namespace annie {
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._beginPath=false;
         }
 
         /**
@@ -386,14 +387,17 @@ namespace annie {
             }
             s._fill(Shape.getBitmapStyle(image));
         }
-
+        private _beginPath:boolean=false;
         private _fill(fillStyle: any): void {
-            let c = this._command;
+            let s=this;
+            let c = s._command;
             c[c.length]=[0, "fillStyle", fillStyle];
-            c[c.length]=[1, "beginPath", []];
-            this._UI.UD = true;
+            if(!s._beginPath){
+                c[c.length] = [1, "beginPath", []];
+                s._beginPath=true;
+            }
+            s._UI.UD = true;
         }
-
         /**
          * 给线条着色
          * @method beginStroke
@@ -564,7 +568,6 @@ namespace annie {
                                 if (buttonRightY == undefined) {
                                     buttonRightY = data[2][1];
                                 }
-
                                 if (data[1] == "bezierCurveTo") {
                                     leftX = Math.min(leftX, data[2][0], data[2][2], data[2][4]);
                                     leftY = Math.min(leftY, data[2][1], data[2][3], data[2][5]);
