@@ -344,8 +344,8 @@ namespace annie {
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._isBeginPath=false;
         }
-
         /**
          * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
          * @method beginFill
@@ -401,12 +401,17 @@ namespace annie {
             }
             s._fill(Shape.getBitmapStyle(image));
         }
+        private _isBeginPath:Boolean=false;
 
         private _fill(fillStyle: any): void {
-            let c = this._command;
+            let s=this;
+            let c = s._command;
             c[c.length]=[0, "fillStyle", fillStyle];
-            c[c.length]=[1, "beginPath", []];
-            this._UI.UD = true;
+            if(!s._isBeginPath) {
+                c[c.length] = [1, "beginPath", []];
+                s._isBeginPath=true;
+            }
+            s._UI.UD = true;
         }
 
         /**
@@ -676,7 +681,7 @@ namespace annie {
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if (!s._isUseToMask) {
+                        if (!s._isUseToMask){
                             let _canvas: any = s._texture;
                             let ctx = _canvas["getContext"]('2d');
                             _canvas.width = w;

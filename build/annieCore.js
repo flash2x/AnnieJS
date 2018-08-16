@@ -2716,6 +2716,7 @@ var annie;
             this.beginRadialGradientFill = function (points, colors) {
                 this._fill(Shape.getGradientColor(points, colors));
             };
+            this._isBeginPath = false;
             /**
              * 画径向渐变的线条 一般给Annie2x用
              * @method beginRadialGradientStroke
@@ -3066,6 +3067,7 @@ var annie;
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._isBeginPath = false;
         };
         /**
          * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
@@ -3107,10 +3109,14 @@ var annie;
             s._fill(Shape.getBitmapStyle(image));
         };
         Shape.prototype._fill = function (fillStyle) {
-            var c = this._command;
+            var s = this;
+            var c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
-            c[c.length] = [1, "beginPath", []];
-            this._UI.UD = true;
+            if (!s._isBeginPath) {
+                c[c.length] = [1, "beginPath", []];
+                s._isBeginPath = true;
+            }
+            s._UI.UD = true;
         };
         /**
          * 给线条着色

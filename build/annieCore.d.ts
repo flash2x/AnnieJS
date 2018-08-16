@@ -1718,6 +1718,7 @@ declare namespace annie {
          * @return {void}
          */
         beginBitmapFill(image: any, matrix: Array<number>): void;
+        private _isBeginPath;
         private _fill(fillStyle);
         /**
          * 给线条着色
