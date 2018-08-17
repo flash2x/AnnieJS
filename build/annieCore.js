@@ -4862,7 +4862,6 @@ var annie;
             this._mP2 = new annie.Point();
             this._onMouseEvent = function (e) {
                 //如果有开放域在，则不触发主舞台事件,如果隐藏了开放域，则不触发开放域事件。这里逻辑有点绕，要仔细分析
-                console.log(annie.SharedCanvas.canvas);
                 if ((annie.SharedCanvas.canvas && annie.SharedCanvas.canvas.width > 5) || (annie.CanvasRender.drawCtx.canvas.width < 5))
                     return;
                 //检查是否有
