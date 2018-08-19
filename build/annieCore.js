@@ -2501,7 +2501,6 @@ var annie;
             this.beginRadialGradientFill = function (points, colors) {
                 this._fill(Shape.getGradientColor(points, colors));
             };
-            this._beginPath = false;
             /**
              * 画径向渐变的线条 一般给Flash2x用
              * @method beginRadialGradientStroke
@@ -2849,7 +2848,6 @@ var annie;
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
-            s._beginPath = false;
         };
         /**
          * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
@@ -2891,10 +2889,7 @@ var annie;
             var s = this;
             var c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
-            if (!s._beginPath) {
-                c[c.length] = [1, "beginPath", []];
-                s._beginPath = true;
-            }
+            c[c.length] = [1, "beginPath", []];
             s._UI.UD = true;
         };
         /**
@@ -3147,16 +3142,31 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        Shape.prototype._draw = function (ctx) {
+        Shape.prototype.drawShape = function (ctx, isMask) {
             var s = this;
             var com = s._command;
             var cLen = com.length;
             var data;
             var leftX = s._offsetX;
             var leftY = s._offsetY;
+            var isBeginPath = false;
             for (var i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
+                    if (data[1] == "beginPath") {
+                        if (isMask) {
+                            if (!isBeginPath) {
+                                isBeginPath = true;
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                    }
+                    ;
+                    if (isMask && data[1] == "closePath") {
+                        continue;
+                    }
                     var paramsLen = data[2].length;
                     if (paramsLen == 0) {
                         ctx[data[1]]();
@@ -3184,6 +3194,9 @@ var annie;
                 else {
                     ctx[data[1]] = data[2];
                 }
+            }
+            if (isMask && isBeginPath) {
+                ctx.closePath();
             }
         };
         /**
@@ -5806,7 +5819,7 @@ var annie;
             var tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
-                target._draw(ctx);
+                target.drawShape(ctx, true);
             }
             else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
                 for (var i = 0; i < target.children.length; i++) {
