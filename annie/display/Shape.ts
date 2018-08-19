@@ -16,8 +16,9 @@ namespace annie {
             this._texture = window.document.createElement("canvas");
         }
 
-       //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
+        //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
         private _command: any = [];
+
         /**
          * 通过一系统参数获取生成颜色或渐变所需要的对象
          * 一般给用户使用较少,Annie2x工具自动使用
@@ -29,16 +30,16 @@ namespace annie {
          * @since 1.0.0
          * @public
          */
-        public static getGradientColor(points: any,colors: any): any {
+        public static getGradientColor(points: any, colors: any): any {
             let colorObj: any;
             let ctx = DisplayObject["_canvas"].getContext("2d");
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             } else {
-                colorObj = ctx.createRadialGradient(points[0], points[1], 0,points[2], points[3], points[4]);
+                colorObj = ctx.createRadialGradient(points[0], points[1], 0, points[2], points[3], points[4]);
             }
             for (let i = 0, l = colors.length; i < l; i++) {
-                colorObj.addColorStop(colors[i][0], Shape.getRGBA(colors[i][1],colors[i][2]));
+                colorObj.addColorStop(colors[i][0], Shape.getRGBA(colors[i][1], colors[i][2]));
             }
             return colorObj;
         }
@@ -83,7 +84,7 @@ namespace annie {
             return color;
         }
 
-        private _isBitmapStroke:  Array<number>;
+        private _isBitmapStroke: Array<number>;
         private _isBitmapFill: Array<number>;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -107,7 +108,7 @@ namespace annie {
         public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
             s._UI.UD = true;
-            s._command[s._command.length]=[1, commandName, params];
+            s._command[s._command.length] = [1, commandName, params];
         }
 
         /**
@@ -153,15 +154,15 @@ namespace annie {
                 rBL = max;
             }
             let c = this._command;
-            c[c.length]=[1, "moveTo", [x + w - rTR, y]];
-            c[c.length]=[1, "arcTo", [x + w + rTR * mTR, y - rTR * mTR, x + w, y + rTR, rTR]];
-            c[c.length]=[1, "lineTo", [x + w, y + h - rBR]];
-            c[c.length]=[1, "arcTo", [x + w + rBR * mBR, y + h + rBR * mBR, x + w - rBR, y + h, rBR]];
-            c[c.length]=[1, "lineTo", [x + rBL, y + h]];
-            c[c.length]=[1, "arcTo", [x - rBL * mBL, y + h + rBL * mBL, x, y + h - rBL, rBL]];
-            c[c.length]=[1, "lineTo", [x, y + rTL]];
-            c[c.length]=[1, "arcTo", [x - rTL * mTL, y - rTL * mTL, x + rTL, y, rTL]];
-            c[c.length]=[1, "closePath", []];
+            c[c.length] = [1, "moveTo", [x + w - rTR, y]];
+            c[c.length] = [1, "arcTo", [x + w + rTR * mTR, y - rTR * mTR, x + w, y + rTR, rTR]];
+            c[c.length] = [1, "lineTo", [x + w, y + h - rBR]];
+            c[c.length] = [1, "arcTo", [x + w + rBR * mBR, y + h + rBR * mBR, x + w - rBR, y + h, rBR]];
+            c[c.length] = [1, "lineTo", [x + rBL, y + h]];
+            c[c.length] = [1, "arcTo", [x - rBL * mBL, y + h + rBL * mBL, x, y + h - rBL, rBL]];
+            c[c.length] = [1, "lineTo", [x, y + rTL]];
+            c[c.length] = [1, "arcTo", [x - rTL * mTL, y - rTL * mTL, x + rTL, y, rTL]];
+            c[c.length] = [1, "closePath", []];
         }
 
         /**
@@ -174,7 +175,7 @@ namespace annie {
          * @return {void}
          */
         public moveTo(x: number, y: number): void {
-            this._command[this._command.length]=[1, "moveTo", [x, y]];
+            this._command[this._command.length] = [1, "moveTo", [x, y]];
         }
 
         /**
@@ -187,7 +188,7 @@ namespace annie {
          * @return {void}
          */
         public lineTo(x: number, y: number): void {
-            this._command[this._command.length]=[1, "lineTo", [x, y]];
+            this._command[this._command.length] = [1, "lineTo", [x, y]];
         }
 
         /**
@@ -200,7 +201,7 @@ namespace annie {
          * @return {void}
          */
         public arcTo(x: number, y: number): void {
-            this._command[this._command.length]=[1, "arcTo", [x, y]];
+            this._command[this._command.length] = [1, "arcTo", [x, y]];
         }
 
         /**
@@ -216,7 +217,7 @@ namespace annie {
          * @return {void}
          */
         public quadraticCurveTo(cpX: number, cpY: number, x: number, y: number): void {
-            this._command[this._command.length]=[1, "quadraticCurveTo", [cpX, cpY, x, y]];
+            this._command[this._command.length] = [1, "quadraticCurveTo", [cpX, cpY, x, y]];
         }
 
         /**
@@ -234,7 +235,7 @@ namespace annie {
          * @return {void}
          */
         public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
-            this._command[this._command.length]=[1, "bezierCurveTo", [cp1X, cp1Y, cp2X, cp2Y, x, y]];
+            this._command[this._command.length] = [1, "bezierCurveTo", [cp1X, cp1Y, cp2X, cp2Y, x, y]];
         }
 
         /**
@@ -245,7 +246,7 @@ namespace annie {
          * @return {void}
          */
         public closePath(): void {
-            this._command[this._command.length]=[1, "closePath", []];
+            this._command[this._command.length] = [1, "closePath", []];
         }
 
         /**
@@ -261,11 +262,11 @@ namespace annie {
          */
         public drawRect(x: number, y: number, w: number, h: number): void {
             let c = this._command;
-            c[c.length]=[1, "moveTo", [x, y]];
-            c[c.length]=[1, "lineTo", [x + w, y]];
-            c[c.length]=[1, "lineTo", [x + w, y + h]];
-            c[c.length]=[1, "lineTo", [x, y + h]];
-            c[c.length]=[1, "closePath", []];
+            c[c.length] = [1, "moveTo", [x, y]];
+            c[c.length] = [1, "lineTo", [x + w, y]];
+            c[c.length] = [1, "lineTo", [x + w, y + h]];
+            c[c.length] = [1, "lineTo", [x, y + h]];
+            c[c.length] = [1, "closePath", []];
         }
 
         /**
@@ -281,7 +282,7 @@ namespace annie {
          * @return {void}
          */
         public drawArc(x: number, y: number, radius: number, start: number, end: number): void {
-            this._command[this._command.length]=[1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]];
+            this._command[this._command.length] = [1, "arc", [x, y, radius, start / 180 * Math.PI, end / 180 * Math.PI]];
         }
 
         /**
@@ -295,7 +296,7 @@ namespace annie {
          * @return {void}
          */
         public drawCircle(x: number, y: number, radius: number): void {
-            this._command[this._command.length]=[1, "arc", [x, y, radius, 0, 2 * Math.PI]];
+            this._command[this._command.length] = [1, "arc", [x, y, radius, 0, 2 * Math.PI]];
         }
 
         /**
@@ -318,11 +319,11 @@ namespace annie {
             let xm = x + w / 2;
             let ym = y + h / 2;
             let c = this._command;
-            c[c.length]=[1, "moveTo", [x, ym]];
-            c[c.length]=[1, "bezierCurveTo", [x, ym - oy, xm - ox, y, xm, y]];
-            c[c.length]=[1, "bezierCurveTo", [xm + ox, y, xe, ym - oy, xe, ym]];
-            c[c.length]=[1, "bezierCurveTo", [xe, ym + oy, xm + ox, ye, xm, ye]];
-            c[c.length]=[1, "bezierCurveTo", [xm - ox, ye, x, ym + oy, x, ym]];
+            c[c.length] = [1, "moveTo", [x, ym]];
+            c[c.length] = [1, "bezierCurveTo", [x, ym - oy, xm - ox, y, xm, y]];
+            c[c.length] = [1, "bezierCurveTo", [xm + ox, y, xe, ym - oy, xe, ym]];
+            c[c.length] = [1, "bezierCurveTo", [xe, ym + oy, xm + ox, ye, xm, ye]];
+            c[c.length] = [1, "bezierCurveTo", [xm - ox, ye, x, ym + oy, x, ym]];
         }
 
         /**
@@ -344,8 +345,8 @@ namespace annie {
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
-            s._isBeginPath=false;
         }
+
         /**
          * 开始绘画填充,如果想画的东西有颜色填充,一定要从此方法开始
          * @method beginFill
@@ -367,8 +368,8 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginLinearGradientFill(points: any,colors:any): void {
-            this._fill(Shape.getGradientColor( points,colors));
+        public beginLinearGradientFill(points: any, colors: any): void {
+            this._fill(Shape.getGradientColor(points, colors));
         }
 
         /**
@@ -381,8 +382,8 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginRadialGradientFill = function (points: any,colors:any):void {
-            this._fill(Shape.getGradientColor(points,colors));
+        public beginRadialGradientFill = function (points: any, colors: any): void {
+            this._fill(Shape.getGradientColor(points, colors));
         };
 
         /**
@@ -394,23 +395,18 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginBitmapFill(image: any, matrix:  Array<number>): void {
+        public beginBitmapFill(image: any, matrix: Array<number>): void {
             let s = this;
             if (matrix) {
                 s._isBitmapFill = matrix;
             }
             s._fill(Shape.getBitmapStyle(image));
         }
-        private _isBeginPath:Boolean=false;
-
         private _fill(fillStyle: any): void {
-            let s=this;
+            let s = this;
             let c = s._command;
-            c[c.length]=[0, "fillStyle", fillStyle];
-            if(!s._isBeginPath) {
-                c[c.length] = [1, "beginPath", []];
-                s._isBeginPath=true;
-            }
+            c[c.length] = [0, "fillStyle", fillStyle];
+            c[c.length] = [1, "beginPath", []];
             s._UI.UD = true;
         }
 
@@ -426,11 +422,13 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginStroke(color: string, lineWidth: number = 1, cap: number=0, join: number = 0, miter: number = 0): void {
-            this._stroke(color, lineWidth, cap,join, miter);
+        public beginStroke(color: string, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 0): void {
+            this._stroke(color, lineWidth, cap, join, miter);
         }
-        private static _caps:Array<string>=["butt","round","square"];
-        private static _joins:Array<string>=["miter","round","bevel"];
+
+        private static _caps: Array<string> = ["butt", "round", "square"];
+        private static _joins: Array<string> = ["miter", "round", "bevel"];
+
         /**
          * 画线性渐变的线条 一般给Annie2x用
          * @method beginLinearGradientStroke
@@ -444,8 +442,8 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginLinearGradientStroke(points: Array<number>,colors:any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10): void {
-            this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
+        public beginLinearGradientStroke(points: Array<number>, colors: any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10): void {
+            this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
         }
 
         /**
@@ -461,9 +459,10 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginRadialGradientStroke = function (points: Array<number>,colors:any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10) {
-            this._stroke(Shape.getGradientColor(points,colors), lineWidth,  cap,join, miter);
+        public beginRadialGradientStroke = function (points: Array<number>, colors: any, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10) {
+            this._stroke(Shape.getGradientColor(points, colors), lineWidth, cap, join, miter);
         };
+
         /**
          * 线条位图填充 一般给Annie2x用
          * @method beginBitmapStroke
@@ -477,24 +476,24 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public beginBitmapStroke(image: any, matrix: Array<number>, lineWidth: number = 1,  cap: number=0, join: number=0, miter: number = 10): void {
+        public beginBitmapStroke(image: any, matrix: Array<number>, lineWidth: number = 1, cap: number = 0, join: number = 0, miter: number = 10): void {
             let s = this;
             if (matrix) {
                 s._isBitmapStroke = matrix;
             }
-            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap,join, miter);
-        }
-        private _stroke(strokeStyle: any, width: number, cap: number, join: number, miter: number): void {
-            let c = this._command;
-            c[c.length]=[0, "lineWidth", width];
-            c[c.length]=[0, "lineCap", Shape._caps[cap]];
-            c[c.length]=[0, "lineJoin", Shape._joins[join]];
-            c[c.length]=[0, "miterLimit", miter];
-            c[c.length]=[0, "strokeStyle", strokeStyle];
-            c[c.length]=[1, "beginPath", []];
-            this._UI.UD = true;
+            s._stroke(Shape.getBitmapStyle(image), lineWidth, cap, join, miter);
         }
 
+        private _stroke(strokeStyle: any, width: number, cap: number, join: number, miter: number): void {
+            let c = this._command;
+            c[c.length] = [0, "lineWidth", width];
+            c[c.length] = [0, "lineCap", Shape._caps[cap]];
+            c[c.length] = [0, "lineJoin", Shape._joins[join]];
+            c[c.length] = [0, "miterLimit", miter];
+            c[c.length] = [0, "strokeStyle", strokeStyle];
+            c[c.length] = [1, "beginPath", []];
+            this._UI.UD = true;
+        }
         /**
          * 结束填充
          * @method endFill
@@ -507,13 +506,14 @@ namespace annie {
             let c = s._command;
             let m = s._isBitmapFill;
             if (m) {
-                c[c.length]=[2, "setTransform", m];
+                c[c.length] = [2, "setTransform", m];
             }
-            c[c.length]=([1, "fill", []]);
+            c[c.length] = ([1, "fill", []]);
             if (m) {
                 s._isBitmapFill = null;
             }
         }
+
         /**
          * 结束画线
          * @method endStroke
@@ -527,13 +527,14 @@ namespace annie {
             let m = s._isBitmapStroke;
             if (m) {
                 //如果为2则还需要特别处理
-                c[c.length]=[2, "setTransform", m];
+                c[c.length] = [2, "setTransform", m];
             }
-            c[c.length]=([1, "stroke", []]);
+            c[c.length] = ([1, "stroke", []]);
             if (m) {
                 s._isBitmapStroke = null;
             }
         }
+
         /**
          * 解析一段路径 一般给Annie2x用
          * @method decodePath
@@ -545,17 +546,18 @@ namespace annie {
         public decodePath = function (data: any): void {
             let s = this;
             let instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
-            let count=data.length;
-            for(let i=0;i<count;i++){
-                if(data[i]==0||data[i]==1){
-                    s.addDraw(instructions[data[i]], [data[i+1],data[i+2]]);
-                    i+=2;
-                }else{
-                    s.addDraw(instructions[data[i]], [data[i+1],data[i+2],data[i+3],data[i+4]]);
-                    i+=4;
+            let count = data.length;
+            for (let i = 0; i < count; i++) {
+                if (data[i] == 0 || data[i] == 1) {
+                    s.addDraw(instructions[data[i]], [data[i + 1], data[i + 2]]);
+                    i += 2;
+                } else {
+                    s.addDraw(instructions[data[i]], [data[i + 1], data[i + 2], data[i + 3], data[i + 4]]);
+                    i += 4;
                 }
             }
         };
+
         public update(isDrawUpdate: boolean = false): void {
             let s = this;
             if (!s._visible) return;
@@ -676,12 +678,12 @@ namespace annie {
                         let h = buttonRightY - leftY;
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX+10;
-                        s._bounds.y = leftY+10;
+                        s._bounds.x = leftX + 10;
+                        s._bounds.y = leftY + 10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if (!s._isUseToMask){
+                        if (!s._isUseToMask) {
                             let _canvas: any = s._texture;
                             let ctx = _canvas["getContext"]('2d');
                             _canvas.width = w;
@@ -712,16 +714,29 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-        private _drawShape(ctx: any): void {
+        private _drawShape(ctx: any,isMask:boolean=false): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;
             let data: any;
             let leftX: number = s._offsetX;
             let leftY: number = s._offsetY;
+            let isBeginPath=false;
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
-                if (data[0] > 0) {
+                if (data[0] > 0){
+                    if(data[1]=="beginPath"){
+                        if(isMask) {
+                            if (!isBeginPath) {
+                                isBeginPath = true;
+                            }else{
+                                continue;
+                            }
+                        }
+                    };
+                    if(isMask&&data[1]=="closePath"){
+                        continue;
+                    }
                     let paramsLen = data[2].length;
                     if (paramsLen == 0) {
                         ctx[data[1]]();
@@ -745,17 +760,21 @@ namespace annie {
                     ctx[data[1]] = data[2];
                 }
             }
+            if(isMask&&isBeginPath){
+                ctx.closePath();
+            }
         }
-        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
+
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
             let s = this;
-            let obj = super.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
+            let obj = super.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
             if (obj) {
-                if (!s._isUseToMask&&s.hitTestWidthPixel) {
-                    let p:any;
-                    if(isGlobalPoint) {
+                if (!s._isUseToMask && s.hitTestWidthPixel) {
+                    let p: any;
+                    if (isGlobalPoint) {
                         p = s.globalToLocal(hitPoint);
-                    }else{
-                        p= hitPoint;
+                    } else {
+                        p = hitPoint;
                     }
                     let image = s._texture;
                     if (!image || image.width == 0 || image.height == 0) {
@@ -779,6 +798,7 @@ namespace annie {
             }
             return null;
         }
+
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor
@@ -811,21 +831,23 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 渲染
          * @method render
          * @param {annie.IRender | any} renderObj
          * @return {void}
          */
-        public render(renderObj: IRender|any): void{
+        public render(renderObj: IRender | any): void {
             super.render(renderObj);
         }
-        public destroy():void {
+
+        public destroy(): void {
             //清除相应的数据引用
             let s = this;
-            s._command=null;
-            s._isBitmapStroke=null;
-            s._isBitmapFill=null;
+            s._command = null;
+            s._isBitmapStroke = null;
+            s._isBitmapFill = null;
             super.destroy();
         }
     }

@@ -1718,7 +1718,6 @@ declare namespace annie {
          * @return {void}
          */
         beginBitmapFill(image: any, matrix: Array<number>): void;
-        private _isBeginPath;
         private _fill(fillStyle);
         /**
          * 给线条着色
@@ -1804,7 +1803,7 @@ declare namespace annie {
          */
         decodePath: (data: any) => void;
         update(isDrawUpdate?: boolean): void;
-        private _drawShape(ctx);
+        private _drawShape(ctx, isMask?);
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
