@@ -1698,7 +1698,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginBitmapFill(image: any, matrix: Array<number>): void;
-        private _beginPath;
         private _fill(fillStyle);
         /**
          * 给线条着色
@@ -1777,7 +1776,7 @@ declare namespace annie {
          */
         decodePath: (data: any) => void;
         update(isDrawUpdate?: boolean): void;
-        private _draw(ctx);
+        private drawShape(ctx, isMask);
         /**
          * @property _offsetX
          * @protected
