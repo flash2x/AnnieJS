@@ -3143,6 +3143,7 @@ var annie;
             s._UI.UF = false;
         };
         Shape.prototype.drawShape = function (ctx, isMask) {
+            if (isMask === void 0) { isMask = false; }
             var s = this;
             var com = s._command;
             var cLen = com.length;
