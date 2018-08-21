@@ -677,7 +677,7 @@ namespace annie {
             s._UI.UF = false;
         }
 
-        private drawShape(ctx: any, isMask: boolean=false): void {
+        private _draw(ctx: any, isMask: boolean=false): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;

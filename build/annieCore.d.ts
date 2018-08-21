@@ -1794,7 +1794,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        private drawShape(ctx, isMask?);
+        private _draw(ctx, isMask?);
         /**
          * @property _offsetX
          * @protected

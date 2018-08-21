@@ -3142,7 +3142,7 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        Shape.prototype.drawShape = function (ctx, isMask) {
+        Shape.prototype._draw = function (ctx, isMask) {
             if (isMask === void 0) { isMask = false; }
             var s = this;
             var com = s._command;
@@ -5820,7 +5820,7 @@ var annie;
             var tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
-                target.drawShape(ctx, true);
+                target._draw(ctx, true);
             }
             else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
                 for (var i = 0; i < target.children.length; i++) {
@@ -5866,7 +5866,7 @@ var annie;
                 ctx.drawImage(texture, 0, 0);
             }
             else {
-                target.drawShape(ctx);
+                target._draw(ctx);
             }
         };
         CanvasRender.prototype.destroy = function () {

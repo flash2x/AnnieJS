@@ -56,7 +56,7 @@ namespace annie {
             let tm = target.cMatrix;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if(target._instanceType=="annie.Shape"){
-                target.drawShape(ctx,true);
+                target._draw(ctx,true);
             }else if(target._instanceType=="annie.Sprite"||target._instanceType=="annie.MovieClip"){
                 for(let i=0;i<target.children.length;i++){
                     s.drawMask(target.children[i],ctx);
@@ -101,7 +101,7 @@ namespace annie {
             if (texture) {
                 ctx.drawImage(texture, 0, 0);
             } else {
-                target.drawShape(ctx);
+                target._draw(ctx);
             }
         }
 
