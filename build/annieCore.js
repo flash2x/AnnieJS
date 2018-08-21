@@ -5866,7 +5866,7 @@ var annie;
                 ctx.drawImage(texture, 0, 0);
             }
             else {
-                target._draw(ctx);
+                target.drawShape(ctx);
             }
         };
         CanvasRender.prototype.destroy = function () {
