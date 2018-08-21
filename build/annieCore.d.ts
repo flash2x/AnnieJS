@@ -1776,7 +1776,7 @@ declare namespace annie {
          */
         decodePath: (data: any) => void;
         update(isDrawUpdate?: boolean): void;
-        private drawShape(ctx, isMask?);
+        private _draw(ctx, isMask?);
         /**
          * @property _offsetX
          * @protected
