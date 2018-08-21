@@ -691,7 +691,7 @@ namespace annie {
                             ctx.clearRect(0, 0, w, h);
                             ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                             ////////////////////
-                            s._drawShape(ctx);
+                            s._draw(ctx);
                             ///////////////////////////
                             //滤镜
                             let cf = s.cFilters;
@@ -714,7 +714,7 @@ namespace annie {
             s._UI.UA = false;
             s._UI.UF = false;
         }
-        private _drawShape(ctx: any,isMask:boolean=false): void {
+        private _draw(ctx: any,isMask:boolean=false): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;

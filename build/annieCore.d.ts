@@ -1577,7 +1577,7 @@ declare namespace annie {
          */
         lineTo(x: number, y: number): void;
         /**
-         * 从上一点画弧到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * 从上一点画弧到某一点,如果没有设置上一点，则上一点默认为(0,0)
          * @method arcTo
          * @param {number} x
          * @param {number} y
@@ -1803,7 +1803,7 @@ declare namespace annie {
          */
         decodePath: (data: any) => void;
         update(isDrawUpdate?: boolean): void;
-        private _drawShape(ctx, isMask?);
+        private _draw(ctx, isMask?);
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.

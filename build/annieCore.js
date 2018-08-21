@@ -2921,7 +2921,7 @@ var annie;
             this._command[this._command.length] = [1, "lineTo", [x, y]];
         };
         /**
-         * 从上一点画弧到某一点,如果没有设置上一点，则上一占默认为(0,0)
+         * 从上一点画弧到某一点,如果没有设置上一点，则上一点默认为(0,0)
          * @method arcTo
          * @param {number} x
          * @param {number} y
@@ -3363,7 +3363,7 @@ var annie;
                             ctx.clearRect(0, 0, w, h);
                             ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                             ////////////////////
-                            s._drawShape(ctx);
+                            s._draw(ctx);
                             ///////////////////////////
                             //滤镜
                             var cf = s.cFilters;
@@ -3384,7 +3384,7 @@ var annie;
             s._UI.UA = false;
             s._UI.UF = false;
         };
-        Shape.prototype._drawShape = function (ctx, isMask) {
+        Shape.prototype._draw = function (ctx, isMask) {
             if (isMask === void 0) { isMask = false; }
             var s = this;
             var com = s._command;
@@ -7761,7 +7761,7 @@ var annie;
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
-                target._drawShape(s._ctx, true);
+                target._draw(s._ctx, true);
             }
             else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
                 for (var i = 0; i < target.children.length; i++) {
