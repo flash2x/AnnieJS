@@ -164,12 +164,14 @@ namespace annie {
             _loadRes();
         }
     }
+
     // 加载资源过程中调用的回调方法。
     function _onRESProgress(e: Event): void {
         if (_progressCallback) {
             _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
         }
     }
+
     //解析加载后的json资源数据
     function _parseContent(loadContent: any, rootObj: any = null) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
@@ -220,7 +222,7 @@ namespace annie {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m]==undefined) {
+                                                if (frameCon[j][m] == undefined) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -254,6 +256,7 @@ namespace annie {
             }
         }
     }
+
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
@@ -277,6 +280,7 @@ namespace annie {
         }
         _checkComplete();
     }
+
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _loadedLoadRes++;
@@ -295,9 +299,7 @@ namespace annie {
                 //全部资源加载完成
                 _isLoading = false;
                 //_progressCallback(100);
-                setTimeout(function () {
-                    _completeCallback(info);
-                }, 100);
+                _completeCallback(info);
             }
             else {
                 _completeCallback(info);
@@ -305,6 +307,7 @@ namespace annie {
             }
         }
     }
+
     //加载场景资源
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
@@ -375,6 +378,7 @@ namespace annie {
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
     }
+
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
     export function d(target: any, info: any, parentFrame: number = 1): void {
         if (target._a2x_res_obj == info) {
@@ -436,13 +440,13 @@ namespace annie {
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
-                                //console.log("部分滤镜效果未实现");
+                            //console.log("部分滤镜效果未实现");
                             //其他还示实现
                         }
                     }
-                    if(filters.length>0){
+                    if (filters.length > 0) {
                         target.filters = filters;
-                    }else{
+                    } else {
                         target.filters = null;
                     }
                 } else {
@@ -494,6 +498,7 @@ namespace annie {
         }
         return textObj;
     }
+
     //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
@@ -645,6 +650,7 @@ namespace annie {
         }
         jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
     }
+
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 获取url地址中的get参数
@@ -729,7 +735,7 @@ namespace annie {
                 } else {
                     for (let index in resClass.l) {
                         for (let n = 0; n < resClass.l[index].length; n++) {
-                            label[resClass.l[index][n]] = parseInt(index)+1;
+                            label[resClass.l[index][n]] = parseInt(index) + 1;
                         }
                     }
                 }
@@ -792,13 +798,13 @@ namespace annie {
                     case 5:
                         //sound
                         obj = s(sceneName, children[i]);
-                        obj.name=children[i];
+                        obj.name = children[i];
                         target.addSound(obj);
                 }
                 if (!isMc) {
                     let index: number = i + 1;
                     if (objType == 5) {
-                        obj._loop=obj._repeate = resClass.s[0][index];
+                        obj._loop = obj._repeate = resClass.s[0][index];
                     } else {
                         d(obj, resClass.f[0].c[index]);
                         // 检查是否有遮罩
@@ -808,7 +814,7 @@ namespace annie {
                         } else {
                             if (maskObj && i <= maskTillId) {
                                 obj.mask = maskObj;
-                                if (i == maskTillId){
+                                if (i == maskTillId) {
                                     maskObj = null;
                                 }
                             }
@@ -820,7 +826,7 @@ namespace annie {
                     allChildren[allChildren.length] = obj;
                     //如果是声音，还要把i这个顺序保存下来
                     if (objType == 5) {
-                        obj.isPlaying=false;
+                        obj.isPlaying = false;
                         if (!target._a2x_sounds) {
                             target._a2x_sounds = {};
                         }
@@ -828,7 +834,7 @@ namespace annie {
                     }
                 }
             }
-            if (isMc){
+            if (isMc) {
                 //将mc里面的实例按照时间轴上的图层排序
                 let ol = resClass.ol;
                 if (ol) {
@@ -839,5 +845,6 @@ namespace annie {
             }
         }
     }
+
     console.log("https://github.com/flash2x/AnnieJS");
 }
