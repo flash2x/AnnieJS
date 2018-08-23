@@ -210,7 +210,6 @@ namespace annieUI {
                 s.isStop = false;
             }
         }
-
         public destroy(): void {
             let s = this;
             s._items = null;

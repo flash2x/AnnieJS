@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+
     /**
      * 声音类
      * @class annie.Sound
@@ -10,6 +11,23 @@ namespace annie {
      * @since 1.0.0
      */
     export class Sound extends Media {
+        //Event
+        /**
+         * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @event annie.Event.ON_PLAY_UPDATE
+         * @since 1.1.0
+         */
+        /**
+         * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @event annie.Event.ON_PLAY_END
+         * @since 1.1.0
+         */
+        /**
+         * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @event annie.Event.ON_PLAY_START
+         * @since 1.1.0
+         */
+        //
         /**
          * 构造函数
          * @method  Sound

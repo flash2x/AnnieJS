@@ -12,6 +12,26 @@ declare namespace annieUI {
      */
     class ScrollPage extends Sprite {
         /**
+         * annie.ScrollPage组件滑动到开始位置事件
+         * @event annie.Event.ON_SCROLL_TO_HEAD
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件停止滑动事件
+         * @event annie.Event.ON_SCROLL_STOP
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件开始滑动事件
+         * @event annie.Event.ON_SCROLL_START
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件滑动到结束位置事件
+         * @event annie.Event.ON_SCROLL_TO_END
+         * @since 1.1.0
+         */
+        /**
          * 横向还是纵向 默认为纵向
          * @property isVertical
          * @type {boolean}
@@ -175,6 +195,11 @@ declare namespace annieUI {
      */
     class FacePhoto extends Sprite {
         /**
+         * 图片加载完成事件
+         * @event COMPLETE
+         * @since 1.0.0
+         */
+        /**
          * 构造函数
          * @method  FacePhoto
          * @since 1.0.0
@@ -223,6 +248,16 @@ declare namespace annieUI {
      * @since 1.0.0
      */
     class SlidePage extends Sprite {
+        /**
+         * annie.Slide 组件开始滑动事件
+         * @event annie.Event.ON_SLIDE_START
+         * @since 1.1.0
+         */
+        /**
+         * annie.Slide 组件结束滑动事件
+         * @event annie.Event.ON_SLIDE_END
+         * @since 1.1.0
+         */
         /**
          * 页面个数
          * @property listLen
@@ -385,14 +420,24 @@ declare namespace annieUI {
  */
 declare namespace annieUI {
     import Sprite = annie.Sprite;
-    /**
-     * 电子杂志组件类
-     * @class annieUI.FlipBook
-     * @public
-     * @extends annie.Sprite
-     * @since 1.0.3
-     */
     class FlipBook extends Sprite {
+        /**
+         * annie.FlipBook组件翻页开始事件
+         * @event annie.Event.ON_FLIP_START
+         * @since 1.1.0
+         */
+        /**
+         * annie.FlipBook组件翻页结束事件
+         * @event annie.Event.ON_FLIP_STOP
+         * @since 1.1.0
+         */
+        /**
+         * 电子杂志组件类
+         * @class annieUI.FlipBook
+         * @public
+         * @extends annie.Sprite
+         * @since 1.0.3
+         */
         /**
          * 总页数
          * @property totalPage
@@ -726,6 +771,12 @@ declare namespace annieUI {
      * @since 1.1.1
      */
     class ScratchCard extends DrawingBoard {
+        /**
+         * annie.ScratchCard 刮刮卡事件，刮了多少，一个百分比
+         * @event annie.Event.ON_DRAW_PERCENT
+         * @since 1.0.9
+         *
+         */
         /**
          * 构造函数
          * 请监听 "onDrawTime"事件来判断刮完多少百分比了。

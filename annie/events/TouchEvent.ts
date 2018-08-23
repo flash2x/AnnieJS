@@ -10,7 +10,7 @@ namespace annie {
     export class TouchEvent extends Event {
         /**
          * annie.Stage 的多点触碰事件。这个事件只能在annie.Stage对象上侦听
-         * @event ON_MULTI_TOUCH
+         * @property ON_MULTI_TOUCH
          * @static
          * @public
          * @since 1.0.3

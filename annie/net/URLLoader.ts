@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
@@ -23,6 +24,33 @@ namespace annie {
      *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
      */
     export class URLLoader extends EventDispatcher {
+        //Event
+        /**
+         * 完成事件
+         * @event annie.Event.COMPLETE
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader加载过程事件
+         * @event annie.Event.PROGRESS
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader出错事件
+         * @event annie.Event.ERROR
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader中断事件
+         * @event annie.Event.ABORT
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader开始事件
+         * @event annie.Event.START
+         * @since 1.0.0
+         */
+        //
         /**
          * 构造函数
          * @method URLLoader
@@ -230,7 +258,7 @@ namespace annie {
         }
 
         /**
-         * 后台返回来的数据类弄
+         * 后台返回来的数据类型
          * @property responseType
          * @type {string}
          * @default null
@@ -256,7 +284,7 @@ namespace annie {
          */
         public method: string = "get";
         /**
-         * 需要像后台传送的数据对象
+         * 需要向后台传送的数据对象
          * @property data
          * @public
          * @since 1.0.0

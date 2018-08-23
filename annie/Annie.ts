@@ -170,7 +170,7 @@ namespace annie {
     let _dSprite: any = null;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，测需要要截图之前手动执行更新方法一次。如:this.update(true);
+     * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
      * @method annie.toDisplayDataURL
      * @static
      * @param {annie.DisplayObject} obj 显示对象
@@ -189,7 +189,7 @@ namespace annie {
      *               quality: 90//图片质量值1-100,png格式不需要设置quality
      *       }, '#CDDBEB');
      *
-     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
+     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
     export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {

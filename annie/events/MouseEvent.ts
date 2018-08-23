@@ -12,7 +12,7 @@ namespace annie {
     export class MouseEvent extends Event {
         /**
          * annie.DisplayObject鼠标或者手指按下事件
-         * @event MOUSE_DOWN
+         * @property MOUSE_DOWN
          * @static
          * @public
          * @since 1.0.0
@@ -21,7 +21,7 @@ namespace annie {
         public static MOUSE_DOWN:string = "onMouseDown";
         /**
          * annie.DisplayObject鼠标或者手指抬起事件
-         * @event MOUSE_UP
+         * @property MOUSE_UP
          * @static
          * @public
          * @since 1.0.0
@@ -30,7 +30,7 @@ namespace annie {
         public static MOUSE_UP:string = "onMouseUp";
         /**
          * annie.DisplayObject鼠标或者手指单击
-         * @event CLICK
+         * @property CLICK
          * @static
          * @public
          * @since 1.0.0
@@ -39,7 +39,7 @@ namespace annie {
         public static CLICK:string = "onMouseClick";
         /**
          * annie.DisplayObject鼠标或者手指移动事件
-         * @event MOUSE_MOVE
+         * @property MOUSE_MOVE
          * @static
          * @public
          * @since 1.0.0
@@ -48,7 +48,7 @@ namespace annie {
         public static MOUSE_MOVE:string = "onMouseMove";
         /**
          * annie.DisplayObject鼠标或者手指移入到显示对象上里触发的事件
-         * @event MOUSE_OVER
+         * @property MOUSE_OVER
          * @static
          * @public
          * @since 1.0.0
@@ -57,7 +57,7 @@ namespace annie {
         public static MOUSE_OVER:string = "onMouseOver";
         /**
          * annie.DisplayObject鼠标或者手指移出显示对象边界触发的事件
-         * @event MOUSE_OUT
+         * @property MOUSE_OUT
          * @static
          * @public
          * @since 1.0.0

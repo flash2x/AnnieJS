@@ -10,6 +10,13 @@ namespace annieUI {
      * @since 1.1.1
      */
     export class ScratchCard extends DrawingBoard {
+        //Events
+        /**
+         * annie.ScratchCard 刮刮卡事件，刮了多少，一个百分比
+         * @event annie.Event.ON_DRAW_PERCENT
+         * @since 1.0.9
+         *
+         */
         /**
          * 构造函数
          * 请监听 "onDrawTime"事件来判断刮完多少百分比了。

@@ -4,6 +4,7 @@
 namespace annieUI {
     import Sprite = annie.Sprite;
     import Shape = annie.Shape;
+
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
      * @class annieUI.ScrollPage
@@ -12,6 +13,28 @@ namespace annieUI {
      * @since 1.0.0
      */
     export class ScrollPage extends Sprite {
+        //Event
+        /**
+         * annie.ScrollPage组件滑动到开始位置事件
+         * @event annie.Event.ON_SCROLL_TO_HEAD
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件停止滑动事件
+         * @event annie.Event.ON_SCROLL_STOP
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件开始滑动事件
+         * @event annie.Event.ON_SCROLL_START
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件滑动到结束位置事件
+         * @event annie.Event.ON_SCROLL_TO_END
+         * @since 1.1.0
+         */
+//
         /**
          * 横向还是纵向 默认为纵向
          * @property isVertical

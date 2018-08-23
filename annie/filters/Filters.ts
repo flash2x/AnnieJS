@@ -52,8 +52,8 @@ namespace annie{
          */
         public blur:number=2;
         /**
-         * 滤镜类型 只读
-         * @property color
+         * 滤镜类型只读
+         * @property type
          * @public
          * @readonly
          * @since 1.0.0

@@ -4,15 +4,28 @@
 namespace annie {
     declare let VConsole: any;
 
-    /**
-     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
-     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
-     * @class annie.Stage
-     * @extends annie.Sprite
-     * @public
-     * @since 1.0.0
-     */
     export class Stage extends Sprite {
+        /**
+         * annie.Stage舞台初始化完成后会触发的事件
+         * @event annie.Event.ON_INIT_STAGE
+         * @since 1.0.0
+         */
+        /**
+         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+         * annie.Stage舞台尺寸发生变化时触发
+         * @event annie.Event.RESIZE
+         * @since 1.0.0
+         */
+        /**
+         * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher中监听
+         * @event annie.Event.ON_RUN_CHANGED
+         * @since 1.0.0
+         */
+        /**
+         * annie.Stage 的多点触碰事件。这个事件只能在annie.Stage对象上侦听
+         * @event annie.TouchEvent.ON_MULTI_TOUCH
+         * @type {string}
+         */
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
@@ -26,7 +39,7 @@ namespace annie {
         public iosTouchendPreventDefault: boolean = true;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
+         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
          * @property isPreventDefaultEvent
          * @since 1.0.9
          * @default true
@@ -139,7 +152,7 @@ namespace annie {
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
-         * 端默认不开启
+         * 默认不开启
          * @property autoSteering
          * @public
          * @since 1.0.0
@@ -150,6 +163,7 @@ namespace annie {
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
+         * 默认不开启
          * @property autoResize
          * @public
          * @since 1.0.0
@@ -269,7 +283,6 @@ namespace annie {
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
          * @param {string} scaleMode 缩放模式 StageScaleMode
-         * @param {string} bgColor 背景颜色-1为透明
          * @param {number} renderType 渲染模式0:canvas 1:webGl 2:dom
          * @public
          * @since 1.0.0
@@ -440,7 +453,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
-         * @return {{w: number, h: number}}
+         * @return {Object}
          */
         public getRootDivWH(div: HTMLDivElement) {
             let sw = div.style.width;

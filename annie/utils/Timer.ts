@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+
     /**
      * 定时器类
      * @class annie.Timer
@@ -9,6 +10,18 @@ namespace annie {
      * @since 1.0.9
      */
     export class Timer extends annie.EventDispatcher{
+        //Evetns
+        /**
+         * annie.Timer定时器触发事件
+         * @event annie.Event.TIMER
+         * @since 1.0.9
+         */
+        /**
+         * annie.Timer定时器完成事件
+         * @event annie.Event.TIMER_COMPLETE
+         * @since 1.0.9
+         */
+//
         /**
          * 构造函数，初始化
          * @method Timer
@@ -132,7 +145,7 @@ namespace annie {
         private _running:boolean=false;
 
         /**
-         * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
+         * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时缠绕着你
          * @method kill
          * @public
          * @since 1.0.9

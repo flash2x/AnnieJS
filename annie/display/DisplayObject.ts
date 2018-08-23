@@ -12,6 +12,55 @@ namespace annie {
      * @extends annie.EventDispatcher
      */
     export abstract class DisplayObject extends EventDispatcher {
+        // events:
+        /**
+         * annie.DisplayObject显示对象加入到舞台事件
+         * @event ADD_TO_STAGE
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject显示对象从舞台移出事件
+         * @event REMOVE_TO_STAGE
+         * @since 1.0.0
+         */
+
+        /**
+         * annie.DisplayObject显示对象 循环帧事件
+         * @event ENTER_FRAME
+         * @since 1.0.0
+         */
+        //MouseEvent
+        /**
+         * annie.DisplayObject鼠标或者手指按下事件
+         * @event MOUSE_DOWN
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指抬起事件
+         * @event MOUSE_UP
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指单击
+         * @event CLICK
+         * @type {string}
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指移动事件
+         * @event MOUSE_MOVE
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指移入到显示对象上里触发的事件
+         * @event MOUSE_OVER
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指移出显示对象边界触发的事件
+         * @event MOUSE_OUT
+         * @since 1.0.0
+         */
+//
         /**
          * @method DisplayObject
          * @since 1.0.0
@@ -68,7 +117,7 @@ namespace annie {
         //显示对象上对显示列表上的最终的所有滤镜组
         protected cFilters: any = [];
         /**
-         * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
+         * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
          * @since 1.0.0
          * @public
@@ -396,7 +445,7 @@ namespace annie {
          * 启动鼠标或者触摸拖动
          * @method startDrag
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
-         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @param {annie.Rectangle} bounds 相对于显示对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
          * @public
          * @return {void}
@@ -465,7 +514,7 @@ namespace annie {
         }
 
         /**
-         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
+         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽象方法
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -598,7 +647,7 @@ namespace annie {
 
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
-         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
+         * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
          * @property  width
          * @public
          * @since 1.0.3
@@ -619,7 +668,7 @@ namespace annie {
 
         /**
          * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
-         * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
+         * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
          * @property  height
          * @public
          * @since 1.0.3
@@ -829,5 +878,6 @@ namespace annie {
                 s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         }
+
     }
 }

@@ -104,7 +104,7 @@ var annie;
          * @method addEventListener
          * @public
          * @since 1.0.0
-         * @param {string} type 侦听类形
+         * @param {string} type 侦听类型
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {void}
@@ -151,18 +151,18 @@ var annie;
          * @method dispatchEvent
          * @public
          * @since 1.0.0
-         * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
+         * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则自动生成一个annie.Event对象,事件类型就是传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
-         *          yourEvent=new annie.Event("yourCustomerEvent");
-         *       yourEvent.data='false2x';
-         *       mySprite.addEventListener("yourCustomerEvent",function(e){
+         *      yourEvent=new annie.Event("yourCustomerEvent");
+         *      yourEvent.data={a:1,b:2,c:"hello",d:{aa:1,bb:2}};
+         *      mySprite.addEventListener("yourCustomerEvent",function(e){
          *          console.log(e.data);
-         *        })
-         *       mySprite.dispatchEvent(yourEvent);
+         *      })
+         *      mySprite.dispatchEvent(yourEvent);
          */
         EventDispatcher.prototype.dispatchEvent = function (event, data, useCapture) {
             if (data === void 0) { data = null; }
@@ -206,11 +206,11 @@ var annie;
             }
         };
         /**
-         * 是否有添加过此类形的侦听
+         * 是否有添加过此类型的侦听
          * @method hasEventListener
          * @public
          * @since 1.0.0
-         * @param {string} type 侦听类形
+         * @param {string} type 侦听类型
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {boolean} 如果有则返回true
          */
@@ -235,7 +235,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} type 要移除的侦听类型
-         * @param {Function} listener 及侦听时绑定的回调方法
+         * @param {Function} listener 侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {void}
          */
@@ -376,7 +376,7 @@ var annie;
             s.data = null;
         };
         /**
-         * 重围事件到初始状态方便重复利用
+         * 重置事件到初始状态方便重复利用
          * @method reset
          * @param {string} type
          * @param target
@@ -392,9 +392,18 @@ var annie;
             s.type = type;
         };
         /**
+         * annie.Stage舞台初始化完成后会触发的事件
+         * @property ON_INIT_STAGE
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        Event.ON_INIT_STAGE = "onInitStage";
+        /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * annie.Stage舞台尺寸发生变化时触发
-         * @event RESIZE
+         * @property RESIZE
          * @type {string}
          * @static
          * @public
@@ -403,7 +412,7 @@ var annie;
         Event.RESIZE = "onResize";
         /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher中监听
-         * @event ON_RUN_CHANGED
+         * @property ON_RUN_CHANGED
          * @type {string}
          * @static
          * @public
@@ -412,7 +421,7 @@ var annie;
         Event.ON_RUN_CHANGED = "onRunChanged";
         /**
          * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @event ON_PLAY_UPDATE
+         * @property ON_PLAY_UPDATE
          * @static
          * @since 1.1.0
          * @type {string}
@@ -420,7 +429,7 @@ var annie;
         Event.ON_PLAY_UPDATE = "onPlayUpdate";
         /**
          * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @event ON_PLAY_END
+         * @property ON_PLAY_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -428,7 +437,7 @@ var annie;
         Event.ON_PLAY_END = "onPlayEnd";
         /**
          * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @event ON_PLAY_START
+         * @property ON_PLAY_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -436,7 +445,7 @@ var annie;
         Event.ON_PLAY_START = "onPlayStart";
         /**
          * annie.FlipBook组件翻页开始事件
-         * @event ON_FLIP_START
+         * @property ON_FLIP_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -444,7 +453,7 @@ var annie;
         Event.ON_FLIP_START = "onFlipStart";
         /**
          * annie.FlipBook组件翻页结束事件
-         * @event ON_FLIP_STOP
+         * @property ON_FLIP_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -452,7 +461,7 @@ var annie;
         Event.ON_FLIP_STOP = "onFlipStop";
         /**
          * annie.ScrollPage组件滑动到开始位置事件
-         * @event ON_SCROLL_TO_HEAD
+         * @property ON_SCROLL_TO_HEAD
          * @static
          * @since 1.1.0
          * @type {string}
@@ -460,7 +469,7 @@ var annie;
         Event.ON_SCROLL_TO_HEAD = "onScrollToHead";
         /**
          * annie.ScrollPage组件停止滑动事件
-         * @event ON_SCROLL_STOP
+         * @property ON_SCROLL_STOP
          * @static
          * @since 1.1.0
          * @type {string}
@@ -468,7 +477,7 @@ var annie;
         Event.ON_SCROLL_STOP = "onScrollStop";
         /**
          * annie.ScrollPage组件开始滑动事件
-         * @event ON_SCROLL_START
+         * @property ON_SCROLL_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -476,7 +485,7 @@ var annie;
         Event.ON_SCROLL_START = "onScrollStart";
         /**
          * annie.ScrollPage组件滑动到结束位置事件
-         * @event ON_SCROLL_TO_END
+         * @property ON_SCROLL_TO_END
          * @static
          * @since 1.1.0
          * @type {string}
@@ -484,7 +493,7 @@ var annie;
         Event.ON_SCROLL_TO_END = "onScrollToEnd";
         /**
          * annie.Slide 组件开始滑动事件
-         * @event ON_SLIDE_START
+         * @property ON_SLIDE_START
          * @static
          * @since 1.1.0
          * @type {string}
@@ -492,24 +501,15 @@ var annie;
         Event.ON_SLIDE_START = "onSlideStart";
         /**
          * annie.Slide 组件结束滑动事件
-         * @event ON_SLIDE_END
+         * @property ON_SLIDE_END
          * @static
          * @since 1.1.0
          * @type {string}
          */
         Event.ON_SLIDE_END = "onSlideEnd";
         /**
-         * annie.Stage舞台初始化完成后会触发的事件
-         * @event ON_INIT_STAGE
-         * @type {string}
-         * @static
-         * @public
-         * @since 1.0.0
-         */
-        Event.ON_INIT_STAGE = "onInitStage";
-        /**
          * annie.DisplayObject显示对象加入到舞台事件
-         * @event ADD_TO_STAGE
+         * @property ADD_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -518,7 +518,7 @@ var annie;
         Event.ADD_TO_STAGE = "onAddToStage";
         /**
          * annie.DisplayObject显示对象从舞台移出事件
-         * @event REMOVE_TO_STAGE
+         * @property REMOVE_TO_STAGE
          * @type {string}
          * @static
          * @public
@@ -527,7 +527,7 @@ var annie;
         Event.REMOVE_TO_STAGE = "onRemoveToStage";
         /**
          * annie.DisplayObject显示对象 循环帧事件
-         * @event ENTER_FRAME
+         * @property ENTER_FRAME
          * @type {string}
          * @static
          * @public
@@ -536,7 +536,7 @@ var annie;
         Event.ENTER_FRAME = "onEnterFrame";
         /**
          * annie.MovieClip 播放完成事件
-         * @event END_FRAME
+         * @property END_FRAME
          * @type {string}
          * @static
          * @public
@@ -545,7 +545,7 @@ var annie;
         Event.END_FRAME = "onEndFrame";
         /**
          * annie.MovieClip 帧标签事件
-         * @event CALL_FRAME
+         * @property CALL_FRAME
          * @type {string}
          * @static
          * @public
@@ -554,7 +554,7 @@ var annie;
         Event.CALL_FRAME = "onCallFrame";
         /**
          * 完成事件
-         * @event COMPLETE
+         * @property COMPLETE
          * @type {string}
          * @static
          * @public
@@ -563,7 +563,7 @@ var annie;
         Event.COMPLETE = "onComplete";
         /**
          * annie.URLLoader加载过程事件
-         * @event PROGRESS
+         * @property PROGRESS
          * @type {string}
          * @static
          * @public
@@ -572,7 +572,7 @@ var annie;
         Event.PROGRESS = "onProgress";
         /**
          * annie.URLLoader出错事件
-         * @event ERROR
+         * @property ERROR
          * @type {string}
          * @static
          * @public
@@ -581,7 +581,7 @@ var annie;
         Event.ERROR = "onError";
         /**
          * annie.URLLoader中断事件
-         * @event ABORT
+         * @property ABORT
          * @type {string}
          * @static
          * @public
@@ -590,7 +590,7 @@ var annie;
         Event.ABORT = "onAbort";
         /**
          * annie.URLLoader开始事件
-         * @event START
+         * @property START
          * @type {string}
          * @static
          * @public
@@ -599,7 +599,7 @@ var annie;
         Event.START = "onStart";
         /**
          * annie.Timer定时器触发事件
-         * @event TIMER
+         * @property TIMER
          * @static
          * @since 1.0.9
          * @public
@@ -608,13 +608,22 @@ var annie;
         Event.TIMER = "onTimer";
         /**
          * annie.Timer定时器完成事件
-         * @event TIMER_COMPLETE
+         * @property TIMER_COMPLETE
          * @since 1.0.9
          * @static
          * @public
          * @type {string}
          */
         Event.TIMER_COMPLETE = "onTimerComplete";
+        /**
+         * annie.ScratchCard 刮刮卡事件，刮了多少，一个百分比
+         * @property ON_DRAW_PERCENT
+         * @since 1.0.9
+         * @static
+         * @public
+         * @type {string}
+         */
+        Event.ON_DRAW_PERCENT = "onDrawTime";
         return Event;
     }(annie.AObject));
     annie.Event = Event;
@@ -726,7 +735,7 @@ var annie;
         };
         /**
          * annie.DisplayObject鼠标或者手指按下事件
-         * @event MOUSE_DOWN
+         * @property MOUSE_DOWN
          * @static
          * @public
          * @since 1.0.0
@@ -735,7 +744,7 @@ var annie;
         MouseEvent.MOUSE_DOWN = "onMouseDown";
         /**
          * annie.DisplayObject鼠标或者手指抬起事件
-         * @event MOUSE_UP
+         * @property MOUSE_UP
          * @static
          * @public
          * @since 1.0.0
@@ -744,7 +753,7 @@ var annie;
         MouseEvent.MOUSE_UP = "onMouseUp";
         /**
          * annie.DisplayObject鼠标或者手指单击
-         * @event CLICK
+         * @property CLICK
          * @static
          * @public
          * @since 1.0.0
@@ -753,7 +762,7 @@ var annie;
         MouseEvent.CLICK = "onMouseClick";
         /**
          * annie.DisplayObject鼠标或者手指移动事件
-         * @event MOUSE_MOVE
+         * @property MOUSE_MOVE
          * @static
          * @public
          * @since 1.0.0
@@ -762,7 +771,7 @@ var annie;
         MouseEvent.MOUSE_MOVE = "onMouseMove";
         /**
          * annie.DisplayObject鼠标或者手指移入到显示对象上里触发的事件
-         * @event MOUSE_OVER
+         * @property MOUSE_OVER
          * @static
          * @public
          * @since 1.0.0
@@ -771,7 +780,7 @@ var annie;
         MouseEvent.MOUSE_OVER = "onMouseOver";
         /**
          * annie.DisplayObject鼠标或者手指移出显示对象边界触发的事件
-         * @event MOUSE_OUT
+         * @property MOUSE_OUT
          * @static
          * @public
          * @since 1.0.0
@@ -855,7 +864,7 @@ var annie;
         };
         /**
          * annie.Stage 的多点触碰事件。这个事件只能在annie.Stage对象上侦听
-         * @event ON_MULTI_TOUCH
+         * @property ON_MULTI_TOUCH
          * @static
          * @public
          * @since 1.0.3
@@ -1544,6 +1553,54 @@ var annie;
      */
     var DisplayObject = (function (_super) {
         __extends(DisplayObject, _super);
+        // events:
+        /**
+         * annie.DisplayObject显示对象加入到舞台事件
+         * @event ADD_TO_STAGE
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject显示对象从舞台移出事件
+         * @event REMOVE_TO_STAGE
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject显示对象 循环帧事件
+         * @event ENTER_FRAME
+         * @since 1.0.0
+         */
+        //MouseEvent
+        /**
+         * annie.DisplayObject鼠标或者手指按下事件
+         * @event MOUSE_DOWN
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指抬起事件
+         * @event MOUSE_UP
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指单击
+         * @event CLICK
+         * @type {string}
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指移动事件
+         * @event MOUSE_MOVE
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指移入到显示对象上里触发的事件
+         * @event MOUSE_OVER
+         * @since 1.0.0
+         */
+        /**
+         * annie.DisplayObject鼠标或者手指移出显示对象边界触发的事件
+         * @event MOUSE_OUT
+         * @since 1.0.0
+         */
+        //
         /**
          * @method DisplayObject
          * @since 1.0.0
@@ -1594,7 +1651,7 @@ var annie;
             //显示对象上对显示列表上的最终的所有滤镜组
             this.cFilters = [];
             /**
-             * 每一个显示对象都可以给他启一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
+             * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
              * @property name
              * @since 1.0.0
              * @public
@@ -1953,7 +2010,7 @@ var annie;
          * 启动鼠标或者触摸拖动
          * @method startDrag
          * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
-         * @param {annie.Rectangle} bounds 相对于显圣对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @param {annie.Rectangle} bounds 相对于显示对象父级的坐标的值，用于指定 Sprite 约束矩形
          * @since 1.1.2
          * @public
          * @return {void}
@@ -2024,7 +2081,7 @@ var annie;
             return null;
         };
         /**
-         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽像方法
+         * 获取对象的自身的没有任何形变的原始姿态下的原点坐标及宽高,抽象方法
          * @method getBounds
          * @public
          * @since 1.0.0
@@ -2158,7 +2215,7 @@ var annie;
         Object.defineProperty(DisplayObject.prototype, "width", {
             /**
              * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
-             * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
+             * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
              * @property  width
              * @public
              * @since 1.0.3
@@ -2181,7 +2238,7 @@ var annie;
         Object.defineProperty(DisplayObject.prototype, "height", {
             /**
              * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
-             * 如果你要同时获取款高，建议使用getWH()方法获取宽和高
+             * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
              * @property  height
              * @public
              * @since 1.0.3
@@ -2403,7 +2460,7 @@ var annie;
          * @since 1.0.0
          * @public
          * @param {Image|Video|other} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
-         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置些值则全部显示Image的内容，小程序或者小游戏里没有这个参数
+         * @param {annie.Rectangle} rect 设置显示Image的区域,不设置值则全部显示Image的内容，小程序或者小游戏里没有这个参数
          * @example
          *      //html5
          *      var imgEle=new Image();
@@ -2453,7 +2510,7 @@ var annie;
         Object.defineProperty(Bitmap.prototype, "rect", {
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 有时候一张贴图图，我们只需要显示他的部分。其他不显示,对你可能猜到了
+             * 有时候一张贴图，我们只需要显示他的部分。其他不显示,对你可能猜到了
              * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
              * @property rect
              * @public
@@ -4345,6 +4402,23 @@ var annie;
      */
     var Sound = (function (_super) {
         __extends(Sound, _super);
+        //Event
+        /**
+         * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @event annie.Event.ON_PLAY_UPDATE
+         * @since 1.1.0
+         */
+        /**
+         * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @event annie.Event.ON_PLAY_END
+         * @since 1.1.0
+         */
+        /**
+         * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
+         * @event annie.Event.ON_PLAY_START
+         * @since 1.1.0
+         */
+        //
         /**
          * 构造函数
          * @method  Sound
@@ -4554,6 +4628,24 @@ var annie;
             s._instanceType = "annie.MovieClip";
         }
         Object.defineProperty(MovieClip.prototype, "currentFrame", {
+            //Events
+            /**
+             * annie.MovieClip 播放完成事件
+             * @event annie.Event.END_FRAME
+             * @type {string}
+             * @static
+             * @public
+             * @since 1.0.0
+             */
+            /**
+             * annie.MovieClip 帧标签事件
+             * @event annie.Event.CALL_FRAME
+             * @type {string}
+             * @static
+             * @public
+             * @since 1.0.0
+             */
+            //
             /**
              * mc的当前帧
              * @property currentFrame
@@ -4630,7 +4722,7 @@ var annie;
             s._isPlaying = false;
         };
         /**
-         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
+         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括Fla文件中当前帧的代码.
          * @method addFrameScript
          * @public
          * @since 1.0.0
@@ -5974,14 +6066,6 @@ var annie;
  */
 var annie;
 (function (annie) {
-    /**
-     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
-     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的getStage()方法进行访问
-     * @class annie.Stage
-     * @extends annie.Sprite
-     * @public
-     * @since 1.0.0
-     */
     var Stage = (function (_super) {
         __extends(Stage, _super);
         /**
@@ -5992,7 +6076,6 @@ var annie;
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
          * @param {string} scaleMode 缩放模式 StageScaleMode
-         * @param {string} bgColor 背景颜色-1为透明
          * @param {number} renderType 渲染模式0:canvas 1:webGl 2:dom
          * @public
          * @since 1.0.0
@@ -6006,6 +6089,27 @@ var annie;
             if (renderType === void 0) { renderType = 0; }
             _super.call(this);
             /**
+             * annie.Stage舞台初始化完成后会触发的事件
+             * @event annie.Event.ON_INIT_STAGE
+             * @since 1.0.0
+             */
+            /**
+             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+             * annie.Stage舞台尺寸发生变化时触发
+             * @event annie.Event.RESIZE
+             * @since 1.0.0
+             */
+            /**
+             * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher中监听
+             * @event annie.Event.ON_RUN_CHANGED
+             * @since 1.0.0
+             */
+            /**
+             * annie.Stage 的多点触碰事件。这个事件只能在annie.Stage对象上侦听
+             * @event annie.TouchEvent.ON_MULTI_TOUCH
+             * @type {string}
+             */
+            /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
              * 所以需要自己灵活设置,默认阻止.
@@ -6018,7 +6122,7 @@ var annie;
             this.iosTouchendPreventDefault = true;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认形为，默认为true是禁止的。
+             * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
              * @property isPreventDefaultEvent
              * @since 1.0.9
              * @default true
@@ -6087,7 +6191,7 @@ var annie;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
-             * 端默认不开启
+             * 默认不开启
              * @property autoSteering
              * @public
              * @since 1.0.0
@@ -6098,6 +6202,7 @@ var annie;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
+             * 默认不开启
              * @property autoResize
              * @public
              * @since 1.0.0
@@ -6438,7 +6543,7 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {HTMLDivElement} div
-         * @return {{w: number, h: number}}
+         * @return {Object}
          */
         Stage.prototype.getRootDivWH = function (div) {
             var sw = div.style.width;
@@ -7023,8 +7128,8 @@ var annie;
              */
             this.blur = 2;
             /**
-             * 滤镜类型 只读
-             * @property color
+             * 滤镜类型只读
+             * @property type
              * @public
              * @readonly
              * @since 1.0.0
@@ -7878,6 +7983,33 @@ var annie;
      */
     var URLLoader = (function (_super) {
         __extends(URLLoader, _super);
+        //Event
+        /**
+         * 完成事件
+         * @event annie.Event.COMPLETE
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader加载过程事件
+         * @event annie.Event.PROGRESS
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader出错事件
+         * @event annie.Event.ERROR
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader中断事件
+         * @event annie.Event.ABORT
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader开始事件
+         * @event annie.Event.START
+         * @since 1.0.0
+         */
+        //
         /**
          * 构造函数
          * @method URLLoader
@@ -7888,7 +8020,7 @@ var annie;
             this._req = null;
             this.headers = [];
             /**
-             * 后台返回来的数据类弄
+             * 后台返回来的数据类型
              * @property responseType
              * @type {string}
              * @default null
@@ -7914,7 +8046,7 @@ var annie;
              */
             this.method = "get";
             /**
-             * 需要像后台传送的数据对象
+             * 需要向后台传送的数据对象
              * @property data
              * @public
              * @since 1.0.0
@@ -8246,7 +8378,7 @@ var annie;
      * @since 1.0.0
      * @param {string} sceneName fla通过flash2x转换时设置的包名
      * @param {Function} progressFun 加载进度回调,回调参数为当前的进度值1-100
-     * @param {Function} completeFun 加载完成回高,无回调参数
+     * @param {Function} completeFun 加载完成回调,回调参数为当前加载的场景信息
      * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
      */
     annie.loadScene = function (sceneName, progressFun, completeFun, domain) {
@@ -8496,9 +8628,7 @@ var annie;
                 //全部资源加载完成
                 _isLoading = false;
                 //_progressCallback(100);
-                setTimeout(function () {
-                    _completeCallback(info);
-                }, 100);
+                _completeCallback(info);
             }
             else {
                 _completeCallback(info);
@@ -9271,7 +9401,7 @@ var annie;
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -9292,7 +9422,7 @@ var annie;
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -9838,6 +9968,18 @@ var annie;
      */
     var Timer = (function (_super) {
         __extends(Timer, _super);
+        //Evetns
+        /**
+         * annie.Timer定时器触发事件
+         * @event annie.Event.TIMER
+         * @since 1.0.9
+         */
+        /**
+         * annie.Timer定时器完成事件
+         * @event annie.Event.TIMER_COMPLETE
+         * @since 1.0.9
+         */
+        //
         /**
          * 构造函数，初始化
          * @method Timer
@@ -9973,7 +10115,7 @@ var annie;
             configurable: true
         });
         /**
-         * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
+         * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时缠绕着你
          * @method kill
          * @public
          * @since 1.0.9
@@ -10201,7 +10343,7 @@ var annie;
     var _dSprite = null;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，测需要要截图之前手动执行更新方法一次。如:this.update(true);
+     * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
      * @method annie.toDisplayDataURL
      * @static
      * @param {annie.DisplayObject} obj 显示对象
@@ -10220,7 +10362,7 @@ var annie;
      *               quality: 90//图片质量值1-100,png格式不需要设置quality
      *       }, '#CDDBEB');
      *
-     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法把显示对象base64就是最好不过的选择了。
+     * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
     annie.toDisplayDataURL = function (obj, rect, typeInfo, bgColor) {
         if (rect === void 0) { rect = null; }

@@ -96,7 +96,7 @@ namespace annie {
          * @method addEventListener
          * @public
          * @since 1.0.0
-         * @param {string} type 侦听类形
+         * @param {string} type 侦听类型
          * @param {Function}listener 侦听后的回调方法,如果这个方法是类实例的方法,为了this引用的正确性,请在方法参数后加上.bind(this);
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {void}
@@ -145,18 +145,18 @@ namespace annie {
          * @method dispatchEvent
          * @public
          * @since 1.0.0
-         * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则直接自动生成一个的事件对象,事件类型就是你传入进来的字符串的值
+         * @param {annie.Event|string} event 广播所带的事件对象,如果传的是字符串则自动生成一个annie.Event对象,事件类型就是传入进来的字符串的值
          * @param {Object} data 广播后跟着事件一起传过去的其他任信息,默认值为null
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {boolean} 如果有收听者则返回true
          * @example
          *      var mySprite=new annie.Sprite(),
-         *          yourEvent=new annie.Event("yourCustomerEvent");
-         *       yourEvent.data='false2x';
-         *       mySprite.addEventListener("yourCustomerEvent",function(e){
+         *      yourEvent=new annie.Event("yourCustomerEvent");
+         *      yourEvent.data={a:1,b:2,c:"hello",d:{aa:1,bb:2}};
+         *      mySprite.addEventListener("yourCustomerEvent",function(e){
          *          console.log(e.data);
-         *        })
-         *       mySprite.dispatchEvent(yourEvent);
+         *      })
+         *      mySprite.dispatchEvent(yourEvent);
          */
         public dispatchEvent(event: any, data: any = null,useCapture = true): boolean {
             let s = this;
@@ -196,11 +196,11 @@ namespace annie {
         }
 
         /**
-         * 是否有添加过此类形的侦听
+         * 是否有添加过此类型的侦听
          * @method hasEventListener
          * @public
          * @since 1.0.0
-         * @param {string} type 侦听类形
+         * @param {string} type 侦听类型
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {boolean} 如果有则返回true
          */
@@ -224,7 +224,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @param {string} type 要移除的侦听类型
-         * @param {Function} listener 及侦听时绑定的回调方法
+         * @param {Function} listener 侦听时绑定的回调方法
          * @param {boolean} useCapture true 捕获阶段 false 冒泡阶段 默认 true
          * @return {void}
          */

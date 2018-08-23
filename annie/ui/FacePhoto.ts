@@ -15,6 +15,12 @@ namespace annieUI {
      * @since 1.0.0
      */
     export class FacePhoto extends Sprite {
+        //events
+        /**
+         * 图片加载完成事件
+         * @event COMPLETE
+         * @since 1.0.0
+         */
         /**
          * 构造函数
          * @method  FacePhoto

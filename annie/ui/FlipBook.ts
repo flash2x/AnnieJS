@@ -7,14 +7,25 @@ namespace annieUI {
     import Event=annie.Event;
     import MouseEvent=annie.MouseEvent;
     import Point=annie.Point;
-    /**
-     * 电子杂志组件类
-     * @class annieUI.FlipBook
-     * @public
-     * @extends annie.Sprite
-     * @since 1.0.3
-     */
     export class FlipBook extends Sprite {
+        //Events
+        /**
+         * annie.FlipBook组件翻页开始事件
+         * @event annie.Event.ON_FLIP_START
+         * @since 1.1.0
+         */
+        /**
+         * annie.FlipBook组件翻页结束事件
+         * @event annie.Event.ON_FLIP_STOP
+         * @since 1.1.0
+         */
+        /**
+         * 电子杂志组件类
+         * @class annieUI.FlipBook
+         * @public
+         * @extends annie.Sprite
+         * @since 1.0.3
+         */
         //可设置或可调用接口,页数以单页数计算~
         /**
          * 总页数

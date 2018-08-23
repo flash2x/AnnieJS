@@ -37,6 +37,28 @@ var annieUI;
         function ScrollPage(vW, vH, maxDistance, isVertical) {
             if (isVertical === void 0) { isVertical = true; }
             _super.call(this);
+            //Event
+            /**
+             * annie.ScrollPage组件滑动到开始位置事件
+             * @event annie.Event.ON_SCROLL_TO_HEAD
+             * @since 1.1.0
+             */
+            /**
+             * annie.ScrollPage组件停止滑动事件
+             * @event annie.Event.ON_SCROLL_STOP
+             * @since 1.1.0
+             */
+            /**
+             * annie.ScrollPage组件开始滑动事件
+             * @event annie.Event.ON_SCROLL_START
+             * @since 1.1.0
+             */
+            /**
+             * annie.ScrollPage组件滑动到结束位置事件
+             * @event annie.Event.ON_SCROLL_TO_END
+             * @since 1.1.0
+             */
+            //
             /**
              * 横向还是纵向 默认为纵向
              * @property isVertical
@@ -388,6 +410,12 @@ var annieUI;
      */
     var FacePhoto = (function (_super) {
         __extends(FacePhoto, _super);
+        //events
+        /**
+         * 图片加载完成事件
+         * @event COMPLETE
+         * @since 1.0.0
+         */
         /**
          * 构造函数
          * @method  FacePhoto
@@ -491,6 +519,16 @@ var annieUI;
             if (isVertical === void 0) { isVertical = true; }
             if (ease === void 0) { ease = null; }
             _super.call(this);
+            /**
+             * annie.Slide 组件开始滑动事件
+             * @event annie.Event.ON_SLIDE_START
+             * @since 1.1.0
+             */
+            /**
+             * annie.Slide 组件结束滑动事件
+             * @event annie.Event.ON_SLIDE_END
+             * @since 1.1.0
+             */
             /**
              * 页面个数
              * @property listLen
@@ -892,13 +930,6 @@ var annieUI;
     var Event = annie.Event;
     var MouseEvent = annie.MouseEvent;
     var Point = annie.Point;
-    /**
-     * 电子杂志组件类
-     * @class annieUI.FlipBook
-     * @public
-     * @extends annie.Sprite
-     * @since 1.0.3
-     */
     var FlipBook = (function (_super) {
         __extends(FlipBook, _super);
         /**
@@ -912,6 +943,24 @@ var annieUI;
          */
         function FlipBook(width, height, pageCount, getPageCallBack) {
             _super.call(this);
+            //Events
+            /**
+             * annie.FlipBook组件翻页开始事件
+             * @event annie.Event.ON_FLIP_START
+             * @since 1.1.0
+             */
+            /**
+             * annie.FlipBook组件翻页结束事件
+             * @event annie.Event.ON_FLIP_STOP
+             * @since 1.1.0
+             */
+            /**
+             * 电子杂志组件类
+             * @class annieUI.FlipBook
+             * @public
+             * @extends annie.Sprite
+             * @since 1.0.3
+             */
             //可设置或可调用接口,页数以单页数计算~
             /**
              * 总页数
@@ -1916,6 +1965,13 @@ var annieUI;
      */
     var ScratchCard = (function (_super) {
         __extends(ScratchCard, _super);
+        //Events
+        /**
+         * annie.ScratchCard 刮刮卡事件，刮了多少，一个百分比
+         * @event annie.Event.ON_DRAW_PERCENT
+         * @since 1.0.9
+         *
+         */
         /**
          * 构造函数
          * 请监听 "onDrawTime"事件来判断刮完多少百分比了。
