@@ -447,6 +447,13 @@ namespace annie {
             let len = 0;
             if (callState == 0) {
                 //上级被移除了，这一层上的所有元素都要执行移除事件
+                children = s.children;
+                len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                }
                 children = s._removeChildren;
                 len = children.length;
                 for (let i = len - 1; i >= 0; i--) {
@@ -454,13 +461,6 @@ namespace annie {
                     child.callEventAndFrameScript(callState);
                     child.stage = null;
                     child.parent = null;
-                }
-                children = s.children;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
                 }
             } else if (callState == 1) {
                 //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
@@ -474,14 +474,6 @@ namespace annie {
                 }
             } else if (callState == 2) {
                 //上级没有任何变化，执行对应的移除事件和添加事件
-                children = s._removeChildren;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(0);
-                    child.stage = null;
-                    child.parent = null;
-                }
                 children = s.children;
                 len = children.length;
                 for (let i = len - 1; i >= 0; i--) {
@@ -493,6 +485,14 @@ namespace annie {
                         child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
+                }
+                children = s._removeChildren;
+                len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(0);
+                    child.stage = null;
+                    child.parent = null;
                 }
             }
             s._removeChildren.length = 0;
