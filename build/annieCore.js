@@ -4847,8 +4847,10 @@ var annie;
          */
         MovieClip.prototype.nextFrame = function () {
             var s = this;
-            if (s._curFrame < s.totalFrames) {
-                s._wantFrame = s._curFrame + 1;
+            if (s._wantFrame == 0)
+                s._wantFrame = s._curFrame;
+            if (s._wantFrame < s.totalFrames) {
+                s._wantFrame += 1;
             }
             s._isPlaying = false;
         };
@@ -4861,8 +4863,10 @@ var annie;
          */
         MovieClip.prototype.prevFrame = function () {
             var s = this;
-            if (s._curFrame > 1) {
-                s._wantFrame = s._curFrame - 1;
+            if (s._wantFrame == 0)
+                s._wantFrame = s._curFrame;
+            if (s._wantFrame > 1) {
+                s._wantFrame -= 1;
             }
             s._isPlaying = false;
         };
@@ -4908,6 +4912,8 @@ var annie;
             var s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            if (s._wantFrame > 0)
+                return;
             var wf = s._curFrame;
             if (s._isFront) {
                 wf++;

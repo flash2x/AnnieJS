@@ -250,8 +250,9 @@ namespace annie {
          */
         public nextFrame(): void {
             let s = this;
-            if (s._curFrame < s.totalFrames) {
-                s._wantFrame = s._curFrame + 1;
+            if(s._wantFrame==0)s._wantFrame=s._curFrame;
+            if (s._wantFrame < s.totalFrames) {
+                s._wantFrame +=1;
             }
             s._isPlaying = false;
         }
@@ -265,8 +266,9 @@ namespace annie {
          */
         public prevFrame(): void {
             let s = this;
-            if (s._curFrame > 1) {
-                s._wantFrame = s._curFrame - 1;
+            if(s._wantFrame==0)s._wantFrame=s._curFrame;
+            if (s._wantFrame >1) {
+                s._wantFrame -=1;
             }
             s._isPlaying = false;
         }
@@ -311,6 +313,7 @@ namespace annie {
             let s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            if(s._wantFrame>0)return;
             let wf=s._curFrame;
             if(s._isFront){
                 wf++;
@@ -501,7 +504,6 @@ namespace annie {
             }
             super.callEventAndFrameScript(callState);
         }
-
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             let isNeedToReset = false;
