@@ -3,7 +3,13 @@
  */
 namespace annie {
     declare let VConsole: any;
-
+    /**
+     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
+     * @class annie.Stage
+     * @extends annie.Sprite
+     * @public
+     * @since 1.0.0
+     */
     export class Stage extends Sprite {
         /**
          * annie.Stage舞台初始化完成后会触发的事件
@@ -78,19 +84,6 @@ namespace annie {
          * @readonly
          */
         public renderType = 0;
-
-        /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @property getStage
-         * @param {string} stageName
-         * @return {any}
-         * @since 2.0.0
-         */
-        public static getStage(stageName: string = "annieEngine") {
-            return annie.Stage._stageList[stageName];
-        }
-
-        private static _stageList: any = {};
 
         /**
          * 是否暂停
@@ -290,9 +283,8 @@ namespace annie {
         public constructor(rootDivId: string = "annieEngine", desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight", renderType: number = 0) {
             super();
             let s: Stage = this;
-            this._instanceType = "annie.Stage";
-            annie.Stage._stageList[rootDivId] = s;
-            s.stage = this;
+            s._instanceType = "annie.Stage";
+            s.stage = s;
             s.name = "stageInstance_" + s.instanceId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;

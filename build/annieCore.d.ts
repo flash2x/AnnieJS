@@ -2796,6 +2796,14 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
+    /**
+     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
+     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的 getStage()方法进行访问
+     * @class annie.Stage
+     * @extends annie.Sprite
+     * @public
+     * @since 1.0.0
+     */
     class Stage extends Sprite {
         /**
          * annie.Stage舞台初始化完成后会触发的事件
@@ -2870,15 +2878,6 @@ declare namespace annie {
          * @readonly
          */
         renderType: number;
-        /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @property getStage
-         * @param {string} stageName
-         * @return {any}
-         * @since 2.0.0
-         */
-        static getStage(stageName?: string): any;
-        private static _stageList;
         /**
          * 是否暂停
          * @property pause

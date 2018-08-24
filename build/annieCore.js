@@ -6066,6 +6066,14 @@ var annie;
  */
 var annie;
 (function (annie) {
+    /**
+     * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
+     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的 getStage()方法进行访问
+     * @class annie.Stage
+     * @extends annie.Sprite
+     * @public
+     * @since 1.0.0
+     */
     var Stage = (function (_super) {
         __extends(Stage, _super);
         /**
@@ -6312,9 +6320,8 @@ var annie;
                 s.update();
             };
             var s = this;
-            this._instanceType = "annie.Stage";
-            annie.Stage._stageList[rootDivId] = s;
-            s.stage = this;
+            s._instanceType = "annie.Stage";
+            s.stage = s;
             s.name = "stageInstance_" + s.instanceId;
             var div = document.getElementById(rootDivId);
             s.renderType = renderType;
@@ -6380,17 +6387,6 @@ var annie;
                 rc.addEventListener('mouseup', s.mouseEvent, false);
             }
         }
-        /**
-         * 直接获取stage的引用，避免总是从annie.Event.ADD_TO_STAGE 事件中去获取stage引用
-         * @property getStage
-         * @param {string} stageName
-         * @return {any}
-         * @since 2.0.0
-         */
-        Stage.getStage = function (stageName) {
-            if (stageName === void 0) { stageName = "annieEngine"; }
-            return annie.Stage._stageList[stageName];
-        };
         Object.defineProperty(Stage, "pause", {
             /**
              * 是否暂停
@@ -7043,7 +7039,6 @@ var annie;
             }
             s.renderObj = null;
         };
-        Stage._stageList = {};
         Stage._pause = false;
         Stage._dragDisplay = null;
         Stage._isLoadedVConsole = false;
