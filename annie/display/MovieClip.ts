@@ -2,6 +2,7 @@
  * @module annie
  */
 namespace annie {
+
     /**
      * annie引擎核心类
      * @class annie.MovieClip
@@ -10,6 +11,24 @@ namespace annie {
      * @extends annie.Sprite
      */
     export class MovieClip extends Sprite {
+        //Events
+        /**
+         * annie.MovieClip 播放完成事件
+         * @event annie.Event.END_FRAME
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        /**
+         * annie.MovieClip 帧标签事件
+         * @event annie.Event.CALL_FRAME
+         * @type {string}
+         * @static
+         * @public
+         * @since 1.0.0
+         */
+        //
         /**
          * mc的当前帧
          * @property currentFrame
@@ -104,7 +123,7 @@ namespace annie {
         private _a2x_script: any = null;
 
         /**
-         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
+         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括Fla文件中当前帧的代码.
          * @method addFrameScript
          * @public
          * @since 1.0.0
@@ -231,8 +250,9 @@ namespace annie {
          */
         public nextFrame(): void {
             let s = this;
-            if (s._curFrame < s.totalFrames) {
-                s._wantFrame = s._curFrame + 1;
+            if(s._wantFrame==0)s._wantFrame=s._curFrame;
+            if (s._wantFrame < s.totalFrames) {
+                s._wantFrame +=1;
             }
             s._isPlaying = false;
         }
@@ -246,8 +266,9 @@ namespace annie {
          */
         public prevFrame(): void {
             let s = this;
-            if (s._curFrame > 1) {
-                s._wantFrame = s._curFrame - 1;
+            if(s._wantFrame==0)s._wantFrame=s._curFrame;
+            if (s._wantFrame >1) {
+                s._wantFrame -=1;
             }
             s._isPlaying = false;
         }
@@ -280,6 +301,7 @@ namespace annie {
             }
             s._wantFrame = <number>frameIndex;
         }
+
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
          * @method play
@@ -291,6 +313,7 @@ namespace annie {
             let s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            if(s._wantFrame>0)return;
             let wf=s._curFrame;
             if(s._isFront){
                 wf++;
@@ -481,7 +504,6 @@ namespace annie {
             }
             super.callEventAndFrameScript(callState);
         }
-
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             let isNeedToReset = false;
@@ -504,7 +526,7 @@ namespace annie {
                 }
             }
         }
-        public destroy(): void {
+        public destroy():void {
             //清除相应的数据引用
             let s = this;
             super.destroy();

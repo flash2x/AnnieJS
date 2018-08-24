@@ -3814,6 +3814,24 @@ var annie;
             s._instanceType = "annie.MovieClip";
         }
         Object.defineProperty(MovieClip.prototype, "currentFrame", {
+            //Events
+            /**
+             * annie.MovieClip 播放完成事件
+             * @event annie.Event.END_FRAME
+             * @type {string}
+             * @static
+             * @public
+             * @since 1.0.0
+             */
+            /**
+             * annie.MovieClip 帧标签事件
+             * @event annie.Event.CALL_FRAME
+             * @type {string}
+             * @static
+             * @public
+             * @since 1.0.0
+             */
+            //
             /**
              * mc的当前帧
              * @property currentFrame
@@ -3890,7 +3908,7 @@ var annie;
             s._isPlaying = false;
         };
         /**
-         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括从Fla文件中当前帧的代码.
+         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括Fla文件中当前帧的代码.
          * @method addFrameScript
          * @public
          * @since 1.0.0
@@ -4015,8 +4033,10 @@ var annie;
          */
         MovieClip.prototype.nextFrame = function () {
             var s = this;
-            if (s._curFrame < s.totalFrames) {
-                s._wantFrame = s._curFrame + 1;
+            if (s._wantFrame == 0)
+                s._wantFrame = s._curFrame;
+            if (s._wantFrame < s.totalFrames) {
+                s._wantFrame += 1;
             }
             s._isPlaying = false;
         };
@@ -4029,8 +4049,10 @@ var annie;
          */
         MovieClip.prototype.prevFrame = function () {
             var s = this;
-            if (s._curFrame > 1) {
-                s._wantFrame = s._curFrame - 1;
+            if (s._wantFrame == 0)
+                s._wantFrame = s._curFrame;
+            if (s._wantFrame > 1) {
+                s._wantFrame -= 1;
             }
             s._isPlaying = false;
         };
@@ -4076,6 +4098,8 @@ var annie;
             var s = this;
             s._isPlaying = true;
             s._isFront = isFront;
+            if (s._wantFrame > 0)
+                return;
             var wf = s._curFrame;
             if (s._isFront) {
                 wf++;
