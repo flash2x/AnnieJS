@@ -3714,6 +3714,13 @@ var annie;
             var len = 0;
             if (callState == 0) {
                 //上级被移除了，这一层上的所有元素都要执行移除事件
+                children = s.children;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                }
                 children = s._removeChildren;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
@@ -3721,13 +3728,6 @@ var annie;
                     child.callEventAndFrameScript(callState);
                     child.stage = null;
                     child.parent = null;
-                }
-                children = s.children;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
                 }
             }
             else if (callState == 1) {
@@ -3743,14 +3743,6 @@ var annie;
             }
             else if (callState == 2) {
                 //上级没有任何变化，执行对应的移除事件和添加事件
-                children = s._removeChildren;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(0);
-                    child.stage = null;
-                    child.parent = null;
-                }
                 children = s.children;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
@@ -3763,6 +3755,14 @@ var annie;
                         child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
+                }
+                children = s._removeChildren;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(0);
+                    child.stage = null;
+                    child.parent = null;
                 }
             }
             s._removeChildren.length = 0;
