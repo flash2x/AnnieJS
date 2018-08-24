@@ -524,7 +524,7 @@ namespace annie {
                 }
             }
         }
-        public destroy(): void {
+        public destroy():void {
             //清除相应的数据引用
             let s = this;
             super.destroy();

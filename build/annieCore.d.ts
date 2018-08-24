@@ -2798,7 +2798,6 @@ declare namespace annie {
 declare namespace annie {
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
-     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的 getStage()方法进行访问
      * @class annie.Stage
      * @extends annie.Sprite
      * @public

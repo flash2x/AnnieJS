@@ -4121,6 +4121,13 @@ var annie;
             var children = null;
             var len = 0;
             if (callState == 0) {
+                children = s.children;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(callState);
+                    child.stage = null;
+                }
                 //上级被移除了，这一层上的所有元素都要执行移除事件
                 children = s._removeChildren;
                 len = children.length;
@@ -4129,13 +4136,6 @@ var annie;
                     child.callEventAndFrameScript(callState);
                     child.stage = null;
                     child.parent = null;
-                }
-                children = s.children;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
                 }
             }
             else if (callState == 1) {
@@ -4150,15 +4150,6 @@ var annie;
                 }
             }
             else if (callState == 2) {
-                //上级没有任何变化，执行对应的移除事件和添加事件
-                children = s._removeChildren;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(0);
-                    child.stage = null;
-                    child.parent = null;
-                }
                 children = s.children;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
@@ -4171,6 +4162,15 @@ var annie;
                         child.parent = s;
                         child.callEventAndFrameScript(1);
                     }
+                }
+                //上级没有任何变化，执行对应的移除事件和添加事件
+                children = s._removeChildren;
+                len = children.length;
+                for (var i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    child.callEventAndFrameScript(0);
+                    child.stage = null;
+                    child.parent = null;
                 }
             }
             s._removeChildren.length = 0;
@@ -6068,7 +6068,6 @@ var annie;
 (function (annie) {
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
-     * 无法以全局方式访问 Stage 对象,而是需要利用DisplayObject实例的 getStage()方法进行访问
      * @class annie.Stage
      * @extends annie.Sprite
      * @public
