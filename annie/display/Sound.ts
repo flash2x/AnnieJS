@@ -126,19 +126,15 @@ namespace annie {
         public set volume(value:number){
             this.media.volume=value;
         }
-        /**
-         * 停止播放，给stopAllSounds调用
-         */
-        private stop2() {
+
+        public stop2() {
             let s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         }
-        /**
-         * 恢复播放，给stopAllSounds调用
-         */
-        private play2() {
+
+        public play2() {
             let s = this;
             if (s.isPlaying) {
                 s.media.play();

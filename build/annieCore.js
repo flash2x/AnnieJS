@@ -5664,18 +5664,12 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        /**
-         * 停止播放，给stopAllSounds调用
-         */
         Sound.prototype.stop2 = function () {
             var s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         };
-        /**
-         * 恢复播放，给stopAllSounds调用
-         */
         Sound.prototype.play2 = function () {
             var s = this;
             if (s.isPlaying) {
