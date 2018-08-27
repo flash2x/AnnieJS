@@ -2692,14 +2692,8 @@ declare namespace annie {
          * @return {number}
          */
         volume: number;
-        /**
-         * 停止播放，给stopAllSounds调用
-         */
-        private stop2();
-        /**
-         * 恢复播放，给stopAllSounds调用
-         */
-        private play2();
+        stop2(): void;
+        play2(): void;
         private static _soundList;
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
