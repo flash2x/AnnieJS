@@ -45,6 +45,7 @@ namespace annieUI {
             let s = this;
             s._instanceType = "annie.FacePhoto";
             s.photo = new Image();
+            s.photo.crossOrigin="";
             s.bitmap = new annie.Bitmap();
             s.maskObj = new annie.Shape();
             s.photo.onload = function (e: any) {
@@ -53,12 +54,12 @@ namespace annieUI {
                 s.maskObj.beginFill("#000000");
                 let scale = s.radio / (s.photo.width < s.photo.height ? s.photo.width : s.photo.height);
                 s.bitmap.scaleX = s.bitmap.scaleY = scale;
-                s.bitmap.x = (s.radio - s.photo.width * scale) >> 1;
-                s.bitmap.y = (s.radio - s.photo.height * scale) >> 1;
-                if (s.maskType == 0) {
-                    s.maskObj.drawCircle(s.radio >> 1, s.radio >> 1, s.radio >> 1);
+                s.bitmap.x = (s.radioW - s.photo.width * scale) >> 1;
+                s.bitmap.y = (s.radioH - s.photo.height * scale) >> 1;
+                if (s.maskType == 0){
+                    s.maskObj.drawEllipse(0, 0,s.radioW, s.radioH);
                 } else {
-                    s.maskObj.drawRect(0, 0, s.radio, s.radio);
+                    s.maskObj.drawRect(0, 0, s.radioW, s.radioH);
                 }
                 s.maskObj.endFill();
                 s.dispatchEvent("onComplete");
@@ -70,6 +71,8 @@ namespace annieUI {
         private photo: any;
         private bitmap: Bitmap;
         private maskType: number = 0;
+        private radioW: number;
+        private radioH: number;
         private radio: number;
         private maskObj: Shape;
 
@@ -77,12 +80,19 @@ namespace annieUI {
          * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
          * @method init
          * @param {string} src 头像的地址
-         * @param {number} radio 指定头像的长宽或者直径
+         * @param {number} w 指定头像的宽
+         * @param {number} h 指定头像的高
          * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
          */
-        public init(src: string, radio: number = 0, maskType: number = 0): void {
+        public init(src: string, w: number,h:number, maskType: number = 0): void {
             let s = this;
-            s.radio = radio;
+            s.radioW = w;
+            s.radioH = h;
+            if(w>h){
+                s.radio=w;
+            }else{
+                s.radio=h;
+            }
             if (s.photo.src != src)
                 s.photo.src = src;
             if (s.maskType != maskType)

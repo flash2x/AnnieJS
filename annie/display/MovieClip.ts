@@ -240,7 +240,6 @@ namespace annie {
             }
             return null;
         }
-
         /**
          * 将播放头向后移一帧并停在下一帧,如果本身在最后一帧则不做任何反应
          * @method nextFrame

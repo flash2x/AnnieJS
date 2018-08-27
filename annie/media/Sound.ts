@@ -64,15 +64,30 @@ namespace annie {
             super.destroy();
         }
 
-        //停止播放，给stopAllSounds调用
-        private stop2() {
+        /**
+         * 作用和stop()相同,但你用这个方法停止声音了，用play2()方法才会有效
+         * @method stop2
+         * @since 2.0.0
+         * @public
+         * @return {void}
+         */
+        public stop2():void {
             let s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         }
-        //恢复播放，给stopAllSounds调用
-        private play2() {
+        /**
+         * 如果你的项目有背景音乐一直在播放,但可能项目里需要播放视频的时候，需要停止背景音乐或者其他需求，
+         * 视频播放完之后再恢复背景音乐播放。这个时候，你要考虑用户之前是否有主动关闭过背景音乐，有的话，
+         * 这个时候你再调用play()方法或者pause()方法就违背用户意愿。所以你应该调用play2()方法。
+         * 这个方法的原理就是如果用户之前关闭过了，那调用这个方法就不会播放声音，如果没关闭则会播放声音。
+         * @method play2
+         * @since 2.0.0
+         * @public
+         * @return {void}
+         */
+        public play2() {
             let s = this;
             if (s.isPlaying) {
                 s.play();

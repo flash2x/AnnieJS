@@ -74,7 +74,6 @@ namespace annie {
                 s._currentCount=0;
             }
         }
-
         /**
          * 停止执行定时器，通过再次调用start方法可以接着之前未完成的状态运行
          * @method stop

@@ -222,16 +222,19 @@ declare namespace annieUI {
         private photo;
         private bitmap;
         private maskType;
+        private radioW;
+        private radioH;
         private radio;
         private maskObj;
         /**
          * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
          * @method init
          * @param {string} src 头像的地址
-         * @param {number} radio 指定头像的长宽或者直径
+         * @param {number} w 指定头像的宽
+         * @param {number} h 指定头像的高
          * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
          */
-        init(src: string, radio?: number, maskType?: number): void;
+        init(src: string, w: number, h: number, maskType?: number): void;
         destroy(): void;
     }
 }
