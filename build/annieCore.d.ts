@@ -2175,8 +2175,25 @@ declare namespace annie {
          * @since 1.1.1
          */
         destroy(): void;
-        private stop2();
-        private play2();
+        /**
+         * 作用和stop()相同,但你用这个方法停止声音了，用play2()方法才会有效
+         * @method stop2
+         * @since 2.0.0
+         * @public
+         * @return {void}
+         */
+        stop2(): void;
+        /**
+         * 如果你的项目有背景音乐一直在播放,但可能项目里需要播放视频的时候，需要停止背景音乐或者其他需求，
+         * 视频播放完之后再恢复背景音乐播放。这个时候，你要考虑用户之前是否有主动关闭过背景音乐，有的话，
+         * 这个时候你再调用play()方法或者pause()方法就违背用户意愿。所以你应该调用play2()方法。
+         * 这个方法的原理就是如果用户之前关闭过了，那调用这个方法就不会播放声音，如果没关闭则会播放声音。
+         * @method play2
+         * @since 2.0.0
+         * @public
+         * @return {void}
+         */
+        play2(): void;
         private static _soundList;
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
@@ -4553,7 +4570,7 @@ declare namespace annie {
      *               width: 441,
      *               height: 694
      *       }, {
-     *               type: "jpeg"//数据类型jpg/png
+     *               type: "jpeg",//数据类型jpg/png
      *               quality: 90//图片质量值1-100,png格式不需要设置quality
      *       }, '#CDDBEB');
      *

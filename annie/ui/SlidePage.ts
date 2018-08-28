@@ -180,6 +180,7 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
         }
 
         /**
@@ -273,7 +274,7 @@ namespace annieUI {
                 }
                 s.lastX = e.localX;
                 s.lastY = e.localY;
-            } else if (e.type == annie.MouseEvent.MOUSE_UP) {
+            }else{
                 if (!s.isMouseDown) return;
                 let ts: number = s.movingY;
                 let fts: number = s.movingX;

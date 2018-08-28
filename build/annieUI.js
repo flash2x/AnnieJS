@@ -674,6 +674,7 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
         }
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
@@ -773,7 +774,7 @@ var annieUI;
                 s.lastX = e.localX;
                 s.lastY = e.localY;
             }
-            else if (e.type == annie.MouseEvent.MOUSE_UP) {
+            else {
                 if (!s.isMouseDown)
                     return;
                 var ts = s.movingY;
