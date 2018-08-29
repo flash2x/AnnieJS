@@ -5595,7 +5595,6 @@ var annie;
             });
             s.media.onCanplay(function (e) {
                 s.play2();
-                s.media.offCanplay();
             });
             annie.Sound._soundList.push(s);
         }
@@ -5619,7 +5618,9 @@ var annie;
                 s._loop = loop;
                 s._repeate = loop;
             }
-            s.media.play();
+            if (s.media.buffered > 0) {
+                s.media.play();
+            }
             s.isPlaying = true;
         };
         /**

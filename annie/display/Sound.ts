@@ -20,6 +20,7 @@ namespace annie {
          */
         public media: any = null;
         private _loop: number = 0;
+
         /**
          * 构造函数
          * @method Sound
@@ -30,30 +31,29 @@ namespace annie {
         public constructor(src: string) {
             super();
             let s = this;
-            s._instanceType="annie.Sound";
-            s.media =annie.createAudio();
+            s._instanceType = "annie.Sound";
+            s.media = annie.createAudio();
             s.media.src = src;
-            s.media.onEnded(function(e:any){
-                s.dispatchEvent("onPlayEnd",e);
-                if(s._loop>1){
+            s.media.onEnded(function (e: any) {
+                s.dispatchEvent("onPlayEnd", e);
+                if (s._loop > 1) {
                     s._loop--;
-                    s.media.startTime=0;
+                    s.media.startTime = 0;
                     s.media.play();
                 }
             });
-            s.media.onPlay(function(e:any){
-                s.dispatchEvent("onPlayStart",e);
+            s.media.onPlay(function (e: any) {
+                s.dispatchEvent("onPlayStart", e);
             });
-            s.media.onTimeUpdate(function(e:any){
-                s.dispatchEvent("onPlayUpdate",e);
+            s.media.onTimeUpdate(function (e: any) {
+                s.dispatchEvent("onPlayUpdate", e);
             });
-            s.media.onCanplay(function(e:any){
+            s.media.onCanplay(function (e: any) {
                 s.play2();
-                s.media.offCanplay();
             });
             annie.Sound._soundList.push(s);
         }
-        private _repeate:number=1;
+        private _repeate: number = 1;
         /**
          * 是否正在播放中
          * @property  isPlaying
@@ -61,7 +61,8 @@ namespace annie {
          * @since 2.0.0
          * @type {boolean}
          */
-        public isPlaying:boolean=true;
+        public isPlaying: boolean = true;
+
         /**
          * 开始播放媒体
          * @method play
@@ -70,18 +71,21 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public play(start: number=0, loop: number=0): void {
+        public play(start: number = 0, loop: number = 0): void {
             let s = this;
             s.media.startTime = start;
-            if(loop==0){
-                s._loop=s._repeate;
-            }else{
-                s._loop=loop;
-                s._repeate=loop;
+            if (loop == 0) {
+                s._loop = s._repeate;
+            } else {
+                s._loop = loop;
+                s._repeate = loop;
             }
-            s.media.play();
-            s.isPlaying=true;
+            if(s.media.buffered>0) {
+                s.media.play();
+            }
+            s.isPlaying = true;
         }
+
         /**
          * 停止播放
          * @method stop
@@ -89,10 +93,11 @@ namespace annie {
          * @since 1.0.0
          */
         public stop(): void {
-            let s=this;
+            let s = this;
             s.media.stop();
-            s.isPlaying=false;
+            s.isPlaying = false;
         }
+
         /**
          * 暂停播放,或者恢复播放
          * @method pause
@@ -100,14 +105,14 @@ namespace annie {
          * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
          * @since 1.0.4
          */
-        public pause(isPause:boolean=true): void {
-            let s=this;
-            if(isPause){
+        public pause(isPause: boolean = true): void {
+            let s = this;
+            if (isPause) {
                 s.media.pause();
-                s.isPlaying=false;
-            }else{
+                s.isPlaying = false;
+            } else {
                 s.media.play();
-                s.isPlaying=true;
+                s.isPlaying = true;
             }
         }
 
@@ -117,18 +122,20 @@ namespace annie {
          * @type {string}
          * @since 2.0.0
          */
-        public name:string="";
+        public name: string = "";
+
         /**
          * 设置或者获取音量 从0-1
          * @since 1.1.0
          * @property volume
          * @return {number}
          */
-        public get volume():number{
+        public get volume(): number {
             return this.media.volume
         }
-        public set volume(value:number){
-            this.media.volume=value;
+
+        public set volume(value: number) {
+            this.media.volume = value;
         }
 
         public stop2() {
@@ -144,8 +151,10 @@ namespace annie {
                 s.media.play();
             }
         }
+
         //声音对象池
         private static _soundList: any = [];
+
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method stopAllSounds
@@ -190,7 +199,7 @@ namespace annie {
          * @public
          * @param {number} volume 音量大小，从0-1
          */
-        public static setAllSoundsVolume(volume: number){
+        public static setAllSoundsVolume(volume: number) {
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
@@ -201,21 +210,23 @@ namespace annie {
             }
             Sound._volume = volume;
         }
+
         private static _volume: number = 1;
-        public destroy(){
-            let s=this;
+
+        public destroy() {
+            let s = this;
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i]==s) {
+                if (annie.Sound._soundList[i] == s) {
                     annie.Sound._soundList[i].stop();
-                    annie.Sound._soundList.splice(i,1);
+                    annie.Sound._soundList.splice(i, 1);
                     break;
                 }
             }
             s.media.offTimeUpdate();
             s.media.offPlay();
             s.media.offEnded();
-            s.media=null;
+            s.media = null;
         }
     }
 }
