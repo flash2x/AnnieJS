@@ -46,11 +46,12 @@ namespace annie {
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
             s.media.oncanplaythrough=function(){
-                s.play2();
-                s.media.oncanplaythrough=null;
+                if(s.isNeedCheckPlay) {
+                    s.play2();
+                    s.isNeedCheckPlay=false;
+                }
             }
         }
-
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
          * @method destroy

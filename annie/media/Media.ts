@@ -91,6 +91,8 @@ namespace annie {
         private _playEvent: any;
         private _updateEvent: any;
         private _endEvent: any;
+        protected isNeedCheckPlay:boolean=false;
+
         /**
          * @property _repeate
          * @type {number}
@@ -132,6 +134,8 @@ namespace annie {
                 } else {
                     s.media.play();
                 }
+            }else{
+                s.isNeedCheckPlay=true;
             }
             s.isPlaying = true;
         }

@@ -2085,6 +2085,7 @@ declare namespace annie {
         private _playEvent;
         private _updateEvent;
         private _endEvent;
+        protected isNeedCheckPlay: boolean;
         /**
          * @property _repeate
          * @type {number}

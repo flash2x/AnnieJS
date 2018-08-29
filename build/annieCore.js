@@ -4238,6 +4238,7 @@ var annie;
              */
             this.name = "";
             this._loop = 1;
+            this.isNeedCheckPlay = false;
             /**
              * @property _repeate
              * @type {number}
@@ -4317,6 +4318,9 @@ var annie;
                 else {
                     s.media.play();
                 }
+            }
+            else {
+                s.isNeedCheckPlay = true;
             }
             s.isPlaying = true;
         };
@@ -4440,8 +4444,10 @@ var annie;
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
             s.media.oncanplaythrough = function () {
-                s.play2();
-                s.media.oncanplaythrough = null;
+                if (s.isNeedCheckPlay) {
+                    s.play2();
+                    s.isNeedCheckPlay = false;
+                }
             };
         }
         /**
