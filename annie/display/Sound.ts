@@ -73,7 +73,9 @@ namespace annie {
                 s._loop=loop;
                 s._repeate=loop;
             }
-            s.media.play();
+            if(s.media.buffered>0) {
+                s.media.play();
+            }
             s.isPlaying=true;
         }
         /**
