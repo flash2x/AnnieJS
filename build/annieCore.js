@@ -5593,6 +5593,10 @@ var annie;
             s.media.onTimeUpdate(function (e) {
                 s.dispatchEvent("onPlayUpdate", e);
             });
+            s.media.onCanplay(function (e) {
+                s.play2();
+                s.media.offCanplay();
+            });
             annie.Sound._soundList.push(s);
         }
         /**

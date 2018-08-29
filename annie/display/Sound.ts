@@ -47,6 +47,10 @@ namespace annie {
             s.media.onTimeUpdate(function(e:any){
                 s.dispatchEvent("onPlayUpdate",e);
             });
+            s.media.onCanplay(function(e:any){
+                s.play2();
+                s.media.offCanplay();
+            });
             annie.Sound._soundList.push(s);
         }
         private _repeate:number=1;
