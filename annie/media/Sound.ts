@@ -2,7 +2,6 @@
  * @module annie
  */
 namespace annie {
-
     /**
      * 声音类
      * @class annie.Sound
@@ -46,6 +45,10 @@ namespace annie {
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
+            s.media.oncanplaythrough=function(){
+                s.play2();
+                s.media.oncanplaythrough=null;
+            }
         }
 
         /**
@@ -89,7 +92,7 @@ namespace annie {
          */
         public play2() {
             let s = this;
-            if (s.isPlaying) {
+            if (s.isPlaying){
                 s.play();
             }
         }

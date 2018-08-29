@@ -969,7 +969,7 @@ namespace annie {
                 rc.removeEventListener('mousemove', s.mouseEvent, false);
                 rc.removeEventListener('mouseup', s.mouseEvent, false);
             }
-            window.addEventListener("resize", s._resizeEvent);
+            window.removeEventListener("resize", s._resizeEvent);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);

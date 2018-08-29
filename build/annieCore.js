@@ -4304,17 +4304,19 @@ var annie;
                 console.log(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            var wsb = window;
-            if (wsb.WeixinJSBridge) {
-                try {
-                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+            if (s.media.readyState == 4) {
+                var wsb = window;
+                if (wsb.WeixinJSBridge) {
+                    try {
+                        wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+                    }
+                    catch (e) {
+                        s.media.play();
+                    }
                 }
-                catch (e) {
+                else {
                     s.media.play();
                 }
-            }
-            else {
-                s.media.play();
             }
             s.isPlaying = true;
         };
@@ -4437,6 +4439,10 @@ var annie;
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
+            s.media.oncanplaythrough = function () {
+                s.play2();
+                s.media.oncanplaythrough = null;
+            };
         }
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
@@ -7052,7 +7058,7 @@ var annie;
                 rc.removeEventListener('mousemove', s.mouseEvent, false);
                 rc.removeEventListener('mouseup', s.mouseEvent, false);
             }
-            window.addEventListener("resize", s._resizeEvent);
+            window.removeEventListener("resize", s._resizeEvent);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
