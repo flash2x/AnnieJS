@@ -226,6 +226,7 @@ namespace annie {
             s.media.offTimeUpdate();
             s.media.offPlay();
             s.media.offEnded();
+            s.media.offCanplay();
             s.media = null;
         }
     }
