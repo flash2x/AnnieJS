@@ -59,7 +59,7 @@ namespace annie {
             this._setProperty("_textHeight",value,3);
         }
 
-        public get textHeight(): number {
+        public get textHeight(): number{
             return this._textHeight;
         }
         private _textHeight: number = 0;
