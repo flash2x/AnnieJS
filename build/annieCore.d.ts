@@ -3813,7 +3813,7 @@ declare namespace annie {
     function d(target: any, info: any, parentFrame?: number): void;
     function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
-     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
+     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public
@@ -3847,7 +3847,7 @@ declare namespace annie {
      */
     function ajax(info: any): void;
     /**
-     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
+     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * jsonp调用方法
      * @method annie.jsonp
      * @param url
@@ -3863,7 +3863,7 @@ declare namespace annie {
      */
     function jsonp(url: string, type: number, callbackName: string, callbackFun: any): void;
     /**
-     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
+     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 获取url地址中的get参数
      * @method annie.getQueryString
      * @static

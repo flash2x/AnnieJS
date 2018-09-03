@@ -1602,7 +1602,6 @@ var annieUI;
             var s = this;
             if (s._isInit > 0) {
                 if (s.view._UI.UM || s._isInit == 1) {
-                    s._isInit = 2;
                     var id = (Math.abs(Math.floor(s.view[s.paramXY] / s._itemRow)) - 1) * s._cols;
                     id = id < 0 ? 0 : id;
                     if (id != s._lastFirstId) {
@@ -1620,6 +1619,9 @@ var annieUI;
                     }
                     for (var i = 0; i < s._itemCount; i++) {
                         var item = s._items[i];
+                        if (s._isInit == 1) {
+                            item._a2x_sl_id = -1;
+                        }
                         if (item._a2x_sl_id != id) {
                             item.initData(s.data[id] ? id : -1, s.data[id]);
                             item[s.paramXY] = Math.floor(id / s._cols) * s._itemRow;
@@ -1636,6 +1638,7 @@ var annieUI;
                         }
                         id++;
                     }
+                    s._isInit = 2;
                 }
             }
         };

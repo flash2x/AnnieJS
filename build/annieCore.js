@@ -8928,7 +8928,7 @@ var annie;
         return new annie.Sound(annie.res[sceneName][resName]);
     }
     /**
-     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
+     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public
@@ -8976,7 +8976,7 @@ var annie;
     }
     annie.ajax = ajax;
     /**
-     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
+     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * jsonp调用方法
      * @method annie.jsonp
      * @param url
@@ -9018,7 +9018,7 @@ var annie;
     }
     annie.jsonp = jsonp;
     /**
-     * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
+     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 获取url地址中的get参数
      * @method annie.getQueryString
      * @static
