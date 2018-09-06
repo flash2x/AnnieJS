@@ -61,7 +61,6 @@ namespace annie {
                 }
             });
         }
-
         /**
          * 初始化方法,htmlElement 一定要设置width和height样式,并且一定要用px单位
          * @method init
@@ -125,7 +124,7 @@ namespace annie {
                     if(!s.stage){
                         visible=false;
                     }else {
-                        let parent = s._parent;
+                        let parent = s.parent;
                         while (parent) {
                             if (!parent._visible) {
                                 visible = false;

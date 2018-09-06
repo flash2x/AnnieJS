@@ -3647,8 +3647,8 @@ var annie;
                 s.children[i].destroy();
             }
             s.removeAllChildren();
-            if (s._parent)
-                s._parent.removeChild(s);
+            if (s.parent)
+                s.parent.removeChild(s);
             s.callEventAndFrameScript(0);
             s.children.length = 0;
             s._removeChildren.length = 0;
@@ -4305,23 +4305,20 @@ var annie;
                 console.log(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            if (s.media.readyState == 4) {
-                var wsb = window;
-                if (wsb.WeixinJSBridge) {
-                    try {
-                        wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
-                    }
-                    catch (e) {
-                        s.media.play();
-                    }
+            //if (s.isNeedCheckPlay) {
+            var wsb = window;
+            if (wsb.WeixinJSBridge) {
+                try {
+                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
                 }
-                else {
+                catch (e) {
                     s.media.play();
                 }
             }
             else {
-                s.isNeedCheckPlay = true;
+                s.media.play();
             }
+            //}
             s.isPlaying = true;
         };
         Media.prototype._weixinSB = function () {
@@ -4443,12 +4440,9 @@ var annie;
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
-            s.media.oncanplaythrough = function () {
-                if (s.isNeedCheckPlay) {
-                    s.play2();
-                    s.isNeedCheckPlay = false;
-                }
-            };
+            s.media.addEventListener("canplaythrough", s._canplay = function () {
+                //s.play2();
+            });
         }
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
@@ -4457,6 +4451,8 @@ var annie;
          * @since 1.1.1
          */
         Sound.prototype.destroy = function () {
+            var s = this;
+            s.media.removeEventListener("canplaythrough", s._canplay);
             var len = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
@@ -5303,7 +5299,7 @@ var annie;
                         visible = false;
                     }
                     else {
-                        var parent_1 = s._parent;
+                        var parent_1 = s.parent;
                         while (parent_1) {
                             if (!parent_1._visible) {
                                 visible = false;

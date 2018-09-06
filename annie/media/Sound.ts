@@ -41,16 +41,13 @@ namespace annie {
          */
         public constructor(src: any) {
             super(src, "Audio");
-            let s = this;
+            let s:any = this;
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
-            s.media.oncanplaythrough=function(){
-                if(s.isNeedCheckPlay) {
-                    s.play2();
-                    s.isNeedCheckPlay=false;
-                }
-            }
+            s.media.addEventListener("canplaythrough", s._canplay = function () {
+                //s.play2();
+            });
         }
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
@@ -59,6 +56,8 @@ namespace annie {
          * @since 1.1.1
          */
         public destroy(): void {
+            let s:any=this;
+            s.media.removeEventListener("canplaythrough", s._canplay);
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {

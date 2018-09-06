@@ -123,7 +123,7 @@ namespace annie {
                 console.log(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            if (s.media.readyState == 4) {
+            //if (s.isNeedCheckPlay) {
                 let wsb: any = window;
                 if (wsb.WeixinJSBridge) {
                     try {
@@ -134,9 +134,7 @@ namespace annie {
                 } else {
                     s.media.play();
                 }
-            }else{
-                s.isNeedCheckPlay=true;
-            }
+            //}
             s.isPlaying = true;
         }
 
