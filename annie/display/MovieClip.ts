@@ -205,17 +205,15 @@ namespace annie {
          * @public
          * @since 2.0.0
          */
-        public get clicked(): boolean {
+        public get clicked():boolean {
             return this._clicked;
         }
-
         private _clicked = false;
-
         private _mouseEvent(e: any): void {
             let s = this;
             if (!s._clicked) {
                 let frame = 2;
-                if (e.type == "onMouseDown") {
+                if (e.type == "onMouseDown"){
                     if (s._curFrame > 2) {
                         frame = 3;
                     }
