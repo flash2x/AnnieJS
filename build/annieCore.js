@@ -3308,8 +3308,8 @@ var annie;
                 s.children[i].destroy();
             }
             s.removeAllChildren();
-            if (s._parent)
-                s._parent.removeChild(s);
+            if (s.parent)
+                s.parent.removeChild(s);
             s.callEventAndFrameScript(0);
             s.children.length = 0;
             s._removeChildren.length = 0;
