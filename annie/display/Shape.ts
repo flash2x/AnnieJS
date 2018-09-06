@@ -694,6 +694,7 @@ namespace annie {
                     }
                     let paramsLen = data[2].length;
                     if (paramsLen == 0) {
+                        if(!isMask)
                         ctx[data[1]]();
                     } else if (paramsLen == 2) {
                         ctx[data[1]](data[2][0], data[2][1]);
