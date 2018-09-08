@@ -4299,27 +4299,28 @@ var annie;
                 s._loop = loop;
                 s._repeate = loop;
             }
-            try {
+            if (s.media.currentTime != start) {
                 s.media.currentTime = start;
             }
-            catch (e) {
-                console.log(e);
-            }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            //if (s.isNeedCheckPlay) {
-            var wsb = window;
-            if (wsb.WeixinJSBridge) {
-                try {
-                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+            if (s.media.readyState == 4) {
+                var wsb = window;
+                if (wsb.WeixinJSBridge) {
+                    try {
+                        wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
+                    }
+                    catch (e) {
+                        s.media.play();
+                    }
                 }
-                catch (e) {
+                else {
                     s.media.play();
                 }
+                s.isNeedCheckPlay = false;
             }
             else {
-                s.media.play();
+                s.isNeedCheckPlay = true;
             }
-            //}
             s.isPlaying = true;
         };
         Media.prototype._weixinSB = function () {
@@ -4422,7 +4423,6 @@ var annie;
          * @event annie.Event.ON_PLAY_START
          * @since 1.1.0
          */
-        //
         /**
          * 构造函数
          * @method  Sound
@@ -4442,7 +4442,9 @@ var annie;
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
             s.media.addEventListener("canplaythrough", s._canplay = function () {
-                //s.play2();
+                if (s.isNeedCheckPlay) {
+                    s.play2();
+                }
             });
         }
         /**
@@ -10530,3 +10532,4 @@ var trace = function () {
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+//同时抛出一个点击事件试试

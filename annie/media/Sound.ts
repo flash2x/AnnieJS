@@ -26,7 +26,6 @@ namespace annie {
          * @event annie.Event.ON_PLAY_START
          * @since 1.1.0
          */
-        //
         /**
          * 构造函数
          * @method  Sound
@@ -46,7 +45,9 @@ namespace annie {
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
             s.media.addEventListener("canplaythrough", s._canplay = function () {
-                //s.play2();
+                if(s.isNeedCheckPlay) {
+                    s.play2();
+                }
             });
         }
         /**

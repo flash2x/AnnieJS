@@ -87,12 +87,10 @@ namespace annie {
                 s.dispatchEvent("onPlayStart");
             });
         }
-
         private _playEvent: any;
         private _updateEvent: any;
         private _endEvent: any;
         protected isNeedCheckPlay:boolean=false;
-
         /**
          * @property _repeate
          * @type {number}
@@ -117,13 +115,11 @@ namespace annie {
                 s._loop = loop;
                 s._repeate = loop;
             }
-            try {
+            if(s.media.currentTime != start) {
                 s.media.currentTime = start;
-            } catch (e) {
-                console.log(e);
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            //if (s.isNeedCheckPlay) {
+            if (s.media.readyState==4) {
                 let wsb: any = window;
                 if (wsb.WeixinJSBridge) {
                     try {
@@ -134,12 +130,13 @@ namespace annie {
                 } else {
                     s.media.play();
                 }
-            //}
+                s.isNeedCheckPlay=false;
+            }else{
+                s.isNeedCheckPlay=true;
+            }
             s.isPlaying = true;
         }
-
         private _SBWeixin: any;
-
         private _weixinSB() {
             this.media.play();
         }
