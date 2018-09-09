@@ -10532,4 +10532,3 @@ var trace = function () {
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-//同时抛出一个点击事件试试
