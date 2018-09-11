@@ -721,7 +721,6 @@ namespace annie {
             let data: any;
             let leftX: number = s._offsetX;
             let leftY: number = s._offsetY;
-            let isBeginPath=false;
             let isStroke=false;
             if(isMask){
                 ctx.beginPath();
@@ -761,7 +760,7 @@ namespace annie {
                     }
                 }
             }
-            if(isMask&&isBeginPath){
+            if(isMask){
                 ctx.closePath();
             }
         }

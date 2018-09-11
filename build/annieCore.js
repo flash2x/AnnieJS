@@ -3449,7 +3449,6 @@ var annie;
             var data;
             var leftX = s._offsetX;
             var leftY = s._offsetY;
-            var isBeginPath = false;
             var isStroke = false;
             if (isMask) {
                 ctx.beginPath();
@@ -3497,7 +3496,7 @@ var annie;
                     }
                 }
             }
-            if (isMask && isBeginPath) {
+            if (isMask) {
                 ctx.closePath();
             }
         };
