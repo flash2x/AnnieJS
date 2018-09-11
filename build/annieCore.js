@@ -4239,7 +4239,6 @@ var annie;
              */
             this.name = "";
             this._loop = 1;
-            this.isNeedCheckPlay = false;
             /**
              * @property _repeate
              * @type {number}

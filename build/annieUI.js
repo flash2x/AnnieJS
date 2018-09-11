@@ -1585,11 +1585,11 @@ var annieUI;
             var s = this;
             if (!s._isInit || isReset) {
                 s.data = data;
-                s._isInit = 1;
             }
             else {
                 s.data = s.data.concat(data);
             }
+            s._isInit = 1;
             s._lastFirstId = -1;
             s.maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -1636,8 +1636,8 @@ var annieUI;
                         }
                     }
                     id++;
-                    s._isInit = 2;
                 }
+                s._isInit = 2;
             }
         };
         /**
