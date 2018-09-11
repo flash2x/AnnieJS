@@ -3129,28 +3129,18 @@ var annie;
             var data;
             var leftX = s._offsetX;
             var leftY = s._offsetY;
-            var isBeginPath = false;
+            var isStroke = false;
+            if (isMask) {
+                ctx.beginPath();
+            }
             for (var i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
-                    if (data[1] == "beginPath") {
-                        if (isMask) {
-                            if (!isBeginPath) {
-                                isBeginPath = true;
-                            }
-                            else {
-                                continue;
-                            }
-                        }
-                    }
-                    ;
-                    if (isMask && data[1] == "closePath") {
-                        continue;
-                    }
                     var paramsLen = data[2].length;
+                    if (isMask && (isStroke || data[1] == "beginPath" || data[1] == "closePath" || paramsLen == 0))
+                        continue;
                     if (paramsLen == 0) {
-                        if (!isMask)
-                            ctx[data[1]]();
+                        ctx[data[1]]();
                     }
                     else if (paramsLen == 2) {
                         ctx[data[1]](data[2][0], data[2][1]);
@@ -3173,10 +3163,20 @@ var annie;
                     }
                 }
                 else {
-                    ctx[data[1]] = data[2];
+                    if (isMask) {
+                        if (data[1] == "strokeStyle") {
+                            isStroke = true;
+                        }
+                        else if (data[1] == "fillStyle") {
+                            isStroke = false;
+                        }
+                    }
+                    else {
+                        ctx[data[1]] = data[2];
+                    }
                 }
             }
-            if (isMask && isBeginPath) {
+            if (isMask) {
                 ctx.closePath();
             }
         };
