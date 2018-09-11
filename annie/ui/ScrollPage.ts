@@ -342,7 +342,7 @@ namespace annieUI {
             }else if(dis>s.maxDistance-newDis){
                 dis=s.maxDistance-newDis;
             }
-            if(time>0) {
+            if(time>0){
                 if (Math.abs(s.view[s.paramXY] + dis) > 2) {
                     s.autoScroll = true;
                     s.isStop = true;

@@ -3450,27 +3450,18 @@ var annie;
             var leftX = s._offsetX;
             var leftY = s._offsetY;
             var isBeginPath = false;
+            var isStroke = false;
+            if (isMask) {
+                ctx.beginPath();
+            }
             for (var i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
-                    if (data[1] == "beginPath") {
-                        if (isMask) {
-                            if (!isBeginPath) {
-                                isBeginPath = true;
-                            }
-                            else {
-                                continue;
-                            }
-                        }
-                    }
-                    ;
-                    if (isMask && data[1] == "closePath") {
-                        continue;
-                    }
                     var paramsLen = data[2].length;
+                    if (isMask && (isStroke || data[1] == "beginPath" || data[1] == "closePath" || paramsLen == 0))
+                        continue;
                     if (paramsLen == 0) {
-                        if (!isMask)
-                            ctx[data[1]]();
+                        ctx[data[1]]();
                     }
                     else if (paramsLen == 2) {
                         ctx[data[1]](data[2][0], data[2][1]);
@@ -3493,7 +3484,17 @@ var annie;
                     }
                 }
                 else {
-                    ctx[data[1]] = data[2];
+                    if (isMask) {
+                        if (data[1] == "strokeStyle") {
+                            isStroke = true;
+                        }
+                        else if (data[1] == "fillStyle") {
+                            isStroke = false;
+                        }
+                    }
+                    else {
+                        ctx[data[1]] = data[2];
+                    }
                 }
             }
             if (isMask && isBeginPath) {
@@ -4303,23 +4304,17 @@ var annie;
                 s.media.currentTime = start;
             }
             //马蛋的有些ios微信无法自动播放,需要做一些特殊处理
-            if (s.media.readyState == 4) {
-                var wsb = window;
-                if (wsb.WeixinJSBridge) {
-                    try {
-                        wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
-                    }
-                    catch (e) {
-                        s.media.play();
-                    }
+            var wsb = window;
+            if (wsb.WeixinJSBridge) {
+                try {
+                    wsb.WeixinJSBridge.invoke("getNetworkType", {}, s._SBWeixin);
                 }
-                else {
+                catch (e) {
                     s.media.play();
                 }
-                s.isNeedCheckPlay = false;
             }
             else {
-                s.isNeedCheckPlay = true;
+                s.media.play();
             }
             s.isPlaying = true;
         };
@@ -4441,11 +4436,6 @@ var annie;
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
-            s.media.addEventListener("canplaythrough", s._canplay = function () {
-                if (s.isNeedCheckPlay) {
-                    s.play2();
-                }
-            });
         }
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
@@ -4455,7 +4445,6 @@ var annie;
          */
         Sound.prototype.destroy = function () {
             var s = this;
-            s.media.removeEventListener("canplaythrough", s._canplay);
             var len = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
@@ -6343,12 +6332,14 @@ var annie;
             this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                s._UI.UM = true;
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize();
-                s.setAlign();
-                s.update();
+                if (s.divHeight != whObj.h && s.divWidth != whObj.w) {
+                    s._UI.UM = true;
+                    s.divHeight = whObj.h;
+                    s.divWidth = whObj.w;
+                    s.renderObj.reSize();
+                    s.setAlign();
+                    s.update();
+                }
             };
             var s = this;
             s._instanceType = "annie.Stage";

@@ -21,6 +21,7 @@ namespace annie {
          * @event annie.Event.ON_PLAY_END
          * @since 1.1.0
          */
+
         /**
          * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
          * @event annie.Event.ON_PLAY_START
@@ -40,15 +41,10 @@ namespace annie {
          */
         public constructor(src: any) {
             super(src, "Audio");
-            let s:any = this;
+            let s: any = this;
             s._instanceType = "annie.Sound";
             annie.Sound._soundList.push(s);
             s.volume = Sound._volume;
-            s.media.addEventListener("canplaythrough", s._canplay = function () {
-                if(s.isNeedCheckPlay) {
-                    s.play2();
-                }
-            });
         }
         /**
          * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
@@ -57,8 +53,7 @@ namespace annie {
          * @since 1.1.1
          */
         public destroy(): void {
-            let s:any=this;
-            s.media.removeEventListener("canplaythrough", s._canplay);
+            let s: any = this;
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
@@ -75,12 +70,13 @@ namespace annie {
          * @public
          * @return {void}
          */
-        public stop2():void {
+        public stop2(): void {
             let s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         }
+
         /**
          * 如果你的项目有背景音乐一直在播放,但可能项目里需要播放视频的时候，需要停止背景音乐或者其他需求，
          * 视频播放完之后再恢复背景音乐播放。这个时候，你要考虑用户之前是否有主动关闭过背景音乐，有的话，
@@ -93,13 +89,14 @@ namespace annie {
          */
         public play2() {
             let s = this;
-            if (s.isPlaying){
+            if (s.isPlaying) {
                 s.play();
             }
         }
 
         //声音对象池
         private static _soundList: any = [];
+
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method stopAllSounds
@@ -155,6 +152,7 @@ namespace annie {
             }
             Sound._volume = volume;
         }
+
         private static _volume: number = 1;
     }
 }

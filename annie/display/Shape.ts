@@ -722,24 +722,16 @@ namespace annie {
             let leftX: number = s._offsetX;
             let leftY: number = s._offsetY;
             let isBeginPath=false;
+            let isStroke=false;
+            if(isMask){
+                ctx.beginPath();
+            }
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0){
-                    if(data[1]=="beginPath"){
-                        if(isMask) {
-                            if (!isBeginPath) {
-                                isBeginPath = true;
-                            }else{
-                                continue;
-                            }
-                        }
-                    };
-                    if(isMask&&data[1]=="closePath"){
-                        continue;
-                    }
                     let paramsLen = data[2].length;
+                    if(isMask&&(isStroke||data[1] == "beginPath"||data[1] == "closePath"||paramsLen==0)) continue;
                     if (paramsLen == 0) {
-                        if(!isMask)
                         ctx[data[1]]();
                     } else if (paramsLen == 2) {
                         ctx[data[1]](data[2][0], data[2][1]);
@@ -758,14 +750,21 @@ namespace annie {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {
-                    ctx[data[1]] = data[2];
+                    if(isMask) {
+                        if (data[1] == "strokeStyle") {
+                            isStroke = true;
+                        } else if (data[1] == "fillStyle") {
+                            isStroke = false;
+                        }
+                    }else {
+                        ctx[data[1]] = data[2];
+                    }
                 }
             }
             if(isMask&&isBeginPath){
                 ctx.closePath();
             }
         }
-
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
             let s = this;
             let obj = super.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);

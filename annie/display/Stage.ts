@@ -309,7 +309,7 @@ namespace annie {
             window.addEventListener("resize", s._resizeEvent = function (e: any) {
                 clearTimeout(s._rid);
                 s._rid = setTimeout(function () {
-                    if (s.autoResize) {
+                    if (s.autoResize){
                         s.resize();
                     }
                     let event = new Event("onResize");
@@ -879,12 +879,14 @@ namespace annie {
         public resize = function (): void {
             let s: Stage = this;
             let whObj = s.getRootDivWH(s.rootDiv);
-            s._UI.UM = true;
-            s.divHeight = whObj.h;
-            s.divWidth = whObj.w;
-            s.renderObj.reSize();
-            s.setAlign();
-            s.update();
+            if(s.divHeight!=whObj.h&&s.divWidth!=whObj.w){
+                s._UI.UM = true;
+                s.divHeight = whObj.h;
+                s.divWidth = whObj.w;
+                s.renderObj.reSize();
+                s.setAlign();
+                s.update();
+            }
         };
 
         public getBounds(): Rectangle {
