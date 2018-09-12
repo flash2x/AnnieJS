@@ -62,7 +62,7 @@ namespace annieUI {
          * @default 0
          */
         protected viewHeight: number = 0;
-        private _tweenId:number=0;
+        private _tweenId:number=-1;
         /**
          * 整个滚动的最大距离值
          * @property maxDistance
@@ -343,13 +343,21 @@ namespace annieUI {
                 dis=s.maxDistance-newDis;
             }
             if(time>0){
-                if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                if (Math.abs(s.view[s.paramXY] + dis) > 2){
+                    if(s._tweenId!=-1)
+                    annie.Tween.kill(s._tweenId);
                     s.autoScroll = true;
                     s.isStop = true;
                     s.isMouseDownState = 0;
                     let obj: any = {};
                     obj.onComplete = function () {
                         s.autoScroll = false;
+                        s.dispatchEvent("onScrollStop");
+                        if(dis==0){
+                            s.dispatchEvent("onScrollToHead");
+                        }else if(dis==s.maxDistance-newDis){
+                            s.dispatchEvent("onScrollToEnd");
+                        }
                     };
                     obj[s.paramXY] = -dis;
                     s._tweenId = annie.Tween.to(s.view, time, obj);

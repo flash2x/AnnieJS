@@ -98,7 +98,6 @@ namespace annie {
          * @default 1
          */
         private _repeate: number = 1;
-
         /**
          * 开始播放媒体
          * @method play
