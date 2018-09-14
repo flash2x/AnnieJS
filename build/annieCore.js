@@ -6565,7 +6565,6 @@ var annie;
             var sw = div.style.width;
             var sh = div.style.height;
             var iw = document.body.clientWidth;
-            // let ih = document.body.clientHeight-40;
             var ih = document.body.clientHeight;
             var vW = parseInt(sw);
             var vH = parseInt(sh);
@@ -10355,7 +10354,6 @@ var annie;
     annie.sendToURL = sendToURL;
     // 作为将显示对象导出成图片的render渲染器
     var _dRender = null;
-    var _dSprite = null;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -10387,20 +10385,19 @@ var annie;
             _dRender = new annie.CanvasRender(null);
         }
         _dRender.rootContainer = annie.DisplayObject["_canvas"];
-        var objParent = obj.parent;
-        if (!_dSprite) {
-            _dSprite = new annie.Sprite();
-        }
-        obj.parent = _dSprite;
-        _dRender._stage = _dSprite;
-        _dSprite.children[0] = obj;
+        var objInfo = {
+            p: obj.parent,
+            x: obj.x,
+            y: obj.y };
+        obj.parent = null;
+        _dRender._stage = obj;
         if (!rect) {
             rect = obj.getDrawRect();
         }
         var w = rect.width;
         var h = rect.height;
-        _dSprite.x = -rect.x;
-        _dSprite.y = -rect.y;
+        obj.x = -rect.x;
+        obj.y = -rect.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
         // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
@@ -10413,11 +10410,12 @@ var annie;
             _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
-        _dSprite._UI.UM = true;
-        _dSprite.update(false);
-        _dSprite.render(_dRender);
-        _dSprite.children.length = 0;
-        obj.parent = objParent;
+        obj._UI.UM = true;
+        obj.update(false);
+        obj.render(_dRender);
+        obj.parent = objInfo.p;
+        obj.x = objInfo.x;
+        obj.y = objInfo.y;
         obj._UI.UM = true;
         obj.update(false);
         if (!typeInfo) {

@@ -451,7 +451,6 @@ namespace annie {
             let sw = div.style.width;
             let sh = div.style.height;
             let iw = document.body.clientWidth;
-            // let ih = document.body.clientHeight-40;
             let ih = document.body.clientHeight;
             let vW = parseInt(sw);
             let vH = parseInt(sh);
