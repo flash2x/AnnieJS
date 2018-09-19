@@ -2323,7 +2323,7 @@ var annie;
             if (sounds) {
                 if (typeof (id) == "string") {
                     for (var i = sounds.length - 1; i >= 0; i--) {
-                        if (sounds[i].name == "id") {
+                        if (sounds[i].name == id) {
                             sounds.splice(id, 1);
                         }
                     }
