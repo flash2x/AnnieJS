@@ -8628,11 +8628,11 @@ var annie;
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         _currentConfig[_loadIndex].shift();
-        annie.res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
         }
         else {
+            annie.res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
             var info = {};
             info.sceneName = _loadSceneNames[_loadIndex];
             _loadIndex++;
@@ -8641,7 +8641,7 @@ var annie;
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                //_progressCallback(100);
+                _progressCallback(100);
                 _completeCallback(info);
             }
             else {

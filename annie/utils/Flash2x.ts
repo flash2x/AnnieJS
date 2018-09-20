@@ -256,7 +256,6 @@ namespace annie {
             }
         }
     }
-
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
@@ -280,16 +279,15 @@ namespace annie {
         }
         _checkComplete();
     }
-
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         _currentConfig[_loadIndex].shift();
-        res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
         } else {
+            res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
             var info: any = {};
             info.sceneName = _loadSceneNames[_loadIndex];
             _loadIndex++;
@@ -298,7 +296,7 @@ namespace annie {
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                //_progressCallback(100);
+                _progressCallback(100);
                 _completeCallback(info);
             }
             else {
