@@ -173,11 +173,11 @@ var annieUI;
             this.autoScroll = false;
             /**
              * 是否有回弹效果，默认是true
-             * @property isSpringback
+             * @property isSpringBack
              * @type {boolean}
              * @since 2.0.1
              */
-            this.isSpringback = true;
+            this.isSpringBack = true;
             var s = this;
             s._instanceType = "annie.ScrollPage";
             s.addChild(s.maskObj);
@@ -196,6 +196,22 @@ var annieUI;
                 var view = s.view;
                 if (s.autoScroll)
                     return;
+                if (!s.isSpringBack) {
+                    if (view[s.paramXY] > 0) {
+                        s.addSpeed = 0;
+                        s.speed = 0;
+                        s.isStop = true;
+                        view[s.paramXY] = 0;
+                        return;
+                    }
+                    else if (view[s.paramXY] < s.distance - s.maxDistance) {
+                        s.addSpeed = 0;
+                        s.speed = 0;
+                        s.isStop = true;
+                        view[s.paramXY] = s.distance - s.maxDistance;
+                        return;
+                    }
+                }
                 if (!s.isStop) {
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
@@ -223,9 +239,6 @@ var annieUI;
                                     }
                                 }
                                 view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
-                                if (s.isSpringback) {
-                                    tarP = view[s.paramXY] = 0;
-                                }
                                 if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     if (s.addSpeed > 0) {

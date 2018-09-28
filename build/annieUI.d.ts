@@ -142,11 +142,11 @@ declare namespace annieUI {
         private autoScroll;
         /**
          * 是否有回弹效果，默认是true
-         * @property isSpringback
+         * @property isSpringBack
          * @type {boolean}
          * @since 2.0.1
          */
-        isSpringback: boolean;
+        isSpringBack: boolean;
         /**
          * 构造函数
          * @method  ScrollPage
