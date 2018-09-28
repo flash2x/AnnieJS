@@ -121,6 +121,13 @@ declare namespace annieUI {
         private isMouseDownState;
         private autoScroll;
         /**
+         * 是否有回弹效果，默认是true
+         * @property isSpringback
+         * @type {boolean}
+         * @since 2.0.1
+         */
+        isSpringback: boolean;
+        /**
          * 构造函数
          * @method  ScrollPage
          * @param {number} vW 可视区域宽
@@ -157,6 +164,13 @@ declare namespace annieUI {
          */
         scrollTo(dis: number, time?: number): void;
         destroy(): void;
+        /**
+         * @property currentPos
+         * 获取当前滑动的位置
+         * @type {number}
+         * @since 2.0.1
+         */
+        currentPos: number;
     }
 }
 /**
