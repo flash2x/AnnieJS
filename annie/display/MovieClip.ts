@@ -39,9 +39,9 @@ namespace annie {
          * @readonly
          */
         public get currentFrame(): number {
-            return this._curFrame;
+            let s=this;
+            return s._wantFrame>0?s._wantFrame:s._curFrame;
         }
-
         private _curFrame: number = 1;
         private _wantFrame: number = 0;
         private _lastFrameObj: any = null;

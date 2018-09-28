@@ -3820,7 +3820,8 @@ var annie;
              * @readonly
              */
             get: function () {
-                return this._curFrame;
+                var s = this;
+                return s._wantFrame > 0 ? s._wantFrame : s._curFrame;
             },
             enumerable: true,
             configurable: true
