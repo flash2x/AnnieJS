@@ -1749,6 +1749,12 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @return {void}
+         * @example
+         *      var shape=new annie.Shape();
+         *      shape.beginLinearGradientFill([0,0,200,0],[[0,"#ff0000",1],[0.164706,"#ffff00",1],[0.364706,"#00ff00",1],[0.498039,"#00ffff",1],[0.666667,"#0000ff",1],[0.831373,"#ff00ff",1],[1,"#ff0000",1]]);
+         *      shape.drawRect(0,0,200,200);
+         *      shape.endFill();
+         *      s.addChild(shape);
          */
         beginLinearGradientFill(points: any, colors: any): void;
         /**
@@ -1760,6 +1766,12 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @return {void}
+         * @example
+         *      var shape=new annie.Shape();
+         *      shape.beginRadialGradientFill([100,100,100,100,100],[[0,"#00ff00",1],[1,"#000000",1]]);
+         *      shape.drawRect(0,0,200,200);
+         *      shape.endFill();
+         *      s.addChild(shape);
          */
         beginRadialGradientFill: (points: any, colors: any) => void;
         /**
