@@ -62,7 +62,7 @@ namespace annieUI {
          * @default 0
          */
         protected viewHeight: number = 0;
-        private _tweenId:number=-1;
+        private _tweenId:number=0;
         /**
          * 整个滚动的最大距离值
          * @property maxDistance
@@ -147,7 +147,13 @@ namespace annieUI {
         private isMouseDownState: number = 0;
         //是否是通过scrollTo方法在滑动中
         private autoScroll: boolean = false;
-
+        /**
+         * 是否有回弹效果，默认是true
+         * @property isSpringback
+         * @type {boolean}
+         * @since 2.0.1
+         */
+        public isSpringback:boolean=true;
         /**
          * 构造函数
          * @method  ScrollPage
@@ -207,6 +213,9 @@ namespace annieUI {
                                     }
                                 }
                                 view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
+                                if(s.isSpringback){
+                                    tarP=view[s.paramXY]=0;
+                                }
                                 if (Math.abs(tarP-view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     if(s.addSpeed>0){
@@ -374,6 +383,17 @@ namespace annieUI {
             s.maskObj=null;
             s.view=null;
             super.destroy();
+        }
+
+        /**
+         * @property currentPos
+         * 获取当前滑动的位置
+         * @type {number}
+         * @since 2.0.1
+         */
+        public get currentPos():number{
+            let s:any=this;
+            return -s.view[s.paramXY];
         }
     }
 }

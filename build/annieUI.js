@@ -86,7 +86,7 @@ var annieUI;
              * @default 0
              */
             this.viewHeight = 0;
-            this._tweenId = -1;
+            this._tweenId = 0;
             /**
              * 整个滚动的最大距离值
              * @property maxDistance
@@ -171,6 +171,13 @@ var annieUI;
             this.isMouseDownState = 0;
             //是否是通过scrollTo方法在滑动中
             this.autoScroll = false;
+            /**
+             * 是否有回弹效果，默认是true
+             * @property isSpringback
+             * @type {boolean}
+             * @since 2.0.1
+             */
+            this.isSpringback = true;
             var s = this;
             s._instanceType = "annie.ScrollPage";
             s.addChild(s.maskObj);
@@ -216,6 +223,9 @@ var annieUI;
                                     }
                                 }
                                 view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
+                                if (s.isSpringback) {
+                                    tarP = view[s.paramXY] = 0;
+                                }
                                 if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     if (s.addSpeed > 0) {
@@ -398,6 +408,20 @@ var annieUI;
             s.view = null;
             _super.prototype.destroy.call(this);
         };
+        Object.defineProperty(ScrollPage.prototype, "currentPos", {
+            /**
+             * @property currentPos
+             * 获取当前滑动的位置
+             * @type {number}
+             * @since 2.0.1
+             */
+            get: function () {
+                var s = this;
+                return -s.view[s.paramXY];
+            },
+            enumerable: true,
+            configurable: true
+        });
         return ScrollPage;
     }(Sprite));
     annieUI.ScrollPage = ScrollPage;
