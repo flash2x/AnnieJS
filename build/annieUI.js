@@ -38,6 +38,28 @@ var annieUI;
         function ScrollPage(vW, vH, maxDistance, isVertical) {
             if (isVertical === void 0) { isVertical = true; }
             _super.call(this);
+            //Event
+            /**
+             * annie.ScrollPage组件滑动到开始位置事件
+             * @event annie.Event.ON_SCROLL_TO_HEAD
+             * @since 1.1.0
+             */
+            /**
+             * annie.ScrollPage组件停止滑动事件
+             * @event annie.Event.ON_SCROLL_STOP
+             * @since 1.1.0
+             */
+            /**
+             * annie.ScrollPage组件开始滑动事件
+             * @event annie.Event.ON_SCROLL_START
+             * @since 1.1.0
+             */
+            /**
+             * annie.ScrollPage组件滑动到结束位置事件
+             * @event annie.Event.ON_SCROLL_TO_END
+             * @since 1.1.0
+             */
+            //
             /**
              * 横向还是纵向 默认为纵向
              * @property isVertical
@@ -152,11 +174,11 @@ var annieUI;
             this.autoScroll = false;
             /**
              * 是否有回弹效果，默认是true
-             * @property isSpringback
+             * @property isSpringBack
              * @type {boolean}
              * @since 2.0.1
              */
-            this.isSpringback = true;
+            this.isSpringBack = true;
             var s = this;
             s._instanceType = "annie.ScrollPage";
             s.addChild(s.maskObj);
@@ -175,6 +197,22 @@ var annieUI;
                 var view = s.view;
                 if (s.autoScroll)
                     return;
+                if (!s.isSpringBack) {
+                    if (view[s.paramXY] > 0) {
+                        s.addSpeed = 0;
+                        s.speed = 0;
+                        s.isStop = true;
+                        view[s.paramXY] = 0;
+                        return;
+                    }
+                    else if (view[s.paramXY] < s.distance - s.maxDistance) {
+                        s.addSpeed = 0;
+                        s.speed = 0;
+                        s.isStop = true;
+                        view[s.paramXY] = s.distance - s.maxDistance;
+                        return;
+                    }
+                }
                 if (!s.isStop) {
                     if (Math.abs(s.speed) > 0) {
                         view[s.paramXY] += s.speed;
@@ -202,9 +240,6 @@ var annieUI;
                                     }
                                 }
                                 view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
-                                if (s.isSpringback) {
-                                    tarP = view[s.paramXY] = 0;
-                                }
                                 if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
                                     s.isStop = true;
                                     if (s.addSpeed > 0) {
@@ -354,12 +389,21 @@ var annieUI;
             }
             if (time > 0) {
                 if (Math.abs(s.view[s.paramXY] + dis) > 2) {
+                    if (s._tweenId != -1)
+                        annie.Tween.kill(s._tweenId);
                     s.autoScroll = true;
                     s.isStop = true;
                     s.isMouseDownState = 0;
                     var obj = {};
                     obj.onComplete = function () {
                         s.autoScroll = false;
+                        s.dispatchEvent("onScrollStop");
+                        if (dis == 0) {
+                            s.dispatchEvent("onScrollToHead");
+                        }
+                        else if (dis == s.maxDistance - newDis) {
+                            s.dispatchEvent("onScrollToEnd");
+                        }
                     };
                     obj[s.paramXY] = -dis;
                     s._tweenId = annie.Tween.to(s.view, time, obj);
