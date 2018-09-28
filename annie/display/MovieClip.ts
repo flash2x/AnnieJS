@@ -45,7 +45,6 @@ namespace annie {
         private _curFrame: number = 1;
         private _wantFrame: number = 0;
         private _lastFrameObj: any = null;
-
         /**
          * 当前动画是否处于播放状态
          * @property isPlaying
