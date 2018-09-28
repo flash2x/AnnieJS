@@ -12,6 +12,26 @@ declare namespace annieUI {
      */
     class ScrollPage extends Sprite {
         /**
+         * annie.ScrollPage组件滑动到开始位置事件
+         * @event annie.Event.ON_SCROLL_TO_HEAD
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件停止滑动事件
+         * @event annie.Event.ON_SCROLL_STOP
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件开始滑动事件
+         * @event annie.Event.ON_SCROLL_START
+         * @since 1.1.0
+         */
+        /**
+         * annie.ScrollPage组件滑动到结束位置事件
+         * @event annie.Event.ON_SCROLL_TO_END
+         * @since 1.1.0
+         */
+        /**
          * 横向还是纵向 默认为纵向
          * @property isVertical
          * @type {boolean}
@@ -122,11 +142,11 @@ declare namespace annieUI {
         private autoScroll;
         /**
          * 是否有回弹效果，默认是true
-         * @property isSpringback
+         * @property isSpringBack
          * @type {boolean}
          * @since 2.0.1
          */
-        isSpringback: boolean;
+        isSpringBack: boolean;
         /**
          * 构造函数
          * @method  ScrollPage

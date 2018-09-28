@@ -13,7 +13,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    export let version: string = "2.0.0";
+    export let version: string = "2.0.1";
     /**
      * 设备的retina值,简单点说就是几个像素表示设备上的一个点
      * @property annie.devicePixelRatio
