@@ -348,7 +348,6 @@ namespace annieUI {
             }
             // }
         }
-
         /**
          * 滚到指定的坐标位置
          * @method scrollTo

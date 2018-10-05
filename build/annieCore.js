@@ -5773,7 +5773,7 @@ var annie;
                 s._offsetX = -10;
                 s._offsetY = -10;
                 s._UI.UD = false;
-                //给webgl更新新
+                //给webGl更新新
                 //s._texture.updateTexture = true;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
