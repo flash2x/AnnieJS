@@ -20,6 +20,7 @@ namespace annie {
          */
         public media: any = null;
         private _loop: number = 0;
+
         /**
          * 构造函数
          * @method Sound
@@ -30,35 +31,35 @@ namespace annie {
         public constructor(src: string) {
             super();
             let s = this;
-            s._instanceType="annie.Sound";
-            s.media =annie.createAudio();
+            s._instanceType = "annie.Sound";
+            s.media = annie.createAudio();
             s.media.src = src;
-            s.media.onEnded(function(e:any){
-                s.dispatchEvent("onPlayEnd",e);
-                if(s._loop>1){
+            s.media.onEnded(function (e: any) {
+                s.dispatchEvent("onPlayEnd", e);
+                if (s._loop > 1) {
                     s._loop--;
-                    s.media.startTime=0;
+                    s.media.startTime = 0;
                     s.media.play();
                 }
             });
-            s.media.onPlay(function(e:any){
-                s.dispatchEvent("onPlayStart",e);
+            s.media.onPlay(function (e: any) {
+                s.dispatchEvent("onPlayStart", e);
             });
-            s.media.onTimeUpdate(function(e:any){
-                s.dispatchEvent("onPlayUpdate",e);
-            });
-            s.media.onCanplay(function (e: any) {
-                s.play2();
+            s.media.onTimeUpdate(function (e: any) {
+                s.dispatchEvent("onPlayUpdate", e);
             });
             annie.Sound._soundList.push(s);
         }
-        private _repeate:number=1;
+        private _repeate: number = 1;
         /**
          * 是否正在播放中
          * @property  isPlaying
+         * @public
+         * @since 2.0.0
          * @type {boolean}
          */
-        public isPlaying:boolean=true;
+        public isPlaying: boolean = true;
+
         /**
          * 开始播放媒体
          * @method play
@@ -67,20 +68,19 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public play(start: number=0, loop: number=0): void {
+        public play(start: number = 0, loop: number = 0): void {
             let s = this;
             s.media.startTime = start;
-            if(loop==0){
-                s._loop=s._repeate;
-            }else{
-                s._loop=loop;
-                s._repeate=loop;
+            if (loop == 0) {
+                s._loop = s._repeate;
+            } else {
+                s._loop = loop;
+                s._repeate = loop;
             }
-            if(s.media.buffered>0) {
-                s.media.play();
-            }
-            s.isPlaying=true;
+            s.media.play();
+            s.isPlaying = true;
         }
+
         /**
          * 停止播放
          * @method stop
@@ -212,8 +212,7 @@ namespace annie {
             s.media.offTimeUpdate();
             s.media.offPlay();
             s.media.offEnded();
-            s.media.offCanplay();
-            s.media=null;
+            s.media = null;
         }
     }
 }
