@@ -5595,9 +5595,6 @@ var annie;
             s.media.onTimeUpdate(function (e) {
                 s.dispatchEvent("onPlayUpdate", e);
             });
-            s.media.onCanplay(function (e) {
-                s.play2();
-            });
             annie.Sound._soundList.push(s);
         }
         /**
@@ -5620,9 +5617,7 @@ var annie;
                 s._loop = loop;
                 s._repeate = loop;
             }
-            if (s.media.buffered > 0) {
-                s.media.play();
-            }
+            s.media.play();
             s.isPlaying = true;
         };
         /**
@@ -5752,7 +5747,6 @@ var annie;
             s.media.offTimeUpdate();
             s.media.offPlay();
             s.media.offEnded();
-            s.media.offCanplay();
             s.media = null;
         };
         //声音对象池

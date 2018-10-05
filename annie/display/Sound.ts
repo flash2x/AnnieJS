@@ -48,9 +48,6 @@ namespace annie {
             s.media.onTimeUpdate(function (e: any) {
                 s.dispatchEvent("onPlayUpdate", e);
             });
-            s.media.onCanplay(function (e: any) {
-                s.play2();
-            });
             annie.Sound._soundList.push(s);
         }
         private _repeate: number = 1;
@@ -80,9 +77,7 @@ namespace annie {
                 s._loop = loop;
                 s._repeate = loop;
             }
-            if(s.media.buffered>0) {
-                s.media.play();
-            }
+            s.media.play();
             s.isPlaying = true;
         }
 
@@ -226,7 +221,6 @@ namespace annie {
             s.media.offTimeUpdate();
             s.media.offPlay();
             s.media.offEnded();
-            s.media.offCanplay();
             s.media = null;
         }
     }
