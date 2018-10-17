@@ -19,7 +19,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public constructor(stage: Stage, ctx: any) {
+        public constructor(stage: Stage, ctx: any){
             super();
             let s = this;
             s._instanceType = "annie.CanvasRender";
@@ -111,7 +111,7 @@ namespace annie {
             }
         }
         public drawSharedCanvas():void{
-            if(SharedCanvas.canvas) {
+            if(SharedCanvas.canvas){
                 let ctx = CanvasRender.drawCtx;
                 ctx.globalAlpha = 1;
                 ctx.setTransform(1, 0, 0, 1, 0, 0);

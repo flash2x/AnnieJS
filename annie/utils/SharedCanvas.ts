@@ -28,8 +28,8 @@ namespace annie {
                     devicePixelRatio: annie.devicePixelRatio
                 }
             });
-            s.width=stage.divWidth;
-            s.height=stage.divHeight;
+            s.context.canvas.width=s.width;
+            s.context.canvas.height=s.height;
         }
         public static destroy():void{
             //清除相应的数据引用
@@ -39,8 +39,6 @@ namespace annie {
         }
         public static canvas: any;
         public static context: any;
-        private static width:number=0;
-        private static height:number=0;
         /**
          * 向子域传消息
          * @method postMessage
@@ -55,26 +53,35 @@ namespace annie {
             }
         }
 
+        /**
+         * 显示开放域
+         * @method show
+         * @since 2.0.1
+         */
         public static show(): void {
             let s = SharedCanvas;
             if(s.context){
                 s.context.postMessage({event: "onShow"});
                 s.canvas = s.context.canvas;
-                s.canvas.width=s.width;
-                s.canvas.height=s.height;
             }
         }
-        public static hide(isSharedDomain:boolean=true): void {
-            if(!isSharedDomain) {
+
+        /**
+         * 隐藏开放域
+         * @method hide
+         * @since 2.0.1
+         */
+        public static hide():void{
+           // if(!isSharedDomain) {
                 let s = SharedCanvas;
                 if (s.context) {
                     s.context.postMessage({event: "onHide"});
                     s.canvas = null;
                 }
-            }else{
-                annie.Stage.pause=true;
-                CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;
-            }
+            // }else{
+            //     annie.Stage.pause=true;
+            //     CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;
+            // }
         }
     }
 }
