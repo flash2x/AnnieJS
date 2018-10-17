@@ -400,8 +400,8 @@ namespace annieUI {
         }
 
         /**
-         * @property currentPos
          * 获取当前滑动的位置
+         * @property currentPos
          * @type {number}
          * @since 2.0.1
          */

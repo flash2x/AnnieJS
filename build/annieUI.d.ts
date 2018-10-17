@@ -185,8 +185,8 @@ declare namespace annieUI {
         scrollTo(dis: number, time?: number): void;
         destroy(): void;
         /**
-         * @property currentPos
          * 获取当前滑动的位置
+         * @property currentPos
          * @type {number}
          * @since 2.0.1
          */
