@@ -5760,11 +5760,33 @@ var annie;
  */
 var annie;
 (function (annie) {
+    /**
+     * TweenObj，具体的tween对象类
+     * @class annie.TweenObj
+     * @public
+     * @since 1.0.0
+     */
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
             _super.call(this);
+            /**
+             * 是否暂停，默认false
+             * @property pause
+             * @type {boolean}
+             */
+            this.pause = false;
+            /**
+             * 当前帧
+             * @property currentFrame
+             * @type {number}
+             */
             this.currentFrame = 0;
+            /**
+             * 总帧数
+             * @property totalFrames
+             * @type {number}
+             */
             this.totalFrames = 0;
             this._isLoop = 0;
             this._delay = 0;
@@ -5867,6 +5889,8 @@ var annie;
          */
         TweenObj.prototype.update = function () {
             var s = this;
+            if (s.pause)
+                return;
             if (s._isFront && s._delay > 0) {
                 s._delay--;
                 return;
@@ -5955,7 +5979,7 @@ var annie;
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -5976,7 +6000,7 @@ var annie;
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -6491,12 +6515,7 @@ var annie;
             }
             return Tween.bounceOut(k * 2 - 1) * 0.5 + 0.5;
         };
-        /**
-         * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
-         * @method flush
-         * @private
-         * @since 1.0.0
-         */
+        //这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
         Tween.flush = function () {
             var len = Tween._tweenList.length;
             for (var i = len - 1; i >= 0; i--) {
@@ -6750,8 +6769,8 @@ var annie;
                     devicePixelRatio: annie.devicePixelRatio
                 }
             });
-            s.width = stage.divWidth;
-            s.height = stage.divHeight;
+            s.context.canvas.width = stage.desWidth;
+            s.context.canvas.height = stage.desHeight;
         };
         SharedCanvas.destroy = function () {
             //清除相应的数据引用
@@ -6772,31 +6791,35 @@ var annie;
                 s.context.postMessage(data);
             }
         };
+        /**
+         * 显示开放域
+         * @method show
+         * @since 2.0.1
+         */
         SharedCanvas.show = function () {
             var s = SharedCanvas;
             if (s.context) {
                 s.context.postMessage({ event: "onShow" });
                 s.canvas = s.context.canvas;
-                s.canvas.width = s.width;
-                s.canvas.height = s.height;
             }
         };
-        SharedCanvas.hide = function (isSharedDomain) {
-            if (isSharedDomain === void 0) { isSharedDomain = true; }
-            if (!isSharedDomain) {
-                var s = SharedCanvas;
-                if (s.context) {
-                    s.context.postMessage({ event: "onHide" });
-                    s.canvas = null;
-                }
+        /**
+         * 隐藏开放域
+         * @method hide
+         * @since 2.0.1
+         */
+        SharedCanvas.hide = function () {
+            // if(!isSharedDomain) {
+            var s = SharedCanvas;
+            if (s.context) {
+                s.context.postMessage({ event: "onHide" });
+                s.canvas = null;
             }
-            else {
-                annie.Stage.pause = true;
-                annie.CanvasRender.drawCtx.canvas.width = annie.CanvasRender.drawCtx.canvas.height = 0;
-            }
+            // }else{
+            //     annie.Stage.pause=true;
+            //     CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;
+            // }
         };
-        SharedCanvas.width = 0;
-        SharedCanvas.height = 0;
         return SharedCanvas;
     }());
     annie.SharedCanvas = SharedCanvas;
@@ -7504,5 +7527,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-
-module.exports = annie;

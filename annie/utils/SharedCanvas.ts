@@ -28,8 +28,8 @@ namespace annie {
                     devicePixelRatio: annie.devicePixelRatio
                 }
             });
-            s.context.canvas.width=s.width;
-            s.context.canvas.height=s.height;
+            s.context.canvas.width=stage.desWidth;
+            s.context.canvas.height=stage.desHeight;
         }
         public static destroy():void{
             //清除相应的数据引用

@@ -2,15 +2,41 @@
  * @module annie
  */
 namespace annie {
+    /**
+     * TweenObj，具体的tween对象类
+     * @class annie.TweenObj
+     * @public
+     * @since 1.0.0
+     */
     export class TweenObj extends AObject {
         public constructor() {
             super();
         }
-
+        /**
+         * 是否暂停，默认false
+         * @property pause
+         * @type {boolean}
+         */
+        public pause:boolean=false;
+        /**
+         * 当前帧
+         * @property currentFrame
+         * @type {number}
+         */
         public currentFrame: number = 0;
+        /**
+         * 总帧数
+         * @property totalFrames
+         * @type {number}
+         */
         public totalFrames: number = 0;
         protected _startData: any;
         protected _disData: any;
+        /**
+         * 当前被tween的对象
+         * @property target
+         * @type {Object}
+         */
         public target: any;
         private _isTo: boolean;
         private _isLoop: number = 0;
@@ -21,7 +47,6 @@ namespace annie {
         private _isFront: boolean = true;
         private _cParams: any = null;
         private _loop: boolean = false;
-
         /**
          * 初始化数据
          * @method init
@@ -113,6 +138,7 @@ namespace annie {
          */
         public update(): void {
             let s = this;
+            if(s.pause)return;
             if (s._isFront && s._delay > 0) {
                 s._delay--;
                 return;
@@ -194,7 +220,7 @@ namespace annie {
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -216,7 +242,7 @@ namespace annie {
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -803,13 +829,7 @@ namespace annie {
             }
             return Tween.bounceOut(k * 2 - 1) * 0.5 + 0.5;
         }
-
-        /**
-         * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
-         * @method flush
-         * @private
-         * @since 1.0.0
-         */
+        //这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
         private static flush(): void {
             let len: number = Tween._tweenList.length;
             for (let i = len - 1; i >= 0; i--) {
@@ -819,7 +839,6 @@ namespace annie {
                     Tween._tweenList.splice(i, 1);
                 }
             }
-
         }
     }
 }
