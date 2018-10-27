@@ -2549,7 +2549,6 @@ var annie;
                     s._bounds.width = s._bounds.height = 0;
                 }
                 else {
-                    value.crossOrigin = "";
                     s._bounds.width = s._rect ? s._rect.width : value.width;
                     s._bounds.height = s._rect ? s._rect.height : value.height;
                 }
@@ -10260,7 +10259,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "2.0.1";
+    annie.version = "2.0.2";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

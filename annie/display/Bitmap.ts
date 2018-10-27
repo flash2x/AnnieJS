@@ -91,7 +91,6 @@ namespace annie {
             if (!value) {
                 s._bounds.width = s._bounds.height = 0;
             } else {
-                value.crossOrigin="";
                 s._bounds.width = s._rect ? s._rect.width : value.width;
                 s._bounds.height = s._rect ? s._rect.height : value.height;
             }
