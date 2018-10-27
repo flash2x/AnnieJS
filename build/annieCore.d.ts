@@ -2813,12 +2813,39 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
+    /**
+     * TweenObj，具体的tween对象类
+     * @class annie.TweenObj
+     * @public
+     * @since 1.0.0
+     */
     class TweenObj extends AObject {
         constructor();
+        /**
+         * 是否暂停，默认false
+         * @property pause
+         * @type {boolean}
+         */
+        pause: boolean;
+        /**
+         * 当前帧
+         * @property currentFrame
+         * @type {number}
+         */
         currentFrame: number;
+        /**
+         * 总帧数
+         * @property totalFrames
+         * @type {number}
+         */
         totalFrames: number;
         protected _startData: any;
         protected _disData: any;
+        /**
+         * 当前被tween的对象
+         * @property target
+         * @type {Object}
+         */
         target: any;
         private _isTo;
         private _isLoop;
@@ -2863,7 +2890,7 @@ declare namespace annie {
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -2882,7 +2909,7 @@ declare namespace annie {
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
-         * @param {number:boolean} data.yoyo 是否向摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
+         * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
          * @param {Function} data.onComplete 完成结束函数. 默认为null
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
@@ -3214,14 +3241,7 @@ declare namespace annie {
          * @return {number}
          */
         static bounceInOut(k: number): number;
-        /**
-         * 这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
-         * @method flush
-         * @private
-         * @since 1.0.0
-         */
         private static flush();
-        private static destroy();
     }
 }
 /**
