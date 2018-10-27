@@ -2,15 +2,41 @@
  * @module annie
  */
 namespace annie {
+    /**
+     * TweenObj，具体的tween对象类
+     * @class annie.TweenObj
+     * @public
+     * @since 1.0.0
+     */
     export class TweenObj extends AObject {
         public constructor() {
             super();
         }
-
+        /**
+         * 是否暂停，默认false
+         * @property pause
+         * @type {boolean}
+         */
+        public pause:boolean=false;
+        /**
+         * 当前帧
+         * @property currentFrame
+         * @type {number}
+         */
         public currentFrame: number = 0;
+        /**
+         * 总帧数
+         * @property totalFrames
+         * @type {number}
+         */
         public totalFrames: number = 0;
         protected _startData: any;
         protected _disData: any;
+        /**
+         * 当前被tween的对象
+         * @property target
+         * @type {Object}
+         */
         public target: any;
         private _isTo: boolean;
         private _isLoop: number = 0;
@@ -21,7 +47,6 @@ namespace annie {
         private _isFront: boolean = true;
         private _cParams: any = null;
         private _loop: boolean = false;
-
         /**
          * 初始化数据
          * @method init
@@ -113,6 +138,7 @@ namespace annie {
          */
         public update(): void {
             let s = this;
+            if(s.pause)return;
             if (s._isFront && s._delay > 0) {
                 s._delay--;
                 return;

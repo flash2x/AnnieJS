@@ -3905,12 +3905,39 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
+    /**
+     * TweenObj，具体的tween对象类
+     * @class annie.TweenObj
+     * @public
+     * @since 1.0.0
+     */
     class TweenObj extends AObject {
         constructor();
+        /**
+         * 是否暂停，默认false
+         * @property pause
+         * @type {boolean}
+         */
+        pause: boolean;
+        /**
+         * 当前帧
+         * @property currentFrame
+         * @type {number}
+         */
         currentFrame: number;
+        /**
+         * 总帧数
+         * @property totalFrames
+         * @type {number}
+         */
         totalFrames: number;
         protected _startData: any;
         protected _disData: any;
+        /**
+         * 当前被tween的对象
+         * @property target
+         * @type {Object}
+         */
         target: any;
         private _isTo;
         private _isLoop;

@@ -2549,6 +2549,7 @@ var annie;
                     s._bounds.width = s._bounds.height = 0;
                 }
                 else {
+                    value.crossOrigin = "";
                     s._bounds.width = s._rect ? s._rect.width : value.width;
                     s._bounds.height = s._rect ? s._rect.height : value.height;
                 }
@@ -9233,11 +9234,33 @@ var annie;
  */
 var annie;
 (function (annie) {
+    /**
+     * TweenObj，具体的tween对象类
+     * @class annie.TweenObj
+     * @public
+     * @since 1.0.0
+     */
     var TweenObj = (function (_super) {
         __extends(TweenObj, _super);
         function TweenObj() {
             _super.call(this);
+            /**
+             * 是否暂停，默认false
+             * @property pause
+             * @type {boolean}
+             */
+            this.pause = false;
+            /**
+             * 当前帧
+             * @property currentFrame
+             * @type {number}
+             */
             this.currentFrame = 0;
+            /**
+             * 总帧数
+             * @property totalFrames
+             * @type {number}
+             */
             this.totalFrames = 0;
             this._isLoop = 0;
             this._delay = 0;
@@ -9340,6 +9363,8 @@ var annie;
          */
         TweenObj.prototype.update = function () {
             var s = this;
+            if (s.pause)
+                return;
             if (s._isFront && s._delay > 0) {
                 s._delay--;
                 return;
