@@ -218,8 +218,35 @@ namespace annie {
         public get border(): boolean {
             return this._border;
         }
+
         private _border: boolean = false;
 
+        /**
+         * 描边宽度 默认为0，不显示. 值为正数则是外描边，值为负数则是内描边
+         * @property stroke
+         * @param {number} value
+         * @since 2.0.2
+         */
+        public set stroke(value:number){
+            this._setProperty("_stroke",value,3);
+        }
+        public get stroke():number{
+            return this._stroke;
+        }
+        private _stroke:number=0;
+        /**
+         * 描边颜色 默认黑色
+         * @property strokeColor
+         * @param {string} value
+         * @since 2.0.2
+         */
+        public set strokeColor(value:string){
+            this._setProperty("_strokeColor",value,3);
+        }
+        public get strokeColor():string{
+            return this._strokeColor;
+        }
+        private _strokeColor:string="#000";
         //设置文本在canvas里的渲染样式
         private _prepContext(ctx: any): void {
             let s = this;
@@ -236,7 +263,10 @@ namespace annie {
             ctx.font = font;
             ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
-            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha)
+            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
+            //实线文字
+            ctx.strokeStyle = s.strokeColor;
+            ctx.lineWidth = Math.abs(s._stroke);
         }
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
@@ -265,7 +295,6 @@ namespace annie {
         get lines(): number {
             return this.realLines.length;
         }
-
         // 获取文本宽
         private _getMeasuredWidth(text: string): number {
             let ctx = this._texture.getContext("2d");
@@ -350,7 +379,14 @@ namespace annie {
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
                 for (let i = 0; i < realLines.length; i++){
+                    if(s._stroke>0) {
+                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                    }
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                    if(s._stroke<0) {
+                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                    }
+
                 }
                 /////////////////////////////////////
                 let cf = s.cFilters;

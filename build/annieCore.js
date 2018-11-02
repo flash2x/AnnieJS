@@ -5386,6 +5386,8 @@ var annie;
             this._italic = false;
             this._bold = false;
             this._border = false;
+            this._stroke = 0;
+            this._strokeColor = "#000";
             this.realLines = [];
             this._instanceType = "annie.TextField";
             this._texture = window.document.createElement("canvas");
@@ -5618,6 +5620,38 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(TextField.prototype, "stroke", {
+            get: function () {
+                return this._stroke;
+            },
+            /**
+             * 描边宽度 默认为0，不显示. 值为正数则是外描边，值为负数则是内描边
+             * @property stroke
+             * @param {number} value
+             * @since 2.0.2
+             */
+            set: function (value) {
+                this._setProperty("_stroke", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "strokeColor", {
+            get: function () {
+                return this._strokeColor;
+            },
+            /**
+             * 描边颜色 默认黑色
+             * @property strokeColor
+             * @param {string} value
+             * @since 2.0.2
+             */
+            set: function (value) {
+                this._setProperty("_strokeColor", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
         //设置文本在canvas里的渲染样式
         TextField.prototype._prepContext = function (ctx) {
             var s = this;
@@ -5635,6 +5669,9 @@ var annie;
             ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
+            //实线文字
+            ctx.strokeStyle = s.strokeColor;
+            ctx.lineWidth = Math.abs(s._stroke);
         };
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
@@ -5758,7 +5795,13 @@ var annie;
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
                 for (var i = 0; i < realLines.length; i++) {
+                    if (s._stroke > 0) {
+                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                    }
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                    if (s._stroke < 0) {
+                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                    }
                 }
                 /////////////////////////////////////
                 var cf = s.cFilters;

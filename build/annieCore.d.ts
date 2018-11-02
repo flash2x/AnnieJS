@@ -2657,6 +2657,22 @@ declare namespace annie {
          */
         border: boolean;
         private _border;
+        /**
+         * 描边宽度 默认为0，不显示. 值为正数则是外描边，值为负数则是内描边
+         * @property stroke
+         * @param {number} value
+         * @since 2.0.2
+         */
+        stroke: number;
+        private _stroke;
+        /**
+         * 描边颜色 默认黑色
+         * @property strokeColor
+         * @param {string} value
+         * @since 2.0.2
+         */
+        strokeColor: string;
+        private _strokeColor;
         private _prepContext(ctx);
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
