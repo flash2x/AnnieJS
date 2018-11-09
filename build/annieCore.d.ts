@@ -2287,6 +2287,22 @@ declare namespace annie {
          * @since 1.0.6
          */
         border: boolean;
+        /**
+         * 描边宽度 默认为0，不显示. 值为正数则是外描边，值为负数则是内描边
+         * @property stroke
+         * @param {number} value
+         * @since 2.0.2
+         */
+        stroke: number;
+        private _stroke;
+        /**
+         * 描边颜色 默认黑色
+         * @property strokeColor
+         * @param {string} value
+         * @since 2.0.2
+         */
+        strokeColor: string;
+        private _strokeColor;
         private _border;
         private fontInfo;
         private realLines;
