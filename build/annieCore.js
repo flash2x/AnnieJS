@@ -4378,6 +4378,8 @@ var annie;
             this._color = "#fff";
             this._italic = false;
             this._bold = false;
+            this._stroke = 0;
+            this._strokeColor = "#000";
             this._border = false;
             this._instanceType = "annie.TextField";
         }
@@ -4602,6 +4604,38 @@ var annie;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(TextField.prototype, "stroke", {
+            get: function () {
+                return this._stroke;
+            },
+            /**
+             * 描边宽度 默认为0，不显示. 值为正数则是外描边，值为负数则是内描边
+             * @property stroke
+             * @param {number} value
+             * @since 2.0.2
+             */
+            set: function (value) {
+                this._setProperty("_stroke", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextField.prototype, "strokeColor", {
+            get: function () {
+                return this._strokeColor;
+            },
+            /**
+             * 描边颜色 默认黑色
+             * @property strokeColor
+             * @param {string} value
+             * @since 2.0.2
+             */
+            set: function (value) {
+                this._setProperty("_strokeColor", value, 3);
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 设置文本在canvas里的渲染样式
          * @param ctx
@@ -4610,12 +4644,19 @@ var annie;
          */
         TextField.prototype._draw = function (ctx) {
             var s = this;
+            var realLines = s.realLines;
             ctx.font = s.fontInfo;
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
             ctx.textAlign = s._textAlign;
             ctx.textBaseline = "top";
-            for (var i = 0; i < s.realLines.length; i++) {
+            for (var i = 0; i < realLines.length; i++) {
+                if (s._stroke > 0) {
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                }
                 ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                if (s._stroke < 0) {
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                }
             }
         };
         /**

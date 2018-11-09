@@ -208,6 +208,32 @@ namespace annie {
         public get border(): boolean {
             return this._border;
         }
+        /**
+         * 描边宽度 默认为0，不显示. 值为正数则是外描边，值为负数则是内描边
+         * @property stroke
+         * @param {number} value
+         * @since 2.0.2
+         */
+        public set stroke(value:number){
+            this._setProperty("_stroke",value,3);
+        }
+        public get stroke():number{
+            return this._stroke;
+        }
+        private _stroke:number=0;
+        /**
+         * 描边颜色 默认黑色
+         * @property strokeColor
+         * @param {string} value
+         * @since 2.0.2
+         */
+        public set strokeColor(value:string){
+            this._setProperty("_strokeColor",value,3);
+        }
+        public get strokeColor():string{
+            return this._strokeColor;
+        }
+        private _strokeColor:string="#000";
         private _border: boolean = false;
         private fontInfo: any;
         private realLines: any;
@@ -219,12 +245,19 @@ namespace annie {
          */
         private _draw(ctx: any): void {
             let s = this;
+            let realLines=s.realLines;
             ctx.font = s.fontInfo;
             ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
             ctx.textAlign = s._textAlign;
             ctx.textBaseline = "top";
-            for (let i = 0; i < s.realLines.length; i++) {
+            for (let i = 0; i < realLines.length; i++){
+                if(s._stroke>0) {
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                }
                 ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                if(s._stroke<0) {
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                }
             }
         }
 
