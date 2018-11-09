@@ -2999,6 +2999,19 @@ var annie;
             }*/
         };
         /**
+         * 设置虚线参数
+         * @method setLineDash
+         * @param {Array} data 一个长度为2的数组，第1个是虚线长度，第2个是虚线间隔，如果此参数为[]的空数组，则是清除虚线。
+         *                如[5,20]是画虚线,[]则是请除虚线，变为实线
+         * @since 2.0.2
+         * @return {void}
+         */
+        Shape.prototype.setLineDash = function (data) {
+            if (data === void 0) { data = []; }
+            var c = this._command;
+            c[c.length] = [1, "setLineDash", [data, 0]];
+        };
+        /**
          * 重写刷新
          * @method update
          * @public
