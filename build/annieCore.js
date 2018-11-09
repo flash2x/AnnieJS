@@ -4130,7 +4130,7 @@ var annie;
         MovieClip.prototype.update = function (isDrawUpdate) {
             if (isDrawUpdate === void 0) { isDrawUpdate = true; }
             var s = this;
-            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1) {
+            if (s._visible && s._a2x_res_class.tf > 1 && (isDrawUpdate || s._wantFrame)) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -4367,6 +4367,11 @@ var annie;
             get: function () {
                 return this._textAlpha;
             },
+            /**
+             * @property textAlpha
+             * @since 2.0.0
+             * @public
+             */
             set: function (value) {
                 this._setProperty("_textAlpha", value, 3);
             },
@@ -4396,7 +4401,9 @@ var annie;
                 return this._lineSpacing;
             },
             /**
-             *
+             * @property lineSpacing
+             * @public
+             * @since 1.0.0
              * @param {number} value
              */
             set: function (value) {

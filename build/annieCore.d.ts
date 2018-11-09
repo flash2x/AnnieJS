@@ -2164,6 +2164,11 @@ declare namespace annie {
          */
         textAlign: string;
         private _textAlign;
+        /**
+         * @property textAlpha
+         * @since 2.0.0
+         * @public
+         */
         textAlpha: number;
         private _textAlpha;
         /**
@@ -2177,7 +2182,9 @@ declare namespace annie {
         textHeight: number;
         private _textHeight;
         /**
-         *
+         * @property lineSpacing
+         * @public
+         * @since 1.0.0
          * @param {number} value
          */
         lineSpacing: number;

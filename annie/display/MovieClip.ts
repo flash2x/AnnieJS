@@ -363,7 +363,7 @@ namespace annie {
 
         public update(isDrawUpdate: boolean = true): void {
             let s: any = this;
-            if (s._visible && isDrawUpdate && s._a2x_res_class.tf > 1){
+            if (s._visible&& s._a2x_res_class.tf > 1 &&(isDrawUpdate||s._wantFrame)){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
