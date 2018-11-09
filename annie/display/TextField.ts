@@ -30,6 +30,12 @@ namespace annie {
             return this._textAlign;
         }
         private _textAlign = "left";
+
+        /**
+         * @property textAlpha
+         * @since 2.0.0
+         * @public
+         */
         public set textAlpha(value: number) {
             this._setProperty("_textAlpha",value,3);
         }
@@ -51,13 +57,15 @@ namespace annie {
             this._setProperty("_textHeight",value,3);
         }
 
-        public get textHeight(): number {
+        public get textHeight(): number{
             return this._textHeight;
         }
         private _textHeight: number = 0;
 
         /**
-         *
+         * @property lineSpacing
+         * @public
+         * @since 1.0.0
          * @param {number} value
          */
         public set lineSpacing(value:number){
@@ -205,9 +213,11 @@ namespace annie {
         public set border(value: boolean) {
             this._setProperty("_border",value,3);
         }
+
         public get border(): boolean {
             return this._border;
         }
+
         private _border: boolean = false;
         private fontInfo: any;
         private realLines: any;
@@ -290,10 +300,10 @@ namespace annie {
                 s.fontInfo  += "px ";
                 s.fontInfo  += s.font;
                 if (s._bold) {
-                    s.fontInfo  = "bold " + s.fontInfo ;
+                    s.fontInfo  = "bold " + s.fontInfo;
                 }
                 if (s._italic) {
-                    s.fontInfo  = "italic " + s.fontInfo ;
+                    s.fontInfo  = "italic " + s.fontInfo;
                 }
                 ctx.font = s.fontInfo;
                 let lineH = s._lineSpacing;
