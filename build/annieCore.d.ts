@@ -2570,13 +2570,13 @@ declare namespace annie {
         textHeight: number;
         private _textHeight;
         /**
-         * @property lineSpacing
+         * @property lineHeight
          * @public
          * @since 1.0.0
          * @param {number} value
          */
-        lineSpacing: number;
-        private _lineSpacing;
+        lineHeight: number;
+        private _lineHeight;
         /**
          * 文本的宽
          * @property textWidth
@@ -2767,16 +2767,16 @@ declare namespace annie {
          * @param {number}size  文字大小
          * @param {string}font  文字所使用的字体
          * @param {boolean}showBorder 是否需要显示边框
-         * @param {number}lineSpacing 如果是多行,请设置行高
+         * @param {number}lineHeight 如果是多行,请设置行高
          */
-        initInfo(text: string, color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void;
+        initInfo(text: string, color: string, align: string, size: number, font: string, showBorder: boolean, lineHeight: number): void;
         /**
-         * @property lineSpacing
+         * @property lineHeight
          * @public
          * @since 2.0.0
          * @type {number}
          */
-        lineSpacing: number;
+        lineHeight: number;
         /**
          * 设置文本是否为粗体
          * @property bold
@@ -2785,6 +2785,23 @@ declare namespace annie {
          * @since 1.0.3
          */
         bold: boolean;
+        /**
+         * @property size
+         * @public
+         * @since 2.0.0
+         * @type {number}
+         */
+        size: number;
+        private _size;
+        /**
+         * 设置文本颜色
+         * @property font
+         * @type {string}
+         * @public
+         * @since 1.0.3
+         */
+        font: string;
+        private _font;
         /**
          * 设置文本是否倾斜
          * @property italic

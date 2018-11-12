@@ -94,34 +94,36 @@ namespace annie {
          * @param {number}size  文字大小
          * @param {string}font  文字所使用的字体
          * @param {boolean}showBorder 是否需要显示边框
-         * @param {number}lineSpacing 如果是多行,请设置行高
+         * @param {number}lineHeight 如果是多行,请设置行高
          */
-        public initInfo(text: string,color: string, align: string, size: number, font: string, showBorder: boolean, lineSpacing: number): void {
+        public initInfo(text: string,color: string, align: string, size: number, font: string, showBorder: boolean, lineHeight: number): void {
             let s: InputText = this;
             s.htmlElement.placeholder = text;
             //font包括字体和大小
             s.htmlElement.style.font = size + "px " + font;
+            s._size=size;
+            s._font=font;
             s.htmlElement.style.color = color;
             s.htmlElement.style.textAlign = align;
             /////////////////////设置边框//////////////
             s.border = showBorder;
             //color:blue; text-align:center"
             if (s.inputType == 2) {
-                s.htmlElement.style.lineHeight = lineSpacing + "px";
+                s.htmlElement.style.lineHeight = lineHeight + "px";
             }
         }
 
         /**
-         * @property lineSpacing
+         * @property lineHeight
          * @public
          * @since 2.0.0
          * @type {number}
          */
-        public set lineSpacing(value:number){
+        public set lineHeight(value:number){
             this.htmlElement.style.lineHeight = value + "px";
             this.htmlElement.style.height = value + "px";
         }
-        public get lineSpacing():number{
+        public get lineHeight():number{
             return parseInt(this.htmlElement.style.lineHeight);
         }
         /**
@@ -143,7 +145,44 @@ namespace annie {
         public get bold(): boolean {
             return this.htmlElement.style.fontWeight == "bold";
         }
+        /**
+         * @property size
+         * @public
+         * @since 2.0.0
+         * @type {number}
+         */
+        public set size(value:number){
+            let s=this;
+            if(s._size!=value) {
+                s._size = value;
+                s.htmlElement.style.font = value + "px " + s._font;
+            }
 
+        }
+        public get size():number{
+            return this._size;
+        }
+        private _size:number=14;
+
+        /**
+         * 设置文本颜色
+         * @property font
+         * @type {string}
+         * @public
+         * @since 1.0.3
+         */
+        public set font(value: string) {
+            let s=this;
+            if(value!=s._font) {
+                s._font=value;
+                s.htmlElement.style.font = s._size + "px " + s._font;
+            }
+        }
+
+        public get font(): string {
+            return this._font;
+        }
+        private _font:string="Arial";
         /**
          * 设置文本是否倾斜
          * @property italic

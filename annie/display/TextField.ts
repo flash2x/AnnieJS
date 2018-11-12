@@ -65,18 +65,18 @@ namespace annie {
         private _textHeight: number = 0;
 
         /**
-         * @property lineSpacing
+         * @property lineHeight
          * @public
          * @since 1.0.0
          * @param {number} value
          */
-        public set lineSpacing(value:number){
-            this._setProperty("_lineSpacing",value,3);
+        public set lineHeight(value:number){
+            this._setProperty("_lineHeight",value,3);
         }
-        public get lineSpacing():number{
-            return this._lineSpacing;
+        public get lineHeight():number{
+            return this._lineHeight;
         }
-        private _lineSpacing: number =14;
+        private _lineHeight: number =14;
         /**
          * 文本的宽
          * @property textWidth
@@ -263,6 +263,8 @@ namespace annie {
             ctx.font = font;
             ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
+            ctx.lineJoin = "miter";
+            ctx.miterLimit = 2.5;
             ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
             //实线文字
             ctx.strokeStyle = s.strokeColor;
@@ -317,7 +319,7 @@ namespace annie {
                 s.realLines=realLines;
                 s._prepContext(ctx);
                 let wordW = 0;
-                let lineH = s._lineSpacing;
+                let lineH = s._lineHeight;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length]=hardLines[0];
                     let str = hardLines[0];

@@ -5389,7 +5389,7 @@ var annie;
             this._textAlign = "left";
             this._textAlpha = 1;
             this._textHeight = 0;
-            this._lineSpacing = 14;
+            this._lineHeight = 14;
             this._textWidth = 120;
             this._lineType = "single";
             this._text = "";
@@ -5456,18 +5456,18 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(TextField.prototype, "lineSpacing", {
+        Object.defineProperty(TextField.prototype, "lineHeight", {
             get: function () {
-                return this._lineSpacing;
+                return this._lineHeight;
             },
             /**
-             * @property lineSpacing
+             * @property lineHeight
              * @public
              * @since 1.0.0
              * @param {number} value
              */
             set: function (value) {
-                this._setProperty("_lineSpacing", value, 3);
+                this._setProperty("_lineHeight", value, 3);
             },
             enumerable: true,
             configurable: true
@@ -5681,6 +5681,8 @@ var annie;
             ctx.font = font;
             ctx.textAlign = s._textAlign || "left";
             ctx.textBaseline = "top";
+            ctx.lineJoin = "miter";
+            ctx.miterLimit = 2.5;
             ctx.fillStyle = annie.Shape.getRGBA(s._color, s._textAlpha);
             //实线文字
             ctx.strokeStyle = s.strokeColor;
@@ -5741,7 +5743,7 @@ var annie;
                 s.realLines = realLines;
                 s._prepContext(ctx);
                 var wordW = 0;
-                var lineH = s._lineSpacing;
+                var lineH = s._lineHeight;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     realLines[realLines.length] = hardLines[0];
                     var str = hardLines[0];
@@ -5886,6 +5888,8 @@ var annie;
              * @default true
              */
             this.isAutoDownKeyBoard = true;
+            this._size = 14;
+            this._font = "Arial";
             var input = null;
             var s = this;
             s._instanceType = "annie.InputText";
@@ -5939,28 +5943,30 @@ var annie;
          * @param {number}size  文字大小
          * @param {string}font  文字所使用的字体
          * @param {boolean}showBorder 是否需要显示边框
-         * @param {number}lineSpacing 如果是多行,请设置行高
+         * @param {number}lineHeight 如果是多行,请设置行高
          */
-        InputText.prototype.initInfo = function (text, color, align, size, font, showBorder, lineSpacing) {
+        InputText.prototype.initInfo = function (text, color, align, size, font, showBorder, lineHeight) {
             var s = this;
             s.htmlElement.placeholder = text;
             //font包括字体和大小
             s.htmlElement.style.font = size + "px " + font;
+            s._size = size;
+            s._font = font;
             s.htmlElement.style.color = color;
             s.htmlElement.style.textAlign = align;
             /////////////////////设置边框//////////////
             s.border = showBorder;
             //color:blue; text-align:center"
             if (s.inputType == 2) {
-                s.htmlElement.style.lineHeight = lineSpacing + "px";
+                s.htmlElement.style.lineHeight = lineHeight + "px";
             }
         };
-        Object.defineProperty(InputText.prototype, "lineSpacing", {
+        Object.defineProperty(InputText.prototype, "lineHeight", {
             get: function () {
                 return parseInt(this.htmlElement.style.lineHeight);
             },
             /**
-             * @property lineSpacing
+             * @property lineHeight
              * @public
              * @since 2.0.0
              * @type {number}
@@ -5990,6 +5996,47 @@ var annie;
                 }
                 else {
                     ss.fontWeight = "normal";
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(InputText.prototype, "size", {
+            get: function () {
+                return this._size;
+            },
+            /**
+             * @property size
+             * @public
+             * @since 2.0.0
+             * @type {number}
+             */
+            set: function (value) {
+                var s = this;
+                if (s._size != value) {
+                    s._size = value;
+                    s.htmlElement.style.font = value + "px " + s._font;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(InputText.prototype, "font", {
+            get: function () {
+                return this._font;
+            },
+            /**
+             * 设置文本颜色
+             * @property font
+             * @type {string}
+             * @public
+             * @since 1.0.3
+             */
+            set: function (value) {
+                var s = this;
+                if (value != s._font) {
+                    s._font = value;
+                    s.htmlElement.style.font = s._size + "px " + s._font;
                 }
             },
             enumerable: true,
@@ -8803,12 +8850,15 @@ var annie;
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             var lastInfo = target._a2x_res_obj;
+            if (lastInfo.tr != info.tr) {
+                _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
+            }
             if (info.w != undefined) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-            }
-            if (lastInfo.tr != info.tr) {
-                _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
+                if (target._instanceType == "annie.TextField") {
+                    target.y -= target.size * 0.1;
+                }
             }
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
@@ -8889,7 +8939,7 @@ var annie;
         var color = textDate[6];
         var textAlpha = textDate[7];
         var border = textDate[12];
-        var lineSpacing = textDate[8];
+        var lineHeight = textDate[8];
         if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
@@ -8902,11 +8952,11 @@ var annie;
             textObj.color = color;
             textObj.textAlpha = textAlpha;
             textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
+            textObj.lineHeight = lineHeight;
         }
         else {
             textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+            textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
             textObj.italic = italic;
             textObj.bold = bold;
         }

@@ -388,12 +388,15 @@ namespace annie {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             let lastInfo = target._a2x_res_obj;
+            if (lastInfo.tr != info.tr) {
+                [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
+            }
             if (info.w != undefined) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-            }
-            if (lastInfo.tr != info.tr) {
-                [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
+                if(target._instanceType == "annie.TextField") {
+                    target.y -= target.size * 0.1;
+                }
             }
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
@@ -474,7 +477,7 @@ namespace annie {
         let color = textDate[6];
         let textAlpha = textDate[7];
         let border = textDate[12];
-        let lineSpacing = textDate[8];
+        let lineHeight = textDate[8];
         if (textDate[1] == 0 || textDate[1] == 1) {
             textObj = new annie.TextField();
             textObj.text = text;
@@ -487,10 +490,10 @@ namespace annie {
             textObj.color = color;
             textObj.textAlpha = textAlpha;
             textObj.border = border;
-            textObj.lineSpacing = lineSpacing;
+            textObj.lineHeight = lineHeight;
         } else {
             textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+            textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
             textObj.italic = italic;
             textObj.bold = bold;
         }
