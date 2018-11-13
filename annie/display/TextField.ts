@@ -57,16 +57,16 @@ namespace annie {
         private _textHeight: number = 0;
 
         /**
-         *
+         * @property lineHeight
          * @param {number} value
          */
-        public set lineSpacing(value:number){
-            this._setProperty("_lineSpacing",value,3);
+        public set lineHeight(value:number){
+            this._setProperty("_lineHeight",value,3);
         }
-        public get lineSpacing():number{
-            return this._lineSpacing;
+        public get lineHeight():number{
+            return this._lineHeight;
         }
-        private _lineSpacing: number =14;
+        private _lineHeight: number =14;
         /**
          * 文本的宽
          * @property textWidth
@@ -252,11 +252,11 @@ namespace annie {
             ctx.textBaseline = "top";
             for (let i = 0; i < realLines.length; i++){
                 if(s._stroke>0) {
-                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineHeight, s._bounds.width);
                 }
-                ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                ctx.fillText(s.realLines[i], s._textOffX, i * s.lineHeight, s._bounds.width);
                 if(s._stroke<0) {
-                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineHeight, s._bounds.width);
                 }
             }
         }
@@ -327,7 +327,7 @@ namespace annie {
                     s.fontInfo  = "italic " + s.fontInfo ;
                 }
                 ctx.font = s.fontInfo;
-                let lineH = s._lineSpacing;
+                let lineH = s._lineHeight;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     s.realLines[s.realLines.length]=hardLines[0];
                     let str = hardLines[0];

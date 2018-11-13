@@ -4368,7 +4368,7 @@ var annie;
             this._textAlign = "left";
             this._textAlpha = 1;
             this._textHeight = 0;
-            this._lineSpacing = 14;
+            this._lineHeight = 14;
             this._textWidth = 120;
             this._lineType = "single";
             this._textOffX = 0;
@@ -4429,16 +4429,16 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(TextField.prototype, "lineSpacing", {
+        Object.defineProperty(TextField.prototype, "lineHeight", {
             get: function () {
-                return this._lineSpacing;
+                return this._lineHeight;
             },
             /**
-             *
+             * @property lineHeight
              * @param {number} value
              */
             set: function (value) {
-                this._setProperty("_lineSpacing", value, 3);
+                this._setProperty("_lineHeight", value, 3);
             },
             enumerable: true,
             configurable: true
@@ -4651,11 +4651,11 @@ var annie;
             ctx.textBaseline = "top";
             for (var i = 0; i < realLines.length; i++) {
                 if (s._stroke > 0) {
-                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineHeight, s._bounds.width);
                 }
-                ctx.fillText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                ctx.fillText(s.realLines[i], s._textOffX, i * s.lineHeight, s._bounds.width);
                 if (s._stroke < 0) {
-                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineSpacing, s._bounds.width);
+                    ctx.strokeText(s.realLines[i], s._textOffX, i * s.lineHeight, s._bounds.width);
                 }
             }
         };
@@ -4732,7 +4732,7 @@ var annie;
                     s.fontInfo = "italic " + s.fontInfo;
                 }
                 ctx.font = s.fontInfo;
-                var lineH = s._lineSpacing;
+                var lineH = s._lineHeight;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
                     s.realLines[s.realLines.length] = hardLines[0];
                     var str = hardLines[0];
@@ -7178,16 +7178,17 @@ var annie;
         else {
             //是不是文本
             var lastInfo = target._a2x_res_obj;
-            if (info.w != undefined) {
-                target.textWidth = info.w;
-                target.textHeight = info.h;
-            }
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             if (lastInfo.tr != info.tr) {
                 _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
+            }
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+                target.y += 2;
             }
             /*if (info.v == undefined) {
                 info.v = 1;
@@ -7223,7 +7224,7 @@ var annie;
         var textDate = res[sceneName]._a2x_con[resName];
         var textObj;
         var text = decodeURIComponent(textDate[9]);
-        var font = decodeURIComponent(textDate[4]);
+        var font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/, "");
         var size = textDate[5];
         var textAlign = _textAlign[textDate[3]];
         var lineType = _textLineType[textDate[2]];
@@ -7232,7 +7233,7 @@ var annie;
         var color = textDate[6];
         var textAlpha = textDate[7];
         var border = textDate[12];
-        var lineSpacing = textDate[8];
+        var lineHeight = textDate[8];
         //if (textDate[1] == 0 || textDate[1] == 1) {
         textObj = new annie.TextField();
         textObj.text = text;
@@ -7245,10 +7246,10 @@ var annie;
         textObj.color = color;
         textObj.textAlpha = textAlpha;
         textObj.border = border;
-        textObj.lineSpacing = lineSpacing;
+        textObj.lineHeight = lineHeight;
         //} else {
         /*textObj = new annie.InputText(textDate[2]);
-        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
         textObj.italic = italic;
         textObj.bold = bold;*/
         if (textDate[1] == 2)

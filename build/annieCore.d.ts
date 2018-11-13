@@ -2208,11 +2208,11 @@ declare namespace annie {
         textHeight: number;
         private _textHeight;
         /**
-         *
+         * @property lineHeight
          * @param {number} value
          */
-        lineSpacing: number;
-        private _lineSpacing;
+        lineHeight: number;
+        private _lineHeight;
         /**
          * 文本的宽
          * @property textWidth

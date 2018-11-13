@@ -237,16 +237,18 @@ namespace annie {
         } else {
             //是不是文本
             let lastInfo = target._a2x_res_obj;
-            if (info.w != undefined) {
-                target.textWidth = info.w;
-                target.textHeight = info.h;
-            }
+
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             if (lastInfo.tr != info.tr) {
                 [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
+            }
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+                target.y +=2;
             }
             /*if (info.v == undefined) {
                 info.v = 1;
@@ -280,7 +282,7 @@ namespace annie {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
         let text = decodeURIComponent(textDate[9]);
-        let font = decodeURIComponent(textDate[4]);
+        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/,"");
         let size = textDate[5];
         let textAlign = _textAlign[textDate[3]];
         let lineType = _textLineType[textDate[2]];
@@ -289,7 +291,7 @@ namespace annie {
         let color = textDate[6];
         let textAlpha = textDate[7];
         let border = textDate[12];
-        let lineSpacing = textDate[8];
+        let lineHeight = textDate[8];
         //if (textDate[1] == 0 || textDate[1] == 1) {
         textObj = new annie.TextField();
         textObj.text = text;
@@ -302,10 +304,10 @@ namespace annie {
         textObj.color = color;
         textObj.textAlpha = textAlpha;
         textObj.border = border;
-        textObj.lineSpacing = lineSpacing;
+        textObj.lineHeight = lineHeight;
         //} else {
         /*textObj = new annie.InputText(textDate[2]);
-        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
         textObj.italic = italic;
         textObj.bold = bold;*/
         if (textDate[1] == 2)
