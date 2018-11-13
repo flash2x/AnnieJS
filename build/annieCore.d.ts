@@ -2191,13 +2191,13 @@ declare namespace annie {
         textHeight: number;
         private _textHeight;
         /**
-         * @property lineSpacing
+         * @property lineHeight
          * @public
          * @since 1.0.0
          * @param {number} value
          */
-        lineSpacing: number;
-        private _lineSpacing;
+        lineHeight: number;
+        private _lineHeight;
         /**
          * 文本的宽
          * @property textWidth

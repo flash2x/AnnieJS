@@ -292,7 +292,7 @@ namespace annie {
         let color = textDate[6];
         let textAlpha = textDate[7];
         let border = textDate[12];
-        let lineSpacing = textDate[8];
+        let lineHeight = textDate[8];
         //if (textDate[1] == 0 || textDate[1] == 1) {
         textObj = new annie.TextField();
         textObj.text = text;
@@ -305,10 +305,10 @@ namespace annie {
         textObj.color = color;
         textObj.textAlpha = textAlpha;
         textObj.border = border;
-        textObj.lineSpacing = lineSpacing;
+        textObj.lineHeight = lineHeight;
         //} else {
         /*textObj = new annie.InputText(textDate[2]);
-        textObj.initInfo(text, color, textAlign, size, font, border, lineSpacing);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
         textObj.italic = italic;
         textObj.bold = bold;*/
         if (textDate[1] == 2)
