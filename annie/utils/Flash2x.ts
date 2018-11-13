@@ -395,7 +395,7 @@ namespace annie {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
                 if(target._instanceType == "annie.TextField") {
-                    target.y -= target.size * 0.1;
+                    target.y +=2;
                 }
             }
             target.alpha = info.al == undefined ? 1 : info.al;
@@ -468,7 +468,7 @@ namespace annie {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
         let text = decodeURIComponent(textDate[9]);
-        let font = decodeURIComponent(textDate[4]);
+        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/,"");
         let size = textDate[5];
         let textAlign = _textAlign[textDate[3]];
         let lineType = _textLineType[textDate[2]];
@@ -523,7 +523,6 @@ namespace annie {
             }
         }
     }
-
     //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];

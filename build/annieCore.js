@@ -8857,7 +8857,7 @@ var annie;
                 target.textWidth = info.w;
                 target.textHeight = info.h;
                 if (target._instanceType == "annie.TextField") {
-                    target.y -= target.size * 0.1;
+                    target.y += 2;
                 }
             }
             target.alpha = info.al == undefined ? 1 : info.al;
@@ -8930,7 +8930,7 @@ var annie;
         var textDate = annie.res[sceneName]._a2x_con[resName];
         var textObj;
         var text = decodeURIComponent(textDate[9]);
-        var font = decodeURIComponent(textDate[4]);
+        var font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/, "");
         var size = textDate[5];
         var textAlign = _textAlign[textDate[3]];
         var lineType = _textLineType[textDate[2]];
