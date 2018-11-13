@@ -236,16 +236,20 @@ namespace annie {
         } else {
             //是不是文本
             let lastInfo = target._a2x_res_obj;
-            if (info.w != undefined) {
-                target.textWidth = info.w;
-                target.textHeight = info.h;
-            }
+
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             if (lastInfo.tr != info.tr) {
                 [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
+            }
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+                //if(target._instanceType == "annie.TextField") {
+                    target.y +=2;
+                //}
             }
             /*if (info.v == undefined) {
                 info.v = 1;
@@ -279,7 +283,7 @@ namespace annie {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
         let text = decodeURIComponent(textDate[9]);
-        let font = decodeURIComponent(textDate[4]);
+        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/,"");
         let size = textDate[5];
         let textAlign = _textAlign[textDate[3]];
         let lineType = _textLineType[textDate[2]];

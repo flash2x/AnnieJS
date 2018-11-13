@@ -7260,16 +7260,18 @@ var annie;
         else {
             //是不是文本
             var lastInfo = target._a2x_res_obj;
-            if (info.w != undefined) {
-                target.textWidth = info.w;
-                target.textHeight = info.h;
-            }
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             if (lastInfo.tr != info.tr) {
                 _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
+            }
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+                //if(target._instanceType == "annie.TextField") {
+                target.y += 2;
             }
             /*if (info.v == undefined) {
                 info.v = 1;
@@ -7305,7 +7307,7 @@ var annie;
         var textDate = res[sceneName]._a2x_con[resName];
         var textObj;
         var text = decodeURIComponent(textDate[9]);
-        var font = decodeURIComponent(textDate[4]);
+        var font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/, "");
         var size = textDate[5];
         var textAlign = _textAlign[textDate[3]];
         var lineType = _textLineType[textDate[2]];
