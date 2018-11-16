@@ -167,7 +167,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
          * @method resumePlaySounds
@@ -185,7 +184,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method setAllSoundsVolume
@@ -205,9 +203,7 @@ namespace annie {
             }
             Sound._volume = volume;
         }
-
         private static _volume: number = 1;
-
         public destroy() {
             let s = this;
             let len: number = annie.Sound._soundList.length;
