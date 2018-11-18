@@ -841,7 +841,6 @@ namespace annie {
                         break;
                 }
             }
-
             s.scaleX = scaleX;
             s.scaleY = scaleY;
             // s.viewRect=new annie.Rectangle();
@@ -849,7 +848,6 @@ namespace annie {
             s.viewRect.y = (desH - divH / scaleY) >> 1;
             s.viewRect.width = desW - s.viewRect.x * 2;
             s.viewRect.height = desH - s.viewRect.y * 2;
-
             if (s.autoSteering) {
                 if (isDesH == isDivH) {
                     s.rotation = 0;
