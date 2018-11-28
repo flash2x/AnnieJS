@@ -11,7 +11,9 @@ namespace annie {
      * @since 1.0.0
      */
     export class SharedCanvas {
-        public constructor(){};
+        public constructor(){
+
+        };
         public static init(stage:Stage): void{
             let s = SharedCanvas;
             if(s.context)return;
@@ -65,7 +67,6 @@ namespace annie {
                 s.canvas = s.context.canvas;
             }
         }
-
         /**
          * 隐藏开放域
          * @method hide

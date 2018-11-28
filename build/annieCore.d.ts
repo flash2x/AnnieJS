@@ -1521,12 +1521,12 @@ declare namespace annie {
         private _isBitmapFill;
         /**
          * 是否对图开对象使用像素碰撞 默认开启
-         * @property hitTestWidthPixel
+         * @property hitTestWithPixel
          * @type {boolean}
          * @default true
          * @since 1.1.0
          */
-        hitTestWidthPixel: boolean;
+        hitTestWithPixel: boolean;
         /**
          * 添加一条绘画指令,具体可以查阅Canvas画图方法
          * @method addDraw

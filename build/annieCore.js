@@ -2470,12 +2470,12 @@ var annie;
             this._command = [];
             /**
              * 是否对图开对象使用像素碰撞 默认开启
-             * @property hitTestWidthPixel
+             * @property hitTestWithPixel
              * @type {boolean}
              * @default true
              * @since 1.1.0
              */
-            this.hitTestWidthPixel = true;
+            this.hitTestWithPixel = true;
             /**
              * 径向渐变填充 一般给Annie2x用
              * @method beginRadialGradientFill
