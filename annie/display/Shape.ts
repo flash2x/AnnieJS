@@ -95,12 +95,12 @@ namespace annie {
         private _isBitmapFill: Array<number>;
         /**
          * 是否对矢量使用像素碰撞 默认开启
-         * @property hitTestWidthPixel
+         * @property hitTestWithPixel
          * @type {boolean}
          * @default true
          * @since 1.1.0
          */
-        public hitTestWidthPixel: boolean = true;
+        public hitTestWithPixel: boolean = true;
 
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
