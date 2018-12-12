@@ -8157,7 +8157,7 @@ var annie;
              * @public
              * @since 1.0.0
              */
-            this.responseType = null;
+            this.responseType = "";
             /**
              * 请求的url地址
              * @property url
@@ -8227,6 +8227,7 @@ var annie;
             var s = this;
             if (s._req) {
                 s._req.abort();
+                s._req = null;
             }
         };
         /**
@@ -8241,7 +8242,7 @@ var annie;
             if (contentType === void 0) { contentType = "form"; }
             var s = this;
             s.loadCancel();
-            if (s.responseType == null || s.responseType == "") {
+            if (s.responseType == "") {
                 //看看是什么后缀
                 var urlSplit = url.split(".");
                 var extStr = urlSplit[urlSplit.length - 1];
@@ -8270,8 +8271,11 @@ var annie;
                 else if (ext == "txt") {
                     s.responseType = "text";
                 }
-                else if (ext == "js" || ext == "swf") {
+                else if (ext == "js") {
                     s.responseType = "js";
+                }
+                else if (ext == "swf") {
+                    s.responseType = "swf";
                 }
                 else {
                     s.responseType = "unKnow";
@@ -8279,50 +8283,19 @@ var annie;
             }
             if (!s._req) {
                 s._req = new XMLHttpRequest();
-                var req_1 = s._req;
-                req_1.withCredentials = false;
-                req_1.onprogress = function (event) {
-                    if (!event || event.loaded > 0 && event.total == 0) {
-                        return; // Sometimes we get no "total", so just ignore the progress event.
-                    }
+                s._req.withCredentials = false;
+                s._req.onprogress = function (event) {
                     s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
                 };
-                req_1.onerror = function (event) {
-                    reSendTimes++;
-                    if (reSendTimes > 2) {
-                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
-                    }
-                    else {
-                        //断线重连
-                        req_1.abort();
-                        if (!s.data) {
-                            req_1.send();
-                        }
-                        else {
-                            if (contentType == "form") {
-                                req_1.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                                req_1.send(s._fqs(s.data, null));
-                            }
-                            else {
-                                var type = "application/json";
-                                if (contentType != "json") {
-                                    type = "multipart/form-data";
-                                }
-                                req_1.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                                req_1.send(s.data);
-                            }
-                        }
-                    }
+                s._req.onerror = function (event) {
+                    s.dispatchEvent("onError", { id: 2, msg: event["message"] });
                 };
-                req_1.onreadystatechange = function (event) {
-                    if (!event)
-                        return;
-                    var t = event.target;
-                    if (t["readyState"] == 4) {
-                        if (req_1.status == 200 || req_1.status == 0) {
+                s._req.onreadystatechange = function (event) {
+                    if (s._req.readyState === s._req.DONE) {
+                        if (s._req.status == 200 || s._req.status == 0) {
                             var isImage = false;
                             var e_1 = new annie.Event("onComplete");
-                            var result = t["response"];
+                            var result = s._req.response;
                             e_1.data = { type: s.responseType, response: null };
                             var item = void 0;
                             switch (s.responseType) {
@@ -8363,6 +8336,7 @@ var annie;
                                     item = JSON.parse(result);
                                     break;
                                 case "js":
+                                case "swf":
                                     item = "JS_CODE";
                                     annie.Eval(result);
                                     break;
@@ -8386,8 +8360,6 @@ var annie;
                     }
                 };
             }
-            var req = s._req;
-            var reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
@@ -8396,38 +8368,35 @@ var annie;
                 s.url = url;
             }
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
-                req.responseType = "blob";
+                s._req.responseType = "blob";
             }
             else {
-                req.responseType = "text";
+                s._req.responseType = "text";
             }
-            req.open(s.method, s.url, true);
+            s._req.open(s.method, s.url, true);
             if (s.headers.length > 0) {
                 for (var h = 0; h < s.headers.length; h += 2) {
-                    req.setRequestHeader(s.headers[h], s.headers[h + 1]);
+                    s._req.setRequestHeader(s.headers[h], s.headers[h + 1]);
                 }
                 s.headers.length = 0;
             }
             if (!s.data) {
-                req.send();
+                s._req.send();
             }
             else {
                 if (contentType == "form") {
-                    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                    req.send(s._fqs(s.data, null));
+                    s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                    s._req.send(s._fqs(s.data, null));
                 }
                 else {
                     var type = "application/json";
                     if (contentType != "json") {
                         type = "multipart/form-data";
                     }
-                    req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                    req.send(s.data);
+                    s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                    s._req.send(s.data);
                 }
             }
-            /*req.onloadstart = function (e) {
-             s.dispatchEvent("onStart");
-             };*/
         };
         /**
          * 添加自定义头
@@ -8554,9 +8523,6 @@ var annie;
             return;
         }
         if (!_isInited) {
-            if (annie._isReleased) {
-                console.log("AnnieJS:https://github.com/flash2x/annieJS");
-            }
             _JSONQueue = new URLLoader();
             _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
             _loaderQueue = new URLLoader();
@@ -8621,7 +8587,12 @@ var annie;
     // 加载资源过程中调用的回调方法。
     function _onRESProgress(e) {
         if (_progressCallback) {
-            _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
+            var ww = window;
+            var total = e.data.totalBytes;
+            if (annie.osType == "android" && ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
+                total = ww.swfBytes[_loadSceneNames[_loadIndex]];
+            }
+            _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
         }
     }
     //解析加载后的json资源数据
@@ -8770,7 +8741,7 @@ var annie;
     function _loadRes() {
         var url = _domain + _currentConfig[_loadIndex][0].src;
         if (annie._isReleased) {
-            _loaderQueue.responseType = "js";
+            _loaderQueue.responseType = "swf";
             url += "?v=" + annie._isReleased;
         }
         else {
@@ -9047,6 +9018,7 @@ var annie;
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
      * @param {string} info.responseType 后台返回数据的类型,默认为"text"
+     * @param {boolean} info.isNeedOption 是否需要添加X-Requested-With 头
      * @example
      *      //get
      *      annie.ajax({
@@ -9068,7 +9040,9 @@ var annie;
      */
     function ajax(info) {
         var urlLoader = new URLLoader();
-        urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
+        if (info.isNeedOption) {
+            urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
+        }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
         urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;

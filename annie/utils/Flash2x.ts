@@ -100,9 +100,6 @@ namespace annie {
             return;
         }
         if (!_isInited) {
-            if (_isReleased) {
-                console.log("AnnieJS:https://github.com/flash2x/annieJS");
-            }
             _JSONQueue = new URLLoader();
             _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
             _loaderQueue = new URLLoader();
@@ -166,9 +163,14 @@ namespace annie {
     }
 
     // 加载资源过程中调用的回调方法。
-    function _onRESProgress(e: Event): void {
+    function _onRESProgress(e:Event): void {
         if (_progressCallback) {
-            _progressCallback((_loadPer + e.data.loadedBytes / e.data.totalBytes * _loadSinglePer) * 100 >> 0);
+            let ww:any=window;
+            let total=e.data.totalBytes;
+            if(annie.osType=="android"&&ww.swfBytes&&ww.swfBytes[_loadSceneNames[_loadIndex]]){
+                total=ww.swfBytes[_loadSceneNames[_loadIndex]];
+            }
+            _progressCallback((_loadPer + e.data.loadedBytes /total * _loadSinglePer) * 100 >> 0);
         }
     }
 
@@ -310,7 +312,7 @@ namespace annie {
     function _loadRes(): void {
         let url = _domain + _currentConfig[_loadIndex][0].src;
         if (_isReleased) {
-            _loaderQueue.responseType = "js";
+            _loaderQueue.responseType = "swf";
             url += "?v=" + _isReleased;
         } else {
             url += "?v=" + _time;
@@ -576,6 +578,7 @@ namespace annie {
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
      * @param {string} info.responseType 后台返回数据的类型,默认为"text"
+     * @param {boolean} info.isNeedOption 是否需要添加X-Requested-With 头
      * @example
      *      //get
      *      annie.ajax({
@@ -597,7 +600,9 @@ namespace annie {
      */
     export function ajax(info: any): void {
         let urlLoader = new URLLoader();
-        urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
+        if(info.isNeedOption) {
+            urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
+        }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
         urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;
@@ -609,7 +614,6 @@ namespace annie {
         }
         urlLoader.load(info.url);
     }
-
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * jsonp调用方法
@@ -845,6 +849,5 @@ namespace annie {
             }
         }
     }
-
     console.log("https://github.com/flash2x/AnnieJS");
 }
