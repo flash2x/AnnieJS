@@ -2,7 +2,6 @@
  * @module annie
  */
 namespace annie {
-
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
@@ -50,6 +49,7 @@ namespace annie {
          * @event annie.Event.START
          * @since 1.0.0
          */
+
         //
         /**
          * 构造函数
@@ -71,10 +71,9 @@ namespace annie {
             let s = this;
             if (s._req) {
                 s._req.abort();
-                // s._req = null;
+                s._req = null;
             }
         }
-
         private _req: XMLHttpRequest = null;
         private headers: Array<string> = [];
 
@@ -89,7 +88,7 @@ namespace annie {
         public load(url: string, contentType: string = "form"): void {
             let s = this;
             s.loadCancel();
-            if (s.responseType == null || s.responseType == "") {
+            if (s.responseType == "") {
                 //看看是什么后缀
                 let urlSplit = url.split(".");
                 let extStr = urlSplit[urlSplit.length - 1];
@@ -110,54 +109,29 @@ namespace annie {
                     s.responseType = "json";
                 } else if (ext == "txt") {
                     s.responseType = "text";
-                } else if (ext == "js" || ext == "swf") {
+                } else if (ext == "js") {
                     s.responseType = "js";
+                } else if (ext == "swf") {
+                    s.responseType = "swf";
                 } else {
                     s.responseType = "unKnow";
                 }
             }
             if (!s._req) {
                 s._req = new XMLHttpRequest();
-                let req = s._req;
-                req.withCredentials = false;
-                req.onprogress = function (event: any): void {
-                    if (!event || event.loaded > 0 && event.total == 0) {
-                        return; // Sometimes we get no "total", so just ignore the progress event.
-                    }
+                s._req.withCredentials = false;
+                s._req.onprogress = function (event: any): void {
                     s.dispatchEvent("onProgress", {loadedBytes: event.loaded, totalBytes: event.total});
                 };
-                req.onerror = function (event: any): void {
-                    reSendTimes++;
-                    if (reSendTimes > 2) {
-                        s.dispatchEvent("onError", {id: 2, msg: event["message"]});
-                    } else {
-                        //断线重连
-                        req.abort();
-                        if (!s.data) {
-                            req.send();
-                        } else {
-                            if (contentType == "form") {
-                                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                                req.send(s._fqs(s.data, null));
-                            } else {
-                                var type = "application/json";
-                                if (contentType != "json") {
-                                    type = "multipart/form-data";
-                                }
-                                req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                                req.send(s.data);
-                            }
-                        }
-                    }
+                s._req.onerror = function (event: any): void {
+                    s.dispatchEvent("onError", {id: 2, msg: event["message"]});
                 };
-                req.onreadystatechange = function (event: any): void {
-                    if(!event)return;
-                    let t = event.target;
-                    if (t["readyState"] == 4) {
-                        if (req.status == 200||req.status==0) {
+                s._req.onreadystatechange = function (event: any): void {
+                    if (s._req.readyState === s._req.DONE) {
+                        if (s._req.status == 200 || s._req.status == 0) {
                             let isImage: boolean = false;
                             let e: Event = new Event("onComplete");
-                            let result = t["response"];
+                            let result = s._req.response;
                             e.data = {type: s.responseType, response: null};
                             let item: any;
                             switch (s.responseType) {
@@ -196,6 +170,7 @@ namespace annie {
                                     item = JSON.parse(result);
                                     break;
                                 case "js":
+                                case "swf":
                                     item = "JS_CODE";
                                     Eval(result);
                                     break;
@@ -217,8 +192,6 @@ namespace annie {
                     }
                 };
             }
-            let req = s._req;
-            let reSendTimes = 0;
             if (s.data && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
@@ -226,35 +199,32 @@ namespace annie {
                 s.url = url;
             }
             if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
-                req.responseType = "blob";
+                s._req.responseType = "blob";
             } else {
-                req.responseType = "text";
+                s._req.responseType = "text";
             }
-            req.open(s.method, s.url, true);
+            s._req.open(s.method, s.url, true);
             if (s.headers.length > 0) {
                 for (let h = 0; h < s.headers.length; h += 2) {
-                    req.setRequestHeader(s.headers[h], s.headers[h + 1]);
+                    s._req.setRequestHeader(s.headers[h], s.headers[h + 1]);
                 }
                 s.headers.length = 0;
             }
             if (!s.data) {
-                req.send();
+                s._req.send();
             } else {
                 if (contentType == "form") {
-                    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                    req.send(s._fqs(s.data, null));
+                    s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                    s._req.send(s._fqs(s.data, null));
                 } else {
                     var type = "application/json";
                     if (contentType != "json") {
                         type = "multipart/form-data";
                     }
-                    req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                    req.send(s.data);
+                    s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                    s._req.send(s.data);
                 }
             }
-            /*req.onloadstart = function (e) {
-             s.dispatchEvent("onStart");
-             };*/
         }
 
         /**
@@ -265,7 +235,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public responseType: string = null;
+        public responseType: string = "";
         /**
          * 请求的url地址
          * @property url
@@ -322,6 +292,7 @@ namespace annie {
                 return src + "?" + s._fqs(data, query);
             }
         };
+
         /**
          * 添加自定义头
          * @method addHeader
@@ -331,11 +302,12 @@ namespace annie {
         public addHeader(name: string, value: string): void {
             this.headers.push(name, value);
         }
+
         public destroy(): void {
-            let s=this;
+            let s = this;
             s.loadCancel();
-            s.headers=null;
-            s.data=null;
+            s.headers = null;
+            s.data = null;
             super.destroy();
         }
     }
