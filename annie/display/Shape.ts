@@ -580,10 +580,9 @@ namespace annie {
                 }
             }
         };
-        public update(isDrawUpdate: boolean = false): void {
+        public update(): void {
             let s = this;
-            if (!s._visible) return;
-            super.update(isDrawUpdate);
+            super.update();
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;

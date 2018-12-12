@@ -1327,7 +1327,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        protected update(isDrawUpdate?: boolean): void;
+        protected update(): void;
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -1418,6 +1418,7 @@ declare namespace annie {
         removeSound(id: number | string): void;
         private _a2x_res_obj;
         destroy(): void;
+        protected updateFrame(): void;
         protected callEventAndFrameScript(callState: number): void;
     }
 }
@@ -1500,7 +1501,7 @@ declare namespace annie {
          * @since 1.1.0
          */
         hitTestWidthPixel: boolean;
-        update(isDrawUpdate?: boolean): void;
+        update(): void;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
@@ -1877,7 +1878,7 @@ declare namespace annie {
          * @return {void}
          */
         decodePath: (data: any) => void;
-        update(isDrawUpdate?: boolean): void;
+        update(): void;
         private _draw(ctx, isMask?);
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
@@ -2041,9 +2042,9 @@ declare namespace annie {
          * @return {void}
          */
         removeAllChildren(): void;
-        update(isDrawUpdate?: boolean): void;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         getBounds(): Rectangle;
+        protected updateFrame(): void;
         render(renderObj: IRender): void;
         protected callEventAndFrameScript(callState: number): void;
     }
@@ -2470,7 +2471,7 @@ declare namespace annie {
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         private isUpdateFrame;
-        update(isDrawUpdate?: boolean): void;
+        protected updateFrame(): void;
         private _a2x_sounds;
         protected callEventAndFrameScript(callState: number): void;
         private static _resetMC(obj);
@@ -2703,7 +2704,7 @@ declare namespace annie {
         lines: number;
         private _getMeasuredWidth(text);
         private realLines;
-        update(isDrawUpdate?: boolean): void;
+        update(): void;
     }
 }
 /**
@@ -3109,7 +3110,7 @@ declare namespace annie {
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
         private _resizeEvent;
-        update(isDrawUpdate?: boolean): void;
+        updateFrame(): void;
         private _touchEvent;
         render(renderObj: IRender): void;
         private _ml;

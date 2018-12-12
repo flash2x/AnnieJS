@@ -351,9 +351,9 @@ namespace annie {
 
         private _resizeEvent: any = null;
 
-        public update(isDrawUpdate: boolean = true): void {
+        public updateFrame(): void {
             let s = this;
-            super.update(isDrawUpdate);
+            super.updateFrame();
             let sf: any = s._floatDisplayList;
             let len = sf.length;
             for (let i = 0; i < len; i++) {
@@ -371,10 +371,8 @@ namespace annie {
 
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
         private _ml: any = [];
-
         //这个是事件中用到的Point对象池,以提高性能
         private _mp: any = [];
-
         //刷新mouse或者touch事件
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
             event["_pd"] = false;
@@ -385,32 +383,29 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
-
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
-
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
             if (s._flush == 0) {
                 s.callEventAndFrameScript(2);
-                s.update(true);
+                s.updateFrame();
                 s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
+                    s.callEventAndFrameScript(2);
+                    s.updateFrame();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s.callEventAndFrameScript(2);
-                        s.update(true);
                         s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
             }
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -882,7 +877,6 @@ namespace annie {
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
-                s.update();
             }
         };
 

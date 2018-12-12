@@ -357,9 +357,12 @@ namespace annie {
             s._wantFrame = <number>frameIndex;
         }
         private isUpdateFrame: boolean = false;
-        public update(isDrawUpdate: boolean = true): void {
+        protected updateFrame(): void {
             let s: any = this;
-            if (s._visible&& s._a2x_res_class.tf > 1 &&(isDrawUpdate||s._wantFrame)){
+            if(s._cacheAsBitmap){
+                return;
+            }
+            if (s._visible&& s._a2x_res_class.tf > 1 &&(s._wantFrame)){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -441,13 +444,13 @@ namespace annie {
                     }
                 }
             }
-            super.update(isDrawUpdate);
+            super.updateFrame();
         }
         //flash声音管理
         private _a2x_sounds: any = null;
         protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
-            if (s.isUpdateFrame) {
+            if (s.isUpdateFrame){
                 let timeLineObj = s._a2x_res_class;
                 s.isUpdateFrame = false;
                 let frameIndex = s._curFrame - 1;

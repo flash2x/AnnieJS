@@ -2131,20 +2131,29 @@ var annie;
          * @since 1.0.0
          * @return {void}
          */
-        DisplayObject.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
+        DisplayObject.prototype.update = function () {
             var s = this;
-            if (!s._visible)
-                return;
             var UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
                 s._cp = false;
             }
-            if (UI.UM) {
-                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+            else {
+                if (s.parent) {
+                    var PUI = s.parent._UI;
+                    if (PUI.UM) {
+                        UI.UM = true;
+                    }
+                    if (PUI.UA) {
+                        UI.UA = true;
+                    }
+                    if (PUI.UF) {
+                        UI.UF = true;
+                    }
+                }
             }
             if (UI.UM) {
+                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
@@ -2186,30 +2195,35 @@ var annie;
          */
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
-            var cf = s.cFilters;
-            var cfLen = cf.length;
-            var fId = -1;
-            if (cfLen) {
-                for (var i = 0; i < cfLen; i++) {
-                    if (s.cFilters[i].type == "Shadow") {
-                        fId = i;
-                        break;
+            if (s._visible) {
+                s.update();
+                if (s._alpha > 0) {
+                    var cf = s.cFilters;
+                    var cfLen = cf.length;
+                    var fId = -1;
+                    if (cfLen) {
+                        for (var i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                fId = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (fId >= 0) {
+                        var ctx = renderObj["_ctx"];
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        renderObj.draw(s);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    }
+                    else {
+                        renderObj.draw(s);
                     }
                 }
-            }
-            if (fId >= 0) {
-                var ctx = renderObj["_ctx"];
-                ctx.shadowBlur = cf[fId].blur;
-                ctx.shadowColor = cf[fId].color;
-                ctx.shadowOffsetX = cf[fId].offsetX;
-                ctx.shadowOffsetY = cf[fId].offsetY;
-                renderObj.draw(s);
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-            }
-            else {
-                renderObj.draw(s);
             }
         };
         Object.defineProperty(DisplayObject.prototype, "width", {
@@ -2397,6 +2411,7 @@ var annie;
             s._visible = false;
             _super.prototype.destroy.call(this);
         };
+        DisplayObject.prototype.updateFrame = function () { };
         //更新流程走完之后再执行脚本和事件执行流程
         DisplayObject.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
@@ -2557,12 +2572,9 @@ var annie;
             configurable: true
         });
         ;
-        Bitmap.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
+        Bitmap.prototype.update = function () {
             var s = this;
-            if (!s._visible)
-                return;
-            _super.prototype.update.call(this, isDrawUpdate);
+            _super.prototype.update.call(this);
             //滤镜
             var bitmapData = s._bitmapData;
             if ((s._UI.UD || s._UI.UF) && bitmapData) {
@@ -3307,12 +3319,9 @@ var annie;
                 s._isBitmapStroke = null;
             }
         };
-        Shape.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
+        Shape.prototype.update = function () {
             var s = this;
-            if (!s._visible)
-                return;
-            _super.prototype.update.call(this, isDrawUpdate);
+            _super.prototype.update.call(this);
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 var cLen = s._command.length;
@@ -3974,34 +3983,6 @@ var annie;
                 s.removeChildAt(0);
             }
         };
-        Sprite.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
-            var s = this;
-            if (!s._visible)
-                return;
-            _super.prototype.update.call(this, isDrawUpdate);
-            var um = s._UI.UM;
-            var ua = s._UI.UA;
-            var uf = s._UI.UF;
-            s._UI.UM = false;
-            s._UI.UA = false;
-            s._UI.UF = false;
-            var len = s.children.length;
-            var child = null;
-            for (var i = len - 1; i >= 0; i--) {
-                child = s.children[i];
-                if (um) {
-                    child._UI.UM = um;
-                }
-                if (uf) {
-                    child._UI.UF = uf;
-                }
-                if (ua) {
-                    child._UI.UA = ua;
-                }
-                child.update(isDrawUpdate);
-            }
-        };
         Sprite.prototype.hitTestPoint = function (hitPoint, isGlobalPoint, isMustMouseEnable) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             if (isMustMouseEnable === void 0) { isMustMouseEnable = false; }
@@ -4098,13 +4079,23 @@ var annie;
             }
             return rect;
         };
+        Sprite.prototype.updateFrame = function () {
+            var s = this;
+            var len = s.children.length;
+            var child;
+            for (var i = 0; i < len; i++) {
+                child = s.children[i];
+                child.updateFrame();
+            }
+        };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s.cAlpha > 0 && s._visible) {
+            if (s._visible) {
                 if (s._cacheAsBitmap) {
                     _super.prototype.render.call(this, renderObj);
                 }
                 else {
+                    s.update();
                     var maskObj = void 0;
                     var child = void 0;
                     var len = s.children.length;
@@ -4138,6 +4129,9 @@ var annie;
                     if (maskObj) {
                         renderObj.endMask();
                     }
+                    s._UI.UF = false;
+                    s._UI.UM = false;
+                    s._UI.UA = false;
                 }
             }
         };
@@ -5001,10 +4995,12 @@ var annie;
             }
             s._wantFrame = frameIndex;
         };
-        MovieClip.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
+        MovieClip.prototype.updateFrame = function () {
             var s = this;
-            if (s._visible && s._a2x_res_class.tf > 1 && (isDrawUpdate || s._wantFrame)) {
+            if (s._cacheAsBitmap) {
+                return;
+            }
+            if (s._visible && s._a2x_res_class.tf > 1 && (s._wantFrame)) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -5092,7 +5088,7 @@ var annie;
                     }
                 }
             }
-            _super.prototype.update.call(this, isDrawUpdate);
+            _super.prototype.updateFrame.call(this);
         };
         MovieClip.prototype.callEventAndFrameScript = function (callState) {
             var s = this;
@@ -5728,12 +5724,9 @@ var annie;
             //ctx.restore();
             return w;
         };
-        TextField.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = false; }
-            _super.prototype.update.call(this, isDrawUpdate);
+        TextField.prototype.update = function () {
+            _super.prototype.update.call(this);
             var s = this;
-            if (!s._visible)
-                return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 var can = s._texture;
@@ -6452,7 +6445,6 @@ var annie;
                     s.divWidth = whObj.w;
                     s.renderObj.reSize();
                     s.setAlign();
-                    s.update();
                 }
             };
             var s = this;
@@ -6596,10 +6588,9 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Stage.prototype.update = function (isDrawUpdate) {
-            if (isDrawUpdate === void 0) { isDrawUpdate = true; }
+        Stage.prototype.updateFrame = function () {
             var s = this;
-            _super.prototype.update.call(this, isDrawUpdate);
+            _super.prototype.updateFrame.call(this);
             var sf = s._floatDisplayList;
             var len = sf.length;
             for (var i = 0; i < len; i++) {
@@ -6625,18 +6616,18 @@ var annie;
             var s = this;
             if (s._flush == 0) {
                 s.callEventAndFrameScript(2);
-                s.update(true);
+                s.updateFrame();
                 s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
+                    s.callEventAndFrameScript(2);
+                    s.updateFrame();
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.callEventAndFrameScript(2);
-                        s.update(true);
                         s.render(s.renderObj);
                     }
                     s._currentFlush--;
@@ -7993,6 +7984,7 @@ var annie;
         };
         CanvasRender.prototype.drawMask = function (target) {
             var s = this;
+            target.update();
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
@@ -8026,10 +8018,6 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this;
-            //由于某些原因导致有些元件没来的及更新就开始渲染了
-            if (target._cp) {
-                s._stage.update(false);
-            }
             var texture = target._texture;
             if (texture && texture.width > 0 && texture.height > 0) {
                 var ctx = s._ctx;

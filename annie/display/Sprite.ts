@@ -89,6 +89,7 @@ namespace annie {
             }
             s._cacheAsBitmap = value;
         }
+
         private _cacheAsBitmap: boolean;
 
         /**
@@ -330,6 +331,7 @@ namespace annie {
             }
             s._removeChildren.push(child);
         }
+
         /**
          * 移除Sprite上的所有child
          * @method removeAllChildren
@@ -342,32 +344,6 @@ namespace annie {
             let len = s.children.length;
             for (let i = len - 1; i >= 0; i--) {
                 s.removeChildAt(0);
-            }
-        }
-        public update(isDrawUpdate: boolean = true): void {
-            let s: any = this;
-            if (!s._visible) return;
-            super.update(isDrawUpdate);
-            let um: boolean = s._UI.UM;
-            let ua: boolean = s._UI.UA;
-            let uf: boolean = s._UI.UF;
-            s._UI.UM = false;
-            s._UI.UA = false;
-            s._UI.UF = false;
-            let len = s.children.length;
-            let child: any = null;
-            for (let i = len - 1; i >= 0; i--) {
-                child = s.children[i];
-                if (um) {
-                    child._UI.UM = um;
-                }
-                if (uf) {
-                    child._UI.UF = uf;
-                }
-                if (ua) {
-                    child._UI.UA = ua;
-                }
-                child.update(isDrawUpdate);
             }
         }
 
@@ -461,12 +437,24 @@ namespace annie {
             }
             return rect;
         }
+
+        protected updateFrame(): void {
+            let s = this;
+            let len: number = s.children.length;
+            let child: any;
+            for (let i = 0; i < len; i++) {
+                child = s.children[i];
+                child.updateFrame();
+            }
+        }
+
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s.cAlpha > 0 && s._visible) {
+            if (s._visible) {
                 if (s._cacheAsBitmap) {
                     super.render(renderObj);
                 } else {
+                    s.update();
                     let maskObj: any;
                     let child: any;
                     let len: number = s.children.length;
@@ -494,9 +482,12 @@ namespace annie {
                             child.render(renderObj);
                         }
                     }
-                    if (maskObj){
+                    if (maskObj) {
                         renderObj.endMask();
                     }
+                    s._UI.UF = false;
+                    s._UI.UM = false;
+                    s._UI.UA = false;
                 }
             }
         }

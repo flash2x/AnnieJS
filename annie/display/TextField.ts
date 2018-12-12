@@ -306,10 +306,9 @@ namespace annie {
             return w;
         }
         private  realLines: any = [];
-        public update(isDrawUpdate:boolean=false): void {
-            super.update(isDrawUpdate);
+        public update(): void {
+            super.update();
             let s: any = this;
-            if(!s._visible)return;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
                 let can = s._texture;

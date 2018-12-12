@@ -60,13 +60,14 @@ namespace annie {
          * @event MOUSE_OUT
          * @since 1.0.0
          */
+
 //
         /**
          * @method DisplayObject
          * @since 1.0.0
          * @public
          */
-        constructor(){
+        constructor() {
             super();
             this._instanceType = "annie.DisplayObject";
         }
@@ -335,6 +336,7 @@ namespace annie {
          * @type {string}
          * @default 0
          */
+
         //public blendMode: string = "normal";
         /**
          * 显示对象的变形矩阵
@@ -557,7 +559,6 @@ namespace annie {
             Rectangle.createFromPoints(s._drawRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
             return s._drawRect;
         }
-
         /**
          * 更新函数
          * @method update
@@ -565,18 +566,28 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        protected update(isDrawUpdate: boolean = true): void {
+        protected update(): void {
             let s = this;
-            if(!s._visible)return;
             let UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
                 s._cp = false;
+            }else{
+                if(s.parent) {
+                    let PUI = s.parent._UI;
+                    if (PUI.UM) {
+                        UI.UM = true;
+                    }
+                    if (PUI.UA) {
+                        UI.UA = true;
+                    }
+                    if (PUI.UF) {
+                        UI.UF = true;
+                    }
+                }
             }
             if (UI.UM) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-            }
-            if (UI.UM) {
                 s.cMatrix.setFrom(s._matrix);
                 if (s.parent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
@@ -597,18 +608,17 @@ namespace annie {
                         s.cFilters.push(sf[i]);
                     }
                 }
-                if (s.parent){
+                if(s.parent){
                     if (s.parent.cFilters.length > 0) {
                         let len = s.parent.cFilters.length;
                         let pf = s.parent.cFilters;
-                        for (let i = len - 1; i >= 0; i--) {
+                        for (let i = len - 1; i >= 0; i--){
                             s.cFilters.unshift(pf[i]);
                         }
                     }
                 }
             }
         }
-
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -617,31 +627,36 @@ namespace annie {
          * @param {annie.IRender} renderObj
          * @return {void}
          */
-        public render(renderObj: IRender | any): void {
+        public render(renderObj: IRender | any): void{
             let s = this;
-            let cf = s.cFilters;
-            let cfLen = cf.length;
-            let fId = -1;
-            if (cfLen) {
-                for (let i = 0; i < cfLen; i++) {
-                    if (s.cFilters[i].type == "Shadow") {
-                        fId = i;
-                        break;
+            if(s._visible) {
+                s.update();
+                if(s._alpha>0){
+                    let cf = s.cFilters;
+                    let cfLen = cf.length;
+                    let fId = -1;
+                    if (cfLen) {
+                        for (let i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                fId = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (fId >= 0) {
+                        let ctx: any = renderObj["_ctx"];
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        renderObj.draw(s);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    } else {
+                        renderObj.draw(s);
                     }
                 }
-            }
-            if (fId >= 0) {
-                let ctx: any = renderObj["_ctx"];
-                ctx.shadowBlur = cf[fId].blur;
-                ctx.shadowColor = cf[fId].color;
-                ctx.shadowOffsetX = cf[fId].offsetX;
-                ctx.shadowOffsetY = cf[fId].offsetY;
-                renderObj.draw(s);
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-            } else {
-                renderObj.draw(s);
             }
         }
 
@@ -677,6 +692,7 @@ namespace annie {
         public get height(): number {
             return this.getWH().height;
         }
+
         public set height(value: number) {
             let s = this;
             let h = s.height;
@@ -748,6 +764,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * @method getSound
          * @param {number|string} id
@@ -772,7 +789,6 @@ namespace annie {
             }
             return newSounds;
         }
-
         /**
          * 当前对象包含的声音列表
          * @property soundList
@@ -800,6 +816,7 @@ namespace annie {
             let sounds = s.soundList;
             sounds.push(sound);
         }
+
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
@@ -827,11 +844,12 @@ namespace annie {
 
         //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
+
         public destroy(): void {
             //清除相应的数据引用
-            let s:any = this;
+            let s: any = this;
             s.stopAllSounds();
-            for(let i=0;i<s.soundList.length;i++){
+            for (let i = 0; i < s.soundList.length; i++) {
                 s.soundList[i].destroy();
             }
             s._a2x_res_obj = null;
@@ -848,11 +866,12 @@ namespace annie {
             s.cMatrix = null;
             s._UI = null;
             s._texture = null;
-            s._visible=false;
+            s._visible = false;
             super.destroy();
         }
+        protected updateFrame(): void {}
         //更新流程走完之后再执行脚本和事件执行流程
-        protected callEventAndFrameScript(callState: number):void {
+        protected callEventAndFrameScript(callState: number): void {
             let s: any = this;
             if (!s.stage) return;
             let sounds = s.soundList;
@@ -865,7 +884,7 @@ namespace annie {
                     }
                 }
             } else {
-                if (callState == 1){
+                if (callState == 1) {
                     //如果有音乐，则播放音乐
                     if (sounds.length > 0) {
                         for (let i = 0; i < sounds.length; i++) {
@@ -874,10 +893,9 @@ namespace annie {
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if(s._visible)
-                s.dispatchEvent(annie.Event.ENTER_FRAME);
+                if (s._visible)
+                    s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         }
-
     }
 }
