@@ -105,9 +105,9 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
-        public update(): void {
+        public updateMatirx(): void {
             let s = this;
-            super.update();
+            super.updateMatirx();
             //滤镜
             let bitmapData = s._bitmapData;
             if ((s._UI.UD || s._UI.UF) && bitmapData) {

@@ -285,8 +285,7 @@ var annie;
             s.eventTypes = {};
         };
         EventDispatcher.prototype.destroy = function () {
-            var s = this;
-            s.removeAllEventListener();
+            this.removeAllEventListener();
         };
         //全局的鼠标事件的监听数对象表
         EventDispatcher._MECO = {};
@@ -2131,7 +2130,7 @@ var annie;
          * @since 1.0.0
          * @return {void}
          */
-        DisplayObject.prototype.update = function () {
+        DisplayObject.prototype.updateMatirx = function () {
             var s = this;
             var UI = s._UI;
             if (s._cp) {
@@ -2196,8 +2195,8 @@ var annie;
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
             if (s._visible) {
-                s.update();
-                if (s._alpha > 0) {
+                s.updateMatirx();
+                if (s.cAlpha > 0) {
                     var cf = s.cFilters;
                     var cfLen = cf.length;
                     var fId = -1;
@@ -2281,7 +2280,7 @@ var annie;
          */
         DisplayObject.prototype.getWH = function () {
             var s = this;
-            s.update();
+            s.updateMatirx();
             var dr = s.getDrawRect();
             return { width: dr.width, height: dr.height };
         };
@@ -2388,8 +2387,9 @@ var annie;
             }
         };
         DisplayObject.prototype.destroy = function () {
-            //清除相应的数据引用
             var s = this;
+            //清除相应的数据引用
+            s.stopDrag();
             s.stopAllSounds();
             for (var i = 0; i < s.soundList.length; i++) {
                 s.soundList[i].destroy();
@@ -2411,24 +2411,22 @@ var annie;
             s._visible = false;
             _super.prototype.destroy.call(this);
         };
-        DisplayObject.prototype.updateFrame = function () { };
         //更新流程走完之后再执行脚本和事件执行流程
-        DisplayObject.prototype.callEventAndFrameScript = function (callState) {
+        DisplayObject.prototype.updateEventAndScript = function (callState) {
             var s = this;
-            if (!s.stage)
-                return;
-            var sounds = s.soundList;
-            if (callState == 0) {
-                s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
-                //如果有音乐,则关闭音乐
-                if (sounds.length > 0) {
-                    for (var i = 0; i < sounds.length; i++) {
-                        sounds[i].stop2();
+            //if (!s.stage || callState == 2) return;
+            if (callState < 2) {
+                var sounds = s.soundList;
+                if (callState == 0) {
+                    //如果有音乐,则关闭音乐
+                    if (sounds.length > 0) {
+                        for (var i = 0; i < sounds.length; i++) {
+                            sounds[i].stop2();
+                        }
                     }
+                    s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
                 }
-            }
-            else {
-                if (callState == 1) {
+                else {
                     //如果有音乐，则播放音乐
                     if (sounds.length > 0) {
                         for (var i = 0; i < sounds.length; i++) {
@@ -2437,8 +2435,9 @@ var annie;
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if (s._visible)
-                    s.dispatchEvent(annie.Event.ENTER_FRAME);
+            }
+            else if (callState == 2) {
+                s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         };
         //为了hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
@@ -2572,9 +2571,9 @@ var annie;
             configurable: true
         });
         ;
-        Bitmap.prototype.update = function () {
+        Bitmap.prototype.updateMatirx = function () {
             var s = this;
-            _super.prototype.update.call(this);
+            _super.prototype.updateMatirx.call(this);
             //滤镜
             var bitmapData = s._bitmapData;
             if ((s._UI.UD || s._UI.UF) && bitmapData) {
@@ -3319,9 +3318,9 @@ var annie;
                 s._isBitmapStroke = null;
             }
         };
-        Shape.prototype.update = function () {
+        Shape.prototype.updateMatirx = function () {
             var s = this;
-            _super.prototype.update.call(this);
+            _super.prototype.updateMatirx.call(this);
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 var cLen = s._command.length;
@@ -3603,15 +3602,6 @@ var annie;
                 }
             }
         };
-        /**
-         * 渲染
-         * @method render
-         * @param {annie.IRender | any} renderObj
-         * @return {void}
-         */
-        Shape.prototype.render = function (renderObj) {
-            _super.prototype.render.call(this, renderObj);
-        };
         Shape.prototype.destroy = function () {
             //清除相应的数据引用
             var s = this;
@@ -3672,6 +3662,8 @@ var annie;
              */
             this.children = [];
             this._removeChildren = [];
+            //0 未更新 1 正在更新 2 需要再次更新 3 更新结束
+            this._updateState = 0;
             var s = this;
             s._instanceType = "annie.Sprite";
         }
@@ -3681,10 +3673,8 @@ var annie;
             for (var i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s.removeAllChildren();
             if (s.parent)
-                s.parent.removeChild(s);
-            s.callEventAndFrameScript(0);
+                Sprite._removeFormParent(s.parent, s);
             s.children.length = 0;
             s._removeChildren.length = 0;
             _super.prototype.destroy.call(this);
@@ -3824,45 +3814,14 @@ var annie;
             if (!child)
                 return;
             var s = this;
-            var sameParent = (s == child.parent);
-            var cp = child.parent;
             var len;
+            var cp = child.parent;
             if (cp) {
-                if (!sameParent) {
-                    var cpc = cp.children;
-                    len = cpc.length;
-                    var isRemove = true;
-                    for (var i = 0; i < len; i++) {
-                        if (cpc[i] == child) {
-                            cpc.splice(i, 1);
-                            isRemove = false;
-                            break;
-                        }
-                    }
-                    if (isRemove) {
-                        var cpc_1 = cp._removeChildren;
-                        len = cpc_1.length;
-                        for (var i = 0; i < len; i++) {
-                            if (cpc_1[i] == child) {
-                                cpc_1.splice(i, 1);
-                                break;
-                            }
-                        }
-                    }
-                }
-                else {
-                    len = s.children.length;
-                    for (var i = 0; i < len; i++) {
-                        if (s.children[i] == child) {
-                            s.children.splice(i, 1);
-                            break;
-                        }
-                    }
-                }
+                Sprite._removeFormParent(cp, child);
             }
             len = s.children.length;
             if (index >= len) {
-                s.children[s.children.length] = child;
+                s.children[len] = child;
             }
             else if (index == 0) {
                 s.children.unshift(child);
@@ -3872,7 +3831,34 @@ var annie;
             }
             if (cp != s) {
                 child["_cp"] = true;
+                child.stage = null;
                 child.parent = s;
+                if (s.stage && s._updateState == 1) {
+                    //被子级改了，遍历又过了，于是只能重新再遍历一次
+                    s.stage.isReUpdate = true;
+                }
+            }
+        };
+        Sprite._removeFormParent = function (cp, child) {
+            var cpc = cp.children;
+            var len = cpc.length;
+            var isHave = false;
+            for (var i = 0; i < len; i++) {
+                if (cpc[i] == child) {
+                    cpc.splice(i, 1);
+                    isHave = true;
+                    break;
+                }
+            }
+            if (!isHave) {
+                cpc = cp._removeChildren;
+                len = cpc.length;
+                for (var i = 0; i < len; i++) {
+                    if (cpc[i] == child) {
+                        cpc.splice(i, 1);
+                        break;
+                    }
+                }
             }
         };
         /**
@@ -4079,122 +4065,114 @@ var annie;
             }
             return rect;
         };
-        Sprite.prototype.updateFrame = function () {
-            var s = this;
-            var len = s.children.length;
-            var child;
-            for (var i = 0; i < len; i++) {
-                child = s.children[i];
-                child.updateFrame();
-            }
-        };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._visible) {
-                if (s._cacheAsBitmap) {
-                    _super.prototype.render.call(this, renderObj);
-                }
-                else {
-                    s.update();
-                    var maskObj = void 0;
-                    var child = void 0;
-                    var len = s.children.length;
-                    for (var i = 0; i < len; i++) {
-                        child = s.children[i];
-                        if (child._isUseToMask > 0)
-                            continue;
-                        if (child.cAlpha > 0 && child._visible) {
-                            if (maskObj) {
-                                if (child.mask && child.mask.parent == child.parent) {
-                                    if (child.mask != maskObj) {
-                                        renderObj.endMask();
-                                        maskObj = child.mask;
-                                        renderObj.beginMask(maskObj);
-                                    }
-                                }
-                                else {
-                                    renderObj.endMask();
-                                    maskObj = null;
-                                }
+            s._updateState = 0;
+            if (s._cacheAsBitmap) {
+                _super.prototype.render.call(this, renderObj);
+            }
+            else {
+                s.updateMatirx();
+                var maskObj = void 0;
+                var child = void 0;
+                var len = s.children.length;
+                for (var i = 0; i < len; i++) {
+                    child = s.children[i];
+                    if (child._isUseToMask > 0)
+                        continue;
+                    if (maskObj) {
+                        if (child.mask && child.mask.parent == child.parent) {
+                            if (child.mask != maskObj) {
+                                renderObj.endMask();
+                                maskObj = child.mask;
+                                renderObj.beginMask(maskObj);
                             }
-                            else {
-                                if (child.mask && child.mask.parent == child.parent) {
-                                    maskObj = child.mask;
-                                    renderObj.beginMask(maskObj);
-                                }
-                            }
-                            child.render(renderObj);
+                        }
+                        else {
+                            renderObj.endMask();
+                            maskObj = null;
                         }
                     }
-                    if (maskObj) {
-                        renderObj.endMask();
+                    else {
+                        if (child.mask && child.mask.parent == child.parent) {
+                            maskObj = child.mask;
+                            renderObj.beginMask(maskObj);
+                        }
                     }
-                    s._UI.UF = false;
-                    s._UI.UM = false;
-                    s._UI.UA = false;
+                    child.render(renderObj);
                 }
+                if (maskObj) {
+                    renderObj.endMask();
+                }
+                s._UI.UF = false;
+                s._UI.UM = false;
+                s._UI.UA = false;
             }
         };
-        Sprite.prototype.callEventAndFrameScript = function (callState) {
+        Sprite.prototype.updateEventAndScript = function (callState) {
             var s = this;
+            if (!s._visible) {
+                return;
+            }
+            _super.prototype.updateEventAndScript.call(this, callState);
+            if (s._cacheAsBitmap) {
+                return;
+            }
+            s._updateState = 1;
             var child = null;
             var children = null;
             var len = 0;
+            //上级舞台发生变动,所有在舞台上的元素及子元素都要执行事件
             if (callState == 0) {
+                //移除舞台
                 children = s.children;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
-                }
-                //上级被移除了，这一层上的所有元素都要执行移除事件
-                children = s._removeChildren;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
-                    child.parent = null;
+                    if (child && child.stage) {
+                        child.updateEventAndScript(callState);
+                        child.stage = null;
+                    }
                 }
             }
             else if (callState == 1) {
-                //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
+                //添加到舞台
                 children = s.children;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.stage = s.stage;
-                    child.parent = s;
-                    child.callEventAndFrameScript(callState);
-                }
-            }
-            else if (callState == 2) {
-                children = s.children;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child.stage) {
-                        child.callEventAndFrameScript(2);
-                    }
-                    else {
+                    if (child && !child.stage) {
                         child.stage = s.stage;
-                        child.parent = s;
-                        child.callEventAndFrameScript(1);
+                        child.updateEventAndScript(callState);
                     }
                 }
-                //上级没有任何变化，执行对应的移除事件和添加事件
-                children = s._removeChildren;
+            }
+            else {
+                children = s.children;
                 len = children.length;
                 for (var i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.callEventAndFrameScript(0);
-                    child.stage = null;
-                    child.parent = null;
+                    if (child) {
+                        if (child.stage) {
+                            child.updateEventAndScript(callState);
+                        }
+                        else {
+                            child.stage = s.stage;
+                            child.updateEventAndScript(1);
+                        }
+                    }
                 }
             }
-            s._removeChildren.length = 0;
-            _super.prototype.callEventAndFrameScript.call(this, callState);
+            //执行移除事件,为什么要用while，因为抛出的事件有可能又产生了被移除的对象
+            children = s._removeChildren;
+            len = children.length;
+            while (len > 0) {
+                child = children.shift();
+                child.updateEventAndScript(0);
+                child.stage = null;
+                child.parent = null;
+                len = children.length;
+            }
         };
         return Sprite;
     }(annie.DisplayObject));
@@ -4656,6 +4634,7 @@ var annie;
             this.isUpdateFrame = false;
             //flash声音管理
             this._a2x_sounds = null;
+            this._frameState = 0;
             var s = this;
             s._instanceType = "annie.MovieClip";
         }
@@ -4886,6 +4865,10 @@ var annie;
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
+            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
+                //要更新
+                s.stage.isReUpdate = true;
+            }
         };
         /**
          * 将播放头向前移一帧并停在下一帧,如果本身在第一帧则不做任何反应
@@ -4902,6 +4885,15 @@ var annie;
                 s._wantFrame -= 1;
             }
             s._isPlaying = false;
+            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
+                //要更新
+                s.stage.isReUpdate = true;
+            }
+        };
+        MovieClip.prototype.isSameFrame = function () {
+            var s = this;
+            var cf = s._wantFrame == 0 ? s._curFrame : s._wantFrame;
+            return cf == s._lastFrame;
         };
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
@@ -4932,6 +4924,10 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
+            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
+                //要更新
+                s.stage.isReUpdate = true;
+            }
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -4945,22 +4941,6 @@ var annie;
             var s = this;
             s._isPlaying = true;
             s._isFront = isFront;
-            if (s._wantFrame > 0)
-                return;
-            var wf = s._curFrame;
-            if (s._isFront) {
-                wf++;
-            }
-            else {
-                wf--;
-            }
-            if (wf > s.totalFrames) {
-                wf = 1;
-            }
-            else if (wf < 1) {
-                wf = s.totalFrames;
-            }
-            s._wantFrame = wf;
         };
         /**
          * 将播放头跳转到指定帧并从那一帧开始继续播放
@@ -4994,13 +4974,17 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
+            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
+                //要更新
+                s.stage.isReUpdate = true;
+            }
         };
         MovieClip.prototype.updateFrame = function () {
             var s = this;
             if (s._cacheAsBitmap) {
                 return;
             }
-            if (s._visible && s._a2x_res_class.tf > 1 && (s._wantFrame)) {
+            if (s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
                     s._curFrame = s.parent._curFrame - s._mode;
@@ -5011,7 +4995,7 @@ var annie;
                         s._wantFrame = 0;
                     }
                 }
-                if (s._lastFrame == s._curFrame && s._isPlaying) {
+                if (s._lastFrame == s._curFrame && s._isPlaying && s._frameState == 0) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -5025,6 +5009,7 @@ var annie;
                         }
                     }
                 }
+                s._frameState = 1;
                 if (s._lastFrame != s._curFrame) {
                     if (s._mode < 0)
                         s.isUpdateFrame = true;
@@ -5086,64 +5071,67 @@ var annie;
                             }
                         }
                     }
-                }
-            }
-            _super.prototype.updateFrame.call(this);
-        };
-        MovieClip.prototype.callEventAndFrameScript = function (callState) {
-            var s = this;
-            if (s.isUpdateFrame) {
-                var timeLineObj = s._a2x_res_class;
-                s.isUpdateFrame = false;
-                var frameIndex = s._curFrame - 1;
-                //更新完所有后再来确定事件和脚本
-                var curFrameScript = void 0;
-                //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
-                var isUserScript = false;
-                //因为脚本有可能改变Front，所以提前存起来
-                var isFront = s._isFront;
-                if (s._a2x_script) {
-                    curFrameScript = s._a2x_script[frameIndex];
-                    if (curFrameScript != undefined) {
-                        if (curFrameScript != null)
-                            curFrameScript();
-                        isUserScript = true;
-                    }
-                }
-                if (!isUserScript) {
-                    curFrameScript = timeLineObj.a[frameIndex];
-                    if (curFrameScript) {
-                        s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
-                    }
-                }
-                //有没有事件
-                if (s.hasEventListener(annie.Event.CALL_FRAME)) {
-                    curFrameScript = timeLineObj.e[frameIndex];
-                    if (curFrameScript) {
-                        for (var i = 0; i < curFrameScript.length; i++) {
-                            //抛事件
-                            s.dispatchEvent(annie.Event.CALL_FRAME, {
+                    if (s.isUpdateFrame) {
+                        var timeLineObj_1 = s._a2x_res_class;
+                        s.isUpdateFrame = false;
+                        var frameIndex = s._curFrame - 1;
+                        //更新完所有后再来确定事件和脚本
+                        var curFrameScript = void 0;
+                        //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
+                        var isUserScript = false;
+                        //因为脚本有可能改变Front，所以提前存起来
+                        var isFront = s._isFront;
+                        if (s._a2x_script) {
+                            curFrameScript = s._a2x_script[frameIndex];
+                            if (curFrameScript != undefined) {
+                                if (curFrameScript != null)
+                                    curFrameScript();
+                                isUserScript = true;
+                            }
+                        }
+                        if (!isUserScript) {
+                            curFrameScript = timeLineObj_1.a[frameIndex];
+                            if (curFrameScript) {
+                                s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
+                            }
+                        }
+                        //有没有事件
+                        if (s.hasEventListener(annie.Event.CALL_FRAME)) {
+                            curFrameScript = timeLineObj_1.e[frameIndex];
+                            if (curFrameScript) {
+                                for (var i = 0; i < curFrameScript.length; i++) {
+                                    //抛事件
+                                    s.dispatchEvent(annie.Event.CALL_FRAME, {
+                                        frameIndex: s._curFrame,
+                                        frameName: curFrameScript[i]
+                                    });
+                                }
+                            }
+                        }
+                        if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
+                            s.dispatchEvent(annie.Event.END_FRAME, {
                                 frameIndex: s._curFrame,
-                                frameName: curFrameScript[i]
+                                frameName: "endFrame"
                             });
+                        }
+                        //有没有声音
+                        var curFrameSound = timeLineObj_1.s[frameIndex];
+                        if (curFrameSound) {
+                            for (var sound in curFrameSound) {
+                                s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
+                            }
                         }
                     }
                 }
-                if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
-                    s.dispatchEvent(annie.Event.END_FRAME, {
-                        frameIndex: s._curFrame,
-                        frameName: "endFrame"
-                    });
-                }
-                //有没有声音
-                var curFrameSound = timeLineObj.s[frameIndex];
-                if (curFrameSound) {
-                    for (var sound in curFrameSound) {
-                        s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
-                    }
-                }
             }
-            _super.prototype.callEventAndFrameScript.call(this, callState);
+        };
+        MovieClip.prototype.updateEventAndScript = function (callState) {
+            var s = this;
+            if (!s._visible) {
+                return;
+            }
+            s.updateFrame();
+            _super.prototype.updateEventAndScript.call(this, callState);
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
@@ -5168,6 +5156,11 @@ var annie;
                     MovieClip._resetMC(obj.children[i]);
                 }
             }
+        };
+        MovieClip.prototype.render = function (renderObj) {
+            var s = this;
+            s._frameState = 0;
+            _super.prototype.render.call(this, renderObj);
         };
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
@@ -5695,7 +5688,7 @@ var annie;
         TextField.prototype.getTextWidth = function (lineIndex) {
             if (lineIndex === void 0) { lineIndex = 0; }
             var s = this;
-            s.update();
+            s.updateMatirx();
             var can = s._texture;
             var ctx = can.getContext("2d");
             var obj = ctx.measureText(s.realLines[lineIndex]);
@@ -5724,8 +5717,8 @@ var annie;
             //ctx.restore();
             return w;
         };
-        TextField.prototype.update = function () {
-            _super.prototype.update.call(this);
+        TextField.prototype.updateMatirx = function () {
+            _super.prototype.updateMatirx.call(this);
             var s = this;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
@@ -6342,9 +6335,9 @@ var annie;
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default false
+             * @default true
              */
-            this.autoResize = false;
+            this.autoResize = true;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -6402,7 +6395,6 @@ var annie;
             // 当前的刷新次数计数器
             this._currentFlush = 0;
             this._lastDpList = {};
-            this._rid = -1;
             this._floatDisplayList = [];
             this._resizeEvent = null;
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
@@ -6411,6 +6403,7 @@ var annie;
             this._mp = [];
             // 鼠标按下事件的对象池
             this._mouseDownPoint = {};
+            this.isReUpdate = false;
             //html的鼠标或单点触摸对应的引擎事件类型名
             this._mouseEventTypes = {
                 mousedown: "onMouseDown",
@@ -6439,14 +6432,42 @@ var annie;
             this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                if (s.divHeight != whObj.h && s.divWidth != whObj.w) {
-                    s._UI.UM = true;
-                    s.divHeight = whObj.h;
-                    s.divWidth = whObj.w;
-                    s.renderObj.reSize();
-                    s.setAlign();
+                if (s.divHeight != whObj.h || s.divWidth != whObj.w) {
+                    //告诉大家我初始化完成
+                    //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
+                    if (s.divWidth == 0 || s.divHeight == 0) {
+                        if (whObj.w == 0 || whObj.h == 0)
+                            return;
+                        s._UI.UM = true;
+                        s.divHeight = whObj.h;
+                        s.divWidth = whObj.w;
+                        s.renderObj.reSize();
+                        s.setAlign();
+                        s.dispatchEvent(new annie.Event("onInitStage"));
+                    }
+                    else {
+                        if (s.autoResize) {
+                            s._UI.UM = true;
+                            s.divHeight = whObj.h;
+                            s.divWidth = whObj.w;
+                            s.renderObj.reSize();
+                            s.setAlign();
+                        }
+                        var event_1 = new annie.Event("onResize");
+                        s.dispatchEvent(event_1);
+                    }
                 }
             };
+            if (annie.debug && !Stage._isLoadedVConsole) {
+                Stage._isLoadedVConsole = true;
+                var script_1 = document.createElement("script");
+                script_1.onload = function () {
+                    new VConsole();
+                    script_1.onload = null;
+                };
+                document.head.appendChild(script_1);
+                script_1.src = "libs/vconsole.min.js";
+            }
             var s = this;
             s._instanceType = "annie.Stage";
             s.stage = s;
@@ -6470,37 +6491,6 @@ var annie;
                 //webgl
                 s.renderObj = new WGRender(s);
             }*/
-            s.renderObj.init();
-            window.addEventListener("resize", s._resizeEvent = function (e) {
-                clearTimeout(s._rid);
-                s._rid = setTimeout(function () {
-                    if (s.autoResize) {
-                        s.resize();
-                    }
-                    var event = new annie.Event("onResize");
-                    s.dispatchEvent(event);
-                }, 300);
-            });
-            setTimeout(function () {
-                s.resize();
-                //同时添加到主更新循环中
-                Stage.addUpdateObj(s);
-                //告诉大家我初始化完成
-                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
-                if (annie.debug && !Stage._isLoadedVConsole) {
-                    var script_1 = document.createElement("script");
-                    script_1.onload = function () {
-                        new VConsole();
-                        s.dispatchEvent(new annie.Event("onInitStage"));
-                        script_1.onload = null;
-                    };
-                    document.head.appendChild(script_1);
-                    script_1.src = "libs/vconsole.min.js";
-                }
-                else {
-                    s.dispatchEvent(new annie.Event("onInitStage"));
-                }
-            }, 100);
             // let rc = s.renderObj.rootContainer;
             var rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
@@ -6514,6 +6504,9 @@ var annie;
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
             }
+            s.renderObj.init();
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
         }
         Object.defineProperty(Stage, "pause", {
             /**
@@ -6588,18 +6581,15 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Stage.prototype.updateFrame = function () {
+        Stage.prototype.render = function (renderObj) {
+            renderObj.begin();
+            _super.prototype.render.call(this, renderObj);
             var s = this;
-            _super.prototype.updateFrame.call(this);
             var sf = s._floatDisplayList;
             var len = sf.length;
             for (var i = 0; i < len; i++) {
                 sf[i].updateStyle();
             }
-        };
-        Stage.prototype.render = function (renderObj) {
-            renderObj.begin();
-            _super.prototype.render.call(this, renderObj);
         };
         //刷新mouse或者touch事件
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
@@ -6614,24 +6604,38 @@ var annie;
         //循环刷新页面的函数
         Stage.prototype.flush = function () {
             var s = this;
+            //看看是否有resize
+            var callState = 2;
+            var needUpdate = false;
             if (s._flush == 0) {
-                s.callEventAndFrameScript(2);
-                s.updateFrame();
-                s.render(s.renderObj);
+                s.resize();
+                needUpdate = true;
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
-                    s.callEventAndFrameScript(2);
-                    s.updateFrame();
+                    s.resize();
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
+                        needUpdate = true;
                     }
                     s._currentFlush--;
                 }
+            }
+            if (needUpdate) {
+                //到时最好是检查下死循环
+                do {
+                    s.isReUpdate = false;
+                    s.updateEventAndScript(callState);
+                    callState++;
+                    if (callState > 100) {
+                        trace("出现无限死循环,请检查");
+                        s.isReUpdate = false;
+                    }
+                } while (s.isReUpdate);
+                s.render(s.renderObj);
             }
         };
         /**
@@ -6669,27 +6673,15 @@ var annie;
          * @return {Object}
          */
         Stage.prototype.getRootDivWH = function (div) {
-            var sw = div.style.width;
-            var sh = div.style.height;
-            var iw = document.body.clientWidth;
-            var ih = document.body.clientHeight;
-            var vW = parseInt(sw);
-            var vH = parseInt(sh);
-            if (vW.toString() == "NaN") {
-                vW = iw;
+            var vW = 640;
+            var vH = 960;
+            if (div.style.width != "") {
+                vW = parseInt(div.style.width);
+                vH = parseInt(div.style.height);
             }
             else {
-                if (sw.indexOf("%") > 0) {
-                    vW *= iw / 100;
-                }
-            }
-            if (vH.toString() == "NaN") {
-                vH = ih;
-            }
-            else {
-                if (sh.indexOf("%") > 0) {
-                    vH *= ih / 100;
-                }
+                vW = document.documentElement.clientWidth;
+                vH = document.documentElement.clientHeight;
             }
             return { w: vW, h: vH };
         };
@@ -6751,7 +6743,7 @@ var annie;
                     var points = void 0;
                     var item = s._mouseEventTypes[e.type];
                     var events = void 0;
-                    var event_1;
+                    var event_2;
                     //stageMousePoint
                     var sp = void 0;
                     //localPoint;
@@ -6789,15 +6781,15 @@ var annie;
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
                         if (!s._ml[eLen]) {
-                            event_1 = new annie.MouseEvent(item);
-                            s._ml[eLen] = event_1;
+                            event_2 = new annie.MouseEvent(item);
+                            s._ml[eLen] = event_2;
                         }
                         else {
-                            event_1 = s._ml[eLen];
-                            event_1.type = item;
+                            event_2 = s._ml[eLen];
+                            event_2.type = item;
                         }
-                        events[events.length] = event_1;
-                        s._initMouseEvent(event_1, cp, sp, identifier);
+                        events[events.length] = event_2;
+                        s._initMouseEvent(event_2, cp, sp, identifier);
                         eLen++;
                         //}
                         if (item == "onMouseDown") {
@@ -6810,15 +6802,15 @@ var annie;
                                     //这个地方检查是所有显示对象列表里是否有添加对应的事件
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
                                         if (!s._ml[eLen]) {
-                                            event_1 = new annie.MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event_1;
+                                            event_2 = new annie.MouseEvent("onMouseClick");
+                                            s._ml[eLen] = event_2;
                                         }
                                         else {
-                                            event_1 = s._ml[eLen];
-                                            event_1.type = "onMouseClick";
+                                            event_2 = s._ml[eLen];
+                                            event_2.type = "onMouseClick";
                                         }
-                                        events[events.length] = event_1;
-                                        s._initMouseEvent(event_1, cp, sp, identifier);
+                                        events[events.length] = event_2;
+                                        s._initMouseEvent(event_2, cp, sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -6985,7 +6977,7 @@ var annie;
                                 sd.y = y1;
                             }
                             if (item == "onMouseUp") {
-                                if (sd) {
+                                if (sd && sd.stage) {
                                     sd._lastDragPoint.x = Number.MAX_VALUE;
                                     sd._lastDragPoint.y = Number.MAX_VALUE;
                                 }
@@ -7984,13 +7976,21 @@ var annie;
         };
         CanvasRender.prototype.drawMask = function (target) {
             var s = this;
-            target.update();
+            target.updateMatirx();
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
                 target._draw(s._ctx, true);
             }
-            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+            else if (target._instanceType == "annie.Sprite") {
+                target._updateState = 0;
+                for (var i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i]);
+                }
+            }
+            else if (target._instanceType == "annie.MovieClip") {
+                target._frameState = 0;
+                target._updateState = 0;
                 for (var i = 0; i < target.children.length; i++) {
                     s.drawMask(target.children[i]);
                 }
@@ -10515,14 +10515,10 @@ var annie;
             _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
-        obj._UI.UM = true;
-        obj.update(false);
         obj.render(_dRender);
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
-        obj._UI.UM = true;
-        obj.update(false);
         if (!typeInfo) {
             typeInfo = { type: "png" };
         }
@@ -10567,8 +10563,6 @@ var annie;
         // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         _dRender._ctx.clearRect(0, 0, w, h);
-        obj._UI.UM = true;
-        obj.update(false);
         obj.render(_dRender);
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
@@ -10578,8 +10572,6 @@ var annie;
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
-        obj._UI.UM = true;
-        obj.update(false);
         return _dRender.rootContainer.toDataURL("image/png");
     };
     /**

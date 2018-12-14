@@ -1327,7 +1327,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        protected update(): void;
+        protected updateMatirx(): void;
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -1418,8 +1418,7 @@ declare namespace annie {
         removeSound(id: number | string): void;
         private _a2x_res_obj;
         destroy(): void;
-        protected updateFrame(): void;
-        protected callEventAndFrameScript(callState: number): void;
+        protected updateEventAndScript(callState: number): void;
     }
 }
 /**
@@ -1501,7 +1500,7 @@ declare namespace annie {
          * @since 1.1.0
          */
         hitTestWidthPixel: boolean;
-        update(): void;
+        updateMatirx(): void;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
@@ -1878,7 +1877,7 @@ declare namespace annie {
          * @return {void}
          */
         decodePath: (data: any) => void;
-        update(): void;
+        updateMatirx(): void;
         private _draw(ctx, isMask?);
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
@@ -1893,13 +1892,6 @@ declare namespace annie {
          * @return {void}
          */
         changeColor(infoObj: any): void;
-        /**
-         * 渲染
-         * @method render
-         * @param {annie.IRender | any} renderObj
-         * @return {void}
-         */
-        render(renderObj: IRender | any): void;
         destroy(): void;
     }
 }
@@ -1998,6 +1990,7 @@ declare namespace annie {
          * @return {void}
          */
         addChildAt(child: DisplayObject, index: number): void;
+        private static _removeFormParent(cp, child);
         /**
          * 获取Sprite中指定层级一个child
          * @method getChildAt
@@ -2044,9 +2037,9 @@ declare namespace annie {
         removeAllChildren(): void;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         getBounds(): Rectangle;
-        protected updateFrame(): void;
         render(renderObj: IRender): void;
-        protected callEventAndFrameScript(callState: number): void;
+        protected _updateState: number;
+        protected updateEventAndScript(callState: number): void;
     }
 }
 /**
@@ -2443,6 +2436,7 @@ declare namespace annie {
          * @return {void}
          */
         prevFrame(): void;
+        private isSameFrame();
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
          * @method gotoAndStop
@@ -2473,8 +2467,10 @@ declare namespace annie {
         private isUpdateFrame;
         protected updateFrame(): void;
         private _a2x_sounds;
-        protected callEventAndFrameScript(callState: number): void;
+        private _frameState;
+        protected updateEventAndScript(callState: number): void;
         private static _resetMC(obj);
+        render(renderObj: IRender): void;
         destroy(): void;
     }
 }
@@ -2704,7 +2700,7 @@ declare namespace annie {
         lines: number;
         private _getMeasuredWidth(text);
         private realLines;
-        update(): void;
+        updateMatirx(): void;
     }
 }
 /**
@@ -3006,7 +3002,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default false
+         * @default true
          */
         autoResize: boolean;
         /**
@@ -3094,7 +3090,6 @@ declare namespace annie {
         static _dragDisplay: DisplayObject;
         private static _isLoadedVConsole;
         private _lastDpList;
-        private _rid;
         private _floatDisplayList;
         /**
          * 显示对象入口函数
@@ -3110,13 +3105,13 @@ declare namespace annie {
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
         private _resizeEvent;
-        updateFrame(): void;
         private _touchEvent;
         render(renderObj: IRender): void;
         private _ml;
         private _mp;
         private _initMouseEvent(event, cp, sp, identifier);
         private _mouseDownPoint;
+        isReUpdate: boolean;
         private flush();
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新

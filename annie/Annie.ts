@@ -219,14 +219,10 @@ namespace annie {
             _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
-        obj._UI.UM=true;
-        obj.update(false);
         obj.render(_dRender);
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
-        obj._UI.UM=true;
-        obj.update(false);
         if (!typeInfo) {
             typeInfo = {type: "png"};
         }else{
@@ -270,8 +266,6 @@ namespace annie {
         // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         _dRender._ctx.clearRect(0, 0, w, h);
-        obj._UI.UM=true;
-        obj.update(false);
         obj.render(_dRender);
         obj.parent = objInfo.p;
         obj.x = objInfo.x;
@@ -281,8 +275,6 @@ namespace annie {
         obj.rotation = objInfo.r;
         obj.skewX = objInfo.skX;
         obj.skewY = objInfo.skY;
-        obj._UI.UM=true;
-        obj.update(false);
         return _dRender.rootContainer.toDataURL("image/png");
     };
     /**

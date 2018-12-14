@@ -3,6 +3,7 @@
  */
 namespace annie {
     declare let VConsole: any;
+
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * @class annie.Stage
@@ -161,9 +162,9 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default false
+         * @default true
          */
-        public autoResize: boolean = false;
+        public autoResize: boolean = true;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
          * @property desWidth
@@ -265,7 +266,6 @@ namespace annie {
         public static _dragDisplay: DisplayObject = null;
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
-        private _rid = -1;
         private _floatDisplayList: Array<FloatDisplay> = [];
 
         /**
@@ -282,6 +282,16 @@ namespace annie {
          */
         public constructor(rootDivId: string = "annieEngine", desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight", renderType: number = 0) {
             super();
+            if (debug && !Stage._isLoadedVConsole) {
+                Stage._isLoadedVConsole = true;
+                let script: HTMLScriptElement = document.createElement("script");
+                script.onload = function () {
+                    new VConsole();
+                    script.onload = null;
+                };
+                document.head.appendChild(script);
+                script.src = "libs/vconsole.min.js";
+            }
             let s: Stage = this;
             s._instanceType = "annie.Stage";
             s.stage = s;
@@ -305,36 +315,6 @@ namespace annie {
                 //webgl
                 s.renderObj = new WGRender(s);
             }*/
-            s.renderObj.init();
-            window.addEventListener("resize", s._resizeEvent = function (e: any) {
-                clearTimeout(s._rid);
-                s._rid = setTimeout(function () {
-                    if (s.autoResize){
-                        s.resize();
-                    }
-                    let event = new Event("onResize");
-                    s.dispatchEvent(event);
-                }, 300);
-            });
-            setTimeout(function () {
-                s.resize();
-                //同时添加到主更新循环中
-                Stage.addUpdateObj(s);
-                //告诉大家我初始化完成
-                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
-                if (debug && !Stage._isLoadedVConsole) {
-                    let script: HTMLScriptElement = document.createElement("script");
-                    script.onload = function () {
-                        new VConsole();
-                        s.dispatchEvent(new annie.Event("onInitStage"));
-                        script.onload = null;
-                    };
-                    document.head.appendChild(script);
-                    script.src = "libs/vconsole.min.js";
-                } else {
-                    s.dispatchEvent(new annie.Event("onInitStage"));
-                }
-            }, 100);
             // let rc = s.renderObj.rootContainer;
             let rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
@@ -347,13 +327,18 @@ namespace annie {
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
             }
+            s.renderObj.init();
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
         }
 
         private _resizeEvent: any = null;
+        private _touchEvent: annie.TouchEvent;
 
-        public updateFrame(): void {
+        public render(renderObj: IRender): void {
+            renderObj.begin();
+            super.render(renderObj);
             let s = this;
-            super.updateFrame();
             let sf: any = s._floatDisplayList;
             let len = sf.length;
             for (let i = 0; i < len; i++) {
@@ -361,18 +346,11 @@ namespace annie {
             }
         }
 
-        private _touchEvent: annie.TouchEvent;
-
-        public render(renderObj: IRender): void {
-            renderObj.begin();
-            super.render(renderObj);
-
-        }
-
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
         private _ml: any = [];
         //这个是事件中用到的Point对象池,以提高性能
         private _mp: any = [];
+
         //刷新mouse或者touch事件
         private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
             event["_pd"] = false;
@@ -383,29 +361,47 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
+
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
+        public isReUpdate: boolean = false;
+
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
+            //看看是否有resize
+            let callState = 2;
+            let needUpdate = false;
             if (s._flush == 0) {
-                s.callEventAndFrameScript(2);
-                s.updateFrame();
-                s.render(s.renderObj);
+                s.resize();
+                needUpdate = true;
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
-                    s.callEventAndFrameScript(2);
-                    s.updateFrame();
+                    s.resize();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s.render(s.renderObj);
+                        needUpdate = true;
                     }
                     s._currentFlush--;
                 }
             }
+            if (needUpdate) {
+                //到时最好是检查下死循环
+                do {
+                    s.isReUpdate = false;
+                    s.updateEventAndScript(callState);
+                    callState++;
+                    if (callState > 100) {
+                        trace("出现无限死循环,请检查");
+                        s.isReUpdate = false;
+                    }
+                } while (s.isReUpdate);
+                s.render(s.renderObj);
+            }
         }
+
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -443,25 +439,14 @@ namespace annie {
          * @return {Object}
          */
         public getRootDivWH(div: HTMLDivElement) {
-            let sw = div.style.width;
-            let sh = div.style.height;
-            let iw = document.body.clientWidth;
-            let ih = document.body.clientHeight;
-            let vW = parseInt(sw);
-            let vH = parseInt(sh);
-            if (vW.toString() == "NaN") {
-                vW = iw;
+            let vW = 640;
+            let vH = 960;
+            if (div.style.width != "") {
+                vW = parseInt(div.style.width);
+                vH = parseInt(div.style.height);
             } else {
-                if (sw.indexOf("%") > 0) {
-                    vW *= iw / 100;
-                }
-            }
-            if (vH.toString() == "NaN") {
-                vH = ih;
-            } else {
-                if (sh.indexOf("%") > 0) {
-                    vH *= ih / 100;
-                }
+                vW = document.documentElement.clientWidth;
+                vH = document.documentElement.clientHeight;
             }
             return {w: vW, h: vH};
         }
@@ -761,7 +746,7 @@ namespace annie {
                                 sd.y = y1;
                             }
                             if (item == "onMouseUp") {
-                                if (sd) {
+                                if (sd&&sd.stage) {
                                     sd._lastDragPoint.x = Number.MAX_VALUE;
                                     sd._lastDragPoint.y = Number.MAX_VALUE;
                                 }
@@ -871,12 +856,28 @@ namespace annie {
         public resize = function (): void {
             let s: Stage = this;
             let whObj = s.getRootDivWH(s.rootDiv);
-            if(s.divHeight!=whObj.h&&s.divWidth!=whObj.w){
-                s._UI.UM = true;
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize();
-                s.setAlign();
+            if (s.divHeight != whObj.h || s.divWidth != whObj.w) {
+                //告诉大家我初始化完成
+                //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
+                if (s.divWidth == 0 || s.divHeight == 0) {
+                    if (whObj.w == 0 || whObj.h == 0) return;
+                    s._UI.UM = true;
+                    s.divHeight = whObj.h;
+                    s.divWidth = whObj.w;
+                    s.renderObj.reSize();
+                    s.setAlign();
+                    s.dispatchEvent(new annie.Event("onInitStage"));
+                } else {
+                    if (s.autoResize) {
+                        s._UI.UM = true;
+                        s.divHeight = whObj.h;
+                        s.divWidth = whObj.w;
+                        s.renderObj.reSize();
+                        s.setAlign();
+                    }
+                    let event = new Event("onResize");
+                    s.dispatchEvent(event);
+                }
             }
         };
 

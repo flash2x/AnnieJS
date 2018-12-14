@@ -1098,20 +1098,20 @@ var annieUI;
             s.addChild(s.rMask0);
             s.addChild(s.rMask1);
             s.setPage(s.currPage);
-            var md = s.onMouseDown.bind(s);
-            var mu = s.onMouseUp.bind(s);
-            var mm = s.onMouseMove.bind(s);
+            s.md = s.onMouseDown.bind(s);
+            s.mu = s.onMouseUp.bind(s);
+            s.mm = s.onMouseMove.bind(s);
             var em = s.onEnterFrame.bind(s);
             s.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
-                s.stage.addEventListener(MouseEvent.MOUSE_DOWN, md);
-                s.stage.addEventListener(MouseEvent.MOUSE_UP, mu);
-                s.stage.addEventListener(MouseEvent.MOUSE_MOVE, mm);
+                s.stage.addEventListener(MouseEvent.MOUSE_DOWN, s.md);
+                s.stage.addEventListener(MouseEvent.MOUSE_UP, s.mu);
+                s.stage.addEventListener(MouseEvent.MOUSE_MOVE, s.mm);
                 s.addEventListener(Event.ENTER_FRAME, em);
             });
             s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
-                s.stage.removeEventListener(MouseEvent.MOUSE_DOWN, md);
-                s.stage.removeEventListener(MouseEvent.MOUSE_UP, mu);
-                s.stage.removeEventListener(MouseEvent.MOUSE_MOVE, mm);
+                s.stage.removeEventListener(MouseEvent.MOUSE_DOWN, s.md);
+                s.stage.removeEventListener(MouseEvent.MOUSE_UP, s.mu);
+                s.stage.removeEventListener(MouseEvent.MOUSE_MOVE, s.mm);
                 s.removeEventListener(Event.ENTER_FRAME, em);
             });
         }
@@ -1530,6 +1530,12 @@ var annieUI;
         };
         FlipBook.prototype.destroy = function () {
             var s = this;
+            s.stage.removeEventListener(MouseEvent.MOUSE_DOWN, s.md);
+            s.stage.removeEventListener(MouseEvent.MOUSE_UP, s.mu);
+            s.stage.removeEventListener(MouseEvent.MOUSE_MOVE, s.mm);
+            s.md = null;
+            s.mu = null;
+            s.mm = null;
             s.layer0Arr = null;
             s.layer1Arr = null;
             s.toPosArr = null;

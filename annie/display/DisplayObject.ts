@@ -559,6 +559,7 @@ namespace annie {
             Rectangle.createFromPoints(s._drawRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
             return s._drawRect;
         }
+
         /**
          * 更新函数
          * @method update
@@ -566,14 +567,14 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        protected update(): void {
+        protected updateMatirx(): void {
             let s = this;
             let UI = s._UI;
             if (s._cp) {
                 UI.UM = UI.UA = UI.UF = true;
                 s._cp = false;
-            }else{
-                if(s.parent) {
+            } else {
+                if (s.parent) {
                     let PUI = s.parent._UI;
                     if (PUI.UM) {
                         UI.UM = true;
@@ -608,17 +609,18 @@ namespace annie {
                         s.cFilters.push(sf[i]);
                     }
                 }
-                if(s.parent){
+                if (s.parent) {
                     if (s.parent.cFilters.length > 0) {
                         let len = s.parent.cFilters.length;
                         let pf = s.parent.cFilters;
-                        for (let i = len - 1; i >= 0; i--){
+                        for (let i = len - 1; i >= 0; i--) {
                             s.cFilters.unshift(pf[i]);
                         }
                     }
                 }
             }
         }
+
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -627,11 +629,11 @@ namespace annie {
          * @param {annie.IRender} renderObj
          * @return {void}
          */
-        public render(renderObj: IRender | any): void{
+        public render(renderObj: IRender | any): void {
             let s = this;
-            if(s._visible) {
-                s.update();
-                if(s._alpha>0){
+            if (s._visible) {
+                s.updateMatirx();
+                if (s.cAlpha > 0) {
                     let cf = s.cFilters;
                     let cfLen = cf.length;
                     let fId = -1;
@@ -711,7 +713,7 @@ namespace annie {
          */
         public getWH(): { width: number, height: number } {
             let s = this;
-            s.update();
+            s.updateMatirx();
             let dr = s.getDrawRect();
             return {width: dr.width, height: dr.height};
         }
@@ -789,6 +791,7 @@ namespace annie {
             }
             return newSounds;
         }
+
         /**
          * 当前对象包含的声音列表
          * @property soundList
@@ -841,13 +844,12 @@ namespace annie {
                 }
             }
         }
-
         //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
-
         public destroy(): void {
-            //清除相应的数据引用
             let s: any = this;
+            //清除相应的数据引用
+            s.stopDrag();
             s.stopAllSounds();
             for (let i = 0; i < s.soundList.length; i++) {
                 s.soundList[i].destroy();
@@ -869,22 +871,21 @@ namespace annie {
             s._visible = false;
             super.destroy();
         }
-        protected updateFrame(): void {}
         //更新流程走完之后再执行脚本和事件执行流程
-        protected callEventAndFrameScript(callState: number): void {
+        protected updateEventAndScript(callState: number): void {
             let s: any = this;
-            if (!s.stage) return;
-            let sounds = s.soundList;
-            if (callState == 0) {
-                s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
-                //如果有音乐,则关闭音乐
-                if (sounds.length > 0) {
-                    for (let i = 0; i < sounds.length; i++) {
-                        sounds[i].stop2();
+            //if (!s.stage || callState == 2) return;
+            if (callState < 2) {
+                let sounds = s.soundList;
+                if (callState == 0) {
+                    //如果有音乐,则关闭音乐
+                    if (sounds.length > 0) {
+                        for (let i = 0; i < sounds.length; i++) {
+                            sounds[i].stop2();
+                        }
                     }
-                }
-            } else {
-                if (callState == 1) {
+                    s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
+                }else{
                     //如果有音乐，则播放音乐
                     if (sounds.length > 0) {
                         for (let i = 0; i < sounds.length; i++) {
@@ -893,8 +894,8 @@ namespace annie {
                     }
                     s.dispatchEvent(annie.Event.ADD_TO_STAGE);
                 }
-                if (s._visible)
-                    s.dispatchEvent(annie.Event.ENTER_FRAME);
+            }else if (callState == 2) {
+                s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         }
     }

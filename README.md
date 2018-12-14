@@ -61,6 +61,16 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 2.1.0 版本
+    优化resize系统
+    优化对象更新系统
+    优化事件循环系统
+    优化渲染系统
+    优化VConsole调试
+    优化annie.ajax访问请求
+    优化annie.URLLoader
+    增加Android下没有加载进度条的解决方案
+    修改stage.autoResize 默认调成true
 ## AnnieJS 2.0.2 版本
     修复使用截图方法时，如果mc有跳帧，则跳帧失效的bug
     优化文字的排版与fla文件中的误差

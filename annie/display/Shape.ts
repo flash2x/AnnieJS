@@ -580,9 +580,9 @@ namespace annie {
                 }
             }
         };
-        public update(): void {
+        public updateMatirx(): void {
             let s = this;
-            super.update();
+            super.updateMatirx();
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;
@@ -725,7 +725,7 @@ namespace annie {
                                 ctx.putImageData(imageData, 0, 0);
                             }
                             //给webgl更新新
-                            //_canvas.updateTexture = true;
+                            //_canvas.updateMatirxTexture = true;
                         }
                     }
                 }
@@ -850,16 +850,6 @@ namespace annie {
                     }
                 }
             }
-        }
-
-        /**
-         * 渲染
-         * @method render
-         * @param {annie.IRender | any} renderObj
-         * @return {void}
-         */
-        public render(renderObj: IRender | any): void {
-            super.render(renderObj);
         }
         public destroy(): void {
             //清除相应的数据引用

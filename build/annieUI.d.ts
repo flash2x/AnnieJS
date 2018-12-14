@@ -525,6 +525,9 @@ declare namespace annieUI {
          * @since 1.0.3
          */
         constructor(width: number, height: number, pageCount: any, getPageCallBack: Function);
+        private md;
+        private mu;
+        private mm;
         private drawPage(num, movePoint);
         private checkLimit(point, limitPoint, limitGap);
         private getPage(index);

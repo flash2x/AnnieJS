@@ -114,7 +114,7 @@ namespace annie {
             }
             return null;
         }
-        public updateStyle(): void {
+        public updateStyle():void{
             let s:any = this;
             let o = s.htmlElement;
             if (o) {

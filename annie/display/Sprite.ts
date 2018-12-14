@@ -24,21 +24,17 @@ namespace annie {
             let s = this;
             s._instanceType = "annie.Sprite";
         }
-
         public destroy(): void {
             let s: any = this;
             //让子级也destroy
             for (let i = 0; i < s.children.length; i++) {
                 s.children[i].destroy();
             }
-            s.removeAllChildren();
-            if (s.parent) s.parent.removeChild(s);
-            s.callEventAndFrameScript(0);
+            if (s.parent) Sprite._removeFormParent(s.parent,s);
             s.children.length = 0;
             s._removeChildren.length = 0;
             super.destroy();
         }
-
         /**
          * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
@@ -122,7 +118,6 @@ namespace annie {
                 }
             }
         }
-
         //全局遍历查找
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
@@ -192,44 +187,14 @@ namespace annie {
         public addChildAt(child: DisplayObject, index: number): void {
             if (!child) return;
             let s = this;
-            let sameParent = (s == child.parent);
-            let cp = child.parent;
             let len: number;
+            let cp = child.parent;
             if (cp) {
-                if (!sameParent) {
-                    let cpc = cp.children;
-                    len = cpc.length;
-                    let isRemove = true;
-                    for (let i = 0; i < len; i++) {
-                        if (cpc[i] == child) {
-                            cpc.splice(i, 1);
-                            isRemove = false;
-                            break;
-                        }
-                    }
-                    if (isRemove) {
-                        let cpc = cp._removeChildren;
-                        len = cpc.length;
-                        for (let i = 0; i < len; i++) {
-                            if (cpc[i] == child) {
-                                cpc.splice(i, 1);
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    len = s.children.length;
-                    for (let i = 0; i < len; i++) {
-                        if (s.children[i] == child) {
-                            s.children.splice(i, 1);
-                            break;
-                        }
-                    }
-                }
+                Sprite._removeFormParent(cp,child);
             }
             len = s.children.length;
             if (index >= len) {
-                s.children[s.children.length] = child;
+                s.children[len] = child;
             } else if (index == 0) {
                 s.children.unshift(child);
             } else {
@@ -237,10 +202,36 @@ namespace annie {
             }
             if (cp != s) {
                 child["_cp"] = true;
+                child.stage = null;
                 child.parent = s;
+                if (s.stage && s._updateState == 1) {
+                    //被子级改了，遍历又过了，于是只能重新再遍历一次
+                    s.stage.isReUpdate = true;
+                }
             }
         }
-
+        private static _removeFormParent(cp:Sprite,child:DisplayObject):void{
+            let cpc = cp.children;
+            let len = cpc.length;
+            let isHave=false;
+            for (let i = 0; i < len; i++) {
+                if (cpc[i] == child) {
+                    cpc.splice(i, 1);
+                    isHave=true;
+                    break;
+                }
+            }
+            if(!isHave) {
+                cpc = cp._removeChildren;
+                len = cpc.length;
+                for (let i = 0; i < len; i++) {
+                    if (cpc[i] == child) {
+                        cpc.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
         /**
          * 获取Sprite中指定层级一个child
          * @method getChildAt
@@ -331,7 +322,6 @@ namespace annie {
             }
             s._removeChildren.push(child);
         }
-
         /**
          * 移除Sprite上的所有child
          * @method removeAllChildren
@@ -342,11 +332,10 @@ namespace annie {
         public removeAllChildren(): void {
             let s = this;
             let len = s.children.length;
-            for (let i = len - 1; i >= 0; i--) {
+            for (let i = len - 1; i >= 0; i--){
                 s.removeChildAt(0);
             }
         }
-
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || (!s.mouseEnable && isMustMouseEnable)) return null;
@@ -437,118 +426,109 @@ namespace annie {
             }
             return rect;
         }
-
-        protected updateFrame(): void {
-            let s = this;
-            let len: number = s.children.length;
-            let child: any;
-            for (let i = 0; i < len; i++) {
-                child = s.children[i];
-                child.updateFrame();
-            }
-        }
-
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._visible) {
-                if (s._cacheAsBitmap) {
-                    super.render(renderObj);
-                } else {
-                    s.update();
-                    let maskObj: any;
-                    let child: any;
-                    let len: number = s.children.length;
-                    for (let i = 0; i < len; i++) {
-                        child = s.children[i];
-                        if (child._isUseToMask > 0) continue;
-                        if (child.cAlpha > 0 && child._visible) {
-                            if (maskObj) {
-                                if (child.mask && child.mask.parent == child.parent) {
-                                    if (child.mask != maskObj) {
-                                        renderObj.endMask();
-                                        maskObj = child.mask;
-                                        renderObj.beginMask(maskObj);
-                                    }
-                                } else {
-                                    renderObj.endMask();
-                                    maskObj = null;
-                                }
-                            } else {
-                                if (child.mask && child.mask.parent == child.parent) {
-                                    maskObj = child.mask;
-                                    renderObj.beginMask(maskObj);
-                                }
+            s._updateState = 0;
+            if (s._cacheAsBitmap) {
+                super.render(renderObj);
+            } else {
+                s.updateMatirx();
+                let maskObj: any;
+                let child: any;
+                let len: number = s.children.length;
+                for (let i = 0; i < len; i++) {
+                    child = s.children[i];
+                    if (child._isUseToMask > 0) continue;
+                    if (maskObj) {
+                        if (child.mask && child.mask.parent == child.parent) {
+                            if (child.mask != maskObj) {
+                                renderObj.endMask();
+                                maskObj = child.mask;
+                                renderObj.beginMask(maskObj);
                             }
-                            child.render(renderObj);
+                        } else {
+                            renderObj.endMask();
+                            maskObj = null;
+                        }
+                    } else {
+                        if (child.mask && child.mask.parent == child.parent) {
+                            maskObj = child.mask;
+                            renderObj.beginMask(maskObj);
                         }
                     }
-                    if (maskObj) {
-                        renderObj.endMask();
-                    }
-                    s._UI.UF = false;
-                    s._UI.UM = false;
-                    s._UI.UA = false;
+                    child.render(renderObj);
                 }
+                if (maskObj) {
+                    renderObj.endMask();
+                }
+                s._UI.UF = false;
+                s._UI.UM = false;
+                s._UI.UA = false;
             }
         }
-
-        protected callEventAndFrameScript(callState: number): void {
+        //0 未更新 1 正在更新 2 需要再次更新 3 更新结束
+        protected _updateState: number = 0;
+        protected updateEventAndScript(callState: number): void{
             let s = this;
+            if (!s._visible){
+                return;
+            }
+            super.updateEventAndScript(callState);
+            if (s._cacheAsBitmap){
+                return;
+            }
+            s._updateState = 1;
             let child: any = null;
             let children: any = null;
             let len = 0;
+            //上级舞台发生变动,所有在舞台上的元素及子元素都要执行事件
             if (callState == 0) {
+                //移除舞台
                 children = s.children;
                 len = children.length;
                 for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
-                }
-                //上级被移除了，这一层上的所有元素都要执行移除事件
-                children = s._removeChildren;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.callEventAndFrameScript(callState);
-                    child.stage = null;
-                    child.parent = null;
-                }
-            } else if (callState == 1) {
-                //上级被添加到舞台了,所有在舞台上的元素都要执行添加事件
-                children = s.children;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    child.stage = s.stage;
-                    child.parent = s;
-                    child.callEventAndFrameScript(callState);
-                }
-            } else if (callState == 2) {
-                children = s.children;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child.stage) {
-                        child.callEventAndFrameScript(2);
-                    } else {
-                        child.stage = s.stage;
-                        child.parent = s;
-                        child.callEventAndFrameScript(1);
+                    if (child && child.stage) {
+                        child.updateEventAndScript(callState);
+                        child.stage = null;
                     }
                 }
-                //上级没有任何变化，执行对应的移除事件和添加事件
-                children = s._removeChildren;
+            } else if (callState == 1) {
+                //添加到舞台
+                children = s.children;
                 len = children.length;
                 for (let i = len - 1; i >= 0; i--) {
                     child = children[i];
-                    child.callEventAndFrameScript(0);
-                    child.stage = null;
-                    child.parent = null;
+                    if (child && !child.stage) {
+                        child.stage = s.stage;
+                        child.updateEventAndScript(callState);
+                    }
+                }
+            } else {
+                children = s.children;
+                len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    if (child) {
+                        if (child.stage){
+                            child.updateEventAndScript(callState);
+                        } else {
+                            child.stage = s.stage;
+                            child.updateEventAndScript(1);
+                        }
+                    }
                 }
             }
-            s._removeChildren.length = 0;
-            super.callEventAndFrameScript(callState);
+            //执行移除事件,为什么要用while，因为抛出的事件有可能又产生了被移除的对象
+            children = s._removeChildren;
+            len = children.length;
+            while (len > 0) {
+                child = children.shift();
+                child.updateEventAndScript(0);
+                child.stage = null;
+                child.parent = null;
+                len = children.length;
+            }
         }
     }
 }
