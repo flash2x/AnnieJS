@@ -6,6 +6,7 @@ var ts = require('gulp-typescript');
 var del = require('del');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+var concat=require('gulp-concat');
 var coreList =[
     "annie/events/EventDispatcher.ts",
     "annie/events/Event.ts",
@@ -86,7 +87,12 @@ var onBuildDoc = function(){
     var tsResult = gulp.src(coreList.concat(uiList.slice(1))).pipe(ts(op));
         tsResult.js.pipe(gulp.dest(outDir));
 };
+var onBuildLast = function(){
+    gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("build"));
+}
 gulp.task('onBuildCore', onBuildCore);
 gulp.task('onBuildUI', onBuildUI);
 gulp.task("onBuildDoc", onBuildDoc);
+gulp.task("onBuildLast", onBuildLast);
 gulp.task('onBuildAll',['onBuildCore','onBuildUI']);
