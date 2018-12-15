@@ -118,7 +118,7 @@ namespace annie {
                 ctx.drawImage(SharedCanvas.canvas, 0, 0);
             }
         }
-        destroy(): void {
+        destroy():void{
             let s = this;
             s._stage = null;
         }

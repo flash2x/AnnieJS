@@ -836,7 +836,7 @@ namespace annie {
                         sounds[i].stop2();
                     }
                 }
-            } else {
+            }else{
                 if (callState == 1){
                     //如果有音乐，则播放音乐
                     if (sounds.length > 0) {

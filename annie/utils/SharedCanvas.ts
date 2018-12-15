@@ -12,11 +12,10 @@ namespace annie {
      */
     export class SharedCanvas {
         public constructor(){
-
         };
-        public static init(stage:Stage): void{
+        public static init(stage: Stage): void {
             let s = SharedCanvas;
-            if(s.context)return;
+            if (s.context) return;
             s.context = wx.getOpenDataContext();
             s.postMessage({
                 event: "initSharedCanvasStage",
@@ -30,8 +29,8 @@ namespace annie {
                     devicePixelRatio: annie.devicePixelRatio
                 }
             });
-            s.context.canvas.width=stage.desWidth;
-            s.context.canvas.height=stage.desHeight;
+            s.context.canvas.width = stage.desWidth;
+            s.context.canvas.height = stage.desHeight;
         }
         public static destroy():void{
             //清除相应的数据引用
@@ -39,8 +38,10 @@ namespace annie {
             s.context = null;
             s.canvas = null;
         }
+
         public static canvas: any;
         public static context: any;
+
         /**
          * 向子域传消息
          * @method postMessage
@@ -50,7 +51,7 @@ namespace annie {
         public static postMessage(data: any): void {
             //呼叫数据显示端
             let s = SharedCanvas;
-            if(s.context) {
+            if (s.context) {
                 s.context.postMessage(data);
             }
         }
@@ -62,23 +63,24 @@ namespace annie {
          */
         public static show(): void {
             let s = SharedCanvas;
-            if(s.context){
+            if (s.context) {
                 s.context.postMessage({event: "onShow"});
                 s.canvas = s.context.canvas;
             }
         }
+
         /**
          * 隐藏开放域
          * @method hide
          * @since 2.0.1
          */
-        public static hide():void{
-           // if(!isSharedDomain) {
-                let s = SharedCanvas;
-                if (s.context) {
-                    s.context.postMessage({event: "onHide"});
-                    s.canvas = null;
-                }
+        public static hide(): void {
+            // if(!isSharedDomain) {
+            let s = SharedCanvas;
+            if (s.context) {
+                s.context.postMessage({event: "onHide"});
+                s.canvas = null;
+            }
             // }else{
             //     annie.Stage.pause=true;
             //     CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;

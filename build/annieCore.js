@@ -7591,4 +7591,6 @@ annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
 
-module.exports = annie;
+GameGlobal.window= {};
+GameGlobal.annie= annie;
+GameGlobal.A2xExtend=__extends;

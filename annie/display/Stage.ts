@@ -756,7 +756,6 @@ namespace annie {
                 Stage.allUpdateObjList.unshift(target);
             }
         }
-
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj

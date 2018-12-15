@@ -1,1 +1,1 @@
-const annie = GameGlobal.annieEngine;
+GameGlobal.annieUI= annieUI;
