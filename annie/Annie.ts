@@ -1,3 +1,5 @@
+declare  var GameGlobal:any;
+declare  var require:any;
 /**
  * @class annie
  */
@@ -21,7 +23,8 @@ namespace annie {
      * @public
      * @static
      */
-    export let devicePixelRatio: number = 1;
+    export let devicePixelRatio: number = wx.getSystemInfoSync().pixelRatio||1;
+    export let isSharedCanvas=false;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
@@ -29,7 +32,7 @@ namespace annie {
      * @static
      * @example
      */
-    export let globalDispatcher: EventDispatcher = new annie.EventDispatcher();
+    export let globalDispatcher: EventDispatcher = new EventDispatcher();
     /**
      * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
      * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
@@ -66,37 +69,13 @@ namespace annie {
     };
     let res: any = {};
     /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
-    export let createAudio: Function = null;
-    export let getImageInfo: Function = null;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
-    export let A2xExtend: any = null;
-    /**
-     * 加载后的类引用全放在这里
-     * @type {Object}
-     */
-    export let classPool: any = null;
-    /**
-     * 加载场景的方法
-     * @method annie.loadScene
-     * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
-     */
-    export let loadScene: Function = null;
-
-    /**
      * 是否已经加载过场景
      * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
      */
     export function isLoadedScene(sceneName: string) {
-        if (classPool[sceneName]) {
+        if (GameGlobal[sceneName]) {
             return true;
         }
         return false;
@@ -107,8 +86,8 @@ namespace annie {
      * @param {string} sceneName
      */
     export function unLoadScene(sceneName: string) {
-        classPool[sceneName] = null;
-        delete classPool[sceneName];
+        GameGlobal[sceneName] = null;
+        delete GameGlobal[sceneName];
     }
     /**
      * 解析资源
@@ -236,7 +215,6 @@ namespace annie {
         } else {
             //是不是文本
             let lastInfo = target._a2x_res_obj;
-
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
@@ -368,7 +346,42 @@ namespace annie {
     function s(sceneName: string, resName: string): Sound {
         return new Sound(res[sceneName][resName]);
     }
-
+    /**
+     * 加载场景的方法
+     * @param sceneName
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    export function loadScene(sceneName:any,progressFun:Function,completeFun:Function,domain:string=""){
+        let sceneList:any = null;
+        domain+="/..";
+        if (typeof (sceneName) == "string"){
+            sceneList = [sceneName];
+        } else {
+            sceneList = sceneName;
+        }
+        let len=sceneList.length;
+        for (let i = 0; i < len; i++) {
+            if (!GameGlobal[sceneList[i]]) {
+                let res = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
+                let con = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
+                for (let j = 0; j < res.length; j++) {
+                    if (res[j].type == "javascript") {
+                        let className:string = res[j].src.split("/")[2].split(".")[0];
+                        require(domain + "/" + res[j].src)[className];
+                    } else {
+                        if (domain != "/..") {
+                            res[j].src = domain + "/" + res[j].src;
+                        }
+                    }
+                }
+                annie.parseScene(sceneList[i], res, con);
+            }
+            progressFun(Math.floor((i+1)/len*100));
+            completeFun({sceneId:i+1,sceneTotal:len,sceneName:sceneList[i]});
+        }
+    }
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes
@@ -379,7 +392,7 @@ namespace annie {
      * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
-        let Root: any = classPool;
+        let Root: any = GameGlobal;
         //资源树最顶层
         let resRoot: any = res[sceneName];
         //资源树里类对象json数据

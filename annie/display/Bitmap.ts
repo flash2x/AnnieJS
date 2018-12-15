@@ -22,7 +22,7 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s._texture = annie.getImageInfo();
+            s._texture = wx.createImage();
             s._texture.onload = function () {
                 s._bounds.width=s._texture.width;
                 s._bounds.height=s._texture.height;

@@ -20,6 +20,15 @@ namespace annie {
          */
         public static RESIZE:string = "onResize";
         /**
+         * 初始化舞台
+         * @Event
+         * @public
+         * @static
+         * @type {string}
+         * @since 1.0.0
+         */
+        public static ON_INIT_STAGE:string = "onInitStage";
+        /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
          * @Event ON_RUN_CHANGED
          * @type {string}

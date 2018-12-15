@@ -406,6 +406,15 @@ var annie;
          */
         Event.RESIZE = "onResize";
         /**
+         * 初始化舞台
+         * @Event
+         * @public
+         * @static
+         * @type {string}
+         * @since 1.0.0
+         */
+        Event.ON_INIT_STAGE = "onInitStage";
+        /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
          * @Event ON_RUN_CHANGED
          * @type {string}
@@ -4806,9 +4815,7 @@ var annie;
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {Canvas} ctx
-         * @param {number} desW canvas宽
-         * @param {number} desH canvas高
+         * @param {string} canvasId
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
@@ -4817,9 +4824,7 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        function Stage(ctx, canW, canH, desW, desH, frameRate, scaleMode) {
-            if (canW === void 0) { canW = 640; }
-            if (canH === void 0) { canH = 960; }
+        function Stage(canvasId, desW, desH, frameRate, scaleMode) {
             if (desW === void 0) { desW = 640; }
             if (desH === void 0) { desH = 1040; }
             if (frameRate === void 0) { frameRate = 30; }
@@ -5343,18 +5348,42 @@ var annie;
             s.name = "stageInstance" + s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
-            s.divWidth = canW;
-            s.divHeight = canH;
             s.setFrameRate(frameRate);
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //目前具支持canvas
-            s.renderObj = new annie.CanvasRender(s, ctx);
+            var sysInfo = wx.getSystemInfoSync();
+            var w = sysInfo.pixelRatio * sysInfo.windowWidth;
+            var h = sysInfo.pixelRatio * sysInfo.windowHeight;
+            s.divWidth = w;
+            s.divHeight = h;
+            s.renderObj = new annie.CanvasRender(s, w, h);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             s.onTouchEvent = s._onMouseEvent.bind(s);
+            wx.onTouchStart(function (e) {
+                if (!e.type) {
+                    e.type = "touchstart";
+                }
+                s.onTouchEvent(e);
+            });
+            wx.onTouchMove(function (e) {
+                if (!e.type) {
+                    e.type = "touchmove";
+                }
+                s.onTouchEvent(e);
+            });
+            wx.onTouchEnd(function (e) {
+                if (!e.type) {
+                    e.type = "touchend";
+                }
+                s.onTouchEvent(e);
+            });
             s._scaleMode = scaleMode;
             s.setAlign();
+            setTimeout(function () {
+                s.dispatchEvent(annie.Event.INIT_TO_STAGE);
+            }, 100);
         }
         Object.defineProperty(Stage, "pause", {
             /**
@@ -6906,12 +6935,16 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        function CanvasRender(stage, ctx) {
+        function CanvasRender(stage, w, h) {
             _super.call(this);
             var s = this;
             s._instanceType = "annie.CanvasRender";
             s._stage = stage;
-            CanvasRender.drawCtx = ctx;
+            var canvas = wx.createCanvas();
+            canvas.width = w;
+            canvas.height = h;
+            CanvasRender.canvas = canvas;
+            CanvasRender.drawCtx = canvas.getContext('2d');
         }
         /**
          * 开始渲染时执行
@@ -7013,6 +7046,7 @@ var annie;
             s._stage = null;
         };
         CanvasRender.drawCtx = null;
+        CanvasRender.canvas = null;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
@@ -7041,7 +7075,10 @@ var annie;
      * @public
      * @static
      */
-    annie.devicePixelRatio = 1;
+    annie.devicePixelRatio = wx.getSystemInfoSync().pixelRatio || 1;
+    annie.isSharedCanvas = false;
+    annie.getImageInfo = wx.createImage;
+    annie.createAudio = wx.createInnerAudioContext;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
@@ -7086,36 +7123,13 @@ var annie;
     };
     var res = {};
     /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
-    annie.createAudio = null;
-    annie.getImageInfo = null;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
-    annie.A2xExtend = null;
-    /**
-     * 加载后的类引用全放在这里
-     * @type {Object}
-     */
-    annie.classPool = null;
-    /**
-     * 加载场景的方法
-     * @method annie.loadScene
-     * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
-     */
-    annie.loadScene = null;
-    /**
      * 是否已经加载过场景
      * @method annie.isLoadedScene
      * @param {string} sceneName
      * @return {boolean}
      */
     function isLoadedScene(sceneName) {
-        if (annie.classPool[sceneName]) {
+        if (GameGlobal[sceneName]) {
             return true;
         }
         return false;
@@ -7127,8 +7141,8 @@ var annie;
      * @param {string} sceneName
      */
     function unLoadScene(sceneName) {
-        annie.classPool[sceneName] = null;
-        delete annie.classPool[sceneName];
+        GameGlobal[sceneName] = null;
+        delete GameGlobal[sceneName];
     }
     annie.unLoadScene = unLoadScene;
     /**
@@ -7399,6 +7413,47 @@ var annie;
         return new annie.Sound(res[sceneName][resName]);
     }
     /**
+     * 加载场景的方法
+     * @param sceneName
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    function loadScene(sceneName, progressFun, completeFun, domain) {
+        if (domain === void 0) { domain = ""; }
+        var sceneList = null;
+        domain += "/..";
+        if (typeof (sceneName) == "string") {
+            sceneList = [sceneName];
+        }
+        else {
+            sceneList = sceneName;
+        }
+        var len = sceneList.length;
+        for (var i = 0; i < len; i++) {
+            if (!GameGlobal[sceneList[i]]) {
+                var res_1 = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
+                var con = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
+                for (var j = 0; j < res_1.length; j++) {
+                    if (res_1[j].type == "javascript") {
+                        var className = res_1[j].src.split("/")[2].split(".")[0];
+                        require(domain + "/" + res_1[j].src)[className];
+                    }
+                    else {
+                        if (domain != "") {
+                            res_1[j].src = domain + "/" + res_1[j].src;
+                        }
+                    }
+                }
+                annie.parseScene(sceneList[i], res_1, con);
+            }
+            progressFun(Math.floor((i + 1) / len * 100));
+            completeFun({ sceneId: i + 1, sceneTotal: len, sceneName: sceneList[i] });
+        }
+    }
+    annie.loadScene = loadScene;
+    ;
+    /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes
      * @param target
@@ -7408,7 +7463,7 @@ var annie;
      * @static
      */
     function initRes(target, sceneName, resName) {
-        var Root = annie.classPool;
+        var Root = GameGlobal;
         //资源树最顶层
         var resRoot = res[sceneName];
         //资源树里类对象json数据
@@ -7591,6 +7646,9 @@ annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
 
-GameGlobal.window= {};
+GameGlobal.AnnieRoot= GameGlobal;
 GameGlobal.annie= annie;
 GameGlobal.A2xExtend=__extends;
+GameGlobal.addEventListener=function (type,listener) {
+    listener();
+};

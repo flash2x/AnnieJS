@@ -165,6 +165,15 @@ declare namespace annie {
          */
         static RESIZE: string;
         /**
+         * 初始化舞台
+         * @Event
+         * @public
+         * @static
+         * @type {string}
+         * @since 1.0.0
+         */
+        static ON_INIT_STAGE: string;
+        /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher 中监听
          * @Event ON_RUN_CHANGED
          * @type {string}
@@ -2507,9 +2516,7 @@ declare namespace annie {
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {Canvas} ctx
-         * @param {number} desW canvas宽
-         * @param {number} desH canvas高
+         * @param {string} canvasId
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
@@ -2518,7 +2525,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        constructor(ctx: any, canW?: number, canH?: number, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
+        constructor(canvasId: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string);
         private _touchEvent;
         /**
          * 渲染函数
@@ -3345,6 +3352,7 @@ declare namespace annie {
      */
     class CanvasRender extends AObject implements IRender {
         static drawCtx: any;
+        static canvas: any;
         private _stage;
         /**
          * @CanvasRender
@@ -3352,7 +3360,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          */
-        constructor(stage: Stage, ctx: any);
+        constructor(stage: Stage, w: number, h: number);
         /**
          * 开始渲染时执行
          * @method begin
@@ -3389,6 +3397,8 @@ declare namespace annie {
         destroy(): void;
     }
 }
+declare var GameGlobal: any;
+declare var require: any;
 /**
  * @class annie
  */
@@ -3413,6 +3423,9 @@ declare namespace annie {
      * @static
      */
     let devicePixelRatio: number;
+    let isSharedCanvas: boolean;
+    let getImageInfo: any;
+    let createAudio: any;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
@@ -3456,29 +3469,6 @@ declare namespace annie {
         FIXED_HEIGHT: string;
     };
     /**
-     * 创建一个声音对象
-     * @type {Audio}
-     */
-    let createAudio: Function;
-    let getImageInfo: Function;
-    /**
-     * 继承类方法
-     * @type {Function}
-     */
-    let A2xExtend: any;
-    /**
-     * 加载后的类引用全放在这里
-     * @type {Object}
-     */
-    let classPool: any;
-    /**
-     * 加载场景的方法
-     * @method annie.loadScene
-     * @param {String|Array} 单个场景名或者多个场景名组成的数组
-     * @type {Function}
-     */
-    let loadScene: Function;
-    /**
      * 是否已经加载过场景
      * @method annie.isLoadedScene
      * @param {string} sceneName
@@ -3520,6 +3510,14 @@ declare namespace annie {
      * @param {Object} info
      */
     function d(target: any, info: any): void;
+    /**
+     * 加载场景的方法
+     * @param sceneName
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    function loadScene(sceneName: any, progressFun: Function, completeFun: Function, domain?: string): void;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes

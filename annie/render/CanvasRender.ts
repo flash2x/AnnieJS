@@ -12,6 +12,7 @@ namespace annie {
      */
     export class CanvasRender extends AObject implements IRender {
         public static drawCtx: any = null;
+        public static canvas: any = null;
         private _stage: Stage;
         /**
          * @CanvasRender
@@ -19,12 +20,16 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public constructor(stage: Stage, ctx: any){
+        public constructor(stage: Stage,w:number,h:number){
             super();
             let s = this;
             s._instanceType = "annie.CanvasRender";
             s._stage = stage;
-            CanvasRender.drawCtx = ctx;
+            let canvas = wx.createCanvas();
+            canvas.width = w;
+            canvas.height = h;
+            CanvasRender.canvas = canvas;
+            CanvasRender.drawCtx = canvas.getContext('2d');
         }
         /**
          * 开始渲染时执行

@@ -191,9 +191,7 @@ namespace annie {
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {Canvas} ctx
-         * @param {number} desW canvas宽
-         * @param {number} desH canvas高
+         * @param {string} canvasId
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
@@ -202,7 +200,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public constructor(ctx: any, canW: number = 640, canH: number = 960, desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight") {
+        public constructor(canvasId:string,desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight") {
             super();
             let s: Stage = this;
             this._instanceType = "annie.Stage";
@@ -210,20 +208,44 @@ namespace annie {
             s.name = "stageInstance" + s._instanceId;
             s.desWidth = desW;
             s.desHeight = desH;
-            s.divWidth = canW;
-            s.divHeight = canH;
             s.setFrameRate(frameRate);
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //目前具支持canvas
-            s.renderObj = new CanvasRender(s, ctx);
+            let sysInfo = wx.getSystemInfoSync();
+            let w=sysInfo.pixelRatio * sysInfo.windowWidth;
+            let h=sysInfo.pixelRatio * sysInfo.windowHeight;
+            s.divWidth=w;
+            s.divHeight=h;
+            s.renderObj = new CanvasRender(s,w,h);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             s.onTouchEvent = s._onMouseEvent.bind(s);
+            wx.onTouchStart(function(e:any){
+                if(!e.type){
+                    e.type="touchstart";
+                }
+                s.onTouchEvent(e);
+            });
+            wx.onTouchMove(function(e:any){
+                if(!e.type){
+                    e.type="touchmove";
+
+                }
+                s.onTouchEvent(e);
+            });
+            wx.onTouchEnd(function(e:any){
+                if(!e.type){
+                    e.type="touchend";
+                }
+                s.onTouchEvent(e);
+            });
             s._scaleMode = scaleMode;
             s.setAlign();
+            setTimeout(function(){
+                s.dispatchEvent(annie.Event.INIT_TO_STAGE);
+            },100)
         }
-
         private _touchEvent: annie.TouchEvent;
 
         /**
