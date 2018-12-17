@@ -429,7 +429,8 @@ namespace annie {
         public render(renderObj: IRender): void {
             let s: any = this;
             s._updateState = 0;
-            if (s._cacheAsBitmap) {
+            if(s._visible)return;
+            if (s._cacheAsBitmap){
                 super.render(renderObj);
             } else {
                 s.updateMatirx();
@@ -439,7 +440,7 @@ namespace annie {
                 for (let i = 0; i < len; i++) {
                     child = s.children[i];
                     if (child._isUseToMask > 0) continue;
-                    if (maskObj) {
+                    if (maskObj){
                         if (child.mask && child.mask.parent == child.parent) {
                             if (child.mask != maskObj) {
                                 renderObj.endMask();

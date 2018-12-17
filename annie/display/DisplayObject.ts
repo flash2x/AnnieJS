@@ -631,7 +631,7 @@ namespace annie {
          */
         public render(renderObj: IRender | any): void {
             let s = this;
-            if (s._visible) {
+            if(s._visible){
                 s.updateMatirx();
                 if (s.cAlpha > 0) {
                     let cf = s.cFilters;
