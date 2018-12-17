@@ -1,5 +1,7 @@
 declare  var GameGlobal:any;
 declare  var require:any;
+declare  var wx: any;
+
 /**
  * @class annie
  */

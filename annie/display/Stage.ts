@@ -221,25 +221,27 @@ namespace annie {
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             s.onTouchEvent = s._onMouseEvent.bind(s);
-            wx.onTouchStart(function(e:any){
-                if(!e.type){
-                    e.type="touchstart";
-                }
-                s.onTouchEvent(e);
-            });
-            wx.onTouchMove(function(e:any){
-                if(!e.type){
-                    e.type="touchmove";
+            if(!annie.isSharedCanvas) {
+                wx.onTouchStart(function (e: any) {
+                    if (!e.type) {
+                        e.type = "touchstart";
+                    }
+                    s.onTouchEvent(e);
+                });
+                wx.onTouchMove(function (e: any) {
+                    if (!e.type) {
+                        e.type = "touchmove";
 
-                }
-                s.onTouchEvent(e);
-            });
-            wx.onTouchEnd(function(e:any){
-                if(!e.type){
-                    e.type="touchend";
-                }
-                s.onTouchEvent(e);
-            });
+                    }
+                    s.onTouchEvent(e);
+                });
+                wx.onTouchEnd(function (e: any) {
+                    if (!e.type) {
+                        e.type = "touchend";
+                    }
+                    s.onTouchEvent(e);
+                });
+            }
             s._scaleMode = scaleMode;
             s.setAlign();
             setTimeout(function(){

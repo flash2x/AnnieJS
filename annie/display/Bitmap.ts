@@ -16,18 +16,24 @@ namespace annie {
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {string} imagePath 一个图片地址
+         * @param {string} bitmapData 一个图片对象或者图片地址或者canvas对象
         */
-        public constructor(imagePath: string) {
+        public constructor(bitmapData:any) {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s._texture = wx.createImage();
-            s._texture.onload = function () {
-                s._bounds.width=s._texture.width;
-                s._bounds.height=s._texture.height;
-            };
-            s._texture.src = imagePath;
+            if(typeof(bitmapData)=="string") {
+                s._texture = wx.createImage();
+                s._texture.onload = function () {
+                    s._bounds.width = s._texture.width;
+                    s._bounds.height = s._texture.height;
+                };
+                s._texture.src = bitmapData;
+            }else{
+                s._texture=bitmapData;
+                s._bounds.width = s._texture.width;
+                s._bounds.height = s._texture.height;
+            }
         }
         public destroy():void {
             //清除相应的数据引用

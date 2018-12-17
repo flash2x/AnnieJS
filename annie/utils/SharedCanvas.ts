@@ -1,4 +1,3 @@
-declare var wx: any;
 /**
  * @module annie
  */
@@ -11,37 +10,86 @@ namespace annie {
      * @since 1.0.0
      */
     export class SharedCanvas {
-        public constructor(){
-        };
-        public static init(stage: Stage): void {
+        public static context: any;
+        public static view: annie.Bitmap = null;
+        public static init(w: number, h: number): void {
             let s = SharedCanvas;
             if (s.context) return;
             s.context = wx.getOpenDataContext();
             s.postMessage({
                 event: "initSharedCanvasStage",
                 data: {
-                    dw: stage.divWidth,
-                    dh: stage.divHeight,
-                    w: stage.desWidth,
-                    h: stage.desHeight,
-                    fps: stage.getFrameRate(),
-                    scaleMode: stage.scaleMode,
-                    devicePixelRatio: annie.devicePixelRatio
+                    w: w,
+                    h: h,
                 }
             });
-            s.context.canvas.width = stage.desWidth;
-            s.context.canvas.height = stage.desHeight;
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
+            s.view = new annie.Bitmap(s.context.canvas);
+            s.view.addEventListener(annie.MouseEvent.CLICK,function(e:MouseEvent){
+                s.postMessage({
+                    event: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE,function(e:MouseEvent){
+                s.postMessage({
+                    event: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT,function(e:MouseEvent){
+                s.postMessage({
+                    event: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER,function(e:MouseEvent){
+                s.postMessage({
+                    event: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_UP,function(e:MouseEvent){
+                s.postMessage({
+                    event: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
         }
-        public static destroy():void{
+        public static resize(w: number, h: number) {
+            let s = SharedCanvas;
+            s.postMessage({
+                event: "canvasResize",
+                data: {
+                    w: w,
+                    h: h,
+                }
+            });
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
+        }
+        public static destroy(): void {
             //清除相应的数据引用
             let s = SharedCanvas;
+            s.view.destroy();
             s.context = null;
-            s.canvas = null;
         }
-
-        public static canvas: any;
-        public static context: any;
-
         /**
          * 向子域传消息
          * @method postMessage
@@ -51,9 +99,7 @@ namespace annie {
         public static postMessage(data: any): void {
             //呼叫数据显示端
             let s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage(data);
-            }
+            s.context.postMessage(data);
         }
 
         /**
@@ -63,28 +109,18 @@ namespace annie {
          */
         public static show(): void {
             let s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage({event: "onShow"});
-                s.canvas = s.context.canvas;
-            }
+            s.context.postMessage({event: "onShow"});
+            s.view.visible = true;
         }
-
         /**
          * 隐藏开放域
          * @method hide
          * @since 2.0.1
          */
         public static hide(): void {
-            // if(!isSharedDomain) {
             let s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage({event: "onHide"});
-                s.canvas = null;
-            }
-            // }else{
-            //     annie.Stage.pause=true;
-            //     CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;
-            // }
+            s.context.postMessage({event: "onHide"});
+            s.view.visible = true;
         }
     }
 }

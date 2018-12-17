@@ -25,7 +25,12 @@ namespace annie {
             let s = this;
             s._instanceType = "annie.CanvasRender";
             s._stage = stage;
-            let canvas = wx.createCanvas();
+            let canvas:any=null;
+            if(annie.isSharedCanvas){
+                canvas = wx.getSharedCanvas();
+            }else {
+                canvas = wx.createCanvas();
+            }
             canvas.width = w;
             canvas.height = h;
             CanvasRender.canvas = canvas;
@@ -113,14 +118,6 @@ namespace annie {
                 ctx.drawImage(texture, 0, 0);
             } else {
                 target._draw(ctx);
-            }
-        }
-        public drawSharedCanvas():void{
-            if(SharedCanvas.canvas){
-                let ctx = CanvasRender.drawCtx;
-                ctx.globalAlpha = 1;
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.drawImage(SharedCanvas.canvas, 0, 0);
             }
         }
         destroy():void{

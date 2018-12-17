@@ -22,6 +22,5 @@ namespace annie {
          * 开始渲染
          */
         begin():void;
-        drawSharedCanvas():void;
     }
 }
