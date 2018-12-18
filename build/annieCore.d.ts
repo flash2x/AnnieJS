@@ -1464,9 +1464,9 @@ declare namespace annie {
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {string} imagePath 一个图片地址
+         * @param {string} bitmapData 一个图片对象或者图片地址或者canvas对象
         */
-        constructor(imagePath: string);
+        constructor(bitmapData: any);
         destroy(): void;
         update(isDrawUpdate?: boolean): void;
     }
@@ -3272,7 +3272,6 @@ declare namespace annie {
         destroy(): void;
     }
 }
-declare var wx: any;
 /**
  * @module annie
  */
@@ -3285,11 +3284,11 @@ declare namespace annie {
      * @since 1.0.0
      */
     class SharedCanvas {
-        constructor();
-        static init(stage: Stage): void;
-        static destroy(): void;
-        static canvas: any;
         static context: any;
+        static view: annie.Bitmap;
+        static init(w: number, h: number): void;
+        static resize(w: number, h: number): void;
+        static destroy(): void;
         /**
          * 向子域传消息
          * @method postMessage
@@ -3335,7 +3334,6 @@ declare namespace annie {
          * 开始渲染
          */
         begin(): void;
-        drawSharedCanvas(): void;
     }
 }
 /**
@@ -3393,12 +3391,12 @@ declare namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         draw(target: any): void;
-        drawSharedCanvas(): void;
         destroy(): void;
     }
 }
 declare var GameGlobal: any;
 declare var require: any;
+declare var wx: any;
 /**
  * @class annie
  */
@@ -3424,8 +3422,6 @@ declare namespace annie {
      */
     let devicePixelRatio: number;
     let isSharedCanvas: boolean;
-    let getImageInfo: any;
-    let createAudio: any;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
@@ -3511,8 +3507,16 @@ declare namespace annie {
      */
     function d(target: any, info: any): void;
     /**
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    function loadSubScene(subName: string, progressFun: Function, completeFun: Function): void;
+    /**
      * 加载场景的方法
-     * @param sceneName
+     * @param sceneName 场景名
      * @param {Function} progressFun
      * @param {Function} completeFun
      * @param {string} domain

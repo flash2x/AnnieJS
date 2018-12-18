@@ -1,6 +1,6 @@
-declare  var GameGlobal:any;
-declare  var require:any;
-declare  var wx: any;
+declare var GameGlobal: any;
+declare var require: any;
+declare var wx: any;
 
 /**
  * @class annie
@@ -25,8 +25,8 @@ namespace annie {
      * @public
      * @static
      */
-    export let devicePixelRatio: number = wx.getSystemInfoSync().pixelRatio||1;
-    export let isSharedCanvas=false;
+    export let devicePixelRatio: number = 1;
+    export let isSharedCanvas = false;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
@@ -70,6 +70,7 @@ namespace annie {
         FIXED_HEIGHT: "fixedHeight"
     };
     let res: any = {};
+
     /**
      * 是否已经加载过场景
      * @method annie.isLoadedScene
@@ -82,6 +83,7 @@ namespace annie {
         }
         return false;
     }
+
     /**
      * 删除加载过的场景
      * @method annie.unLoadScene
@@ -91,6 +93,7 @@ namespace annie {
         GameGlobal[sceneName] = null;
         delete GameGlobal[sceneName];
     }
+
     /**
      * 解析资源
      * @method annie.parseScene
@@ -151,7 +154,7 @@ namespace annie {
                                         if (frameCon[j].at != -1) {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
-                                                if (frameCon[j][m]==undefined) {
+                                                if (frameCon[j][m] == undefined) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -228,7 +231,7 @@ namespace annie {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
                 //if(target._instanceType == "annie.TextField") {
-                    target.y +=2;
+                target.y += 2;
                 //}
             }
             /*if (info.v == undefined) {
@@ -237,20 +240,22 @@ namespace annie {
             //target.visible = new Boolean(info.v);
             target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if(info.t!=undefined) {
+            if (info.t != undefined) {
                 if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
                         target.initButton();
                     }
                 }
-                target._mode=info.t;
+                target._mode = info.t;
             }
             target._a2x_res_obj = info;
         }
     }
+
     let _textLineType: Array<string> = ["single", "multiline"];
     let _textAlign: Array<string> = ["left", "center", "right"];
+
     /**
      * 创建一个动态文本或输入文本,此方法一般给Flash2x工具自动调用
      * @method annie.t
@@ -263,7 +268,7 @@ namespace annie {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
         let text = decodeURIComponent(textDate[9]);
-        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/,"");
+        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/, "");
         let size = textDate[5];
         let textAlign = _textAlign[textDate[3]];
         let lineType = _textLineType[textDate[2]];
@@ -337,6 +342,7 @@ namespace annie {
         }
         return shape;
     }
+
     /**
      * 创建一个Sound声音对象,此方法一般给Annie2x工具自动调用
      * @method annie.s
@@ -349,41 +355,79 @@ namespace annie {
         return new Sound(res[sceneName][resName]);
     }
     /**
-     * 加载场景的方法
-     * @param sceneName
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
      * @param {Function} progressFun
      * @param {Function} completeFun
      * @param {string} domain
      */
-    export function loadScene(sceneName:any,progressFun:Function,completeFun:Function,domain:string=""){
-        let sceneList:any = null;
-        domain+="/..";
+    export function loadSubScene(subName: string, progressFun: Function, completeFun: Function){
+        //分包加载
+        let loadTask = wx.loadSubpackage({
+            name: subName,
+            success: function (res:any) {
+                //分包加载成功后通过 success 回调
+                completeFun({status:1,name:subName});
+            },
+            fail: function (res:any) {
+                //分包加载失败通过 fail 回调
+                completeFun({status:0,name:subName});
+            }
+        });
+        loadTask.onProgressUpdate(progressFun);
+    }
+    /**
+     * 加载场景的方法
+     * @param sceneName 场景名
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    export function loadScene(sceneName: any, progressFun: Function, completeFun: Function, domain: string = "") {
+        let sceneList: any = null;
+        var sourceUrl = "../";
+        if(domain !=""){
+            sourceUrl = "../"+domain+"/";
+        }
         if (typeof (sceneName) == "string"){
             sceneList = [sceneName];
         } else {
             sceneList = sceneName;
         }
-        let len=sceneList.length;
+        let len = sceneList.length;
         for (let i = 0; i < len; i++) {
             if (!GameGlobal[sceneList[i]]) {
-                let res = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
-                let con = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
-                for (let j = 0; j < res.length; j++) {
-                    if (res[j].type == "javascript") {
-                        let className:string = res[j].src.split("/")[2].split(".")[0];
-                        require(domain + "/" + res[j].src)[className];
-                    } else {
-                        if (domain != "/..") {
+                if (annie.isSharedCanvas) {
+                    let res = require('../resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
+                    let con = require('../resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
+                    for (let j = 0; j < res.length; j++) {
+                        if (res[j].type == "javascript") {
+                            let className = res[j].src.split("/")[2].split(".")[0];
+                            require("../" + res[j].src)[className];
+                        } else {
+                            res[j].src = "sharedCanvas/" + res[j].src;
+                        }
+                    }
+                    annie.parseScene(sceneList[i], res, con);
+                } else {
+                    let res = require(sourceUrl + 'resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
+                    let con = require(sourceUrl + 'resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
+                    for (let j = 0; j < res.length; j++) {
+                        if (res[j].type == "javascript") {
+                            let className: string = res[j].src.split("/")[2].split(".")[0];
+                            require(sourceUrl+res[j].src)[className];
+                        } else {
                             res[j].src = domain + "/" + res[j].src;
                         }
                     }
+                    annie.parseScene(sceneList[i], res, con);
                 }
-                annie.parseScene(sceneList[i], res, con);
             }
-            progressFun(Math.floor((i+1)/len*100));
-            completeFun({sceneId:i+1,sceneTotal:len,sceneName:sceneList[i]});
+            if(progressFun)progressFun(Math.floor((i + 1) / len * 100));
+            if(completeFun)completeFun({sceneId: i + 1, sceneTotal: len, sceneName: sceneList[i]});
         }
     }
+
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes
@@ -446,7 +490,7 @@ namespace annie {
                 } else {
                     for (let index in resClass.l) {
                         for (let n = 0; n < resClass.l[index].length; n++) {
-                            label[resClass.l[index][n]] = parseInt(index)+1;
+                            label[resClass.l[index][n]] = parseInt(index) + 1;
                         }
                     }
                 }
@@ -509,13 +553,13 @@ namespace annie {
                     case 5:
                         //sound
                         obj = s(sceneName, children[i]);
-                        obj.name=children[i];
+                        obj.name = children[i];
                         target.addSound(obj);
                 }
                 if (!isMc) {
                     let index: number = i + 1;
                     if (objType == 5) {
-                        obj._loop=obj._repeate = resClass.s[0][index];
+                        obj._loop = obj._repeate = resClass.s[0][index];
                     } else {
                         d(obj, resClass.f[0].c[index]);
                         // 检查是否有遮罩
@@ -537,7 +581,7 @@ namespace annie {
                     allChildren[allChildren.length] = obj;
                     //如果是声音，还要把i这个顺序保存下来
                     if (objType == 5) {
-                        obj.isPlaying=false;
+                        obj.isPlaying = false;
                         if (!target._a2x_sounds) {
                             target._a2x_sounds = {};
                         }
@@ -556,5 +600,6 @@ namespace annie {
             }
         }
     }
+
     console.log("https://github.com/flash2x/AnnieJS");
 }

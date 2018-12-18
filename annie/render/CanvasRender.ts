@@ -30,9 +30,9 @@ namespace annie {
                 canvas = wx.getSharedCanvas();
             }else {
                 canvas = wx.createCanvas();
+                canvas.width = w;
+                canvas.height = h;
             }
-            canvas.width = w;
-            canvas.height = h;
             CanvasRender.canvas = canvas;
             CanvasRender.drawCtx = canvas.getContext('2d');
         }

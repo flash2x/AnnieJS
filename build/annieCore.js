@@ -2420,18 +2420,25 @@ var annie;
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {string} imagePath 一个图片地址
+         * @param {string} bitmapData 一个图片对象或者图片地址或者canvas对象
         */
-        function Bitmap(imagePath) {
+        function Bitmap(bitmapData) {
             _super.call(this);
             var s = this;
             s._instanceType = "annie.Bitmap";
-            s._texture = annie.getImageInfo();
-            s._texture.onload = function () {
+            if (typeof (bitmapData) == "string") {
+                s._texture = wx.createImage();
+                s._texture.onload = function () {
+                    s._bounds.width = s._texture.width;
+                    s._bounds.height = s._texture.height;
+                };
+                s._texture.src = bitmapData;
+            }
+            else {
+                s._texture = bitmapData;
                 s._bounds.width = s._texture.width;
                 s._bounds.height = s._texture.height;
-            };
-            s._texture.src = imagePath;
+            }
         }
         Bitmap.prototype.destroy = function () {
             //清除相应的数据引用
@@ -5351,35 +5358,58 @@ var annie;
             s.setFrameRate(frameRate);
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
-            //目前具支持canvas
-            var sysInfo = wx.getSystemInfoSync();
-            var w = sysInfo.pixelRatio * sysInfo.windowWidth;
-            var h = sysInfo.pixelRatio * sysInfo.windowHeight;
-            s.divWidth = w;
-            s.divHeight = h;
-            s.renderObj = new annie.CanvasRender(s, w, h);
+            s.onTouchEvent = s._onMouseEvent.bind(s);
+            s._scaleMode = scaleMode;
+            if (annie.isSharedCanvas) {
+                s.divWidth = desW;
+                s.divHeight = desH;
+                s.renderObj = new annie.CanvasRender(s, desW, desH);
+                annie.globalDispatcher.addEventListener("onMainStageMsg", function (e) {
+                    switch (e.data.type) {
+                        case "canvasResize":
+                            break;
+                        case annie.MouseEvent.CLICK:
+                        case annie.MouseEvent.MOUSE_MOVE:
+                        case annie.MouseEvent.MOUSE_UP:
+                        case annie.MouseEvent.MOUSE_DOWN:
+                            var event_2 = new annie.MouseEvent(e.type);
+                            event_2.reset(e.type, s);
+                            event_2.clientX = event_2.stageX = event_2.localX = e.data.x;
+                            event_2.clientY = event_2.stageY = event_2.localY = e.data.y;
+                            s.dispatchEvent(event_2);
+                            break;
+                        default:
+                    }
+                });
+            }
+            else {
+                var sysInfo = wx.getSystemInfoSync();
+                var w = annie.devicePixelRatio * sysInfo.windowWidth;
+                var h = annie.devicePixelRatio * sysInfo.windowHeight;
+                s.divWidth = w;
+                s.divHeight = h;
+                s.renderObj = new annie.CanvasRender(s, w, h);
+                wx.onTouchStart(function (e) {
+                    if (!e.type) {
+                        e.type = "touchstart";
+                    }
+                    s.onTouchEvent(e);
+                });
+                wx.onTouchMove(function (e) {
+                    if (!e.type) {
+                        e.type = "touchmove";
+                    }
+                    s.onTouchEvent(e);
+                });
+                wx.onTouchEnd(function (e) {
+                    if (!e.type) {
+                        e.type = "touchend";
+                    }
+                    s.onTouchEvent(e);
+                });
+            }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
-            s.onTouchEvent = s._onMouseEvent.bind(s);
-            wx.onTouchStart(function (e) {
-                if (!e.type) {
-                    e.type = "touchstart";
-                }
-                s.onTouchEvent(e);
-            });
-            wx.onTouchMove(function (e) {
-                if (!e.type) {
-                    e.type = "touchmove";
-                }
-                s.onTouchEvent(e);
-            });
-            wx.onTouchEnd(function (e) {
-                if (!e.type) {
-                    e.type = "touchend";
-                }
-                s.onTouchEvent(e);
-            });
-            s._scaleMode = scaleMode;
             s.setAlign();
             setTimeout(function () {
                 s.dispatchEvent(annie.Event.INIT_TO_STAGE);
@@ -5491,7 +5521,6 @@ var annie;
                 s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.renderObj.drawSharedCanvas();
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
@@ -5503,7 +5532,6 @@ var annie;
                         s.callEventAndFrameScript(2);
                         s.update(true);
                         s.render(s.renderObj);
-                        s.renderObj.drawSharedCanvas();
                     }
                     s._currentFlush--;
                 }
@@ -5668,7 +5696,7 @@ var annie;
             this.name = "";
             var s = this;
             s._instanceType = "annie.Sound";
-            s.media = annie.createAudio();
+            s.media = wx.createInnerAudioContext();
             s.media.src = src;
             s.media.onEnded(function (e) {
                 s.dispatchEvent("onPlayEnd", e);
@@ -6841,32 +6869,82 @@ var annie;
     var SharedCanvas = (function () {
         function SharedCanvas() {
         }
-        ;
-        SharedCanvas.init = function (stage) {
+        SharedCanvas.init = function (w, h) {
             var s = SharedCanvas;
             if (s.context)
                 return;
             s.context = wx.getOpenDataContext();
             s.postMessage({
-                event: "initSharedCanvasStage",
+                type: "initSharedCanvasStage",
+            });
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
+            s.view = new annie.Bitmap(s.context.canvas);
+            s.view.addEventListener(annie.MouseEvent.CLICK, function (e) {
+                s.postMessage({
+                    type: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e) {
+                s.postMessage({
+                    type: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT, function (e) {
+                s.postMessage({
+                    //不要搞错了，这里要设置成UP
+                    type: annie.MouseEvent.MOUSE_UP,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER, function (e) {
+                s.postMessage({
+                    //不要搞错了，这里要设置成down
+                    type: annie.MouseEvent.MOUSE_DOWN,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+            s.view.addEventListener(annie.MouseEvent.MOUSE_UP, function (e) {
+                s.postMessage({
+                    type: e.type,
+                    data: {
+                        x: e.localX,
+                        y: e.localY
+                    }
+                });
+            });
+        };
+        SharedCanvas.resize = function (w, h) {
+            var s = SharedCanvas;
+            s.postMessage({
+                type: "canvasResize",
                 data: {
-                    dw: stage.divWidth,
-                    dh: stage.divHeight,
-                    w: stage.desWidth,
-                    h: stage.desHeight,
-                    fps: stage.getFrameRate(),
-                    scaleMode: stage.scaleMode,
-                    devicePixelRatio: annie.devicePixelRatio
+                    w: w,
+                    h: h,
                 }
             });
-            s.context.canvas.width = stage.desWidth;
-            s.context.canvas.height = stage.desHeight;
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
         };
         SharedCanvas.destroy = function () {
             //清除相应的数据引用
             var s = SharedCanvas;
+            s.view.destroy();
             s.context = null;
-            s.canvas = null;
         };
         /**
          * 向子域传消息
@@ -6877,9 +6955,7 @@ var annie;
         SharedCanvas.postMessage = function (data) {
             //呼叫数据显示端
             var s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage(data);
-            }
+            s.context.postMessage(data);
         };
         /**
          * 显示开放域
@@ -6888,10 +6964,8 @@ var annie;
          */
         SharedCanvas.show = function () {
             var s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage({ event: "onShow" });
-                s.canvas = s.context.canvas;
-            }
+            s.context.postMessage({ event: "onShow" });
+            s.view.visible = true;
         };
         /**
          * 隐藏开放域
@@ -6899,17 +6973,11 @@ var annie;
          * @since 2.0.1
          */
         SharedCanvas.hide = function () {
-            // if(!isSharedDomain) {
             var s = SharedCanvas;
-            if (s.context) {
-                s.context.postMessage({ event: "onHide" });
-                s.canvas = null;
-            }
-            // }else{
-            //     annie.Stage.pause=true;
-            //     CanvasRender.drawCtx.canvas.width=CanvasRender.drawCtx.canvas.height=0;
-            // }
+            s.context.postMessage({ event: "onHide" });
+            s.view.visible = true;
         };
+        SharedCanvas.view = null;
         return SharedCanvas;
     }());
     annie.SharedCanvas = SharedCanvas;
@@ -6940,9 +7008,15 @@ var annie;
             var s = this;
             s._instanceType = "annie.CanvasRender";
             s._stage = stage;
-            var canvas = wx.createCanvas();
-            canvas.width = w;
-            canvas.height = h;
+            var canvas = null;
+            if (annie.isSharedCanvas) {
+                canvas = wx.getSharedCanvas();
+            }
+            else {
+                canvas = wx.createCanvas();
+                canvas.width = w;
+                canvas.height = h;
+            }
             CanvasRender.canvas = canvas;
             CanvasRender.drawCtx = canvas.getContext('2d');
         }
@@ -7033,14 +7107,6 @@ var annie;
                 target._draw(ctx);
             }
         };
-        CanvasRender.prototype.drawSharedCanvas = function () {
-            if (annie.SharedCanvas.canvas) {
-                var ctx = CanvasRender.drawCtx;
-                ctx.globalAlpha = 1;
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.drawImage(annie.SharedCanvas.canvas, 0, 0);
-            }
-        };
         CanvasRender.prototype.destroy = function () {
             var s = this;
             s._stage = null;
@@ -7075,10 +7141,8 @@ var annie;
      * @public
      * @static
      */
-    annie.devicePixelRatio = wx.getSystemInfoSync().pixelRatio || 1;
+    annie.devicePixelRatio = 1;
     annie.isSharedCanvas = false;
-    annie.getImageInfo = wx.createImage;
-    annie.createAudio = wx.createInnerAudioContext;
     /**
      * 全局事件侦听
      * @property annie.globalDispatcher
@@ -7413,8 +7477,31 @@ var annie;
         return new annie.Sound(res[sceneName][resName]);
     }
     /**
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    function loadSubScene(subName, progressFun, completeFun) {
+        //分包加载
+        var loadTask = wx.loadSubpackage({
+            name: subName,
+            success: function (res) {
+                //分包加载成功后通过 success 回调
+                completeFun({ status: 1, name: subName });
+            },
+            fail: function (res) {
+                //分包加载失败通过 fail 回调
+                completeFun({ status: 0, name: subName });
+            }
+        });
+        loadTask.onProgressUpdate(progressFun);
+    }
+    annie.loadSubScene = loadSubScene;
+    /**
      * 加载场景的方法
-     * @param sceneName
+     * @param sceneName 场景名
      * @param {Function} progressFun
      * @param {Function} completeFun
      * @param {string} domain
@@ -7422,7 +7509,10 @@ var annie;
     function loadScene(sceneName, progressFun, completeFun, domain) {
         if (domain === void 0) { domain = ""; }
         var sceneList = null;
-        domain += "/..";
+        var sourceUrl = "../";
+        if (domain != "") {
+            sourceUrl = "../" + domain + "/";
+        }
         if (typeof (sceneName) == "string") {
             sceneList = [sceneName];
         }
@@ -7432,27 +7522,42 @@ var annie;
         var len = sceneList.length;
         for (var i = 0; i < len; i++) {
             if (!GameGlobal[sceneList[i]]) {
-                var res_1 = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
-                var con = require(domain + '/resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
-                for (var j = 0; j < res_1.length; j++) {
-                    if (res_1[j].type == "javascript") {
-                        var className = res_1[j].src.split("/")[2].split(".")[0];
-                        require(domain + "/" + res_1[j].src)[className];
-                    }
-                    else {
-                        if (domain != "") {
-                            res_1[j].src = domain + "/" + res_1[j].src;
+                if (annie.isSharedCanvas) {
+                    var res_1 = require('../resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
+                    var con = require('../resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
+                    for (var j = 0; j < res_1.length; j++) {
+                        if (res_1[j].type == "javascript") {
+                            var className = res_1[j].src.split("/")[2].split(".")[0];
+                            require("../" + res_1[j].src)[className];
+                        }
+                        else {
+                            res_1[j].src = "sharedCanvas/" + res_1[j].src;
                         }
                     }
+                    annie.parseScene(sceneList[i], res_1, con);
                 }
-                annie.parseScene(sceneList[i], res_1, con);
+                else {
+                    var res_2 = require(sourceUrl + 'resource/' + sceneList[i] + '/' + sceneList[i] + '.res.js');
+                    var con = require(sourceUrl + 'resource/' + sceneList[i] + '/' + sceneList[i] + '.con.js');
+                    for (var j = 0; j < res_2.length; j++) {
+                        if (res_2[j].type == "javascript") {
+                            var className = res_2[j].src.split("/")[2].split(".")[0];
+                            require(sourceUrl + res_2[j].src)[className];
+                        }
+                        else {
+                            res_2[j].src = domain + "/" + res_2[j].src;
+                        }
+                    }
+                    annie.parseScene(sceneList[i], res_2, con);
+                }
             }
-            progressFun(Math.floor((i + 1) / len * 100));
-            completeFun({ sceneId: i + 1, sceneTotal: len, sceneName: sceneList[i] });
+            if (progressFun)
+                progressFun(Math.floor((i + 1) / len * 100));
+            if (completeFun)
+                completeFun({ sceneId: i + 1, sceneTotal: len, sceneName: sceneList[i] });
         }
     }
     annie.loadScene = loadScene;
-    ;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes
@@ -7647,8 +7752,9 @@ annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
 
 GameGlobal.AnnieRoot= GameGlobal;
-GameGlobal.annie= annie;
 GameGlobal.A2xExtend=__extends;
+GameGlobal.annie= annie;
+GameGlobal.trace= console.log;
 GameGlobal.addEventListener=function (type,listener) {
     listener();
 };

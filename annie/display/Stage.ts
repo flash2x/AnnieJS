@@ -1,4 +1,3 @@
-
 /**
  * @module annie
  */
@@ -22,6 +21,7 @@ namespace annie {
          * @default null
          */
         public renderObj: IRender = null;
+
         /**
          * 如果值为true则暂停更新当前显示对象及所有子对象。在视觉上就相当于界面停止了,但一样能会接收鼠标事件<br/>
          * 有时候背景为大量动画的一个对象时,当需要弹出一个框或者其他内容,或者模糊一个背景时可以设置此属性让<br/>
@@ -38,7 +38,7 @@ namespace annie {
         }
 
         static set pause(value: boolean) {
-            let s:any=Stage;
+            let s: any = Stage;
             if (value != s._pause) {
                 s._pause = value;
                 if (value) {
@@ -200,7 +200,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public constructor(canvasId:string,desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight") {
+        public constructor(canvasId: string, desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight") {
             super();
             let s: Stage = this;
             this._instanceType = "annie.Stage";
@@ -211,17 +211,36 @@ namespace annie {
             s.setFrameRate(frameRate);
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
-            //目前具支持canvas
-            let sysInfo = wx.getSystemInfoSync();
-            let w=sysInfo.pixelRatio * sysInfo.windowWidth;
-            let h=sysInfo.pixelRatio * sysInfo.windowHeight;
-            s.divWidth=w;
-            s.divHeight=h;
-            s.renderObj = new CanvasRender(s,w,h);
-            //同时添加到主更新循环中
-            Stage.addUpdateObj(s);
             s.onTouchEvent = s._onMouseEvent.bind(s);
-            if(!annie.isSharedCanvas) {
+            s._scaleMode = scaleMode;
+            if (annie.isSharedCanvas) {
+                s.divWidth = desW;
+                s.divHeight = desH;
+                s.renderObj = new CanvasRender(s, desW, desH);
+                annie.globalDispatcher.addEventListener("onMainStageMsg", function (e: any) {
+                    switch (e.data.type){
+                        case "canvasResize":
+                            break;
+                        case annie.MouseEvent.CLICK:
+                        case annie.MouseEvent.MOUSE_MOVE:
+                        case annie.MouseEvent.MOUSE_UP:
+                        case annie.MouseEvent.MOUSE_DOWN:
+                            let event: MouseEvent = new MouseEvent(e.type);
+                            event.reset(e.type, s);
+                            event.clientX = event.stageX = event.localX = e.data.x;
+                            event.clientY = event.stageY = event.localY = e.data.y;
+                            s.dispatchEvent(event);
+                            break;
+                        default:
+                    }
+                });
+            } else {
+                let sysInfo = wx.getSystemInfoSync();
+                let w = annie.devicePixelRatio * sysInfo.windowWidth;
+                let h = annie.devicePixelRatio * sysInfo.windowHeight;
+                s.divWidth = w;
+                s.divHeight = h;
+                s.renderObj = new CanvasRender(s, w, h);
                 wx.onTouchStart(function (e: any) {
                     if (!e.type) {
                         e.type = "touchstart";
@@ -231,7 +250,6 @@ namespace annie {
                 wx.onTouchMove(function (e: any) {
                     if (!e.type) {
                         e.type = "touchmove";
-
                     }
                     s.onTouchEvent(e);
                 });
@@ -242,12 +260,14 @@ namespace annie {
                     s.onTouchEvent(e);
                 });
             }
-            s._scaleMode = scaleMode;
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
             s.setAlign();
-            setTimeout(function(){
+            setTimeout(function () {
                 s.dispatchEvent(annie.Event.INIT_TO_STAGE);
-            },100)
+            }, 100)
         }
+
         private _touchEvent: annie.TouchEvent;
 
         /**
@@ -288,8 +308,10 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
+
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
+
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
@@ -297,7 +319,6 @@ namespace annie {
                 s.callEventAndFrameScript(2);
                 s.update(true);
                 s.render(s.renderObj);
-                s.renderObj.drawSharedCanvas();
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
@@ -307,12 +328,12 @@ namespace annie {
                         s.callEventAndFrameScript(2);
                         s.update(true);
                         s.render(s.renderObj);
-                        s.renderObj.drawSharedCanvas();
                     }
                     s._currentFlush--;
                 }
             }
         }
+
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -460,16 +481,16 @@ namespace annie {
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
-                            if (!s._ml[eLen]) {
-                                event = new MouseEvent(item);
-                                s._ml[eLen] = event;
-                            } else {
-                                event = s._ml[eLen];
-                                event.type = item;
-                            }
-                            events[events.length] = event;
-                            s._initMouseEvent(event, cp, sp, identifier);
-                            eLen++;
+                        if (!s._ml[eLen]) {
+                            event = new MouseEvent(item);
+                            s._ml[eLen] = event;
+                        } else {
+                            event = s._ml[eLen];
+                            event.type = item;
+                        }
+                        events[events.length] = event;
+                        s._initMouseEvent(event, cp, sp, identifier);
+                        eLen++;
                         //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -496,7 +517,7 @@ namespace annie {
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            let d: any = s.hitTestPoint(cp, true,true);
+                            let d: any = s.hitTestPoint(cp, true, true);
                             let displayList: Array<DisplayObject> = [];
                             if (d) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
@@ -513,9 +534,9 @@ namespace annie {
                                 displayList[displayList.length] = s;
                             }
                             let len: number = displayList.length;
-                            for (let i =len-1; i >=0; i--) {
+                            for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
-                                for (let j = 0; j <eLen; j++) {
+                                for (let j = 0; j < eLen; j++) {
                                     if (!events[j]["_bpd"]) {
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
@@ -530,17 +551,17 @@ namespace annie {
                             }
                             //这里一定要反转一下，因为会影响mouseOut mouseOver
                             displayList.reverse();
-                            for (let i =len-1; i >=0; i--) {
+                            for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
-                                for (let j = 0; j <eLen; j++) {
-                                    if (!events[j]["_bpd"]){
+                                for (let j = 0; j < eLen; j++) {
+                                    if (!events[j]["_bpd"]) {
                                         if (d.hasEventListener(events[j].type)) {
                                             events[j].currentTarget = d;
-                                            events[j].target = displayList[eLen-1];
+                                            events[j].target = displayList[eLen - 1];
                                             lp = d.globalToLocal(cp, DisplayObject._bp);
                                             events[j].localX = lp.x;
                                             events[j].localY = lp.y;
-                                            d.dispatchEvent(events[j],null,false);
+                                            d.dispatchEvent(events[j], null, false);
                                         }
                                     }
                                 }
@@ -745,9 +766,10 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
+
         //刷新所有定时器
         private static flushAll(): void {
-            if(!Stage._pause) {
+            if (!Stage._pause) {
                 let len = Stage.allUpdateObjList.length;
                 for (let i = 0; i < len; i++) {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
@@ -780,6 +802,7 @@ namespace annie {
                 Stage.allUpdateObjList.unshift(target);
             }
         }
+
         /**
          * 移除掉已经添加的循环刷新对象
          * @method removeUpdateObj
@@ -798,7 +821,8 @@ namespace annie {
                 }
             }
         }
-        public destroy():void{
+
+        public destroy(): void {
             let s = this;
             Stage.removeUpdateObj(s);
             super.destroy();
