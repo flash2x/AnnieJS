@@ -4068,7 +4068,7 @@ var annie;
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             s._updateState = 0;
-            if (s._visible)
+            if (!s._visible)
                 return;
             if (s._cacheAsBitmap) {
                 _super.prototype.render.call(this, renderObj);
@@ -10597,3 +10597,7 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
+
+window.AnnieRoot= window;
+window.A2xExtend=__extends;
+window.trace=console.log;

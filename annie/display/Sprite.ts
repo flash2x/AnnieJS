@@ -429,7 +429,7 @@ namespace annie {
         public render(renderObj: IRender): void {
             let s: any = this;
             s._updateState = 0;
-            if(s._visible)return;
+            if(!s._visible)return;
             if (s._cacheAsBitmap){
                 super.render(renderObj);
             } else {
