@@ -80,7 +80,7 @@ namespace annie {
 
         private drawMask(target: any): void {
             let s = this;
-            target.updateMatirx();
+            target.updateMatrix();
             let tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {

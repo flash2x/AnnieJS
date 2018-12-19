@@ -280,7 +280,7 @@ namespace annie {
          */
         public getTextWidth(lineIndex:number=0){
             let s=this;
-            s.updateMatirx();
+            s.updateMatrix();
             let can = s._texture;
             let ctx = can.getContext("2d");
             let obj:any=ctx.measureText(s.realLines[lineIndex]);
@@ -306,8 +306,8 @@ namespace annie {
             return w;
         }
         private  realLines: any = [];
-        public updateMatirx(): void {
-            super.updateMatirx();
+        public updateMatrix(): void {
+            super.updateMatrix();
             let s: any = this;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";

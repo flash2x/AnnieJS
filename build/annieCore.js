@@ -2130,7 +2130,7 @@ var annie;
          * @since 1.0.0
          * @return {void}
          */
-        DisplayObject.prototype.updateMatirx = function () {
+        DisplayObject.prototype.updateMatrix = function () {
             var s = this;
             var UI = s._UI;
             if (s._cp) {
@@ -2195,7 +2195,7 @@ var annie;
         DisplayObject.prototype.render = function (renderObj) {
             var s = this;
             if (s._visible) {
-                s.updateMatirx();
+                s.updateMatrix();
                 if (s.cAlpha > 0) {
                     var cf = s.cFilters;
                     var cfLen = cf.length;
@@ -2280,7 +2280,7 @@ var annie;
          */
         DisplayObject.prototype.getWH = function () {
             var s = this;
-            s.updateMatirx();
+            s.updateMatrix();
             var dr = s.getDrawRect();
             return { width: dr.width, height: dr.height };
         };
@@ -2571,9 +2571,9 @@ var annie;
             configurable: true
         });
         ;
-        Bitmap.prototype.updateMatirx = function () {
+        Bitmap.prototype.updateMatrix = function () {
             var s = this;
-            _super.prototype.updateMatirx.call(this);
+            _super.prototype.updateMatrix.call(this);
             //滤镜
             var bitmapData = s._bitmapData;
             if ((s._UI.UD || s._UI.UF) && bitmapData) {
@@ -3318,9 +3318,9 @@ var annie;
                 s._isBitmapStroke = null;
             }
         };
-        Shape.prototype.updateMatirx = function () {
+        Shape.prototype.updateMatrix = function () {
             var s = this;
-            _super.prototype.updateMatirx.call(this);
+            _super.prototype.updateMatrix.call(this);
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 var cLen = s._command.length;
@@ -4074,7 +4074,7 @@ var annie;
                 _super.prototype.render.call(this, renderObj);
             }
             else {
-                s.updateMatirx();
+                s.updateMatrix();
                 var maskObj = void 0;
                 var child = void 0;
                 var len = s.children.length;
@@ -5690,7 +5690,7 @@ var annie;
         TextField.prototype.getTextWidth = function (lineIndex) {
             if (lineIndex === void 0) { lineIndex = 0; }
             var s = this;
-            s.updateMatirx();
+            s.updateMatrix();
             var can = s._texture;
             var ctx = can.getContext("2d");
             var obj = ctx.measureText(s.realLines[lineIndex]);
@@ -5719,8 +5719,8 @@ var annie;
             //ctx.restore();
             return w;
         };
-        TextField.prototype.updateMatirx = function () {
-            _super.prototype.updateMatirx.call(this);
+        TextField.prototype.updateMatrix = function () {
+            _super.prototype.updateMatrix.call(this);
             var s = this;
             if (s._UI.UD || s._UI.UF) {
                 s._text += "";
@@ -7978,7 +7978,7 @@ var annie;
         };
         CanvasRender.prototype.drawMask = function (target) {
             var s = this;
-            target.updateMatirx();
+            target.updateMatrix();
             var tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
@@ -9467,6 +9467,9 @@ var annie;
                         s.currentFrame = 1;
                     }
                     else {
+                        if (cf) {
+                            cf(s._isLoop == 0, pm);
+                        }
                         if (s._isLoop > 0) {
                             s._isFront = false;
                             s.currentFrame = s.totalFrames;
@@ -9476,23 +9479,20 @@ var annie;
                             Tween.kill(s.instanceId);
                         }
                     }
-                    if (cf) {
-                        cf(pm);
-                    }
                 }
             }
             else {
                 s.currentFrame--;
                 if (s.currentFrame < 0) {
+                    if (cf) {
+                        cf(s._isLoop == 0, pm);
+                    }
                     if (s._isLoop > 0) {
                         s._isFront = true;
                         s.currentFrame = 1;
                     }
                     else {
                         Tween.kill(s.instanceId);
-                    }
-                    if (cf) {
-                        cf(pm);
                     }
                 }
             }
@@ -9516,19 +9516,19 @@ var annie;
         function Tween() {
         }
         /**
-         * 将target对象的属性数值渐变到data中对应属性指定的数值
-         * @method to
+         * 将target对象从data中指定的属性数值渐变到target属性当前的数值
+         * @method from
          * @static
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成函数. 默认为null
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位,默认以秒为单位
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
@@ -9545,7 +9545,7 @@ var annie;
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
@@ -10490,25 +10490,26 @@ var annie;
         if (bgColor === void 0) { bgColor = ""; }
         if (!_dRender) {
             _dRender = new annie.CanvasRender(null);
+            _dRender.rootContainer = annie.DisplayObject["_canvas"];
         }
-        _dRender.rootContainer = annie.DisplayObject["_canvas"];
         var objInfo = {
             p: obj.parent,
             x: obj.x,
             y: obj.y };
         obj.parent = null;
-        _dRender._stage = obj;
+        obj._cp = true;
+        obj.x = obj.y = 0;
         if (!rect) {
             rect = obj.getDrawRect();
         }
-        var w = rect.width;
-        var h = rect.height;
         obj.x = -rect.x;
         obj.y = -rect.y;
+        var w = rect.width;
+        var h = rect.height;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        //_dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        //_dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
@@ -10519,6 +10520,7 @@ var annie;
         }
         obj.render(_dRender);
         obj.parent = objInfo.p;
+        obj._cp = true;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
         if (!typeInfo) {
@@ -10534,9 +10536,8 @@ var annie;
     annie.toDisplayCache = function (obj) {
         if (!_dRender) {
             _dRender = new annie.CanvasRender(null);
+            _dRender.rootContainer = annie.DisplayObject["_canvas"];
         }
-        _dRender._stage = obj;
-        _dRender.rootContainer = annie.DisplayObject["_canvas"];
         var objInfo = {
             p: obj.parent,
             x: obj.x,
@@ -10548,6 +10549,7 @@ var annie;
             skY: obj.skewY
         };
         obj.parent = null;
+        obj._cp = true;
         obj.x = obj.y = 0;
         obj.scaleX = obj.scaleY = 1;
         obj.rotation = obj.skewX = obj.skewY = 0;
@@ -10567,6 +10569,7 @@ var annie;
         _dRender._ctx.clearRect(0, 0, w, h);
         obj.render(_dRender);
         obj.parent = objInfo.p;
+        obj._cp = true;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
         obj.scaleX = objInfo.scX;

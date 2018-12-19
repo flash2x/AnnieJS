@@ -433,7 +433,7 @@ namespace annie {
             if (s._cacheAsBitmap){
                 super.render(renderObj);
             } else {
-                s.updateMatirx();
+                s.updateMatrix();
                 let maskObj: any;
                 let child: any;
                 let len: number = s.children.length;

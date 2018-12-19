@@ -23,11 +23,10 @@ namespace annie {
          * @type {annie.Rectangle}
          * @default null
          */
-        get rect(): annie.Rectangle {
+        get rect(): annie.Rectangle{
             return this._rect;
         }
-
-        set rect(value: annie.Rectangle) {
+        set rect(value: annie.Rectangle){
             let s:any=this;
             s._rect = value;
             s._UI.UD=true;
@@ -105,9 +104,9 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
-        public updateMatirx(): void {
+        public updateMatrix(): void {
             let s = this;
-            super.updateMatirx();
+            super.updateMatrix();
             //滤镜
             let bitmapData = s._bitmapData;
             if ((s._UI.UD || s._UI.UF) && bitmapData) {
@@ -258,7 +257,6 @@ namespace annie {
             }
             return null;
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

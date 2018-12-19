@@ -331,10 +331,8 @@ namespace annie {
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
         }
-
         private _resizeEvent: any = null;
         private _touchEvent: annie.TouchEvent;
-
         public render(renderObj: IRender): void {
             renderObj.begin();
             super.render(renderObj);

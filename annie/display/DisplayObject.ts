@@ -522,7 +522,7 @@ namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        public getBounds(): Rectangle {
+        public getBounds(): Rectangle{
             return this._bounds;
         };
 
@@ -567,7 +567,7 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        protected updateMatirx(): void {
+        protected updateMatrix(): void {
             let s = this;
             let UI = s._UI;
             if (s._cp) {
@@ -632,7 +632,7 @@ namespace annie {
         public render(renderObj: IRender | any): void {
             let s = this;
             if(s._visible){
-                s.updateMatirx();
+                s.updateMatrix();
                 if (s.cAlpha > 0) {
                     let cf = s.cFilters;
                     let cfLen = cf.length;
@@ -713,7 +713,7 @@ namespace annie {
          */
         public getWH(): { width: number, height: number } {
             let s = this;
-            s.updateMatirx();
+            s.updateMatrix();
             let dr = s.getDrawRect();
             return {width: dr.width, height: dr.height};
         }

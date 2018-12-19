@@ -598,7 +598,7 @@ namespace annie {
      *             error: function (result) {console.log(result)}
      *      })
      */
-    export function ajax(info: any): void {
+    export function ajax(info: any): void{
         let urlLoader = new URLLoader();
         if(info.isNeedOption) {
             urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
@@ -756,7 +756,7 @@ namespace annie {
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
-                if (Array.isArray(classRoot[children[i]])) {
+                if (Array.isArray(classRoot[children[i]])){
                     objType = classRoot[children[i]][0];
                 } else {
                     objType = classRoot[children[i]].t;

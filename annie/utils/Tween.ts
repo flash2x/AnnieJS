@@ -170,6 +170,9 @@ namespace annie {
                     if (s._loop) {
                         s.currentFrame = 1;
                     } else {
+                        if (cf) {
+                            cf(s._isLoop==0,pm);
+                        }
                         if (s._isLoop > 0) {
                             s._isFront = false;
                             s.currentFrame = s.totalFrames;
@@ -178,22 +181,20 @@ namespace annie {
                             Tween.kill(s.instanceId);
                         }
                     }
-                    if (cf) {
-                        cf(pm);
-                    }
                 }
             } else {
                 s.currentFrame--;
                 if (s.currentFrame < 0) {
+                    if (cf) {
+                        cf(s._isLoop==0,pm);
+                    }
                     if (s._isLoop > 0) {
                         s._isFront = true;
                         s.currentFrame = 1;
                     } else {
                         Tween.kill(s.instanceId);
                     }
-                    if (cf) {
-                        cf(pm);
-                    }
+
                 }
             }
         }
@@ -214,19 +215,19 @@ namespace annie {
      */
     export class Tween {
         /**
-         * 将target对象的属性数值渐变到data中对应属性指定的数值
-         * @method to
+         * 将target对象从data中指定的属性数值渐变到target属性当前的数值
+         * @method from
          * @static
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成函数. 默认为null
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
-         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位,默认以秒为单位
+         * @param {boolean} data.useFrame 为false用时间秒值;为true则是以帧为单位
          * @param {number} data.delay 延时，useFrame为true以帧为单位 useFrame为false以秒为单位
          * @public
          * @since 1.0.0
@@ -244,7 +245,7 @@ namespace annie {
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法

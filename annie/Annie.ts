@@ -193,25 +193,26 @@ namespace annie {
     export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
             _dRender = new CanvasRender(null);
+            _dRender.rootContainer = DisplayObject["_canvas"];
         }
-        _dRender.rootContainer = DisplayObject["_canvas"];
         let objInfo:any = {
             p: obj.parent,
             x: obj.x,
             y: obj.y};
         obj.parent=null;
-        _dRender._stage = obj;
+        obj._cp=true;
+        obj.x=obj.y=0;
         if(!rect){
             rect = obj.getDrawRect();
         }
-        let w: number =rect.width;
-        let h: number =rect.height;
         obj.x=-rect.x;
         obj.y=-rect.y;
+        let w: number =rect.width;
+        let h: number =rect.height;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        //_dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        //_dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
@@ -221,6 +222,7 @@ namespace annie {
         }
         obj.render(_dRender);
         obj.parent = objInfo.p;
+        obj._cp=true;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
         if (!typeInfo) {
@@ -235,9 +237,8 @@ namespace annie {
     export let toDisplayCache = function (obj: any): string {
         if (!_dRender) {
             _dRender = new CanvasRender(null);
+            _dRender.rootContainer = DisplayObject["_canvas"];
         }
-        _dRender._stage = obj;
-        _dRender.rootContainer = DisplayObject["_canvas"];
         let objInfo = {
             p: obj.parent,
             x: obj.x,
@@ -249,6 +250,7 @@ namespace annie {
             skY: obj.skewY
         };
         obj.parent = null;
+        obj._cp=true;
         obj.x=obj.y=0;
         obj.scaleX = obj.scaleY = 1;
         obj.rotation = obj.skewX = obj.skewY = 0;
@@ -268,6 +270,7 @@ namespace annie {
         _dRender._ctx.clearRect(0, 0, w, h);
         obj.render(_dRender);
         obj.parent = objInfo.p;
+        obj._cp=true;
         obj.x = objInfo.x;
         obj.y = objInfo.y;
         obj.scaleX = objInfo.scX;

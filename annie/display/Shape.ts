@@ -580,9 +580,9 @@ namespace annie {
                 }
             }
         };
-        public updateMatirx(): void {
+        public updateMatrix(): void {
             let s = this;
-            super.updateMatirx();
+            super.updateMatrix();
             if (s._UI.UD || s._UI.UF) {
                 //更新缓存
                 let cLen: number = s._command.length;
@@ -725,7 +725,7 @@ namespace annie {
                                 ctx.putImageData(imageData, 0, 0);
                             }
                             //给webgl更新新
-                            //_canvas.updateMatirxTexture = true;
+                            //_canvas.updateMatrixTexture = true;
                         }
                     }
                 }
