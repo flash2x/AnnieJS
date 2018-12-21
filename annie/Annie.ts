@@ -417,7 +417,9 @@ namespace annie {
                             let className: string = res[j].src.split("/")[2].split(".")[0];
                             require(sourceUrl+res[j].src)[className];
                         } else {
-                            res[j].src = domain + "/" + res[j].src;
+                            if(domain!="") {
+                                res[j].src = domain + "/" + res[j].src;
+                            }
                         }
                     }
                     annie.parseScene(sceneList[i], res, con);

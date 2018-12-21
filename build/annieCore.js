@@ -7545,7 +7545,9 @@ var annie;
                             require(sourceUrl + res_2[j].src)[className];
                         }
                         else {
-                            res_2[j].src = domain + "/" + res_2[j].src;
+                            if (domain != "") {
+                                res_2[j].src = domain + "/" + res_2[j].src;
+                            }
                         }
                     }
                     annie.parseScene(sceneList[i], res_2, con);
