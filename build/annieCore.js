@@ -1893,6 +1893,8 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (value != s._visible) {
+                    if (value)
+                        s._cp = true;
                     s._visible = value;
                 }
             },
