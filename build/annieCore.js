@@ -5372,8 +5372,10 @@ var annie;
                         case annie.MouseEvent.MOUSE_MOVE:
                         case annie.MouseEvent.MOUSE_UP:
                         case annie.MouseEvent.MOUSE_DOWN:
-                            var event_2 = new annie.MouseEvent(e.type);
-                            event_2.reset(e.type, s);
+                        case annie.MouseEvent.MOUSE_OVER:
+                        case annie.MouseEvent.MOUSE_OUT:
+                            var event_2 = new annie.MouseEvent(e.data.type);
+                            event_2.reset(e.data.type, s);
                             event_2.clientX = event_2.stageX = event_2.localX = e.data.x;
                             event_2.clientY = event_2.stageY = event_2.localY = e.data.y;
                             s.dispatchEvent(event_2);
@@ -6869,6 +6871,16 @@ var annie;
     var SharedCanvas = (function () {
         function SharedCanvas() {
         }
+        SharedCanvas.onMouseEvent = function (e) {
+            var s = SharedCanvas;
+            s.postMessage({
+                type: e.type,
+                data: {
+                    x: e.localX,
+                    y: e.localY
+                }
+            });
+        };
         SharedCanvas.init = function (w, h) {
             var s = SharedCanvas;
             if (s.context)
@@ -6880,53 +6892,12 @@ var annie;
             s.context.canvas.width = w;
             s.context.canvas.height = h;
             s.view = new annie.Bitmap(s.context.canvas);
-            s.view.addEventListener(annie.MouseEvent.CLICK, function (e) {
-                s.postMessage({
-                    type: e.type,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e) {
-                s.postMessage({
-                    type: e.type,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT, function (e) {
-                s.postMessage({
-                    //不要搞错了，这里要设置成UP
-                    type: annie.MouseEvent.MOUSE_UP,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER, function (e) {
-                s.postMessage({
-                    //不要搞错了，这里要设置成down
-                    type: annie.MouseEvent.MOUSE_DOWN,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_UP, function (e) {
-                s.postMessage({
-                    type: e.type,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
+            s.view.addEventListener(annie.MouseEvent.CLICK, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent);
         };
         SharedCanvas.resize = function (w, h) {
             var s = SharedCanvas;

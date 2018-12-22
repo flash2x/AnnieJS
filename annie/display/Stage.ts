@@ -225,8 +225,10 @@ namespace annie {
                         case annie.MouseEvent.MOUSE_MOVE:
                         case annie.MouseEvent.MOUSE_UP:
                         case annie.MouseEvent.MOUSE_DOWN:
-                            let event: MouseEvent = new MouseEvent(e.type);
-                            event.reset(e.type, s);
+                        case annie.MouseEvent.MOUSE_OVER:
+                        case annie.MouseEvent.MOUSE_OUT:
+                            let event: MouseEvent = new MouseEvent(e.data.type);
+                            event.reset(e.data.type, s);
                             event.clientX = event.stageX = event.localX = e.data.x;
                             event.clientY = event.stageY = event.localY = e.data.y;
                             s.dispatchEvent(event);

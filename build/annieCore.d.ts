@@ -3286,6 +3286,7 @@ declare namespace annie {
     class SharedCanvas {
         static context: any;
         static view: annie.Bitmap;
+        private static onMouseEvent(e);
         static init(w: number, h: number): void;
         static resize(w: number, h: number): void;
         static destroy(): void;

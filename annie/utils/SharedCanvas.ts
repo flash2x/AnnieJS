@@ -12,8 +12,18 @@ namespace annie {
     export class SharedCanvas {
         public static context: any;
         public static view: annie.Bitmap = null;
+        private static onMouseEvent(e:MouseEvent):void{
+            let s:any = SharedCanvas;
+            s.postMessage({
+                type: e.type,
+                data: {
+                    x: e.localX,
+                    y: e.localY
+                }
+            });
+        }
         public static init(w: number, h: number): void {
-            let s = SharedCanvas;
+            let s:any = SharedCanvas;
             if (s.context) return;
             s.context = wx.getOpenDataContext();
             s.postMessage({
@@ -22,53 +32,12 @@ namespace annie {
             s.context.canvas.width = w;
             s.context.canvas.height = h;
             s.view = new annie.Bitmap(s.context.canvas);
-            s.view.addEventListener(annie.MouseEvent.CLICK,function(e:MouseEvent){
-                s.postMessage({
-                    type: e.type,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE,function(e:MouseEvent){
-                s.postMessage({
-                    type: e.type,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT,function(e:MouseEvent){
-                s.postMessage({
-                    //不要搞错了，这里要设置成UP
-                    type: annie.MouseEvent.MOUSE_UP,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER,function(e:MouseEvent){
-                s.postMessage({
-                    //不要搞错了，这里要设置成down
-                    type: annie.MouseEvent.MOUSE_DOWN,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
-            s.view.addEventListener(annie.MouseEvent.MOUSE_UP,function(e:MouseEvent){
-                s.postMessage({
-                    type: e.type,
-                    data: {
-                        x: e.localX,
-                        y: e.localY
-                    }
-                });
-            });
+            s.view.addEventListener(annie.MouseEvent.CLICK,s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE,s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_DOWN,s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_UP,s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER,s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT,s.onMouseEvent);
         }
         public static resize(w: number, h: number) {
             let s = SharedCanvas;
