@@ -8219,7 +8219,6 @@ var annie;
             var s = this;
             if (s._req) {
                 s._req.abort();
-                s._req = null;
             }
         };
         /**
@@ -8273,6 +8272,7 @@ var annie;
                     s.responseType = "unKnow";
                 }
             }
+            var reSendTimes = 0;
             if (!s._req) {
                 s._req = new XMLHttpRequest();
                 s._req.withCredentials = false;
@@ -8280,7 +8280,31 @@ var annie;
                     s.dispatchEvent("onProgress", { loadedBytes: event.loaded, totalBytes: event.total });
                 };
                 s._req.onerror = function (event) {
-                    s.dispatchEvent("onError", { id: 2, msg: event["message"] });
+                    reSendTimes++;
+                    if (reSendTimes > 2) {
+                        s.dispatchEvent("onError", { id: 2, msg: event["message"] });
+                    }
+                    else {
+                        //断线重连
+                        s._req.abort();
+                        if (!s.data) {
+                            s._req.send();
+                        }
+                        else {
+                            if (contentType == "form") {
+                                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                                s._req.send(s._fqs(s.data, null));
+                            }
+                            else {
+                                var type = "application/json";
+                                if (contentType != "json") {
+                                    type = "multipart/form-data";
+                                }
+                                s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                                s._req.send(s.data);
+                            }
+                        }
+                    }
                 };
                 s._req.onreadystatechange = function (event) {
                     if (s._req.readyState === s._req.DONE) {

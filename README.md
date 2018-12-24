@@ -261,6 +261,9 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Annie2x 4.0.10(全新更名)
+    新增了单独打包单个fla的资源。做大型项目的时候，如果只是修改个别fla的话尤其有用。
+    修复调试模式下vConsole卡顿
 ## Annie2x 4.0.0(全新更名)
     全新的版本,同步AnnieJS 2.0.0
     支持导出Html5

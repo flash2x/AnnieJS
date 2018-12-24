@@ -4,6 +4,7 @@
 namespace annie {
     declare let VConsole: any;
     declare let trace: any;
+
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * @class annie.Stage
@@ -331,8 +332,10 @@ namespace annie {
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
         }
+
         private _resizeEvent: any = null;
         private _touchEvent: annie.TouchEvent;
+
         public render(renderObj: IRender): void {
             renderObj.begin();
             super.render(renderObj);
@@ -744,7 +747,7 @@ namespace annie {
                                 sd.y = y1;
                             }
                             if (item == "onMouseUp") {
-                                if (sd&&sd.stage) {
+                                if (sd && sd.stage) {
                                     sd._lastDragPoint.x = Number.MAX_VALUE;
                                     sd._lastDragPoint.y = Number.MAX_VALUE;
                                 }
@@ -768,7 +771,6 @@ namespace annie {
                 }
             }
         };
-
         //设置舞台的对齐模式
         private setAlign(): void {
             let s = this;
