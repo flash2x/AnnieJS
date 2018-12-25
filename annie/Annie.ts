@@ -36,7 +36,7 @@ namespace annie {
      *      console.log(annie.version);
      */
 
-    export let version:string="2.0.2";
+    export let version:string="2.1.0";
 
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
