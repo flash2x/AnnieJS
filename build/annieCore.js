@@ -10554,7 +10554,7 @@ var annie;
         }
         else {
             if (typeInfo.quality) {
-                typeInfo.quality /= 10;
+                typeInfo.quality /= 100;
             }
         }
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
