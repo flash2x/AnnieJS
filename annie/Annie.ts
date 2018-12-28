@@ -211,8 +211,8 @@ namespace annie {
         let h: number =rect.height;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        //_dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        //_dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
@@ -264,8 +264,8 @@ namespace annie {
         obj._offsetY = whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
+        _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         _dRender._ctx.clearRect(0, 0, w, h);
         obj.render(_dRender);

@@ -153,6 +153,7 @@ namespace annie {
             }
             let c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
+            // s._ctx.imageSmoothingQuality="high";
         }
 
         /**
