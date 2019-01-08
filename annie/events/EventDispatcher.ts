@@ -11,7 +11,6 @@ namespace annie {
         protected _instanceId: number = 0;
         protected _instanceType: string = "annie.AObject";
         protected static _object_id = 0;
-
         constructor() {
             this._instanceId = AObject._object_id++;
         }

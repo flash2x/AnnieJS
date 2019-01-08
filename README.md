@@ -69,6 +69,7 @@
     优化VConsole调试
     优化annie.ajax访问请求
     优化annie.URLLoader
+    优化annie.Tween的 onComplete完成事件，现在的完成事件默认带了参数.详情请看Api文档
     增加Android下没有加载进度条的解决方案
     修改stage.autoResize 默认调成true
 ## AnnieJS 2.0.2 版本

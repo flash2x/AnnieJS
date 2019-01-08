@@ -8053,6 +8053,7 @@ var annie;
             }
             var c = s.rootContainer;
             s._ctx = c["getContext"]('2d');
+            // s._ctx.imageSmoothingQuality="high";
         };
         /**
          * 当舞台尺寸改变时会调用
@@ -9370,11 +9371,13 @@ var annie;
          * @param times
          * @param data
          * @param isTo
+         * @param isPlay
          * @public
          * @since 1.0.0
          */
-        TweenObj.prototype.init = function (target, times, data, isTo) {
+        TweenObj.prototype.init = function (target, times, data, isTo, isPlay) {
             if (isTo === void 0) { isTo = true; }
+            if (isPlay === void 0) { isPlay = true; }
             if (times <= 0 || typeof (times) != "number") {
                 throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
@@ -9583,7 +9586,8 @@ var annie;
         Tween.from = function (target, totalFrame, data) {
             return Tween.createTween(target, totalFrame, data, false);
         };
-        Tween.createTween = function (target, totalFrame, data, isTo) {
+        Tween.createTween = function (target, totalFrame, data, isTo, isPlay) {
+            if (isPlay === void 0) { isPlay = true; }
             var tweenObj;
             var len = Tween._tweenList.length;
             for (var i = 0; i < len; i++) {
@@ -9607,7 +9611,7 @@ var annie;
                 tweenObj = new TweenObj();
             }
             Tween._tweenList.push(tweenObj);
-            tweenObj.init(target, totalFrame, data, isTo);
+            tweenObj.init(target, totalFrame, data, isTo, isPlay);
             return tweenObj.instanceId;
         };
         /**
@@ -10355,7 +10359,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "2.0.2";
+    annie.version = "2.1.0";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -10534,8 +10538,8 @@ var annie;
         var h = rect.height;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        //_dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        //_dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        _dRender.rootContainer.style.width = w / annie.devicePixelRatio + "px";
+        _dRender.rootContainer.style.height = h / annie.devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         if (bgColor == "") {
             _dRender._ctx.clearRect(0, 0, w, h);
@@ -10589,8 +10593,8 @@ var annie;
         obj._offsetY = whObj.y;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
-        // _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        // _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
+        _dRender.rootContainer.style.width = w / annie.devicePixelRatio + "px";
+        _dRender.rootContainer.style.height = h / annie.devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
         _dRender._ctx.clearRect(0, 0, w, h);
         obj.render(_dRender);
@@ -10626,7 +10630,3 @@ var annie;
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 annie.Stage["flushAll"]();
-
-window.AnnieRoot= window;
-window.A2xExtend=__extends;
-window.trace=console.log;
