@@ -54,10 +54,11 @@ namespace annie {
          * @param times
          * @param data
          * @param isTo
+         * @param isPlay
          * @public
          * @since 1.0.0
          */
-        public init(target: any, times: number, data: any, isTo: boolean = true): void {
+        public init(target: any, times: number, data: any, isTo: boolean = true,isPlay:boolean=true): void {
             if (times <= 0 || typeof(times) != "number") {
                 throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
@@ -129,7 +130,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 更新数据
          * @method update
@@ -254,11 +254,10 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public static from(target: any, totalFrame: number, data: Object): number {
+        public static from(target: any, totalFrame: number, data: Object): number{
             return Tween.createTween(target, totalFrame, data, false);
         }
-
-        private static createTween(target: any, totalFrame: number, data: any, isTo: boolean): number {
+        public static createTween(target: any, totalFrame: number, data: any, isTo: boolean,isPlay:boolean=true): number {
             let tweenObj: Tween | any;
             let len = Tween._tweenList.length;
             for (let i = 0; i < len; i++) {
@@ -281,7 +280,7 @@ namespace annie {
                 tweenObj = new TweenObj();
             }
             Tween._tweenList.push(tweenObj);
-            tweenObj.init(target, totalFrame, data, isTo);
+            tweenObj.init(target, totalFrame, data, isTo,isPlay);
             return tweenObj.instanceId;
         }
 

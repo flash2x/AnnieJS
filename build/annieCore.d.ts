@@ -3994,10 +3994,11 @@ declare namespace annie {
          * @param times
          * @param data
          * @param isTo
+         * @param isPlay
          * @public
          * @since 1.0.0
          */
-        init(target: any, times: number, data: any, isTo?: boolean): void;
+        init(target: any, times: number, data: any, isTo?: boolean, isPlay?: boolean): void;
         /**
          * 更新数据
          * @method update
@@ -4052,7 +4053,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         static from(target: any, totalFrame: number, data: Object): number;
-        private static createTween(target, totalFrame, data, isTo);
+        static createTween(target: any, totalFrame: number, data: any, isTo: boolean, isPlay?: boolean): number;
         /**
          * 销毁所有正在运行的Tween对象
          * @method killAll
