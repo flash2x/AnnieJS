@@ -14,6 +14,7 @@ namespace annie {
     import ColorMatrixFilter=annie.ColorMatrixFilter;
     //打包swf用
     export let _isReleased = false;
+    export let suffixName = ".swf";
     //打包swf用
     export let _shareSceneList: any = [];
     //存储加载资源的总对象
@@ -132,7 +133,7 @@ namespace annie {
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
             for (let i = 0; i < _totalLoadRes; i++) {
-                _currentConfig.push([{src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + ".swf"}]);
+                _currentConfig.push([{src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + suffixName}]);
             }
             _loadRes();
         }
@@ -248,7 +249,7 @@ namespace annie {
                         var image = new Image();
                         image.src = rootObj[item];
                         rootObj[item] = image;
-                    } else if (loadContent[item] == 5) {
+                    } else if (loadContent[item] == 5){
                         //声音
                         var audio = new Audio();
                         audio.src = rootObj[item];

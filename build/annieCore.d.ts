@@ -3814,6 +3814,7 @@ declare namespace annie {
  */
 declare namespace annie {
     let _isReleased: boolean;
+    let suffixName: string;
     let _shareSceneList: any;
     let res: any;
     /**
