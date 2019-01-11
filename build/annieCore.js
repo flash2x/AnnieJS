@@ -8266,7 +8266,7 @@ var annie;
                 else if (ext == "js") {
                     s.responseType = "js";
                 }
-                else if (ext == "swf") {
+                else if ("." + ext == annie.suffixName) {
                     s.responseType = "swf";
                 }
                 else {
@@ -8451,6 +8451,7 @@ var annie;
     var ColorMatrixFilter = annie.ColorMatrixFilter;
     //打包swf用
     annie._isReleased = false;
+    annie.suffixName = ".swf";
     //打包swf用
     annie._shareSceneList = [];
     //存储加载资源的总对象
@@ -8573,7 +8574,7 @@ var annie;
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
             for (var i = 0; i < _totalLoadRes; i++) {
-                _currentConfig.push([{ src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + ".swf" }]);
+                _currentConfig.push([{ src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + annie.suffixName }]);
             }
             _loadRes();
         }

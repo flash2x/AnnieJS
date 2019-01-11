@@ -110,7 +110,7 @@ namespace annie {
                     s.responseType = "text";
                 } else if (ext == "js") {
                     s.responseType = "js";
-                } else if (ext == "swf") {
+                } else if ("."+ext == annie.suffixName) {
                     s.responseType = "swf";
                 } else {
                     s.responseType = "unKnow";
