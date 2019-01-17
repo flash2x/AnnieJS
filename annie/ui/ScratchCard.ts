@@ -30,6 +30,8 @@ namespace annieUI {
         constructor(width: number, height: number, frontColorObj: any, backColorObj: any, drawRadius: number = 50) {
             super(width, height, frontColorObj);
             let s = this;
+            s._instanceType = "annieUI.ScratchCard";
+
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e: annie.MouseEvent) {

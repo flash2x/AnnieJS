@@ -15,22 +15,22 @@ namespace annieUI {
     export class ScrollPage extends Sprite {
         //Event
         /**
-         * annie.ScrollPage组件滑动到开始位置事件
+         * annieUI.ScrollPage组件滑动到开始位置事件
          * @event annie.Event.ON_SCROLL_TO_HEAD
          * @since 1.1.0
          */
         /**
-         * annie.ScrollPage组件停止滑动事件
+         * annieUI.ScrollPage组件停止滑动事件
          * @event annie.Event.ON_SCROLL_STOP
          * @since 1.1.0
          */
         /**
-         * annie.ScrollPage组件开始滑动事件
+         * annieUI.ScrollPage组件开始滑动事件
          * @event annie.Event.ON_SCROLL_START
          * @since 1.1.0
          */
         /**
-         * annie.ScrollPage组件滑动到结束位置事件
+         * annieUI.ScrollPage组件滑动到结束位置事件
          * @event annie.Event.ON_SCROLL_TO_END
          * @since 1.1.0
          */
@@ -162,7 +162,7 @@ namespace annieUI {
          * @param {number} maxDistance 最大滚动的长度
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
-         *      s.sPage=new annie.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
@@ -172,7 +172,7 @@ namespace annieUI {
         constructor(vW: number, vH: number, maxDistance: number, isVertical: boolean = true) {
             super();
             let s = this;
-            s._instanceType = "annie.ScrollPage";
+            s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;

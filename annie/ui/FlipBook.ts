@@ -10,12 +10,12 @@ namespace annieUI {
     export class FlipBook extends Sprite {
         //Events
         /**
-         * annie.FlipBook组件翻页开始事件
+         * annieUI.FlipBook组件翻页开始事件
          * @event annie.Event.ON_FLIP_START
          * @since 1.1.0
          */
         /**
-         * annie.FlipBook组件翻页结束事件
+         * annieUI.FlipBook组件翻页结束事件
          * @event annie.Event.ON_FLIP_STOP
          * @since 1.1.0
          */
@@ -99,7 +99,7 @@ namespace annieUI {
         public constructor(width: number, height: number, pageCount: any,getPageCallBack:Function) {
             super();
             let s = this;
-            s._instanceType = "annie.FlipBook";
+            s._instanceType = "annieUI.FlipBook";
             s.getPageCallback=getPageCallBack;
             s.bW = width;
             s.bH = height;

@@ -13,12 +13,12 @@ namespace annieUI {
      */
     export class SlidePage extends Sprite {
         /**
-         * annie.Slide 组件开始滑动事件
+         * annieUI.Slide 组件开始滑动事件
          * @event annie.Event.ON_SLIDE_START
          * @since 1.1.0
          */
         /**
-         * annie.Slide 组件结束滑动事件
+         * annieUI.Slide 组件结束滑动事件
          * @event annie.Event.ON_SLIDE_END
          * @since 1.1.0
          */

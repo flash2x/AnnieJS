@@ -27,7 +27,7 @@ var annieUI;
          * @param {number} maxDistance 最大滚动的长度
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
-         *      s.sPage=new annie.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
@@ -39,22 +39,22 @@ var annieUI;
             _super.call(this);
             //Event
             /**
-             * annie.ScrollPage组件滑动到开始位置事件
+             * annieUI.ScrollPage组件滑动到开始位置事件
              * @event annie.Event.ON_SCROLL_TO_HEAD
              * @since 1.1.0
              */
             /**
-             * annie.ScrollPage组件停止滑动事件
+             * annieUI.ScrollPage组件停止滑动事件
              * @event annie.Event.ON_SCROLL_STOP
              * @since 1.1.0
              */
             /**
-             * annie.ScrollPage组件开始滑动事件
+             * annieUI.ScrollPage组件开始滑动事件
              * @event annie.Event.ON_SCROLL_START
              * @since 1.1.0
              */
             /**
-             * annie.ScrollPage组件滑动到结束位置事件
+             * annieUI.ScrollPage组件滑动到结束位置事件
              * @event annie.Event.ON_SCROLL_TO_END
              * @since 1.1.0
              */
@@ -179,7 +179,7 @@ var annieUI;
              */
             this.isSpringBack = true;
             var s = this;
-            s._instanceType = "annie.ScrollPage";
+            s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
@@ -468,8 +468,8 @@ var annieUI;
          * @since 1.0.0
          * @public
          * @example
-         *      var circleface = new annie.FacePhoto(),
-         *          rectFace=new annie.FacePhoto();
+         *      var circleface = new annieUI.FacePhoto(),
+         *          rectFace=new annieUI.FacePhoto();
          *          //圆形头像
          *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
          *          circleface.x = 260;
@@ -485,7 +485,7 @@ var annieUI;
             _super.call(this);
             this.maskType = 0;
             var s = this;
-            s._instanceType = "annie.FacePhoto";
+            s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
             s.photo.crossOrigin = "";
             s.bitmap = new annie.Bitmap();
@@ -574,12 +574,12 @@ var annieUI;
             if (ease === void 0) { ease = null; }
             _super.call(this);
             /**
-             * annie.Slide 组件开始滑动事件
+             * annieUI.Slide 组件开始滑动事件
              * @event annie.Event.ON_SLIDE_START
              * @since 1.1.0
              */
             /**
-             * annie.Slide 组件结束滑动事件
+             * annieUI.Slide 组件结束滑动事件
              * @event annie.Event.ON_SLIDE_END
              * @since 1.1.0
              */
@@ -1000,12 +1000,12 @@ var annieUI;
             _super.call(this);
             //Events
             /**
-             * annie.FlipBook组件翻页开始事件
+             * annieUI.FlipBook组件翻页开始事件
              * @event annie.Event.ON_FLIP_START
              * @since 1.1.0
              */
             /**
-             * annie.FlipBook组件翻页结束事件
+             * annieUI.FlipBook组件翻页结束事件
              * @event annie.Event.ON_FLIP_STOP
              * @since 1.1.0
              */
@@ -1063,7 +1063,7 @@ var annieUI;
              */
             this.canFlip = true;
             var s = this;
-            s._instanceType = "annie.FlipBook";
+            s._instanceType = "annieUI.FlipBook";
             s.getPageCallback = getPageCallBack;
             s.bW = width;
             s.bH = height;
@@ -1602,7 +1602,7 @@ var annieUI;
             this.downL = null;
             this._lastFirstId = -1;
             var s = this;
-            s._instanceType = "annie.ScrollList";
+            s._instanceType = "annieUI.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
             s._items = [];
@@ -1856,6 +1856,7 @@ var annieUI;
              */
             this.currentStepId = 0;
             var s = this;
+            s._instanceType = "annieUI.DrawingBoard";
             var bd = document.createElement("canvas");
             bd.width = width;
             bd.height = height;
@@ -2051,6 +2052,7 @@ var annieUI;
             this._totalDraw = 1;
             this._currentDraw = 0;
             var s = this;
+            s._instanceType = "annieUI.ScratchCard";
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e) {

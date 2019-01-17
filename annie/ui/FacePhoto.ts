@@ -27,8 +27,8 @@ namespace annieUI {
          * @since 1.0.0
          * @public
          * @example
-         *      var circleface = new annie.FacePhoto(),
-         *          rectFace=new annie.FacePhoto();
+         *      var circleface = new annieUI.FacePhoto(),
+         *          rectFace=new annieUI.FacePhoto();
          *          //圆形头像
          *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
          *          circleface.x = 260;
@@ -43,7 +43,7 @@ namespace annieUI {
         constructor() {
             super();
             let s = this;
-            s._instanceType = "annie.FacePhoto";
+            s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
             s.photo.crossOrigin="";
             s.bitmap = new annie.Bitmap();
