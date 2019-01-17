@@ -6403,7 +6403,6 @@ var annie;
             this._currentFlush = 0;
             this._lastDpList = {};
             this._floatDisplayList = [];
-            this._resizeEvent = null;
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
             this._ml = [];
             //这个是事件中用到的Point对象池,以提高性能
@@ -6439,7 +6438,7 @@ var annie;
             this.resize = function () {
                 var s = this;
                 var whObj = s.getRootDivWH(s.rootDiv);
-                if (s.divHeight != whObj.h || s.divWidth != whObj.w) {
+                if (s.divHeight != whObj.h && s.divWidth != whObj.w) {
                     //告诉大家我初始化完成
                     //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                     if (s.divWidth == 0 || s.divHeight == 0) {
@@ -6700,10 +6699,10 @@ var annie;
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
-                    s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
-                    s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
-                    s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                    s._mP1.x = e.targetTouches[0].clientX - s.rootDiv.offsetLeft;
+                    s._mP1.y = e.targetTouches[0].clientY - s.rootDiv.offsetTop;
+                    s._mP2.x = e.targetTouches[1].clientX - s.rootDiv.offsetLeft;
+                    s._mP2.y = e.targetTouches[1].clientY - s.rootDiv.offsetTop;
                     var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     var dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -6782,8 +6781,8 @@ var annie;
                         else {
                             cp = new annie.Point();
                         }
-                        cp.x = (points[o].clientX - points[o].target.offsetLeft) * annie.devicePixelRatio;
-                        cp.y = (points[o].clientY - points[o].target.offsetTop) * annie.devicePixelRatio;
+                        cp.x = (points[o].clientX - s.rootDiv.offsetLeft) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY - s.rootDiv.offsetTop) * annie.devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
@@ -7157,7 +7156,6 @@ var annie;
                 rc.removeEventListener('mousemove', s.mouseEvent, false);
                 rc.removeEventListener('mouseup', s.mouseEvent, false);
             }
-            window.removeEventListener("resize", s._resizeEvent);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);

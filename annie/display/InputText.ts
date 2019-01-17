@@ -82,7 +82,7 @@ namespace annie {
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
-            s.htmlElement.onblur = function () {
+            s.htmlElement.onblur = function (){
                 document.body.scrollTop = 0;
             };
         }

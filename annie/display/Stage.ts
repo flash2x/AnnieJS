@@ -333,7 +333,6 @@ namespace annie {
             Stage.addUpdateObj(s);
         }
 
-        private _resizeEvent: any = null;
         private _touchEvent: annie.TouchEvent;
 
         public render(renderObj: IRender): void {
@@ -451,7 +450,6 @@ namespace annie {
             }
             return {w: vW, h: vH};
         }
-
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -467,7 +465,6 @@ namespace annie {
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
         private mouseEvent: any = null;
-
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this;
@@ -476,10 +473,10 @@ namespace annie {
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX - e.target.offsetLeft;
-                    s._mP1.y = e.targetTouches[0].clientY - e.target.offsetTop;
-                    s._mP2.x = e.targetTouches[1].clientX - e.target.offsetLeft;
-                    s._mP2.y = e.targetTouches[1].clientY - e.target.offsetTop;
+                    s._mP1.x = e.targetTouches[0].clientX - s.rootDiv.offsetLeft;
+                    s._mP1.y = e.targetTouches[0].clientY - s.rootDiv.offsetTop;
+                    s._mP2.x = e.targetTouches[1].clientX - s.rootDiv.offsetLeft;
+                    s._mP2.y = e.targetTouches[1].clientY - s.rootDiv.offsetTop;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -553,8 +550,8 @@ namespace annie {
                         } else {
                             cp = new Point();
                         }
-                        cp.x = (points[o].clientX - points[o].target.offsetLeft) * devicePixelRatio;
-                        cp.y = (points[o].clientY - points[o].target.offsetTop) * devicePixelRatio;
+                        cp.x = (points[o].clientX - s.rootDiv.offsetLeft) * devicePixelRatio;
+                        cp.y = (points[o].clientY - s.rootDiv.offsetTop) * devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
@@ -856,7 +853,7 @@ namespace annie {
         public resize = function (): void {
             let s: Stage = this;
             let whObj = s.getRootDivWH(s.rootDiv);
-            if (s.divHeight != whObj.h || s.divWidth != whObj.w) {
+            if (s.divHeight != whObj.h&&s.divWidth != whObj.w) {
                 //告诉大家我初始化完成
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if (s.divWidth == 0 || s.divHeight == 0) {
@@ -963,7 +960,6 @@ namespace annie {
                 rc.removeEventListener('mousemove', s.mouseEvent, false);
                 rc.removeEventListener('mouseup', s.mouseEvent, false);
             }
-            window.removeEventListener("resize", s._resizeEvent);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);

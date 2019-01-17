@@ -3104,7 +3104,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
-        private _resizeEvent;
         private _touchEvent;
         render(renderObj: IRender): void;
         private _ml;
