@@ -263,9 +263,9 @@
     支持flash2x 管理类
 # Flash2x 版本更新列表
 ## Annie2x 4.1.0(全新更名)
-    新增打包压缩部分fla的资源，只修改单个或少量fla的时尤其有用。
+    新增打包压缩部分fla的资源，只修改单个或少量fla的时尤其有用。第一步 gulp -s sceneName1 sceneName2 ... 第二步 gulp packToOne -s sceneName1 sceneName2 ...
     支持ES6语法的打包压缩
-    支持将打包后的swf后缀名更改成其他的后缀名
+    支持将打包后的swf后缀名更改成其他的后缀名,在package.json更改
     新增html打包压缩
     修复调试模式下vConsole卡顿
     修复输入文本在弹出输入界面后ios下无法还原的bug

@@ -2449,6 +2449,7 @@ declare namespace annie {
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
          * @method play
+         * @param {boolean} isFront true向前播放，false 向后播放。默认向前
          * @public
          * @since 1.0.0
          * @return {void}
@@ -3104,7 +3105,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
-        private _resizeEvent;
         private _touchEvent;
         render(renderObj: IRender): void;
         private _ml;

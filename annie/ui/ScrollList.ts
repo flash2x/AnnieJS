@@ -65,7 +65,7 @@ namespace annieUI {
         constructor(itemClassName: any, itemWidth: number, itemHeight: number, vW: number, vH: number, isVertical: boolean = true, cols: number = 1) {
             super(vW, vH, 0, isVertical);
             let s = this;
-            s._instanceType = "annie.ScrollList";
+            s._instanceType = "annieUI.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
             s._items = [];

@@ -12,22 +12,22 @@ declare namespace annieUI {
      */
     class ScrollPage extends Sprite {
         /**
-         * annie.ScrollPage组件滑动到开始位置事件
+         * annieUI.ScrollPage组件滑动到开始位置事件
          * @event annie.Event.ON_SCROLL_TO_HEAD
          * @since 1.1.0
          */
         /**
-         * annie.ScrollPage组件停止滑动事件
+         * annieUI.ScrollPage组件停止滑动事件
          * @event annie.Event.ON_SCROLL_STOP
          * @since 1.1.0
          */
         /**
-         * annie.ScrollPage组件开始滑动事件
+         * annieUI.ScrollPage组件开始滑动事件
          * @event annie.Event.ON_SCROLL_START
          * @since 1.1.0
          */
         /**
-         * annie.ScrollPage组件滑动到结束位置事件
+         * annieUI.ScrollPage组件滑动到结束位置事件
          * @event annie.Event.ON_SCROLL_TO_END
          * @since 1.1.0
          */
@@ -155,7 +155,7 @@ declare namespace annieUI {
          * @param {number} maxDistance 最大滚动的长度
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
          * @example
-         *      s.sPage=new annie.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
@@ -219,8 +219,8 @@ declare namespace annieUI {
          * @since 1.0.0
          * @public
          * @example
-         *      var circleface = new annie.FacePhoto(),
-         *          rectFace=new annie.FacePhoto();
+         *      var circleface = new annieUI.FacePhoto(),
+         *          rectFace=new annieUI.FacePhoto();
          *          //圆形头像
          *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
          *          circleface.x = 260;
@@ -266,12 +266,12 @@ declare namespace annieUI {
      */
     class SlidePage extends Sprite {
         /**
-         * annie.Slide 组件开始滑动事件
+         * annieUI.Slide 组件开始滑动事件
          * @event annie.Event.ON_SLIDE_START
          * @since 1.1.0
          */
         /**
-         * annie.Slide 组件结束滑动事件
+         * annieUI.Slide 组件结束滑动事件
          * @event annie.Event.ON_SLIDE_END
          * @since 1.1.0
          */
@@ -439,12 +439,12 @@ declare namespace annieUI {
     import Sprite = annie.Sprite;
     class FlipBook extends Sprite {
         /**
-         * annie.FlipBook组件翻页开始事件
+         * annieUI.FlipBook组件翻页开始事件
          * @event annie.Event.ON_FLIP_START
          * @since 1.1.0
          */
         /**
-         * annie.FlipBook组件翻页结束事件
+         * annieUI.FlipBook组件翻页结束事件
          * @event annie.Event.ON_FLIP_STOP
          * @since 1.1.0
          */

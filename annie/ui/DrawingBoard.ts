@@ -98,6 +98,7 @@ namespace annieUI {
         constructor(width: number, height: number, bgColor: any = "") {
             super();
             var s = this;
+            s._instanceType = "annieUI.DrawingBoard";
             var bd = document.createElement("canvas");
             bd.width = width;
             bd.height = height;
