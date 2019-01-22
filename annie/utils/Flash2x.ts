@@ -335,7 +335,6 @@ namespace annie {
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                _progressCallback(100);
                 _completeCallback(info);
             }
             else {

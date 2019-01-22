@@ -3160,7 +3160,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        resize: () => void;
+        resize: (isMustResize?: boolean) => void;
         getBounds(): Rectangle;
         /**
          * 要循环调用 flush 函数对象列表

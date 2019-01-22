@@ -373,13 +373,13 @@ namespace annie {
             let callState = 2;
             let needUpdate = false;
             if (s._flush == 0) {
-                s.resize();
+                s.resize(false);
                 needUpdate = true;
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
-                    s.resize();
+                    s.resize(false);
                 } else {
                     if (s._currentFlush == s._flush) {
                         needUpdate = true;
@@ -858,10 +858,16 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public resize = function (): void {
+        public resize = function (isMustResize:boolean=true): void {
             let s: Stage = this;
-            let whObj = s.getRootDivWH(s.rootDiv);
-            if (s.divHeight != whObj.h&&s.divWidth != whObj.w) {
+            let whObj:any = s.getRootDivWH(s.rootDiv);
+            let isResize=isMustResize;
+            if(!isMustResize){
+                if (s.divHeight!= whObj.h&&s.divWidth != whObj.w) {
+                    isResize=true;
+                }
+            }
+            if (isResize){
                 //告诉大家我初始化完成
                 //判断debug,如果debug等于true并且之前没有加载过则加载debug所需要的js文件
                 if (s.divWidth == 0 || s.divHeight == 0) {
@@ -873,14 +879,16 @@ namespace annie {
                     s.setAlign();
                     s.dispatchEvent("onInitStage");
                 } else {
-                    if (s.autoResize) {
+                    if (s.autoResize||isMustResize) {
                         s._UI.UM = true;
                         s.divHeight = whObj.h;
                         s.divWidth = whObj.w;
                         s.renderObj.reSize();
                         s.setAlign();
                     }
-                    s.dispatchEvent("onResize");
+                    if(!isMustResize) {
+                        s.dispatchEvent("onResize");
+                    }
                 }
             }
         };
