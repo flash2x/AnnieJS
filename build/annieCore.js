@@ -8320,10 +8320,11 @@ var annie;
                 s._req.onreadystatechange = function (event) {
                     if (s._req.readyState === s._req.DONE) {
                         if (s._req.status == 200 || s._req.status == 0) {
-                            var isImage = false;
-                            var e_1 = new annie.Event("onComplete");
+                            //是否异步
+                            var asynchronous = false;
+                            var e = new annie.Event("onComplete");
                             var result = s._req.response;
-                            e_1.data = { type: s.responseType, response: null };
+                            e.data = { type: s.responseType, response: null };
                             var item = void 0;
                             switch (s.responseType) {
                                 case "css":
@@ -8334,30 +8335,7 @@ var annie;
                                 case "image":
                                 case "sound":
                                 case "video":
-                                    var itemObj_1;
-                                    if (s.responseType == "image") {
-                                        isImage = true;
-                                        itemObj_1 = document.createElement("img");
-                                        itemObj_1.onload = function () {
-                                            URL.revokeObjectURL(itemObj_1.src);
-                                            itemObj_1.onload = null;
-                                            s.dispatchEvent(e_1);
-                                        };
-                                        itemObj_1.src = URL.createObjectURL(result);
-                                    }
-                                    else {
-                                        if (s.responseType == "sound") {
-                                            itemObj_1 = document.createElement("AUDIO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                        }
-                                        else if (s.responseType == "video") {
-                                            itemObj_1 = document.createElement("VIDEO");
-                                            itemObj_1.preload = true;
-                                            itemObj_1.src = s.url;
-                                        }
-                                    }
-                                    item = itemObj_1;
+                                    item = s.url;
                                     break;
                                 case "json":
                                     item = JSON.parse(result);
@@ -8374,11 +8352,11 @@ var annie;
                                     item = result;
                                     break;
                             }
-                            e_1.data["response"] = item;
+                            e.data["response"] = item;
                             s.data = null;
                             s.responseType = "";
-                            if (!isImage)
-                                s.dispatchEvent(e_1);
+                            if (!asynchronous)
+                                s.dispatchEvent(e);
                         }
                         else {
                             //服务器返回报错
@@ -8629,6 +8607,7 @@ var annie;
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         var mc = null;
+        mediaResourceCount = 0;
         for (var item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
@@ -8696,47 +8675,77 @@ var annie;
             }
             else {
                 //如果是released版本，则需要更新资源数据
-                if (annie._isReleased) {
+                if (rootObj) {
                     if (loadContent[item] == 2) {
                         //图片
                         var image = new Image();
                         image.src = rootObj[item];
                         rootObj[item] = image;
+                        mediaResourceCount++;
+                        rootObj[item].onload = mediaResourceOnload;
                     }
                     else if (loadContent[item] == 5) {
                         //声音
                         var audio = new Audio();
                         audio.src = rootObj[item];
                         rootObj[item] = audio;
+                        mediaResourceCount++;
+                        rootObj[item].onload = mediaResourceOnload;
                     }
                 }
             }
         }
+        if (mediaResourceCount <= 0) {
+            _checkComplete();
+        }
     }
+    var mediaResourceCount = 0;
+    var mediaResourceOnload = function (e) {
+        e.target.onload = null;
+        mediaResourceCount--;
+        if (mediaResourceCount <= 0) {
+            _checkComplete();
+        }
+    };
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e) {
         var scene = _loadSceneNames[_loadIndex];
         if (!annie._isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
                 var loadContent = e.data.response;
+                annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                     _parseContent(loadContent);
                 }
-                annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                else {
+                    if (e.data.type == "image") {
+                        //图片
+                        var image = new Image();
+                        image.src = loadContent;
+                        mediaResourceCount++;
+                        image.onload = mediaResourceOnload;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
+                    }
+                    else if (e.data.type == "sound") {
+                        //声音
+                        var audio = new Audio();
+                        audio.src = loadContent;
+                        mediaResourceCount++;
+                        audio.onload = mediaResourceOnload;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                    }
+                    else {
+                        _checkComplete();
+                    }
+                }
+            }
+            else {
+                _checkComplete();
             }
         }
         else {
-            if (scene != "f2xShare") {
-                _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
-            }
-            else {
-                _currentConfig.shift();
-                _loadSceneNames.shift();
-                _loadRes();
-                return;
-            }
+            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
         }
-        _checkComplete();
     }
     //检查所有资源是否全加载完成
     function _checkComplete() {

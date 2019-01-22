@@ -73,6 +73,7 @@ namespace annie {
                 s._req.abort();
             }
         }
+
         private _req: XMLHttpRequest = null;
         private headers: Array<string> = [];
 
@@ -110,7 +111,7 @@ namespace annie {
                     s.responseType = "text";
                 } else if (ext == "js") {
                     s.responseType = "js";
-                } else if ("."+ext == annie.suffixName) {
+                } else if ("." + ext == annie.suffixName) {
                     s.responseType = "swf";
                 } else {
                     s.responseType = "unKnow";
@@ -150,12 +151,13 @@ namespace annie {
                 s._req.onreadystatechange = function (event: any): void {
                     if (s._req.readyState === s._req.DONE) {
                         if (s._req.status == 200 || s._req.status == 0) {
-                            let isImage: boolean = false;
+                            //是否异步
+                            let asynchronous: boolean = false;
                             let e: Event = new Event("onComplete");
                             let result = s._req.response;
                             e.data = {type: s.responseType, response: null};
                             let item: any;
-                            switch (s.responseType){
+                            switch (s.responseType) {
                                 case "css":
                                     item = document.createElement("link");
                                     item.rel = "stylesheet";
@@ -164,28 +166,7 @@ namespace annie {
                                 case "image":
                                 case "sound":
                                 case "video":
-                                    let itemObj: any;
-                                    if (s.responseType == "image") {
-                                        isImage = true;
-                                        itemObj = document.createElement("img");
-                                        itemObj.onload = function () {
-                                            URL.revokeObjectURL(itemObj.src);
-                                            itemObj.onload = null;
-                                            s.dispatchEvent(e);
-                                        };
-                                        itemObj.src = URL.createObjectURL(result);
-                                    } else {
-                                        if (s.responseType == "sound") {
-                                            itemObj = document.createElement("AUDIO");
-                                            itemObj.preload = true;
-                                            itemObj.src = s.url;
-                                        } else if (s.responseType == "video") {
-                                            itemObj = document.createElement("VIDEO");
-                                            itemObj.preload = true;
-                                            itemObj.src = s.url;
-                                        }
-                                    }
-                                    item = itemObj;
+                                    item = s.url;
                                     break;
                                 case "json":
                                     item = JSON.parse(result);
@@ -205,7 +186,7 @@ namespace annie {
                             e.data["response"] = item;
                             s.data = null;
                             s.responseType = "";
-                            if (!isImage) s.dispatchEvent(e);
+                            if (!asynchronous) s.dispatchEvent(e);
                         } else {
                             //服务器返回报错
                             s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});

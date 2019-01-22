@@ -144,6 +144,7 @@ namespace annie {
     function _loadConfig(): void {
         _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
     }
+
     //加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function onCFGComplete(e: Event): void {
@@ -164,14 +165,14 @@ namespace annie {
     }
 
     // 加载资源过程中调用的回调方法。
-    function _onRESProgress(e:Event): void {
+    function _onRESProgress(e: Event): void {
         if (_progressCallback) {
-            let ww:any=window;
-            let total=e.data.totalBytes;
-            if(annie.osType=="android"&&ww.swfBytes&&ww.swfBytes[_loadSceneNames[_loadIndex]]){
-                total=ww.swfBytes[_loadSceneNames[_loadIndex]];
+            let ww: any = window;
+            let total = e.data.totalBytes;
+            if (annie.osType == "android" && ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
+                total = ww.swfBytes[_loadSceneNames[_loadIndex]];
             }
-            _progressCallback((_loadPer + e.data.loadedBytes /total * _loadSinglePer) * 100 >> 0);
+            _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
         }
     }
 
@@ -180,6 +181,7 @@ namespace annie {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         let mc: any = null;
+        mediaResourceCount = 0;
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
@@ -243,45 +245,76 @@ namespace annie {
                 }
             } else {
                 //如果是released版本，则需要更新资源数据
-                if (_isReleased) {
+                if(rootObj) {
                     if (loadContent[item] == 2) {
                         //图片
                         var image = new Image();
                         image.src = rootObj[item];
                         rootObj[item] = image;
-                    } else if (loadContent[item] == 5){
+                        mediaResourceCount++;
+                        rootObj[item].onload = mediaResourceOnload;
+                    } else if (loadContent[item] == 5) {
                         //声音
                         var audio = new Audio();
                         audio.src = rootObj[item];
                         rootObj[item] = audio;
+                        mediaResourceCount++;
+                        rootObj[item].onload = mediaResourceOnload;
                     }
                 }
             }
         }
+        if (mediaResourceCount <= 0) {
+            _checkComplete();
+        }
     }
+
+    let mediaResourceCount = 0;
+    let mediaResourceOnload = function (e: any) {
+        e.target.onload=null;
+        mediaResourceCount--;
+        if (mediaResourceCount <= 0) {
+            _checkComplete();
+        }
+    };
+
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
         if (!_isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
                 let loadContent: any = e.data.response;
+                res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                     _parseContent(loadContent);
+                }else{
+                    if (e.data.type =="image") {
+                        //图片
+                        var image = new Image();
+                        image.src = loadContent;
+                        mediaResourceCount++;
+                        image.onload = mediaResourceOnload;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
+                    }
+                    else if (e.data.type =="sound") {
+                        //声音
+                        var audio = new Audio();
+                        audio.src = loadContent;
+                        mediaResourceCount++;
+                        audio.onload = mediaResourceOnload;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id]=audio;
+                    }else{
+                        _checkComplete();
+                    }
                 }
-                res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+            }else{
+                _checkComplete();
             }
         } else {
-            if (scene != "f2xShare") {
-                _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
-            } else {
-                _currentConfig.shift();
-                _loadSceneNames.shift();
-                _loadRes();
-                return;
-            }
+            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
         }
-        _checkComplete();
     }
+
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _loadedLoadRes++;
@@ -397,8 +430,8 @@ namespace annie {
             if (info.w != undefined) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-                if(target._instanceType == "annie.TextField") {
-                    target.y +=2;
+                if (target._instanceType == "annie.TextField") {
+                    target.y += 2;
                 }
             }
             target.alpha = info.al == undefined ? 1 : info.al;
@@ -471,7 +504,7 @@ namespace annie {
         let textDate = res[sceneName]._a2x_con[resName];
         let textObj: any;
         let text = decodeURIComponent(textDate[9]);
-        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/,"");
+        let font = decodeURIComponent(textDate[4]).replace(/\s(Regular|Medium)/, "");
         let size = textDate[5];
         let textAlign = _textAlign[textDate[3]];
         let lineType = _textLineType[textDate[2]];
@@ -526,6 +559,7 @@ namespace annie {
             }
         }
     }
+
     //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
@@ -599,9 +633,9 @@ namespace annie {
      *             error: function (result) {console.log(result)}
      *      })
      */
-    export function ajax(info: any): void{
+    export function ajax(info: any): void {
         let urlLoader = new URLLoader();
-        if(info.isNeedOption) {
+        if (info.isNeedOption) {
             urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
         }
         urlLoader.method = info.type == undefined ? "get" : info.type;
@@ -615,6 +649,7 @@ namespace annie {
         }
         urlLoader.load(info.url);
     }
+
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * jsonp调用方法
@@ -757,7 +792,7 @@ namespace annie {
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
-                if (Array.isArray(classRoot[children[i]])){
+                if (Array.isArray(classRoot[children[i]])) {
                     objType = classRoot[children[i]][0];
                 } else {
                     objType = classRoot[children[i]].t;
@@ -850,5 +885,6 @@ namespace annie {
             }
         }
     }
+
     console.log("https://github.com/flash2x/AnnieJS");
 }
