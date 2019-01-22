@@ -871,7 +871,7 @@ namespace annie {
                     s.divWidth = whObj.w;
                     s.renderObj.reSize();
                     s.setAlign();
-                    s.dispatchEvent(new annie.Event("onInitStage"));
+                    s.dispatchEvent("onInitStage");
                 } else {
                     if (s.autoResize) {
                         s._UI.UM = true;
@@ -880,8 +880,7 @@ namespace annie {
                         s.renderObj.reSize();
                         s.setAlign();
                     }
-                    let event = new Event("onResize");
-                    s.dispatchEvent(event);
+                    s.dispatchEvent("onResize");
                 }
             }
         };

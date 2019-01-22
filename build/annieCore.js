@@ -6450,7 +6450,7 @@ var annie;
                         s.divWidth = whObj.w;
                         s.renderObj.reSize();
                         s.setAlign();
-                        s.dispatchEvent(new annie.Event("onInitStage"));
+                        s.dispatchEvent("onInitStage");
                     }
                     else {
                         if (s.autoResize) {
@@ -6460,8 +6460,7 @@ var annie;
                             s.renderObj.reSize();
                             s.setAlign();
                         }
-                        var event_1 = new annie.Event("onResize");
-                        s.dispatchEvent(event_1);
+                        s.dispatchEvent("onResize");
                     }
                 }
             };
@@ -6758,7 +6757,7 @@ var annie;
                     var points = void 0;
                     var item = s._mouseEventTypes[e.type];
                     var events = void 0;
-                    var event_2;
+                    var event_1;
                     //stageMousePoint
                     var sp = void 0;
                     //localPoint;
@@ -6796,15 +6795,15 @@ var annie;
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
                         if (!s._ml[eLen]) {
-                            event_2 = new annie.MouseEvent(item);
-                            s._ml[eLen] = event_2;
+                            event_1 = new annie.MouseEvent(item);
+                            s._ml[eLen] = event_1;
                         }
                         else {
-                            event_2 = s._ml[eLen];
-                            event_2.type = item;
+                            event_1 = s._ml[eLen];
+                            event_1.type = item;
                         }
-                        events[events.length] = event_2;
-                        s._initMouseEvent(event_2, cp, sp, identifier);
+                        events[events.length] = event_1;
+                        s._initMouseEvent(event_1, cp, sp, identifier);
                         eLen++;
                         //}
                         if (item == "onMouseDown") {
@@ -6817,15 +6816,15 @@ var annie;
                                     //这个地方检查是所有显示对象列表里是否有添加对应的事件
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
                                         if (!s._ml[eLen]) {
-                                            event_2 = new annie.MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event_2;
+                                            event_1 = new annie.MouseEvent("onMouseClick");
+                                            s._ml[eLen] = event_1;
                                         }
                                         else {
-                                            event_2 = s._ml[eLen];
-                                            event_2.type = "onMouseClick";
+                                            event_1 = s._ml[eLen];
+                                            event_1.type = "onMouseClick";
                                         }
-                                        events[events.length] = event_2;
-                                        s._initMouseEvent(event_2, cp, sp, identifier);
+                                        events[events.length] = event_1;
+                                        s._initMouseEvent(event_1, cp, sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -8321,7 +8320,6 @@ var annie;
                     if (s._req.readyState === s._req.DONE) {
                         if (s._req.status == 200 || s._req.status == 0) {
                             //是否异步
-                            var asynchronous = false;
                             var e = new annie.Event("onComplete");
                             var result = s._req.response;
                             e.data = { type: s.responseType, response: null };
@@ -8355,8 +8353,7 @@ var annie;
                             e.data["response"] = item;
                             s.data = null;
                             s.responseType = "";
-                            if (!asynchronous)
-                                s.dispatchEvent(e);
+                            s.dispatchEvent(e);
                         }
                         else {
                             //服务器返回报错
@@ -8690,7 +8687,7 @@ var annie;
                         audio.src = rootObj[item];
                         rootObj[item] = audio;
                         mediaResourceCount++;
-                        rootObj[item].onload = mediaResourceOnload;
+                        rootObj[item].oncanplaythrough = mediaResourceOnload;
                     }
                 }
             }
@@ -8701,7 +8698,12 @@ var annie;
     }
     var mediaResourceCount = 0;
     var mediaResourceOnload = function (e) {
-        e.target.onload = null;
+        if (e.target.nodeName == "IMAGE") {
+            e.target.onload = null;
+        }
+        else {
+            e.target.oncanplaythrough = null;
+        }
         mediaResourceCount--;
         if (mediaResourceCount <= 0) {
             _checkComplete();
@@ -8731,7 +8733,7 @@ var annie;
                         var audio = new Audio();
                         audio.src = loadContent;
                         mediaResourceCount++;
-                        audio.onload = mediaResourceOnload;
+                        audio.oncanplaythrough = mediaResourceOnload;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
                     }
                     else {
@@ -8749,9 +8751,9 @@ var annie;
     }
     //检查所有资源是否全加载完成
     function _checkComplete() {
+        _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        _currentConfig[_loadIndex].shift();
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
         }

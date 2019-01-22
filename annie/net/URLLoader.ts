@@ -152,7 +152,6 @@ namespace annie {
                     if (s._req.readyState === s._req.DONE) {
                         if (s._req.status == 200 || s._req.status == 0) {
                             //是否异步
-                            let asynchronous: boolean = false;
                             let e: Event = new Event("onComplete");
                             let result = s._req.response;
                             e.data = {type: s.responseType, response: null};
@@ -186,7 +185,7 @@ namespace annie {
                             e.data["response"] = item;
                             s.data = null;
                             s.responseType = "";
-                            if (!asynchronous) s.dispatchEvent(e);
+                            s.dispatchEvent(e);
                         } else {
                             //服务器返回报错
                             s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});

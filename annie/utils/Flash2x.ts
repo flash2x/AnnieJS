@@ -259,7 +259,7 @@ namespace annie {
                         audio.src = rootObj[item];
                         rootObj[item] = audio;
                         mediaResourceCount++;
-                        rootObj[item].onload = mediaResourceOnload;
+                        rootObj[item].oncanplaythrough = mediaResourceOnload;
                     }
                 }
             }
@@ -271,7 +271,11 @@ namespace annie {
 
     let mediaResourceCount = 0;
     let mediaResourceOnload = function (e: any) {
-        e.target.onload=null;
+        if(e.target.nodeName=="IMAGE"){
+            e.target.onload=null;
+        }else{
+            e.target.oncanplaythrough=null;
+        }
         mediaResourceCount--;
         if (mediaResourceCount <= 0) {
             _checkComplete();
@@ -301,7 +305,7 @@ namespace annie {
                         var audio = new Audio();
                         audio.src = loadContent;
                         mediaResourceCount++;
-                        audio.onload = mediaResourceOnload;
+                        audio.oncanplaythrough = mediaResourceOnload;
                         annie.res[scene][_currentConfig[_loadIndex][0].id]=audio;
                     }else{
                         _checkComplete();
@@ -314,12 +318,11 @@ namespace annie {
             _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
         }
     }
-
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
+        _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        _currentConfig[_loadIndex].shift();
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
         } else {
