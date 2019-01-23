@@ -872,7 +872,7 @@ namespace annie {
                 s.renderObj.reSize();
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
-            } else if(s.autoResize) {
+            }else if(s.autoResize){
                 let whObj: any = s.getRootDivWH(s.rootDiv);
                 if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
                     s._UI.UM = true;
@@ -887,7 +887,6 @@ namespace annie {
         public getBounds(): Rectangle {
             return this.viewRect;
         }
-
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
