@@ -245,21 +245,19 @@ namespace annie {
                 }
             } else {
                 //如果是released版本，则需要更新资源数据
-                if(rootObj) {
+                if (rootObj) {
                     if (loadContent[item] == 2) {
                         //图片
-                        var image = new Image();
+                        var image: any = new Image();
                         image.src = rootObj[item];
-                        rootObj[item] = image;
                         mediaResourceCount++;
-                        rootObj[item].onload = mediaResourceOnload;
+                        image.onload = mediaResourceOnload;
+                        rootObj[item] = image;
                     } else if (loadContent[item] == 5) {
                         //声音
-                        var audio = new Audio();
+                        var audio: any = new Audio();
                         audio.src = rootObj[item];
                         rootObj[item] = audio;
-                        mediaResourceCount++;
-                        rootObj[item].oncanplaythrough = mediaResourceOnload;
                     }
                 }
             }
@@ -271,10 +269,8 @@ namespace annie {
 
     let mediaResourceCount = 0;
     let mediaResourceOnload = function (e: any) {
-        if(e.target.nodeName=="IMAGE"){
-            e.target.onload=null;
-        }else{
-            e.target.oncanplaythrough=null;
+        if (e.target.nodeName == "IMG") {
+            e.target.onload = null;
         }
         mediaResourceCount--;
         if (mediaResourceCount <= 0) {
@@ -291,33 +287,33 @@ namespace annie {
                 res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                     _parseContent(loadContent);
-                }else{
-                    if (e.data.type =="image") {
+                } else {
+                    if (e.data.type == "image") {
                         //图片
+                        mediaResourceCount++;
                         var image = new Image();
                         image.src = loadContent;
-                        mediaResourceCount++;
                         image.onload = mediaResourceOnload;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
-                    else if (e.data.type =="sound") {
-                        //声音
-                        var audio = new Audio();
-                        audio.src = loadContent;
-                        mediaResourceCount++;
-                        audio.oncanplaythrough = mediaResourceOnload;
-                        annie.res[scene][_currentConfig[_loadIndex][0].id]=audio;
-                    }else{
+                    else {
+                        if (e.data.type == "sound") {
+                            //声音
+                            var audio: any = new Audio();
+                            audio.src = loadContent;
+                            annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                        }
                         _checkComplete();
                     }
                 }
-            }else{
+            } else {
                 _checkComplete();
             }
         } else {
             _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
         }
     }
+
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _currentConfig[_loadIndex].shift();

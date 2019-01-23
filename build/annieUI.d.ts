@@ -222,12 +222,12 @@ declare namespace annieUI {
          *      var circleface = new annieUI.FacePhoto(),
          *          rectFace=new annieUI.FacePhoto();
          *          //圆形头像
-         *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100, 0);
+         *          circleface.init('http://test.annie2x.com/biglong/logo.jpg', 100,100, 0);
          *          circleface.x = 260;
          *          circleface.y = 100;
          *          s.addChild(circleface);
          *          //方形头像
-         *          rectFace.init('http://test.annie2x.com/biglong/logo.jpg', 200, 1);
+         *          rectFace.init('http://test.annie2x.com/biglong/logo.jpg', 200,200, 1);
          *          rectFace.x = 260;
          *          rectFace.y = 400;
          *          s.addChild(rectFace);
@@ -246,7 +246,7 @@ declare namespace annieUI {
          * @param {string} src 头像的地址
          * @param {number} w 指定头像的宽
          * @param {number} h 指定头像的高
-         * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形 1方形 默认是0
+         * @param {number} maskType 遮罩类型，是圆形遮罩还是方形遮罩 0 圆形或椭圆形 1 正方形或者长方形 默认是圆形
          */
         init(src: string, w: number, h: number, maskType?: number): void;
         destroy(): void;

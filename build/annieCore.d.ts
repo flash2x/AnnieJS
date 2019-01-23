@@ -3160,7 +3160,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        resize: (isMustResize?: boolean) => void;
+        resize: () => void;
         getBounds(): Rectangle;
         /**
          * 要循环调用 flush 函数对象列表
@@ -4018,7 +4018,7 @@ declare namespace annie {
     class Tween {
         /**
          * 将target对象从data中指定的属性数值渐变到target属性当前的数值
-         * @method from
+         * @method to
          * @static
          * @param {Object} target
          * @param {number} totalFrame 总时间长度 如果data.useFrame为true 这里就是帧数，如果data.useFrame为false则这里就是时间
