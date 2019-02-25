@@ -336,9 +336,8 @@ namespace annieUI {
          */
         public slideTo(index: number,noTween:boolean=false): void {
             let s: any = this;
-            if (s.isMoving || s.currentPageIndex == index) {
-                return;
-            }
+            if (s.currentPageIndex == index) return;
+            if(s.isMoving)return;
             let lastId = s.currentPageIndex;
             let isNext = s.currentPageIndex < index ? true : false;
             if (isNext) {

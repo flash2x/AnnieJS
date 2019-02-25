@@ -887,9 +887,10 @@ var annieUI;
         SlidePage.prototype.slideTo = function (index, noTween) {
             if (noTween === void 0) { noTween = false; }
             var s = this;
-            if (s.isMoving || s.currentPageIndex == index) {
+            if (s.currentPageIndex == index)
                 return;
-            }
+            if (s.isMoving)
+                return;
             var lastId = s.currentPageIndex;
             var isNext = s.currentPageIndex < index ? true : false;
             if (isNext) {

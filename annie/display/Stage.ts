@@ -874,7 +874,7 @@ namespace annie {
                 s.dispatchEvent("onInitStage");
             }else if(s.autoResize){
                 let whObj: any = s.getRootDivWH(s.rootDiv);
-                if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
+                if (s.divWidth != whObj.w || s.divHeight != whObj.h){
                     s._UI.UM = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
@@ -950,7 +950,6 @@ namespace annie {
                 }
             }
         }
-
         public destroy(): void {
             super.destroy();
             let s = this;
