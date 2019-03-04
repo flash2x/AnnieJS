@@ -175,12 +175,11 @@ namespace annie {
             _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
         }
     }
-
     //解析加载后的json资源数据
-    function _parseContent(loadContent: any, rootObj: any = null) {
+    function _parseContent(loadContent: any) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
-        let mc: any = null;
+        let mc: any;
         mediaResourceCount = 0;
         for (let item in loadContent) {
             mc = loadContent[item];
@@ -243,47 +242,27 @@ namespace annie {
                     }
                     mc.ol = ol;
                 }
-            } else {
-                //如果是released版本，则需要更新资源数据
-                if (rootObj) {
-                    if (loadContent[item] == 2) {
-                        //图片
-                        var image: any = new Image();
-                        image.src = rootObj[item];
-                        mediaResourceCount++;
-                        image.onload = mediaResourceOnload;
-                        rootObj[item] = image;
-                    } else if (loadContent[item] == 5) {
-                        //声音
-                        var audio: any = new Audio();
-                        audio.src = rootObj[item];
-                        rootObj[item] = audio;
-                    }
-                }
             }
         }
         if (mediaResourceCount <= 0) {
             _checkComplete();
         }
     }
-
     let mediaResourceCount = 0;
     let mediaResourceOnload = function (e: any) {
-        if (e.target.nodeName == "IMG") {
-            e.target.onload = null;
-        }
+        URL.revokeObjectURL(e.target.url);
+        e.target.onload = null;
         mediaResourceCount--;
         if (mediaResourceCount <= 0) {
             _checkComplete();
         }
     };
-
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
+        let loadContent: any = e.data.response;
         if (!_isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
-                let loadContent: any = e.data.response;
                 res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                     _parseContent(loadContent);
@@ -292,17 +271,18 @@ namespace annie {
                         //图片
                         mediaResourceCount++;
                         var image = new Image();
-                        image.src = loadContent;
                         image.onload = mediaResourceOnload;
+                        image.src = loadContent;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
-                    else {
-                        if (e.data.type == "sound") {
+                    else if (e.data.type == "sound") {
                             //声音
                             var audio: any = new Audio();
+                            mediaResourceCount++;
+                            audio.onload = mediaResourceOnload;
                             audio.src = loadContent;
                             annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                        }
+                    }else{
                         _checkComplete();
                     }
                 }
@@ -310,7 +290,14 @@ namespace annie {
                 _checkComplete();
             }
         } else {
-            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
+            //解析swf
+            //annie.res[_loadSceneNames[_loadIndex]]
+            let fileReader:FileReader=new FileReader();
+            fileReader.readAsArrayBuffer(loadContent.slice(0,4));
+            fileReader.onload=function(){
+                let data:Uint16Array=new Uint16Array(fileReader.result);
+            };
+            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con);
         }
     }
 

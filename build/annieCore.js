@@ -4067,6 +4067,21 @@ var annie;
             }
             return rect;
         };
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @return {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        Sprite.prototype.getWH = function () {
+            var s = this;
+            var count = s.children.length;
+            for (var i = 0; i < count; i++) {
+                s.children[i].updateMatrix();
+            }
+            return _super.prototype.getWH.call(this);
+        };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             s._updateState = 0;
@@ -8138,7 +8153,6 @@ var annie;
          * @event annie.Event.START
          * @since 1.0.0
          */
-        //
         /**
          * 构造函数
          * @method URLLoader
@@ -8313,50 +8327,31 @@ var annie;
                         }
                     }
                 };
-                s._req.onreadystatechange = function (event) {
-                    if (s._req.readyState === s._req.DONE) {
-                        if (s._req.status == 200 || s._req.status == 0) {
-                            //是否异步
-                            var e = new annie.Event("onComplete");
-                            var result = s._req.response;
-                            e.data = { type: s.responseType, response: null };
-                            var item = void 0;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    item = s.url;
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                case "swf":
-                                    item = "JS_CODE";
-                                    annie.Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
-                            s.dispatchEvent(e);
-                        }
-                        else {
-                            //服务器返回报错
-                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
-                        }
+                s._req.onload = function () {
+                    //是否异步
+                    var e = new annie.Event("onComplete");
+                    var result = s._req.response;
+                    e.data = { type: s.responseType, response: null };
+                    var item;
+                    switch (s.responseType) {
+                        case "css":
+                            item = s.url;
+                            break;
+                        case "json":
+                            item = JSON.parse(result);
+                            break;
+                        case "js":
+                            item = "JS_CODE";
+                            annie.Eval(result);
+                            break;
+                        default:
+                            item = result;
+                            break;
                     }
+                    e.data["response"] = item;
+                    s.data = null;
+                    s.responseType = "";
+                    s.dispatchEvent(e);
                 };
             }
             if (s.data && s.method.toLocaleLowerCase() == "get") {
@@ -8366,11 +8361,11 @@ var annie;
             else {
                 s.url = url;
             }
-            if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
+            if (s.responseType == "swf" || s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
                 s._req.responseType = "blob";
             }
             else {
-                s._req.responseType = "text";
+                s._req.responseType = "";
             }
             s._req.open(s.method, s.url, true);
             if (s.headers.length > 0) {
@@ -8596,11 +8591,10 @@ var annie;
         }
     }
     //解析加载后的json资源数据
-    function _parseContent(loadContent, rootObj) {
-        if (rootObj === void 0) { rootObj = null; }
+    function _parseContent(loadContent) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
-        var mc = null;
+        var mc;
         mediaResourceCount = 0;
         for (var item in loadContent) {
             mc = loadContent[item];
@@ -8667,25 +8661,6 @@ var annie;
                     mc.ol = ol;
                 }
             }
-            else {
-                //如果是released版本，则需要更新资源数据
-                if (rootObj) {
-                    if (loadContent[item] == 2) {
-                        //图片
-                        var image = new Image();
-                        image.src = rootObj[item];
-                        mediaResourceCount++;
-                        image.onload = mediaResourceOnload;
-                        rootObj[item] = image;
-                    }
-                    else if (loadContent[item] == 5) {
-                        //声音
-                        var audio = new Audio();
-                        audio.src = rootObj[item];
-                        rootObj[item] = audio;
-                    }
-                }
-            }
         }
         if (mediaResourceCount <= 0) {
             _checkComplete();
@@ -8693,9 +8668,8 @@ var annie;
     }
     var mediaResourceCount = 0;
     var mediaResourceOnload = function (e) {
-        if (e.target.nodeName == "IMG") {
-            e.target.onload = null;
-        }
+        URL.revokeObjectURL(e.target.url);
+        e.target.onload = null;
         mediaResourceCount--;
         if (mediaResourceCount <= 0) {
             _checkComplete();
@@ -8704,9 +8678,9 @@ var annie;
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e) {
         var scene = _loadSceneNames[_loadIndex];
+        var loadContent = e.data.response;
         if (!annie._isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
-                var loadContent = e.data.response;
                 annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                     _parseContent(loadContent);
@@ -8716,17 +8690,19 @@ var annie;
                         //图片
                         mediaResourceCount++;
                         var image = new Image();
-                        image.src = loadContent;
                         image.onload = mediaResourceOnload;
+                        image.src = loadContent;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
+                    else if (e.data.type == "sound") {
+                        //声音
+                        var audio = new Audio();
+                        mediaResourceCount++;
+                        audio.onload = mediaResourceOnload;
+                        audio.src = loadContent;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                    }
                     else {
-                        if (e.data.type == "sound") {
-                            //声音
-                            var audio = new Audio();
-                            audio.src = loadContent;
-                            annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                        }
                         _checkComplete();
                     }
                 }
@@ -8736,7 +8712,14 @@ var annie;
             }
         }
         else {
-            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
+            //解析swf
+            //annie.res[_loadSceneNames[_loadIndex]]
+            var fileReader_1 = new FileReader();
+            fileReader_1.readAsArrayBuffer(loadContent.slice(0, 4));
+            fileReader_1.onload = function () {
+                var data = new Uint16Array(fileReader_1.result);
+            };
+            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con);
         }
     }
     //检查所有资源是否全加载完成

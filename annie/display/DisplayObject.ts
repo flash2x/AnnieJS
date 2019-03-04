@@ -714,7 +714,7 @@ namespace annie {
          * @since 1.0.9
          */
         public getWH(): { width: number, height: number } {
-            let s = this;
+            let s:any = this;
             s.updateMatrix();
             let dr = s.getDrawRect();
             return {width: dr.width, height: dr.height};

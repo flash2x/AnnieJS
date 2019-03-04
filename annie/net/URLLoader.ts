@@ -49,8 +49,6 @@ namespace annie {
          * @event annie.Event.START
          * @since 1.0.0
          */
-
-        //
         /**
          * 构造函数
          * @method URLLoader
@@ -148,49 +146,31 @@ namespace annie {
                         }
                     }
                 };
-                s._req.onreadystatechange = function (event: any): void {
-                    if (s._req.readyState === s._req.DONE) {
-                        if (s._req.status == 200 || s._req.status == 0) {
-                            //是否异步
-                            let e: Event = new Event("onComplete");
-                            let result = s._req.response;
-                            e.data = {type: s.responseType, response: null};
-                            let item: any;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    item = s.url;
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                case "swf":
-                                    item = "JS_CODE";
-                                    Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
-                            s.dispatchEvent(e);
-                        } else {
-                            //服务器返回报错
-                            s.dispatchEvent("onError", {id: 0, msg: "访问地址不存在"});
-                        }
+                s._req.onload = function (): void {
+                    //是否异步
+                    let e: Event = new Event("onComplete");
+                    let result = s._req.response;
+                    e.data = {type: s.responseType, response: null};
+                    let item: any;
+                    switch (s.responseType) {
+                        case "css":
+                            item = s.url;
+                            break;
+                        case "json":
+                            item = JSON.parse(result);
+                            break;
+                        case "js":
+                            item = "JS_CODE";
+                            Eval(result);
+                            break;
+                        default:
+                            item = result;
+                            break;
                     }
+                    e.data["response"] = item;
+                    s.data = null;
+                    s.responseType = "";
+                    s.dispatchEvent(e);
                 };
             }
             if (s.data && s.method.toLocaleLowerCase() == "get") {
@@ -199,10 +179,10 @@ namespace annie {
             } else {
                 s.url = url;
             }
-            if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
+            if (s.responseType=="swf"||s.responseType=="image"||s.responseType=="sound"||s.responseType=="video") {
                 s._req.responseType = "blob";
             } else {
-                s._req.responseType = "text";
+                s._req.responseType = "";
             }
             s._req.open(s.method, s.url, true);
             if (s.headers.length > 0) {
