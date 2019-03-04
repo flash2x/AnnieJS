@@ -385,7 +385,6 @@ namespace annie {
             }
             return null;
         }
-
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -425,6 +424,21 @@ namespace annie {
                 }
             }
             return rect;
+        }
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @return {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        public getWH(): { width: number, height: number } {
+            let s:any = this;
+            let count=s.children.length;
+            for(let i=0;i<count;i++){
+                s.children[i].updateMatrix();
+            }
+            return super.getWH();
         }
         public render(renderObj: IRender): void {
             let s: any = this;

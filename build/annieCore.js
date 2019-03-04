@@ -4067,6 +4067,21 @@ var annie;
             }
             return rect;
         };
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @return {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        Sprite.prototype.getWH = function () {
+            var s = this;
+            var count = s.children.length;
+            for (var i = 0; i < count; i++) {
+                s.children[i].updateMatrix();
+            }
+            return _super.prototype.getWH.call(this);
+        };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
             s._updateState = 0;
