@@ -2037,6 +2037,17 @@ declare namespace annie {
         removeAllChildren(): void;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         getBounds(): Rectangle;
+        /**
+         * 如果需要同时获取宽和高的值，建议使用此方法更有效率
+         * @method getWH
+         * @public
+         * @return {{width: number, height: number}}
+         * @since 1.0.9
+         */
+        getWH(): {
+            width: number;
+            height: number;
+        };
         render(renderObj: IRender): void;
         protected _updateState: number;
         protected updateEventAndScript(callState: number): void;
