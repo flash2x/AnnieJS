@@ -108,6 +108,7 @@ namespace annie {
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
             _isInited = true;
         }
+        _loadResCount=0;
         _loadPer = 0;
         _loadIndex = 0;
         _totalLoadRes = 0;
@@ -175,12 +176,12 @@ namespace annie {
             _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
         }
     }
+
     //解析加载后的json资源数据
     function _parseContent(loadContent: any) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         let mc: any;
-        mediaResourceCount = 0;
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
@@ -244,19 +245,21 @@ namespace annie {
                 }
             }
         }
-        if (mediaResourceCount <= 0) {
+        _loadResCount--;
+        if(_loadResCount==0){
             _checkComplete();
         }
     }
-    let mediaResourceCount = 0;
+    let _loadResCount = 0;
     let mediaResourceOnload = function (e: any) {
         URL.revokeObjectURL(e.target.url);
         e.target.onload = null;
-        mediaResourceCount--;
-        if (mediaResourceCount <= 0) {
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     };
+
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
@@ -265,24 +268,25 @@ namespace annie {
             if (e.data.type != "js" && e.data.type != "css") {
                 res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
+                    _loadResCount++;
                     _parseContent(loadContent);
                 } else {
                     if (e.data.type == "image") {
                         //图片
-                        mediaResourceCount++;
+                        _loadResCount++;
                         var image = new Image();
                         image.onload = mediaResourceOnload;
-                        image.src = loadContent;
+                        image.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
                     else if (e.data.type == "sound") {
-                            //声音
-                            var audio: any = new Audio();
-                            mediaResourceCount++;
-                            audio.onload = mediaResourceOnload;
-                            audio.src = loadContent;
-                            annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                    }else{
+                        //声音
+                        _loadResCount++;
+                        var audio: any = new Audio();
+                        audio.onload = mediaResourceOnload;
+                        audio.src = URL.createObjectURL(loadContent);
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                    } else {
                         _checkComplete();
                     }
                 }
@@ -291,22 +295,74 @@ namespace annie {
             }
         } else {
             //解析swf
-            //annie.res[_loadSceneNames[_loadIndex]]
-            let fileReader:FileReader=new FileReader();
-            fileReader.readAsArrayBuffer(loadContent.slice(0,4));
-            fileReader.onload=function(){
-                let data:Uint16Array=new Uint16Array(fileReader.result);
+            let fileReader: FileReader = new FileReader();
+            let state = 0;
+            let lastIndex = 0;
+            let currIndex = 1;
+            let JSONData: any;
+            fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size));
+            fileReader.onload = function () {
+                if (state == 0) {
+                    //获取JSON有多少字节
+                    state++;
+                    lastIndex = currIndex;
+                    currIndex += parseInt(fileReader.result);
+                    fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size - lastIndex));
+                } else if (state == 1) {
+                    //获取JSON具体字节数
+                    state++;
+                    lastIndex = currIndex;
+                    currIndex += parseInt(fileReader.result);
+                    fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size - lastIndex));
+                } else if (state == 2) {
+                    state++;
+                    lastIndex = 0;
+                    currIndex = 0;
+                    //解析JSON数据
+                    JSONData = JSON.parse(fileReader.result);
+                    lastIndex = currIndex;
+                    currIndex += JSONData[0].src;
+                    _loadResCount=JSONData.length-1;
+                    fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                } else if (state == 3) {
+                    state++;
+                    Eval(fileReader.result);
+                    //解析JSON数据
+                    for (let i = 1; i < JSONData.length; i++) {
+                        lastIndex = currIndex;
+                        currIndex += JSONData[i].src;
+                       if (JSONData[i].type == "image") {
+                            var image = new Image();
+                            image.onload = mediaResourceOnload;
+                            image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
+                            annie.res[scene][JSONData[i].id] = image;
+                        } else if (JSONData[i].type == "sound") {
+                            var audio: any = new Audio();
+                            audio.onload = mediaResourceOnload;
+                            audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
+                            annie.res[scene][JSONData[i].id] = audio;
+                        } else if (JSONData[i].type == "json") {
+                            if (JSONData[i].id == "_a2x_con") {
+                                fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                            }
+                        }
+                    }
+                } else if (state == 4) {
+                    state++;
+                    annie.res[scene]["_a2x_con"] = JSON.parse(fileReader.result);
+                    _parseContent(annie.res[scene]["_a2x_con"]);
+                }
             };
-            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con);
         }
     }
 
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
+        if(!_isReleased)
         _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (_currentConfig[_loadIndex].length > 0) {
+        if (!_isReleased&&_currentConfig[_loadIndex].length > 0) {
             _loadRes();
         } else {
             res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
@@ -870,6 +926,5 @@ namespace annie {
             }
         }
     }
-
     console.log("https://github.com/flash2x/AnnieJS");
 }

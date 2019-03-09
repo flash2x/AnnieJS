@@ -91,7 +91,13 @@ namespace annie {
                 let urlSplit = url.split(".");
                 let extStr = urlSplit[urlSplit.length - 1];
                 let ext = extStr.split("?")[0].toLocaleLowerCase();
-                if (ext == "mp3" || ext == "ogg" || ext == "wav") {
+                if ("." + ext == annie.suffixName) {
+                    if(annie._isReleased) {
+                        s.responseType = "swf";
+                    }else{
+                        s.responseType = "js";
+                    }
+                }else if (ext == "mp3" || ext == "ogg" || ext == "wav") {
                     s.responseType = "sound";
                 } else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
                     s.responseType = "image";
@@ -109,8 +115,6 @@ namespace annie {
                     s.responseType = "text";
                 } else if (ext == "js") {
                     s.responseType = "js";
-                } else if ("." + ext == annie.suffixName) {
-                    s.responseType = "swf";
                 } else {
                     s.responseType = "unKnow";
                 }

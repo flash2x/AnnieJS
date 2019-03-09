@@ -8259,7 +8259,15 @@ var annie;
                 var urlSplit = url.split(".");
                 var extStr = urlSplit[urlSplit.length - 1];
                 var ext = extStr.split("?")[0].toLocaleLowerCase();
-                if (ext == "mp3" || ext == "ogg" || ext == "wav") {
+                if ("." + ext == annie.suffixName) {
+                    if (annie._isReleased) {
+                        s.responseType = "swf";
+                    }
+                    else {
+                        s.responseType = "js";
+                    }
+                }
+                else if (ext == "mp3" || ext == "ogg" || ext == "wav") {
                     s.responseType = "sound";
                 }
                 else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
@@ -8285,9 +8293,6 @@ var annie;
                 }
                 else if (ext == "js") {
                     s.responseType = "js";
-                }
-                else if ("." + ext == annie.suffixName) {
-                    s.responseType = "swf";
                 }
                 else {
                     s.responseType = "unKnow";
@@ -8525,6 +8530,7 @@ var annie;
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
             _isInited = true;
         }
+        _loadResCount = 0;
         _loadPer = 0;
         _loadIndex = 0;
         _totalLoadRes = 0;
@@ -8595,7 +8601,6 @@ var annie;
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         var mc;
-        mediaResourceCount = 0;
         for (var item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
@@ -8662,16 +8667,17 @@ var annie;
                 }
             }
         }
-        if (mediaResourceCount <= 0) {
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     }
-    var mediaResourceCount = 0;
+    var _loadResCount = 0;
     var mediaResourceOnload = function (e) {
         URL.revokeObjectURL(e.target.url);
         e.target.onload = null;
-        mediaResourceCount--;
-        if (mediaResourceCount <= 0) {
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     };
@@ -8683,23 +8689,24 @@ var annie;
             if (e.data.type != "js" && e.data.type != "css") {
                 annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
+                    _loadResCount++;
                     _parseContent(loadContent);
                 }
                 else {
                     if (e.data.type == "image") {
                         //图片
-                        mediaResourceCount++;
+                        _loadResCount++;
                         var image = new Image();
                         image.onload = mediaResourceOnload;
-                        image.src = loadContent;
+                        image.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
                     else if (e.data.type == "sound") {
                         //声音
+                        _loadResCount++;
                         var audio = new Audio();
-                        mediaResourceCount++;
                         audio.onload = mediaResourceOnload;
-                        audio.src = loadContent;
+                        audio.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
                     }
                     else {
@@ -8713,21 +8720,79 @@ var annie;
         }
         else {
             //解析swf
-            //annie.res[_loadSceneNames[_loadIndex]]
             var fileReader_1 = new FileReader();
-            fileReader_1.readAsArrayBuffer(loadContent.slice(0, 4));
+            var state_1 = 0;
+            var lastIndex_1 = 0;
+            var currIndex_1 = 1;
+            var JSONData_1;
+            fileReader_1.readAsText(loadContent.slice(loadContent.size - currIndex_1, loadContent.size));
             fileReader_1.onload = function () {
-                var data = new Uint16Array(fileReader_1.result);
+                if (state_1 == 0) {
+                    //获取JSON有多少字节
+                    state_1++;
+                    lastIndex_1 = currIndex_1;
+                    currIndex_1 += parseInt(fileReader_1.result);
+                    fileReader_1.readAsText(loadContent.slice(loadContent.size - currIndex_1, loadContent.size - lastIndex_1));
+                }
+                else if (state_1 == 1) {
+                    //获取JSON具体字节数
+                    state_1++;
+                    lastIndex_1 = currIndex_1;
+                    currIndex_1 += parseInt(fileReader_1.result);
+                    fileReader_1.readAsText(loadContent.slice(loadContent.size - currIndex_1, loadContent.size - lastIndex_1));
+                }
+                else if (state_1 == 2) {
+                    state_1++;
+                    lastIndex_1 = 0;
+                    currIndex_1 = 0;
+                    //解析JSON数据
+                    JSONData_1 = JSON.parse(fileReader_1.result);
+                    lastIndex_1 = currIndex_1;
+                    currIndex_1 += JSONData_1[0].src;
+                    _loadResCount = JSONData_1.length - 1;
+                    fileReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                }
+                else if (state_1 == 3) {
+                    state_1++;
+                    annie.Eval(fileReader_1.result);
+                    //解析JSON数据
+                    for (var i = 1; i < JSONData_1.length; i++) {
+                        lastIndex_1 = currIndex_1;
+                        currIndex_1 += JSONData_1[i].src;
+                        if (JSONData_1[i].type == "image") {
+                            var image = new Image();
+                            image.onload = mediaResourceOnload;
+                            image.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
+                            annie.res[scene][JSONData_1[i].id] = image;
+                        }
+                        else if (JSONData_1[i].type == "sound") {
+                            var audio = new Audio();
+                            audio.onload = mediaResourceOnload;
+                            audio.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
+                            annie.res[scene][JSONData_1[i].id] = audio;
+                        }
+                        else if (JSONData_1[i].type == "json") {
+                            if (JSONData_1[i].id == "_a2x_con") {
+                                fileReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                            }
+                        }
+                    }
+                }
+                else if (state_1 == 4) {
+                    state_1++;
+                    annie.res[scene]["_a2x_con"] = JSON.parse(fileReader_1.result);
+                    _parseContent(annie.res[scene]["_a2x_con"]);
+                }
             };
-            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con);
         }
     }
     //检查所有资源是否全加载完成
     function _checkComplete() {
-        _currentConfig[_loadIndex].shift();
+        if (!annie._isReleased)
+            _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (_currentConfig[_loadIndex].length > 0) {
+        if (!annie._isReleased && _currentConfig[_loadIndex].length > 0) {
             _loadRes();
         }
         else {
