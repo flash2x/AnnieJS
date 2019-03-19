@@ -108,6 +108,7 @@ namespace annie {
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
             _isInited = true;
         }
+        _loadResCount = 0;
         _loadPer = 0;
         _loadIndex = 0;
         _totalLoadRes = 0;
@@ -177,11 +178,10 @@ namespace annie {
     }
 
     //解析加载后的json资源数据
-    function _parseContent(loadContent: any, rootObj: any = null) {
+    function _parseContent(loadContent: any) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
-        let mc: any = null;
-        mediaResourceCount = 0;
+        let mc: any;
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
@@ -243,37 +243,20 @@ namespace annie {
                     }
                     mc.ol = ol;
                 }
-            } else {
-                //如果是released版本，则需要更新资源数据
-                if (rootObj) {
-                    if (loadContent[item] == 2) {
-                        //图片
-                        var image: any = new Image();
-                        image.src = rootObj[item];
-                        mediaResourceCount++;
-                        image.onload = mediaResourceOnload;
-                        rootObj[item] = image;
-                    } else if (loadContent[item] == 5) {
-                        //声音
-                        var audio: any = new Audio();
-                        audio.src = rootObj[item];
-                        rootObj[item] = audio;
-                    }
-                }
             }
         }
-        if (mediaResourceCount <= 0) {
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     }
 
-    let mediaResourceCount = 0;
+    let _loadResCount = 0;
     let mediaResourceOnload = function (e: any) {
-        if (e.target.nodeName == "IMG") {
-            e.target.onload = null;
-        }
-        mediaResourceCount--;
-        if (mediaResourceCount <= 0) {
+        URL.revokeObjectURL(e.target.url);
+        e.target.onload = null;
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     };
@@ -281,28 +264,29 @@ namespace annie {
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
+        let loadContent: any = e.data.response;
         if (!_isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
-                let loadContent: any = e.data.response;
                 res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
+                    _loadResCount++;
                     _parseContent(loadContent);
                 } else {
                     if (e.data.type == "image") {
                         //图片
-                        mediaResourceCount++;
+                        _loadResCount++;
                         var image = new Image();
-                        image.src = loadContent;
                         image.onload = mediaResourceOnload;
+                        image.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
-                    else {
-                        if (e.data.type == "sound") {
-                            //声音
-                            var audio: any = new Audio();
-                            audio.src = loadContent;
-                            annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                        }
+                    else if (e.data.type == "sound") {
+                        //声音
+                        var audio: any = new Audio();
+                        audio.src = URL.createObjectURL(loadContent);
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                        _checkComplete();
+                    } else {
                         _checkComplete();
                     }
                 }
@@ -310,16 +294,82 @@ namespace annie {
                 _checkComplete();
             }
         } else {
-            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
+            //解析swf
+            let fileReader: FileReader = new FileReader();
+            let state = 0;
+            let lastIndex = 0;
+            let currIndex = 1;
+            let JSONData: any;
+            fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size));
+            fileReader.onload = function () {
+                if (state == 0) {
+                    //获取JSON有多少字节
+                    state++;
+                    lastIndex = currIndex;
+                    currIndex += parseInt(fileReader.result);
+                    fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size - lastIndex));
+                } else if (state == 1) {
+                    //获取JSON具体字节数
+                    state++;
+                    lastIndex = currIndex;
+                    currIndex += parseInt(fileReader.result);
+                    fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size - lastIndex));
+                } else if (state == 2) {
+                    state++;
+                    lastIndex = 0;
+                    currIndex = 0;
+                    //解析JSON数据
+                    JSONData = JSON.parse(fileReader.result);
+                    lastIndex = currIndex;
+                    currIndex += JSONData[0].src;
+                    _loadResCount = JSONData.length - 1;
+                    fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                } else if (state == 3) {
+                    state++;
+                    Eval(fileReader.result);
+                    //解析JSON数据
+                    for (let i = 1; i < JSONData.length; i++) {
+                        lastIndex = currIndex;
+                        currIndex += JSONData[i].src;
+                        if (JSONData[i].type == "image") {
+                            let image = new Image();
+                            image.onload = mediaResourceOnload;
+                            image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
+                            annie.res[scene][JSONData[i].id] = image;
+                        } else if (JSONData[i].type == "sound") {
+                            let audio: any = new Audio();
+                            annie.res[scene][JSONData[i].id] = audio;
+                            let audioReader: any = new FileReader();
+                            audioReader.onload = function () {
+                                audio.src = audioReader.result;
+                                _loadResCount--;
+                                if (_loadResCount == 0){
+                                    _checkComplete();
+                                }
+                            };
+                            audioReader.readAsDataURL(loadContent.slice(lastIndex, currIndex,"audio/mp3"));
+                        } else if (JSONData[i].type == "json") {
+                            if (JSONData[i].id == "_a2x_con") {
+                                fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                            }
+                        }
+                    }
+                } else if (state == 4) {
+                    state++;
+                    annie.res[scene]["_a2x_con"] = JSON.parse(fileReader.result);
+                    _parseContent(annie.res[scene]["_a2x_con"]);
+                }
+            };
         }
     }
 
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
-        _currentConfig[_loadIndex].shift();
+        if (!_isReleased)
+            _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (_currentConfig[_loadIndex].length > 0) {
+        if (!_isReleased && _currentConfig[_loadIndex].length > 0) {
             _loadRes();
         } else {
             res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;

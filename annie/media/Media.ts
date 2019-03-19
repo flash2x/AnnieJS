@@ -3,7 +3,6 @@
  */
 namespace annie {
     declare let WeixinJSBridge: any;
-
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 抽象类 一般不直接使用
@@ -167,7 +166,6 @@ namespace annie {
                 s.isPlaying = true;
             }
         }
-
         /**
          * 设置或者获取音量 从0-1
          * @since 1.1.0

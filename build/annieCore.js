@@ -6358,9 +6358,9 @@ var annie;
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default true
+             * @default false
              */
-            this.autoResize = true;
+            this.autoResize = false;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -8153,7 +8153,6 @@ var annie;
          * @event annie.Event.START
          * @since 1.0.0
          */
-        //
         /**
          * 构造函数
          * @method URLLoader
@@ -8260,7 +8259,15 @@ var annie;
                 var urlSplit = url.split(".");
                 var extStr = urlSplit[urlSplit.length - 1];
                 var ext = extStr.split("?")[0].toLocaleLowerCase();
-                if (ext == "mp3" || ext == "ogg" || ext == "wav") {
+                if ("." + ext == annie.suffixName) {
+                    if (annie._isReleased) {
+                        s.responseType = "swf";
+                    }
+                    else {
+                        s.responseType = "js";
+                    }
+                }
+                else if (ext == "mp3" || ext == "ogg" || ext == "wav") {
                     s.responseType = "sound";
                 }
                 else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
@@ -8286,9 +8293,6 @@ var annie;
                 }
                 else if (ext == "js") {
                     s.responseType = "js";
-                }
-                else if ("." + ext == annie.suffixName) {
-                    s.responseType = "swf";
                 }
                 else {
                     s.responseType = "unKnow";
@@ -8328,50 +8332,32 @@ var annie;
                         }
                     }
                 };
-                s._req.onreadystatechange = function (event) {
-                    if (s._req.readyState === s._req.DONE) {
-                        if (s._req.status == 200 || s._req.status == 0) {
-                            //是否异步
-                            var e = new annie.Event("onComplete");
-                            var result = s._req.response;
-                            e.data = { type: s.responseType, response: null };
-                            var item = void 0;
-                            switch (s.responseType) {
-                                case "css":
-                                    item = document.createElement("link");
-                                    item.rel = "stylesheet";
-                                    item.href = s.url;
-                                    break;
-                                case "image":
-                                case "sound":
-                                case "video":
-                                    item = s.url;
-                                    break;
-                                case "json":
-                                    item = JSON.parse(result);
-                                    break;
-                                case "js":
-                                case "swf":
-                                    item = "JS_CODE";
-                                    annie.Eval(result);
-                                    break;
-                                case "text":
-                                case "unKnow":
-                                case "xml":
-                                default:
-                                    item = result;
-                                    break;
-                            }
-                            e.data["response"] = item;
-                            s.data = null;
-                            s.responseType = "";
-                            s.dispatchEvent(e);
-                        }
-                        else {
-                            //服务器返回报错
-                            s.dispatchEvent("onError", { id: 0, msg: "访问地址不存在" });
-                        }
+                s._req.onload = function () {
+                    //是否异步
+                    var e = new annie.Event("onComplete");
+                    var result = s._req.response;
+                    e.data = { type: s.responseType, response: null };
+                    var item;
+                    switch (s.responseType) {
+                        case "css":
+                        case "video":
+                            item = s.url;
+                            break;
+                        case "json":
+                            item = JSON.parse(result);
+                            break;
+                        case "js":
+                            item = "JS_CODE";
+                            annie.Eval(result);
+                            break;
+                        default:
+                            item = result;
+                            break;
                     }
+                    e.data["response"] = item;
+                    s.data = null;
+                    s.responseType = "";
+                    s.dispatchEvent(e);
                 };
             }
             if (s.data && s.method.toLocaleLowerCase() == "get") {
@@ -8381,11 +8367,11 @@ var annie;
             else {
                 s.url = url;
             }
-            if (s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
+            if (s.responseType == "swf" || s.responseType == "image" || s.responseType == "sound") {
                 s._req.responseType = "blob";
             }
             else {
-                s._req.responseType = "text";
+                s._req.responseType = "";
             }
             s._req.open(s.method, s.url, true);
             if (s.headers.length > 0) {
@@ -8545,6 +8531,7 @@ var annie;
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
             _isInited = true;
         }
+        _loadResCount = 0;
         _loadPer = 0;
         _loadIndex = 0;
         _totalLoadRes = 0;
@@ -8611,12 +8598,10 @@ var annie;
         }
     }
     //解析加载后的json资源数据
-    function _parseContent(loadContent, rootObj) {
-        if (rootObj === void 0) { rootObj = null; }
+    function _parseContent(loadContent) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
-        var mc = null;
-        mediaResourceCount = 0;
+        var mc;
         for (var item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
@@ -8682,66 +8667,49 @@ var annie;
                     mc.ol = ol;
                 }
             }
-            else {
-                //如果是released版本，则需要更新资源数据
-                if (rootObj) {
-                    if (loadContent[item] == 2) {
-                        //图片
-                        var image = new Image();
-                        image.src = rootObj[item];
-                        mediaResourceCount++;
-                        image.onload = mediaResourceOnload;
-                        rootObj[item] = image;
-                    }
-                    else if (loadContent[item] == 5) {
-                        //声音
-                        var audio = new Audio();
-                        audio.src = rootObj[item];
-                        rootObj[item] = audio;
-                    }
-                }
-            }
         }
-        if (mediaResourceCount <= 0) {
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     }
-    var mediaResourceCount = 0;
+    var _loadResCount = 0;
     var mediaResourceOnload = function (e) {
-        if (e.target.nodeName == "IMG") {
-            e.target.onload = null;
-        }
-        mediaResourceCount--;
-        if (mediaResourceCount <= 0) {
+        URL.revokeObjectURL(e.target.url);
+        e.target.onload = null;
+        _loadResCount--;
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     };
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e) {
         var scene = _loadSceneNames[_loadIndex];
+        var loadContent = e.data.response;
         if (!annie._isReleased) {
             if (e.data.type != "js" && e.data.type != "css") {
-                var loadContent = e.data.response;
                 annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
+                    _loadResCount++;
                     _parseContent(loadContent);
                 }
                 else {
                     if (e.data.type == "image") {
                         //图片
-                        mediaResourceCount++;
+                        _loadResCount++;
                         var image = new Image();
-                        image.src = loadContent;
                         image.onload = mediaResourceOnload;
+                        image.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
+                    else if (e.data.type == "sound") {
+                        //声音
+                        var audio = new Audio();
+                        audio.src = URL.createObjectURL(loadContent);
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                        _checkComplete();
+                    }
                     else {
-                        if (e.data.type == "sound") {
-                            //声音
-                            var audio = new Audio();
-                            audio.src = loadContent;
-                            annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                        }
                         _checkComplete();
                     }
                 }
@@ -8751,15 +8719,90 @@ var annie;
             }
         }
         else {
-            _parseContent(annie.res[_loadSceneNames[_loadIndex]]._a2x_con, annie.res[_loadSceneNames[_loadIndex]]);
+            //解析swf
+            var fileReader_1 = new FileReader();
+            var state_1 = 0;
+            var lastIndex_1 = 0;
+            var currIndex_1 = 1;
+            var JSONData_1;
+            fileReader_1.readAsText(loadContent.slice(loadContent.size - currIndex_1, loadContent.size));
+            fileReader_1.onload = function () {
+                if (state_1 == 0) {
+                    //获取JSON有多少字节
+                    state_1++;
+                    lastIndex_1 = currIndex_1;
+                    currIndex_1 += parseInt(fileReader_1.result);
+                    fileReader_1.readAsText(loadContent.slice(loadContent.size - currIndex_1, loadContent.size - lastIndex_1));
+                }
+                else if (state_1 == 1) {
+                    //获取JSON具体字节数
+                    state_1++;
+                    lastIndex_1 = currIndex_1;
+                    currIndex_1 += parseInt(fileReader_1.result);
+                    fileReader_1.readAsText(loadContent.slice(loadContent.size - currIndex_1, loadContent.size - lastIndex_1));
+                }
+                else if (state_1 == 2) {
+                    state_1++;
+                    lastIndex_1 = 0;
+                    currIndex_1 = 0;
+                    //解析JSON数据
+                    JSONData_1 = JSON.parse(fileReader_1.result);
+                    lastIndex_1 = currIndex_1;
+                    currIndex_1 += JSONData_1[0].src;
+                    _loadResCount = JSONData_1.length - 1;
+                    fileReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                }
+                else if (state_1 == 3) {
+                    state_1++;
+                    annie.Eval(fileReader_1.result);
+                    //解析JSON数据
+                    var _loop_1 = function(i) {
+                        lastIndex_1 = currIndex_1;
+                        currIndex_1 += JSONData_1[i].src;
+                        if (JSONData_1[i].type == "image") {
+                            var image_1 = new Image();
+                            image_1.onload = mediaResourceOnload;
+                            image_1.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
+                            annie.res[scene][JSONData_1[i].id] = image_1;
+                        }
+                        else if (JSONData_1[i].type == "sound") {
+                            var audio_1 = new Audio();
+                            annie.res[scene][JSONData_1[i].id] = audio_1;
+                            var audioReader_1 = new FileReader();
+                            audioReader_1.onload = function () {
+                                audio_1.src = audioReader_1.result;
+                                _loadResCount--;
+                                if (_loadResCount == 0) {
+                                    _checkComplete();
+                                }
+                            };
+                            audioReader_1.readAsDataURL(loadContent.slice(lastIndex_1, currIndex_1, "audio/mp3"));
+                        }
+                        else if (JSONData_1[i].type == "json") {
+                            if (JSONData_1[i].id == "_a2x_con") {
+                                fileReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                            }
+                        }
+                    };
+                    for (var i = 1; i < JSONData_1.length; i++) {
+                        _loop_1(i);
+                    }
+                }
+                else if (state_1 == 4) {
+                    state_1++;
+                    annie.res[scene]["_a2x_con"] = JSON.parse(fileReader_1.result);
+                    _parseContent(annie.res[scene]["_a2x_con"]);
+                }
+            };
         }
     }
     //检查所有资源是否全加载完成
     function _checkComplete() {
-        _currentConfig[_loadIndex].shift();
+        if (!annie._isReleased)
+            _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (_currentConfig[_loadIndex].length > 0) {
+        if (!annie._isReleased && _currentConfig[_loadIndex].length > 0) {
             _loadRes();
         }
         else {

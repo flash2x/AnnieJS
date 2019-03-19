@@ -84,11 +84,32 @@ namespace annieUI {
          * @default 0
          */
         public currentPageIndex: number = 0;
-        //上下的回弹率
+        /**
+         * 上下的回弹率 默认0.3
+         * @property reBound
+         * @type {number}
+         * @public
+         * @since 1.0.3
+         * @default 0.3
+         */
         public reBound: number = 0.3;
-        //页面是否滑动跟随
+        /**
+         * 页面是否滑动跟随，默认false
+         * @property isPageFollowToMove
+         * @type {boolean}
+         * @public
+         * @since 1.0.3
+         * @default false
+         */
         public isPageFollowToMove: boolean = false;
-        //页面的跟率
+        /**
+         * 页面的跟随缓动系数率，默认0.7
+         * @property reBound
+         * @type {number}
+         * @public
+         * @since 1.0.3
+         * @default 0.7
+         */
         public follow: number = 0.7;
         /**
          * 页面是否移动
@@ -114,12 +135,18 @@ namespace annieUI {
          */
         protected viewHeight: number = 0;
         /**
-         * 页面列表
+         * 页面对象列表
          * @property pageList
          * @type {Array}
          * @public
          */
         public pageList: Array<any> = [];
+        /**
+         * 页面对象的类列表
+         * @property pageList
+         * @type {Array}
+         * @public
+         */
         public pageClassList: Array<any> = [];
         private lastX: number = 0;
         private lastY: number = 0;
@@ -173,8 +200,8 @@ namespace annieUI {
             s.addChild(s.maskObj);
             s.addChild(s.view);
             s.view.mask = s.maskObj;
-            s.maskObj["_isUseToMask"]=0;
-            s.maskObj.alpha=0;
+            s.maskObj["_isUseToMask"] = 0;
+            s.maskObj.alpha = 0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
@@ -230,7 +257,7 @@ namespace annieUI {
                     lts = s.movingX;
                     s._moveDis = s.lastX - e.localX;
                 }
-                if(Math.abs(ts)>Math.abs(fts)) {
+                if (Math.abs(ts) > Math.abs(fts)) {
                     if (!s.isPageFollowToMove) {
                         if (Math.abs(ts) - Math.abs(lts) < -1) {
                             s._isBreak = true;
@@ -238,7 +265,7 @@ namespace annieUI {
                     }
                     if (ts > 0) {
                         if (s.currentPageIndex == 0) {
-                            s.view[s.paramXY] -= s._moveDis  * s.reBound;
+                            s.view[s.paramXY] -= s._moveDis * s.reBound;
                         } else {
                             if (s.isPageFollowToMove) {
                                 s.view[s.paramXY] -= s._moveDis * s.follow;
@@ -254,7 +281,7 @@ namespace annieUI {
                         }
                     } else if (ts < 0) {
                         if (s.currentPageIndex == s.listLen - 1) {
-                            s.view[s.paramXY]  -= s._moveDis * s.reBound;
+                            s.view[s.paramXY] -= s._moveDis * s.reBound;
                         } else {
                             if (s.isPageFollowToMove) {
                                 s.view[s.paramXY] -= s._moveDis * s.follow;
@@ -269,12 +296,12 @@ namespace annieUI {
                             }
                         }
                     }
-                }else{
+                } else {
                     s.movingX = s.movingY = 0;
                 }
                 s.lastX = e.localX;
                 s.lastY = e.localY;
-            }else{
+            } else {
                 if (!s.isMouseDown) return;
                 let ts: number = s.movingY;
                 let fts: number = s.movingX;
@@ -334,10 +361,10 @@ namespace annieUI {
          * @param {number} index 要跳到页的索引
          * @param {boolean} noTween 是否需要动画过渡，如果不需要设置成true
          */
-        public slideTo(index: number,noTween:boolean=false): void {
+        public slideTo(index: number, noTween: boolean = false): void {
             let s: any = this;
             if (s.currentPageIndex == index) return;
-            if(s.isMoving)return;
+            if (s.isMoving) return;
             let lastId = s.currentPageIndex;
             let isNext = s.currentPageIndex < index ? true : false;
             if (isNext) {
@@ -368,12 +395,12 @@ namespace annieUI {
             if (s.pageList[s.currentPageIndex] != s.view) {
                 s.view.addChild(s.pageList[s.currentPageIndex]);
             }
-            if(noTween){
+            if (noTween) {
                 s.dispatchEvent("onSlideStart", {currentPage: s.currentPageIndex, lastPage: lastId});
-                s.view[s.paramXY]=-s.currentPageIndex * s.distance;
+                s.view[s.paramXY] = -s.currentPageIndex * s.distance;
                 s.view.removeChild(s.pageList[lastId]);
                 s.dispatchEvent("onSlideEnd");
-            }else {
+            } else {
                 s.view.mouseEnable = false;
                 s.isMoving = true;
                 let tweenData: any = {};
@@ -409,10 +436,11 @@ namespace annieUI {
             }
             s.listLen = s.pageClassList.length;
         }
+
         public destroy(): void {
-            let s=this;
-            s.pageList=null;
-            s.pageClassList=null;
+            let s = this;
+            s.pageList = null;
+            s.pageClassList = null;
             super.destroy();
         }
     }

@@ -61,6 +61,8 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.0.0 版本
+    更新加载库以支持打包成二进制文件包，提升加载和渲染性能
 ## AnnieJS 2.1.0 版本
     修复打包后初始化获取fla内部资源的annie.Bitmap尺寸为0的bug
     修复打包后初矢量位图填充效果为黑色的bug
@@ -264,6 +266,8 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Annie2x 4.2.0
+    更新打包后的文件为二进制流，提高加载和渲染性能。旧项目只需要将新的gulpfile.js和package.json替换后用新的工具发布即可。
 ## Annie2x 4.1.10
     新增打包压缩部分fla的资源，只修改单个或少量fla的时尤其有用。第一步 gulp -s sceneName1 sceneName2 ... 第二步 gulp packToOne -s sceneName1 sceneName2 ...
     支持ES6语法的打包压缩
