@@ -108,7 +108,7 @@ namespace annie {
             _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
             _isInited = true;
         }
-        _loadResCount=0;
+        _loadResCount = 0;
         _loadPer = 0;
         _loadIndex = 0;
         _totalLoadRes = 0;
@@ -246,10 +246,11 @@ namespace annie {
             }
         }
         _loadResCount--;
-        if(_loadResCount==0){
+        if (_loadResCount == 0) {
             _checkComplete();
         }
     }
+
     let _loadResCount = 0;
     let mediaResourceOnload = function (e: any) {
         URL.revokeObjectURL(e.target.url);
@@ -281,11 +282,10 @@ namespace annie {
                     }
                     else if (e.data.type == "sound") {
                         //声音
-                        _loadResCount++;
                         var audio: any = new Audio();
-                        audio.onload = mediaResourceOnload;
                         audio.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                        _checkComplete();
                     } else {
                         _checkComplete();
                     }
@@ -322,7 +322,7 @@ namespace annie {
                     JSONData = JSON.parse(fileReader.result);
                     lastIndex = currIndex;
                     currIndex += JSONData[0].src;
-                    _loadResCount=JSONData.length-1;
+                    _loadResCount = JSONData.length - 1;
                     fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
                 } else if (state == 3) {
                     state++;
@@ -331,16 +331,23 @@ namespace annie {
                     for (let i = 1; i < JSONData.length; i++) {
                         lastIndex = currIndex;
                         currIndex += JSONData[i].src;
-                       if (JSONData[i].type == "image") {
-                            var image = new Image();
+                        if (JSONData[i].type == "image") {
+                            let image = new Image();
                             image.onload = mediaResourceOnload;
                             image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
                             annie.res[scene][JSONData[i].id] = image;
                         } else if (JSONData[i].type == "sound") {
-                            var audio: any = new Audio();
-                            audio.onload = mediaResourceOnload;
-                            audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
+                            let audio: any = new Audio();
                             annie.res[scene][JSONData[i].id] = audio;
+                            let audioReader: any = new FileReader();
+                            audioReader.onload = function () {
+                                audio.src = audioReader.result;
+                                _loadResCount--;
+                                if (_loadResCount == 0){
+                                    _checkComplete();
+                                }
+                            };
+                            audioReader.readAsDataURL(loadContent.slice(lastIndex, currIndex,"audio/mp3"));
                         } else if (JSONData[i].type == "json") {
                             if (JSONData[i].id == "_a2x_con") {
                                 fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
@@ -358,11 +365,11 @@ namespace annie {
 
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
-        if(!_isReleased)
-        _currentConfig[_loadIndex].shift();
+        if (!_isReleased)
+            _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (!_isReleased&&_currentConfig[_loadIndex].length > 0) {
+        if (!_isReleased && _currentConfig[_loadIndex].length > 0) {
             _loadRes();
         } else {
             res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
@@ -926,5 +933,6 @@ namespace annie {
             }
         }
     }
+
     console.log("https://github.com/flash2x/AnnieJS");
 }

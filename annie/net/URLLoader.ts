@@ -158,6 +158,7 @@ namespace annie {
                     let item: any;
                     switch (s.responseType) {
                         case "css":
+                        case "video":
                             item = s.url;
                             break;
                         case "json":
@@ -183,7 +184,7 @@ namespace annie {
             } else {
                 s.url = url;
             }
-            if (s.responseType=="swf"||s.responseType=="image"||s.responseType=="sound"||s.responseType=="video") {
+            if (s.responseType=="swf"||s.responseType=="image"||s.responseType=="sound") {
                 s._req.responseType = "blob";
             } else {
                 s._req.responseType = "";

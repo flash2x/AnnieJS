@@ -163,9 +163,9 @@ namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default true
+         * @default false
          */
-        public autoResize: boolean = true;
+        public autoResize: boolean = false;
         /**
          * 舞台的尺寸宽,也就是我们常说的设计尺寸
          * @property desWidth

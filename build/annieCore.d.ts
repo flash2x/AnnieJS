@@ -3014,7 +3014,7 @@ declare namespace annie {
          * @public
          * @since 1.0.0
          * @type {boolean}
-         * @default true
+         * @default false
          */
         autoResize: boolean;
         /**

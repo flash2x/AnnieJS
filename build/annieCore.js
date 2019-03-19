@@ -6358,9 +6358,9 @@ var annie;
              * @public
              * @since 1.0.0
              * @type {boolean}
-             * @default true
+             * @default false
              */
-            this.autoResize = true;
+            this.autoResize = false;
             /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
@@ -8340,6 +8340,7 @@ var annie;
                     var item;
                     switch (s.responseType) {
                         case "css":
+                        case "video":
                             item = s.url;
                             break;
                         case "json":
@@ -8366,7 +8367,7 @@ var annie;
             else {
                 s.url = url;
             }
-            if (s.responseType == "swf" || s.responseType == "image" || s.responseType == "sound" || s.responseType == "video") {
+            if (s.responseType == "swf" || s.responseType == "image" || s.responseType == "sound") {
                 s._req.responseType = "blob";
             }
             else {
@@ -8703,11 +8704,10 @@ var annie;
                     }
                     else if (e.data.type == "sound") {
                         //声音
-                        _loadResCount++;
                         var audio = new Audio();
-                        audio.onload = mediaResourceOnload;
                         audio.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
+                        _checkComplete();
                     }
                     else {
                         _checkComplete();
@@ -8756,26 +8756,36 @@ var annie;
                     state_1++;
                     annie.Eval(fileReader_1.result);
                     //解析JSON数据
-                    for (var i = 1; i < JSONData_1.length; i++) {
+                    var _loop_1 = function(i) {
                         lastIndex_1 = currIndex_1;
                         currIndex_1 += JSONData_1[i].src;
                         if (JSONData_1[i].type == "image") {
-                            var image = new Image();
-                            image.onload = mediaResourceOnload;
-                            image.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
-                            annie.res[scene][JSONData_1[i].id] = image;
+                            var image_1 = new Image();
+                            image_1.onload = mediaResourceOnload;
+                            image_1.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
+                            annie.res[scene][JSONData_1[i].id] = image_1;
                         }
                         else if (JSONData_1[i].type == "sound") {
-                            var audio = new Audio();
-                            audio.onload = mediaResourceOnload;
-                            audio.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
-                            annie.res[scene][JSONData_1[i].id] = audio;
+                            var audio_1 = new Audio();
+                            annie.res[scene][JSONData_1[i].id] = audio_1;
+                            var audioReader_1 = new FileReader();
+                            audioReader_1.onload = function () {
+                                audio_1.src = audioReader_1.result;
+                                _loadResCount--;
+                                if (_loadResCount == 0) {
+                                    _checkComplete();
+                                }
+                            };
+                            audioReader_1.readAsDataURL(loadContent.slice(lastIndex_1, currIndex_1, "audio/mp3"));
                         }
                         else if (JSONData_1[i].type == "json") {
                             if (JSONData_1[i].id == "_a2x_con") {
                                 fileReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
                             }
                         }
+                    };
+                    for (var i = 1; i < JSONData_1.length; i++) {
+                        _loop_1(i);
                     }
                 }
                 else if (state_1 == 4) {

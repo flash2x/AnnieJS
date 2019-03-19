@@ -84,11 +84,32 @@ namespace annieUI {
          * @default 0
          */
         public currentPageIndex: number = 0;
-        //上下的回弹率
+        /**
+         * 上下的回弹率 默认0.3
+         * @property reBound
+         * @type {number}
+         * @public
+         * @since 1.0.3
+         * @default 0.3
+         */
         public reBound: number = 0.3;
-        //页面是否滑动跟随
+        /**
+         * 页面是否滑动跟随，默认false
+         * @property isPageFollowToMove
+         * @type {boolean}
+         * @public
+         * @since 1.0.3
+         * @default false
+         */
         public isPageFollowToMove: boolean = false;
-        //页面的跟率
+        /**
+         * 页面的跟随缓动系数率，默认0.7
+         * @property reBound
+         * @type {number}
+         * @public
+         * @since 1.0.3
+         * @default 0.7
+         */
         public follow: number = 0.7;
         /**
          * 页面是否移动
@@ -114,12 +135,18 @@ namespace annieUI {
          */
         protected viewHeight: number = 0;
         /**
-         * 页面列表
+         * 页面对象列表
          * @property pageList
          * @type {Array}
          * @public
          */
         public pageList: Array<any> = [];
+        /**
+         * 页面对象的类列表
+         * @property pageList
+         * @type {Array}
+         * @public
+         */
         public pageClassList: Array<any> = [];
         private lastX: number = 0;
         private lastY: number = 0;
@@ -325,7 +352,6 @@ namespace annieUI {
                 }
             }
         }
-
         /**
          * 滑动到指定页
          * @method slideTo
