@@ -331,8 +331,32 @@ declare namespace annieUI {
          * @default 0
          */
         currentPageIndex: number;
+        /**
+         * 上下的回弹率 默认0.3
+         * @property reBound
+         * @type {number}
+         * @public
+         * @since 1.0.3
+         * @default 0.3
+         */
         reBound: number;
+        /**
+         * 页面是否滑动跟随，默认false
+         * @property isPageFollowToMove
+         * @type {boolean}
+         * @public
+         * @since 1.0.3
+         * @default false
+         */
         isPageFollowToMove: boolean;
+        /**
+         * 页面的跟随缓动系数率，默认0.7
+         * @property reBound
+         * @type {number}
+         * @public
+         * @since 1.0.3
+         * @default 0.7
+         */
         follow: number;
         /**
          * 页面是否移动
@@ -358,12 +382,18 @@ declare namespace annieUI {
          */
         protected viewHeight: number;
         /**
-         * 页面列表
+         * 页面对象列表
          * @property pageList
          * @type {Array}
          * @public
          */
         pageList: Array<any>;
+        /**
+         * 页面对象的类列表
+         * @property pageList
+         * @type {Array}
+         * @public
+         */
         pageClassList: Array<any>;
         private lastX;
         private lastY;

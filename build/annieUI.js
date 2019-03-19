@@ -635,11 +635,32 @@ var annieUI;
              * @default 0
              */
             this.currentPageIndex = 0;
-            //上下的回弹率
+            /**
+             * 上下的回弹率 默认0.3
+             * @property reBound
+             * @type {number}
+             * @public
+             * @since 1.0.3
+             * @default 0.3
+             */
             this.reBound = 0.3;
-            //页面是否滑动跟随
+            /**
+             * 页面是否滑动跟随，默认false
+             * @property isPageFollowToMove
+             * @type {boolean}
+             * @public
+             * @since 1.0.3
+             * @default false
+             */
             this.isPageFollowToMove = false;
-            //页面的跟率
+            /**
+             * 页面的跟随缓动系数率，默认0.7
+             * @property reBound
+             * @type {number}
+             * @public
+             * @since 1.0.3
+             * @default 0.7
+             */
             this.follow = 0.7;
             /**
              * 页面是否移动
@@ -665,12 +686,18 @@ var annieUI;
              */
             this.viewHeight = 0;
             /**
-             * 页面列表
+             * 页面对象列表
              * @property pageList
              * @type {Array}
              * @public
              */
             this.pageList = [];
+            /**
+             * 页面对象的类列表
+             * @property pageList
+             * @type {Array}
+             * @public
+             */
             this.pageClassList = [];
             this.lastX = 0;
             this.lastY = 0;
