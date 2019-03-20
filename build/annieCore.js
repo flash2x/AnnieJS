@@ -6512,15 +6512,15 @@ var annie;
             // let rc = s.renderObj.rootContainer;
             var rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
-            if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", s.mouseEvent, false);
-                rc.addEventListener('touchmove', s.mouseEvent, false);
-                rc.addEventListener('touchend', s.mouseEvent, false);
-            }
-            else {
+            if (annie.osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
+            }
+            if ('ontouchstart' in rc) {
+                rc.addEventListener("touchstart", s.mouseEvent, false);
+                rc.addEventListener('touchmove', s.mouseEvent, false);
+                rc.addEventListener('touchend', s.mouseEvent, false);
             }
             s.renderObj.init();
             //同时添加到主更新循环中
@@ -10428,7 +10428,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "2.1.0";
+    annie.version = "3.0.0";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

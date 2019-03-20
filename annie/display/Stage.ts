@@ -319,14 +319,15 @@ namespace annie {
             // let rc = s.renderObj.rootContainer;
             let rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
-            if (osType != "pc") {
-                rc.addEventListener("touchstart", s.mouseEvent, false);
-                rc.addEventListener('touchmove', s.mouseEvent, false);
-                rc.addEventListener('touchend', s.mouseEvent, false);
-            } else {
+            if (osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
+            }
+            if('ontouchstart' in rc) {
+                rc.addEventListener("touchstart", s.mouseEvent, false);
+                rc.addEventListener('touchmove', s.mouseEvent, false);
+                rc.addEventListener('touchend', s.mouseEvent, false);
             }
             s.renderObj.init();
             //同时添加到主更新循环中
