@@ -104,7 +104,7 @@ namespace annieUI {
         public isPageFollowToMove: boolean = false;
         /**
          * 页面的跟随缓动系数率，默认0.7
-         * @property reBound
+         * @property follow
          * @type {number}
          * @public
          * @since 1.0.3
