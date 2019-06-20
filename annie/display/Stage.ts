@@ -213,11 +213,29 @@ namespace annie {
          * @property bgColor
          * @public
          * @since 1.0.0
-         * @type {string}
-         * @default "";
+         * @type {number} 0xFFFFFFFF R G B A
+         * @default -1 不填充;
          */
-        public bgColor: string = "";
-
+        public set bgColor(value:number){
+            if(value!=this._bgColor){
+                this._bgColor=value;
+                let a= value >> 24 & 0xff;
+                let r= value >> 16 & 0xff;
+                let g= value >> 8 & 0xff;
+                let b= value & 0xff;
+                this._bgColorStr="rgba("+r+","+g+","+b+","+(a/255)+")";
+                this._bgColorRGBA.a=a/255;
+                this._bgColorRGBA.r=r/255;
+                this._bgColorRGBA.g=g/255;
+                this._bgColorRGBA.b=b/255;
+            }
+        };
+        public get bgColor():number{
+            return this._bgColor;
+        };
+        private _bgColor:number=-1;
+        public _bgColorStr:string="rgba(0,0,0,0)";
+        public _bgColorRGBA:{r:number,g:number,b:number,a:number}={r:0,g:0,b:0,a:0};
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -306,17 +324,14 @@ namespace annie {
             s._scaleMode = scaleMode;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
-            //目前具支持canvas
-            s.renderObj = new CanvasRender(s);
-            /* webgl 直到对2d的支持非常成熟了再考虑开启
+             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                s.renderObj = new WGRender(s);
-            }*/
-            // let rc = s.renderObj.rootContainer;
+                s.renderObj = new WebGLRender(s);
+            }
             let rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
             if (osType == "pc") {

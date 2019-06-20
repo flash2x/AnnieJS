@@ -295,7 +295,7 @@ namespace annie {
             }
         } else {
             //解析swf
-            let fileReader: FileReader = new FileReader();
+            let fileReader: any = new FileReader();
             let state = 0;
             let lastIndex = 0;
             let currIndex = 1;

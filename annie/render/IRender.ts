@@ -34,5 +34,10 @@ namespace annie {
          * 开始渲染
          */
         begin():void;
+
+        /**
+         * 结束渲染
+         */
+        end():void;
     }
 }

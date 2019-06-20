@@ -55,8 +55,8 @@ namespace annie {
             let s = this;
             let c = s.rootContainer;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (s._stage.bgColor != "") {
-                s._ctx.fillStyle = s._stage.bgColor;
+            if (s._stage.bgColor != -1) {
+                s._ctx.fillStyle = s._stage._bgColorStr;
                 s._ctx.fillRect(0, 0, c.width, c.height);
             } else {
                 s._ctx.clearRect(0, 0, c.width, c.height);
@@ -137,7 +137,7 @@ namespace annie {
                 }
             }
         }
-
+        public end(){};
         /**
          * 初始化渲染器
          * @public

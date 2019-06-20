@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      console.log(this.instanceId);
          */
-        instanceId: number;
+        readonly instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @type {string}
          * @readonly
          */
-        instanceType: string;
+        readonly instanceType: string;
         /**
          * 销毁一个对象
          * 销毁之前一定要做完其他善后工作，否则有可能会出错
@@ -70,7 +70,7 @@ declare namespace annie {
          *      this.addEventListener(annie.Event.ADD_TO_STAGE,function(e){console.log(this);}.bind(this));
          */
         addEventListener(type: string, listener: Function, useCapture?: boolean): void;
-        private _changeMouseCount(type, isAdd);
+        private _changeMouseCount;
         private _defaultEvent;
         /**
          * 广播侦听
@@ -1223,7 +1223,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        matrix: Matrix;
+        readonly matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1784,7 +1784,7 @@ declare namespace annie {
          * @return {void}
          */
         beginBitmapFill(image: any, matrix: Array<number>): void;
-        private _fill(fillStyle);
+        private _fill;
         /**
          * 给线条着色
          * @method beginStroke
@@ -1842,7 +1842,7 @@ declare namespace annie {
          * @return {void}
          */
         beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
-        private _stroke(strokeStyle, width, cap, join, miter);
+        private _stroke;
         /**
          * 结束填充
          * @method endFill
@@ -1878,7 +1878,7 @@ declare namespace annie {
          */
         decodePath: (data: any) => void;
         updateMatrix(): void;
-        private _draw(ctx, isMask?);
+        private _draw;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean, isMustMouseEnable?: boolean): DisplayObject;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
@@ -1968,7 +1968,7 @@ declare namespace annie {
          * @return {void}
          */
         removeChild(child: DisplayObject): void;
-        private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
+        private static _getElementsByName;
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
          * @method getChildByName
@@ -1990,7 +1990,7 @@ declare namespace annie {
          * @return {void}
          */
         addChildAt(child: DisplayObject, index: number): void;
-        private static _removeFormParent(cp, child);
+        private static _removeFormParent;
         /**
          * 获取Sprite中指定层级一个child
          * @method getChildAt
@@ -2128,7 +2128,7 @@ declare namespace annie {
          */
         play(start?: number, loop?: number): void;
         private _SBWeixin;
-        private _weixinSB();
+        private _weixinSB;
         /**
          * 停止播放
          * @method stop
@@ -2321,7 +2321,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        currentFrame: number;
+        readonly currentFrame: number;
         private _curFrame;
         private _wantFrame;
         private _lastFrameObj;
@@ -2335,7 +2335,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        isPlaying: boolean;
+        readonly isPlaying: boolean;
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2346,7 +2346,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        isFront: boolean;
+        readonly isFront: boolean;
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2357,7 +2357,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        totalFrames: number;
+        readonly totalFrames: number;
         private _lastFrame;
         /**
          * 构造函数
@@ -2402,7 +2402,7 @@ declare namespace annie {
          * @since 2.0.0
          * @default false
          */
-        isButton: boolean;
+        readonly isButton: boolean;
         private _mode;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2414,15 +2414,15 @@ declare namespace annie {
          */
         initButton(): void;
         /**
-         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
-         * @property clicked
-         * @return {boolean}
-         * @public
-         * @since 2.0.0
-         */
+        * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+        * @property clicked
+        * @return {boolean}
+        * @public
+        * @since 2.0.0
+        */
         clicked: boolean;
         private _clicked;
-        private _mouseEvent(e);
+        private _mouseEvent;
         /**
          * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
@@ -2447,7 +2447,7 @@ declare namespace annie {
          * @return {void}
          */
         prevFrame(): void;
-        private isSameFrame();
+        private isSameFrame;
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
          * @method gotoAndStop
@@ -2481,7 +2481,7 @@ declare namespace annie {
         private _a2x_sounds;
         private _frameState;
         protected updateEventAndScript(callState: number): void;
-        private static _resetMC(obj);
+        private static _resetMC;
         render(renderObj: IRender): void;
         destroy(): void;
     }
@@ -2533,7 +2533,7 @@ declare namespace annie {
          * @param {HtmlElement} htmlElement 需要封装起来的html元素的引用。你可以通过这个引用来调用或设置此元素自身的属性方法和事件,甚至是样式
          */
         init(htmlElement: any): void;
-        private getStyle(elem, cssName);
+        private getStyle;
         updateStyle(): void;
         destroy(): void;
     }
@@ -2691,7 +2691,7 @@ declare namespace annie {
          */
         strokeColor: string;
         private _strokeColor;
-        private _prepContext(ctx);
+        private _prepContext;
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
          * @method getTextWidth
@@ -2709,8 +2709,8 @@ declare namespace annie {
          * @readonly
          * @since 2.0.0
          */
-        lines: number;
-        private _getMeasuredWidth(text);
+        readonly lines: number;
+        private _getMeasuredWidth;
         private realLines;
         updateMatrix(): void;
     }
@@ -3064,10 +3064,18 @@ declare namespace annie {
          * @property bgColor
          * @public
          * @since 1.0.0
-         * @type {string}
-         * @default "";
+         * @type {number} 0xFFFFFFFF R G B A
+         * @default -1 不填充;
          */
-        bgColor: string;
+        bgColor: number;
+        private _bgColor;
+        _bgColorStr: string;
+        _bgColorRGBA: {
+            r: number;
+            g: number;
+            b: number;
+            a: number;
+        };
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -3120,10 +3128,10 @@ declare namespace annie {
         render(renderObj: IRender): void;
         private _ml;
         private _mp;
-        private _initMouseEvent(event, cp, sp, identifier);
+        private _initMouseEvent;
         private _mouseDownPoint;
         isReUpdate: boolean;
-        private flush();
+        private flush;
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -3159,8 +3167,8 @@ declare namespace annie {
         private _mP1;
         private _mP2;
         private mouseEvent;
-        private onMouseEvent(e);
-        private setAlign();
+        private onMouseEvent;
+        private setAlign;
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -3181,7 +3189,7 @@ declare namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList;
-        private static flushAll();
+        private static flushAll;
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -3470,8 +3478,8 @@ declare namespace annie {
          */
         drawFilter(imageData?: ImageData): void;
         static DELTA_INDEX: number[];
-        private _multiplyMatrix(colorMat);
-        private _cleanValue(value, limit);
+        private _multiplyMatrix;
+        private _cleanValue;
         /**
          *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
          * @method toString
@@ -3606,6 +3614,10 @@ declare namespace annie {
          * 开始渲染
          */
         begin(): void;
+        /**
+         * 结束渲染
+         */
+        end(): void;
     }
 }
 /**
@@ -3664,7 +3676,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginMask(target: any): void;
-        private drawMask(target);
+        private drawMask;
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -3680,6 +3692,7 @@ declare namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         draw(target: any): void;
+        end(): void;
         /**
          * 初始化渲染器
          * @public
@@ -3695,6 +3708,112 @@ declare namespace annie {
          */
         reSize(): void;
         destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.WebGLRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class WebGLRender extends AObject implements IRender {
+        bufferSize: number;
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        rootContainer: any;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
+        protected _ctx: any;
+        /**
+         * @protected _stage
+         * @protected
+         * @default null
+         */
+        private _stage;
+        private _dataLength;
+        private _dataBuffer;
+        DEFAULT_PROGRAM: number;
+        currentProgramId: number;
+        private curProgram;
+        private programList;
+        /**
+         * @method WebGLRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        constructor(stage: Stage);
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        private drawMask;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        end(): void;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        init(): void;
+        /**
+         * 当舞台尺寸改变时会调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        reSize(): void;
+        destroy(): void;
+        private createTextureCountScript;
+        createProgram(id: number): WebGLProgram;
+        private textureList;
+        private textureCount;
+        initTextureCount(): void;
+        private dataStatus;
+        private dataRefList;
+        clearDataStatus(): void;
+        setTexture(data: any): number;
     }
 }
 /**
@@ -3805,7 +3924,7 @@ declare namespace annie {
          * @default null
          * @type {Object}
          */
-        data: Object;
+        data: any;
         private _fqs;
         private _fus;
         /**
@@ -4385,7 +4504,7 @@ declare namespace annie {
          * @return {number}
          */
         static bounceInOut(k: number): number;
-        private static flush();
+        private static flush;
     }
 }
 /**
@@ -4455,7 +4574,7 @@ declare namespace annie {
          * @since 1.0.9
          * @return {number}
          */
-        currentCount: number;
+        readonly currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -4483,7 +4602,7 @@ declare namespace annie {
          * @since 1.0.9
          * @return {boolean}
          */
-        running: boolean;
+        readonly running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时缠绕着你
@@ -4492,9 +4611,9 @@ declare namespace annie {
          * @since 1.0.9
          */
         kill(): void;
-        private update();
+        private update;
         private static _timerList;
-        private static flush();
+        private static flush;
         destroy(): void;
     }
 }

@@ -247,7 +247,7 @@ namespace annie {
          * @default null
          * @type {Object}
          */
-        public data: Object = null;
+        public data: any = null;
         //格式化post请求参数
         private _fqs = function (data: any, query: any): string {
             let params: any = [];
