@@ -11,7 +11,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class WebGLRender extends AObject implements IRender {
-        public bufferSize: number = 1 >> 20;
+        public bufferSize: number = 1 << 20;
         /**
          * 渲染器所在最上层的对象
          * @property rootContainer
@@ -139,7 +139,7 @@ namespace annie {
                 if (texId < 0) {
                     //说明纹理通道用完了,这个时候画一次。
                     gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
-                    gl.drawArrays(gl.TRIANGLES, 0, s._dataLength);
+                    gl.drawArrays(gl.TRIANGLES, 0, s._dataLength / 12);
                     //清除纹理状态
                     s.clearDataStatus();
                     s._dataLength = 0;
@@ -176,7 +176,7 @@ namespace annie {
                 if (s._dataLength > s.bufferSize - dataArray.length) {
                     //说明缓冲空间用完了,这个时候画一次。
                     gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
-                    gl.drawArrays(gl.TRIANGLES, 0, s._dataLength);
+                    gl.drawArrays(gl.TRIANGLES, 0, s._dataLength / 12);
                     s._dataLength = 0;
                 }
                 for (let i = 0; i < dataArray.length; i++) {
@@ -187,9 +187,11 @@ namespace annie {
 
         public end() {
             let s = this;
-            let gl = this._ctx;
-            gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
-            gl.drawArrays(gl.TRIANGLES, 0, s._dataLength);
+            if (s._dataLength > 0) {
+                let gl = s._ctx;
+                gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
+                gl.drawArrays(gl.TRIANGLES, 0, s._dataLength / 12);
+            }
         }
 
         /**
@@ -210,7 +212,6 @@ namespace annie {
                     return;
                 }
                 s._dataBuffer = new Float32Array(s.bufferSize);
-
                 let gl = s._ctx;
                 s.initTextureCount();
                 //创建program
@@ -250,8 +251,9 @@ namespace annie {
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
             let gl: any = s._ctx;
+            gl.viewport(0, 0, c.width, c.height);
             let resolutionLocation = gl.getUniformLocation(s.curProgram, "u_resolution");
-            gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+            gl.uniform2f(resolutionLocation, c.width, c.height);
         }
 
         public destroy(): void {
@@ -260,30 +262,31 @@ namespace annie {
             s._stage = null;
             s._ctx = null;
         }
-        private createTextureCountScript(type:number):string{
-            let s=this;
-            if(type==0){
-                let script="uniform sampler2D u_texture0;\n";
-                for(let i=1;i<s.textureCount;i++){
-                    script+="uniform sampler2D u_texture"+i+";\n";
+
+        private createTextureCountScript(type: number): string {
+            let s = this;
+            if (type == 1) {
+                let script = "uniform sampler2D u_texture0;\n";
+                for (let i = 1; i < s.textureCount; i++) {
+                    script += "uniform sampler2D u_texture" + i + ";\n";
                 }
                 return script;
-            }else if(type==1){
-                let script="float ok1=float(v_texCoord[2]==1.0);\n";
-                for(let i=1;i<s.textureCount;i++){
-                    script+="float ok"+i+"=float(v_texCoord[2]=="+i+".0);\n";
+            } else if (type == 2) {
+                let script = "float ok0=float(v_texCoord[2]==0.0);\n";
+                for (let i = 1; i < s.textureCount; i++) {
+                    script += "float ok" + i + "=float(v_texCoord[2]==" + i + ".0);\n";
                 }
                 return script;
-            }else if(type==3){
-                let script="gl_FragColor = texture2D(u_texture0, v_texCoord.xy)*ok1";
-                for(let i=1;i<s.textureCount;i++){
-                    script+="+texture2D(u_texture"+i+", v_texCoord.xy)*ok"+i;
+            } else if (type == 3) {
+                let script = "gl_FragColor = texture2D(u_texture0, v_texCoord.xy)*ok0\n";
+                for (let i = 1; i < s.textureCount; i++) {
+                    script += "+texture2D(u_texture" + i + ", v_texCoord.xy)*ok" + i;
                 }
-                script+=";";
+                script += ";\n";
                 return script;
             }
-
         }
+
         public createProgram(id: number): WebGLProgram {
             let s = this;
             let gl = s._ctx;
@@ -292,46 +295,45 @@ namespace annie {
                 let vSource: string;
                 let fSource: string;
                 if (id == s.DEFAULT_PROGRAM) {
-                    vSource =
-                        "attribute vec2 a_position;" +
-                        "attribute vec4 a_texUVIA;" +
-                        "attribute vec4 a_matABCD;" +
-                        "attribute vec2 a_matXY;" +
-                        "uniform vec2 u_resolution;" +
-                        "varying vec4 v_texCoord;" +
-                        "void main() {" +
-                        "mat3 matrix=mat3(a_matABCD[0],a_matABCD[1],0,a_matABCD[2],a_matABCD[3],0,a_matXY.x,a_matXY.y,1);" +
-                        "vec2 position=(matrix*vec3(a_position,1)).xy;" +
-                        "position = ((position/u_resolution)*2.0-1.0)* vec2(1, -1);" +
-                        "gl_Position = vec4(position,0,1);" +
-                        "v_texCoord = a_texUVIA;}";
+                    vSource = "attribute vec2 a_position;\n" +
+                        "attribute vec4 a_texUVIA;\n" +
+                        "attribute vec4 a_matABCD;\n" +
+                        "attribute vec2 a_matXY;\n" +
+                        "uniform vec2 u_resolution;\n" +
+                        "varying vec4 v_texCoord;\n" +
+                        "void main() {\n" +
+                        "   mat3 matrix=mat3(a_matABCD[0],a_matABCD[1],0,a_matABCD[2],a_matABCD[3],0,a_matXY.x,a_matXY.y,1);\n" +
+                        "   vec2 position=(matrix*vec3(a_position,1)).xy;\n" +
+                        "   position = ((position/u_resolution)*2.0-1.0)* vec2(1, -1);\n" +
+                        "   gl_Position = vec4(position,0,1);\n" +
+                        "   v_texCoord = a_texUVIA;\n" +
+                        "}";
                     fSource =
-                        "precision mediump float;" +
-                         s.createTextureCountScript(1)+
-                        "varying vec4 v_texCoord;" +
-                        "void main(){" +
-                        s.createTextureCountScript(2)+
-                        s.createTextureCountScript(3)+
+                        "precision mediump float;\n" +
+                        s.createTextureCountScript(1) +
+                        "varying vec4 v_texCoord;\n" +
+                        "void main(){\n" +
+                        s.createTextureCountScript(2) +
+                        s.createTextureCountScript(3) +
                         "gl_FragColor.a*=v_texCoord[3];}";
                 }
                 let vertexShader = gl.createShader(gl.VERTEX_SHADER); // 创建着色器对象
                 gl.shaderSource(vertexShader, vSource); // 提供数据源
                 gl.compileShader(vertexShader); // 编译 -> 生成着色器
-                let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER); // 创建着色器对象
-                gl.shaderSource(vertexShader, fSource); // 提供数据源
-                gl.compileShader(vertexShader); // 编译 -> 生成着色器
                 gl.attachShader(program, vertexShader);
+                let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER); // 创建着色器对象
+                gl.shaderSource(fragmentShader, fSource); // 提供数据源
+                gl.compileShader(fragmentShader); // 编译 -> 生成着色器
                 gl.attachShader(program, fragmentShader);
                 gl.linkProgram(program);
+                gl.useProgram(program);
                 s.programList["p" + id] = program;
             }
             s.currentProgramId = id;
             return s.programList["p" + id];
         }
-
         private textureList: Array<WebGLTexture> = [];
         private textureCount = 1;
-
         public initTextureCount(): void {
             let s = this;
             let gl = s._ctx;
@@ -339,11 +341,11 @@ namespace annie {
             while (gl["TEXTURE" + i] != undefined) {
                 i++;
             }
-            s.textureCount = i;
+            //这个地方为什么只取一半的通道，如果取所有通道片元着色器会编译链接失败，原因待查
+            s.textureCount = (i >> 1);
         }
         private dataStatus: Array<boolean> = [];
         private dataRefList: Array<any> = [];
-
         public clearDataStatus() {
             let s: any = this;
             for (let i = 0; i < s.textureCount; i++) {
@@ -354,9 +356,9 @@ namespace annie {
             let id: number = -1;
             let s: any = this;
             let gl: any = s._ctx;
-            //是否绑定过,0也什是false,所以我们从1开始算
-            if (data._webgl_tex_id) {
-                id = data._webgl_tex_id - 1;
+            //是否绑定过,0也什是false,所以我们判断写法一定要注意
+            if (data._webgl_tex_id>0) {
+                id = data._webgl_tex_id;
                 //看看此通道在当前渲染中是否已经被绑定过了
                 if (!s.dataStatus[id]) {
                     //如果没有绑定其他资源，那么现在就绑定
@@ -395,6 +397,7 @@ namespace annie {
                     return -1;
                 }
             }
+            gl.activeTexture(gl.TEXTURE0 + id);
             if (s.textureList[id] == null) {
                 let texture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -408,11 +411,10 @@ namespace annie {
                 gl.uniform1i(u_image0Location, id);  // 纹理单元
                 s.textureList[id] = texture;
             }
-            gl.activeTexture(gl.TEXTURE0 + id);
             // Upload the image into the texture.
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
             data._webgl_data_changed = false;
-            data._webgl_tex_id = id + 1;
+            data._webgl_tex_id = id;
             return data._webgl_tex_id;
         }
     }

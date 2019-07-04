@@ -72,7 +72,7 @@ var onBuildUI = function(){
     var outDir = "build";
     var tsResult = gulp.src(uiList).pipe(ts(op));
         tsResult.dts.pipe(gulp.dest(outDir));
-        tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 var onBuildDoc = function(){
     del([

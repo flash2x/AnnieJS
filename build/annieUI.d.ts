@@ -173,7 +173,7 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         setViewRect(w: number, h: number, isVertical: boolean): void;
-        private onMouseEvent(e);
+        private onMouseEvent;
         /**
          * 滚到指定的坐标位置
          * @method scrollTo
@@ -190,7 +190,7 @@ declare namespace annieUI {
          * @type {number}
          * @since 2.0.1
          */
-        currentPos: number;
+        readonly currentPos: number;
     }
 }
 /**
@@ -351,7 +351,7 @@ declare namespace annieUI {
         isPageFollowToMove: boolean;
         /**
          * 页面的跟随缓动系数率，默认0.7
-         * @property reBound
+         * @property follow
          * @type {number}
          * @public
          * @since 1.0.3
@@ -440,8 +440,8 @@ declare namespace annieUI {
          * @public
          * @since 1.0.0
          */
-        private setMask(w, h);
-        private onMouseEvent(e);
+        private setMask;
+        private onMouseEvent;
         /**
          * 滑动到指定页
          * @method slideTo
@@ -558,19 +558,19 @@ declare namespace annieUI {
         private md;
         private mu;
         private mm;
-        private drawPage(num, movePoint);
-        private checkLimit(point, limitPoint, limitGap);
-        private getPage(index);
-        private getBookArr(point, actionPoint1, actionPoint2);
-        private getLayerArr(point1, point2, actionPoint1, actionPoint2, limitPoint1, limitPoint2);
-        private getShape(shape, pointArr);
-        private setShadowMask(shape, g_width, g_height);
-        private getShadow(shape, point1, point2, arg);
-        private setPage(pageNum);
-        private onMouseDown(e);
-        private onMouseUp(e);
-        private onMouseMove(e);
-        private checkArea(point);
+        private drawPage;
+        private checkLimit;
+        private getPage;
+        private getBookArr;
+        private getLayerArr;
+        private getShape;
+        private setShadowMask;
+        private getShadow;
+        private setPage;
+        private onMouseDown;
+        private onMouseUp;
+        private onMouseMove;
+        private checkArea;
         /**
          * 跳到指定的页数
          * @method flipTo
@@ -602,11 +602,11 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         endPage(): void;
-        private flushPage();
-        private onEnterFrame(e);
-        private arc(argR, argN1, argN2);
-        private angle(target1, target2);
-        private pos(target1, target2);
+        private flushPage;
+        private onEnterFrame;
+        private arc;
+        private angle;
+        private pos;
         destroy(): void;
     }
 }
@@ -654,7 +654,7 @@ declare namespace annieUI {
          * @since 1.0.9
          * @return {DisplayObject}
          */
-        loadingView: DisplayObject;
+        readonly loadingView: DisplayObject;
         /**
          * 构造函数
          * @method ScrollList
@@ -676,7 +676,7 @@ declare namespace annieUI {
          * @since 1.0.9
          */
         updateData(data: Array<any>, isReset?: boolean): void;
-        private flushData();
+        private flushData;
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
          * @method setViewRect
@@ -687,7 +687,7 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         setViewRect(w: number, h: number, isVertical: boolean): void;
-        private _updateViewRect();
+        private _updateViewRect;
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9
@@ -787,9 +787,9 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         constructor(width: number, height: number, bgColor?: any);
-        private onMouseDown(e);
-        private onMouseUp(e);
-        private onMouseMove(e);
+        private onMouseDown;
+        private onMouseUp;
+        private onMouseMove;
         /**
          * 重置画板
          * @method reset

@@ -1,8 +1,16 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /**
  * @module annieUI
  */
@@ -17,7 +25,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var ScrollPage = (function (_super) {
+    var ScrollPage = /** @class */ (function (_super) {
         __extends(ScrollPage, _super);
         /**
          * 构造函数
@@ -36,7 +44,7 @@ var annieUI;
          */
         function ScrollPage(vW, vH, maxDistance, isVertical) {
             if (isVertical === void 0) { isVertical = true; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             //Event
             /**
              * annieUI.ScrollPage组件滑动到开始位置事件
@@ -67,7 +75,7 @@ var annieUI;
              * @since 1.0.0
              * @default true
              */
-            this.isVertical = true;
+            _this.isVertical = true;
             /**
              * 可见区域的宽
              * @property viewWidth
@@ -76,7 +84,7 @@ var annieUI;
              * @since 1.0.0
              * @default 0
              */
-            this.viewWidth = 0;
+            _this.viewWidth = 0;
             /**
              * 可见区域的高
              * @property viewHeight
@@ -85,8 +93,8 @@ var annieUI;
              * @since 1.0.0
              * @default 0
              */
-            this.viewHeight = 0;
-            this._tweenId = 0;
+            _this.viewHeight = 0;
+            _this._tweenId = 0;
             /**
              * 整个滚动的最大距离值
              * @property maxDistance
@@ -95,7 +103,7 @@ var annieUI;
              * @since 1.0.0
              * @default 1040
              */
-            this.maxDistance = 1040;
+            _this.maxDistance = 1040;
             /**
              * @property 滚动距离
              * @type {number}
@@ -103,16 +111,16 @@ var annieUI;
              * @default 0
              * @since 1.0.0
              */
-            this.distance = 0;
+            _this.distance = 0;
             /**
              * 最小鼠标滑动距离
              * @property  minDis
              * @protected
              * @type {number}
              */
-            this.minDis = 2;
+            _this.minDis = 2;
             // 遮罩对象
-            this.maskObj = new Shape();
+            _this.maskObj = new Shape();
             /**
              * 真正的容器对象，所有滚动的内容都应该是添加到这个容器中
              * @property view
@@ -120,9 +128,9 @@ var annieUI;
              * @since 1.0.0
              * @type {annie.Sprite}
              */
-            this.view = new Sprite();
+            _this.view = new Sprite();
             // 最后鼠标经过的坐标值
-            this.lastValue = 0;
+            _this.lastValue = 0;
             /**
              * 速度
              * @property speed
@@ -130,7 +138,7 @@ var annieUI;
              * @since 1.0.0
              * @type {number}
              */
-            this.speed = 0;
+            _this.speed = 0;
             /**
              * 加速度
              * @property addSpeed
@@ -138,7 +146,7 @@ var annieUI;
              * @since 1.0.0
              * @type {number}
              */
-            this.addSpeed = 0;
+            _this.addSpeed = 0;
             /**
              * 是否是停止滚动状态
              * @property isStop
@@ -147,7 +155,7 @@ var annieUI;
              * @type {boolean}
              * @default true
              */
-            this.isStop = true;
+            _this.isStop = true;
             /**
              * 滚动的最大速度，直接影响一次滑动之后最长可以滚多远
              * @property maxSpeed
@@ -156,7 +164,7 @@ var annieUI;
              * @default 100
              * @type {number}
              */
-            this.maxSpeed = 100;
+            _this.maxSpeed = 100;
             /**
              * 摩擦力,值越大，减速越快
              * @property fSpeed
@@ -165,20 +173,20 @@ var annieUI;
              * @default 20
              * @type {number}
              */
-            this.fSpeed = 20;
-            this.paramXY = "y";
-            this.stopTimes = -1;
-            this.isMouseDownState = 0;
+            _this.fSpeed = 20;
+            _this.paramXY = "y";
+            _this.stopTimes = -1;
+            _this.isMouseDownState = 0;
             //是否是通过scrollTo方法在滑动中
-            this.autoScroll = false;
+            _this.autoScroll = false;
             /**
              * 是否有回弹效果，默认是true
              * @property isSpringBack
              * @type {boolean}
              * @since 2.0.1
              */
-            this.isSpringBack = true;
-            var s = this;
+            _this.isSpringBack = true;
+            var s = _this;
             s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
             s.addChild(s.view);
@@ -268,6 +276,7 @@ var annieUI;
                     }
                 }
             });
+            return _this;
         }
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
@@ -454,7 +463,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var FacePhoto = (function (_super) {
+    var FacePhoto = /** @class */ (function (_super) {
         __extends(FacePhoto, _super);
         //events
         /**
@@ -482,9 +491,9 @@ var annieUI;
          *          s.addChild(rectFace);
          */
         function FacePhoto() {
-            _super.call(this);
-            this.maskType = 0;
-            var s = this;
+            var _this = _super.call(this) || this;
+            _this.maskType = 0;
+            var s = _this;
             s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
             s.photo.crossOrigin = "";
@@ -510,6 +519,7 @@ var annieUI;
             s.addChild(s.bitmap);
             s.addChild(s.maskObj);
             s.bitmap.mask = s.maskObj;
+            return _this;
         }
         /**
          * 被始化头像，可反复调用设置不同的遮罩类型或者不同的头像地址
@@ -559,7 +569,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var SlidePage = (function (_super) {
+    var SlidePage = /** @class */ (function (_super) {
         __extends(SlidePage, _super);
         /**
          * 构造函数
@@ -572,7 +582,7 @@ var annieUI;
         function SlidePage(vW, vH, isVertical, ease) {
             if (isVertical === void 0) { isVertical = true; }
             if (ease === void 0) { ease = null; }
-            _super.call(this);
+            var _this = _super.call(this) || this;
             /**
              * annieUI.Slide 组件开始滑动事件
              * @event annie.Event.ON_SLIDE_START
@@ -590,7 +600,7 @@ var annieUI;
              * @protected
              * @default 0
              */
-            this.listLen = 0;
+            _this.listLen = 0;
             /**
              * 页面滑动容器
              * @property view
@@ -598,8 +608,8 @@ var annieUI;
              * @since 1.1.0
              * @public
              */
-            this.view = new annie.Sprite();
-            this.maskObj = new annie.Shape();
+            _this.view = new annie.Sprite();
+            _this.maskObj = new annie.Shape();
             /**
              * 容器活动速度
              * @property slideSpeed
@@ -607,9 +617,9 @@ var annieUI;
              * @public
              * @default 0.2
              */
-            this.slideSpeed = 0.2;
+            _this.slideSpeed = 0.2;
             //是否滑动中断
-            this._isBreak = false;
+            _this._isBreak = false;
             /**
              * 滚动距离
              * @property distance
@@ -618,14 +628,14 @@ var annieUI;
              * @default 0
              * @since 1.0.0
              */
-            this.distance = 0;
+            _this.distance = 0;
             //触摸点结束点X
-            this.touchEndX = 0;
-            this.movingX = 0;
-            this.movingY = 0;
-            this._moveDis = 0;
+            _this.touchEndX = 0;
+            _this.movingX = 0;
+            _this.movingY = 0;
+            _this._moveDis = 0;
             //触摸点结束点Y
-            this.touchEndY = 0;
+            _this.touchEndY = 0;
             /**
              * 当前页面索引ID 默认从0开始
              * @property currentPageIndex
@@ -634,7 +644,7 @@ var annieUI;
              * @since 1.0.3
              * @default 0
              */
-            this.currentPageIndex = 0;
+            _this.currentPageIndex = 0;
             /**
              * 上下的回弹率 默认0.3
              * @property reBound
@@ -643,7 +653,7 @@ var annieUI;
              * @since 1.0.3
              * @default 0.3
              */
-            this.reBound = 0.3;
+            _this.reBound = 0.3;
             /**
              * 页面是否滑动跟随，默认false
              * @property isPageFollowToMove
@@ -652,16 +662,16 @@ var annieUI;
              * @since 1.0.3
              * @default false
              */
-            this.isPageFollowToMove = false;
+            _this.isPageFollowToMove = false;
             /**
              * 页面的跟随缓动系数率，默认0.7
-             * @property reBound
+             * @property follow
              * @type {number}
              * @public
              * @since 1.0.3
              * @default 0.7
              */
-            this.follow = 0.7;
+            _this.follow = 0.7;
             /**
              * 页面是否移动
              * @property isMoving
@@ -670,44 +680,44 @@ var annieUI;
              * @default false
              * @public
              */
-            this.isMoving = false;
+            _this.isMoving = false;
             /**
              * 页面宽
              * @property viewWidth
              * @type {number}
              * @protected
              */
-            this.viewWidth = 0;
+            _this.viewWidth = 0;
             /**
              * 页面高
              * @property viewHeight
              * @type {number}
              * @protected
              */
-            this.viewHeight = 0;
+            _this.viewHeight = 0;
             /**
              * 页面对象列表
              * @property pageList
              * @type {Array}
              * @public
              */
-            this.pageList = [];
+            _this.pageList = [];
             /**
              * 页面对象的类列表
              * @property pageList
              * @type {Array}
              * @public
              */
-            this.pageClassList = [];
-            this.lastX = 0;
-            this.lastY = 0;
+            _this.pageClassList = [];
+            _this.lastX = 0;
+            _this.lastY = 0;
             /**
              * 是否点击了鼠标
              * @property isMouseDown
              * @type {boolean}
              * @public
              */
-            this.isMouseDown = false;
+            _this.isMouseDown = false;
             /**
              * 是否可以下一页
              * @property canSlideNext
@@ -716,7 +726,7 @@ var annieUI;
              * @type {boolean}
              * @public
              */
-            this.canSlideNext = true;
+            _this.canSlideNext = true;
             /**
              * 是否可以上一页
              * @property canSlidePrev
@@ -724,9 +734,9 @@ var annieUI;
              * @public
              * @default true
              */
-            this.canSlidePrev = true;
-            this.paramXY = "y";
-            var s = this;
+            _this.canSlidePrev = true;
+            _this.paramXY = "y";
+            var s = _this;
             s.isVertical = isVertical;
             s._ease = ease;
             if (isVertical) {
@@ -748,6 +758,7 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
+            return _this;
         }
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
@@ -1013,7 +1024,7 @@ var annieUI;
     var Event = annie.Event;
     var MouseEvent = annie.MouseEvent;
     var Point = annie.Point;
-    var FlipBook = (function (_super) {
+    var FlipBook = /** @class */ (function (_super) {
         __extends(FlipBook, _super);
         /**
          * 初始化电子杂志
@@ -1025,7 +1036,7 @@ var annieUI;
          * @since 1.0.3
          */
         function FlipBook(width, height, pageCount, getPageCallBack) {
-            _super.call(this);
+            var _this = _super.call(this) || this;
             //Events
             /**
              * annieUI.FlipBook组件翻页开始事件
@@ -1050,47 +1061,47 @@ var annieUI;
              * @property totalPage
              * @type {number}
              */
-            this.totalPage = 0;
+            _this.totalPage = 0;
             /**
              * 当前页数
              * @property
              * @type {number}
              * @since 1.0.3
              */
-            this.currPage = 0;
+            _this.currPage = 0;
             /**
              * 翻页速度，0-1之间，值越小，速度越快
              * @property
              * @since 1.1.3
              * @type {number}
              */
-            this.speed = 0.4;
-            this.state = "stop";
-            this.timerArg0 = 0;
-            this.timerArg1 = 0;
-            this.px = 0;
-            this.py = 0;
-            this.rPage0 = new Sprite();
-            this.rPage1 = new Sprite();
-            this.pageMC = new Sprite();
-            this.leftPage = null;
-            this.rightPage = null;
-            this.rMask0 = new Shape();
-            this.rMask1 = new Shape();
-            this.shadow0 = new Shape();
-            this.shadow1 = new Shape();
-            this.sMask0 = new Shape();
-            this.sMask1 = new Shape();
-            this.pages = [];
-            this.stageMP = new Point();
+            _this.speed = 0.4;
+            _this.state = "stop";
+            _this.timerArg0 = 0;
+            _this.timerArg1 = 0;
+            _this.px = 0;
+            _this.py = 0;
+            _this.rPage0 = new Sprite();
+            _this.rPage1 = new Sprite();
+            _this.pageMC = new Sprite();
+            _this.leftPage = null;
+            _this.rightPage = null;
+            _this.rMask0 = new Shape();
+            _this.rMask1 = new Shape();
+            _this.shadow0 = new Shape();
+            _this.shadow1 = new Shape();
+            _this.sMask0 = new Shape();
+            _this.sMask1 = new Shape();
+            _this.pages = [];
+            _this.stageMP = new Point();
             /**
              * 指定是否能够翻页动作
              * @property canFlip
              * @since 1.0.3
              * @type {boolean}
              */
-            this.canFlip = true;
-            var s = this;
+            _this.canFlip = true;
+            var s = _this;
             s._instanceType = "annieUI.FlipBook";
             s.getPageCallback = getPageCallBack;
             s.bW = width;
@@ -1142,6 +1153,7 @@ var annieUI;
                 s.stage.removeEventListener(MouseEvent.MOUSE_MOVE, s.mm);
                 s.removeEventListener(Event.ENTER_FRAME, em);
             });
+            return _this;
         }
         FlipBook.prototype.drawPage = function (num, movePoint) {
             var s = this;
@@ -1606,7 +1618,7 @@ var annieUI;
      * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
-    var ScrollList = (function (_super) {
+    var ScrollList = /** @class */ (function (_super) {
         __extends(ScrollList, _super);
         /**
          * 构造函数
@@ -1623,13 +1635,13 @@ var annieUI;
         function ScrollList(itemClassName, itemWidth, itemHeight, vW, vH, isVertical, cols) {
             if (isVertical === void 0) { isVertical = true; }
             if (cols === void 0) { cols = 1; }
-            _super.call(this, vW, vH, 0, isVertical);
-            this._items = null;
-            this._isInit = 0;
-            this.data = [];
-            this.downL = null;
-            this._lastFirstId = -1;
-            var s = this;
+            var _this = _super.call(this, vW, vH, 0, isVertical) || this;
+            _this._items = null;
+            _this._isInit = 0;
+            _this.data = [];
+            _this.downL = null;
+            _this._lastFirstId = -1;
+            var s = _this;
             s._instanceType = "annieUI.ScrollList";
             s._itemW = itemWidth;
             s._itemH = itemHeight;
@@ -1639,6 +1651,7 @@ var annieUI;
             s._cols = cols;
             s._updateViewRect();
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
+            return _this;
         }
         Object.defineProperty(ScrollList.prototype, "loadingView", {
             /**
@@ -1818,7 +1831,7 @@ var annieUI;
      * @extends annie.Bitmap
      * @since 1.1.1
      */
-    var DrawingBoard = (function (_super) {
+    var DrawingBoard = /** @class */ (function (_super) {
         __extends(DrawingBoard, _super);
         /**
          * 构造函数
@@ -1830,10 +1843,10 @@ var annieUI;
          */
         function DrawingBoard(width, height, bgColor) {
             if (bgColor === void 0) { bgColor = ""; }
-            _super.call(this);
-            this.context = null;
-            this._isMouseDown = false;
-            this._drawRadius = 50;
+            var _this = _super.call(this) || this;
+            _this.context = null;
+            _this._isMouseDown = false;
+            _this._drawRadius = 50;
             /**
              * 绘画颜色, 可以是任何的颜色类型
              * @property drawColor
@@ -1842,7 +1855,7 @@ var annieUI;
              * @since
              * @type {any}
              */
-            this.drawColor = "#ffffff";
+            _this.drawColor = "#ffffff";
             /**
              * 背景色 可以是任何的颜色类型
              * @property bgColor
@@ -1850,7 +1863,7 @@ var annieUI;
              * @public
              * @since 1.1.1
              */
-            this.bgColor = "";
+            _this.bgColor = "";
             /**
              * 画板宽
              * @property drawWidth
@@ -1859,7 +1872,7 @@ var annieUI;
              * @public
              * @since 1.1.1
              */
-            this.drawWidth = 0;
+            _this.drawWidth = 0;
             /**
              * 画板高
              * @property drawHeight
@@ -1868,22 +1881,22 @@ var annieUI;
              * @public
              * @since 1.1.1
              */
-            this.drawHeight = 0;
+            _this.drawHeight = 0;
             /**
              * 总步数数据
              * @property totalStepList
              * @protected
              * @type {any[]}
              */
-            this.totalStepList = [];
+            _this.totalStepList = [];
             /**
              * 当前步数所在的id
              * @property currentStepId
              * @protected
              * @type {number}
              */
-            this.currentStepId = 0;
-            var s = this;
+            _this.currentStepId = 0;
+            var s = _this;
             s._instanceType = "annieUI.DrawingBoard";
             var bd = document.createElement("canvas");
             bd.width = width;
@@ -1901,6 +1914,7 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseDown);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
+            return _this;
         }
         Object.defineProperty(DrawingBoard.prototype, "drawRadius", {
             /**
@@ -2054,7 +2068,7 @@ var annieUI;
      * @extends annie.DrawingBoard
      * @since 1.1.1
      */
-    var ScratchCard = (function (_super) {
+    var ScratchCard = /** @class */ (function (_super) {
         __extends(ScratchCard, _super);
         //Events
         /**
@@ -2075,11 +2089,11 @@ var annieUI;
          */
         function ScratchCard(width, height, frontColorObj, backColorObj, drawRadius) {
             if (drawRadius === void 0) { drawRadius = 50; }
-            _super.call(this, width, height, frontColorObj);
-            this._drawList = [];
-            this._totalDraw = 1;
-            this._currentDraw = 0;
-            var s = this;
+            var _this = _super.call(this, width, height, frontColorObj) || this;
+            _this._drawList = [];
+            _this._totalDraw = 1;
+            _this._currentDraw = 0;
+            var s = _this;
             s._instanceType = "annieUI.ScratchCard";
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
@@ -2097,6 +2111,7 @@ var annieUI;
                     }
                 }
             });
+            return _this;
         }
         /**
          * 重置刮刮卡

@@ -354,6 +354,7 @@ namespace annie {
         public render(renderObj: IRender): void {
             renderObj.begin();
             super.render(renderObj);
+            renderObj.end();
             let s = this;
             let sf: any = s._floatDisplayList;
             let len = sf.length;
