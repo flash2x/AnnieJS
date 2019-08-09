@@ -133,18 +133,19 @@ namespace annie {
         public static createFromPoints(rect:Rectangle,...arg:Point[]):Rectangle{
            let x=arg[0].x,y=arg[0].y,w=arg[0].x,h=arg[0].y;
             for(let i:number=1;i<arg.length;i++){
-                if(arg[i]==null)continue;
-                if(x>arg[i].x){
-                    x=arg[i].x;
-                }
-                if(y>arg[i].y){
-                    y=arg[i].y;
-                }
-                if(w<arg[i].x){
-                    w=arg[i].x;
-                }
-                if(h<arg[i].y){
-                    h=arg[i].y;
+                if(arg[i] instanceof annie.Point) {
+                    if (x > arg[i].x) {
+                        x = arg[i].x;
+                    }
+                    if (y > arg[i].y) {
+                        y = arg[i].y;
+                    }
+                    if (w < arg[i].x) {
+                        w = arg[i].x;
+                    }
+                    if (h < arg[i].y) {
+                        h = arg[i].y;
+                    }
                 }
             }
             rect.x=x;
@@ -156,14 +157,14 @@ namespace annie {
 
         /**
          * 通过两个点来确定一个矩形
-         * @method createRectform2Point
+         * @method createRectForm2Point
          * @static
          * @param rect
          * @param p1
          * @param p2
          * @return {void}
          */
-        public static createRectform2Point(rect:Rectangle,p1:Point,p2:Point):void{
+        public static createRectForm2Point(rect:Rectangle,p1:Point,p2:Point):void{
             let x=p1.x,y=p1.y,w=p1.x,h=p1.y;
                 if(x>p2.x){
                     x=p2.x;

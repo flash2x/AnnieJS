@@ -52,8 +52,7 @@ namespace annie {
          * @public
          */
         public begin(): void {
-            let s = this;
-            let c = s.rootContainer;
+            let s = this,c = s.rootContainer;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (s._stage.bgColor != -1) {
                 s._ctx.fillStyle = s._stage._bgColorStr;
@@ -77,12 +76,10 @@ namespace annie {
             s.drawMask(target);
             s._ctx.clip();
         }
-
         private drawMask(target: any): void {
-            let s = this;
-            target.updateMatrix();
-            let tm = target.cMatrix;
+            let s = this, tm = target.cMatrix;
             s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            s._ctx.translate(-target._offsetX,-target._offsetY);
             if (target._instanceType == "annie.Shape") {
                 target._draw(s._ctx, true);
             } else if (target._instanceType == "annie.Sprite") {
@@ -112,7 +109,6 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
-
         /**
          * 调用渲染
          * @public
@@ -121,23 +117,21 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: any): void {
-            let s = this;
-            let texture = target._texture;
-            if (texture && texture.width > 0 && texture.height > 0) {
-                let ctx = s._ctx;
-                ctx.globalAlpha = target.cAlpha;
-                let tm = target.cMatrix;
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (target.rect && !target._isCache) {
-                    let tr = target.rect;
-                    ctx.drawImage(texture, tr.x, tr.y, tr.width, tr.height, 0, 0, tr.width, tr.height);
-                } else {
-                    ctx.translate(target._offsetX, target._offsetY);
-                    ctx.drawImage(texture, 0, 0);
-                }
+            let s = this,texture = target._texture,ctx = s._ctx, tm = target.cMatrix;
+            if(ctx.globalAlpha != target.cAlpha){
+                ctx.globalAlpha = target.cAlpha
+            };
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if(target instanceof annie.Bitmap){
+                let rect:any=target.rect;
+                ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height);
+            }else{
+                ctx.drawImage(texture, 0, 0);
             }
         }
-        public end(){};
+        public end() {
+        };
+
         /**
          * 初始化渲染器
          * @public
@@ -151,9 +145,7 @@ namespace annie {
                 s._stage.rootDiv.appendChild(s.rootContainer);
                 s.rootContainer.id = "_a2x_canvas";
             }
-            let c = s.rootContainer;
-            s._ctx = c["getContext"]('2d');
-            // s._ctx.imageSmoothingQuality="high";
+            s._ctx =  s.rootContainer.getContext('2d');
         }
 
         /**
@@ -163,8 +155,7 @@ namespace annie {
          * @method reSize
          */
         public reSize(): void {
-            let s = this;
-            let c = s.rootContainer;
+            let s = this, c = s.rootContainer;
             c.width = s._stage.divWidth * devicePixelRatio;
             c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";

@@ -185,7 +185,7 @@ namespace annie {
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
-                if (!mc.f) {
+                if (!(mc.f instanceof Object)) {
                     mc.f = [];
                     continue;
                 }
@@ -198,7 +198,7 @@ namespace annie {
                     for (let i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
                         //这帧是否为空
-                        if (frameCon) {
+                        if (frameCon instanceof Object) {
                             for (let j in frameCon) {
                                 let at = frameCon[j].at;
                                 if (at != undefined && at != -1) {
@@ -216,10 +216,10 @@ namespace annie {
                                 }
                             }
                             //上一帧是否为空
-                            if (lastFrameCon) {
+                            if (lastFrameCon instanceof Object) {
                                 for (let j in lastFrameCon) {
                                     //上一帧有，这一帧没有，加进来
-                                    if (!frameCon[j]) {
+                                    if (!(frameCon[j] instanceof Object)) {
                                         frameCon[j] = lastFrameCon[j];
                                     } else {
                                         //上一帧有，这一帧也有那么at就只有-1一种可能
@@ -227,7 +227,7 @@ namespace annie {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] == undefined) {
+                                                if (frameCon[j][m] === void 0) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -468,23 +468,23 @@ namespace annie {
         } else {
             //是不是文本
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr == undefined || info.tr.length == 1) {
+            if (info.tr === void 0 || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             let lastInfo = target._a2x_res_obj;
             if (lastInfo.tr != info.tr) {
                 [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
             }
-            if (info.w != undefined) {
+            if (info.w !== void 0) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
                 if (target._instanceType == "annie.TextField") {
                     target.y += 2;
                 }
             }
-            target.alpha = info.al == undefined ? 1 : info.al;
+            target.alpha = info.al === void 0 ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t != undefined) {
+            if (info.t !== void 0) {
                 if (info.t == -1) {
                     //initButton
                     if (target.initButton) {
@@ -496,7 +496,7 @@ namespace annie {
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {
-                if (info.fi != undefined) {
+                if (info.fi !== void 0) {
                     let filters: any = [];
                     let blur: any;
                     let color: any;
@@ -587,18 +587,13 @@ namespace annie {
     //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
     export function sb(sceneName: string, resName: string): annie.Bitmap {
         let sbName: string = "_f2x_s" + resName;
-        if (res[sceneName][sbName]) {
+        if (res[sceneName][sbName] instanceof Object) {
             return res[sceneName][sbName];
         } else {
             let bitmapData: any = null;
             let bitmap = b(sceneName, resName);
-            if (bitmap) {
-                if (bitmap.rect) {
-                    //从SpriteSheet中取出Image单独存放
-                    bitmapData = annie.Bitmap.convertToImage(bitmap, false);
-                } else {
-                    bitmapData = bitmap.bitmapData;
-                }
+            if (bitmap instanceof Object) {
+                bitmapData = annie.Bitmap.convertToImage(bitmap, false);
                 res[sceneName][sbName] = bitmapData;
                 return bitmapData;
             } else {
@@ -641,7 +636,6 @@ namespace annie {
         }
         return shape;
     }
-
     // 获取声音实例
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
@@ -688,11 +682,11 @@ namespace annie {
         }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;
-        if (info.success != undefined) {
+        urlLoader.responseType = info.responseType == undefined ? (info.dataType==undefined?"text":info.dataType): info.responseType;
+        if (info.success instanceof Object) {
             urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
-        if (info.error != undefined) {
+        if (info.error instanceof Object) {
             urlLoader.addEventListener(annie.Event.ERROR, info.error);
         }
         urlLoader.load(info.url);
@@ -785,7 +779,7 @@ namespace annie {
         let i: number;
         if (resClass.tf > 1) {
             isMc = true;
-            if (resClass.timeLine == undefined) {
+            if (resClass.timeLine === void 0) {
                 //将时间轴丰满,抽出脚本，抽出标签
                 let keyFrameCount = resClass.f.length;
                 let timeLine: Array<number> = [];
@@ -813,12 +807,12 @@ namespace annie {
                 }
                 resClass.timeLine = timeLine;
                 //初始化标签对象方便gotoAndStop gotoAndPlay
-                if (!resClass.f) resClass.f = [];
-                if (!resClass.a) resClass.a = {};
-                if (!resClass.s) resClass.s = {};
-                if (!resClass.e) resClass.e = {};
+                if (!(resClass.f instanceof Object)) resClass.f = [];
+                if (!(resClass.a instanceof Object)) resClass.a = {};
+                if (!(resClass.s instanceof Object)) resClass.s = {};
+                if (!(resClass.e instanceof Object)) resClass.e = {};
                 let label: any = {};
-                if (!resClass.l) {
+                if (!(resClass.l instanceof Object)) {
                     resClass.l = [];
                 } else {
                     for (let index in resClass.l) {
@@ -831,7 +825,7 @@ namespace annie {
             }
         }
         let children = resClass.c;
-        if (children) {
+        if (children instanceof Object) {
             let allChildren: any = [];
             let objCount = children.length;
             let obj: any = null;
@@ -896,11 +890,11 @@ namespace annie {
                     } else {
                         d(obj, resClass.f[0].c[index]);
                         // 检查是否有遮罩
-                        if (resClass.f[0].c[index].ma != undefined) {
+                        if (resClass.f[0].c[index].ma !== void 0) {
                             maskObj = obj;
                             maskTillId = resClass.f[0].c[index].ma - 1;
                         } else {
-                            if (maskObj && i <= maskTillId) {
+                            if (maskObj instanceof Object && i <= maskTillId) {
                                 obj.mask = maskObj;
                                 if (i == maskTillId) {
                                     maskObj = null;
@@ -915,7 +909,7 @@ namespace annie {
                     //如果是声音，还要把i这个顺序保存下来
                     if (objType == 5) {
                         obj.isPlaying = false;
-                        if (!target._a2x_sounds) {
+                        if (!(target._a2x_sounds instanceof Object)) {
                             target._a2x_sounds = {};
                         }
                         target._a2x_sounds[i] = obj;
@@ -925,7 +919,7 @@ namespace annie {
             if (isMc) {
                 //将mc里面的实例按照时间轴上的图层排序
                 let ol = resClass.ol;
-                if (ol) {
+                if (ol instanceof Object) {
                     for (let o = 0; o < ol.length; o++) {
                         target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
                     }

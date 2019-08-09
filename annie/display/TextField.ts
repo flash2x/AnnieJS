@@ -25,7 +25,11 @@ namespace annie {
          * @default left
          */
         public set textAlign(value: string) {
-            this._setProperty("_textAlign",value,3);
+            let s = this;
+            if (value != s._textAlign) {
+                s._textAlign = value;
+                s.UF = true;
+            }
         }
 
         public get textAlign(): string {
@@ -39,7 +43,11 @@ namespace annie {
          * @public
          */
         public set textAlpha(value: number) {
-            this._setProperty("_textAlpha",value,3);
+            let s = this;
+            if (value != s._textAlpha) {
+                s._textAlpha = value;
+                s.UF = true;
+            }
         }
 
         public get textAlpha(): number {
@@ -56,7 +64,11 @@ namespace annie {
          * @default 0
          */
         public set textHeight(value: number) {
-            this._setProperty("_textHeight",value,3);
+            let s = this;
+            if (value != s._textHeight) {
+                s._textHeight = value;
+                s.UF = true;
+            }
         }
 
         public get textHeight(): number{
@@ -71,7 +83,11 @@ namespace annie {
          * @param {number} value
          */
         public set lineHeight(value:number){
-            this._setProperty("_lineHeight",value,3);
+            let s = this;
+            if (value != s._lineHeight) {
+                s._lineHeight = value;
+                s.UF = true;
+            }
         }
         public get lineHeight():number{
             return this._lineHeight;
@@ -86,7 +102,11 @@ namespace annie {
          * @default 0
          */
         public set textWidth(value: number) {
-            this._setProperty("_textWidth",value,3);
+            let s = this;
+            if (value != s._textWidth) {
+                s._textWidth = value;
+                s.UF = true;
+            }
         }
 
         public get textWidth(): number {
@@ -102,8 +122,11 @@ namespace annie {
          * @default single
          */
         public set lineType(value: string) {
-            this._setProperty("_lineType",value,3);
-
+            let s = this;
+            if (value != s._lineType) {
+                s._lineType = value;
+                s.UF = true;
+            }
         }
         public get lineType(): string {
             return this._lineType;
@@ -118,7 +141,11 @@ namespace annie {
          * @since 1.0.0
          */
         public set text(value: string) {
-            this._setProperty("_text",value,3);
+            let s = this;
+            if (value != s._text) {
+                s._text = value;
+                s.UF = true;
+            }
         }
 
         public get text(): string {
@@ -134,9 +161,12 @@ namespace annie {
          * @default 12px Arial
          */
         public set font(value: string) {
-            this._setProperty("_font",value,3);
+            let s = this;
+            if (value != s._font) {
+                s._font = value;
+                s.UF = true;
+            }
         }
-
         public get font(): string {
             return this._font;
         }
@@ -150,7 +180,11 @@ namespace annie {
          * @default 12
          */
         public set size(value: number) {
-            this._setProperty("_size",value,3);
+            let s = this;
+            if (value != s._size) {
+                s._size = value;
+                s.UF = true;
+            }
         }
 
         public get size(): number {
@@ -166,7 +200,11 @@ namespace annie {
          * @default #fff
          */
         public set color(value: string) {
-            this._setProperty("_color",value,3);
+            let s = this;
+            if (value != s._color) {
+                s._color = value;
+                s.UF = true;
+            }
         }
 
         public get color(): string {
@@ -182,7 +220,11 @@ namespace annie {
          * @type {boolean}
          */
         public set italic(value: boolean) {
-            this._setProperty("_italic",value,3);
+            let s = this;
+            if (value != s._italic) {
+                s._italic = value;
+                s.UF = true;
+            }
         }
 
         public get italic(): boolean {
@@ -198,7 +240,11 @@ namespace annie {
          * @type {boolean}
          */
         public set bold(value: boolean) {
-            this._setProperty("_bold",value,3);
+            let s = this;
+            if (value != s._bold) {
+                s._bold = value;
+                s.UF = true;
+            }
         }
         public get bold(): boolean {
             return this._bold;
@@ -212,7 +258,11 @@ namespace annie {
          * @since 1.0.6
          */
         public set border(value: boolean) {
-            this._setProperty("_border",value,3);
+            let s = this;
+            if (value != s._border) {
+                s._border = value;
+                s.UF = true;
+            }
         }
 
         public get border(): boolean {
@@ -228,7 +278,11 @@ namespace annie {
          * @since 2.0.2
          */
         public set stroke(value:number){
-            this._setProperty("_stroke",value,3);
+            let s = this;
+            if (value != s._stroke) {
+                s._stroke = value;
+                s.UF = true;
+            }
         }
         public get stroke():number{
             return this._stroke;
@@ -241,7 +295,11 @@ namespace annie {
          * @since 2.0.2
          */
         public set strokeColor(value:string){
-            this._setProperty("_strokeColor",value,3);
+            let s = this;
+            if (value != s._strokeColor) {
+                s._strokeColor = value;
+                s.UF = true;
+            }
         }
         public get strokeColor():string{
             return this._strokeColor;
@@ -305,11 +363,10 @@ namespace annie {
             //ctx.restore();
             return w;
         }
-        private  realLines: any = [];
+        private realLines: any = [];
         public updateMatrix(): void {
-            super.updateMatrix();
             let s: any = this;
-            if (s._UI.UD || s._UI.UF) {
+            if (s.UF) {
                 s._text += "";
                 let can = s._texture;
                 let ctx = can.getContext("2d");
@@ -390,7 +447,8 @@ namespace annie {
 
                 }
                 /////////////////////////////////////
-                let cf = s.cFilters;
+                s.updateFilters();
+                let cf:any=s.cFilters;
                 let cfLen = cf.length;
                 if(cfLen>0) {
                     let imageData = ctx.getImageData(0, 0, maxW, maxH);
@@ -399,17 +457,17 @@ namespace annie {
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
-                s._offsetX = -10;
-                s._offsetY = -10;
-                s._UI.UD = false;
-                //给webGl更新新
-                //s._texture.updateTexture = true;
+                s.offsetX = -10;
+                s.offsetY = -10;
+                s._bounds.x=10;
+                s._bounds.y=10;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
             }
-            s._UI.UM = false;
-            s._UI.UA = false;
-            s._UI.UF = false;
+            super.updateMatrix();
+            s.UM = false;
+            s.UA = false;
+            s.UF = false;
         }
     }
 }

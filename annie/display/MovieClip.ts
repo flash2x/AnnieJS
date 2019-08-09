@@ -132,7 +132,7 @@ namespace annie {
          */
         public addFrameScript(frameIndex: number, frameScript: Function): void {
             let s = this;
-            if (s._a2x_script == undefined)
+            if (!(s._a2x_script instanceof Object))
                 s._a2x_script = {};
             s._a2x_script[frameIndex] = frameScript;
         }
@@ -146,7 +146,7 @@ namespace annie {
          */
         public removeFrameScript(frameIndex: number): void {
             let s = this;
-            if (s._a2x_script != undefined)
+            if (s._a2x_script instanceof Object)
                 s._a2x_script[frameIndex] = null;
         }
 
@@ -185,8 +185,7 @@ namespace annie {
                 s._mode = -1;
             }
         }
-
-        public set clicked(value: boolean) {
+        public set clicked(value: boolean){
             let s = this;
             if (value != s._clicked) {
                 if (value) {
@@ -366,9 +365,6 @@ namespace annie {
         private isUpdateFrame: boolean = false;
         protected updateFrame(): void {
             let s: any = this;
-            if(s._cacheAsBitmap){
-                return;
-            }
             if (s._a2x_res_class.tf > 1){
                 if (s._mode >= 0) {
                     s._isPlaying = false;
@@ -413,23 +409,23 @@ namespace annie {
                         for (let i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            if (curFrameObj && curFrameObj.c) {
+                            if (curFrameObj instanceof Object && curFrameObj.c) {
                                 objInfo = curFrameObj.c[objId];
                             } else {
                                 objInfo = null;
                             }
-                            //证明这一帧有这个对象
-                            if (objInfo) {
-                                annie.d(obj, objInfo);
-                            }
-                            if (objInfo || objId == 0) {
+                            if (objInfo instanceof Object || objId == 0) {
                                 //如果之前没有在显示对象列表,则添加进来
+                                //证明这一帧有这个对象
+                                if (objInfo instanceof Object ) {
+                                    annie.d(obj, objInfo);
+                                }
                                 // 检查是否有遮罩
                                 if (objInfo.ma != undefined) {
                                     maskObj = obj;
                                     maskTillId = objInfo.ma;
                                 } else {
-                                    if (maskObj) {
+                                    if (maskObj instanceof Object) {
                                         obj.mask = maskObj;
                                         if (objId == maskTillId) {
                                             maskObj = null;
@@ -437,13 +433,13 @@ namespace annie {
                                     }
                                 }
                                 s.children.unshift(obj);
-                                if (!obj.parent || s.parent != s) {
-                                    obj["_cp"] = true;
+                                if (!(obj.parent  instanceof annie.Sprite) || s.parent != s) {
+                                    obj._cp = true;
                                     obj.parent = s;
                                 }
                             } else {
                                 //这一帧没这个对象,如果之前在则删除
-                                if (obj.parent) {
+                                if (obj.parent instanceof annie.Sprite) {
                                     s._removeChildren.push(obj);
                                     MovieClip._resetMC(obj);
                                 }
@@ -460,24 +456,23 @@ namespace annie {
                         let isUserScript = false;
                         //因为脚本有可能改变Front，所以提前存起来
                         let isFront = s._isFront;
-                        if (s._a2x_script) {
+                        if (s._a2x_script instanceof Object) {
                             curFrameScript = s._a2x_script[frameIndex];
-                            if (curFrameScript != undefined) {
-                                if (curFrameScript != null)
-                                    curFrameScript();
+                            if (curFrameScript instanceof Object) {
+                                curFrameScript();
                                 isUserScript = true;
                             }
                         }
                         if (!isUserScript) {
                             curFrameScript = timeLineObj.a[frameIndex];
-                            if (curFrameScript) {
+                            if (curFrameScript instanceof Object) {
                                 s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
                             }
                         }
                         //有没有事件
                         if (s.hasEventListener(Event.CALL_FRAME)) {
                             curFrameScript = timeLineObj.e[frameIndex];
-                            if (curFrameScript) {
+                            if (curFrameScript instanceof Object) {
                                 for (let i = 0; i < curFrameScript.length; i++) {
                                     //抛事件
                                     s.dispatchEvent(Event.CALL_FRAME, {
@@ -495,7 +490,7 @@ namespace annie {
                         }
                         //有没有声音
                         let curFrameSound = timeLineObj.s[frameIndex];
-                        if (curFrameSound) {
+                        if (curFrameSound instanceof Object) {
                             for (let sound in curFrameSound) {
                                 s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
                             }
@@ -507,7 +502,7 @@ namespace annie {
         //flash声音管理
         private _a2x_sounds: any = null;
         private _frameState=0;
-        protected updateEventAndScript(callState: number): void {
+        public updateEventAndScript(callState: number): void {
             let s=this;
             if(!s._visible){
                 return;

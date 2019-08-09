@@ -131,11 +131,15 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: any): void {
-            let s = this;
-            let gl = s._ctx;
-            let texture = target._texture;
-            if (texture && texture.width > 0 && texture.height > 0) {
-                let texId = s.setTexture(texture);
+            let s = this,gl = s._ctx,texture = target._texture;
+            if (s._dataLength > s.bufferSize - 72) {
+                //说明缓冲空间用完了,这个时候画一次。
+                gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
+                gl.drawArrays(gl.TRIANGLES, 0, s._dataLength / 12);
+                s._dataLength = 0;
+            }
+            if (texture.width>0) {
+                let texW:number= texture.width,texH:number=texture.height,texId = s.setTexture(texture),rect=target._bounds;
                 if (texId < 0) {
                     //说明纹理通道用完了,这个时候画一次。
                     gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
@@ -146,19 +150,12 @@ namespace annie {
                     //继续获取texId
                     texId = s.setTexture(texture);
                 }
-                /////////////////////////
-                let rect: Rectangle;
-                if (target.rect && !target._isCache) {
-                    rect = target.rect;
-                } else {
-                    rect = new Rectangle(0, 0, texture.width, target.height);
-                }
                 let w = rect.width;
                 let h = rect.height;
-                let tx = rect.x / texture.width;
-                let ty = rect.y / texture.height;
-                let tw = (rect.x + rect.width) / texture.width;
-                let th = (rect.y + rect.height) / texture.height;
+                let tx = rect.x / texW;
+                let ty = rect.y / texH;
+                let tw = (rect.x + rect.width) / texW;
+                let th = (rect.y + rect.height) / texH;
                 let alpha = target.cAlpha;
                 let a = target.cMatrix.a;
                 let b = target.cMatrix.b;
@@ -166,22 +163,14 @@ namespace annie {
                 let d = target.cMatrix.d;
                 let x = target.cMatrix.tx;
                 let y = target.cMatrix.ty;
-                let dataArray = [
+                s._dataBuffer.set([
                     0, 0, tx, ty, texId, alpha, a, b, c, d, x, y,
                     w, 0, tw, ty, texId, alpha, a, b, c, d, x, y,
                     0, h, tx, th, texId, alpha, a, b, c, d, x, y,
                     0, h, tx, th, texId, alpha, a, b, c, d, x, y,
                     w, 0, tw, ty, texId, alpha, a, b, c, d, x, y,
-                    w, h, tw, th, texId, alpha, a, b, c, d, x, y];
-                if (s._dataLength > s.bufferSize - dataArray.length) {
-                    //说明缓冲空间用完了,这个时候画一次。
-                    gl.bufferData(gl.ARRAY_BUFFER, s._dataBuffer.subarray(0, s._dataLength), gl.STATIC_DRAW);
-                    gl.drawArrays(gl.TRIANGLES, 0, s._dataLength / 12);
-                    s._dataLength = 0;
-                }
-                for (let i = 0; i < dataArray.length; i++) {
-                    s._dataBuffer[s._dataLength++] = dataArray[i];
-                }
+                    w, h, tw, th, texId, alpha, a, b, c, d, x, y],s._dataLength);
+                s._dataLength+=72;
             }
         }
 
@@ -206,9 +195,9 @@ namespace annie {
                 s.rootContainer = document.createElement("canvas");
                 s._stage.rootDiv.appendChild(s.rootContainer);
                 s.rootContainer.id = "_a2x_canvas";
-                s._ctx = s.rootContainer["getContext"]('webgl');
+                s._ctx = s.rootContainer.getContext('webgl2');
                 if (!s._ctx) {
-                    console.log("no support WebGL");
+                    console.log("no support WebGL2.0");
                     return;
                 }
                 s._dataBuffer = new Float32Array(s.bufferSize);
@@ -236,7 +225,6 @@ namespace annie {
                 gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             }
         }
-
         /**
          * 当舞台尺寸改变时会调用
          * @public
@@ -255,14 +243,12 @@ namespace annie {
             let resolutionLocation = gl.getUniformLocation(s.curProgram, "u_resolution");
             gl.uniform2f(resolutionLocation, c.width, c.height);
         }
-
         public destroy(): void {
             let s = this;
             s.rootContainer = null;
             s._stage = null;
             s._ctx = null;
         }
-
         private createTextureCountScript(type: number): string {
             let s = this;
             if (type == 1) {
@@ -385,7 +371,7 @@ namespace annie {
             if (id < 0) {
                 //是否还有没用过的纹理通道
                 for (let i = 0; i < s.textureCount; i++) {
-                    if (this.dataRefList[i] == null) {
+                    if (!(this.dataRefList[i] instanceof Object)) {
                         //找到了未使用的通道，将他分配给目前的资源
                         s.dataRefList[i] = data;
                         s.dataStatus[i] = true;
@@ -398,7 +384,7 @@ namespace annie {
                 }
             }
             gl.activeTexture(gl.TEXTURE0 + id);
-            if (s.textureList[id] == null) {
+            if (!(s.textureList[id] instanceof Object)) {
                 let texture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 // Set the parameters so we can render any size image.

@@ -293,18 +293,6 @@ namespace annie {
         public stopImmediatePropagation():void{
             this._pd=true;
         }
-
-        /**
-         * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。
-         * @method stopPropagation
-         * @public
-         * @since 2.0.0
-         * @return {void}
-         */
-        public stopPropagation():void{
-            this._bpd=true;
-        }
-        private  _bpd:boolean=false;
         //是否阻止事件向下冒泡
         private _pd:boolean=false;
 
@@ -327,7 +315,6 @@ namespace annie {
             let s=this;
             s.target=target;
             s._pd=false;
-            s._bpd=false;
             s.type=type;
         }
     }

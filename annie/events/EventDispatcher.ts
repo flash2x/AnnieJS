@@ -114,7 +114,7 @@ namespace annie {
             if(!useCapture){
                 eventTypes=s.eventTypes1;
             }
-            if (!eventTypes[type]) {
+            if (!(eventTypes[type] instanceof Object)) {
                 eventTypes[type] = [];
             }
             if (eventTypes[type].indexOf(listener) < 0) {
@@ -160,10 +160,10 @@ namespace annie {
         public dispatchEvent(event: any, data: any = null,useCapture = true): boolean {
             let s = this;
             if (typeof(event) == "string") {
-                if (!s._defaultEvent) {
-                    s._defaultEvent = new annie.Event(event);
-                } else {
+                if (s._defaultEvent instanceof annie.Event) {
                     s._defaultEvent.reset(event, s);
+                } else {
+                    s._defaultEvent = new annie.Event(event);
                 }
                 event = s._defaultEvent;
             }
@@ -171,17 +171,17 @@ namespace annie {
             if(!useCapture){
                 listeners=s.eventTypes1[event.type];
             }
-            if (listeners) {
-                let len = listeners.length;
-                if (event.target == null) {
+            if (listeners instanceof Array) {
+                if (!(event.target instanceof Object)) {
                     event.target = s;
                 }
-                if (data != null) {
+                if (data instanceof Object) {
                     event.data = data;
                 }
+                let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    if(!event["_pd"]) {
-                        if (listeners[i]) {
+                    if(!event._pd){
+                        if (listeners[i] instanceof Function) {
                             listeners[i](event);
                         } else {
                             listeners.splice(i, 1);
@@ -206,11 +206,11 @@ namespace annie {
         public hasEventListener(type: string, useCapture = true): boolean {
             let s = this;
             if (useCapture) {
-                if (s.eventTypes[type] && s.eventTypes[type].length > 0) {
+                if (s.eventTypes[type] instanceof Array && s.eventTypes[type].length > 0) {
                     return true
                 }
             } else {
-                if (s.eventTypes1[type] && s.eventTypes1[type].length > 0) {
+                if (s.eventTypes[type] instanceof Array && s.eventTypes1[type].length > 0) {
                     return true
                 }
             }
@@ -233,7 +233,7 @@ namespace annie {
             if(!useCapture){
                 listeners=s.eventTypes1[type];
             }
-            if (listeners) {
+            if (listeners instanceof Array) {
                 let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
                     if (listeners[i] === listener) {

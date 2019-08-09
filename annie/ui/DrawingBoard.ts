@@ -48,24 +48,6 @@ namespace annieUI {
          */
         public bgColor: any = "";
         /**
-         * 画板宽
-         * @property drawWidth
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        public drawWidth: number = 0;
-        /**
-         * 画板高
-         * @property drawHeight
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        public drawHeight: number = 0;
-        /**
          * 总步数数据
          * @property totalStepList
          * @protected
@@ -86,7 +68,12 @@ namespace annieUI {
          * @type {number}
          */
         protected currentStepId: number = 0;
-
+        protected static _getDrawCanvas(width:number,height:number):HTMLCanvasElement{
+            let canvas:HTMLCanvasElement=document.createElement("canvas");
+            canvas.width=width;
+            canvas.height=height;
+            return canvas;
+        }
         /**
          * 构造函数
          * @method DrawingBoard
@@ -95,19 +82,13 @@ namespace annieUI {
          * @param bgColor 背景色 默认透明
          * @since 1.1.1
          */
-        constructor(width: number, height: number, bgColor: any = "") {
-            super();
+        constructor(width:number,height:number, bgColor: any = ""){
+            super(DrawingBoard._getDrawCanvas(width,height));
             var s = this;
             s._instanceType = "annieUI.DrawingBoard";
-            var bd = document.createElement("canvas");
-            bd.width = width;
-            bd.height = height;
-            s.context = bd.getContext("2d");
+            s.context=s.bitmapData.getContext('2d');
             s.context.lineCap = "round";
             s.context.lineJoin = "round";
-            s.bitmapData = bd;
-            s.drawHeight = height;
-            s.drawWidth = width;
             s.reset(bgColor);
             var mouseDown = s.onMouseDown.bind(s);
             var mouseMove = s.onMouseMove.bind(s);

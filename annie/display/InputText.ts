@@ -294,7 +294,6 @@ namespace annie {
                 s.htmlElement.value = value;
             }
         }
-
         /**
          * 输入文本的最大输入字数
          * @public

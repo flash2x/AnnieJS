@@ -182,7 +182,7 @@ namespace annie {
         private static flush():void{
             var len=Timer._timerList.length;
             for(var i=len-1;i>=0;i--){
-                if(Timer._timerList[i]) {
+                if(Timer._timerList[i] ) {
                     Timer._timerList[i].update();
                 }else{
                     Timer._timerList.splice(i,1);

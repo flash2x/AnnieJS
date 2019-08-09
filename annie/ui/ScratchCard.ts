@@ -27,11 +27,10 @@ namespace annieUI {
          * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。一般是用位图填充，如果生成位图填充，请自行复习canvas位图填充
          * @param drawRadius 刮刮卡刮的时候的半径，默认为50
          */
-        constructor(width: number, height: number, frontColorObj: any, backColorObj: any, drawRadius: number = 50) {
-            super(width, height, frontColorObj);
+        constructor(width:number,height:number, frontColorObj: any, backColorObj: any, drawRadius: number = 50) {
+            super(width,height, frontColorObj);
             let s = this;
             s._instanceType = "annieUI.ScratchCard";
-
             s.drawColor = backColorObj;
             s.drawRadius = drawRadius;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, function (e: annie.MouseEvent) {
@@ -68,8 +67,8 @@ namespace annieUI {
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
-                let dw: number = Math.floor(s.drawWidth / s._drawRadius);
-                let dh: number = Math.floor(s.drawHeight / s._drawRadius);
+                let dw: number = Math.floor(s._bounds.width / s._drawRadius);
+                let dh: number = Math.floor(s._bounds.height  / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (let i = 0; i < dw; i++) {
                     s._drawList[i] = [];
@@ -96,8 +95,8 @@ namespace annieUI {
         public set drawRadius(value: number) {
             let s = this;
             s._drawRadius = value;
-            let dw: number = Math.floor(s.drawWidth / value);
-            let dh: number = Math.floor(s.drawHeight / value);
+            let dw: number = Math.floor(s._bounds.width / s._drawRadius);
+            let dh: number = Math.floor(s._bounds.height  / s._drawRadius);
             s._totalDraw = dw * dh;
             for (let i = 0; i < dw; i++) {
                 s._drawList[i] = [];

@@ -740,24 +740,6 @@ declare namespace annieUI {
          */
         bgColor: any;
         /**
-         * 画板宽
-         * @property drawWidth
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        drawWidth: number;
-        /**
-         * 画板高
-         * @property drawHeight
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        drawHeight: number;
-        /**
          * 总步数数据
          * @property totalStepList
          * @protected
@@ -778,6 +760,7 @@ declare namespace annieUI {
          * @type {number}
          */
         protected currentStepId: number;
+        protected static _getDrawCanvas(width: number, height: number): HTMLCanvasElement;
         /**
          * 构造函数
          * @method DrawingBoard

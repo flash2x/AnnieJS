@@ -497,10 +497,9 @@ var annieUI;
             s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
             s.photo.crossOrigin = "";
-            s.bitmap = new annie.Bitmap();
             s.maskObj = new annie.Shape();
             s.photo.onload = function (e) {
-                s.bitmap.bitmapData = s.photo;
+                s.bitmap = new annie.Bitmap(s.photo);
                 s.maskObj.clear();
                 s.maskObj.beginFill("#000000");
                 var scale = s.radio / (s.photo.width < s.photo.height ? s.photo.width : s.photo.height);
@@ -514,11 +513,11 @@ var annieUI;
                     s.maskObj.drawRect(0, 0, s.radioW, s.radioH);
                 }
                 s.maskObj.endFill();
+                s.addChild(s.bitmap);
+                s.addChild(s.maskObj);
+                s.bitmap.mask = s.maskObj;
                 s.dispatchEvent("onComplete");
             };
-            s.addChild(s.bitmap);
-            s.addChild(s.maskObj);
-            s.bitmap.mask = s.maskObj;
             return _this;
         }
         /**
@@ -1843,7 +1842,7 @@ var annieUI;
          */
         function DrawingBoard(width, height, bgColor) {
             if (bgColor === void 0) { bgColor = ""; }
-            var _this = _super.call(this) || this;
+            var _this = _super.call(this, DrawingBoard._getDrawCanvas(width, height)) || this;
             _this.context = null;
             _this._isMouseDown = false;
             _this._drawRadius = 50;
@@ -1865,24 +1864,6 @@ var annieUI;
              */
             _this.bgColor = "";
             /**
-             * 画板宽
-             * @property drawWidth
-             * @type {number}
-             * @readonly
-             * @public
-             * @since 1.1.1
-             */
-            _this.drawWidth = 0;
-            /**
-             * 画板高
-             * @property drawHeight
-             * @type {number}
-             * @readonly
-             * @public
-             * @since 1.1.1
-             */
-            _this.drawHeight = 0;
-            /**
              * 总步数数据
              * @property totalStepList
              * @protected
@@ -1898,15 +1879,9 @@ var annieUI;
             _this.currentStepId = 0;
             var s = _this;
             s._instanceType = "annieUI.DrawingBoard";
-            var bd = document.createElement("canvas");
-            bd.width = width;
-            bd.height = height;
-            s.context = bd.getContext("2d");
+            s.context = s.bitmapData.getContext('2d');
             s.context.lineCap = "round";
             s.context.lineJoin = "round";
-            s.bitmapData = bd;
-            s.drawHeight = height;
-            s.drawWidth = width;
             s.reset(bgColor);
             var mouseDown = s.onMouseDown.bind(s);
             var mouseMove = s.onMouseMove.bind(s);
@@ -1934,6 +1909,12 @@ var annieUI;
             configurable: true
         });
         ;
+        DrawingBoard._getDrawCanvas = function (width, height) {
+            var canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            return canvas;
+        };
         DrawingBoard.prototype.onMouseDown = function (e) {
             var s = this;
             s._isMouseDown = true;
@@ -2129,8 +2110,8 @@ var annieUI;
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
-                var dw = Math.floor(s.drawWidth / s._drawRadius);
-                var dh = Math.floor(s.drawHeight / s._drawRadius);
+                var dw = Math.floor(s._bounds.width / s._drawRadius);
+                var dh = Math.floor(s._bounds.height / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (var i = 0; i < dw; i++) {
                     s._drawList[i] = [];
@@ -2157,8 +2138,8 @@ var annieUI;
             set: function (value) {
                 var s = this;
                 s._drawRadius = value;
-                var dw = Math.floor(s.drawWidth / value);
-                var dh = Math.floor(s.drawHeight / value);
+                var dw = Math.floor(s._bounds.width / s._drawRadius);
+                var dh = Math.floor(s._bounds.height / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (var i = 0; i < dw; i++) {
                     s._drawList[i] = [];

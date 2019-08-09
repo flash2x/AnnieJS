@@ -125,7 +125,7 @@ namespace annie {
                         visible=false;
                     }else {
                         let parent = s.parent;
-                        while (parent) {
+                        while (parent instanceof annie.Sprite) {
                             if (!parent._visible) {
                                 visible = false;
                                 break;
@@ -138,20 +138,23 @@ namespace annie {
                 if (show != style.display) {
                     style.display = show;
                 }
-                if(visible||s._UI.UM||s._UI.UA||s._UI.UF){
-                    if(s._UI.UM) {
+                if(visible||s.UM||s.UA||s.UF){
+                    if(s.UM) {
                         let mtx = s.cMatrix;
                         let d = annie.devicePixelRatio;
                         style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                     }
-                    if (s._UI.UA){
+                    if (s.UA){
                         style.opacity = s.cAlpha;
                     }
-                    s._UI.UF = false;
-                    s._UI.UM = false;
-                    s._UI.UA = false;
+                    s.UF = false;
+                    s.UM = false;
+                    s.UA = false;
                 }
             }
+        }
+        public render(renderObj: IRender){
+            super.updateMatrix();
         }
         public destroy():void {
             //清除相应的数据引用

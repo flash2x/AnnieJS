@@ -139,7 +139,7 @@ namespace annie {
          */
         public transformPoint = function (x:number, y:number,bp:Point=null):Point {
             let s = this;
-            if(!bp){
+            if(!(bp instanceof annie.Point)){
                 bp=new Point();
             }
             bp.x=x * s.a + y * s.c + s.tx;
