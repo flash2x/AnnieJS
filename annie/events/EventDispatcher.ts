@@ -44,6 +44,8 @@ namespace annie {
         /**
          * 销毁一个对象
          * 销毁之前一定要做完其他善后工作，否则有可能会出错
+         * 特别注意不能在对象自身方法或事件里调用此方法。
+         * 比如，不要在显示对象自身的 annie.Event.ON_REMOVE_TO_STAGE 或者其他类似事件调用，一定会报错
          * @method destroy
          * @since 2.0.0
          * @public
@@ -272,8 +274,16 @@ namespace annie {
             s.eventTypes1 = {};
             s.eventTypes = {};
         }
-        destroy(): void {
-            this.removeAllEventListener();
+
+        /**
+         *
+         */
+        public destroy(): void {
+            let s:any=this;
+            s.removeAllEventListener();
+            s.eventTypes1=null;
+            s.eventTypes=null;
+            s._defaultEvent=null;
         }
     }
 }

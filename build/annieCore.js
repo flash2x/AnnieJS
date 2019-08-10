@@ -63,6 +63,8 @@ var annie;
         /**
          * 销毁一个对象
          * 销毁之前一定要做完其他善后工作，否则有可能会出错
+         * 特别注意不能在对象自身方法或事件里调用此方法。
+         * 比如，不要在显示对象自身的 annie.Event.ON_REMOVE_TO_STAGE 或者其他类似事件调用，一定会报错
          * @method destroy
          * @since 2.0.0
          * @public
@@ -293,8 +295,15 @@ var annie;
             s.eventTypes1 = {};
             s.eventTypes = {};
         };
+        /**
+         *
+         */
         EventDispatcher.prototype.destroy = function () {
-            this.removeAllEventListener();
+            var s = this;
+            s.removeAllEventListener();
+            s.eventTypes1 = null;
+            s.eventTypes = null;
+            s._defaultEvent = null;
         };
         //全局的鼠标事件的监听数对象表
         EventDispatcher._MECO = {};
@@ -723,7 +732,7 @@ var annie;
          * @return {void}
          */
         MouseEvent.prototype.updateAfterEvent = function () {
-            this.target.stage.isReUpdate = true;
+            this.target.stage.updateMatrix();
         };
         MouseEvent.prototype.destroy = function () {
             //清除相应的数据引用
@@ -852,7 +861,7 @@ var annie;
          * @return {void}
          */
         TouchEvent.prototype.updateAfterEvent = function () {
-            this.target.stage.isReUpdate = true;
+            this.target.stage.updateMatrix();
         };
         TouchEvent.prototype.destroy = function () {
             //清除相应的数据引用
@@ -1694,6 +1703,7 @@ var annie;
             _this.soundList = [];
             //每个Flash文件生成的对象都有一个自带的初始化信息
             _this._a2x_res_obj = {};
+            _this._isOnStage = false;
             _this._instanceType = "annie.DisplayObject";
             return _this;
         }
@@ -2396,34 +2406,36 @@ var annie;
             s._visible = false;
             _super.prototype.destroy.call(this);
         };
-        //更新流程走完之后再执行脚本和事件执行流程
-        DisplayObject.prototype.updateEventAndScript = function (callState) {
+        DisplayObject.prototype._onRemoveEvent = function () {
+            //如果有音乐,则关闭音乐
             var s = this;
-            //if (!s.stage || callState == 2) return;
-            if (callState < 2) {
-                var sounds = s.soundList;
-                if (callState == 0) {
-                    //如果有音乐,则关闭音乐
-                    if (sounds.length > 0) {
-                        for (var i = 0; i < sounds.length; i++) {
-                            sounds[i].stop2();
-                        }
-                    }
-                    s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
-                }
-                else {
-                    //如果有音乐，则播放音乐
-                    if (sounds.length > 0) {
-                        for (var i = 0; i < sounds.length; i++) {
-                            sounds[i].play2();
-                        }
-                    }
-                    s.dispatchEvent(annie.Event.ADD_TO_STAGE);
+            s._isOnStage = false;
+            var sounds = s.soundList;
+            if (sounds.length > 0) {
+                for (var i = 0; i < sounds.length; i++) {
+                    sounds[i].stop2();
                 }
             }
-            else if (callState == 2) {
-                s.dispatchEvent(annie.Event.ENTER_FRAME);
+            s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
+        };
+        DisplayObject.prototype._onAddEvent = function () {
+            var s = this;
+            s._isOnStage = true;
+            //如果有音乐，则播放音乐
+            var sounds = s.soundList;
+            if (sounds.length > 0) {
+                for (var i = 0; i < sounds.length; i++) {
+                    sounds[i].play2();
+                }
             }
+            s.dispatchEvent(annie.Event.ADD_TO_STAGE);
+        };
+        DisplayObject.prototype._onEnterFrameEvent = function () {
+            var s = this;
+            if (!s._visible) {
+                return;
+            }
+            s.dispatchEvent(annie.Event.ENTER_FRAME);
         };
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
@@ -3575,9 +3587,6 @@ var annie;
              * @readonly
              */
             _this.children = [];
-            _this._removeChildren = [];
-            //0 未更新 1 正在更新 2 需要再次更新 3 更新结束
-            _this._updateState = 0;
             _this._hitArea = null;
             var s = _this;
             s._instanceType = "annie.Sprite";
@@ -3592,7 +3601,6 @@ var annie;
             if (s.parent instanceof annie.Sprite)
                 Sprite._removeFormParent(s.parent, s);
             s.children = null;
-            s._removeChildren = null;
             s._hitArea = null;
             _super.prototype.destroy.call(this);
         };
@@ -3716,33 +3724,20 @@ var annie;
             }
             if (cp != s) {
                 child._cp = true;
-                child.stage = null;
                 child.parent = s;
-                if (s.stage instanceof annie.Stage && s._updateState == 1) {
-                    //被子级改了，遍历又过了，于是只能重新再遍历一次
-                    s.stage.isReUpdate = true;
+                if (s._isOnStage && !child._isOnStage) {
+                    child.stage = s.stage;
+                    child._onAddEvent();
                 }
             }
         };
         Sprite._removeFormParent = function (cp, child) {
             var cpc = cp.children;
             var len = cpc.length;
-            var isHave = false;
             for (var i = 0; i < len; i++) {
                 if (cpc[i] == child) {
                     cpc.splice(i, 1);
-                    isHave = true;
                     break;
-                }
-            }
-            if (!isHave) {
-                cpc = cp._removeChildren;
-                len = cpc.length;
-                for (var i = 0; i < len; i++) {
-                    if (cpc[i] == child) {
-                        cpc.splice(i, 1);
-                        break;
-                    }
                 }
             }
         };
@@ -3838,7 +3833,11 @@ var annie;
             else {
                 child = s.children.splice(index, 1)[0];
             }
-            s._removeChildren.push(child);
+            if (s._isOnStage && child._isOnStage) {
+                child._onRemoveEvent();
+                child.stage = null;
+            }
+            child.parent = null;
         };
         /**
          * 移除Sprite上的所有child
@@ -3918,7 +3917,6 @@ var annie;
             s.UF = false;
             s.UM = false;
             s.UA = false;
-            s._updateState = 0;
         };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
@@ -3957,66 +3955,45 @@ var annie;
                 renderObj.endMask();
             }
         };
-        Sprite.prototype.updateEventAndScript = function (callState) {
+        Sprite.prototype._onRemoveEvent = function () {
+            _super.prototype._onRemoveEvent.call(this);
             var s = this;
-            if (!s._visible) {
-                return;
-            }
-            _super.prototype.updateEventAndScript.call(this, callState);
-            s._updateState = 1;
             var child = null;
-            var children = null;
-            var len = 0;
-            //上级舞台发生变动,所有在舞台上的元素及子元素都要执行事件
-            if (callState == 0) {
-                //移除舞台
-                children = s.children;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child instanceof annie.DisplayObject && child.stage instanceof annie.Stage) {
-                        child.updateEventAndScript(callState);
-                        child.stage = null;
-                    }
+            var children = s.children.concat();
+            var len = children.length;
+            for (var i = len - 1; i >= 0; i--) {
+                child = children[i];
+                if (child instanceof annie.DisplayObject && child._isOnStage) {
+                    child._onRemoveEvent();
+                    child.stage = null;
                 }
             }
-            else if (callState == 1) {
-                //添加到舞台
-                children = s.children;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child instanceof annie.DisplayObject && !(child.stage instanceof annie.Stage)) {
-                        child.stage = s.stage;
-                        child.updateEventAndScript(callState);
-                    }
+        };
+        Sprite.prototype._onAddEvent = function () {
+            var s = this;
+            _super.prototype._onAddEvent.call(this);
+            var child = null;
+            var children = s.children.concat();
+            var len = children.length;
+            for (var i = len - 1; i >= 0; i--) {
+                child = children[i];
+                if (child instanceof annie.DisplayObject && !child._isOnStage) {
+                    child.stage = s.stage;
+                    child._onAddEvent();
                 }
             }
-            else {
-                children = s.children;
-                len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child instanceof annie.DisplayObject) {
-                        if (child.stage instanceof annie.Stage) {
-                            child.updateEventAndScript(callState);
-                        }
-                        else {
-                            child.stage = s.stage;
-                            child.updateEventAndScript(1);
-                        }
-                    }
+        };
+        Sprite.prototype._onEnterFrameEvent = function () {
+            var s = this;
+            _super.prototype._onEnterFrameEvent.call(this);
+            var child = null;
+            var children = s.children.concat();
+            var len = children.length;
+            for (var i = len - 1; i >= 0; i--) {
+                child = children[i];
+                if (child instanceof annie.DisplayObject && child._isOnStage) {
+                    child._onEnterFrameEvent();
                 }
-            }
-            //执行移除事件,为什么要用while，因为抛出的事件有可能又产生了被移除的对象
-            children = s._removeChildren;
-            len = children.length;
-            while (len > 0) {
-                child = children.shift();
-                child.updateEventAndScript(0);
-                child.stage = null;
-                child.parent = null;
-                len = children.length;
             }
         };
         Object.defineProperty(Sprite.prototype, "hitArea", {
@@ -4731,10 +4708,6 @@ var annie;
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
-            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
-                //要更新
-                s.stage.isReUpdate = true;
-            }
         };
         /**
          * 将播放头向前移一帧并停在下一帧,如果本身在第一帧则不做任何反应
@@ -4751,10 +4724,6 @@ var annie;
                 s._wantFrame -= 1;
             }
             s._isPlaying = false;
-            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
-                //要更新
-                s.stage.isReUpdate = true;
-            }
         };
         MovieClip.prototype.isSameFrame = function () {
             var s = this;
@@ -4790,10 +4759,6 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
-            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
-                //要更新
-                s.stage.isReUpdate = true;
-            }
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -4841,10 +4806,6 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
-            if (s.stage && s._frameState == 1 && !s.isSameFrame()) {
-                //要更新
-                s.stage.isReUpdate = true;
-            }
         };
         MovieClip.prototype.updateFrame = function () {
             var s = this;
@@ -4889,7 +4850,6 @@ var annie;
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s._removeChildren.length = 0;
                         var maskObj = null;
                         var maskTillId = -1;
                         for (var i = childCount - 1; i >= 0; i--) {
@@ -4924,12 +4884,20 @@ var annie;
                                 if (!(obj.parent instanceof annie.Sprite) || s.parent != s) {
                                     obj._cp = true;
                                     obj.parent = s;
+                                    if (s._isOnStage && !obj._isOnStage) {
+                                        obj.stage = s.stage;
+                                        obj._onAddEvent();
+                                    }
                                 }
                             }
                             else {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent instanceof annie.Sprite) {
-                                    s._removeChildren.push(obj);
+                                    if (obj.parent._isOnStage && obj._isOnStage) {
+                                        obj._onRemoveEvent();
+                                        obj.stage = null;
+                                        obj.parent = null;
+                                    }
                                     MovieClip._resetMC(obj);
                                 }
                             }
@@ -4988,13 +4956,13 @@ var annie;
                 }
             }
         };
-        MovieClip.prototype.updateEventAndScript = function (callState) {
+        MovieClip.prototype._onEnterFrameEvent = function () {
             var s = this;
             if (!s._visible) {
                 return;
             }
+            _super.prototype._onEnterFrameEvent.call(this);
             s.updateFrame();
-            _super.prototype.updateEventAndScript.call(this, callState);
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
@@ -5095,7 +5063,6 @@ var annie;
                     if (!s._isAdded) {
                         s._isAdded = true;
                         s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
-                        s.stage["_floatDisplayList"].push(s);
                     }
                     else {
                         if (s.htmlElement && s.visible) {
@@ -5157,14 +5124,15 @@ var annie;
             }
             return null;
         };
-        FloatDisplay.prototype.updateStyle = function () {
+        FloatDisplay.prototype._onEnterFrameEvent = function () {
+            _super.prototype._onEnterFrameEvent.call(this);
             var s = this;
             var o = s.htmlElement;
             if (o) {
                 var style = o.style;
                 var visible = s._visible;
                 if (visible) {
-                    if (!s.stage) {
+                    if (!s._isOnStage) {
                         visible = false;
                     }
                     else {
@@ -5182,23 +5150,32 @@ var annie;
                 if (show != style.display) {
                     style.display = show;
                 }
-                if (visible || s.UM || s.UA || s.UF) {
-                    if (s.UM) {
-                        var mtx = s.cMatrix;
-                        var d_1 = annie.devicePixelRatio;
-                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d_1).toFixed(4) + "," + (mtx.b / d_1).toFixed(4) + "," + (mtx.c / d_1).toFixed(4) + "," + (mtx.d / d_1).toFixed(4) + "," + (mtx.tx / d_1).toFixed(4) + "," + (mtx.ty / d_1).toFixed(4) + ")";
-                    }
-                    if (s.UA) {
-                        style.opacity = s.cAlpha;
-                    }
-                    s.UF = false;
-                    s.UM = false;
-                    s.UA = false;
+            }
+        };
+        FloatDisplay.prototype.updateMatrix = function () {
+            var s = this;
+            var o = s.htmlElement;
+            if (!s._visible || !o)
+                return;
+            _super.prototype.updateMatrix.call(this);
+            if (s.UM || s.UA || s.UF) {
+                var style = o.style;
+                if (s.UM) {
+                    var mtx = s.cMatrix;
+                    var d_1 = annie.devicePixelRatio;
+                    style.transform = style.webkitTransform = "matrix(" + (mtx.a / d_1).toFixed(4) + "," + (mtx.b / d_1).toFixed(4) + "," + (mtx.c / d_1).toFixed(4) + "," + (mtx.d / d_1).toFixed(4) + "," + (mtx.tx / d_1).toFixed(4) + "," + (mtx.ty / d_1).toFixed(4) + ")";
                 }
+                if (s.UA) {
+                    style.opacity = s.cAlpha;
+                }
+            }
+            if (s._visible) {
+                s.UF = false;
+                s.UM = false;
+                s.UA = false;
             }
         };
         FloatDisplay.prototype.render = function (renderObj) {
-            _super.prototype.updateMatrix.call(this);
         };
         FloatDisplay.prototype.destroy = function () {
             //清除相应的数据引用
@@ -5211,14 +5188,6 @@ var annie;
                 }
                 s._isAdded = false;
                 s.htmlElement = null;
-            }
-            var sf = s.stage["_floatDisplayList"];
-            var len = sf.length;
-            for (var i = 0; i < len; i++) {
-                if (sf[i] == s) {
-                    sf.splice(i, 1);
-                    break;
-                }
             }
             _super.prototype.destroy.call(this);
         };
@@ -6307,14 +6276,12 @@ var annie;
             // 当前的刷新次数计数器
             _this._currentFlush = 0;
             _this._lastDpList = {};
-            _this._floatDisplayList = [];
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
             _this._ml = [];
             //这个是事件中用到的Point对象池,以提高性能
             _this._mp = [];
             // 鼠标按下事件的对象池
             _this._mouseDownPoint = {};
-            _this.isReUpdate = false;
             //html的鼠标或单点触摸对应的引擎事件类型名
             _this._mouseEventTypes = {
                 mousedown: "onMouseDown",
@@ -6379,6 +6346,7 @@ var annie;
             var s = _this;
             s._instanceType = "annie.Stage";
             s.stage = s;
+            s._isOnStage = true;
             s.name = "stageInstance_" + s.instanceId;
             var div = document.getElementById(rootDivId);
             s.renderType = renderType;
@@ -6525,12 +6493,6 @@ var annie;
             renderObj.begin();
             _super.prototype.render.call(this, renderObj);
             renderObj.end();
-            var s = this;
-            var sf = s._floatDisplayList;
-            var len = sf.length;
-            for (var i = 0; i < len; i++) {
-                sf[i].updateStyle();
-            }
         };
         //刷新mouse或者touch事件
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
@@ -6545,38 +6507,26 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             //看看是否有resize
-            var callState = 2;
-            var needUpdate = false;
             if (s._flush == 0) {
                 s.resize();
-                needUpdate = true;
+                s._onEnterFrameEvent();
+                s.updateMatrix();
+                s.render(s.renderObj);
             }
             else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
                     s.resize();
+                    s._onEnterFrameEvent();
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        needUpdate = true;
+                        s.updateMatrix();
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
-            }
-            if (needUpdate) {
-                //到时最好是检查下死循环
-                do {
-                    s.isReUpdate = false;
-                    s.updateEventAndScript(callState);
-                    callState++;
-                    if (callState > 100) {
-                        trace("出现无限死循环,请检查");
-                        s.isReUpdate = false;
-                    }
-                } while (s.isReUpdate);
-                s.updateMatrix();
-                s.render(s.renderObj);
             }
         };
         /**

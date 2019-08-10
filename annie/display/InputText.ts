@@ -41,7 +41,7 @@ namespace annie {
          */
         public constructor(inputType:number=0){
             super();
-            var input: any = null;
+            let input: any = null;
             let s: InputText = this;
             s._instanceType = "annie.InputText";
            if(inputType<2){
@@ -53,7 +53,7 @@ namespace annie {
                 input.style.overflow = "hidden";
             }
             s.inputType = inputType;
-            var remove = function (){
+            let remove = function (){
                 if (s.isAutoDownKeyBoard&&annie.osType!="pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }

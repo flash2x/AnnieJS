@@ -72,7 +72,6 @@ namespace annie {
             s.clearDataStatus();
             s._dataLength = 0;
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -87,7 +86,6 @@ namespace annie {
              s.drawMask(target);
              s._ctx.clip();*/
         }
-
         private drawMask(target: any): void {
             /*let s = this;
             target.updateMatrix();

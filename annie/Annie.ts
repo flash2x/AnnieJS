@@ -1,7 +1,7 @@
 /**
  * @class annie
  */
-namespace annie {
+namespace annie{
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。

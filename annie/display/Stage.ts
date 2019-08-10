@@ -264,7 +264,6 @@ namespace annie {
         private _currentFlush: number = 0;
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
-        private _floatDisplayList: Array<FloatDisplay> = [];
 
         /**
          * 显示对象入口函数
@@ -293,6 +292,7 @@ namespace annie {
             let s: Stage = this;
             s._instanceType = "annie.Stage";
             s.stage = s;
+            s._isOnStage=true;
             s.name = "stageInstance_" + s.instanceId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;
@@ -334,12 +334,6 @@ namespace annie {
             renderObj.begin();
             super.render(renderObj);
             renderObj.end();
-            let s = this;
-            let sf: any = s._floatDisplayList;
-            let len = sf.length;
-            for (let i = 0; i < len; i++) {
-                sf[i].updateStyle();
-            }
         }
 
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
@@ -358,44 +352,30 @@ namespace annie {
         }
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
-        public isReUpdate: boolean = false;
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
             //看看是否有resize
-            let callState = 2;
-            let needUpdate = false;
             if (s._flush == 0) {
                 s.resize();
-                needUpdate = true;
+                s._onEnterFrameEvent();
+                s.updateMatrix();
+                s.render(s.renderObj);
             }else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
                     s.resize();
+                    s._onEnterFrameEvent();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        needUpdate = true;
+                        s.updateMatrix();
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
             }
-            if (needUpdate) {
-                //到时最好是检查下死循环
-                do {
-                    s.isReUpdate = false;
-                    s.updateEventAndScript(callState);
-                    callState++;
-                    if (callState > 100) {
-                        trace("出现无限死循环,请检查");
-                        s.isReUpdate = false;
-                    }
-                } while (s.isReUpdate);
-                s.updateMatrix();
-                s.render(s.renderObj);
-            }
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -411,7 +391,6 @@ namespace annie {
                 s._flush = 0;
             }
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method getFrameRate
@@ -422,7 +401,6 @@ namespace annie {
         public getFrameRate(): number {
             return 60 / (this._flush + 1);
         }
-
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 获取引擎所在的div宽高

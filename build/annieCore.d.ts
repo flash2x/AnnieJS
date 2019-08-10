@@ -36,6 +36,8 @@ declare namespace annie {
         /**
          * 销毁一个对象
          * 销毁之前一定要做完其他善后工作，否则有可能会出错
+         * 特别注意不能在对象自身方法或事件里调用此方法。
+         * 比如，不要在显示对象自身的 annie.Event.ON_REMOVE_TO_STAGE 或者其他类似事件调用，一定会报错
          * @method destroy
          * @since 2.0.0
          * @public
@@ -120,6 +122,9 @@ declare namespace annie {
          * @return {void}
          */
         removeAllEventListener(): void;
+        /**
+         *
+         */
         destroy(): void;
     }
 }
@@ -1370,7 +1375,10 @@ declare namespace annie {
         removeSound(id: number | string): void;
         private _a2x_res_obj;
         destroy(): void;
-        updateEventAndScript(callState: number): void;
+        _isOnStage: boolean;
+        _onRemoveEvent(): void;
+        _onAddEvent(): void;
+        _onEnterFrameEvent(): void;
     }
 }
 /**
@@ -1871,7 +1879,6 @@ declare namespace annie {
          * @readonly
          */
         children: DisplayObject[];
-        _removeChildren: DisplayObject[];
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -1961,8 +1968,9 @@ declare namespace annie {
         getBounds(): Rectangle;
         updateMatrix(): void;
         render(renderObj: IRender): void;
-        protected _updateState: number;
-        updateEventAndScript(callState: number): void;
+        _onRemoveEvent(): void;
+        _onAddEvent(): void;
+        _onEnterFrameEvent(): void;
         /**
          * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。
          * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。
@@ -2401,7 +2409,7 @@ declare namespace annie {
         protected updateFrame(): void;
         private _a2x_sounds;
         private _frameState;
-        updateEventAndScript(callState: number): void;
+        _onEnterFrameEvent(): void;
         private static _resetMC;
         render(renderObj: IRender): void;
         destroy(): void;
@@ -2455,7 +2463,8 @@ declare namespace annie {
          */
         init(htmlElement: any): void;
         private getStyle;
-        updateStyle(): void;
+        _onEnterFrameEvent(): void;
+        updateMatrix(): void;
         render(renderObj: IRender): void;
         destroy(): void;
     }
@@ -3019,7 +3028,6 @@ declare namespace annie {
         private _currentFlush;
         private static _isLoadedVConsole;
         private _lastDpList;
-        private _floatDisplayList;
         /**
          * 显示对象入口函数
          * @method Stage
@@ -3039,7 +3047,6 @@ declare namespace annie {
         private _mp;
         private _initMouseEvent;
         private _mouseDownPoint;
-        isReUpdate: boolean;
         private flush;
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新

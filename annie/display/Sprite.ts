@@ -32,7 +32,6 @@ namespace annie {
             }
             if (s.parent instanceof annie.Sprite) Sprite._removeFormParent(s.parent, s);
             s.children = null;
-            s._removeChildren = null;
             s._hitArea=null;
             super.destroy();
         }
@@ -57,8 +56,6 @@ namespace annie {
          * @readonly
          */
         public children: DisplayObject[] = [];
-        public _removeChildren: DisplayObject[] = [];
-
         /**
          * 添加一个显示对象到Sprite
          * @method addChild
@@ -70,7 +67,6 @@ namespace annie {
         public addChild(child: DisplayObject): void {
             this.addChildAt(child, this.children.length);
         }
-
         /**
          * 从Sprite中移除一个child
          * @method removeChild
@@ -89,7 +85,6 @@ namespace annie {
                 }
             }
         }
-
         //全局遍历查找
         private static _getElementsByName(rex: RegExp, root: annie.Sprite, isOnlyOne: boolean, isRecursive: boolean, resultList: Array<annie.DisplayObject>): void {
             let len = root.children.length;
@@ -102,7 +97,7 @@ namespace annie {
                     if (name && name != "") {
                         if (rex.test(name)) {
                             resultList[resultList.length] = child;
-                            if (isOnlyOne) {
+                            if (isOnlyOne){
                                 return;
                             }
                         }
@@ -173,38 +168,23 @@ namespace annie {
             }
             if (cp != s) {
                 child._cp = true;
-                child.stage = null;
                 child.parent = s;
-                if (s.stage instanceof annie.Stage && s._updateState == 1) {
-                    //被子级改了，遍历又过了，于是只能重新再遍历一次
-                    s.stage.isReUpdate = true;
+                if (s._isOnStage && !child._isOnStage) {
+                    child.stage = s.stage;
+                    child._onAddEvent();
                 }
             }
         }
-
         private static _removeFormParent(cp: Sprite, child: DisplayObject): void {
             let cpc = cp.children;
             let len = cpc.length;
-            let isHave = false;
             for (let i = 0; i < len; i++) {
                 if (cpc[i] == child) {
                     cpc.splice(i, 1);
-                    isHave = true;
                     break;
                 }
             }
-            if (!isHave) {
-                cpc = cp._removeChildren;
-                len = cpc.length;
-                for (let i = 0; i < len; i++) {
-                    if (cpc[i] == child) {
-                        cpc.splice(i, 1);
-                        break;
-                    }
-                }
-            }
         }
-
         /**
          * 获取Sprite中指定层级一个child
          * @method getChildAt
@@ -229,7 +209,7 @@ namespace annie {
          * @since 1.0.2
          * @return {number}
          */
-        public getChildIndex(child: DisplayObject): number {
+        public getChildIndex(child: DisplayObject): number{
             let s = this;
             let len = s.children.length;
             for (let i: number = 0; i < len; i++) {
@@ -258,7 +238,7 @@ namespace annie {
             } else {
                 id1 = s.getChildIndex(child1);
             }
-            if (typeof(child2) == "number") {
+            if (typeof(child2) == "number"){
                 id2 = child2;
             } else {
                 id2 = s.getChildIndex(child2);
@@ -283,7 +263,7 @@ namespace annie {
          */
         public removeChildAt(index: number): void {
             let s = this;
-            let child: any;
+            let child: DisplayObject;
             let len = s.children.length - 1;
             if (len < 0) return;
             if (index == len) {
@@ -293,7 +273,11 @@ namespace annie {
             } else {
                 child = s.children.splice(index, 1)[0];
             }
-            s._removeChildren.push(child);
+            if(s._isOnStage&&child._isOnStage){
+                child._onRemoveEvent();
+                child.stage=null;
+            }
+            child.parent=null;
         }
         /**
          * 移除Sprite上的所有child
@@ -369,9 +353,7 @@ namespace annie {
             s.UF = false;
             s.UM = false;
             s.UA = false;
-            s._updateState = 0;
         }
-
         public render(renderObj: IRender): void {
             let s: any = this;
             if (!s._visible) return;
@@ -405,70 +387,47 @@ namespace annie {
                 renderObj.endMask();
             }
         }
-
-        //0 未更新 1 正在更新 2 需要再次更新 3 更新结束
-        protected _updateState: number = 0;
-
-        public updateEventAndScript(callState: number): void {
+        public _onRemoveEvent():void{
+            super._onRemoveEvent();
             let s = this;
-            if (!s._visible) {
-                return;
-            }
-            super.updateEventAndScript(callState);
-            s._updateState = 1;
             let child: any = null;
-            let children: any = null;
-            let len = 0;
-            //上级舞台发生变动,所有在舞台上的元素及子元素都要执行事件
-            if (callState == 0) {
-                //移除舞台
-                children = s.children;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child instanceof annie.DisplayObject && child.stage instanceof annie.Stage) {
-                        child.updateEventAndScript(callState);
-                        child.stage = null;
-                    }
+            let children = s.children.concat();
+            let len =children.length;
+            for (let i = len - 1; i >= 0; i--){
+                child = children[i];
+                if (child instanceof annie.DisplayObject && child._isOnStage){
+                    child._onRemoveEvent();
+                    child.stage = null;
                 }
-            } else if (callState == 1) {
-                //添加到舞台
-                children = s.children;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child instanceof annie.DisplayObject && !(child.stage instanceof annie.Stage)) {
-                        child.stage = s.stage;
-                        child.updateEventAndScript(callState);
-                    }
-                }
-            } else {
-                children = s.children;
-                len = children.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child instanceof annie.DisplayObject) {
-                        if (child.stage instanceof annie.Stage) {
-                            child.updateEventAndScript(callState);
-                        } else {
-                            child.stage = s.stage;
-                            child.updateEventAndScript(1);
-                        }
-                    }
-                }
-            }
-            //执行移除事件,为什么要用while，因为抛出的事件有可能又产生了被移除的对象
-            children = s._removeChildren;
-            len = children.length;
-            while (len > 0) {
-                child = children.shift();
-                child.updateEventAndScript(0);
-                child.stage = null;
-                child.parent = null;
-                len = children.length;
             }
         }
-
+        public _onAddEvent():void{
+            let s = this;
+            super._onAddEvent();
+            let child: any = null;
+            let children = s.children.concat();
+            let len =children.length;
+            for (let i = len - 1; i >= 0; i--) {
+                child = children[i];
+                if (child instanceof annie.DisplayObject && !child._isOnStage) {
+                    child.stage = s.stage;
+                    child._onAddEvent();
+                }
+            }
+        }
+        public _onEnterFrameEvent():void{
+            let s = this;
+            super._onEnterFrameEvent();
+            let child: any = null;
+            let children = s.children.concat();
+            let len =children.length;
+            for (let i = len - 1; i >= 0; i--){
+                child = children[i];
+                if (child instanceof annie.DisplayObject && child._isOnStage){
+                    child._onEnterFrameEvent();
+                }
+            }
+        }
         /**
          * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。
          * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。

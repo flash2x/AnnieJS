@@ -251,10 +251,6 @@ namespace annie {
                 s._wantFrame +=1;
             }
             s._isPlaying = false;
-            if(s.stage&&s._frameState==1&&!s.isSameFrame()){
-                //要更新
-                s.stage.isReUpdate=true;
-            }
         }
 
         /**
@@ -271,10 +267,6 @@ namespace annie {
                 s._wantFrame -=1;
             }
             s._isPlaying = false;
-            if(s.stage&&s._frameState==1&&!s.isSameFrame()){
-                //要更新
-                s.stage.isReUpdate=true;
-            }
         }
         private isSameFrame():boolean{
             let s=this;
@@ -308,10 +300,6 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
-            if(s.stage&&s._frameState==1&&!s.isSameFrame()){
-                //要更新
-                s.stage.isReUpdate=true;
-            }
         }
 
         /**
@@ -357,10 +345,6 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
-            if(s.stage&&s._frameState==1&&!s.isSameFrame()){
-                //要更新
-                s.stage.isReUpdate=true;
-            }
         }
         private isUpdateFrame: boolean = false;
         protected updateFrame(): void {
@@ -403,7 +387,6 @@ namespace annie {
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
-                        s._removeChildren.length = 0;
                         let maskObj: any = null;
                         let maskTillId: number = -1;
                         for (let i = childCount - 1; i >= 0; i--) {
@@ -436,11 +419,19 @@ namespace annie {
                                 if (!(obj.parent  instanceof annie.Sprite) || s.parent != s) {
                                     obj._cp = true;
                                     obj.parent = s;
+                                    if(s._isOnStage&& !obj._isOnStage) {
+                                        obj.stage = s.stage;
+                                        obj._onAddEvent();
+                                    }
                                 }
                             } else {
                                 //这一帧没这个对象,如果之前在则删除
                                 if (obj.parent instanceof annie.Sprite) {
-                                    s._removeChildren.push(obj);
+                                    if(obj.parent._isOnStage&&obj._isOnStage) {
+                                        obj._onRemoveEvent();
+                                        obj.stage=null;
+                                        obj.parent=null;
+                                    }
                                     MovieClip._resetMC(obj);
                                 }
                             }
@@ -502,13 +493,13 @@ namespace annie {
         //flash声音管理
         private _a2x_sounds: any = null;
         private _frameState=0;
-        public updateEventAndScript(callState: number): void {
+        public _onEnterFrameEvent(): void {
             let s=this;
             if(!s._visible){
                 return;
             }
+            super._onEnterFrameEvent();
             s.updateFrame();
-            super.updateEventAndScript(callState);
         }
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态

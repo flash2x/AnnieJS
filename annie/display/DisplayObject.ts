@@ -441,7 +441,6 @@ namespace annie {
 
             }
         }
-
         private _mask: DisplayObject = null;
 
         /**
@@ -831,32 +830,37 @@ namespace annie {
             s._visible = false;
             super.destroy();
         }
-        //更新流程走完之后再执行脚本和事件执行流程
-        public updateEventAndScript(callState: number): void {
-            let s: any = this;
-            //if (!s.stage || callState == 2) return;
-            if (callState < 2) {
-                let sounds = s.soundList;
-                if (callState == 0) {
-                    //如果有音乐,则关闭音乐
-                    if (sounds.length > 0) {
-                        for (let i = 0; i < sounds.length; i++) {
-                            sounds[i].stop2();
-                        }
-                    }
-                    s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
-                } else {
-                    //如果有音乐，则播放音乐
-                    if (sounds.length > 0) {
-                        for (let i = 0; i < sounds.length; i++) {
-                            sounds[i].play2();
-                        }
-                    }
-                    s.dispatchEvent(annie.Event.ADD_TO_STAGE);
+        public _isOnStage:boolean=false;
+        public _onRemoveEvent():void{
+            //如果有音乐,则关闭音乐
+            let s=this;
+            s._isOnStage=false;
+            let sounds = s.soundList;
+            if (sounds.length > 0) {
+                for (let i = 0; i < sounds.length; i++) {
+                    sounds[i].stop2();
                 }
-            } else if (callState == 2) {
-                s.dispatchEvent(annie.Event.ENTER_FRAME);
             }
+            s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
+        }
+        public _onAddEvent():void{
+            let s = this;
+            s._isOnStage=true;
+            //如果有音乐，则播放音乐
+            let sounds = s.soundList;
+            if (sounds.length > 0) {
+                for (let i = 0; i < sounds.length; i++) {
+                    sounds[i].play2();
+                }
+            }
+            s.dispatchEvent(annie.Event.ADD_TO_STAGE);
+        }
+        public _onEnterFrameEvent():void{
+            let s = this;
+            if (!s._visible) {
+                return;
+            }
+            s.dispatchEvent(annie.Event.ENTER_FRAME);
         }
     }
 }

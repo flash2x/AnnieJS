@@ -564,9 +564,6 @@ namespace annieUI {
         }
         public destroy(): void {
             let s=this;
-            s.stage.removeEventListener(MouseEvent.MOUSE_DOWN, s.md);
-            s.stage.removeEventListener(MouseEvent.MOUSE_UP, s.mu);
-            s.stage.removeEventListener(MouseEvent.MOUSE_MOVE, s.mm);
             s.md=null;
             s.mu=null;
             s.mm=null;

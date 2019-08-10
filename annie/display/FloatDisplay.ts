@@ -52,7 +52,6 @@ namespace annie {
                     if (!s._isAdded) {
                         s._isAdded = true;
                         s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
-                        s.stage["_floatDisplayList"].push(s);
                     } else {
                         if (s.htmlElement && s.visible) {
                             style.display = "inline";
@@ -114,14 +113,15 @@ namespace annie {
             }
             return null;
         }
-        public updateStyle():void{
+        public _onEnterFrameEvent():void{
+            super._onEnterFrameEvent();
             let s:any = this;
             let o = s.htmlElement;
             if (o) {
                 let style = o.style;
                 let visible = s._visible;
                 if(visible){
-                    if(!s.stage){
+                    if(!s._isOnStage){
                         visible=false;
                     }else {
                         let parent = s.parent;
@@ -138,23 +138,32 @@ namespace annie {
                 if (show != style.display) {
                     style.display = show;
                 }
-                if(visible||s.UM||s.UA||s.UF){
-                    if(s.UM) {
-                        let mtx = s.cMatrix;
-                        let d = annie.devicePixelRatio;
-                        style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
-                    }
-                    if (s.UA){
-                        style.opacity = s.cAlpha;
-                    }
-                    s.UF = false;
-                    s.UM = false;
-                    s.UA = false;
+            }
+        }
+        public updateMatrix(): void {
+            let s = this;
+            let o = s.htmlElement;
+            if (!s._visible||!o) return;
+            super.updateMatrix();
+            if(s.UM||s.UA||s.UF){
+                let style = o.style;
+                if(s.UM) {
+                    let mtx = s.cMatrix;
+                    let d = annie.devicePixelRatio;
+                    style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                 }
+                if (s.UA){
+                    style.opacity = s.cAlpha;
+                }
+            }
+            if(s._visible){
+                s.UF = false;
+                s.UM = false;
+                s.UA = false;
             }
         }
         public render(renderObj: IRender){
-            super.updateMatrix();
+
         }
         public destroy():void {
             //清除相应的数据引用
@@ -167,14 +176,6 @@ namespace annie {
                 }
                 s._isAdded = false;
                 s.htmlElement = null;
-            }
-            let sf:any=s.stage["_floatDisplayList"];
-            let len=sf.length;
-            for(let i=0;i<len;i++){
-                if(sf[i]==s){
-                    sf.splice(i,1);
-                    break;
-                }
             }
             super.destroy();
         }
