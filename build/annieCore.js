@@ -4473,10 +4473,8 @@ var annie;
             //动画模式 按钮 剪辑 图形
             _this._mode = -2;
             _this._clicked = false;
-            _this.isUpdateFrame = false;
             //flash声音管理
             _this._a2x_sounds = null;
-            _this._frameState = 0;
             var s = _this;
             s._instanceType = "annie.MovieClip";
             return _this;
@@ -4725,11 +4723,6 @@ var annie;
             }
             s._isPlaying = false;
         };
-        MovieClip.prototype.isSameFrame = function () {
-            var s = this;
-            var cf = s._wantFrame == 0 ? s._curFrame : s._wantFrame;
-            return cf == s._lastFrame;
-        };
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
          * @method gotoAndStop
@@ -4807,12 +4800,21 @@ var annie;
             }
             s._wantFrame = frameIndex;
         };
-        MovieClip.prototype.updateFrame = function () {
+        MovieClip.prototype._onEnterFrameEvent = function () {
             var s = this;
+            _super.prototype._onEnterFrameEvent.call(this);
+            if (!s._visible) {
+                return;
+            }
             if (s._a2x_res_class.tf > 1) {
                 if (s._mode >= 0) {
                     s._isPlaying = false;
-                    s._curFrame = s.parent._curFrame - s._mode;
+                    if (s.parent instanceof annie.MovieClip) {
+                        s._curFrame = s.parent._curFrame - s._mode;
+                    }
+                    else {
+                        s._curFrame = 1;
+                    }
                 }
                 else {
                     if (s._wantFrame != 0) {
@@ -4820,7 +4822,7 @@ var annie;
                         s._wantFrame = 0;
                     }
                 }
-                if (s._lastFrame == s._curFrame && s._isPlaying && s._frameState == 0) {
+                if (s._isPlaying && s._lastFrame == s._curFrame) {
                     if (s._isFront) {
                         s._curFrame++;
                         if (s._curFrame > s._a2x_res_class.tf) {
@@ -4834,10 +4836,7 @@ var annie;
                         }
                     }
                 }
-                s._frameState = 1;
                 if (s._lastFrame != s._curFrame) {
-                    if (s._mode < 0)
-                        s.isUpdateFrame = true;
                     s._lastFrame = s._curFrame;
                     var timeLineObj = s._a2x_res_class;
                     //先确定是哪一帧
@@ -4846,7 +4845,12 @@ var annie;
                     var objId = 0;
                     var obj = null;
                     var objInfo = null;
-                    var curFrameObj = timeLineObj.f[timeLineObj.timeLine[s._curFrame - 1]];
+                    var frameIndex = s._curFrame - 1;
+                    var curFrameScript = void 0;
+                    var isFront = s._isFront;
+                    var curFrameObj = timeLineObj.f[timeLineObj.timeLine[frameIndex]];
+                    var addChildren = [];
+                    var remChildren = [];
                     if (s._lastFrameObj != curFrameObj) {
                         s._lastFrameObj = curFrameObj;
                         s.children.length = 0;
@@ -4855,64 +4859,64 @@ var annie;
                         for (var i = childCount - 1; i >= 0; i--) {
                             objId = allChildren[i][0];
                             obj = allChildren[i][1];
-                            if (curFrameObj instanceof Object && curFrameObj.c) {
+                            if (curFrameObj instanceof Object && curFrameObj.c instanceof Object) {
                                 objInfo = curFrameObj.c[objId];
                             }
                             else {
                                 objInfo = null;
                             }
-                            if (objInfo instanceof Object || objId == 0) {
-                                //如果之前没有在显示对象列表,则添加进来
-                                //证明这一帧有这个对象
-                                if (objInfo instanceof Object) {
-                                    annie.d(obj, objInfo);
-                                }
+                            if (objInfo instanceof Object) {
+                                //这个对象有可能是新来的，有可能是再次进入帧里的。需要对他进行初始化
+                                annie.d(obj, objInfo);
                                 // 检查是否有遮罩
                                 if (objInfo.ma != undefined) {
                                     maskObj = obj;
                                     maskTillId = objInfo.ma;
                                 }
-                                else {
-                                    if (maskObj instanceof Object) {
-                                        obj.mask = maskObj;
-                                        if (objId == maskTillId) {
-                                            maskObj = null;
-                                        }
+                                else if (maskObj instanceof Object) {
+                                    obj.mask = maskObj;
+                                    if (objId == maskTillId) {
+                                        maskObj = null;
                                     }
                                 }
                                 s.children.unshift(obj);
-                                if (!(obj.parent instanceof annie.Sprite) || s.parent != s) {
-                                    obj._cp = true;
-                                    obj.parent = s;
-                                    if (s._isOnStage && !obj._isOnStage) {
-                                        obj.stage = s.stage;
-                                        obj._onAddEvent();
-                                    }
+                                if (!obj._isOnStage) {
+                                    //证明是这一帧新添加进来的，所以需要执行添加事件
+                                    addChildren.unshift(obj);
                                 }
                             }
-                            else {
-                                //这一帧没这个对象,如果之前在则删除
-                                if (obj.parent instanceof annie.Sprite) {
-                                    if (obj.parent._isOnStage && obj._isOnStage) {
-                                        obj._onRemoveEvent();
-                                        obj.stage = null;
-                                        obj.parent = null;
-                                    }
-                                    MovieClip._resetMC(obj);
-                                }
+                            else if (obj._isOnStage) {
+                                //这个对象在上一帧存在，这一帧不存在，所以需要执行删除事件
+                                remChildren.unshift(obj);
+                            }
+                        }
+                        var count = addChildren.length;
+                        for (var i = 0; i < count; i++) {
+                            obj = addChildren[i];
+                            if (!obj._isOnStage && s._isOnStage) {
+                                obj._cp = true;
+                                obj.parent = s;
+                                obj.stage = s.stage;
+                                obj._onAddEvent();
+                            }
+                        }
+                        count = remChildren.length;
+                        for (var i = 0; i < count; i++) {
+                            obj = remChildren[i];
+                            if (obj._isOnStage && s._isOnStage) {
+                                obj._onRemoveEvent();
+                                MovieClip._resetMC(obj);
+                                obj.stage = null;
+                                obj.parent = null;
                             }
                         }
                     }
-                    if (s.isUpdateFrame) {
-                        var timeLineObj_1 = s._a2x_res_class;
-                        s.isUpdateFrame = false;
-                        var frameIndex = s._curFrame - 1;
+                    //如果发现不是图形动画，则执行脚本
+                    if (s._mode < 0) {
                         //更新完所有后再来确定事件和脚本
-                        var curFrameScript = void 0;
                         //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
                         var isUserScript = false;
                         //因为脚本有可能改变Front，所以提前存起来
-                        var isFront = s._isFront;
                         if (s._a2x_script instanceof Object) {
                             curFrameScript = s._a2x_script[frameIndex];
                             if (curFrameScript instanceof Object) {
@@ -4921,14 +4925,14 @@ var annie;
                             }
                         }
                         if (!isUserScript) {
-                            curFrameScript = timeLineObj_1.a[frameIndex];
+                            curFrameScript = timeLineObj.a[frameIndex];
                             if (curFrameScript instanceof Object) {
                                 s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
                             }
                         }
                         //有没有事件
                         if (s.hasEventListener(annie.Event.CALL_FRAME)) {
-                            curFrameScript = timeLineObj_1.e[frameIndex];
+                            curFrameScript = timeLineObj.e[frameIndex];
                             if (curFrameScript instanceof Object) {
                                 for (var i = 0; i < curFrameScript.length; i++) {
                                     //抛事件
@@ -4945,24 +4949,16 @@ var annie;
                                 frameName: "endFrame"
                             });
                         }
-                        //有没有声音
-                        var curFrameSound = timeLineObj_1.s[frameIndex];
-                        if (curFrameSound instanceof Object) {
-                            for (var sound in curFrameSound) {
-                                s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
-                            }
+                    }
+                    //有没有声音
+                    var curFrameSound = timeLineObj.s[frameIndex];
+                    if (curFrameSound instanceof Object) {
+                        for (var sound in curFrameSound) {
+                            s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
                 }
             }
-        };
-        MovieClip.prototype._onEnterFrameEvent = function () {
-            var s = this;
-            if (!s._visible) {
-                return;
-            }
-            _super.prototype._onEnterFrameEvent.call(this);
-            s.updateFrame();
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
@@ -4987,11 +4983,6 @@ var annie;
                     MovieClip._resetMC(obj.children[i]);
                 }
             }
-        };
-        MovieClip.prototype.render = function (renderObj) {
-            var s = this;
-            s._frameState = 0;
-            _super.prototype.render.call(this, renderObj);
         };
         MovieClip.prototype.destroy = function () {
             //清除相应的数据引用
@@ -9101,8 +9092,7 @@ var annie;
         return new annie.Bitmap(annie.res[sceneName][resName]);
     }
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
-    function d(target, info, parentFrame) {
-        if (parentFrame === void 0) { parentFrame = 1; }
+    function d(target, info) {
         var _a;
         if (target._a2x_res_obj == info) {
             return;
@@ -9120,18 +9110,13 @@ var annie;
             if (info.w !== void 0) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-                if (target._instanceType == "annie.TextField") {
-                    target.y += 2;
-                }
             }
             target.alpha = info.al === void 0 ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
             if (info.t !== void 0) {
-                if (info.t == -1) {
+                if (info.t == -1 || target.initButton) {
                     //initButton
-                    if (target.initButton) {
-                        target.initButton();
-                    }
+                    target.initButton();
                 }
                 target._mode = info.t;
             }
@@ -9167,8 +9152,7 @@ var annie;
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default:
-                            //console.log("部分滤镜效果未实现");
-                            //其他还示实现
+                            //TODO 其他还示实现
                         }
                     }
                     if (filters.length > 0) {

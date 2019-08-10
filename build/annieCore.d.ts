@@ -2376,7 +2376,6 @@ declare namespace annie {
          * @return {void}
          */
         prevFrame(): void;
-        private isSameFrame;
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
          * @method gotoAndStop
@@ -2405,13 +2404,9 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
-        private isUpdateFrame;
-        protected updateFrame(): void;
         private _a2x_sounds;
-        private _frameState;
         _onEnterFrameEvent(): void;
         private static _resetMC;
-        render(renderObj: IRender): void;
         destroy(): void;
     }
 }
@@ -3919,7 +3914,7 @@ declare namespace annie {
      * @return {any}
      */
     function getResource(sceneName: string, resName: string): any;
-    function d(target: any, info: any, parentFrame?: number): void;
+    function d(target: any, info: any): void;
     function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>

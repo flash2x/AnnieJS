@@ -462,7 +462,7 @@ namespace annie {
     }
 
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
-    export function d(target: any, info: any, parentFrame: number = 1): void {
+    export function d(target: any, info: any): void {
         if (target._a2x_res_obj == info) {
             return;
         } else {
@@ -478,18 +478,13 @@ namespace annie {
             if (info.w !== void 0) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-                if (target._instanceType == "annie.TextField") {
-                    target.y += 2;
-                }
             }
             target.alpha = info.al === void 0 ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
             if (info.t !== void 0) {
-                if (info.t == -1) {
+                if (info.t == -1||target.initButton) {
                     //initButton
-                    if (target.initButton) {
-                        target.initButton();
-                    }
+                    target.initButton();
                 }
                 target._mode = info.t;
             }
@@ -525,8 +520,7 @@ namespace annie {
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
-                            //console.log("部分滤镜效果未实现");
-                            //其他还示实现
+                            //TODO 其他还示实现
                         }
                     }
                     if (filters.length > 0) {
