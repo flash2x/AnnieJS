@@ -6338,7 +6338,7 @@ var annie;
             s._instanceType = "annie.Stage";
             s.stage = s;
             s._isOnStage = true;
-            s.name = "stageInstance_" + s.instanceId;
+            s.name = rootDivId;
             var div = document.getElementById(rootDivId);
             s.renderType = renderType;
             s.desWidth = desW;
@@ -6357,6 +6357,7 @@ var annie;
                 //webgl
                 s.renderObj = new annie.WebGLRender(s);
             }
+            s.renderObj.init();
             var rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
             if (annie.osType == "pc") {
@@ -6369,7 +6370,6 @@ var annie;
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);
             }
-            s.renderObj.init();
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             return _this;
@@ -6510,10 +6510,10 @@ var annie;
                     s._currentFlush = s._flush;
                     s.resize();
                     s._onEnterFrameEvent();
+                    s.updateMatrix();
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s.updateMatrix();
                         s.render(s.renderObj);
                     }
                     s._currentFlush--;
@@ -6569,14 +6569,28 @@ var annie;
         };
         Stage.prototype.onMouseEvent = function (e) {
             //检查是否有
-            var s = this;
+            var s = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
+            //TODO path需要做筛选过滤
+            var isCanGetScroll = false;
+            for (var i = 0; i < e.path.length; i++) {
+                c = e.path[i];
+                if (c.id != s.name) {
+                    isCanGetScroll = true;
+                }
+                if (isCanGetScroll) {
+                    offSetX -= c.scrollLeft;
+                    offSetY -= c.scrollTop;
+                }
+                if (c.nodeName == "HTML")
+                    break;
+            }
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX;
-                    s._mP1.y = e.targetTouches[0].clientY;
-                    s._mP2.x = e.targetTouches[1].clientX;
-                    s._mP2.y = e.targetTouches[1].clientY;
+                    s._mP1.x = e.targetTouches[0].clientX - offSetX;
+                    s._mP1.y = e.targetTouches[0].clientY - offSetY;
+                    s._mP2.x = e.targetTouches[1].clientX - offSetX;
+                    s._mP2.y = e.targetTouches[1].clientY - offSetY;
                     var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     var dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -6651,8 +6665,8 @@ var annie;
                         else {
                             cp = new annie.Point();
                         }
-                        cp.x = points[o].clientX * annie.devicePixelRatio;
-                        cp.y = points[o].clientY * annie.devicePixelRatio;
+                        cp.x = (points[o].clientX - offSetX) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY - offSetY) * annie.devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
@@ -7864,17 +7878,18 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this, texture = target._texture, ctx = s._ctx, tm = target.cMatrix;
-            if (ctx.globalAlpha != target.cAlpha) {
-                ctx.globalAlpha = target.cAlpha;
-            }
-            ;
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target instanceof annie.Bitmap) {
-                var rect = target.rect;
-                ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height);
-            }
-            else {
-                ctx.drawImage(texture, 0, 0);
+            if (texture instanceof Object) {
+                if (ctx.globalAlpha != target.cAlpha) {
+                    ctx.globalAlpha = target.cAlpha;
+                }
+                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                if (target instanceof annie.Bitmap) {
+                    var rect = target.rect;
+                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height);
+                }
+                else {
+                    ctx.drawImage(texture, 0, 0);
+                }
             }
         };
         CanvasRender.prototype.end = function () {

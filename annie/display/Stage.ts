@@ -85,6 +85,7 @@ namespace annie {
          * @readonly
          */
         public renderType = 0;
+
         /**
          * 是否暂停
          * @property pause
@@ -97,6 +98,7 @@ namespace annie {
         static get pause(): boolean {
             return Stage._pause;
         }
+
         static set pause(value: boolean) {
             let s: any = Stage;
             if (value != s._pause) {
@@ -112,6 +114,7 @@ namespace annie {
                 globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
             }
         }
+
         private static _pause: boolean = false;
         private _viewRect: Rectangle = new Rectangle();
         /**
@@ -190,6 +193,7 @@ namespace annie {
          * @type {number}
          */
         public divWidth: number = 0;
+
         /**
          * 舞台的背景色
          * 默认就是透明背景
@@ -214,12 +218,15 @@ namespace annie {
                 this._bgColorRGBA.b = b / 255;
             }
         };
+
         public get bgColor(): number {
             return this._bgColor;
         };
+
         private _bgColor: number = -1;
         public _bgColorStr: string = "rgba(0,0,0,0)";
         public _bgColorRGBA: { r: number, g: number, b: number, a: number } = {r: 0, g: 0, b: 0, a: 0};
+
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -250,6 +257,7 @@ namespace annie {
         get scaleMode(): string {
             return this._scaleMode;
         }
+
         set scaleMode(value: string) {
             let s = this;
             if (value != s._scaleMode) {
@@ -257,6 +265,7 @@ namespace annie {
                 s.setAlign();
             }
         }
+
         private _scaleMode: string = "onScale";
         //原始为60的刷新速度时的计数器
         private _flush: number = 0;
@@ -292,8 +301,8 @@ namespace annie {
             let s: Stage = this;
             s._instanceType = "annie.Stage";
             s.stage = s;
-            s._isOnStage=true;
-            s.name = "stageInstance_" + s.instanceId;
+            s._isOnStage = true;
+            s.name = rootDivId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;
             s.desWidth = desW;
@@ -311,6 +320,7 @@ namespace annie {
                 //webgl
                 s.renderObj = new WebGLRender(s);
             }
+            s.renderObj.init();
             let rc = s.rootDiv;
             s.mouseEvent = s.onMouseEvent.bind(s);
             if (osType == "pc") {
@@ -323,7 +333,6 @@ namespace annie {
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);
             }
-            s.renderObj.init();
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
         }
@@ -350,8 +359,10 @@ namespace annie {
             event.stageY = sp.y;
             event.identifier = identifier;
         }
+
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
+
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
@@ -361,21 +372,22 @@ namespace annie {
                 s._onEnterFrameEvent();
                 s.updateMatrix();
                 s.render(s.renderObj);
-            }else {
+            } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
                     s.resize();
                     s._onEnterFrameEvent();
+                    s.updateMatrix();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s.updateMatrix();
                         s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
             }
         }
+
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -391,6 +403,7 @@ namespace annie {
                 s._flush = 0;
             }
         }
+
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method getFrameRate
@@ -401,6 +414,7 @@ namespace annie {
         public getFrameRate(): number {
             return 60 / (this._flush + 1);
         }
+
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 获取引擎所在的div宽高
@@ -422,7 +436,6 @@ namespace annie {
             }
             return {w: vW, h: vH};
         }
-
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -438,17 +451,30 @@ namespace annie {
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
         private mouseEvent: any = null;
-        private mouseEvents:any=[];
+        private mouseEvents: any = [];
         private onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this;
+            let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
+            //TODO path需要做筛选过滤
+            let isCanGetScroll=false;
+            for(let i=0;i<e.path.length;i++){
+                c=e.path[i];
+                if(c.id!=s.name){
+                    isCanGetScroll=true;
+                }
+                if(isCanGetScroll) {
+                    offSetX -= c.scrollLeft;
+                    offSetY -= c.scrollTop;
+                }
+                if(c.nodeName=="HTML")break;
+            }
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
-                if (e.targetTouches.length == 2){
+                if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX;
-                    s._mP1.y = e.targetTouches[0].clientY;
-                    s._mP2.x = e.targetTouches[1].clientX;
-                    s._mP2.y = e.targetTouches[1].clientY;
+                    s._mP1.x = e.targetTouches[0].clientX - offSetX;
+                    s._mP1.y = e.targetTouches[0].clientY - offSetY;
+                    s._mP2.x = e.targetTouches[1].clientX - offSetX;
+                    s._mP2.y = e.targetTouches[1].clientY - offSetY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -488,7 +514,7 @@ namespace annie {
                 if (EventDispatcher._totalMEC > 0) {
                     let points: any;
                     let item = s._mouseEventTypes[e.type];
-                    let events: any=s.mouseEvents;
+                    let events: any = s.mouseEvents;
                     let event: any;
                     //stageMousePoint
                     let sp: Point;
@@ -511,15 +537,15 @@ namespace annie {
                     }
                     for (let o = 0; o < points.length; o++) {
                         eLen = 0;
-                        events.length=0;
+                        events.length = 0;
                         identifier = "m" + points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         } else {
                             cp = new Point();
                         }
-                        cp.x = points[o].clientX * devicePixelRatio;
-                        cp.y = points[o].clientY * devicePixelRatio;
+                        cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
+                        cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
                         //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
                         //if (EventDispatcher.getMouseEventCount() > 0) {
@@ -564,14 +590,14 @@ namespace annie {
                             if (d instanceof annie.DisplayObject) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
                                 //找出真正的target,因为有些父级可能会mouseChildren=false;
-                                do{
+                                do {
                                     if (d instanceof annie.Sprite && d.mouseChildren == false) {
                                         //丢掉之前的层级,因为根本没用了
                                         displayList.length = 0;
                                     }
                                     displayList[displayList.length] = d;
                                     d = d.parent;
-                                }while (d instanceof annie.DisplayObject)
+                                } while (d instanceof annie.DisplayObject)
                             } else {
                                 displayList[0] = s;
                             }
@@ -579,7 +605,7 @@ namespace annie {
                             for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
                                 for (let j = 0; j < eLen; j++) {
-                                    if (!events[j]._pd&&d.hasEventListener(events[j].type)) {
+                                    if (!events[j]._pd && d.hasEventListener(events[j].type)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[0];
                                         lp = d.globalToLocal(cp, DisplayObject._bp);
@@ -594,7 +620,7 @@ namespace annie {
                             for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
                                 for (let j = 0; j < eLen; j++) {
-                                    if (!events[j]._pd&&d.hasEventListener(events[j].type)) {
+                                    if (!events[j]._pd && d.hasEventListener(events[j].type)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[eLen - 1];
                                         lp = d.globalToLocal(cp, DisplayObject._bp);
@@ -643,7 +669,7 @@ namespace annie {
                                                 if (s._lastDpList[identifier][i]) {
                                                     //触发onMouseOut事件
                                                     d = s._lastDpList[identifier][i];
-                                                    if (!outEvent._pd&&d.hasEventListener("onMouseOut")) {
+                                                    if (!outEvent._pd && d.hasEventListener("onMouseOut")) {
                                                         outEvent.currentTarget = d;
                                                         outEvent.target = s._lastDpList[identifier][len1 - 1];
                                                         lp = d.globalToLocal(cp, DisplayObject._bp);
@@ -655,7 +681,7 @@ namespace annie {
                                                 d = displayList[i];
                                                 if (d instanceof annie.DisplayObject) {
                                                     //触发onMouseOver事件
-                                                    if (!overEvent._pd&&d.hasEventListener("onMouseOver")) {
+                                                    if (!overEvent._pd && d.hasEventListener("onMouseOver")) {
                                                         overEvent.currentTarget = d;
                                                         overEvent.target = displayList[len2 - 1];
                                                         lp = d.globalToLocal(cp, DisplayObject._bp);
@@ -763,6 +789,7 @@ namespace annie {
                 s.rotation = 0;
             }
         };
+
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -811,6 +838,7 @@ namespace annie {
         public get viewRect(): Rectangle {
             return this._viewRect;
         }
+
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
@@ -830,6 +858,7 @@ namespace annie {
             }
             requestAnimationFrame(Stage.flushAll);
         }
+
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -873,6 +902,7 @@ namespace annie {
                 }
             }
         }
+
         public destroy(): void {
             super.destroy();
             let s = this;
