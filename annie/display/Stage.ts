@@ -455,18 +455,10 @@ namespace annie {
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
-            //TODO path需要做筛选过滤
-            let isCanGetScroll=false;
-            for(let i=0;i<e.path.length;i++){
-                c=e.path[i];
-                if(c.id!=s.name){
-                    isCanGetScroll=true;
-                }
-                if(isCanGetScroll) {
-                    offSetX -= c.scrollLeft;
-                    offSetY -= c.scrollTop;
-                }
-                if(c.nodeName=="HTML")break;
+            while (c.scrollLeft!==void 0){
+                offSetX -= c.scrollLeft;
+                offSetY -= c.scrollTop;
+                c=c.parentNode;
             }
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {

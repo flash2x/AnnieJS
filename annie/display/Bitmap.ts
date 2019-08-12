@@ -229,7 +229,7 @@ namespace annie {
                 } else {
                     p = hitPoint;
                 }
-                let _canvas = DisplayObject["_canvas"], ctx = _canvas["getContext"]('2d');
+                let _canvas = DisplayObject._canvas, ctx = _canvas.getContext('2d');
                 _canvas.width = 1;
                 _canvas.height = 1;
                 ctx.clearRect(0, 0, 1, 1);
@@ -244,7 +244,6 @@ namespace annie {
                 return super.hitTestPoint(hitPoint, isGlobalPoint);
             }
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

@@ -1322,8 +1322,7 @@ var annie;
             s.tx += dx;
             s.ty += dy;
         };
-        Matrix.prototype.destroy = function () {
-        };
+        Matrix.prototype.destroy = function () { };
         return Matrix;
     }(annie.AObject));
     annie.Matrix = Matrix;
@@ -2691,7 +2690,7 @@ var annie;
                 else {
                     p = hitPoint;
                 }
-                var _canvas = annie.DisplayObject["_canvas"], ctx = _canvas["getContext"]('2d');
+                var _canvas = annie.DisplayObject._canvas, ctx = _canvas.getContext('2d');
                 _canvas.width = 1;
                 _canvas.height = 1;
                 ctx.clearRect(0, 0, 1, 1);
@@ -3292,7 +3291,7 @@ var annie;
         Shape.prototype.updateMatrix = function () {
             var s = this;
             var _canvas = s._texture;
-            var ctx = _canvas["getContext"]('2d');
+            var ctx = _canvas.getContext("2d");
             if (s.a2x_ut) {
                 //更新缓存
                 var cLen = s._command.length;
@@ -3517,10 +3516,9 @@ var annie;
             if (texture.width == 0) {
                 return null;
             }
-            var _canvas = annie.DisplayObject["_canvas"];
+            var _canvas = annie.DisplayObject._canvas, ctx = _canvas.getContext('2d');
             _canvas.width = 1;
             _canvas.height = 1;
-            var ctx = _canvas["getContext"]('2d');
             ctx.clearRect(0, 0, 1, 1);
             ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
             ctx.drawImage(texture, 0, 0);
@@ -6607,19 +6605,10 @@ var annie;
         Stage.prototype.onMouseEvent = function (e) {
             //检查是否有
             var s = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
-            //TODO path需要做筛选过滤
-            var isCanGetScroll = false;
-            for (var i = 0; i < e.path.length; i++) {
-                c = e.path[i];
-                if (c.id != s.name) {
-                    isCanGetScroll = true;
-                }
-                if (isCanGetScroll) {
-                    offSetX -= c.scrollLeft;
-                    offSetY -= c.scrollTop;
-                }
-                if (c.nodeName == "HTML")
-                    break;
+            while (c.scrollLeft !== void 0) {
+                offSetX -= c.scrollLeft;
+                offSetY -= c.scrollTop;
+                c = c.parentNode;
             }
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {

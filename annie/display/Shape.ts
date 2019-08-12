@@ -583,7 +583,7 @@ namespace annie {
         public updateMatrix(): void {
             let s: any = this;
             let _canvas: any = s._texture;
-            let ctx = _canvas["getContext"]('2d');
+            let ctx = _canvas.getContext("2d");
             if (s.a2x_ut) {
                 //更新缓存
                 let cLen: number = s._command.length;
@@ -795,10 +795,9 @@ namespace annie {
             if (texture.width == 0) {
                 return null;
             }
-            let _canvas = DisplayObject["_canvas"];
+            let _canvas = DisplayObject._canvas,ctx = _canvas.getContext('2d');
             _canvas.width = 1;
             _canvas.height = 1;
-            let ctx = _canvas["getContext"]('2d');
             ctx.clearRect(0, 0, 1, 1);
             ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
             ctx.drawImage(texture, 0, 0);
