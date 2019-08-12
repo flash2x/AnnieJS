@@ -1045,9 +1045,9 @@ declare namespace annie {
          * @public
          */
         constructor();
-        protected UM: boolean;
-        protected UA: boolean;
-        protected UF: boolean;
+        protected a2x_um: boolean;
+        protected a2x_ua: boolean;
+        protected a2x_uf: boolean;
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
@@ -1298,7 +1298,6 @@ declare namespace annie {
          * @return {void}
          */
         protected updateMatrix(): void;
-        protected updateFilters(): void;
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -1398,7 +1397,13 @@ declare namespace annie {
         private _cacheImg;
         private rectX;
         private rectY;
-        rect: annie.Rectangle;
+        /**
+         * 设置显示元素的显示区间
+         * @property rect
+         * @param {annie.Rectangle} value
+         */
+        rect: Rectangle;
+        _rect: annie.Rectangle;
         /**
          * 构造函数
          * @method Bitmap
@@ -1440,7 +1445,7 @@ declare namespace annie {
          * @type {any}
          * @default null
          */
-        readonly bitmapData: any;
+        bitmapData: any;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -1818,6 +1823,7 @@ declare namespace annie {
          * @return {void}
          */
         decodePath: (data: any) => void;
+        private a2x_ut;
         updateMatrix(): void;
         private _draw;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean): DisplayObject;
@@ -2638,6 +2644,7 @@ declare namespace annie {
         readonly lines: number;
         private _getMeasuredWidth;
         private realLines;
+        a2x_ut: boolean;
         updateMatrix(): void;
     }
 }

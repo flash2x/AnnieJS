@@ -805,7 +805,7 @@ namespace annie {
             if (s.divWidth == 0 || s.divHeight == 0) {
                 let whObj: any = s.getRootDivWH(s.rootDiv);
                 if (whObj.w == 0 || whObj.h == 0) return;
-                s.UM = true;
+                s.a2x_um = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
@@ -814,7 +814,7 @@ namespace annie {
             } else if (s.autoResize) {
                 let whObj: any = s.getRootDivWH(s.rootDiv);
                 if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
-                    s.UM = true;
+                    s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
                     s.renderObj.reSize();

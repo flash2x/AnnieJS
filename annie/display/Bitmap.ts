@@ -15,7 +15,32 @@ namespace annie {
         private _cacheImg: any = null;
         private rectX: number = 0;
         private rectY: number = 0;
-        public rect: annie.Rectangle = null;
+        /**
+         * 设置显示元素的显示区间
+         * @property rect
+         * @param {annie.Rectangle} value
+         */
+        public set rect(value: Rectangle) {
+            let s = this;
+            if (value instanceof annie.Rectangle) {
+                s._bounds.width = value.width;
+                s._bounds.height = value.height;
+                s.rectX = value.x;
+                s.rectY = value.y;
+                s._rect = new annie.Rectangle(value.x, value.y, value.width, value.height);
+            } else {
+                s.rectX = 0;
+                s.rectY = 0;
+                s._bounds.width = s._bitmapData.width;
+                s._bounds.height = s._bitmapData.height;
+                s._rect = new annie.Rectangle(0, 0, s._bounds.width, s._bounds.height);
+            }
+            s.a2x_uf = true;
+        }
+        public get rect(): annie.Rectangle {
+            return this._rect;
+        }
+        public _rect: annie.Rectangle = null;
 
         /**
          * 构造函数
@@ -53,17 +78,7 @@ namespace annie {
             let s = this;
             s._instanceType = "annie.Bitmap";
             s._bitmapData = bitmapData;
-            if (rect instanceof annie.Rectangle) {
-                s._bounds.width = rect.width;
-                s._bounds.height = rect.height;
-                s.rectX = rect.x;
-                s.rectY = rect.y;
-                s.rect = rect;
-            } else {
-                s._bounds.width = bitmapData.width;
-                s._bounds.height = bitmapData.height;
-                s.rect = new annie.Rectangle(0, 0, s._bounds.width, s._bounds.height);
-            }
+            s.rect = rect;
         }
 
         /**
@@ -79,6 +94,17 @@ namespace annie {
             return this._bitmapData;
         };
 
+        public set bitmapData(value: any) {
+            let s = this;
+            s._bitmapData = value;
+            s._bounds.width = value.width;
+            s._bounds.height = value.height;
+            s.rectX = 0;
+            s.rectY = 0;
+            s._rect = new annie.Rectangle(0, 0, value.width, value.height);
+            s.a2x_uf = true;
+        }
+
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -88,16 +114,17 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
+
         public updateMatrix(): void {
             let s: any = this;
-            //滤镜
-            if (s.UF) {
+            super.updateMatrix();
+            //滤镜,这里一定是UF
+            if (s.a2x_uf) {
                 let bitmapData: any = s._bitmapData;
                 let bw = s._bounds.width, bh = s._bounds.height;
-                s.updateFilters();
-                let cf:any=s.cFilters;
+                let cf: any = s.cFilters;
                 let cfLen = cf.length;
-                if (cfLen > 0){
+                if (cfLen > 0) {
                     let newW = bw + 20, newH = bh + 20;
                     if (!(s._cacheImg instanceof Object)) {
                         s._cacheImg = window.document.createElement("canvas");
@@ -137,11 +164,14 @@ namespace annie {
                     s.rect.width = bw;
                     s.rect.height = bh;
                 }
+                //因为这里offset有可能再次改变，需要再次更新下matrix
+                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
+                s.cMatrix.setFrom(s._matrix);
+                s.cMatrix.prepend(s.parent.cMatrix);
             }
-            super.updateMatrix();
-            s.UF = false;
-            s.UM = false;
-            s.UA = false;
+            s.a2x_uf = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
         }
 
         /**

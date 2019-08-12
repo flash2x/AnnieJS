@@ -98,7 +98,7 @@ namespace annie {
          */
         public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
-            s.UF = true;
+            s.a2x_ut = true;
             s._command[s._command.length] = [1, commandName, params];
         }
 
@@ -327,7 +327,7 @@ namespace annie {
         public clear(): void {
             let s = this;
             s._command = [];
-            s.UF = true;
+            s.a2x_ut = true;
             if (s._texture) {
                 s._texture.width = 0;
                 s._texture.height = 0;
@@ -413,7 +413,7 @@ namespace annie {
             let c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
             c[c.length] = [1, "beginPath", []];
-            s.UF = true;
+            s.a2x_ut = true;
         }
 
         /**
@@ -498,7 +498,7 @@ namespace annie {
             c[c.length] = [0, "miterLimit", miter];
             c[c.length] = [0, "strokeStyle", strokeStyle];
             c[c.length] = [1, "beginPath", []];
-            this.UF = true;
+            this.a2x_ut = true;
         }
 
         /**
@@ -577,10 +577,14 @@ namespace annie {
                 }
             }
         };
+        //是否矢量元素有更新
+        private a2x_ut: boolean = false;
 
         public updateMatrix(): void {
-            let s:any = this;
-            if (s.UF) {
+            let s: any = this;
+            let _canvas: any = s._texture;
+            let ctx = _canvas["getContext"]('2d');
+            if (s.a2x_ut) {
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -701,8 +705,6 @@ namespace annie {
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
-                        let _canvas: any = s._texture;
-                        let ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
                         _canvas.height = h;
                         ctx.clearRect(0, 0, w, h);
@@ -710,23 +712,25 @@ namespace annie {
                         ///////////////////////////
                         s._draw(ctx);
                         ///////////////////////////
-                        s.updateFilters();
-                        let cf:any=s.cFilters;
-                        let cfLen = cf.length;
-                        if (cfLen > 0) {
-                            let imageData = ctx.getImageData(0, 0, w, h);
-                            for (let i = 0; i < cfLen; i++) {
-                                cf[i].drawFilter(imageData);
-                            }
-                            ctx.putImageData(imageData, 0, 0);
-                        }
                     }
                 }
             }
             super.updateMatrix();
-            s.UM = false;
-            s.UA = false;
-            s.UF = false;
+            if (s.a2x_uf || s.a2x_ut) {
+                let cf: any = s.cFilters;
+                let cfLen = cf.length;
+                if (cfLen > 0) {
+                    let imageData = ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+                    for (let i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                }
+            }
+            s.a2x_ut = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
         }
         private _draw(ctx: any, isMask: boolean = false): void {
             let s = this;
@@ -778,6 +782,7 @@ namespace annie {
                 ctx.closePath();
             }
         }
+
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             let p: any;
@@ -823,19 +828,20 @@ namespace annie {
                 if (c[i][0] == 0) {
                     if (c[i][1] == "fillStyle" && infoObj.fillColor && c[i][2] != infoObj.fillColor) {
                         c[i][2] = infoObj.fillColor;
-                        s.UF = true;
+                        s.a2x_ut = true;
                     }
                     if (c[i][1] == "strokeStyle" && infoObj.strokeColor && c[i][2] != infoObj.strokeColor) {
                         c[i][2] = infoObj.strokeColor;
-                        s.UF = true;
+                        s.a2x_ut = true;
                     }
                     if (c[i][1] == "lineWidth" && infoObj.lineWidth && c[i][2] != infoObj.lineWidth) {
                         c[i][2] = infoObj.lineWidth;
-                        s.UF = true;
+                        s.a2x_ut = true;
                     }
                 }
             }
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

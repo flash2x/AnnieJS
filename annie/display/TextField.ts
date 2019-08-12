@@ -28,13 +28,14 @@ namespace annie {
             let s = this;
             if (value != s._textAlign) {
                 s._textAlign = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get textAlign(): string {
             return this._textAlign;
         }
+
         private _textAlign = "left";
 
         /**
@@ -46,14 +47,15 @@ namespace annie {
             let s = this;
             if (value != s._textAlpha) {
                 s._textAlpha = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get textAlpha(): number {
             return this._textAlpha;
         }
-        private _textAlpha:number= 1;
+
+        private _textAlpha: number = 1;
 
         /**
          * 文本的行高
@@ -67,13 +69,14 @@ namespace annie {
             let s = this;
             if (value != s._textHeight) {
                 s._textHeight = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
-        public get textHeight(): number{
+        public get textHeight(): number {
             return this._textHeight;
         }
+
         private _textHeight: number = 0;
 
         /**
@@ -82,17 +85,20 @@ namespace annie {
          * @since 1.0.0
          * @param {number} value
          */
-        public set lineHeight(value:number){
+        public set lineHeight(value: number) {
             let s = this;
             if (value != s._lineHeight) {
                 s._lineHeight = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
-        public get lineHeight():number{
+
+        public get lineHeight(): number {
             return this._lineHeight;
         }
-        private _lineHeight: number =14;
+
+        private _lineHeight: number = 14;
+
         /**
          * 文本的宽
          * @property textWidth
@@ -105,14 +111,16 @@ namespace annie {
             let s = this;
             if (value != s._textWidth) {
                 s._textWidth = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get textWidth(): number {
             return this._textWidth;
         }
+
         private _textWidth: number = 120;
+
         /**
          * 文本类型,单行还是多行 single multi
          * @property lineType
@@ -125,13 +133,16 @@ namespace annie {
             let s = this;
             if (value != s._lineType) {
                 s._lineType = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
+
         public get lineType(): string {
             return this._lineType;
         }
+
         private _lineType: string = "single";
+
         /**
          * 文本内容
          * @property text
@@ -144,14 +155,16 @@ namespace annie {
             let s = this;
             if (value != s._text) {
                 s._text = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get text(): string {
             return this._text;
         }
+
         private _text: string = "";
+
         /**
          * 文本的css字体样式
          * @property font
@@ -164,13 +177,16 @@ namespace annie {
             let s = this;
             if (value != s._font) {
                 s._font = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
+
         public get font(): string {
             return this._font;
         }
+
         private _font: string = "Arial";
+
         /**
          * 文本的size
          * @property size
@@ -183,14 +199,16 @@ namespace annie {
             let s = this;
             if (value != s._size) {
                 s._size = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get size(): number {
             return this._size;
         }
+
         private _size: number = 12;
+
         /**
          * 文本的颜色值
          * @property color
@@ -203,14 +221,16 @@ namespace annie {
             let s = this;
             if (value != s._color) {
                 s._color = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get color(): string {
             return this._color;
         }
+
         public _color: string = "#fff";
+
         /**
          * 文本是否倾斜
          * @property italic
@@ -223,14 +243,16 @@ namespace annie {
             let s = this;
             if (value != s._italic) {
                 s._italic = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
         public get italic(): boolean {
             return this._italic;
         }
+
         private _italic: boolean = false;
+
         /**
          * 文本是否加粗
          * @property bold
@@ -243,13 +265,16 @@ namespace annie {
             let s = this;
             if (value != s._bold) {
                 s._bold = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
+
         public get bold(): boolean {
             return this._bold;
         }
+
         public _bold: boolean = false;
+
         /**
          * 设置或获取是否有边框
          * @property property
@@ -261,7 +286,7 @@ namespace annie {
             let s = this;
             if (value != s._border) {
                 s._border = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
 
@@ -277,34 +302,40 @@ namespace annie {
          * @param {number} value
          * @since 2.0.2
          */
-        public set stroke(value:number){
+        public set stroke(value: number) {
             let s = this;
             if (value != s._stroke) {
                 s._stroke = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
-        public get stroke():number{
+
+        public get stroke(): number {
             return this._stroke;
         }
-        private _stroke:number=0;
+
+        private _stroke: number = 0;
+
         /**
          * 描边颜色 默认黑色
          * @property strokeColor
          * @param {string} value
          * @since 2.0.2
          */
-        public set strokeColor(value:string){
+        public set strokeColor(value: string) {
             let s = this;
             if (value != s._strokeColor) {
                 s._strokeColor = value;
-                s.UF = true;
+                s.a2x_ut= true;
             }
         }
-        public get strokeColor():string{
+
+        public get strokeColor(): string {
             return this._strokeColor;
         }
-        private _strokeColor:string="#000";
+
+        private _strokeColor: string = "#000";
+
         //设置文本在canvas里的渲染样式
         private _prepContext(ctx: any): void {
             let s = this;
@@ -323,11 +354,12 @@ namespace annie {
             ctx.textBaseline = "top";
             ctx.lineJoin = "miter";
             ctx.miterLimit = 2.5;
-            ctx.fillStyle = Shape.getRGBA(s._color,s._textAlpha);
+            ctx.fillStyle = Shape.getRGBA(s._color, s._textAlpha);
             //实线文字
             ctx.strokeStyle = s.strokeColor;
             ctx.lineWidth = Math.abs(s._stroke);
         }
+
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
          * @method getTextWidth
@@ -336,14 +368,15 @@ namespace annie {
          * @public
          * @return {number}
          */
-        public getTextWidth(lineIndex:number=0){
-            let s=this;
+        public getTextWidth(lineIndex: number = 0) {
+            let s = this;
             s.updateMatrix();
             let can = s._texture;
             let ctx = can.getContext("2d");
-            let obj:any=ctx.measureText(s.realLines[lineIndex]);
+            let obj: any = ctx.measureText(s.realLines[lineIndex]);
             return obj.width;
         }
+
         /**
          * 获取当前文本行数
          * @property lines
@@ -355,6 +388,7 @@ namespace annie {
         get lines(): number {
             return this.realLines.length;
         }
+
         // 获取文本宽
         private _getMeasuredWidth(text: string): number {
             let ctx = this._texture.getContext("2d");
@@ -363,24 +397,27 @@ namespace annie {
             //ctx.restore();
             return w;
         }
+
         private realLines: any = [];
+        public  a2x_ut:boolean=false;
         public updateMatrix(): void {
             let s: any = this;
-            if (s.UF) {
+            let can = s._texture;
+            let ctx = can.getContext("2d");
+            //这个地方一定要用UF
+            if (s.a2x_ut) {
                 s._text += "";
-                let can = s._texture;
-                let ctx = can.getContext("2d");
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
-                s.realLines=realLines;
+                s.realLines = realLines;
                 s._prepContext(ctx);
                 let wordW = 0;
                 let lineH = s._lineHeight;
                 if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines[realLines.length]=hardLines[0];
+                    realLines[realLines.length] = hardLines[0];
                     let str = hardLines[0];
                     let lineW = s._getMeasuredWidth(str);
-                    if (lineW > s._textWidth){
+                    if (lineW > s._textWidth) {
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let strLen = str.length;
@@ -398,7 +435,7 @@ namespace annie {
                 } else {
                     for (let i = 0, l = hardLines.length; i < l; i++) {
                         let str = hardLines[i];
-                        if (!str)continue;
+                        if (!str) continue;
                         let w = s._getMeasuredWidth(str[0]);
                         let lineStr = str[0];
                         let strLen = str.length;
@@ -406,14 +443,14 @@ namespace annie {
                             wordW = ctx.measureText(str[j]).width;
                             w += wordW;
                             if (w > s._textWidth) {
-                                realLines[realLines.length]=lineStr;
+                                realLines[realLines.length] = lineStr;
                                 lineStr = str[j];
                                 w = wordW;
                             } else {
                                 lineStr += str[j];
                             }
                         }
-                        realLines[realLines.length]=lineStr;
+                        realLines[realLines.length] = lineStr;
                     }
                 }
                 let maxH = lineH * realLines.length;
@@ -421,7 +458,7 @@ namespace annie {
                 let tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
-                } else if (s._textAlign == "right"){
+                } else if (s._textAlign == "right") {
                     tx = maxW;
                 }
                 can.width = maxW + 20;
@@ -436,38 +473,39 @@ namespace annie {
                 }
                 ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++){
-                    if(s._stroke>0) {
+                for (let i = 0; i < realLines.length; i++) {
+                    if (s._stroke > 0) {
                         ctx.strokeText(realLines[i], 0, i * lineH, maxW);
                     }
                     ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                    if(s._stroke<0) {
+                    if (s._stroke < 0) {
                         ctx.strokeText(realLines[i], 0, i * lineH, maxW);
                     }
 
                 }
-                /////////////////////////////////////
-                s.updateFilters();
-                let cf:any=s.cFilters;
+                s.offsetX = -10;
+                s.offsetY = -10;
+                s._bounds.x = 10;
+                s._bounds.y = 10;
+                s._bounds.height = maxH;
+                s._bounds.width = maxW;
+            }
+            super.updateMatrix();
+            if (s.a2x_ut|| s.a2x_uf) {
+                let cf: any = s.cFilters;
                 let cfLen = cf.length;
-                if(cfLen>0) {
-                    let imageData = ctx.getImageData(0, 0, maxW, maxH);
+                if (cfLen > 0) {
+                    let imageData = ctx.getImageData(0, 0, can.width, can.height);
                     for (let i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
-                s.offsetX = -10;
-                s.offsetY = -10;
-                s._bounds.x=10;
-                s._bounds.y=10;
-                s._bounds.height = maxH;
-                s._bounds.width = maxW;
             }
-            super.updateMatrix();
-            s.UM = false;
-            s.UA = false;
-            s.UF = false;
+            s.a2x_ut= false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
         }
     }
 }

@@ -1619,10 +1619,10 @@ var annie;
          */
         function DisplayObject() {
             var _this = _super.call(this) || this;
-            //更新信息对象是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-            _this.UM = true;
-            _this.UA = true;
-            _this.UF = true;
+            //更新信息对象是否更新矩阵 a2x_ua 是否更新Alpha a2x_uf 是否更新滤镜
+            _this.a2x_um = true;
+            _this.a2x_ua = true;
+            _this.a2x_uf = false;
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
              * @property stage
@@ -1724,7 +1724,7 @@ var annie;
                 if (value != s._x) {
                     s._x = value;
                     s._lastX = value + s._offsetX;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1739,7 +1739,7 @@ var annie;
                 if (value != s._offsetX) {
                     s._offsetX = value;
                     s._lastX = value + s._x;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1754,7 +1754,7 @@ var annie;
                 if (value != s._offsetY) {
                     s._offsetY = value;
                     s._lastY = value + s._y;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1777,7 +1777,7 @@ var annie;
                 if (value != s._y) {
                     s._y = value;
                     s._lastY = value + s._offsetY;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1799,7 +1799,7 @@ var annie;
                 var s = this;
                 if (value != s._scaleX) {
                     s._scaleX = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1821,7 +1821,7 @@ var annie;
                 var s = this;
                 if (value != s._scaleY) {
                     s._scaleY = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1843,7 +1843,7 @@ var annie;
                 var s = this;
                 if (value != s._rotation) {
                     s._rotation = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1865,7 +1865,7 @@ var annie;
                 var s = this;
                 if (value != s._alpha) {
                     s._alpha = value;
-                    s.UA = true;
+                    s.a2x_ua = true;
                 }
             },
             enumerable: true,
@@ -1887,7 +1887,7 @@ var annie;
                 var s = this;
                 if (value != s._skewX) {
                     s._skewX = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1909,7 +1909,7 @@ var annie;
                 var s = this;
                 if (value != s._skewY) {
                     s._skewY = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1931,7 +1931,7 @@ var annie;
                 var s = this;
                 if (value != s._anchorX) {
                     s._anchorX = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -1953,7 +1953,7 @@ var annie;
                 var s = this;
                 if (value != s._anchorY) {
                     s._anchorY = value;
-                    s.UM = true;
+                    s.a2x_um = true;
                 }
             },
             enumerable: true,
@@ -2052,7 +2052,7 @@ var annie;
             },
             set: function (value) {
                 this._filters = value;
-                this.UF = true;
+                this.a2x_uf = true;
             },
             enumerable: true,
             configurable: true
@@ -2164,41 +2164,40 @@ var annie;
         DisplayObject.prototype.updateMatrix = function () {
             var s = this;
             var isHadParent = s.parent instanceof annie.Sprite;
+            if (s.a2x_um) {
+                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
+            }
             if (s._cp) {
-                s.UM = s.UA = s.UF = true;
+                s.a2x_um = s.a2x_ua = s.a2x_uf = true;
                 s._cp = false;
             }
             else {
                 if (isHadParent) {
                     var PUI = s.parent;
-                    if (PUI.UM) {
-                        s.UM = true;
+                    if (PUI.a2x_um) {
+                        s.a2x_um = true;
                     }
-                    if (PUI.UA) {
-                        s.UA = true;
+                    if (PUI.a2x_ua) {
+                        s.a2x_ua = true;
                     }
-                    if (PUI.UF) {
-                        s.UF = true;
+                    if (PUI.a2x_uf) {
+                        s.a2x_uf = true;
                     }
                 }
             }
-            if (s.UM) {
-                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+            if (s.a2x_um) {
                 s.cMatrix.setFrom(s._matrix);
                 if (isHadParent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (s.UA) {
+            if (s.a2x_ua) {
                 s.cAlpha = s._alpha;
                 if (isHadParent) {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-        };
-        DisplayObject.prototype.updateFilters = function () {
-            var s = this;
-            if (s.UF) {
+            if (s.a2x_uf) {
                 s.cFilters = [];
                 var sf = s.filters;
                 if (sf instanceof Array) {
@@ -2207,7 +2206,7 @@ var annie;
                         s.cFilters.push(sf[i]);
                     }
                 }
-                if (s.parent instanceof annie.Sprite) {
+                if (isHadParent) {
                     if (s.parent.cFilters.length > 0) {
                         var len = s.parent.cFilters.length, pf = s.parent.cFilters;
                         for (var i = len - 1; i >= 0; i--) {
@@ -2503,7 +2502,7 @@ var annie;
             _this._cacheImg = null;
             _this.rectX = 0;
             _this.rectY = 0;
-            _this.rect = null;
+            _this._rect = null;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -2516,20 +2515,39 @@ var annie;
             var s = _this;
             s._instanceType = "annie.Bitmap";
             s._bitmapData = bitmapData;
-            if (rect instanceof annie.Rectangle) {
-                s._bounds.width = rect.width;
-                s._bounds.height = rect.height;
-                s.rectX = rect.x;
-                s.rectY = rect.y;
-                s.rect = rect;
-            }
-            else {
-                s._bounds.width = bitmapData.width;
-                s._bounds.height = bitmapData.height;
-                s.rect = new annie.Rectangle(0, 0, s._bounds.width, s._bounds.height);
-            }
+            s.rect = rect;
             return _this;
         }
+        Object.defineProperty(Bitmap.prototype, "rect", {
+            get: function () {
+                return this._rect;
+            },
+            /**
+             * 设置显示元素的显示区间
+             * @property rect
+             * @param {annie.Rectangle} value
+             */
+            set: function (value) {
+                var s = this;
+                if (value instanceof annie.Rectangle) {
+                    s._bounds.width = value.width;
+                    s._bounds.height = value.height;
+                    s.rectX = value.x;
+                    s.rectY = value.y;
+                    s._rect = new annie.Rectangle(value.x, value.y, value.width, value.height);
+                }
+                else {
+                    s.rectX = 0;
+                    s.rectY = 0;
+                    s._bounds.width = s._bitmapData.width;
+                    s._bounds.height = s._bitmapData.height;
+                    s._rect = new annie.Rectangle(0, 0, s._bounds.width, s._bounds.height);
+                }
+                s.a2x_uf = true;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -2543,17 +2561,27 @@ var annie;
             get: function () {
                 return this._bitmapData;
             },
+            set: function (value) {
+                var s = this;
+                s._bitmapData = value;
+                s._bounds.width = value.width;
+                s._bounds.height = value.height;
+                s.rectX = 0;
+                s.rectY = 0;
+                s._rect = new annie.Rectangle(0, 0, value.width, value.height);
+                s.a2x_uf = true;
+            },
             enumerable: true,
             configurable: true
         });
         ;
         Bitmap.prototype.updateMatrix = function () {
             var s = this;
-            //滤镜
-            if (s.UF) {
+            _super.prototype.updateMatrix.call(this);
+            //滤镜,这里一定是UF
+            if (s.a2x_uf) {
                 var bitmapData = s._bitmapData;
                 var bw = s._bounds.width, bh = s._bounds.height;
-                s.updateFilters();
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
@@ -2597,11 +2625,14 @@ var annie;
                     s.rect.width = bw;
                     s.rect.height = bh;
                 }
+                //因为这里offset有可能再次改变，需要再次更新下matrix
+                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
+                s.cMatrix.setFrom(s._matrix);
+                s.cMatrix.prepend(s.parent.cMatrix);
             }
-            _super.prototype.updateMatrix.call(this);
-            s.UF = false;
-            s.UM = false;
-            s.UA = false;
+            s.a2x_uf = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
         };
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -2768,6 +2799,8 @@ var annie;
                     }
                 }
             };
+            //是否矢量元素有更新
+            _this.a2x_ut = false;
             _this._instanceType = "annie.Shape";
             _this._texture = window.document.createElement("canvas");
             return _this;
@@ -2846,7 +2879,7 @@ var annie;
          */
         Shape.prototype.addDraw = function (commandName, params) {
             var s = this;
-            s.UF = true;
+            s.a2x_ut = true;
             s._command[s._command.length] = [1, commandName, params];
         };
         /**
@@ -3067,7 +3100,7 @@ var annie;
         Shape.prototype.clear = function () {
             var s = this;
             s._command = [];
-            s.UF = true;
+            s.a2x_ut = true;
             if (s._texture) {
                 s._texture.width = 0;
                 s._texture.height = 0;
@@ -3129,7 +3162,7 @@ var annie;
             var c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
             c[c.length] = [1, "beginPath", []];
-            s.UF = true;
+            s.a2x_ut = true;
         };
         /**
          * 给线条着色
@@ -3202,7 +3235,7 @@ var annie;
             c[c.length] = [0, "miterLimit", miter];
             c[c.length] = [0, "strokeStyle", strokeStyle];
             c[c.length] = [1, "beginPath", []];
-            this.UF = true;
+            this.a2x_ut = true;
         };
         /**
          * 结束填充
@@ -3258,7 +3291,9 @@ var annie;
         };
         Shape.prototype.updateMatrix = function () {
             var s = this;
-            if (s.UF) {
+            var _canvas = s._texture;
+            var ctx = _canvas["getContext"]('2d');
+            if (s.a2x_ut) {
                 //更新缓存
                 var cLen = s._command.length;
                 var leftX = void 0;
@@ -3382,8 +3417,6 @@ var annie;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
-                        var _canvas = s._texture;
-                        var ctx = _canvas["getContext"]('2d');
                         _canvas.width = w;
                         _canvas.height = h;
                         ctx.clearRect(0, 0, w, h);
@@ -3391,23 +3424,25 @@ var annie;
                         ///////////////////////////
                         s._draw(ctx);
                         ///////////////////////////
-                        s.updateFilters();
-                        var cf = s.cFilters;
-                        var cfLen = cf.length;
-                        if (cfLen > 0) {
-                            var imageData = ctx.getImageData(0, 0, w, h);
-                            for (var i_1 = 0; i_1 < cfLen; i_1++) {
-                                cf[i_1].drawFilter(imageData);
-                            }
-                            ctx.putImageData(imageData, 0, 0);
-                        }
                     }
                 }
             }
             _super.prototype.updateMatrix.call(this);
-            s.UM = false;
-            s.UA = false;
-            s.UF = false;
+            if (s.a2x_uf || s.a2x_ut) {
+                var cf = s.cFilters;
+                var cfLen = cf.length;
+                if (cfLen > 0) {
+                    var imageData = ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+                    for (var i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                }
+            }
+            s.a2x_ut = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
         };
         Shape.prototype._draw = function (ctx, isMask) {
             if (isMask === void 0) { isMask = false; }
@@ -3515,15 +3550,15 @@ var annie;
                 if (c[i][0] == 0) {
                     if (c[i][1] == "fillStyle" && infoObj.fillColor && c[i][2] != infoObj.fillColor) {
                         c[i][2] = infoObj.fillColor;
-                        s.UF = true;
+                        s.a2x_ut = true;
                     }
                     if (c[i][1] == "strokeStyle" && infoObj.strokeColor && c[i][2] != infoObj.strokeColor) {
                         c[i][2] = infoObj.strokeColor;
-                        s.UF = true;
+                        s.a2x_ut = true;
                     }
                     if (c[i][1] == "lineWidth" && infoObj.lineWidth && c[i][2] != infoObj.lineWidth) {
                         c[i][2] = infoObj.lineWidth;
-                        s.UF = true;
+                        s.a2x_ut = true;
                     }
                 }
             }
@@ -3908,15 +3943,14 @@ var annie;
             if (!s._visible)
                 return;
             _super.prototype.updateMatrix.call(this);
-            s.updateFilters();
             var children = s.children;
             var len = children.length;
             for (var i = 0; i < len; i++) {
                 children[i].updateMatrix();
             }
-            s.UF = false;
-            s.UM = false;
-            s.UA = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
+            s.a2x_um = false;
         };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
@@ -5149,21 +5183,21 @@ var annie;
             if (!s._visible || !o)
                 return;
             _super.prototype.updateMatrix.call(this);
-            if (s.UM || s.UA || s.UF) {
+            if (s.a2x_um || s.a2x_ua || s.a2x_uf) {
                 var style = o.style;
-                if (s.UM) {
+                if (s.a2x_um) {
                     var mtx = s.cMatrix;
                     var d_1 = annie.devicePixelRatio;
                     style.transform = style.webkitTransform = "matrix(" + (mtx.a / d_1).toFixed(4) + "," + (mtx.b / d_1).toFixed(4) + "," + (mtx.c / d_1).toFixed(4) + "," + (mtx.d / d_1).toFixed(4) + "," + (mtx.tx / d_1).toFixed(4) + "," + (mtx.ty / d_1).toFixed(4) + ")";
                 }
-                if (s.UA) {
+                if (s.a2x_ua) {
                     style.opacity = s.cAlpha;
                 }
             }
             if (s._visible) {
-                s.UF = false;
-                s.UM = false;
-                s.UA = false;
+                s.a2x_uf = false;
+                s.a2x_um = false;
+                s.a2x_ua = false;
             }
         };
         FloatDisplay.prototype.render = function (renderObj) {
@@ -5218,6 +5252,7 @@ var annie;
             _this._stroke = 0;
             _this._strokeColor = "#000";
             _this.realLines = [];
+            _this.a2x_ut = false;
             _this._instanceType = "annie.TextField";
             _this._texture = window.document.createElement("canvas");
             return _this;
@@ -5238,7 +5273,7 @@ var annie;
                 var s = this;
                 if (value != s._textAlign) {
                     s._textAlign = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5257,7 +5292,7 @@ var annie;
                 var s = this;
                 if (value != s._textAlpha) {
                     s._textAlpha = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5279,7 +5314,7 @@ var annie;
                 var s = this;
                 if (value != s._textHeight) {
                     s._textHeight = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5299,7 +5334,7 @@ var annie;
                 var s = this;
                 if (value != s._lineHeight) {
                     s._lineHeight = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5321,7 +5356,7 @@ var annie;
                 var s = this;
                 if (value != s._textWidth) {
                     s._textWidth = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5343,7 +5378,7 @@ var annie;
                 var s = this;
                 if (value != s._lineType) {
                     s._lineType = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5365,7 +5400,7 @@ var annie;
                 var s = this;
                 if (value != s._text) {
                     s._text = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5387,7 +5422,7 @@ var annie;
                 var s = this;
                 if (value != s._font) {
                     s._font = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5409,7 +5444,7 @@ var annie;
                 var s = this;
                 if (value != s._size) {
                     s._size = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5431,7 +5466,7 @@ var annie;
                 var s = this;
                 if (value != s._color) {
                     s._color = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5453,7 +5488,7 @@ var annie;
                 var s = this;
                 if (value != s._italic) {
                     s._italic = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5475,7 +5510,7 @@ var annie;
                 var s = this;
                 if (value != s._bold) {
                     s._bold = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5496,7 +5531,7 @@ var annie;
                 var s = this;
                 if (value != s._border) {
                     s._border = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5516,7 +5551,7 @@ var annie;
                 var s = this;
                 if (value != s._stroke) {
                     s._stroke = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5536,7 +5571,7 @@ var annie;
                 var s = this;
                 if (value != s._strokeColor) {
                     s._strokeColor = value;
-                    s.UF = true;
+                    s.a2x_ut = true;
                 }
             },
             enumerable: true,
@@ -5607,10 +5642,11 @@ var annie;
         };
         TextField.prototype.updateMatrix = function () {
             var s = this;
-            if (s.UF) {
+            var can = s._texture;
+            var ctx = can.getContext("2d");
+            //这个地方一定要用UF
+            if (s.a2x_ut) {
                 s._text += "";
-                var can = s._texture;
-                var ctx = can.getContext("2d");
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
                 s.realLines = realLines;
@@ -5691,17 +5727,6 @@ var annie;
                         ctx.strokeText(realLines[i], 0, i * lineH, maxW);
                     }
                 }
-                /////////////////////////////////////
-                s.updateFilters();
-                var cf = s.cFilters;
-                var cfLen = cf.length;
-                if (cfLen > 0) {
-                    var imageData = ctx.getImageData(0, 0, maxW, maxH);
-                    for (var i = 0; i < cfLen; i++) {
-                        cf[i].drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-                }
                 s.offsetX = -10;
                 s.offsetY = -10;
                 s._bounds.x = 10;
@@ -5710,9 +5735,21 @@ var annie;
                 s._bounds.width = maxW;
             }
             _super.prototype.updateMatrix.call(this);
-            s.UM = false;
-            s.UA = false;
-            s.UF = false;
+            if (s.a2x_ut || s.a2x_uf) {
+                var cf = s.cFilters;
+                var cfLen = cf.length;
+                if (cfLen > 0) {
+                    var imageData = ctx.getImageData(0, 0, can.width, can.height);
+                    for (var i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                }
+            }
+            s.a2x_ut = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
         };
         return TextField;
     }(annie.DisplayObject));
@@ -6305,7 +6342,7 @@ var annie;
                     var whObj = s.getRootDivWH(s.rootDiv);
                     if (whObj.w == 0 || whObj.h == 0)
                         return;
-                    s.UM = true;
+                    s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
                     s.renderObj.reSize();
@@ -6315,7 +6352,7 @@ var annie;
                 else if (s.autoResize) {
                     var whObj = s.getRootDivWH(s.rootDiv);
                     if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
-                        s.UM = true;
+                        s.a2x_um = true;
                         s.divHeight = whObj.h;
                         s.divWidth = whObj.w;
                         s.renderObj.reSize();
@@ -7878,7 +7915,7 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this, texture = target._texture, ctx = s._ctx, tm = target.cMatrix;
-            if (texture instanceof Object) {
+            if (texture instanceof Object && texture.width > 0) {
                 if (ctx.globalAlpha != target.cAlpha) {
                     ctx.globalAlpha = target.cAlpha;
                 }

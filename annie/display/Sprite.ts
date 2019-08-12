@@ -344,15 +344,14 @@ namespace annie {
             let s = this;
             if (!s._visible) return;
             super.updateMatrix();
-            s.updateFilters();
             let children: any = s.children;
             let len: number = children.length;
             for (let i = 0; i < len; i++) {
                 children[i].updateMatrix();
             }
-            s.UF = false;
-            s.UM = false;
-            s.UA = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
+            s.a2x_um = false;
         }
         public render(renderObj: IRender): void {
             let s: any = this;

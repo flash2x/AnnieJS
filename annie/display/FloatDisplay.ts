@@ -145,21 +145,21 @@ namespace annie {
             let o = s.htmlElement;
             if (!s._visible||!o) return;
             super.updateMatrix();
-            if(s.UM||s.UA||s.UF){
+            if(s.a2x_um||s.a2x_ua||s.a2x_uf){
                 let style = o.style;
-                if(s.UM) {
+                if(s.a2x_um) {
                     let mtx = s.cMatrix;
                     let d = annie.devicePixelRatio;
                     style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                 }
-                if (s.UA){
+                if (s.a2x_ua){
                     style.opacity = s.cAlpha;
                 }
             }
             if(s._visible){
-                s.UF = false;
-                s.UM = false;
-                s.UA = false;
+                s.a2x_uf = false;
+                s.a2x_um = false;
+                s.a2x_ua = false;
             }
         }
         public render(renderObj: IRender){

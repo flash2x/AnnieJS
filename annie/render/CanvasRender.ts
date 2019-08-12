@@ -120,7 +120,7 @@ namespace annie {
          */
         public draw(target: any): void {
             let s = this, texture = target._texture, ctx = s._ctx, tm = target.cMatrix;
-            if(texture instanceof Object) {
+            if(texture instanceof Object&&texture.width>0) {
                 if (ctx.globalAlpha != target.cAlpha) {
                     ctx.globalAlpha = target.cAlpha
                 }

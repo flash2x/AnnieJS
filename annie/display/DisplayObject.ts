@@ -72,10 +72,10 @@ namespace annie {
             this._instanceType = "annie.DisplayObject";
         }
 
-        //更新信息对象是否更新矩阵 UA 是否更新Alpha UF 是否更新滤镜
-        protected UM: boolean = true;
-        protected UA: boolean = true;
-        protected UF: boolean = true;
+        //更新信息对象是否更新矩阵 a2x_ua 是否更新Alpha a2x_uf 是否更新滤镜
+        protected a2x_um: boolean = true;
+        protected a2x_ua: boolean = true;
+        protected a2x_uf: boolean = false;
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
@@ -141,7 +141,7 @@ namespace annie {
             if (value != s._x) {
                 s._x = value;
                 s._lastX=value+s._offsetX;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
         private _x: number = 0;
@@ -153,7 +153,7 @@ namespace annie {
             if (value != s._offsetX) {
                 s._offsetX = value;
                 s._lastX=value+s._x;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
         protected _offsetX: number = 0;
@@ -165,7 +165,7 @@ namespace annie {
             if (value != s._offsetY) {
                 s._offsetY = value;
                 s._lastY=value+s._y;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
         protected _offsetY: number = 0;
@@ -186,7 +186,7 @@ namespace annie {
             if (value != s._y) {
                 s._y = value;
                 s._lastY=value+s._offsetY;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
         private _y: number = 0;
@@ -207,7 +207,7 @@ namespace annie {
             let s = this;
             if (value != s._scaleX) {
                 s._scaleX = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -230,7 +230,7 @@ namespace annie {
             let s = this;
             if (value != s._scaleY) {
                 s._scaleY = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -252,7 +252,7 @@ namespace annie {
             let s = this;
             if (value != s._rotation) {
                 s._rotation = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -274,7 +274,7 @@ namespace annie {
             let s = this;
             if (value != s._alpha) {
                 s._alpha = value;
-                s.UA = true;
+                s.a2x_ua = true;
             }
         }
 
@@ -296,7 +296,7 @@ namespace annie {
             let s = this;
             if (value != s._skewX) {
                 s._skewX = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -318,7 +318,7 @@ namespace annie {
             let s = this;
             if (value != s._skewY) {
                 s._skewY = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -340,7 +340,7 @@ namespace annie {
             let s = this;
             if (value != s._anchorX) {
                 s._anchorX = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -362,7 +362,7 @@ namespace annie {
             let s: any = this;
             if (value != s._anchorY) {
                 s._anchorY = value;
-                s.UM = true;
+                s.a2x_um = true;
             }
         }
 
@@ -458,7 +458,7 @@ namespace annie {
 
         public set filters(value: any[]) {
             this._filters = value;
-            this.UF = true;
+            this.a2x_uf = true;
         }
 
         private _filters: any[] = [];
@@ -577,40 +577,39 @@ namespace annie {
         protected updateMatrix(): void {
             let s = this;
             let isHadParent:boolean=s.parent instanceof annie.Sprite;
+            if(s.a2x_um){
+                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX-s._offsetX, s._anchorY-s._offsetY);
+            }
             if (s._cp) {
-                s.UM = s.UA = s.UF = true;
+                s.a2x_um = s.a2x_ua = s.a2x_uf = true;
                 s._cp = false;
-            } else {
+            }else{
                 if (isHadParent) {
                     let PUI = s.parent;
-                    if (PUI.UM) {
-                        s.UM = true;
+                    if (PUI.a2x_um) {
+                        s.a2x_um = true;
                     }
-                    if (PUI.UA) {
-                        s.UA = true;
+                    if (PUI.a2x_ua) {
+                        s.a2x_ua = true;
                     }
-                    if (PUI.UF) {
-                        s.UF = true;
+                    if (PUI.a2x_uf) {
+                        s.a2x_uf = true;
                     }
                 }
             }
-            if (s.UM) {
-                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+            if (s.a2x_um){
                 s.cMatrix.setFrom(s._matrix);
                 if (isHadParent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (s.UA) {
+            if (s.a2x_ua){
                 s.cAlpha = s._alpha;
                 if (isHadParent){
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-        }
-        protected updateFilters():void{
-            let s:any=this;
-            if (s.UF) {
+            if (s.a2x_uf){
                 s.cFilters = [];
                 let sf = s.filters;
                 if (sf instanceof Array) {
@@ -619,7 +618,7 @@ namespace annie {
                         s.cFilters.push(sf[i]);
                     }
                 }
-                if (s.parent instanceof annie.Sprite) {
+                if (isHadParent) {
                     if (s.parent.cFilters.length > 0) {
                         let len = s.parent.cFilters.length, pf = s.parent.cFilters;
                         for (let i = len - 1; i >= 0; i--) {
