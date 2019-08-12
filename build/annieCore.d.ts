@@ -1378,6 +1378,16 @@ declare namespace annie {
         _onRemoveEvent(): void;
         _onAddEvent(): void;
         _onEnterFrameEvent(): void;
+        /**
+         * @method startDrag
+         * @param {annie.Rectangle} dragRect
+         * @param {annie.Point} dragPoint
+         */
+        startDrag(dragRect?: annie.Rectangle, dragPoint?: annie.Point): void;
+        /**
+         * @method stopDrag
+         */
+        stopDrag(): void;
     }
 }
 /**
@@ -3086,6 +3096,9 @@ declare namespace annie {
         private _mP2;
         private mouseEvent;
         private mouseEvents;
+        _dragDisplayObject: annie.DisplayObject;
+        _dragRect: annie.Rectangle;
+        _dragPoint: annie.Point;
         private onMouseEvent;
         private setAlign;
         /**

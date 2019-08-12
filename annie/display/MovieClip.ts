@@ -426,7 +426,7 @@ namespace annie {
                                     }
                                 }
                                 s.children.unshift(obj);
-                                if(!obj._isOnStage) {
+                                if (!obj._isOnStage) {
                                     //证明是这一帧新添加进来的，所以需要执行添加事件
                                     addChildren.unshift(obj);
                                 }
@@ -435,20 +435,20 @@ namespace annie {
                                 remChildren.unshift(obj);
                             }
                         }
-                        let count:number=addChildren.length;
-                        for(let i=0;i<count;i++){
-                            obj=addChildren[i];
-                            if(!obj._isOnStage&&s._isOnStage){
+                        let count: number = addChildren.length;
+                        for (let i = 0; i < count; i++) {
+                            obj = addChildren[i];
+                            if (!obj._isOnStage && s._isOnStage) {
                                 obj._cp = true;
                                 obj.parent = s;
                                 obj.stage = s.stage;
                                 obj._onAddEvent();
                             }
                         }
-                        count=remChildren.length;
-                        for(let i=0;i<count;i++){
-                            obj=remChildren[i];
-                            if(obj._isOnStage&&s._isOnStage){
+                        count = remChildren.length;
+                        for (let i = 0; i < count; i++) {
+                            obj = remChildren[i];
+                            if (obj._isOnStage && s._isOnStage) {
                                 obj._onRemoveEvent();
                                 MovieClip._resetMC(obj);
                                 obj.stage = null;
@@ -459,35 +459,34 @@ namespace annie {
                     //如果发现不是图形动画，则执行脚本
                     if (s._mode < 0) {
                         //更新完所有后再来确定事件和脚本
-                        //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
-                        let isUserScript = false;
-                        //因为脚本有可能改变Front，所以提前存起来
+                        let isCodeScript = false;
+                        //有没有用户后期通过代码调用加入的脚本,有就直接调用然后不再调用时间轴代码
                         if (s._a2x_script instanceof Object) {
                             curFrameScript = s._a2x_script[frameIndex];
-                            if (curFrameScript instanceof Object) {
+                            if (curFrameScript instanceof Function) {
                                 curFrameScript();
-                                isUserScript = true;
+                                isCodeScript = true;
                             }
                         }
-                        if (!isUserScript) {
+                        //有没有用户后期通过代码调用加入的脚本,没有再检查有没有时间轴代码
+                        if (!isCodeScript) {
                             curFrameScript = timeLineObj.a[frameIndex];
-                            if (curFrameScript instanceof Object) {
+                            if (curFrameScript instanceof Array) {
                                 s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
                             }
                         }
-                        //有没有事件
-                        if (s.hasEventListener(Event.CALL_FRAME)) {
-                            curFrameScript = timeLineObj.e[frameIndex];
-                            if (curFrameScript instanceof Object) {
-                                for (let i = 0; i < curFrameScript.length; i++) {
-                                    //抛事件
-                                    s.dispatchEvent(Event.CALL_FRAME, {
-                                        frameIndex: s._curFrame,
-                                        frameName: curFrameScript[i]
-                                    });
-                                }
+                        //有没有帧事件
+                        curFrameScript = timeLineObj.e[frameIndex];
+                        if (curFrameScript instanceof Array){
+                            for (let i = 0; i < curFrameScript.length; i++) {
+                                //抛事件
+                                s.dispatchEvent(Event.CALL_FRAME, {
+                                    frameIndex: s._curFrame,
+                                    frameName: curFrameScript[i]
+                                });
                             }
                         }
+                        //有没有去到帧的最后一帧
                         if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(Event.END_FRAME)) {
                             s.dispatchEvent(Event.END_FRAME, {
                                 frameIndex: s._curFrame,
@@ -528,6 +527,7 @@ namespace annie {
                 }
             }
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

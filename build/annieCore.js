@@ -2435,6 +2435,45 @@ var annie;
             }
             s.dispatchEvent(annie.Event.ENTER_FRAME);
         };
+        /**
+         * @method startDrag
+         * @param {annie.Rectangle} dragRect
+         * @param {annie.Point} dragPoint
+         */
+        DisplayObject.prototype.startDrag = function (dragRect, dragPoint) {
+            if (dragRect === void 0) { dragRect = null; }
+            if (dragPoint === void 0) { dragPoint = null; }
+            var s = this;
+            if (s.stage instanceof annie.Stage) {
+                s.stage._dragDisplayObject = s;
+                if (dragRect instanceof annie.Rectangle) {
+                    s.stage._dragRect.x = dragRect.x;
+                    s.stage._dragRect.y = dragRect.y;
+                    s.stage._dragRect.width = dragRect.width;
+                    s.stage._dragRect.height = dragRect.height;
+                }
+                else {
+                    s.stage._dragRect.x = Number.MIN_VALUE;
+                    s.stage._dragRect.y = Number.MIN_VALUE;
+                    s.stage._dragRect.width = Number.MAX_VALUE;
+                    s.stage._dragRect.height = Number.MAX_VALUE;
+                }
+                if (dragPoint instanceof annie.Point) {
+                    s.stage._dragPoint.x = dragPoint.x;
+                    s.stage._dragPoint.y = dragPoint.y;
+                }
+                else {
+                    s.stage._dragPoint.x = 0;
+                    s.stage._dragPoint.y = 0;
+                }
+            }
+        };
+        /**
+         * @method stopDrag
+         */
+        DisplayObject.prototype.stopDrag = function () {
+            this.stage._dragDisplayObject = null;
+        };
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
         DisplayObject._p1 = new annie.Point();
@@ -4946,35 +4985,34 @@ var annie;
                     //如果发现不是图形动画，则执行脚本
                     if (s._mode < 0) {
                         //更新完所有后再来确定事件和脚本
-                        //有没有脚本，是否用户有动态添加，如果有则覆盖原有的，并且就算用户删除了这个动态脚本，原有时间轴上的脚本一样不再执行
-                        var isUserScript = false;
-                        //因为脚本有可能改变Front，所以提前存起来
+                        var isCodeScript = false;
+                        //有没有用户后期通过代码调用加入的脚本,有就直接调用然后不再调用时间轴代码
                         if (s._a2x_script instanceof Object) {
                             curFrameScript = s._a2x_script[frameIndex];
-                            if (curFrameScript instanceof Object) {
+                            if (curFrameScript instanceof Function) {
                                 curFrameScript();
-                                isUserScript = true;
+                                isCodeScript = true;
                             }
                         }
-                        if (!isUserScript) {
+                        //有没有用户后期通过代码调用加入的脚本,没有再检查有没有时间轴代码
+                        if (!isCodeScript) {
                             curFrameScript = timeLineObj.a[frameIndex];
-                            if (curFrameScript instanceof Object) {
+                            if (curFrameScript instanceof Array) {
                                 s[curFrameScript[0]](curFrameScript[1] == undefined ? true : curFrameScript[1], curFrameScript[2] == undefined ? true : curFrameScript[2]);
                             }
                         }
-                        //有没有事件
-                        if (s.hasEventListener(annie.Event.CALL_FRAME)) {
-                            curFrameScript = timeLineObj.e[frameIndex];
-                            if (curFrameScript instanceof Object) {
-                                for (var i = 0; i < curFrameScript.length; i++) {
-                                    //抛事件
-                                    s.dispatchEvent(annie.Event.CALL_FRAME, {
-                                        frameIndex: s._curFrame,
-                                        frameName: curFrameScript[i]
-                                    });
-                                }
+                        //有没有帧事件
+                        curFrameScript = timeLineObj.e[frameIndex];
+                        if (curFrameScript instanceof Array) {
+                            for (var i = 0; i < curFrameScript.length; i++) {
+                                //抛事件
+                                s.dispatchEvent(annie.Event.CALL_FRAME, {
+                                    frameIndex: s._curFrame,
+                                    frameName: curFrameScript[i]
+                                });
                             }
                         }
+                        //有没有去到帧的最后一帧
                         if (((s._curFrame == 1 && !isFront) || (s._curFrame == s._a2x_res_class.tf && isFront)) && s.hasEventListener(annie.Event.END_FRAME)) {
                             s.dispatchEvent(annie.Event.END_FRAME, {
                                 frameIndex: s._curFrame,
@@ -6324,6 +6362,9 @@ var annie;
             _this._mP2 = new annie.Point();
             _this.mouseEvent = null;
             _this.mouseEvents = [];
+            _this._dragDisplayObject = null;
+            _this._dragRect = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+            _this._dragPoint = new annie.Point();
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
              * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -6681,7 +6722,39 @@ var annie;
                             points = [e.changedTouches[0]];
                         }
                     }
-                    for (var o = 0; o < points.length; o++) {
+                    var pLen = points.length;
+                    var dragDisplayObject = s._dragDisplayObject;
+                    if (dragDisplayObject instanceof annie.DisplayObject && pLen == 1) {
+                        if (!dragDisplayObject._isOnStage) {
+                            s._dragDisplayObject = null;
+                        }
+                        else {
+                            //有drag对象
+                            var dp = new annie.Point();
+                            var dragPoint = s._dragPoint;
+                            var dragRect = s._dragRect;
+                            dp.x = (points[0].clientX - offSetX) * annie.devicePixelRatio;
+                            dp.y = (points[0].clientY - offSetY) * annie.devicePixelRatio;
+                            var lp_1 = dragDisplayObject.parent.globalToLocal(dp, annie.DisplayObject._bp);
+                            if (lp_1.x < dragRect.x) {
+                                lp_1.x = dragRect.x;
+                            }
+                            else if (lp_1.x > dragRect.x + dragRect.width) {
+                                lp_1.x = dragRect.x + dragRect.width;
+                            }
+                            if (lp_1.y < dragRect.y) {
+                                lp_1.y = dragRect.y;
+                            }
+                            else if (lp_1.y > dragRect.y + dragRect.height) {
+                                lp_1.y = dragRect.y + dragRect.height;
+                            }
+                            lp_1.x -= dragPoint.x;
+                            lp_1.y -= dragPoint.y;
+                            dragDisplayObject.x = lp_1.x;
+                            dragDisplayObject.y = lp_1.y;
+                        }
+                    }
+                    for (var o = 0; o < pLen; o++) {
                         eLen = 0;
                         events.length = 0;
                         identifier = "m" + points[o].identifier;
@@ -6693,9 +6766,7 @@ var annie;
                         }
                         cp.x = (points[o].clientX - offSetX) * annie.devicePixelRatio;
                         cp.y = (points[o].clientY - offSetY) * annie.devicePixelRatio;
-                        //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, annie.DisplayObject._bp);
-                        //if (EventDispatcher.getMouseEventCount() > 0) {
                         if (s._ml[eLen] instanceof annie.MouseEvent) {
                             event_1 = s._ml[eLen];
                             event_1.type = item;
@@ -6707,7 +6778,6 @@ var annie;
                         events[events.length] = event_1;
                         s._initMouseEvent(event_1, cp, sp, identifier);
                         eLen++;
-                        //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                             //清空上次存在的显示列表

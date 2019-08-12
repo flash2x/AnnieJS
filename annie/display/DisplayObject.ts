@@ -861,5 +861,42 @@ namespace annie {
             }
             s.dispatchEvent(annie.Event.ENTER_FRAME);
         }
+
+        /**
+         * @method startDrag
+         * @param {annie.Rectangle} dragRect
+         * @param {annie.Point} dragPoint
+         */
+        public startDrag(dragRect:annie.Rectangle=null,dragPoint:annie.Point=null){
+            let s=this;
+            if(s.stage instanceof annie.Stage) {
+                s.stage._dragDisplayObject = s;
+                if(dragRect instanceof annie.Rectangle){
+                    s.stage._dragRect.x=dragRect.x;
+                    s.stage._dragRect.y=dragRect.y;
+                    s.stage._dragRect.width=dragRect.width;
+                    s.stage._dragRect.height=dragRect.height;
+                }else{
+                    s.stage._dragRect.x=Number.MIN_VALUE;
+                    s.stage._dragRect.y=Number.MIN_VALUE;
+                    s.stage._dragRect.width=Number.MAX_VALUE;
+                    s.stage._dragRect.height=Number.MAX_VALUE;
+                }
+                if(dragPoint instanceof annie.Point){
+                    s.stage._dragPoint.x = dragPoint.x;
+                    s.stage._dragPoint.y = dragPoint.y;
+                }else{
+                    s.stage._dragPoint.x = 0;
+                    s.stage._dragPoint.y = 0;
+                }
+            }
+        }
+
+        /**
+         * @method stopDrag
+         */
+        public stopDrag(){
+            this.stage._dragDisplayObject=null;
+        }
     }
 }

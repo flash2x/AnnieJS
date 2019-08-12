@@ -4,6 +4,7 @@
 namespace annie {
     declare let VConsole: any;
     declare let trace: any;
+
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * @class annie.Stage
@@ -436,6 +437,7 @@ namespace annie {
             }
             return {w: vW, h: vH};
         }
+
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -452,13 +454,17 @@ namespace annie {
         private _mP2: Point = new Point();
         private mouseEvent: any = null;
         private mouseEvents: any = [];
+        public _dragDisplayObject: annie.DisplayObject = null;
+        public _dragRect: annie.Rectangle = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+        public _dragPoint: annie.Point = new Point();
+
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
-            while (c.scrollLeft!==void 0){
+            while (c.scrollLeft !== void 0) {
                 offSetX -= c.scrollLeft;
                 offSetY -= c.scrollTop;
-                c=c.parentNode;
+                c = c.parentNode;
             }
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
@@ -527,7 +533,36 @@ namespace annie {
                             points = [e.changedTouches[0]];
                         }
                     }
-                    for (let o = 0; o < points.length; o++) {
+                    let pLen = points.length;
+                    let dragDisplayObject = s._dragDisplayObject;
+                    if (dragDisplayObject instanceof annie.DisplayObject && pLen == 1){
+                        if(!dragDisplayObject._isOnStage){
+                            s._dragDisplayObject=null;
+                        }else {
+                            //有drag对象
+                            let dp: annie.Point = new annie.Point();
+                            let dragPoint = s._dragPoint;
+                            let dragRect = s._dragRect;
+                            dp.x = (points[0].clientX - offSetX) * devicePixelRatio;
+                            dp.y = (points[0].clientY - offSetY) * devicePixelRatio;
+                            let lp = dragDisplayObject.parent.globalToLocal(dp, DisplayObject._bp);
+                            if (lp.x < dragRect.x) {
+                                lp.x = dragRect.x
+                            } else if (lp.x > dragRect.x + dragRect.width) {
+                                lp.x = dragRect.x + dragRect.width;
+                            }
+                            if (lp.y < dragRect.y) {
+                                lp.y = dragRect.y;
+                            } else if (lp.y > dragRect.y + dragRect.height) {
+                                lp.y = dragRect.y + dragRect.height;
+                            }
+                            lp.x -= dragPoint.x;
+                            lp.y -= dragPoint.y;
+                            dragDisplayObject.x = lp.x;
+                            dragDisplayObject.y = lp.y;
+                        }
+                    }
+                    for (let o = 0; o < pLen; o++) {
                         eLen = 0;
                         events.length = 0;
                         identifier = "m" + points[o].identifier;
@@ -538,9 +573,7 @@ namespace annie {
                         }
                         cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
                         cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
-                        //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
                         sp = s.globalToLocal(cp, DisplayObject._bp);
-                        //if (EventDispatcher.getMouseEventCount() > 0) {
                         if (s._ml[eLen] instanceof annie.MouseEvent) {
                             event = s._ml[eLen];
                             event.type = item;
@@ -551,7 +584,6 @@ namespace annie {
                         events[events.length] = event;
                         s._initMouseEvent(event, cp, sp, identifier);
                         eLen++;
-                        //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                             //清空上次存在的显示列表
@@ -815,6 +847,7 @@ namespace annie {
                 }
             }
         };
+
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
