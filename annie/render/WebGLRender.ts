@@ -274,7 +274,7 @@ namespace annie {
         public createProgram(id: number): WebGLProgram {
             let s = this;
             let gl = s._ctx;
-            if (s.programList["p" + id] == null) {
+            if (s.programList["p" + id] == void 0) {
                 let program = gl.createProgram();
                 let vSource: string;
                 let fSource: string;

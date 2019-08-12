@@ -863,9 +863,10 @@ namespace annie {
         }
 
         /**
+         * 鼠标跟随
          * @method startDrag
-         * @param {annie.Rectangle} dragRect
-         * @param {annie.Point} dragPoint
+         * @param {annie.Rectangle} dragRect 跟随范围
+         * @param {annie.Point} dragPoint 跟随时鼠标对应显示对象的(x,y)坐标位置
          */
         public startDrag(dragRect:annie.Rectangle=null,dragPoint:annie.Point=null){
             let s=this;
@@ -891,8 +892,8 @@ namespace annie {
                 }
             }
         }
-
         /**
+         * 停止鼠标跟随
          * @method stopDrag
          */
         public stopDrag(){

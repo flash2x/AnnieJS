@@ -303,7 +303,7 @@ namespace annie {
          */
         public get maxCharacters():number{
             let l:any=this.htmlElement.getAttribute("maxlength");
-            if(l===null){
+            if(l==null){
                 return 0;
             }else{
                 return l;

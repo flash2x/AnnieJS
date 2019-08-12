@@ -160,11 +160,11 @@ namespace annie {
          * @default false
          */
         public get isButton(): boolean {
-            return this._mode == -1;
+            return this._a2x_mode == -1;
         }
 
         //动画模式 按钮 剪辑 图形
-        private _mode: number = -2;
+        private _a2x_mode: number = -2;
 
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -176,14 +176,14 @@ namespace annie {
          */
         public initButton(): void {
             let s: any = this;
-            if (s._mode != -1 && s._a2x_res_class.tf > 1) {
+            if (s._a2x_mode != -1 && s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
-                s._mode = -1;
+                s._a2x_mode = -1;
             }
         }
 
@@ -350,18 +350,16 @@ namespace annie {
 
         //flash声音管理
         private _a2x_sounds: any = null;
-
         public _onEnterFrameEvent(): void {
             let s: any = this;
-            super._onEnterFrameEvent();
             if (!s._visible) {
                 return;
             }
             if (s._a2x_res_class.tf > 1) {
-                if (s._mode >= 0) {
+                if (s._a2x_mode >= 0) {
                     s._isPlaying = false;
                     if (s.parent instanceof annie.MovieClip) {
-                        s._curFrame = s.parent._curFrame - s._mode;
+                        s._curFrame = s.parent._curFrame - s._a2x_mode;
                     } else {
                         s._curFrame = 1;
                     }
@@ -450,14 +448,13 @@ namespace annie {
                             obj = remChildren[i];
                             if (obj._isOnStage && s._isOnStage) {
                                 obj._onRemoveEvent();
-                                MovieClip._resetMC(obj);
                                 obj.stage = null;
                                 obj.parent = null;
                             }
                         }
                     }
                     //如果发现不是图形动画，则执行脚本
-                    if (s._mode < 0) {
+                    if (s._a2x_mode < 0) {
                         //更新完所有后再来确定事件和脚本
                         let isCodeScript = false;
                         //有没有用户后期通过代码调用加入的脚本,有就直接调用然后不再调用时间轴代码
@@ -477,7 +474,7 @@ namespace annie {
                         }
                         //有没有帧事件
                         curFrameScript = timeLineObj.e[frameIndex];
-                        if (curFrameScript instanceof Array){
+                        if (curFrameScript instanceof Array) {
                             for (let i = 0; i < curFrameScript.length; i++) {
                                 //抛事件
                                 s.dispatchEvent(Event.CALL_FRAME, {
@@ -503,31 +500,26 @@ namespace annie {
                     }
                 }
             }
+            super._onEnterFrameEvent();
         }
-
+        public _onRemoveEvent() {
+            super._onRemoveEvent();
+            MovieClip._resetMC(this);
+        }
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
-            let isNeedToReset = false;
-            if (obj._instanceType == "annie.MovieClip") {
-                obj._wantFrame = 1;
-                obj._lastFrame = 0;
-                obj._isFront = true;
-                if (obj._mode < -1) {
-                    obj._isPlaying = true;
-                } else {
-                    obj._isPlaying = false;
-                }
-                isNeedToReset = true;
-            } else if (obj._instanceType == "annie.Sprite") {
-                isNeedToReset = true;
-            }
-            if (isNeedToReset) {
-                for (let i = 0; i < obj.children.length; i++) {
-                    MovieClip._resetMC(obj.children[i]);
-                }
+            obj._wantFrame =0;
+            obj._curFrame = 1;
+            obj._lastFrame = 0;
+            obj._lastFrameObj = null;
+            obj._isFront = true;
+            obj.children.length=0;
+            if (obj._a2x_mode < -1) {
+                obj._isPlaying = true;
+            } else {
+                obj._isPlaying = false;
             }
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

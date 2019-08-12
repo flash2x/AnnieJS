@@ -323,7 +323,7 @@ namespace annie {
             }
             s.renderObj.init();
             let rc = s.rootDiv;
-            s.mouseEvent = s.onMouseEvent.bind(s);
+            s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
                 rc.addEventListener('mousemove', s.mouseEvent, false);
@@ -370,6 +370,7 @@ namespace annie {
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
+                s._onUpdateMouseEvent();
                 s._onEnterFrameEvent();
                 s.updateMatrix();
                 s.render(s.renderObj);
@@ -378,6 +379,7 @@ namespace annie {
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
                     s.resize();
+                    s._onUpdateMouseEvent();
                     s._onEnterFrameEvent();
                     s.updateMatrix();
                 } else {
@@ -457,11 +459,33 @@ namespace annie {
         public _dragDisplayObject: annie.DisplayObject = null;
         public _dragRect: annie.Rectangle = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
         public _dragPoint: annie.Point = new Point();
-
+        private _onMouseEvent(e:any):void{
+            let s:any=this;
+            if (e.target.id == "_a2x_canvas") {
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
+                }
+            }
+            s.mouseEvents.push(e);
+        }
+        private _onUpdateMouseEvent(){
+            let s=this;
+            let mouseEvents:any=s.mouseEvents;
+            let len=mouseEvents.length;
+            for(let i=0;i<len;i++){
+                s.onMouseEvent(mouseEvents[i]);
+            }
+            mouseEvents.length=0;
+        }
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
-            while (c.scrollLeft !== void 0) {
+            while (c.scrollLeft != void 0) {
                 offSetX -= c.scrollLeft;
                 offSetY -= c.scrollTop;
                 c = c.parentNode;
@@ -512,7 +536,7 @@ namespace annie {
                 if (EventDispatcher._totalMEC > 0) {
                     let points: any;
                     let item = s._mouseEventTypes[e.type];
-                    let events: any = s.mouseEvents;
+                    let events: any = [];
                     let event: any;
                     //stageMousePoint
                     let sp: Point;
@@ -730,16 +754,6 @@ namespace annie {
                     }
                 }
             }
-            if (e.target.id == "_a2x_canvas") {
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
-            }
         };
 
         //设置舞台的对齐模式
@@ -899,7 +913,7 @@ namespace annie {
             let isHave: boolean = false;
             let len = Stage.allUpdateObjList.length;
             for (let i = 0; i < len; i++) {
-                if (Stage.allUpdateObjList[i] === target) {
+                if (Stage.allUpdateObjList[i] == target) {
                     isHave = true;
                     break;
                 }
@@ -921,7 +935,7 @@ namespace annie {
         public static removeUpdateObj(target: any): void {
             let len = Stage.allUpdateObjList.length;
             for (let i = 0; i < len; i++) {
-                if (Stage.allUpdateObjList[i] === target) {
+                if (Stage.allUpdateObjList[i] == target) {
                     Stage.allUpdateObjList.splice(i, 1);
                     break;
                 }

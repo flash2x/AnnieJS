@@ -196,7 +196,7 @@ var annie;
                 if (!(event.target instanceof Object)) {
                     event.target = s;
                 }
-                if (data instanceof Object) {
+                if (data != void 0) {
                     event.data = data;
                 }
                 var len = listeners.length;
@@ -260,7 +260,7 @@ var annie;
             if (listeners instanceof Array) {
                 var len = listeners.length;
                 for (var i = len - 1; i >= 0; i--) {
-                    if (listeners[i] === listener) {
+                    if (listeners[i] == listener) {
                         listeners.splice(i, 1);
                         if (type.indexOf("onMouse") == 0) {
                             s._changeMouseCount(type, false);
@@ -861,7 +861,7 @@ var annie;
          * @return {void}
          */
         TouchEvent.prototype.updateAfterEvent = function () {
-            this.target.stage.updateMatrix();
+            this.target.updateMatrix();
         };
         TouchEvent.prototype.destroy = function () {
             //清除相应的数据引用
@@ -2436,9 +2436,10 @@ var annie;
             s.dispatchEvent(annie.Event.ENTER_FRAME);
         };
         /**
+         * 鼠标跟随
          * @method startDrag
-         * @param {annie.Rectangle} dragRect
-         * @param {annie.Point} dragPoint
+         * @param {annie.Rectangle} dragRect 跟随范围
+         * @param {annie.Point} dragPoint 跟随时鼠标对应显示对象的(x,y)坐标位置
          */
         DisplayObject.prototype.startDrag = function (dragRect, dragPoint) {
             if (dragRect === void 0) { dragRect = null; }
@@ -2469,6 +2470,7 @@ var annie;
             }
         };
         /**
+         * 停止鼠标跟随
          * @method stopDrag
          */
         DisplayObject.prototype.stopDrag = function () {
@@ -2561,7 +2563,7 @@ var annie;
                 return this._rect;
             },
             /**
-             * 设置显示元素的显示区间
+             * 设置显示元素的绘制区间
              * @property rect
              * @param {annie.Rectangle} value
              */
@@ -2612,7 +2614,6 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        ;
         Bitmap.prototype.updateMatrix = function () {
             var s = this;
             _super.prototype.updateMatrix.call(this);
@@ -4027,7 +4028,6 @@ var annie;
             }
         };
         Sprite.prototype._onRemoveEvent = function () {
-            _super.prototype._onRemoveEvent.call(this);
             var s = this;
             var child = null;
             var children = s.children.concat();
@@ -4039,10 +4039,10 @@ var annie;
                     child.stage = null;
                 }
             }
+            _super.prototype._onRemoveEvent.call(this);
         };
         Sprite.prototype._onAddEvent = function () {
             var s = this;
-            _super.prototype._onAddEvent.call(this);
             var child = null;
             var children = s.children.concat();
             var len = children.length;
@@ -4053,10 +4053,10 @@ var annie;
                     child._onAddEvent();
                 }
             }
+            _super.prototype._onAddEvent.call(this);
         };
         Sprite.prototype._onEnterFrameEvent = function () {
             var s = this;
-            _super.prototype._onEnterFrameEvent.call(this);
             var child = null;
             var children = s.children.concat();
             var len = children.length;
@@ -4066,6 +4066,7 @@ var annie;
                     child._onEnterFrameEvent();
                 }
             }
+            _super.prototype._onEnterFrameEvent.call(this);
         };
         Object.defineProperty(Sprite.prototype, "hitArea", {
             get: function () {
@@ -4542,7 +4543,7 @@ var annie;
             _this._a2x_res_children = [];
             _this._a2x_script = null;
             //动画模式 按钮 剪辑 图形
-            _this._mode = -2;
+            _this._a2x_mode = -2;
             _this._clicked = false;
             //flash声音管理
             _this._a2x_sounds = null;
@@ -4681,7 +4682,7 @@ var annie;
              * @default false
              */
             get: function () {
-                return this._mode == -1;
+                return this._a2x_mode == -1;
             },
             enumerable: true,
             configurable: true
@@ -4696,14 +4697,14 @@ var annie;
          */
         MovieClip.prototype.initButton = function () {
             var s = this;
-            if (s._mode != -1 && s._a2x_res_class.tf > 1) {
+            if (s._a2x_mode != -1 && s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
-                s._mode = -1;
+                s._a2x_mode = -1;
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
@@ -4873,15 +4874,14 @@ var annie;
         };
         MovieClip.prototype._onEnterFrameEvent = function () {
             var s = this;
-            _super.prototype._onEnterFrameEvent.call(this);
             if (!s._visible) {
                 return;
             }
             if (s._a2x_res_class.tf > 1) {
-                if (s._mode >= 0) {
+                if (s._a2x_mode >= 0) {
                     s._isPlaying = false;
                     if (s.parent instanceof annie.MovieClip) {
-                        s._curFrame = s.parent._curFrame - s._mode;
+                        s._curFrame = s.parent._curFrame - s._a2x_mode;
                     }
                     else {
                         s._curFrame = 1;
@@ -4976,14 +4976,13 @@ var annie;
                             obj = remChildren[i];
                             if (obj._isOnStage && s._isOnStage) {
                                 obj._onRemoveEvent();
-                                MovieClip._resetMC(obj);
                                 obj.stage = null;
                                 obj.parent = null;
                             }
                         }
                     }
                     //如果发现不是图形动画，则执行脚本
-                    if (s._mode < 0) {
+                    if (s._a2x_mode < 0) {
                         //更新完所有后再来确定事件和脚本
                         var isCodeScript = false;
                         //有没有用户后期通过代码调用加入的脚本,有就直接调用然后不再调用时间轴代码
@@ -5029,29 +5028,25 @@ var annie;
                     }
                 }
             }
+            _super.prototype._onEnterFrameEvent.call(this);
+        };
+        MovieClip.prototype._onRemoveEvent = function () {
+            _super.prototype._onRemoveEvent.call(this);
+            MovieClip._resetMC(this);
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
-            var isNeedToReset = false;
-            if (obj._instanceType == "annie.MovieClip") {
-                obj._wantFrame = 1;
-                obj._lastFrame = 0;
-                obj._isFront = true;
-                if (obj._mode < -1) {
-                    obj._isPlaying = true;
-                }
-                else {
-                    obj._isPlaying = false;
-                }
-                isNeedToReset = true;
+            obj._wantFrame = 0;
+            obj._curFrame = 1;
+            obj._lastFrame = 0;
+            obj._lastFrameObj = null;
+            obj._isFront = true;
+            obj.children.length = 0;
+            if (obj._a2x_mode < -1) {
+                obj._isPlaying = true;
             }
-            else if (obj._instanceType == "annie.Sprite") {
-                isNeedToReset = true;
-            }
-            if (isNeedToReset) {
-                for (var i = 0; i < obj.children.length; i++) {
-                    MovieClip._resetMC(obj.children[i]);
-                }
+            else {
+                obj._isPlaying = false;
             }
         };
         MovieClip.prototype.destroy = function () {
@@ -6129,7 +6124,7 @@ var annie;
              */
             get: function () {
                 var l = this.htmlElement.getAttribute("maxlength");
-                if (l === null) {
+                if (l == null) {
                     return 0;
                 }
                 else {
@@ -6435,7 +6430,7 @@ var annie;
             }
             s.renderObj.init();
             var rc = s.rootDiv;
-            s.mouseEvent = s.onMouseEvent.bind(s);
+            s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
                 rc.addEventListener('mousemove', s.mouseEvent, false);
@@ -6576,6 +6571,7 @@ var annie;
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
+                s._onUpdateMouseEvent();
                 s._onEnterFrameEvent();
                 s.updateMatrix();
                 s.render(s.renderObj);
@@ -6585,6 +6581,7 @@ var annie;
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
                     s.resize();
+                    s._onUpdateMouseEvent();
                     s._onEnterFrameEvent();
                     s.updateMatrix();
                 }
@@ -6643,10 +6640,33 @@ var annie;
             }
             return { w: vW, h: vH };
         };
+        Stage.prototype._onMouseEvent = function (e) {
+            var s = this;
+            if (e.target.id == "_a2x_canvas") {
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
+                }
+            }
+            s.mouseEvents.push(e);
+        };
+        Stage.prototype._onUpdateMouseEvent = function () {
+            var s = this;
+            var mouseEvents = s.mouseEvents;
+            var len = mouseEvents.length;
+            for (var i = 0; i < len; i++) {
+                s.onMouseEvent(mouseEvents[i]);
+            }
+            mouseEvents.length = 0;
+        };
         Stage.prototype.onMouseEvent = function (e) {
             //检查是否有
             var s = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
-            while (c.scrollLeft !== void 0) {
+            while (c.scrollLeft != void 0) {
                 offSetX -= c.scrollLeft;
                 offSetY -= c.scrollTop;
                 c = c.parentNode;
@@ -6699,7 +6719,7 @@ var annie;
                 if (annie.EventDispatcher._totalMEC > 0) {
                     var points = void 0;
                     var item = s._mouseEventTypes[e.type];
-                    var events = s.mouseEvents;
+                    var events = [];
                     var event_1;
                     //stageMousePoint
                     var sp = void 0;
@@ -6930,16 +6950,6 @@ var annie;
                     }
                 }
             }
-            if (e.target.id == "_a2x_canvas") {
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
-            }
         };
         ;
         //设置舞台的对齐模式
@@ -7063,7 +7073,7 @@ var annie;
             var isHave = false;
             var len = Stage.allUpdateObjList.length;
             for (var i = 0; i < len; i++) {
-                if (Stage.allUpdateObjList[i] === target) {
+                if (Stage.allUpdateObjList[i] == target) {
                     isHave = true;
                     break;
                 }
@@ -7084,7 +7094,7 @@ var annie;
         Stage.removeUpdateObj = function (target) {
             var len = Stage.allUpdateObjList.length;
             for (var i = 0; i < len; i++) {
-                if (Stage.allUpdateObjList[i] === target) {
+                if (Stage.allUpdateObjList[i] == target) {
                     Stage.allUpdateObjList.splice(i, 1);
                     break;
                 }
@@ -8296,7 +8306,7 @@ var annie;
         WebGLRender.prototype.createProgram = function (id) {
             var s = this;
             var gl = s._ctx;
-            if (s.programList["p" + id] == null) {
+            if (s.programList["p" + id] == void 0) {
                 var program = gl.createProgram();
                 var vSource = void 0;
                 var fSource = void 0;
@@ -8957,7 +8967,7 @@ var annie;
                                             //如果不为空，则更新元素
                                             for (var m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] === void 0) {
+                                                if (frameCon[j][m] == void 0) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -9211,30 +9221,30 @@ var annie;
         else {
             //是不是文本
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr === void 0 || info.tr.length == 1) {
+            if (info.tr == void 0 || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             var lastInfo = target._a2x_res_obj;
             if (lastInfo.tr != info.tr) {
                 _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
             }
-            if (info.w !== void 0) {
+            if (info.w != void 0) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
             }
-            target.alpha = info.al === void 0 ? 1 : info.al;
+            target.alpha = info.al == void 0 ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t !== void 0) {
-                if (info.t == -1 || target.initButton) {
+            if (info.t != void 0 && target instanceof annie.MovieClip) {
+                if (info.t == -1) {
                     //initButton
                     target.initButton();
                 }
-                target._mode = info.t;
+                target["_a2x_mode"] = info.t;
             }
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {
-                if (info.fi !== void 0) {
+                if (info.fi != void 0) {
                     var filters = [];
                     var blur_1;
                     var color = void 0;
@@ -9527,7 +9537,7 @@ var annie;
         var i;
         if (resClass.tf > 1) {
             isMc = true;
-            if (resClass.timeLine === void 0) {
+            if (resClass.timeLine == void 0) {
                 //将时间轴丰满,抽出脚本，抽出标签
                 var keyFrameCount = resClass.f.length;
                 var timeLine = [];
@@ -9649,7 +9659,7 @@ var annie;
                     else {
                         d(obj, resClass.f[0].c[index]);
                         // 检查是否有遮罩
-                        if (resClass.f[0].c[index].ma !== void 0) {
+                        if (resClass.f[0].c[index].ma != void 0) {
                             maskObj = obj;
                             maskTillId = resClass.f[0].c[index].ma - 1;
                         }
@@ -9772,10 +9782,10 @@ var annie;
                         }
                         break;
                     case "yoyo":
-                        if (data[item] === false) {
+                        if (data[item] == false) {
                             s._isLoop = 0;
                         }
-                        else if (data[item] === true) {
+                        else if (data[item] == true) {
                             s._isLoop = Number.MAX_VALUE;
                         }
                         else {
@@ -9864,7 +9874,7 @@ var annie;
                     }
                     else {
                         if (cf) {
-                            cf(s._isLoop == 0, pm);
+                            cf(pm, s._isLoop == 0);
                         }
                         if (s._isLoop > 0) {
                             s._isFront = false;
@@ -9881,7 +9891,7 @@ var annie;
                 s.currentFrame--;
                 if (s.currentFrame < 0) {
                     if (cf) {
-                        cf(s._isLoop == 0, pm);
+                        cf(pm, s._isLoop == 0);
                     }
                     if (s._isLoop > 0) {
                         s._isFront = true;
@@ -10231,7 +10241,7 @@ var annie;
          * @return {number}
          */
         Tween.exponentialIn = function (k) {
-            return k === 0 ? 0 : Math.pow(1024, k - 1);
+            return k == 0 ? 0 : Math.pow(1024, k - 1);
         };
         /**
          * exponentialOut 缓动类型
@@ -10243,7 +10253,7 @@ var annie;
          * @return {number}
          */
         Tween.exponentialOut = function (k) {
-            return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+            return k == 1 ? 1 : 1 - Math.pow(2, -10 * k);
         };
         /**
          * exponentialInOut 缓动类型
@@ -10255,10 +10265,10 @@ var annie;
          * @return {number}
          */
         Tween.exponentialInOut = function (k) {
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
             if ((k *= 2) < 1) {
@@ -10315,10 +10325,10 @@ var annie;
          * @return {number}
          */
         Tween.elasticIn = function (k) {
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
             return -Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
@@ -10333,10 +10343,10 @@ var annie;
          * @return {number}
          */
         Tween.elasticOut = function (k) {
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
             return Math.pow(2, -10 * k) * Math.sin((k - 0.1) * 5 * Math.PI) + 1;
@@ -10351,10 +10361,10 @@ var annie;
          * @return {number}
          */
         Tween.elasticInOut = function (k) {
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
             k *= 2;

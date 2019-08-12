@@ -227,7 +227,7 @@ namespace annie {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] === void 0) {
+                                                if (frameCon[j][m] == void 0) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -343,11 +343,11 @@ namespace annie {
                             audioReader.onload = function () {
                                 audio.src = audioReader.result;
                                 _loadResCount--;
-                                if (_loadResCount == 0){
+                                if (_loadResCount == 0) {
                                     _checkComplete();
                                 }
                             };
-                            audioReader.readAsDataURL(loadContent.slice(lastIndex, currIndex,"audio/mp3"));
+                            audioReader.readAsDataURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
                         } else if (JSONData[i].type == "json") {
                             if (JSONData[i].id == "_a2x_con") {
                                 fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
@@ -468,30 +468,30 @@ namespace annie {
         } else {
             //是不是文本
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr === void 0 || info.tr.length == 1) {
+            if (info.tr == void 0 || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             let lastInfo = target._a2x_res_obj;
             if (lastInfo.tr != info.tr) {
                 [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
             }
-            if (info.w !== void 0) {
+            if (info.w != void 0) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
             }
-            target.alpha = info.al === void 0 ? 1 : info.al;
+            target.alpha = info.al == void 0 ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
-            if (info.t !== void 0) {
-                if (info.t == -1||target.initButton) {
+            if (info.t != void 0 && target instanceof annie.MovieClip) {
+                if (info.t == -1) {
                     //initButton
                     target.initButton();
                 }
-                target._mode = info.t;
+                target["_a2x_mode"] = info.t;
             }
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {
-                if (info.fi !== void 0) {
+                if (info.fi != void 0) {
                     let filters: any = [];
                     let blur: any;
                     let color: any;
@@ -630,6 +630,7 @@ namespace annie {
         }
         return shape;
     }
+
     // 获取声音实例
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
@@ -676,7 +677,7 @@ namespace annie {
         }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? (info.dataType==undefined?"text":info.dataType): info.responseType;
+        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "text" : info.dataType) : info.responseType;
         if (info.success instanceof Object) {
             urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
@@ -773,7 +774,7 @@ namespace annie {
         let i: number;
         if (resClass.tf > 1) {
             isMc = true;
-            if (resClass.timeLine === void 0) {
+            if (resClass.timeLine == void 0) {
                 //将时间轴丰满,抽出脚本，抽出标签
                 let keyFrameCount = resClass.f.length;
                 let timeLine: Array<number> = [];
@@ -884,7 +885,7 @@ namespace annie {
                     } else {
                         d(obj, resClass.f[0].c[index]);
                         // 检查是否有遮罩
-                        if (resClass.f[0].c[index].ma !== void 0) {
+                        if (resClass.f[0].c[index].ma != void 0) {
                             maskObj = obj;
                             maskTillId = resClass.f[0].c[index].ma - 1;
                         } else {

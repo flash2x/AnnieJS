@@ -387,7 +387,6 @@ namespace annie {
             }
         }
         public _onRemoveEvent():void{
-            super._onRemoveEvent();
             let s = this;
             let child: any = null;
             let children = s.children.concat();
@@ -399,10 +398,10 @@ namespace annie {
                     child.stage = null;
                 }
             }
+            super._onRemoveEvent();
         }
         public _onAddEvent():void{
             let s = this;
-            super._onAddEvent();
             let child: any = null;
             let children = s.children.concat();
             let len =children.length;
@@ -413,10 +412,10 @@ namespace annie {
                     child._onAddEvent();
                 }
             }
+            super._onAddEvent();
         }
         public _onEnterFrameEvent():void{
             let s = this;
-            super._onEnterFrameEvent();
             let child: any = null;
             let children = s.children.concat();
             let len =children.length;
@@ -426,6 +425,7 @@ namespace annie {
                     child._onEnterFrameEvent();
                 }
             }
+            super._onEnterFrameEvent();
         }
         /**
          * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。

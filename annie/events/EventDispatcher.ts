@@ -177,7 +177,7 @@ namespace annie {
                 if (!(event.target instanceof Object)) {
                     event.target = s;
                 }
-                if (data instanceof Object) {
+                if(data!=void 0) {
                     event.data = data;
                 }
                 let len = listeners.length;
@@ -238,7 +238,7 @@ namespace annie {
             if (listeners instanceof Array) {
                 let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    if (listeners[i] === listener) {
+                    if (listeners[i] == listener) {
                         listeners.splice(i, 1);
                         if (type.indexOf("onMouse") == 0) {
                             s._changeMouseCount(type, false);

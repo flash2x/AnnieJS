@@ -15,8 +15,9 @@ namespace annie {
         private _cacheImg: any = null;
         private rectX: number = 0;
         private rectY: number = 0;
+
         /**
-         * 设置显示元素的显示区间
+         * 设置显示元素的绘制区间
          * @property rect
          * @param {annie.Rectangle} value
          */
@@ -37,9 +38,11 @@ namespace annie {
             }
             s.a2x_uf = true;
         }
+
         public get rect(): annie.Rectangle {
             return this._rect;
         }
+
         public _rect: annie.Rectangle = null;
 
         /**
@@ -92,7 +95,7 @@ namespace annie {
          */
         public get bitmapData(): any {
             return this._bitmapData;
-        };
+        }
 
         public set bitmapData(value: any) {
             let s = this;
@@ -244,6 +247,7 @@ namespace annie {
                 return super.hitTestPoint(hitPoint, isGlobalPoint);
             }
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

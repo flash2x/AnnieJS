@@ -1379,12 +1379,14 @@ declare namespace annie {
         _onAddEvent(): void;
         _onEnterFrameEvent(): void;
         /**
+         * 鼠标跟随
          * @method startDrag
-         * @param {annie.Rectangle} dragRect
-         * @param {annie.Point} dragPoint
+         * @param {annie.Rectangle} dragRect 跟随范围
+         * @param {annie.Point} dragPoint 跟随时鼠标对应显示对象的(x,y)坐标位置
          */
         startDrag(dragRect?: annie.Rectangle, dragPoint?: annie.Point): void;
         /**
+         * 停止鼠标跟随
          * @method stopDrag
          */
         stopDrag(): void;
@@ -1408,7 +1410,7 @@ declare namespace annie {
         private rectX;
         private rectY;
         /**
-         * 设置显示元素的显示区间
+         * 设置显示元素的绘制区间
          * @property rect
          * @param {annie.Rectangle} value
          */
@@ -2348,7 +2350,7 @@ declare namespace annie {
          * @default false
          */
         readonly isButton: boolean;
-        private _mode;
+        private _a2x_mode;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
          * 此方法不可逆，设置后不再能设置回剪辑，一定要这么做的话，请联系作者，看作者答不答应
@@ -2422,6 +2424,7 @@ declare namespace annie {
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         private _a2x_sounds;
         _onEnterFrameEvent(): void;
+        _onRemoveEvent(): void;
         private static _resetMC;
         destroy(): void;
     }
@@ -3099,6 +3102,8 @@ declare namespace annie {
         _dragDisplayObject: annie.DisplayObject;
         _dragRect: annie.Rectangle;
         _dragPoint: annie.Point;
+        private _onMouseEvent;
+        private _onUpdateMouseEvent;
         private onMouseEvent;
         private setAlign;
         /**
