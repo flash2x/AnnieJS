@@ -212,7 +212,7 @@ namespace annie {
                     return true
                 }
             } else {
-                if (s.eventTypes[type] instanceof Array && s.eventTypes1[type].length > 0) {
+                if (s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
                     return true
                 }
             }

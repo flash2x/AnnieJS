@@ -447,7 +447,7 @@ namespace annie {
                         for (let i = 0; i < count; i++) {
                             obj = remChildren[i];
                             if (obj._isOnStage && s._isOnStage) {
-                                obj._onRemoveEvent();
+                                obj._onRemoveEvent(true);
                                 obj.stage = null;
                                 obj.parent = null;
                             }
@@ -502,8 +502,9 @@ namespace annie {
             }
             super._onEnterFrameEvent();
         }
-        public _onRemoveEvent() {
-            super._onRemoveEvent();
+        public _onRemoveEvent(isReSetMc:boolean) {
+            super._onRemoveEvent(isReSetMc);
+            if(isReSetMc)
             MovieClip._resetMC(this);
         }
         private static _resetMC(obj: any) {

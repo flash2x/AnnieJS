@@ -11,7 +11,7 @@ namespace annie {
      * @since 1.0.0
      * @extends annie.EventDispatcher
      */
-    export abstract class DisplayObject extends EventDispatcher{
+    export abstract class DisplayObject extends EventDispatcher {
         // events:
         /**
          * annie.DisplayObject显示对象加入到舞台事件
@@ -123,8 +123,9 @@ namespace annie {
          * @default ""
          */
         public name: string = "";
-        private _lastX:number=0;
-        private _lastY:number=0;
+        private _lastX: number = 0;
+        private _lastY: number = 0;
+
         /**
          * 显示对象位置x
          * @property x
@@ -136,39 +137,48 @@ namespace annie {
         public get x(): number {
             return this._x;
         }
+
         public set x(value: number) {
             let s = this;
             if (value != s._x) {
                 s._x = value;
-                s._lastX=value+s._offsetX;
+                s._lastX = value + s._offsetX;
                 s.a2x_um = true;
             }
         }
+
         private _x: number = 0;
+
         protected get offsetX(): number {
             return this._offsetX;
         }
+
         protected set offsetX(value: number) {
             let s = this;
             if (value != s._offsetX) {
                 s._offsetX = value;
-                s._lastX=value+s._x;
+                s._lastX = value + s._x;
                 s.a2x_um = true;
             }
         }
+
         protected _offsetX: number = 0;
+
         protected get offsetY(): number {
             return this._offsetY;
         }
+
         protected set offsetY(value: number) {
             let s = this;
             if (value != s._offsetY) {
                 s._offsetY = value;
-                s._lastY=value+s._y;
+                s._lastY = value + s._y;
                 s.a2x_um = true;
             }
         }
+
         protected _offsetY: number = 0;
+
         /**
          * 显示对象位置y
          * @property y
@@ -185,10 +195,11 @@ namespace annie {
             let s = this;
             if (value != s._y) {
                 s._y = value;
-                s._lastY=value+s._offsetY;
+                s._lastY = value + s._offsetY;
                 s.a2x_um = true;
             }
         }
+
         private _y: number = 0;
 
         /**
@@ -430,7 +441,7 @@ namespace annie {
         public set mask(value: DisplayObject) {
             let s = this;
             if (value != s._mask) {
-                if (value instanceof annie.DisplayObject){
+                if (value instanceof annie.DisplayObject) {
                     value._isUseToMask++;
                 } else {
                     if (s._mask instanceof annie.DisplayObject) {
@@ -441,6 +452,7 @@ namespace annie {
 
             }
         }
+
         private _mask: DisplayObject = null;
 
         /**
@@ -504,6 +516,7 @@ namespace annie {
         public static _p3: Point = new Point();
         public static _p4: Point = new Point();
         protected _isUseToMask: number = 0;
+
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -519,19 +532,21 @@ namespace annie {
             let p: Point;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._bp);
-            } else{
+            } else {
                 p = hitPoint;
             }
             p.x += s._offsetX;
             p.y += s._offsetY;
-            if (s._bounds.isPointIn(p)){
+            if (s._bounds.isPointIn(p)) {
                 return s;
             }
             return null;
         }
-        public getBounds():Rectangle{
+
+        public getBounds(): Rectangle {
             return this._bounds;
         }
+
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
@@ -550,7 +565,7 @@ namespace annie {
                 if (x < maskRect.x) {
                     x = maskRect.x;
                 }
-                if (y < maskRect.y){
+                if (y < maskRect.y) {
                     y = maskRect.y;
                 }
                 if (w > maskRect.width) {
@@ -567,6 +582,7 @@ namespace annie {
             Rectangle.createFromPoints(s._drawRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
             return s._drawRect;
         }
+
         /**
          * 更新函数
          * @method update
@@ -576,14 +592,14 @@ namespace annie {
          */
         protected updateMatrix(): void {
             let s = this;
-            let isHadParent:boolean=s.parent instanceof annie.Sprite;
-            if(s.a2x_um){
-                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX-s._offsetX, s._anchorY-s._offsetY);
+            let isHadParent: boolean = s.parent instanceof annie.Sprite;
+            if (s.a2x_um) {
+                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
             }
             if (s._cp) {
                 s.a2x_um = s.a2x_ua = s.a2x_uf = true;
                 s._cp = false;
-            }else{
+            } else {
                 if (isHadParent) {
                     let PUI = s.parent;
                     if (PUI.a2x_um) {
@@ -597,19 +613,19 @@ namespace annie {
                     }
                 }
             }
-            if (s.a2x_um){
+            if (s.a2x_um) {
                 s.cMatrix.setFrom(s._matrix);
                 if (isHadParent) {
                     s.cMatrix.prepend(s.parent.cMatrix);
                 }
             }
-            if (s.a2x_ua){
+            if (s.a2x_ua) {
                 s.cAlpha = s._alpha;
-                if (isHadParent){
+                if (isHadParent) {
                     s.cAlpha *= s.parent.cAlpha;
                 }
             }
-            if (s.a2x_uf){
+            if (s.a2x_uf) {
                 s.cFilters = [];
                 let sf = s.filters;
                 if (sf instanceof Array) {
@@ -628,6 +644,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -667,6 +684,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
@@ -678,7 +696,8 @@ namespace annie {
         public get width(): number {
             return this.getDrawRect().width;
         }
-        public set width(value: number){
+
+        public set width(value: number) {
             let s = this;
             let w = s.getDrawRect().width;
             if (value > 0 && w > 0) {
@@ -686,6 +705,7 @@ namespace annie {
                 s.scaleX *= sx;
             }
         }
+
         /**
          * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
@@ -697,7 +717,8 @@ namespace annie {
         public get height(): number {
             return this.getDrawRect().height;
         }
-        public set height(value: number){
+
+        public set height(value: number) {
             let s = this;
             let h = s.getDrawRect().height;
             if (value > 0 && h > 0) {
@@ -705,6 +726,7 @@ namespace annie {
                 s.scaleY *= sy;
             }
         }
+
         //画缓存位图的时候需要使用
         //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
         public static _canvas: any = window.document.createElement("canvas");
@@ -780,6 +802,7 @@ namespace annie {
             }
             s.soundList.push(sound);
         }
+
         /**
          * 删除一个已经添加进来的声音
          * @method removeSound
@@ -804,8 +827,10 @@ namespace annie {
                 }
             }
         }
+
         //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
+
         public destroy(): void {
             let s: any = this;
             //清除相应的数据引用
@@ -829,11 +854,13 @@ namespace annie {
             s._visible = false;
             super.destroy();
         }
-        public _isOnStage:boolean=false;
-        public _onRemoveEvent():void{
+
+        public _isOnStage: boolean = false;
+
+        public _onRemoveEvent(isReSetMc: boolean): void {
             //如果有音乐,则关闭音乐
-            let s=this;
-            s._isOnStage=false;
+            let s = this;
+            s._isOnStage = false;
             let sounds = s.soundList;
             if (sounds.length > 0) {
                 for (let i = 0; i < sounds.length; i++) {
@@ -842,9 +869,10 @@ namespace annie {
             }
             s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
         }
-        public _onAddEvent():void{
+
+        public _onAddEvent(): void {
             let s = this;
-            s._isOnStage=true;
+            s._isOnStage = true;
             //如果有音乐，则播放音乐
             let sounds = s.soundList;
             if (sounds.length > 0) {
@@ -854,7 +882,8 @@ namespace annie {
             }
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         }
-        public _onEnterFrameEvent():void{
+
+        public _onEnterFrameEvent(): void {
             let s = this;
             if (!s._visible) {
                 return;
@@ -865,39 +894,58 @@ namespace annie {
         /**
          * 鼠标跟随
          * @method startDrag
+         * @param {annie.Point|boolean} 当dragPoint 为annie.Point对象时，那就是跟随时鼠标对应显示对象的(x,y)坐标位置；如果为true或false,则表示是否绑定到中心
          * @param {annie.Rectangle} dragRect 跟随范围
-         * @param {annie.Point} dragPoint 跟随时鼠标对应显示对象的(x,y)坐标位置
          */
-        public startDrag(dragRect:annie.Rectangle=null,dragPoint:annie.Point=null){
-            let s=this;
-            if(s.stage instanceof annie.Stage) {
+        public startDrag(dragPoint: annie.Point = null, dragRect: annie.Rectangle = null) {
+            DisplayObject._startDrag(this, dragPoint, dragRect);
+        }
+
+        private static _startDrag(target: DisplayObject, dragPoint: annie.Point = null, dragRound: annie.Rectangle = null) {
+            let s = target;
+            if (s.stage instanceof annie.Stage) {
                 s.stage._dragDisplayObject = s;
-                if(dragRect instanceof annie.Rectangle){
-                    s.stage._dragRect.x=dragRect.x;
-                    s.stage._dragRect.y=dragRect.y;
-                    s.stage._dragRect.width=dragRect.width;
-                    s.stage._dragRect.height=dragRect.height;
-                }else{
-                    s.stage._dragRect.x=Number.MIN_VALUE;
-                    s.stage._dragRect.y=Number.MIN_VALUE;
-                    s.stage._dragRect.width=Number.MAX_VALUE;
-                    s.stage._dragRect.height=Number.MAX_VALUE;
-                }
-                if(dragPoint instanceof annie.Point){
+                if (dragPoint instanceof annie.Point) {
                     s.stage._dragPoint.x = dragPoint.x;
                     s.stage._dragPoint.y = dragPoint.y;
-                }else{
-                    s.stage._dragPoint.x = 0;
-                    s.stage._dragPoint.y = 0;
+                    s.stage._isFixedDrag = true;
+                } else {
+                    if (dragPoint === true) {
+                        let drawRect = s.getDrawRect();
+                        s.stage._dragPoint.x = drawRect.x + (drawRect.width >> 1);
+                        s.stage._dragPoint.y = drawRect.y + (drawRect.height >> 1);
+                        s.stage._isFixedDrag = true;
+                    } else {
+                        s.stage._isFixedDrag = false;
+                    }
+                }
+                if (dragRound instanceof annie.Rectangle) {
+                    s.stage._dragRect.x = dragRound.x;
+                    s.stage._dragRect.y = dragRound.y;
+                    s.stage._dragRect.width = dragRound.width;
+                    s.stage._dragRect.height = dragRound.height;
+                } else {
+                    s.stage._dragRect.x = Number.MIN_VALUE;
+                    s.stage._dragRect.y = Number.MIN_VALUE;
+                    s.stage._dragRect.width = Number.MAX_VALUE;
+                    s.stage._dragRect.height = Number.MAX_VALUE;
                 }
             }
         }
+
+        private static _stopDrage(target: DisplayObject) {
+            let s = target;
+            if (s.stage instanceof annie.Stage) {
+                s.stage._dragDisplayObject = null;
+            }
+        }
+
         /**
          * 停止鼠标跟随
          * @method stopDrag
          */
-        public stopDrag(){
-            this.stage._dragDisplayObject=null;
+        public stopDrag() {
+            DisplayObject._stopDrage(this);
         }
     }
 }

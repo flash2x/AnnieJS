@@ -1375,16 +1375,18 @@ declare namespace annie {
         private _a2x_res_obj;
         destroy(): void;
         _isOnStage: boolean;
-        _onRemoveEvent(): void;
+        _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
         _onEnterFrameEvent(): void;
         /**
          * 鼠标跟随
          * @method startDrag
+         * @param {annie.Point|boolean} 当dragPoint 为annie.Point对象时，那就是跟随时鼠标对应显示对象的(x,y)坐标位置；如果为true或false,则表示是否绑定到中心
          * @param {annie.Rectangle} dragRect 跟随范围
-         * @param {annie.Point} dragPoint 跟随时鼠标对应显示对象的(x,y)坐标位置
          */
-        startDrag(dragRect?: annie.Rectangle, dragPoint?: annie.Point): void;
+        startDrag(dragPoint?: annie.Point, dragRect?: annie.Rectangle): void;
+        private static _startDrag;
+        private static _stopDrage;
         /**
          * 停止鼠标跟随
          * @method stopDrag
@@ -1986,7 +1988,7 @@ declare namespace annie {
         getBounds(): Rectangle;
         updateMatrix(): void;
         render(renderObj: IRender): void;
-        _onRemoveEvent(): void;
+        _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
         _onEnterFrameEvent(): void;
         /**
@@ -2424,7 +2426,7 @@ declare namespace annie {
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         private _a2x_sounds;
         _onEnterFrameEvent(): void;
-        _onRemoveEvent(): void;
+        _onRemoveEvent(isReSetMc: boolean): void;
         private static _resetMC;
         destroy(): void;
     }
@@ -3102,6 +3104,7 @@ declare namespace annie {
         _dragDisplayObject: annie.DisplayObject;
         _dragRect: annie.Rectangle;
         _dragPoint: annie.Point;
+        _isFixedDrag: boolean;
         private _onMouseEvent;
         private _onUpdateMouseEvent;
         private onMouseEvent;
@@ -4104,7 +4107,7 @@ declare namespace annie {
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是data.completeParams的值,第二个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
@@ -4123,7 +4126,7 @@ declare namespace annie {
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是data.completeParams的值,第二个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法

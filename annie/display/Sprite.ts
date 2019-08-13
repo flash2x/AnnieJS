@@ -274,7 +274,7 @@ namespace annie {
                 child = s.children.splice(index, 1)[0];
             }
             if(s._isOnStage&&child._isOnStage){
-                child._onRemoveEvent();
+                child._onRemoveEvent(false);
                 child.stage=null;
             }
             child.parent=null;
@@ -386,7 +386,7 @@ namespace annie {
                 renderObj.endMask();
             }
         }
-        public _onRemoveEvent():void{
+        public _onRemoveEvent(isReSetMc:boolean):void{
             let s = this;
             let child: any = null;
             let children = s.children.concat();
@@ -394,11 +394,11 @@ namespace annie {
             for (let i = len - 1; i >= 0; i--){
                 child = children[i];
                 if (child instanceof annie.DisplayObject && child._isOnStage){
-                    child._onRemoveEvent();
+                    child._onRemoveEvent(isReSetMc);
                     child.stage = null;
                 }
             }
-            super._onRemoveEvent();
+            super._onRemoveEvent(isReSetMc);
         }
         public _onAddEvent():void{
             let s = this;

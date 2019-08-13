@@ -459,8 +459,10 @@ namespace annie {
         public _dragDisplayObject: annie.DisplayObject = null;
         public _dragRect: annie.Rectangle = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
         public _dragPoint: annie.Point = new Point();
-        private _onMouseEvent(e:any):void{
-            let s:any=this;
+        public _isFixedDrag: boolean = false;
+
+        private _onMouseEvent(e: any): void {
+            let s: any = this;
             if (e.target.id == "_a2x_canvas") {
                 if (s.isPreventDefaultEvent) {
                     if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
@@ -473,15 +475,17 @@ namespace annie {
             }
             s.mouseEvents.push(e);
         }
-        private _onUpdateMouseEvent(){
-            let s=this;
-            let mouseEvents:any=s.mouseEvents;
-            let len=mouseEvents.length;
-            for(let i=0;i<len;i++){
+
+        private _onUpdateMouseEvent() {
+            let s = this;
+            let mouseEvents: any = s.mouseEvents;
+            let len = mouseEvents.length;
+            for (let i = 0; i < len; i++) {
                 s.onMouseEvent(mouseEvents[i]);
             }
-            mouseEvents.length=0;
+            mouseEvents.length = 0;
         }
+
         private onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
@@ -559,10 +563,10 @@ namespace annie {
                     }
                     let pLen = points.length;
                     let dragDisplayObject = s._dragDisplayObject;
-                    if (dragDisplayObject instanceof annie.DisplayObject && pLen == 1){
-                        if(!dragDisplayObject._isOnStage){
-                            s._dragDisplayObject=null;
-                        }else {
+                    if (dragDisplayObject instanceof annie.DisplayObject && pLen == 1) {
+                        if (!dragDisplayObject._isOnStage) {
+                            s._dragDisplayObject = null;
+                        } else {
                             //有drag对象
                             let dp: annie.Point = new annie.Point();
                             let dragPoint = s._dragPoint;
@@ -570,6 +574,12 @@ namespace annie {
                             dp.x = (points[0].clientX - offSetX) * devicePixelRatio;
                             dp.y = (points[0].clientY - offSetY) * devicePixelRatio;
                             let lp = dragDisplayObject.parent.globalToLocal(dp, DisplayObject._bp);
+                            if(!s._isFixedDrag && item == "onMouseDown") {
+                                dragPoint.x = lp.x - dragDisplayObject.x;
+                                dragPoint.y = lp.y - dragDisplayObject.y;
+                            }
+                            lp.x -= dragPoint.x;
+                            lp.y -= dragPoint.y;
                             if (lp.x < dragRect.x) {
                                 lp.x = dragRect.x
                             } else if (lp.x > dragRect.x + dragRect.width) {
@@ -580,8 +590,6 @@ namespace annie {
                             } else if (lp.y > dragRect.y + dragRect.height) {
                                 lp.y = dragRect.y + dragRect.height;
                             }
-                            lp.x -= dragPoint.x;
-                            lp.y -= dragPoint.y;
                             dragDisplayObject.x = lp.x;
                             dragDisplayObject.y = lp.y;
                         }
@@ -668,7 +676,7 @@ namespace annie {
                             for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
                                 for (let j = 0; j < eLen; j++) {
-                                    if (!events[j]._pd && d.hasEventListener(events[j].type)) {
+                                    if (!events[j]._pd && d.hasEventListener(events[j].type, false)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[eLen - 1];
                                         lp = d.globalToLocal(cp, DisplayObject._bp);

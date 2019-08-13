@@ -154,6 +154,7 @@ namespace annieUI {
          * @since 2.0.1
          */
         public isSpringBack: boolean = true;
+
         /**
          * 构造函数
          * @method  ScrollPage
@@ -181,24 +182,23 @@ namespace annieUI {
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH, isVertical);
             let mouseEvent = s.onMouseEvent.bind(s);
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseEvent);
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent);
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 let view: any = s.view;
                 if (s.autoScroll) return;
-                if(!s.isSpringBack){
-                    if (view[s.paramXY]>0) {
-                        s.addSpeed=0;
-                        s.speed=0;
-                        s.isStop=true;
-                        view[s.paramXY]= 0;
+                if (!s.isSpringBack) {
+                    if (view[s.paramXY] > 0) {
+                        s.addSpeed = 0;
+                        s.speed = 0;
+                        s.isStop = true;
+                        view[s.paramXY] = 0;
                         return;
-                    }else if(view[s.paramXY]<s.distance - s.maxDistance) {
-                        s.addSpeed=0;
-                        s.speed=0;
-                        s.isStop=true;
+                    } else if (view[s.paramXY] < s.distance - s.maxDistance) {
+                        s.addSpeed = 0;
+                        s.speed = 0;
+                        s.isStop = true;
                         view[s.paramXY] = s.distance - s.maxDistance;
                         return;
                     }
@@ -287,26 +287,24 @@ namespace annieUI {
         private onMouseEvent(e: annie.MouseEvent): void {
             let s = this;
             let view: any = s.view;
-            // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                if (!s.isStop) {
-                    s.isStop = true;
-                }
-                if (s.autoScroll) {
-                    s.autoScroll = false;
-                    annie.Tween.kill(s._tweenId);
-                }
-                if (s.isVertical) {
-                    s.lastValue = e.localY;
-                } else {
-                    s.lastValue = e.localX;
-                }
-                s.speed = 0;
-                s.isMouseDownState = 1;
-            } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState < 1) return;
-                if (s.isMouseDownState == 1) {
+            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState < 1) {
+                    if (!s.isStop) {
+                        s.isStop = true;
+                    }
+                    if (s.autoScroll) {
+                        s.autoScroll = false;
+                        annie.Tween.kill(s._tweenId);
+                    }
+                    if (s.isVertical) {
+                        s.lastValue = e.localY;
+                    } else {
+                        s.lastValue = e.localX;
+                    }
+                    s.speed = 0;
+                    s.isMouseDownState = 1;
                     s.dispatchEvent("onScrollStart");
+                    return;
                 }
                 s.isMouseDownState = 2;
                 let currentValue: number;
@@ -348,6 +346,7 @@ namespace annieUI {
             }
             // }
         }
+
         /**
          * 滚到指定的坐标位置
          * @method scrollTo

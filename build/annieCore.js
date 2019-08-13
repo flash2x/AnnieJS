@@ -234,7 +234,7 @@ var annie;
                 }
             }
             else {
-                if (s.eventTypes[type] instanceof Array && s.eventTypes1[type].length > 0) {
+                if (s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
                     return true;
                 }
             }
@@ -2404,7 +2404,7 @@ var annie;
             s._visible = false;
             _super.prototype.destroy.call(this);
         };
-        DisplayObject.prototype._onRemoveEvent = function () {
+        DisplayObject.prototype._onRemoveEvent = function (isReSetMc) {
             //如果有音乐,则关闭音乐
             var s = this;
             s._isOnStage = false;
@@ -2438,20 +2438,41 @@ var annie;
         /**
          * 鼠标跟随
          * @method startDrag
+         * @param {annie.Point|boolean} 当dragPoint 为annie.Point对象时，那就是跟随时鼠标对应显示对象的(x,y)坐标位置；如果为true或false,则表示是否绑定到中心
          * @param {annie.Rectangle} dragRect 跟随范围
-         * @param {annie.Point} dragPoint 跟随时鼠标对应显示对象的(x,y)坐标位置
          */
-        DisplayObject.prototype.startDrag = function (dragRect, dragPoint) {
-            if (dragRect === void 0) { dragRect = null; }
+        DisplayObject.prototype.startDrag = function (dragPoint, dragRect) {
             if (dragPoint === void 0) { dragPoint = null; }
-            var s = this;
+            if (dragRect === void 0) { dragRect = null; }
+            DisplayObject._startDrag(this, dragPoint, dragRect);
+        };
+        DisplayObject._startDrag = function (target, dragPoint, dragRound) {
+            if (dragPoint === void 0) { dragPoint = null; }
+            if (dragRound === void 0) { dragRound = null; }
+            var s = target;
             if (s.stage instanceof annie.Stage) {
                 s.stage._dragDisplayObject = s;
-                if (dragRect instanceof annie.Rectangle) {
-                    s.stage._dragRect.x = dragRect.x;
-                    s.stage._dragRect.y = dragRect.y;
-                    s.stage._dragRect.width = dragRect.width;
-                    s.stage._dragRect.height = dragRect.height;
+                if (dragPoint instanceof annie.Point) {
+                    s.stage._dragPoint.x = dragPoint.x;
+                    s.stage._dragPoint.y = dragPoint.y;
+                    s.stage._isFixedDrag = true;
+                }
+                else {
+                    if (dragPoint === true) {
+                        var drawRect = s.getBounds();
+                        s.stage._dragPoint.x = drawRect.x + (drawRect.width>> 1);
+                        s.stage._dragPoint.y = drawRect.y + (drawRect.height>> 1);
+                        s.stage._isFixedDrag = true;
+                    }
+                    else {
+                        s.stage._isFixedDrag = false;
+                    }
+                }
+                if (dragRound instanceof annie.Rectangle) {
+                    s.stage._dragRect.x = dragRound.x;
+                    s.stage._dragRect.y = dragRound.y;
+                    s.stage._dragRect.width = dragRound.width;
+                    s.stage._dragRect.height = dragRound.height;
                 }
                 else {
                     s.stage._dragRect.x = Number.MIN_VALUE;
@@ -2459,14 +2480,12 @@ var annie;
                     s.stage._dragRect.width = Number.MAX_VALUE;
                     s.stage._dragRect.height = Number.MAX_VALUE;
                 }
-                if (dragPoint instanceof annie.Point) {
-                    s.stage._dragPoint.x = dragPoint.x;
-                    s.stage._dragPoint.y = dragPoint.y;
-                }
-                else {
-                    s.stage._dragPoint.x = 0;
-                    s.stage._dragPoint.y = 0;
-                }
+            }
+        };
+        DisplayObject._stopDrage = function (target) {
+            var s = target;
+            if (s.stage instanceof annie.Stage) {
+                s.stage._dragDisplayObject = null;
             }
         };
         /**
@@ -2474,7 +2493,7 @@ var annie;
          * @method stopDrag
          */
         DisplayObject.prototype.stopDrag = function () {
-            this.stage._dragDisplayObject = null;
+            DisplayObject._stopDrage(this);
         };
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
@@ -3907,7 +3926,7 @@ var annie;
                 child = s.children.splice(index, 1)[0];
             }
             if (s._isOnStage && child._isOnStage) {
-                child._onRemoveEvent();
+                child._onRemoveEvent(false);
                 child.stage = null;
             }
             child.parent = null;
@@ -4027,7 +4046,7 @@ var annie;
                 renderObj.endMask();
             }
         };
-        Sprite.prototype._onRemoveEvent = function () {
+        Sprite.prototype._onRemoveEvent = function (isReSetMc) {
             var s = this;
             var child = null;
             var children = s.children.concat();
@@ -4035,11 +4054,11 @@ var annie;
             for (var i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child instanceof annie.DisplayObject && child._isOnStage) {
-                    child._onRemoveEvent();
+                    child._onRemoveEvent(isReSetMc);
                     child.stage = null;
                 }
             }
-            _super.prototype._onRemoveEvent.call(this);
+            _super.prototype._onRemoveEvent.call(this, isReSetMc);
         };
         Sprite.prototype._onAddEvent = function () {
             var s = this;
@@ -4975,7 +4994,7 @@ var annie;
                         for (var i = 0; i < count; i++) {
                             obj = remChildren[i];
                             if (obj._isOnStage && s._isOnStage) {
-                                obj._onRemoveEvent();
+                                obj._onRemoveEvent(true);
                                 obj.stage = null;
                                 obj.parent = null;
                             }
@@ -5030,9 +5049,10 @@ var annie;
             }
             _super.prototype._onEnterFrameEvent.call(this);
         };
-        MovieClip.prototype._onRemoveEvent = function () {
-            _super.prototype._onRemoveEvent.call(this);
-            MovieClip._resetMC(this);
+        MovieClip.prototype._onRemoveEvent = function (isReSetMc) {
+            _super.prototype._onRemoveEvent.call(this, isReSetMc);
+            if (isReSetMc)
+                MovieClip._resetMC(this);
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
@@ -6360,6 +6380,7 @@ var annie;
             _this._dragDisplayObject = null;
             _this._dragRect = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
             _this._dragPoint = new annie.Point();
+            _this._isFixedDrag = false;
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
              * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -6756,6 +6777,12 @@ var annie;
                             dp.x = (points[0].clientX - offSetX) * annie.devicePixelRatio;
                             dp.y = (points[0].clientY - offSetY) * annie.devicePixelRatio;
                             var lp_1 = dragDisplayObject.parent.globalToLocal(dp, annie.DisplayObject._bp);
+                            if (!s._isFixedDrag && item == "onMouseDown") {
+                                dragPoint.x = lp_1.x - dragDisplayObject.x;
+                                dragPoint.y = lp_1.y - dragDisplayObject.y;
+                            }
+                            lp_1.x -= dragPoint.x;
+                            lp_1.y -= dragPoint.y;
                             if (lp_1.x < dragRect.x) {
                                 lp_1.x = dragRect.x;
                             }
@@ -6768,8 +6795,6 @@ var annie;
                             else if (lp_1.y > dragRect.y + dragRect.height) {
                                 lp_1.y = dragRect.y + dragRect.height;
                             }
-                            lp_1.x -= dragPoint.x;
-                            lp_1.y -= dragPoint.y;
                             dragDisplayObject.x = lp_1.x;
                             dragDisplayObject.y = lp_1.y;
                         }
@@ -6861,7 +6886,7 @@ var annie;
                             for (var i = len - 1; i >= 0; i--) {
                                 d_2 = displayList[i];
                                 for (var j = 0; j < eLen; j++) {
-                                    if (!events[j]._pd && d_2.hasEventListener(events[j].type)) {
+                                    if (!events[j]._pd && d_2.hasEventListener(events[j].type, false)) {
                                         events[j].currentTarget = d_2;
                                         events[j].target = displayList[eLen - 1];
                                         lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
@@ -9930,7 +9955,7 @@ var annie;
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是data.completeParams的值,第二个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
@@ -9951,7 +9976,7 @@ var annie;
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是data.completeParams的值,第二个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法

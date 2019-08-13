@@ -196,10 +196,9 @@ var annieUI;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH, isVertical);
             var mouseEvent = s.onMouseEvent.bind(s);
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseEvent);
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent);
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
             s.addEventListener(annie.Event.ENTER_FRAME, function () {
                 var view = s.view;
                 if (s.autoScroll)
@@ -309,29 +308,25 @@ var annieUI;
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
             var view = s.view;
-            // if (s.distance < s.maxDistance) {
-            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                if (!s.isStop) {
-                    s.isStop = true;
-                }
-                if (s.autoScroll) {
-                    s.autoScroll = false;
-                    annie.Tween.kill(s._tweenId);
-                }
-                if (s.isVertical) {
-                    s.lastValue = e.localY;
-                }
-                else {
-                    s.lastValue = e.localX;
-                }
-                s.speed = 0;
-                s.isMouseDownState = 1;
-            }
-            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState < 1)
-                    return;
-                if (s.isMouseDownState == 1) {
+            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.isMouseDownState < 1) {
+                    if (!s.isStop) {
+                        s.isStop = true;
+                    }
+                    if (s.autoScroll) {
+                        s.autoScroll = false;
+                        annie.Tween.kill(s._tweenId);
+                    }
+                    if (s.isVertical) {
+                        s.lastValue = e.localY;
+                    }
+                    else {
+                        s.lastValue = e.localX;
+                    }
+                    s.speed = 0;
+                    s.isMouseDownState = 1;
                     s.dispatchEvent("onScrollStart");
+                    return;
                 }
                 s.isMouseDownState = 2;
                 var currentValue = void 0;
@@ -753,10 +748,10 @@ var annieUI;
             s.maskObj.alpha = 0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me, false);
             return _this;
         }
         /**
@@ -781,19 +776,18 @@ var annieUI;
             var s = this;
             if (s.isMoving)
                 return;
-            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
-                s.movingX = s.movingY = 0;
-                s.isMouseDown = true;
-                s._isBreak = false;
-                s.lastX = e.localX;
-                s.lastY = e.localY;
-                s._moveDis = 0;
-            }
-            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown)
+            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (!s.isMouseDown) {
+                    s.touchEndX = e.localX;
+                    s.touchEndY = e.localY;
+                    s.movingX = s.movingY = 0;
+                    s.isMouseDown = true;
+                    s._isBreak = false;
+                    s.lastX = e.localX;
+                    s.lastY = e.localY;
+                    s._moveDis = 0;
                     return;
+                }
                 var mx = e.localX - s.touchEndX;
                 var my = e.localY - s.touchEndY;
                 var ts = my;
@@ -861,11 +855,9 @@ var annieUI;
                 if (!s.isMouseDown)
                     return;
                 var ts = s.movingY;
-                var fts = s.movingX;
                 s.isMouseDown = false;
                 if (!s.isVertical) {
                     ts = s.movingX;
-                    fts = s.movingY;
                 }
                 if ((s.currentPageIndex == 0 && s.view[s.paramXY] > 0) || (s.currentPageIndex == (s.listLen - 1) && s.view[s.paramXY] < -s.currentPageIndex * s.distance)) {
                     var tweenData = {};

@@ -204,10 +204,10 @@ namespace annieUI {
             s.maskObj.alpha = 0;
             s.setMask(vW, vH);
             var me = s.onMouseEvent.bind(s);
-            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me);
-            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me);
-            s.addEventListener(annie.MouseEvent.MOUSE_UP, me);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_UP, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me, false);
         }
 
         /**
@@ -227,22 +227,22 @@ namespace annieUI {
             s.viewHeight = h;
             s.maskObj.endFill();
         }
-
         //触摸事件 onMouseEvent
         private onMouseEvent(e: annie.MouseEvent): void {
             let s: any = this;
             if (s.isMoving) return;
-            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                s.touchEndX = e.localX;
-                s.touchEndY = e.localY;
-                s.movingX = s.movingY = 0;
-                s.isMouseDown = true;
-                s._isBreak = false;
-                s.lastX = e.localX;
-                s.lastY = e.localY;
-                s._moveDis = 0;
-            } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown) return;
+            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (!s.isMouseDown){
+                    s.touchEndX = e.localX;
+                    s.touchEndY = e.localY;
+                    s.movingX = s.movingY = 0;
+                    s.isMouseDown = true;
+                    s._isBreak = false;
+                    s.lastX = e.localX;
+                    s.lastY = e.localY;
+                    s._moveDis = 0;
+                    return;
+                }
                 let mx: number = e.localX - s.touchEndX;
                 let my = e.localY - s.touchEndY;
                 let ts: number = my;
@@ -304,11 +304,9 @@ namespace annieUI {
             } else {
                 if (!s.isMouseDown) return;
                 let ts: number = s.movingY;
-                let fts: number = s.movingX;
                 s.isMouseDown = false;
                 if (!s.isVertical) {
                     ts = s.movingX;
-                    fts = s.movingY;
                 }
                 if ((s.currentPageIndex == 0 && s.view[s.paramXY] > 0) || (s.currentPageIndex == (s.listLen - 1) && s.view[s.paramXY] < -s.currentPageIndex * s.distance)) {
                     let tweenData: any = {};
