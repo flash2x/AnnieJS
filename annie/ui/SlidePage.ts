@@ -158,6 +158,13 @@ namespace annieUI {
          */
         public isMouseDown: boolean = false;
         /**
+         * 是否允许滚动
+         * @property isCanScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        public isCanScroll: boolean = true;
+        /**
          * 是否可以下一页
          * @property canSlideNext
          * @since 1.0.3
@@ -227,20 +234,23 @@ namespace annieUI {
             s.viewHeight = h;
             s.maskObj.endFill();
         }
+
         //触摸事件 onMouseEvent
         private onMouseEvent(e: annie.MouseEvent): void {
             let s: any = this;
-            if (s.isMoving) return;
-            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (!s.isMouseDown){
-                    s.touchEndX = e.localX;
-                    s.touchEndY = e.localY;
-                    s.movingX = s.movingY = 0;
-                    s.isMouseDown = true;
-                    s._isBreak = false;
-                    s.lastX = e.localX;
-                    s.lastY = e.localY;
-                    s._moveDis = 0;
+            if (s.isMoving || !s.isCanScroll) return;
+
+            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                s.touchEndX = e.localX;
+                s.touchEndY = e.localY;
+                s.movingX = s.movingY = 0;
+                s.isMouseDown = true;
+                s._isBreak = false;
+                s.lastX = e.localX;
+                s.lastY = e.localY;
+                s._moveDis = 0;
+            } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (!s.isMouseDown) {
                     return;
                 }
                 let mx: number = e.localX - s.touchEndX;

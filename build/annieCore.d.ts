@@ -1996,7 +1996,7 @@ declare namespace annie {
          * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。
          * @property hitArea
          * @param {annie.Rectangle} rect
-         * @since 3.0.0
+         * @since 3.0.1
          */
         hitArea: annie.Rectangle;
         private _hitArea;

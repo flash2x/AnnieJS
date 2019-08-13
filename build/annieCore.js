@@ -2459,9 +2459,9 @@ var annie;
                 }
                 else {
                     if (dragPoint === true) {
-                        var drawRect = s.getBounds();
-                        s.stage._dragPoint.x = drawRect.x + (drawRect.width>> 1);
-                        s.stage._dragPoint.y = drawRect.y + (drawRect.height>> 1);
+                        var drawRect = s.getDrawRect();
+                        s.stage._dragPoint.x = drawRect.x + (drawRect.width >> 1);
+                        s.stage._dragPoint.y = drawRect.y + (drawRect.height >> 1);
                         s.stage._isFixedDrag = true;
                     }
                     else {
@@ -4096,7 +4096,7 @@ var annie;
              * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。
              * @property hitArea
              * @param {annie.Rectangle} rect
-             * @since 3.0.0
+             * @since 3.0.1
              */
             set: function (rect) {
                 this._hitArea = rect;

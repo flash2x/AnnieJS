@@ -61,6 +61,12 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.0.1 版本
+    大量优化渲染结构,提升运行效率
+    增加annie.Sprite.hitArea属性，设置此属性将直接设置容器鼠标事件接受的区域范围，提升效率。
+    加强annie.DisplayObject.startDrag方法功能。
+    更改annie.DisplayObject.mouseEnable属性功能。设置此属性为false后，此显示对象及其子级都将无法获取鼠标事件
+    修复在非全屏情况下html有滚动条的情况下鼠标位置异常的bug
 ## AnnieJS 3.0.0 版本
     更新加载库以支持打包成二进制文件包，提升加载和渲染性能
 ## AnnieJS 2.1.0 版本

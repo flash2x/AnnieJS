@@ -148,6 +148,13 @@ declare namespace annieUI {
          */
         isSpringBack: boolean;
         /**
+         * 是否允许滚动
+         * @property isCanScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        isCanScroll: boolean;
+        /**
          * 构造函数
          * @method  ScrollPage
          * @param {number} vW 可视区域宽
@@ -404,6 +411,13 @@ declare namespace annieUI {
          * @public
          */
         isMouseDown: boolean;
+        /**
+         * 是否允许滚动
+         * @property isCanScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        isCanScroll: boolean;
         /**
          * 是否可以下一页
          * @property canSlideNext

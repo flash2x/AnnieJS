@@ -12,7 +12,6 @@ namespace annieUI {
      */
     export interface IScrollListItem extends DisplayObject {
         initData(id: number, data: Array<any>): void;
-
         id: number;
         data: number;
     }

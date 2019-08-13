@@ -186,6 +186,13 @@ var annieUI;
              * @since 2.0.1
              */
             _this.isSpringBack = true;
+            /**
+             * 是否允许滚动
+             * @property isCanScroll
+             * @type {boolean}
+             * @since 3.0.1
+             */
+            _this.isCanScroll = true;
             var s = _this;
             s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
@@ -196,6 +203,7 @@ var annieUI;
             s.maxDistance = maxDistance;
             s.setViewRect(vW, vH, isVertical);
             var mouseEvent = s.onMouseEvent.bind(s);
+            s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
@@ -307,9 +315,9 @@ var annieUI;
         };
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
-            var view = s.view;
-            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.isMouseDownState < 1) {
+            if (s.isCanScroll) {
+                var view = s.view;
+                if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {
                         s.isStop = true;
                     }
@@ -326,51 +334,54 @@ var annieUI;
                     s.speed = 0;
                     s.isMouseDownState = 1;
                     s.dispatchEvent("onScrollStart");
-                    return;
                 }
-                s.isMouseDownState = 2;
-                var currentValue = void 0;
-                if (s.isVertical) {
-                    currentValue = e.localY;
+                else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                    if (s.isMouseDownState < 1) {
+                        return;
+                    }
+                    s.isMouseDownState = 2;
+                    var currentValue = void 0;
+                    if (s.isVertical) {
+                        currentValue = e.localY;
+                    }
+                    else {
+                        currentValue = e.localX;
+                    }
+                    s.speed = currentValue - s.lastValue;
+                    if (s.speed > s.minDis) {
+                        s.addSpeed = -2;
+                        if (s.speed > s.maxSpeed) {
+                            s.speed = s.maxSpeed;
+                        }
+                    }
+                    else if (s.speed < -s.minDis) {
+                        if (s.speed < -s.maxSpeed) {
+                            s.speed = -s.maxSpeed;
+                        }
+                        s.addSpeed = 2;
+                    }
+                    else {
+                        s.speed = 0;
+                    }
+                    if (s.speed != 0) {
+                        var speedPer = 1;
+                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                            speedPer = 0.2;
+                        }
+                        view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
+                    }
+                    s.lastValue = currentValue;
+                    s.stopTimes = 0;
                 }
                 else {
-                    currentValue = e.localX;
-                }
-                s.speed = currentValue - s.lastValue;
-                if (s.speed > s.minDis) {
-                    s.addSpeed = -2;
-                    if (s.speed > s.maxSpeed) {
-                        s.speed = s.maxSpeed;
+                    s.isStop = false;
+                    s.stopTimes = -1;
+                    if (s.speed == 0 && s.isMouseDownState == 2) {
+                        s.dispatchEvent("onScrollStop");
                     }
+                    s.isMouseDownState = 0;
                 }
-                else if (s.speed < -s.minDis) {
-                    if (s.speed < -s.maxSpeed) {
-                        s.speed = -s.maxSpeed;
-                    }
-                    s.addSpeed = 2;
-                }
-                else {
-                    s.speed = 0;
-                }
-                if (s.speed != 0) {
-                    var speedPer = 1;
-                    if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                        speedPer = 0.2;
-                    }
-                    view[s.paramXY] += (currentValue - s.lastValue) * speedPer;
-                }
-                s.lastValue = currentValue;
-                s.stopTimes = 0;
             }
-            else {
-                s.isStop = false;
-                s.stopTimes = -1;
-                if (s.speed == 0 && s.isMouseDownState == 2) {
-                    s.dispatchEvent("onScrollStop");
-                }
-                s.isMouseDownState = 0;
-            }
-            // }
         };
         /**
          * 滚到指定的坐标位置
@@ -713,6 +724,13 @@ var annieUI;
              */
             _this.isMouseDown = false;
             /**
+             * 是否允许滚动
+             * @property isCanScroll
+             * @type {boolean}
+             * @since 3.0.1
+             */
+            _this.isCanScroll = true;
+            /**
              * 是否可以下一页
              * @property canSlideNext
              * @since 1.0.3
@@ -774,18 +792,20 @@ var annieUI;
         //触摸事件 onMouseEvent
         SlidePage.prototype.onMouseEvent = function (e) {
             var s = this;
-            if (s.isMoving)
+            if (s.isMoving || !s.isCanScroll)
                 return;
-            if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                s.touchEndX = e.localX;
+                s.touchEndY = e.localY;
+                s.movingX = s.movingY = 0;
+                s.isMouseDown = true;
+                s._isBreak = false;
+                s.lastX = e.localX;
+                s.lastY = e.localY;
+                s._moveDis = 0;
+            }
+            else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
                 if (!s.isMouseDown) {
-                    s.touchEndX = e.localX;
-                    s.touchEndY = e.localY;
-                    s.movingX = s.movingY = 0;
-                    s.isMouseDown = true;
-                    s._isBreak = false;
-                    s.lastX = e.localX;
-                    s.lastY = e.localY;
-                    s._moveDis = 0;
                     return;
                 }
                 var mx = e.localX - s.touchEndX;

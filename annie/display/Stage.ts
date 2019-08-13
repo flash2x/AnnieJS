@@ -4,7 +4,6 @@
 namespace annie {
     declare let VConsole: any;
     declare let trace: any;
-
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * @class annie.Stage
