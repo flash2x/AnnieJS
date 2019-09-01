@@ -413,7 +413,6 @@ namespace annie {
             let c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
             c[c.length] = [1, "beginPath", []];
-            s.a2x_ut = true;
         }
 
         /**
@@ -498,7 +497,7 @@ namespace annie {
             c[c.length] = [0, "miterLimit", miter];
             c[c.length] = [0, "strokeStyle", strokeStyle];
             c[c.length] = [1, "beginPath", []];
-            this.a2x_ut = true;
+
         }
 
         /**
@@ -519,6 +518,7 @@ namespace annie {
             if (m) {
                 s._isBitmapFill = null;
             }
+            this.a2x_ut = true;
         }
 
         /**
@@ -553,6 +553,7 @@ namespace annie {
             if (m) {
                 s._isBitmapStroke = null;
             }
+            this.a2x_ut = true;
         }
 
         /**

@@ -404,7 +404,6 @@ namespace annie {
             let s: any = this;
             let can = s._texture;
             let ctx = can.getContext("2d");
-            //这个地方一定要用UF
             if (s.a2x_ut) {
                 s._text += "";
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);

@@ -155,12 +155,12 @@ namespace annieUI {
          */
         public isSpringBack: boolean = true;
         /**
-         * 是否允许滚动
-         * @property isCanScroll
+         * 是否允许通过鼠标去滚动
+         * @property isCanUseMouseScroll
          * @type {boolean}
          * @since 3.0.1
          */
-        public isCanScroll: boolean = true;
+        public isCanUseMouseScroll: boolean = true;
 
         /**
          * 构造函数
@@ -294,7 +294,7 @@ namespace annieUI {
 
         private onMouseEvent(e: annie.MouseEvent): void {
             let s = this;
-            if (s.isCanScroll){
+            if (s.isCanUseMouseScroll){
                 let view: any = s.view;
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {

@@ -2866,7 +2866,7 @@ declare namespace annie {
         iosTouchendPreventDefault: boolean;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
+         * 是否禁止引擎所在的DIV的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
          * @property isPreventDefaultEvent
          * @since 1.0.9
          * @default true
@@ -3105,6 +3105,7 @@ declare namespace annie {
         _dragRect: annie.Rectangle;
         _dragPoint: annie.Point;
         _isFixedDrag: boolean;
+        _isMouseClickCanvas: boolean;
         private _onMouseEvent;
         private _onUpdateMouseEvent;
         private onMouseEvent;

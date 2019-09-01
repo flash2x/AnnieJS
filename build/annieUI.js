@@ -187,12 +187,12 @@ var annieUI;
              */
             _this.isSpringBack = true;
             /**
-             * 是否允许滚动
-             * @property isCanScroll
+             * 是否允许通过鼠标去滚动
+             * @property isCanUseMouseScroll
              * @type {boolean}
              * @since 3.0.1
              */
-            _this.isCanScroll = true;
+            _this.isCanUseMouseScroll = true;
             var s = _this;
             s._instanceType = "annieUI.ScrollPage";
             s.addChild(s.maskObj);
@@ -315,7 +315,7 @@ var annieUI;
         };
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
-            if (s.isCanScroll) {
+            if (s.isCanUseMouseScroll) {
                 var view = s.view;
                 if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                     if (!s.isStop) {
@@ -724,12 +724,12 @@ var annieUI;
              */
             _this.isMouseDown = false;
             /**
-             * 是否允许滚动
-             * @property isCanScroll
+             * 是否允许通过鼠标去滚动
+             * @property isCanUseMouseScroll
              * @type {boolean}
              * @since 3.0.1
              */
-            _this.isCanScroll = true;
+            _this.isCanUseMouseScroll = true;
             /**
              * 是否可以下一页
              * @property canSlideNext
@@ -792,7 +792,7 @@ var annieUI;
         //触摸事件 onMouseEvent
         SlidePage.prototype.onMouseEvent = function (e) {
             var s = this;
-            if (s.isMoving || !s.isCanScroll)
+            if (s.isMoving || !s.isCanUseMouseScroll)
                 return;
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                 s.touchEndX = e.localX;

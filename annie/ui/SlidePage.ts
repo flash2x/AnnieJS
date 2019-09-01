@@ -158,12 +158,12 @@ namespace annieUI {
          */
         public isMouseDown: boolean = false;
         /**
-         * 是否允许滚动
-         * @property isCanScroll
+         * 是否允许通过鼠标去滚动
+         * @property isCanUseMouseScroll
          * @type {boolean}
          * @since 3.0.1
          */
-        public isCanScroll: boolean = true;
+        public isCanUseMouseScroll: boolean = true;
         /**
          * 是否可以下一页
          * @property canSlideNext
@@ -238,7 +238,7 @@ namespace annieUI {
         //触摸事件 onMouseEvent
         private onMouseEvent(e: annie.MouseEvent): void {
             let s: any = this;
-            if (s.isMoving || !s.isCanScroll) return;
+            if (s.isMoving || !s.isCanUseMouseScroll) return;
 
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                 s.touchEndX = e.localX;

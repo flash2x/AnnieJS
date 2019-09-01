@@ -97,11 +97,7 @@ var annie;
             var count = 0;
             if (type == "") {
                 //返回所有鼠标事件数
-                for (var item in EventDispatcher._MECO) {
-                    if (item.indexOf("onMouse") == 0) {
-                        count += EventDispatcher._MECO[item];
-                    }
-                }
+                count = EventDispatcher._totalMEC;
             }
             else {
                 if (EventDispatcher._MECO[type]) {
@@ -2328,6 +2324,7 @@ var annie;
                 if (typeof (id) == "string") {
                     for (var i = sounds.length - 1; i >= 0; i--) {
                         if (sounds[i].name == id) {
+                            //这里是全部找出来
                             newSounds.push(sounds[i]);
                         }
                     }
@@ -2369,6 +2366,7 @@ var annie;
             if (sounds instanceof Array) {
                 if (typeof (id) == "string") {
                     for (var i = sounds.length - 1; i >= 0; i--) {
+                        //这里是全部找出来
                         if (sounds[i].name == id) {
                             sounds.splice(i, 1);
                         }
@@ -3220,7 +3218,6 @@ var annie;
             var c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
             c[c.length] = [1, "beginPath", []];
-            s.a2x_ut = true;
         };
         /**
          * 给线条着色
@@ -3293,7 +3290,6 @@ var annie;
             c[c.length] = [0, "miterLimit", miter];
             c[c.length] = [0, "strokeStyle", strokeStyle];
             c[c.length] = [1, "beginPath", []];
-            this.a2x_ut = true;
         };
         /**
          * 结束填充
@@ -3313,6 +3309,7 @@ var annie;
             if (m) {
                 s._isBitmapFill = null;
             }
+            this.a2x_ut = true;
         };
         /**
          * 设置虚线参数
@@ -3346,6 +3343,7 @@ var annie;
             if (m) {
                 s._isBitmapStroke = null;
             }
+            this.a2x_ut = true;
         };
         Shape.prototype.updateMatrix = function () {
             var s = this;
@@ -5245,11 +5243,9 @@ var annie;
                     style.opacity = s.cAlpha;
                 }
             }
-            if (s._visible) {
-                s.a2x_uf = false;
-                s.a2x_um = false;
-                s.a2x_ua = false;
-            }
+            s.a2x_uf = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
         };
         FloatDisplay.prototype.render = function (renderObj) {
         };
@@ -5695,7 +5691,6 @@ var annie;
             var s = this;
             var can = s._texture;
             var ctx = can.getContext("2d");
-            //这个地方一定要用UF
             if (s.a2x_ut) {
                 s._text += "";
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
@@ -5866,15 +5861,15 @@ var annie;
             }
             s.inputType = inputType;
             var remove = function () {
-                if (s.isAutoDownKeyBoard && annie.osType != "pc") {
+                if (s.stage._isMouseClickCanvas && s.isAutoDownKeyBoard && annie.osType != "pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
             }.bind(s);
             s.addEventListener(annie.Event.REMOVE_TO_STAGE, function (e) {
-                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP, remove);
+                s.stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN, remove);
             });
             s.addEventListener(annie.Event.ADD_TO_STAGE, function (e) {
-                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
+                s.stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, remove);
             });
             s.init(input);
             return _this;
@@ -6230,7 +6225,7 @@ var annie;
             _this.iosTouchendPreventDefault = true;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
+             * 是否禁止引擎所在的DIV的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
              * @property isPreventDefaultEvent
              * @since 1.0.9
              * @default true
@@ -6381,6 +6376,7 @@ var annie;
             _this._dragRect = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
             _this._dragPoint = new annie.Point();
             _this._isFixedDrag = false;
+            _this._isMouseClickCanvas = true;
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
              * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -6664,6 +6660,7 @@ var annie;
         Stage.prototype._onMouseEvent = function (e) {
             var s = this;
             if (e.target.id == "_a2x_canvas") {
+                s._isMouseClickCanvas = true;
                 if (s.isPreventDefaultEvent) {
                     if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
                         e.preventDefault();
@@ -6672,6 +6669,9 @@ var annie;
                         e.preventDefault();
                     }
                 }
+            }
+            else {
+                s._isMouseClickCanvas = false;
             }
             s.mouseEvents.push(e);
         };
@@ -8574,7 +8574,7 @@ var annie;
             //格式化get 请求参数
             _this._fus = function (src, data) {
                 var s = this;
-                if (data instanceof Object || data == "") {
+                if (data == void 0) {
                     return src;
                 }
                 var query = [];

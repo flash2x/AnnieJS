@@ -54,15 +54,15 @@ namespace annie {
             }
             s.inputType = inputType;
             let remove = function (){
-                if (s.isAutoDownKeyBoard&&annie.osType!="pc") {
+                if (s.stage._isMouseClickCanvas&&s.isAutoDownKeyBoard&&annie.osType!="pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
             }.bind(s);
             s.addEventListener(Event.REMOVE_TO_STAGE, function (e: Event) {
-                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP, remove);
+                s.stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN, remove);
             });
             s.addEventListener(Event.ADD_TO_STAGE, function (e: Event) {
-                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
+                s.stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, remove);
             });
             s.init(input);
         }

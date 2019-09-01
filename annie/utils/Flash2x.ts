@@ -139,7 +139,6 @@ namespace annie {
             _loadRes();
         }
     };
-
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
@@ -176,7 +175,6 @@ namespace annie {
             _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
         }
     }
-
     //解析加载后的json资源数据
     function _parseContent(loadContent: any) {
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
@@ -260,7 +258,6 @@ namespace annie {
             _checkComplete();
         }
     };
-
     // 一个场景加载完成后的事件回调
     function _onRESComplete(e: Event): void {
         let scene = _loadSceneNames[_loadIndex];
@@ -293,7 +290,7 @@ namespace annie {
             } else {
                 _checkComplete();
             }
-        } else {
+        }else {
             //解析swf
             let fileReader: any = new FileReader();
             let state = 0;
@@ -362,7 +359,6 @@ namespace annie {
             };
         }
     }
-
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         if (!_isReleased)
@@ -922,6 +918,5 @@ namespace annie {
             }
         }
     }
-
     console.log("https://github.com/flash2x/AnnieJS");
 }

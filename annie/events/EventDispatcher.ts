@@ -79,11 +79,7 @@ namespace annie {
             let count: number = 0;
             if (type == "") {
                 //返回所有鼠标事件数
-                for (let item in EventDispatcher._MECO) {
-                    if (item.indexOf("onMouse") == 0) {
-                        count += EventDispatcher._MECO[item];
-                    }
-                }
+                count=EventDispatcher._totalMEC;
             } else {
                 if (EventDispatcher._MECO[type]) {
                     count = EventDispatcher._MECO[type];

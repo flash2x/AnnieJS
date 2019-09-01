@@ -46,7 +46,7 @@ namespace annie {
         public iosTouchendPreventDefault: boolean = true;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
+         * 是否禁止引擎所在的DIV的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
          * @property isPreventDefaultEvent
          * @since 1.0.9
          * @default true
@@ -459,11 +459,12 @@ namespace annie {
         public _dragRect: annie.Rectangle = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
         public _dragPoint: annie.Point = new Point();
         public _isFixedDrag: boolean = false;
-
+        public _isMouseClickCanvas:boolean=true;
         private _onMouseEvent(e: any): void {
             let s: any = this;
-            if (e.target.id == "_a2x_canvas") {
-                if (s.isPreventDefaultEvent) {
+            if (e.target.id == "_a2x_canvas"){
+                s._isMouseClickCanvas=true;
+                if (s.isPreventDefaultEvent){
                     if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
                         e.preventDefault();
                     }
@@ -471,6 +472,8 @@ namespace annie {
                         e.preventDefault();
                     }
                 }
+            }else{
+                s._isMouseClickCanvas=false;
             }
             s.mouseEvents.push(e);
         }

@@ -250,7 +250,7 @@ namespace annie {
         //格式化get 请求参数
         private _fus = function (src: any, data: any): string {
             let s = this;
-            if (data instanceof Object || data == "") {
+            if (data ==void 0) {
                 return src;
             }
             let query: any = [];

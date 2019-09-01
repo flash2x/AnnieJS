@@ -764,6 +764,7 @@ namespace annie {
                 if (typeof(id) == "string") {
                     for (let i = sounds.length - 1; i >= 0; i--) {
                         if (sounds[i].name == id) {
+                            //这里是全部找出来
                             newSounds.push(sounds[i]);
                         }
                     }
@@ -816,6 +817,7 @@ namespace annie {
             if (sounds instanceof Array) {
                 if (typeof(id) == "string") {
                     for (let i = sounds.length - 1; i >= 0; i--) {
+                        //这里是全部找出来
                         if (sounds[i].name == id) {
                             sounds.splice(i, 1);
                         }

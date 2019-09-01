@@ -502,7 +502,7 @@ namespace annie {
             }
             super._onEnterFrameEvent();
         }
-        public _onRemoveEvent(isReSetMc:boolean) {
+        public _onRemoveEvent(isReSetMc:boolean){
             super._onRemoveEvent(isReSetMc);
             if(isReSetMc)
             MovieClip._resetMC(this);

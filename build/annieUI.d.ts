@@ -148,12 +148,12 @@ declare namespace annieUI {
          */
         isSpringBack: boolean;
         /**
-         * 是否允许滚动
-         * @property isCanScroll
+         * 是否允许通过鼠标去滚动
+         * @property isCanUseMouseScroll
          * @type {boolean}
          * @since 3.0.1
          */
-        isCanScroll: boolean;
+        isCanUseMouseScroll: boolean;
         /**
          * 构造函数
          * @method  ScrollPage
@@ -412,12 +412,12 @@ declare namespace annieUI {
          */
         isMouseDown: boolean;
         /**
-         * 是否允许滚动
-         * @property isCanScroll
+         * 是否允许通过鼠标去滚动
+         * @property isCanUseMouseScroll
          * @type {boolean}
          * @since 3.0.1
          */
-        isCanScroll: boolean;
+        isCanUseMouseScroll: boolean;
         /**
          * 是否可以下一页
          * @property canSlideNext
