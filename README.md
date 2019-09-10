@@ -67,6 +67,7 @@
     加强annie.DisplayObject.startDrag方法功能。
     更改annie.DisplayObject.mouseEnable属性功能。设置此属性为false后，此显示对象及其子级都将无法获取鼠标事件
     修复在非全屏情况下html有滚动条的情况下鼠标位置异常的bug
+    更新vConsole版本
 ## AnnieJS 3.0.0 版本
     更新加载库以支持打包成二进制文件包，提升加载和渲染性能
 ## AnnieJS 2.1.0 版本

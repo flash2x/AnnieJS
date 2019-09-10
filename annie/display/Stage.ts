@@ -318,7 +318,7 @@ namespace annie {
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                s.renderObj = new WebGLRender(s);
+                //s.renderObj = new WebGLRender(s);
             }
             s.renderObj.init();
             let rc = s.rootDiv;
@@ -369,7 +369,6 @@ namespace annie {
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
-                s._onUpdateMouseEvent();
                 s._onEnterFrameEvent();
                 s.updateMatrix();
                 s.render(s.renderObj);
@@ -378,11 +377,10 @@ namespace annie {
                 if (s._currentFlush == 0) {
                     s._currentFlush = s._flush;
                     s.resize();
-                    s._onUpdateMouseEvent();
-                    s._onEnterFrameEvent();
-                    s.updateMatrix();
                 } else {
                     if (s._currentFlush == s._flush) {
+                        s._onEnterFrameEvent();
+                        s.updateMatrix();
                         s.render(s.renderObj);
                     }
                     s._currentFlush--;
@@ -454,14 +452,14 @@ namespace annie {
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
         private mouseEvent: any = null;
-        private mouseEvents: any = [];
         public _dragDisplayObject: annie.DisplayObject = null;
         public _dragRect: annie.Rectangle = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
         public _dragPoint: annie.Point = new Point();
         public _isFixedDrag: boolean = false;
         public _isMouseClickCanvas:boolean=true;
         private _onMouseEvent(e: any): void {
-            let s: any = this;
+            //检查是否有
+            let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
             if (e.target.id == "_a2x_canvas"){
                 s._isMouseClickCanvas=true;
                 if (s.isPreventDefaultEvent){
@@ -475,22 +473,6 @@ namespace annie {
             }else{
                 s._isMouseClickCanvas=false;
             }
-            s.mouseEvents.push(e);
-        }
-
-        private _onUpdateMouseEvent() {
-            let s = this;
-            let mouseEvents: any = s.mouseEvents;
-            let len = mouseEvents.length;
-            for (let i = 0; i < len; i++) {
-                s.onMouseEvent(mouseEvents[i]);
-            }
-            mouseEvents.length = 0;
-        }
-
-        private onMouseEvent(e: any): void {
-            //检查是否有
-            let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
             while (c.scrollLeft != void 0) {
                 offSetX -= c.scrollLeft;
                 offSetY -= c.scrollTop;

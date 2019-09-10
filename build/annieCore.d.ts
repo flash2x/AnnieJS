@@ -3100,15 +3100,12 @@ declare namespace annie {
         private _mP1;
         private _mP2;
         private mouseEvent;
-        private mouseEvents;
         _dragDisplayObject: annie.DisplayObject;
         _dragRect: annie.Rectangle;
         _dragPoint: annie.Point;
         _isFixedDrag: boolean;
         _isMouseClickCanvas: boolean;
         private _onMouseEvent;
-        private _onUpdateMouseEvent;
-        private onMouseEvent;
         private setAlign;
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
@@ -3661,112 +3658,6 @@ declare namespace annie {
          */
         reSize(): void;
         destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * Canvas 渲染器
-     * @class annie.WebGLRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.0
-     */
-    class WebGLRender extends AObject implements IRender {
-        bufferSize: number;
-        /**
-         * 渲染器所在最上层的对象
-         * @property rootContainer
-         * @public
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        rootContainer: any;
-        /**
-         * @property _ctx
-         * @protected
-         * @default null
-         */
-        protected _ctx: any;
-        /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage;
-        private _dataLength;
-        private _dataBuffer;
-        DEFAULT_PROGRAM: number;
-        currentProgramId: number;
-        private curProgram;
-        private programList;
-        /**
-         * @method WebGLRender
-         * @param {annie.Stage} stage
-         * @public
-         * @since 1.0.0
-         */
-        constructor(stage: Stage);
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.0
-         * @public
-         */
-        begin(): void;
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.0
-         */
-        beginMask(target: any): void;
-        private drawMask;
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.0
-         */
-        endMask(): void;
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        draw(target: any): void;
-        end(): void;
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.0
-         * @method init
-         */
-        init(): void;
-        /**
-         * 当舞台尺寸改变时会调用
-         * @public
-         * @since 1.0.0
-         * @method reSize
-         */
-        reSize(): void;
-        destroy(): void;
-        private createTextureCountScript;
-        createProgram(id: number): WebGLProgram;
-        private textureList;
-        private textureCount;
-        initTextureCount(): void;
-        private dataStatus;
-        private dataRefList;
-        clearDataStatus(): void;
-        setTexture(data: any): number;
     }
 }
 /**

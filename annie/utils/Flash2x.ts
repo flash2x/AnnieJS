@@ -251,8 +251,14 @@ namespace annie {
 
     let _loadResCount = 0;
     let mediaResourceOnload = function (e: any) {
-        URL.revokeObjectURL(e.target.url);
-        e.target.onload = null;
+        if(e != void 0){
+            URL.revokeObjectURL(e.target.url);
+            if (e.target instanceof Image) {
+                e.target.onload = null;
+            } else {
+                e.target.mediaResourceOnload = null;
+            }
+        }
         _loadResCount--;
         if (_loadResCount == 0) {
             _checkComplete();
@@ -280,9 +286,19 @@ namespace annie {
                     else if (e.data.type == "sound") {
                         //声音
                         var audio: any = new Audio();
-                        audio.src = URL.createObjectURL(loadContent);
+                        _loadResCount++;
+                        if(annie.osType=="ios"){
+                            var sFileReader=new FileReader();
+                            sFileReader.onload=function(){
+                                audio.src = sFileReader.result;
+                                mediaResourceOnload(null);
+                            };
+                            sFileReader.readAsDataURL(loadContent);
+                        }else{
+                            audio.onloadedmetadata=mediaResourceOnload;
+                            audio.src = URL.createObjectURL(loadContent);
+                        }
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                        _checkComplete();
                     } else {
                         _checkComplete();
                     }
@@ -329,22 +345,24 @@ namespace annie {
                         lastIndex = currIndex;
                         currIndex += JSONData[i].src;
                         if (JSONData[i].type == "image") {
-                            let image = new Image();
+                            let image:any = new Image();
                             image.onload = mediaResourceOnload;
                             image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
                             annie.res[scene][JSONData[i].id] = image;
                         } else if (JSONData[i].type == "sound") {
                             let audio: any = new Audio();
+                            if(annie.osType=="ios"){
+                                let sFileReader=new FileReader();
+                                sFileReader.onload=function(){
+                                    audio.src = sFileReader.result;
+                                    mediaResourceOnload(null);
+                                };
+                                sFileReader.readAsDataURL(loadContent.slice(lastIndex, currIndex,"audio/mp3"));
+                            }else{
+                                audio.onloadedmetadata = mediaResourceOnload;
+                                audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex,"audio/mp3"));
+                            }
                             annie.res[scene][JSONData[i].id] = audio;
-                            let audioReader: any = new FileReader();
-                            audioReader.onload = function () {
-                                audio.src = audioReader.result;
-                                _loadResCount--;
-                                if (_loadResCount == 0) {
-                                    _checkComplete();
-                                }
-                            };
-                            audioReader.readAsDataURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
                         } else if (JSONData[i].type == "json") {
                             if (JSONData[i].id == "_a2x_con") {
                                 fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
