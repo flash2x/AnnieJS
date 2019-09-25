@@ -21,6 +21,11 @@ namespace annie {
          */
         public rootContainer: any = null;
         /**
+         * @property viewPort
+         *
+         */
+        public viewPort:annie.Rectangle=new annie.Rectangle();
+        /**
          * @property _ctx
          * @protected
          * @default null
@@ -110,7 +115,6 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
-
         /**
          * 调用渲染
          * @public
@@ -131,6 +135,33 @@ namespace annie {
                 } else {
                     ctx.drawImage(texture, 0, 0);
                 }
+                /*//getBounds
+                let rect=target.getBounds();
+                //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+                s._ctx.beginPath();
+                s._ctx.lineWidth=4;
+                s._ctx.strokeStyle="#ff0000";
+                s._ctx.moveTo(rect.x,rect.y);
+                s._ctx.lineTo(rect.x+rect.width,rect.y);
+                s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+                s._ctx.lineTo(rect.x,rect.y+rect.height);
+                s._ctx.closePath();
+                s._ctx.stroke();
+                //getTransformRect
+                s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+                target.getTransformRect(target.cMatrix);
+                rect=DisplayObject._transformRect;
+                s._ctx.beginPath();
+                s._ctx.lineWidth=2;
+                s._ctx.strokeStyle="#00ff00";
+                s._ctx.moveTo(rect.x,rect.y);
+                s._ctx.lineTo(rect.x+rect.width,rect.y);
+                s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+                s._ctx.lineTo(rect.x,rect.y+rect.height);
+                s._ctx.closePath();
+                s._ctx.stroke();
+                */
+                //
             }
         }
 
@@ -165,6 +196,9 @@ namespace annie {
             c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
+            s.viewPort.width=c.width;
+            s.viewPort.height=c.height;
+
         }
         destroy(): void {
             let s = this;

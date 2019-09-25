@@ -154,6 +154,7 @@ declare namespace annieUI {
          * @since 3.0.1
          */
         isCanUseMouseScroll: boolean;
+        private _timer;
         /**
          * 构造函数
          * @method  ScrollPage
@@ -198,6 +199,82 @@ declare namespace annieUI {
          * @since 2.0.1
          */
         readonly currentPos: number;
+    }
+}
+/**
+ * @module annieUI
+ */
+declare namespace annieUI {
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.Scroller
+     * @public
+     * @extends annie.AObject
+     * @since 3.1.0
+     */
+    class Scroller extends annie.EventDispatcher {
+        /**
+         * annieUI.Scroller组件滑动到开始位置事件
+         * @event annie.Event.ON_SCROLL_ING
+         * @since 3.1.0
+         */
+        /**
+         * 滑动方向
+         * @property isVertical
+         * @type {boolean}
+         */
+        isVertical: boolean;
+        /**
+         * 手指按下后的滑动速度，值越大，滑动越快
+         * @property speed
+         * @protected
+         * @since 3.1.0
+         * @type {number}
+         */
+        speed: number;
+        /**
+         * 滚动的最大速度，直接影响一次滑动之后最长可以滚多远
+         * @property maxSpeed
+         * @public
+         * @since 3.1.0
+         * @default 100
+         * @type {number}
+         */
+        maxSpeed: number;
+        /**
+         * 松开手指后的自然滚动的摩擦力，摩擦力越大，停止的越快
+         * @property fSpeed
+         * @since 3.1.0
+         * @type {number}
+         */
+        fSpeed: number;
+        private _isMouseDownState;
+        private _moveDis;
+        /**
+         * 是否允许通过鼠标去滚动
+         * @property isCanScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        isCanScroll: boolean;
+        private _isStop;
+        private _timer;
+        private _stage;
+        private _maxDis;
+        private _lastValue;
+        private _frame;
+        constructor();
+        /**
+         * 初始化函数
+         * @method  ScrollPage
+         * @param {annie.Stage} Stage
+         * @param {number} maxDis
+         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         */
+        init(stage: annie.Stage, maxDis: number, isVertical?: boolean): void;
+        mouseEvent: any;
+        private onMouseEvent;
+        destroy(): void;
     }
 }
 /**

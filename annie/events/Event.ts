@@ -103,6 +103,14 @@ namespace annie {
          */
         public static ON_SCROLL_START="onScrollStart";
         /**
+         * annie.Scroller组件开始滑动事件
+         * @property ON_SCROLL_ING
+         * @static
+         * @since 3.1.0
+         * @type {string}
+         */
+        public static ON_SCROLL_ING="onScrollIng";
+        /**
          * annie.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
          * @static

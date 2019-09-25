@@ -198,7 +198,6 @@ namespace annie {
             b_cy = rb.y + (rb.height/2);
             return ((Math.abs(a_cx - b_cx) <= (ra.width/2 + rb.width/2))&&(Math.abs(a_cy - b_cy) <= (ra.height/2 + rb.height/2)));
         }
-
         public destroy(): void {
         }
     }

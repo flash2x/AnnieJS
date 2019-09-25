@@ -21,7 +21,6 @@ namespace annie {
          * @event annie.Event.TIMER_COMPLETE
          * @since 1.0.9
          */
-//
         /**
          * 构造函数，初始化
          * @method Timer
@@ -45,7 +44,7 @@ namespace annie {
             }
             let s=this;
             s._delay=delay;
-            s._frameDelay=Math.ceil(delay*0.001*60);
+            s._frameDelay=Math.ceil(delay*0.06);
             s._repeatCount=repeatCount;
             Timer._timerList.push(s);
         }

@@ -480,7 +480,6 @@ namespace annie {
         if (target._a2x_res_obj == info) {
             return;
         } else {
-            //是不是文本
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == void 0 || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
@@ -493,7 +492,10 @@ namespace annie {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
             }
-            target.alpha = info.al == void 0 ? 1 : info.al;
+            if(info.al == void 0){
+                info.al=1;
+            }
+            target.alpha =info.al;
             //动画播放模式 图形 按钮 动画
             if (info.t != void 0 && target instanceof annie.MovieClip) {
                 if (info.t == -1) {

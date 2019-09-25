@@ -65,6 +65,7 @@
     大量优化渲染结构,提升运行效率
     增加annie.Sprite.hitArea属性，设置此属性将直接设置容器鼠标事件接受的区域范围，提升效率。
     加强annie.DisplayObject.startDrag方法功能。
+    加载annie.MovieClip的gotoAndStop,gotoAndPlay方法功能，现在帧数可以是带小数的，以此来加载动画缓功能，或者播放快慢调整
     更改annie.DisplayObject.mouseEnable属性功能。设置此属性为false后，此显示对象及其子级都将无法获取鼠标事件
     修复在非全屏情况下html有滚动条的情况下鼠标位置异常的bug
     更新vConsole版本

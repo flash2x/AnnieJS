@@ -161,7 +161,7 @@ namespace annieUI {
          * @since 3.0.1
          */
         public isCanUseMouseScroll: boolean = true;
-
+        private _timer:annie.Timer;
         /**
          * 构造函数
          * @method  ScrollPage
@@ -193,75 +193,79 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
-            s.addEventListener(annie.Event.ENTER_FRAME, function () {
+            s._timer=new annie.Timer(20);
+            s._timer.addEventListener(annie.Event.TIMER, function () {
                 let view: any = s.view;
-                if (s.autoScroll) return;
-                if (!s.isSpringBack) {
-                    if (view[s.paramXY] > 0) {
-                        s.addSpeed = 0;
-                        s.speed = 0;
-                        s.isStop = true;
-                        view[s.paramXY] = 0;
-                        return;
-                    } else if (view[s.paramXY] < s.distance - s.maxDistance) {
-                        s.addSpeed = 0;
-                        s.speed = 0;
-                        s.isStop = true;
-                        view[s.paramXY] = s.distance - s.maxDistance;
-                        return;
-                    }
-                }
-                if (!s.isStop) {
-                    if (Math.abs(s.speed) > 0) {
-                        view[s.paramXY] += s.speed;
-                        //是否超过了边界,如果超过了,则加快加速度,让其停止
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                            s.speed += s.addSpeed * s.fSpeed;
-                        } else {
-                            s.speed += s.addSpeed;
-                        }
-                        //说明超过了界线,准备回弹
-                        if (s.speed * s.addSpeed > 0) {
-                            s.dispatchEvent("onScrollStop");
+                if(view!=void 0 &&view._isOnStage) {
+                    if (s.autoScroll) return;
+                    if (!s.isSpringBack) {
+                        if (view[s.paramXY] > 0) {
+                            s.addSpeed = 0;
                             s.speed = 0;
+                            s.isStop = true;
+                            view[s.paramXY] = 0;
+                            return;
+                        } else if (view[s.paramXY] < s.distance - s.maxDistance) {
+                            s.addSpeed = 0;
+                            s.speed = 0;
+                            s.isStop = true;
+                            view[s.paramXY] = s.distance - s.maxDistance;
+                            return;
+                        }
+                    }
+                    if (!s.isStop) {
+                        if (Math.abs(s.speed) > 0) {
+                            view[s.paramXY] += s.speed;
+                            //是否超过了边界,如果超过了,则加快加速度,让其停止
+                            if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                s.speed += s.addSpeed * s.fSpeed;
+                            } else {
+                                s.speed += s.addSpeed;
+                            }
+                            //说明超过了界线,准备回弹
+                            if (s.speed * s.addSpeed > 0) {
+                                s.dispatchEvent("onScrollStop");
+                                s.speed = 0;
+                            }
+                        } else {
+                            //检测是否超出了边界,如果超出了边界则回弹
+                            if (s.addSpeed != 0) {
+                                if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                    let tarP: number = 0;
+                                    if (s.addSpeed > 0) {
+                                        if (s.distance < s.maxDistance) {
+                                            tarP = s.distance - s.maxDistance;
+                                        }
+                                    }
+                                    view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
+                                    if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
+                                        s.isStop = true;
+                                        if (s.addSpeed > 0) {
+                                            s.dispatchEvent("onScrollToEnd");
+                                        } else {
+                                            s.dispatchEvent("onScrollToHead");
+                                        }
+                                    }
+                                }
+                            } else {
+                                s.isStop = true;
+                            }
                         }
                     } else {
-                        //检测是否超出了边界,如果超出了边界则回弹
-                        if (s.addSpeed != 0) {
-                            if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                                let tarP: number = 0;
-                                if (s.addSpeed > 0) {
-                                    if (s.distance < s.maxDistance) {
-                                        tarP = s.distance - s.maxDistance;
-                                    }
+                        if (s.stopTimes >= 0) {
+                            s.stopTimes++;
+                            if (s.stopTimes >= 15) {
+                                s.speed = 0;
+                                if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                    s.isStop = false;
+                                    s.stopTimes = -1;
                                 }
-                                view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
-                                if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
-                                    s.isStop = true;
-                                    if (s.addSpeed > 0) {
-                                        s.dispatchEvent("onScrollToEnd");
-                                    } else {
-                                        s.dispatchEvent("onScrollToHead");
-                                    }
-                                }
-                            }
-                        } else {
-                            s.isStop = true;
-                        }
-                    }
-                } else {
-                    if (s.stopTimes >= 0) {
-                        s.stopTimes++;
-                        if (s.stopTimes >= 15) {
-                            s.speed = 0;
-                            if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                                s.isStop = false;
-                                s.stopTimes = -1;
                             }
                         }
                     }
                 }
-            })
+            });
+            s._timer.start();
         }
 
         /**

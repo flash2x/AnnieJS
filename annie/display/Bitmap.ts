@@ -117,7 +117,6 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
-
         public updateMatrix(): void {
             let s: any = this;
             super.updateMatrix();
@@ -171,6 +170,11 @@ namespace annie {
                 s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
                 s.cMatrix.setFrom(s._matrix);
                 s.cMatrix.prepend(s.parent.cMatrix);
+            }else{
+                if(s._rect.width==0){
+                    s._bounds.width=s._rect.width=s._bitmapData.width;
+                    s._bounds.height=s._rect.height=s._bitmapData.height;
+                }
             }
             s.a2x_uf = false;
             s.a2x_um = false;

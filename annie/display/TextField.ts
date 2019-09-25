@@ -397,9 +397,8 @@ namespace annie {
             //ctx.restore();
             return w;
         }
-
         private realLines: any = [];
-        public  a2x_ut:boolean=false;
+        public  a2x_ut:boolean=true;
         public updateMatrix(): void {
             let s: any = this;
             let can = s._texture;

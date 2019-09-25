@@ -335,7 +335,7 @@ namespace annie {
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     if (children[i].visible && children[i]._isUseToMask == 0)
-                        Rectangle.createFromRects(rect, children[i].getDrawRect());
+                        Rectangle.createFromRects(rect, children[i].getTransformRect());
                 }
             }
             return rect;
@@ -365,7 +365,7 @@ namespace annie {
                 if (child._isUseToMask > 0) continue;
                 if (maskObj instanceof annie.DisplayObject) {
                     if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                        if (child.mask != maskObj) {
+                        if (child.mask != maskObj){
                             renderObj.endMask();
                             maskObj = child.mask;
                             renderObj.beginMask(maskObj);

@@ -498,15 +498,8 @@ namespace annie {
          * @param {annie.Point} point
          * @return {annie.Point}
          */
-        public localToGlobal(point: Point, bp: Point = null): Point {
-            let s = this;
-            if (s.parent instanceof annie.Sprite) {
-                //下一级的坐标始终应该是相对父级来说的，所以是用父级的矩阵去转换
-                return s.parent.cMatrix.transformPoint(point.x, point.y, bp);
-            } else {
-                //没有父级
-                return s.cMatrix.transformPoint(point.x, point.y, bp);
-            }
+        public localToGlobal(point: Point, bp: Point = null): Point{
+            return this.cMatrix.transformPoint(point.x, point.y, bp);
         }
 
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
@@ -537,7 +530,7 @@ namespace annie {
             }
             p.x += s._offsetX;
             p.y += s._offsetY;
-            if (s._bounds.isPointIn(p)) {
+            if (s._bounds.isPointIn(p)){
                 return s;
             }
             return null;
@@ -550,39 +543,22 @@ namespace annie {
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
-         * @method getDrawRect
+         * @method getTransformRect
          * @public
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        public getDrawRect(): Rectangle {
+        public getTransformRect(matrix:annie.Matrix): void {
             let s = this;
             s.getBounds();
             let x: number = s._bounds.x, y: number = s._bounds.y, w: number = s._bounds.width,
                 h: number = s._bounds.height;
-            if (s._mask instanceof annie.DisplayObject) {
-                let maskRect = s._mask.getDrawRect();
-                if (x < maskRect.x) {
-                    x = maskRect.x;
-                }
-                if (y < maskRect.y) {
-                    y = maskRect.y;
-                }
-                if (w > maskRect.width) {
-                    w = maskRect.width;
-                }
-                if (h > maskRect.height) {
-                    h = maskRect.height;
-                }
-            }
-            s.matrix.transformPoint(x, y, DisplayObject._p1);
-            s.matrix.transformPoint(x + w, y, DisplayObject._p2);
-            s.matrix.transformPoint(x + w, y + h, DisplayObject._p3);
-            s.matrix.transformPoint(x, y + h, DisplayObject._p4);
-            Rectangle.createFromPoints(s._drawRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
-            return s._drawRect;
+            matrix.transformPoint(x, y, DisplayObject._p1);
+            matrix.transformPoint(x + w, y, DisplayObject._p2);
+            matrix.transformPoint(x + w, y + h, DisplayObject._p3);
+            matrix.transformPoint(x, y + h, DisplayObject._p4);
+            Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         }
-
         /**
          * 更新函数
          * @method update
@@ -644,7 +620,6 @@ namespace annie {
                 }
             }
         }
-
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -657,29 +632,33 @@ namespace annie {
             let s = this;
             if (s._visible) {
                 if (s.cAlpha > 0) {
-                    let cf = s.cFilters;
-                    let cfLen = cf.length;
-                    let fId = -1;
-                    if (cfLen) {
-                        for (let i = 0; i < cfLen; i++) {
-                            if (s.cFilters[i].type == "Shadow") {
-                                fId = i;
-                                break;
+                    //是否不在可视范围
+                    s.getTransformRect(s.cMatrix);
+                    if (Rectangle.testRectCross(DisplayObject._transformRect, renderObj.viewPort)){
+                        let cf = s.cFilters;
+                        let cfLen = cf.length;
+                        let fId = -1;
+                        if (cfLen) {
+                            for (let i = 0; i < cfLen; i++) {
+                                if (s.cFilters[i].type == "Shadow") {
+                                    fId = i;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (fId >= 0) {
-                        let ctx: any = renderObj["_ctx"];
-                        ctx.shadowBlur = cf[fId].blur;
-                        ctx.shadowColor = cf[fId].color;
-                        ctx.shadowOffsetX = cf[fId].offsetX;
-                        ctx.shadowOffsetY = cf[fId].offsetY;
-                        renderObj.draw(s);
-                        ctx.shadowBlur = 0;
-                        ctx.shadowOffsetX = 0;
-                        ctx.shadowOffsetY = 0;
-                    } else {
-                        renderObj.draw(s);
+                        if (fId >= 0) {
+                            let ctx: any = renderObj["_ctx"];
+                            ctx.shadowBlur = cf[fId].blur;
+                            ctx.shadowColor = cf[fId].color;
+                            ctx.shadowOffsetX = cf[fId].offsetX;
+                            ctx.shadowOffsetY = cf[fId].offsetY;
+                            renderObj.draw(s);
+                            ctx.shadowBlur = 0;
+                            ctx.shadowOffsetX = 0;
+                            ctx.shadowOffsetY = 0;
+                        } else {
+                            renderObj.draw(s);
+                        }
                     }
                 }
             }
@@ -694,12 +673,14 @@ namespace annie {
          * @return {number}
          */
         public get width(): number {
-            return this.getDrawRect().width;
+            this.getTransformRect(this.matrix);
+            return DisplayObject._transformRect.width;
         }
 
         public set width(value: number) {
             let s = this;
-            let w = s.getDrawRect().width;
+            s.getTransformRect(s.matrix);
+            let w = DisplayObject._transformRect.width;
             if (value > 0 && w > 0) {
                 let sx = value / w;
                 s.scaleX *= sx;
@@ -715,12 +696,14 @@ namespace annie {
          * @return {number}
          */
         public get height(): number {
-            return this.getDrawRect().height;
+            this.getTransformRect(this.matrix);
+            return DisplayObject._transformRect.height;
         }
 
         public set height(value: number) {
             let s = this;
-            let h = s.getDrawRect().height;
+            s.getTransformRect(s.matrix);
+            let h = DisplayObject._transformRect.height;
             if (value > 0 && h > 0) {
                 let sy = value / h;
                 s.scaleY *= sy;
@@ -732,7 +715,7 @@ namespace annie {
         public static _canvas: any = window.document.createElement("canvas");
         // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
         protected _texture: any = null;
-        protected _drawRect: Rectangle = new Rectangle();
+        public static _transformRect: Rectangle = new annie.Rectangle();
         protected _bounds: Rectangle = new Rectangle();
 
         /**
@@ -846,7 +829,6 @@ namespace annie {
             s.parent = null;
             s.stage = null;
             s._bounds = null;
-            s._drawRect = null;
             s._dragBounds = null;
             s._lastDragPoint = null;
             s.cFilters = null;
@@ -894,51 +876,30 @@ namespace annie {
         }
 
         /**
-         * 鼠标跟随
+         * 启动鼠标或者触摸拖动
          * @method startDrag
-         * @param {annie.Point|boolean} 当dragPoint 为annie.Point对象时，那就是跟随时鼠标对应显示对象的(x,y)坐标位置；如果为true或false,则表示是否绑定到中心
-         * @param {annie.Rectangle} dragRect 跟随范围
+         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
+         * @param {annie.Rectangle} bounds 相对于显示对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @since 1.1.2
+         * @public
+         * @return {void}
          */
-        public startDrag(dragPoint: annie.Point = null, dragRect: annie.Rectangle = null) {
-            DisplayObject._startDrag(this, dragPoint, dragRect);
-        }
-
-        private static _startDrag(target: DisplayObject, dragPoint: annie.Point = null, dragRound: annie.Rectangle = null) {
-            let s = target;
-            if (s.stage instanceof annie.Stage) {
-                s.stage._dragDisplayObject = s;
-                if (dragPoint instanceof annie.Point) {
-                    s.stage._dragPoint.x = dragPoint.x;
-                    s.stage._dragPoint.y = dragPoint.y;
-                    s.stage._isFixedDrag = true;
-                } else {
-                    if (dragPoint === true) {
-                        let drawRect = s.getDrawRect();
-                        s.stage._dragPoint.x = drawRect.x + (drawRect.width >> 1);
-                        s.stage._dragPoint.y = drawRect.y + (drawRect.height >> 1);
-                        s.stage._isFixedDrag = true;
-                    } else {
-                        s.stage._isFixedDrag = false;
-                    }
-                }
-                if (dragRound instanceof annie.Rectangle) {
-                    s.stage._dragRect.x = dragRound.x;
-                    s.stage._dragRect.y = dragRound.y;
-                    s.stage._dragRect.width = dragRound.width;
-                    s.stage._dragRect.height = dragRound.height;
-                } else {
-                    s.stage._dragRect.x = Number.MIN_VALUE;
-                    s.stage._dragRect.y = Number.MIN_VALUE;
-                    s.stage._dragRect.width = Number.MAX_VALUE;
-                    s.stage._dragRect.height = Number.MAX_VALUE;
-                }
-            }
-        }
-
-        private static _stopDrage(target: DisplayObject) {
-            let s = target;
-            if (s.stage instanceof annie.Stage) {
-                s.stage._dragDisplayObject = null;
+        public startDrag(isCenter: boolean = false, bounds: Rectangle = null): void {
+            let s = this;
+            annie.Stage._dragDisplay = s;
+            annie.Stage._isDragCenter = isCenter;
+            annie.Stage._lastDragPoint.x = Number.MAX_VALUE;
+            annie.Stage._lastDragPoint.y = Number.MAX_VALUE;
+            if (bounds) {
+                annie.Stage._dragBounds.x = bounds.x;
+                annie.Stage._dragBounds.y = bounds.y;
+                annie.Stage._dragBounds.width = bounds.width;
+                annie.Stage._dragBounds.height = bounds.height;
+            } else {
+                annie.Stage._dragBounds.x = 0;
+                annie.Stage._dragBounds.y = 0;
+                annie.Stage._dragBounds.width = 0;
+                annie.Stage._dragBounds.height = 0;
             }
         }
 
@@ -947,7 +908,7 @@ namespace annie {
          * @method stopDrag
          */
         public stopDrag() {
-            DisplayObject._stopDrage(this);
+            annie.Stage._dragDisplay = null;
         }
     }
 }

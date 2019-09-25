@@ -233,6 +233,14 @@ declare namespace annie {
          */
         static ON_SCROLL_START: string;
         /**
+         * annie.Scroller组件开始滑动事件
+         * @property ON_SCROLL_ING
+         * @static
+         * @since 3.1.0
+         * @type {string}
+         */
+        static ON_SCROLL_ING: string;
+        /**
          * annie.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
          * @static
@@ -1284,12 +1292,12 @@ declare namespace annie {
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
-         * @method getDrawRect
+         * @method getTransformRect
          * @public
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getDrawRect(): Rectangle;
+        getTransformRect(matrix: annie.Matrix): void;
         /**
          * 更新函数
          * @method update
@@ -1327,7 +1335,7 @@ declare namespace annie {
         height: number;
         static _canvas: any;
         protected _texture: any;
-        protected _drawRect: Rectangle;
+        static _transformRect: Rectangle;
         protected _bounds: Rectangle;
         /**
          * 停止这个显示对象上的所有声音
@@ -1379,14 +1387,15 @@ declare namespace annie {
         _onAddEvent(): void;
         _onEnterFrameEvent(): void;
         /**
-         * 鼠标跟随
+         * 启动鼠标或者触摸拖动
          * @method startDrag
-         * @param {annie.Point|boolean} 当dragPoint 为annie.Point对象时，那就是跟随时鼠标对应显示对象的(x,y)坐标位置；如果为true或false,则表示是否绑定到中心
-         * @param {annie.Rectangle} dragRect 跟随范围
+         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
+         * @param {annie.Rectangle} bounds 相对于显示对象父级的坐标的值，用于指定 Sprite 约束矩形
+         * @since 1.1.2
+         * @public
+         * @return {void}
          */
-        startDrag(dragPoint?: annie.Point, dragRect?: annie.Rectangle): void;
-        private static _startDrag;
-        private static _stopDrage;
+        startDrag(isCenter?: boolean, bounds?: Rectangle): void;
         /**
          * 停止鼠标跟随
          * @method stopDrag
@@ -2308,6 +2317,7 @@ declare namespace annie {
          */
         readonly totalFrames: number;
         private _lastFrame;
+        private _floatFrame;
         /**
          * 构造函数
          * @method MovieClip
@@ -2427,6 +2437,7 @@ declare namespace annie {
         private _a2x_sounds;
         _onEnterFrameEvent(): void;
         _onRemoveEvent(isReSetMc: boolean): void;
+        private _updateFloatFrame;
         private static _resetMC;
         destroy(): void;
     }
@@ -2925,7 +2936,7 @@ declare namespace annie {
          */
         isMultiTouch: boolean;
         /**
-         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * 开启或关闭多个手指的鼠标事件
          * @property isMultiMouse
          * @since 1.1.3
          * @type {boolean}
@@ -2993,6 +3004,7 @@ declare namespace annie {
          * @type {number}
          */
         divWidth: number;
+        private _isFullScreen;
         /**
          * 舞台的背景色
          * 默认就是透明背景
@@ -3100,10 +3112,10 @@ declare namespace annie {
         private _mP1;
         private _mP2;
         private mouseEvent;
-        _dragDisplayObject: annie.DisplayObject;
-        _dragRect: annie.Rectangle;
-        _dragPoint: annie.Point;
-        _isFixedDrag: boolean;
+        static _dragDisplay: annie.DisplayObject;
+        static _dragBounds: annie.Rectangle;
+        static _lastDragPoint: annie.Point;
+        static _isDragCenter: boolean;
         _isMouseClickCanvas: boolean;
         private _onMouseEvent;
         private setAlign;
@@ -3568,6 +3580,10 @@ declare namespace annie {
          * 结束渲染
          */
         end(): void;
+        /**
+         * viewPort
+         */
+        viewPort: annie.Rectangle;
     }
 }
 /**
@@ -3592,6 +3608,11 @@ declare namespace annie {
          * @default null
          */
         rootContainer: any;
+        /**
+         * @property viewPort
+         *
+         */
+        viewPort: annie.Rectangle;
         /**
          * @property _ctx
          * @protected

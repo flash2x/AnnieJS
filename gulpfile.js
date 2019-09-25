@@ -43,6 +43,7 @@ var coreList =[
 var uiList=[
     "build/annieCore.d.ts",
     "annie/ui/ScrollPage.ts",
+    "annie/ui/Scroller.ts",
     "annie/ui/FacePhoto.ts",
     "annie/ui/SlidePage.ts",
     "annie/ui/FlipBook.ts",

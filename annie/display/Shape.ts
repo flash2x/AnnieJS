@@ -327,7 +327,6 @@ namespace annie {
         public clear(): void {
             let s = this;
             s._command = [];
-            s.a2x_ut = true;
             if (s._texture) {
                 s._texture.width = 0;
                 s._texture.height = 0;
@@ -338,6 +337,7 @@ namespace annie {
             s._bounds.y = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s.a2x_ut = true;
         }
 
         /**
@@ -699,8 +699,8 @@ namespace annie {
                         buttonRightY += 20 + lineWidth >> 1;
                         let w = buttonRightX - leftX;
                         let h = buttonRightY - leftY;
-                        s._bounds.x = leftX + 10;
-                        s._bounds.y = leftY + 10;
+                        s._bounds.x = 10;
+                        s._bounds.y = 10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////

@@ -4,6 +4,7 @@
 namespace annie {
     declare let VConsole: any;
     declare let trace: any;
+
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * @class annie.Stage
@@ -125,7 +126,7 @@ namespace annie {
          */
         public isMultiTouch: boolean = false;
         /**
-         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * 开启或关闭多个手指的鼠标事件
          * @property isMultiMouse
          * @since 1.1.3
          * @type {boolean}
@@ -193,6 +194,7 @@ namespace annie {
          * @type {number}
          */
         public divWidth: number = 0;
+        private _isFullScreen:boolean=true;
 
         /**
          * 舞台的背景色
@@ -332,6 +334,7 @@ namespace annie {
                 rc.addEventListener("touchstart", s.mouseEvent, false);
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);
+                rc.addEventListener('touchcancel', s.mouseEvent, false);
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
@@ -430,7 +433,9 @@ namespace annie {
             if (div.style.width != "") {
                 vW = parseInt(div.style.width);
                 vH = parseInt(div.style.height);
+                this._isFullScreen=false;
             } else {
+                this._isFullScreen=true;
                 vW = document.documentElement.clientWidth;
                 vH = document.documentElement.clientHeight;
             }
@@ -444,7 +449,8 @@ namespace annie {
             mousemove: "onMouseMove",
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
-            touchend: "onMouseUp"
+            touchend: "onMouseUp",
+            touchcancel:"onMouseUp"
         };
         private muliPoints: Array<any> = [];
         //当document有鼠标或触摸事件时调用
@@ -452,17 +458,18 @@ namespace annie {
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
         private mouseEvent: any = null;
-        public _dragDisplayObject: annie.DisplayObject = null;
-        public _dragRect: annie.Rectangle = new annie.Rectangle(Number.MIN_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-        public _dragPoint: annie.Point = new Point();
-        public _isFixedDrag: boolean = false;
-        public _isMouseClickCanvas:boolean=true;
+        public static _dragDisplay: annie.DisplayObject = null;
+        public static _dragBounds: annie.Rectangle = new annie.Rectangle();
+        public static _lastDragPoint: annie.Point = new annie.Point();
+        public static _isDragCenter: boolean = false;
+        public _isMouseClickCanvas: boolean = true;
+
         private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this, c = s.renderObj.rootContainer, offSetX = c.offsetLeft, offSetY = c.offsetTop;
-            if (e.target.id == "_a2x_canvas"){
-                s._isMouseClickCanvas=true;
-                if (s.isPreventDefaultEvent){
+            let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
+            if (e.target.id == "_a2x_canvas") {
+                s._isMouseClickCanvas = true;
+                if (s.isPreventDefaultEvent) {
                     if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
                         e.preventDefault();
                     }
@@ -470,14 +477,14 @@ namespace annie {
                         e.preventDefault();
                     }
                 }
-            }else{
-                s._isMouseClickCanvas=false;
+            } else {
+                s._isMouseClickCanvas = false;
             }
-            while (c.scrollLeft != void 0) {
-                offSetX -= c.scrollLeft;
-                offSetY -= c.scrollTop;
-                c = c.parentNode;
+            if(!s._isFullScreen) {
+                offSetX = c.getBoundingClientRect().left + c.scrollLeft;
+                offSetY = c.getBoundingClientRect().top + c.scrollTop;
             }
+            let sd: any = Stage._dragDisplay;
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
@@ -509,6 +516,10 @@ namespace annie {
                 }
                 s._mouseDownPoint = {};
                 s._lastDpList = {};
+                if (sd) {
+                    Stage._lastDragPoint.x = Number.MAX_VALUE;
+                    Stage._lastDragPoint.y = Number.MAX_VALUE;
+                }
             } else {
                 if (s.muliPoints.length > 0) {
                     s._touchEvent.rotate = 0;
@@ -546,38 +557,6 @@ namespace annie {
                         }
                     }
                     let pLen = points.length;
-                    let dragDisplayObject = s._dragDisplayObject;
-                    if (dragDisplayObject instanceof annie.DisplayObject && pLen == 1) {
-                        if (!dragDisplayObject._isOnStage) {
-                            s._dragDisplayObject = null;
-                        } else {
-                            //有drag对象
-                            let dp: annie.Point = new annie.Point();
-                            let dragPoint = s._dragPoint;
-                            let dragRect = s._dragRect;
-                            dp.x = (points[0].clientX - offSetX) * devicePixelRatio;
-                            dp.y = (points[0].clientY - offSetY) * devicePixelRatio;
-                            let lp = dragDisplayObject.parent.globalToLocal(dp, DisplayObject._bp);
-                            if(!s._isFixedDrag && item == "onMouseDown") {
-                                dragPoint.x = lp.x - dragDisplayObject.x;
-                                dragPoint.y = lp.y - dragDisplayObject.y;
-                            }
-                            lp.x -= dragPoint.x;
-                            lp.y -= dragPoint.y;
-                            if (lp.x < dragRect.x) {
-                                lp.x = dragRect.x
-                            } else if (lp.x > dragRect.x + dragRect.width) {
-                                lp.x = dragRect.x + dragRect.width;
-                            }
-                            if (lp.y < dragRect.y) {
-                                lp.y = dragRect.y;
-                            } else if (lp.y > dragRect.y + dragRect.height) {
-                                lp.y = dragRect.y + dragRect.height;
-                            }
-                            dragDisplayObject.x = lp.x;
-                            dragDisplayObject.y = lp.y;
-                        }
-                    }
                     for (let o = 0; o < pLen; o++) {
                         eLen = 0;
                         events.length = 0;
@@ -736,9 +715,44 @@ namespace annie {
                                 }
                                 s._mp[s._mp.length] = cp;
                             }
+                            if (sd && sd.stage && sd.parent) {
+                                let x1 = sd.x, y1 = sd.y;
+                                lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
+                                if (!Stage._isDragCenter) {
+                                    if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
+                                        x1 += lp.x - Stage._lastDragPoint.x;
+                                        y1 += lp.y - Stage._lastDragPoint.y;
+                                    }
+                                    Stage._lastDragPoint.x = lp.x;
+                                    Stage._lastDragPoint.y = lp.y;
+                                } else {
+                                    x1 = lp.x;
+                                    y1 = lp.y;
+                                }
+                                lp.x = x1;
+                                lp.y = y1;
+                                if (Stage._dragBounds.width != 0) {
+                                    if (x1 < Stage._dragBounds.x) {
+                                        x1 = Stage._dragBounds.x;
+                                    } else if (x1 > Stage._dragBounds.x + Stage._dragBounds.width) {
+                                        x1 = Stage._dragBounds.x + Stage._dragBounds.width;
+                                    }
+                                    if (y1 < Stage._dragBounds.y) {
+                                        y1 = Stage._dragBounds.y;
+                                    } else if (y1 > Stage._dragBounds.y + Stage._dragBounds.height) {
+                                        y1 = Stage._dragBounds.y + Stage._dragBounds.height;
+                                    }
+                                }
+                                sd.x = x1;
+                                sd.y = y1;
+                            }
                             if (item == "onMouseUp") {
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
+                                if (sd) {
+                                    Stage._lastDragPoint.x = Number.MAX_VALUE;
+                                    Stage._lastDragPoint.y = Number.MAX_VALUE;
+                                }
                             } else {
                                 s._lastDpList[identifier] = displayList;
                             }
@@ -758,9 +772,9 @@ namespace annie {
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //设备是否为竖屏
-            let isDivH = divH > divW;
+            let isDivH = divH >= divW;
             //内容是否为竖屏内容
-            let isDesH = desH > desW;
+            let isDesH = desH >= desW;
             let scaleY = 1;
             let scaleX = 1;
             s.x = (divW - desW) >> 1;
@@ -800,11 +814,6 @@ namespace annie {
             }
             s.scaleX = scaleX;
             s.scaleY = scaleY;
-            // s._viewRect=new annie.Rectangle();
-            s._viewRect.x = (desW - divW / scaleX) >> 1;
-            s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x * 2;
-            s._viewRect.height = desH - s._viewRect.y * 2;
             if (s.autoSteering) {
                 if (isDesH == isDivH) {
                     s.rotation = 0;
@@ -818,6 +827,10 @@ namespace annie {
             } else {
                 s.rotation = 0;
             }
+            s._viewRect.x = (desW - divW / scaleX) >> 1;
+            s._viewRect.y = (desH - divH / scaleY) >> 1;
+            s._viewRect.width = desW - s._viewRect.x * 2;
+            s._viewRect.height = desH - s._viewRect.y * 2;
         };
 
         /**
@@ -943,6 +956,7 @@ namespace annie {
                 rc.removeEventListener("touchstart", s.mouseEvent, false);
                 rc.removeEventListener('touchmove', s.mouseEvent, false);
                 rc.removeEventListener('touchend', s.mouseEvent, false);
+                rc.removeEventListener('touchcancel', s.mouseEvent, false);
             } else {
                 rc.removeEventListener("mousedown", s.mouseEvent, false);
                 rc.removeEventListener('mousemove', s.mouseEvent, false);

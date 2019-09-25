@@ -191,10 +191,16 @@ namespace annie {
                 }
                 s.headers.length = 0;
             }
-            if (s.data instanceof Object) {
-                s._req.send(s.data);
+            if (contentType == "form") {
+                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                s._req.send(s._fqs(s.data, null));
             } else {
-                s._req.send();
+                var type = "application/json";
+                if (contentType != "json") {
+                    type = "multipart/form-data";
+                }
+                s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                s._req.send(s.data);
             }
         }
 

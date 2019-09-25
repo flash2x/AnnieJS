@@ -39,5 +39,10 @@ namespace annie {
          * 结束渲染
          */
         end():void;
+
+        /**
+         * viewPort
+         */
+        viewPort:annie.Rectangle;
     }
 }

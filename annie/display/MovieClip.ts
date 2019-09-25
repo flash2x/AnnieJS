@@ -92,6 +92,8 @@ namespace annie {
         }
 
         private _lastFrame: number = 0;
+        //有可能帧数带有小数点
+        private _floatFrame: number = 0;
 
         /**
          * 构造函数
@@ -293,10 +295,12 @@ namespace annie {
                     frameIndex = s._curFrame;
                 }
             } else if (typeof(frameIndex) == "number") {
+                s._floatFrame = frameIndex;
+                frameIndex = Math.floor(s._floatFrame);
+                s._floatFrame -= frameIndex;
                 if (frameIndex > timeLineObj.tf) {
                     frameIndex = timeLineObj.tf;
-                }
-                if (frameIndex < 1) {
+                }else if (frameIndex < 1){
                     frameIndex = 1;
                 }
             }
@@ -338,10 +342,12 @@ namespace annie {
                     frameIndex = s._curFrame;
                 }
             } else if (typeof(frameIndex) == "number") {
+                s._floatFrame = frameIndex;
+                frameIndex = Math.floor(s._floatFrame);
+                s._floatFrame -= frameIndex;
                 if (frameIndex > timeLineObj.tf) {
                     frameIndex = timeLineObj.tf;
-                }
-                if (frameIndex < 1) {
+                }else if (frameIndex < 1){
                     frameIndex = 1;
                 }
             }
@@ -350,6 +356,7 @@ namespace annie {
 
         //flash声音管理
         private _a2x_sounds: any = null;
+
         public _onEnterFrameEvent(): void {
             let s: any = this;
             if (!s._visible) {
@@ -363,6 +370,7 @@ namespace annie {
                     } else {
                         s._curFrame = 1;
                     }
+                    s._floatFrame = s.parent._floatFrame;
                 } else {
                     if (s._wantFrame != 0) {
                         s._curFrame = s._wantFrame;
@@ -412,7 +420,7 @@ namespace annie {
                             }
                             if (objInfo instanceof Object) {
                                 //这个对象有可能是新来的，有可能是再次进入帧里的。需要对他进行初始化
-                                annie.d(obj, objInfo);
+                                    annie.d(obj, objInfo);
                                 // 检查是否有遮罩
                                 if (objInfo.ma != undefined) {
                                     maskObj = obj;
@@ -432,6 +440,10 @@ namespace annie {
                                 //这个对象在上一帧存在，这一帧不存在，所以需要执行删除事件
                                 remChildren.unshift(obj);
                             }
+                        }
+                        if (s._floatFrame > 0) {
+                            //帧数带小数点的，所以执行微调
+                            s._updateFloatFrame();
                         }
                         let count: number = addChildren.length;
                         for (let i = 0; i < count; i++) {
@@ -498,23 +510,85 @@ namespace annie {
                             s._a2x_sounds[<any>sound - 1].play(0, curFrameSound[sound]);
                         }
                     }
+                } else if (s._floatFrame > 0) {
+                    //帧数带小数点的，所以执行微调
+                    s._updateFloatFrame();
                 }
             }
             super._onEnterFrameEvent();
+            s._floatFrame = 0;
         }
-        public _onRemoveEvent(isReSetMc:boolean){
+
+        public _onRemoveEvent(isReSetMc: boolean) {
             super._onRemoveEvent(isReSetMc);
-            if(isReSetMc)
-            MovieClip._resetMC(this);
+            if (isReSetMc)
+                MovieClip._resetMC(this);
         }
+
+        private _updateFloatFrame() {
+            let s = this;
+            let timeLineObj = s._a2x_res_class;
+            //先确定是哪一帧
+            let allChildren = s._a2x_res_children;
+            let childCount = allChildren.length;
+            let objId: number = 0;
+            let obj: any = null;
+            let nextObjInfo: any = null;
+            let curObjInfo: any = null;
+            let nextFrameIndex = s._curFrame;
+            let curFrameObj: any = s._lastFrameObj;
+            let ff = s._floatFrame;
+            let nextFrameObj: any = timeLineObj.f[timeLineObj.timeLine[nextFrameIndex]];
+            if (nextFrameObj != void 0 && curFrameObj != void 0 && curFrameObj != nextFrameObj) {
+                for (let i = childCount - 1; i >= 0; i--) {
+                    objId = allChildren[i][0];
+                    obj = allChildren[i][1];
+                    if (nextFrameObj.c instanceof Object && curFrameObj.c instanceof Object) {
+                        nextObjInfo = nextFrameObj.c[objId];
+                        curObjInfo = curFrameObj.c[objId];
+                        //更新对象信息
+                        if (curObjInfo != void 0 && nextObjInfo != void 0) {
+                            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+                            if (nextObjInfo.tr == void 0 || nextObjInfo.tr.length == 1) {
+                                nextObjInfo.tr = [0, 0, 1, 1, 0, 0];
+                            }
+                            if(nextObjInfo.al == void 0){
+                                nextObjInfo.al=1;
+                            }
+                            var sx=nextObjInfo.tr[4] - curObjInfo.tr[4];
+                            var sy=nextObjInfo.tr[5] - curObjInfo.tr[5];
+                            if(sx>180){
+                                sx-=360;
+                            }else if(sx<-180){
+                                sx+=360;
+                            }
+                            if(sy>180){
+                                sy-=360;
+                            }else if(sy<-180){
+                                sy+=360;
+                            }
+                            obj.x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
+                            obj.y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
+                            obj.scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
+                            obj.scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
+                            obj.skewX = curObjInfo.tr[4] + sx * ff;
+                            obj.skewY = curObjInfo.tr[5] + sy * ff;
+                            obj.alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                        }
+                    }
+                }
+            }
+        }
+
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
-            obj._wantFrame =0;
+            obj._wantFrame = 0;
             obj._curFrame = 1;
             obj._lastFrame = 0;
             obj._lastFrameObj = null;
             obj._isFront = true;
-            obj.children.length=0;
+            obj._floatFrame = 0;
+            obj.children.length = 0;
             if (obj._a2x_mode < -1) {
                 obj._isPlaying = true;
             } else {

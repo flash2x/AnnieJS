@@ -196,13 +196,15 @@ namespace annie{
         }
         _dRender.rootContainer = DisplayObject["_canvas"];
         if(!rect){
-            rect = obj.getDrawRect();
+            rect = obj.getTransformRect();
         }
         let sp=obj.parent;
         obj.parent=null;
         obj._cp=true;
-        obj.offsetX=-rect.x;
-        obj.offsetY=-rect.y;
+        let ox=obj.x;
+        let oy=obj.y;
+        obj.x=ox-rect.x;
+        obj.y=oy-rect.y;
         let w: number =rect.width;
         let h: number =rect.height;
         _dRender.rootContainer.width = w;
@@ -220,8 +222,8 @@ namespace annie{
         obj.render(_dRender);
         obj.parent = sp;
         obj._cp=true;
-        obj.offsetX=0;
-        obj.offsetY=0;
+        obj.x=ox;
+        obj.y=oy;
         if (!typeInfo) {
             typeInfo = {type: "png"};
         }else{

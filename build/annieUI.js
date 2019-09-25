@@ -207,82 +207,86 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
-            s.addEventListener(annie.Event.ENTER_FRAME, function () {
+            s._timer = new annie.Timer(20);
+            s._timer.addEventListener(annie.Event.TIMER, function () {
                 var view = s.view;
-                if (s.autoScroll)
-                    return;
-                if (!s.isSpringBack) {
-                    if (view[s.paramXY] > 0) {
-                        s.addSpeed = 0;
-                        s.speed = 0;
-                        s.isStop = true;
-                        view[s.paramXY] = 0;
+                if (view != void 0 && view._isOnStage) {
+                    if (s.autoScroll)
                         return;
-                    }
-                    else if (view[s.paramXY] < s.distance - s.maxDistance) {
-                        s.addSpeed = 0;
-                        s.speed = 0;
-                        s.isStop = true;
-                        view[s.paramXY] = s.distance - s.maxDistance;
-                        return;
-                    }
-                }
-                if (!s.isStop) {
-                    if (Math.abs(s.speed) > 0) {
-                        view[s.paramXY] += s.speed;
-                        //是否超过了边界,如果超过了,则加快加速度,让其停止
-                        if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                            s.speed += s.addSpeed * s.fSpeed;
-                        }
-                        else {
-                            s.speed += s.addSpeed;
-                        }
-                        //说明超过了界线,准备回弹
-                        if (s.speed * s.addSpeed > 0) {
-                            s.dispatchEvent("onScrollStop");
+                    if (!s.isSpringBack) {
+                        if (view[s.paramXY] > 0) {
+                            s.addSpeed = 0;
                             s.speed = 0;
+                            s.isStop = true;
+                            view[s.paramXY] = 0;
+                            return;
+                        }
+                        else if (view[s.paramXY] < s.distance - s.maxDistance) {
+                            s.addSpeed = 0;
+                            s.speed = 0;
+                            s.isStop = true;
+                            view[s.paramXY] = s.distance - s.maxDistance;
+                            return;
                         }
                     }
-                    else {
-                        //检测是否超出了边界,如果超出了边界则回弹
-                        if (s.addSpeed != 0) {
+                    if (!s.isStop) {
+                        if (Math.abs(s.speed) > 0) {
+                            view[s.paramXY] += s.speed;
+                            //是否超过了边界,如果超过了,则加快加速度,让其停止
                             if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                                var tarP = 0;
-                                if (s.addSpeed > 0) {
-                                    if (s.distance < s.maxDistance) {
-                                        tarP = s.distance - s.maxDistance;
-                                    }
-                                }
-                                view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
-                                if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
-                                    s.isStop = true;
-                                    if (s.addSpeed > 0) {
-                                        s.dispatchEvent("onScrollToEnd");
-                                    }
-                                    else {
-                                        s.dispatchEvent("onScrollToHead");
-                                    }
-                                }
+                                s.speed += s.addSpeed * s.fSpeed;
+                            }
+                            else {
+                                s.speed += s.addSpeed;
+                            }
+                            //说明超过了界线,准备回弹
+                            if (s.speed * s.addSpeed > 0) {
+                                s.dispatchEvent("onScrollStop");
+                                s.speed = 0;
                             }
                         }
                         else {
-                            s.isStop = true;
+                            //检测是否超出了边界,如果超出了边界则回弹
+                            if (s.addSpeed != 0) {
+                                if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                    var tarP = 0;
+                                    if (s.addSpeed > 0) {
+                                        if (s.distance < s.maxDistance) {
+                                            tarP = s.distance - s.maxDistance;
+                                        }
+                                    }
+                                    view[s.paramXY] += 0.4 * (tarP - view[s.paramXY]);
+                                    if (Math.abs(tarP - view[s.paramXY]) < 0.1) {
+                                        s.isStop = true;
+                                        if (s.addSpeed > 0) {
+                                            s.dispatchEvent("onScrollToEnd");
+                                        }
+                                        else {
+                                            s.dispatchEvent("onScrollToHead");
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                s.isStop = true;
+                            }
                         }
                     }
-                }
-                else {
-                    if (s.stopTimes >= 0) {
-                        s.stopTimes++;
-                        if (s.stopTimes >= 15) {
-                            s.speed = 0;
-                            if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
-                                s.isStop = false;
-                                s.stopTimes = -1;
+                    else {
+                        if (s.stopTimes >= 0) {
+                            s.stopTimes++;
+                            if (s.stopTimes >= 15) {
+                                s.speed = 0;
+                                if (view[s.paramXY] > 0 || view[s.paramXY] < s.distance - s.maxDistance) {
+                                    s.isStop = false;
+                                    s.stopTimes = -1;
+                                }
                             }
                         }
                     }
                 }
             });
+            s._timer.start();
             return _this;
         }
         /**
@@ -453,6 +457,198 @@ var annieUI;
         return ScrollPage;
     }(Sprite));
     annieUI.ScrollPage = ScrollPage;
+})(annieUI || (annieUI = {}));
+/**
+ * @module annieUI
+ */
+var annieUI;
+(function (annieUI) {
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.Scroller
+     * @public
+     * @extends annie.AObject
+     * @since 3.1.0
+     */
+    var Scroller = /** @class */ (function (_super) {
+        __extends(Scroller, _super);
+        function Scroller() {
+            var _this = _super.call(this) || this;
+            //Event
+            /**
+             * annieUI.Scroller组件滑动到开始位置事件
+             * @event annie.Event.ON_SCROLL_ING
+             * @since 3.1.0
+             */
+            /**
+             * 滑动方向
+             * @property isVertical
+             * @type {boolean}
+             */
+            _this.isVertical = true;
+            /**
+             * 手指按下后的滑动速度，值越大，滑动越快
+             * @property speed
+             * @protected
+             * @since 3.1.0
+             * @type {number}
+             */
+            _this.speed = 0.2;
+            /**
+             * 滚动的最大速度，直接影响一次滑动之后最长可以滚多远
+             * @property maxSpeed
+             * @public
+             * @since 3.1.0
+             * @default 100
+             * @type {number}
+             */
+            _this.maxSpeed = 15;
+            /**
+             * 松开手指后的自然滚动的摩擦力，摩擦力越大，停止的越快
+             * @property fSpeed
+             * @since 3.1.0
+             * @type {number}
+             */
+            _this.fSpeed = 0.1;
+            _this._isMouseDownState = 0;
+            _this._moveDis = 0;
+            /**
+             * 是否允许通过鼠标去滚动
+             * @property isCanScroll
+             * @type {boolean}
+             * @since 3.0.1
+             */
+            _this.isCanScroll = true;
+            _this._isStop = false;
+            _this._stage = null;
+            _this._maxDis = 1;
+            //最后鼠标经过的坐标值
+            _this._lastValue = 0;
+            _this._frame = 1;
+            _this.mouseEvent = null;
+            var s = _this;
+            s._instanceType = "annieUI.Scroller";
+            return _this;
+        }
+        /**
+         * 初始化函数
+         * @method  ScrollPage
+         * @param {annie.Stage} Stage
+         * @param {number} maxDis
+         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         */
+        Scroller.prototype.init = function (stage, maxDis, isVertical) {
+            if (isVertical === void 0) { isVertical = true; }
+            var s = this;
+            s.mouseEvent = s.onMouseEvent.bind(s);
+            s._stage = stage;
+            s._maxDis = maxDis;
+            stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.mouseEvent, false);
+            stage.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.mouseEvent, false);
+            stage.addEventListener(annie.MouseEvent.MOUSE_UP, s.mouseEvent, false);
+            stage.addEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent, false);
+            s._timer = new annie.Timer(20);
+            s._timer.addEventListener(annie.Event.TIMER, function () {
+                if (s._isStop) {
+                    var frame = s._frame;
+                    if (Math.abs(frame - s._moveDis) > 0.001) {
+                        frame += s.fSpeed * (s._moveDis - frame);
+                        if (frame < 1) {
+                            frame = 1;
+                            s._isStop = true;
+                        }
+                        else if (frame > s._maxDis) {
+                            frame = s._maxDis;
+                            s._isStop = true;
+                        }
+                        s.dispatchEvent("onScrollIng", frame);
+                        s._frame = frame;
+                    }
+                    else {
+                        s._isStop = false;
+                    }
+                }
+            });
+            s._timer.start();
+        };
+        Scroller.prototype.onMouseEvent = function (e) {
+            var s = this;
+            if (s.isCanScroll) {
+                var frame = s._frame;
+                var moveDis = s._moveDis;
+                if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                    if (s.isVertical) {
+                        s._lastValue = e.localY;
+                    }
+                    else {
+                        s._lastValue = e.localX;
+                    }
+                    moveDis = 0;
+                    s._isMouseDownState = 1;
+                    s._isStop = false;
+                }
+                else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                    if (s._isMouseDownState < 1) {
+                        return;
+                    }
+                    s._isMouseDownState = 2;
+                    var currentValue = void 0;
+                    if (s.isVertical) {
+                        currentValue = e.localY;
+                    }
+                    else {
+                        currentValue = e.localX;
+                    }
+                    moveDis = s._lastValue - currentValue;
+                    if (moveDis > s.maxSpeed) {
+                        moveDis = s.maxSpeed;
+                    }
+                    else if (moveDis < -s.maxSpeed) {
+                        moveDis = -s.maxSpeed;
+                    }
+                    if (moveDis != 0) {
+                        frame += moveDis * s.speed;
+                        if (frame < 1) {
+                            frame = 1;
+                        }
+                        else if (frame > s._maxDis) {
+                            frame = s._maxDis;
+                        }
+                        s._frame = frame;
+                        //触发事件
+                        s.dispatchEvent("onScrollIng", s._frame);
+                    }
+                    s._lastValue = currentValue;
+                }
+                else {
+                    moveDis *= 6;
+                    moveDis += s._frame;
+                    if (moveDis < 1) {
+                        moveDis = 1;
+                    }
+                    else if (moveDis > s._maxDis) {
+                        moveDis = s._maxDis;
+                    }
+                    s._isMouseDownState = 0;
+                    s._isStop = true;
+                }
+                s._moveDis = moveDis;
+            }
+        };
+        Scroller.prototype.destroy = function () {
+            var s = this;
+            s._stage.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s.mouseEvent, false);
+            s._stage.removeEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent, false);
+            s._stage.removeEventListener(annie.MouseEvent.MOUSE_UP, s.mouseEvent, false);
+            s._stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s.mouseEvent, false);
+            s._timer.stop();
+            s._timer.destroy();
+            s._timer = null;
+            _super.prototype.destroy.call(this);
+        };
+        return Scroller;
+    }(annie.EventDispatcher));
+    annieUI.Scroller = Scroller;
 })(annieUI || (annieUI = {}));
 /**
  * @module annieUI
