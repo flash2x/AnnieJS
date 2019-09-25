@@ -1076,8 +1076,8 @@ declare namespace annie {
          * @readonly
          */
         parent: Sprite;
-        protected cAlpha: number;
-        protected cMatrix: Matrix;
+        cAlpha: number;
+        cMatrix: Matrix;
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -1297,7 +1297,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getTransformRect(matrix: annie.Matrix): void;
+        getTransformRect(matrix: annie.Matrix, bounds?: annie.Rectangle): void;
         /**
          * 更新函数
          * @method update
@@ -1334,9 +1334,13 @@ declare namespace annie {
          */
         height: number;
         static _canvas: any;
-        protected _texture: any;
+        _texture: any;
         static _transformRect: Rectangle;
         protected _bounds: Rectangle;
+        _splitBoundsList: Array<{
+            isDraw: boolean;
+            rect: Rectangle;
+        }>;
         /**
          * 停止这个显示对象上的所有声音
          * @method stopAllSounds
@@ -1345,6 +1349,13 @@ declare namespace annie {
          * @return {void}
          */
         stopAllSounds(): void;
+        boundsRow: number;
+        boundsCol: number;
+        /**
+         * 更新bounds矩阵
+         * @private
+         */
+        protected _updateSplitBounds(): void;
         /**
          * @method getSound
          * @param {number|string} id
@@ -1416,17 +1427,7 @@ declare namespace annie {
      * @since 1.0.0
      */
     class Bitmap extends DisplayObject {
-        protected _bitmapData: any;
         private _cacheImg;
-        private rectX;
-        private rectY;
-        /**
-         * 设置显示元素的绘制区间
-         * @property rect
-         * @param {annie.Rectangle} value
-         */
-        rect: Rectangle;
-        _rect: annie.Rectangle;
         /**
          * 构造函数
          * @method Bitmap
@@ -1458,7 +1459,7 @@ declare namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        constructor(bitmapData: any, rect?: Rectangle);
+        constructor(bitmapData: any);
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -3662,7 +3663,7 @@ declare namespace annie {
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          */
-        draw(target: any): void;
+        draw(target: DisplayObject): void;
         end(): void;
         /**
          * 初始化渲染器

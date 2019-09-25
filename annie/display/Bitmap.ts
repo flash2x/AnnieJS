@@ -11,40 +11,7 @@ namespace annie {
      * @since 1.0.0
      */
     export class Bitmap extends DisplayObject {
-        protected _bitmapData: any = null;
         private _cacheImg: any = null;
-        private rectX: number = 0;
-        private rectY: number = 0;
-
-        /**
-         * 设置显示元素的绘制区间
-         * @property rect
-         * @param {annie.Rectangle} value
-         */
-        public set rect(value: Rectangle) {
-            let s = this;
-            if (value instanceof annie.Rectangle) {
-                s._bounds.width = value.width;
-                s._bounds.height = value.height;
-                s.rectX = value.x;
-                s.rectY = value.y;
-                s._rect = new annie.Rectangle(value.x, value.y, value.width, value.height);
-            } else {
-                s.rectX = 0;
-                s.rectY = 0;
-                s._bounds.width = s._bitmapData.width;
-                s._bounds.height = s._bitmapData.height;
-                s._rect = new annie.Rectangle(0, 0, s._bounds.width, s._bounds.height);
-            }
-            s.a2x_uf = true;
-        }
-
-        public get rect(): annie.Rectangle {
-            return this._rect;
-        }
-
-        public _rect: annie.Rectangle = null;
-
         /**
          * 构造函数
          * @method Bitmap
@@ -76,12 +43,11 @@ namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        public constructor(bitmapData: any, rect: Rectangle = null) {
+        public constructor(bitmapData: any) {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s._bitmapData = bitmapData;
-            s.rect = rect;
+            s.bitmapData = bitmapData;
         }
 
         /**
@@ -93,21 +59,7 @@ namespace annie {
          * @type {any}
          * @default null
          */
-        public get bitmapData(): any {
-            return this._bitmapData;
-        }
-
-        public set bitmapData(value: any) {
-            let s = this;
-            s._bitmapData = value;
-            s._bounds.width = value.width;
-            s._bounds.height = value.height;
-            s.rectX = 0;
-            s.rectY = 0;
-            s._rect = new annie.Rectangle(0, 0, value.width, value.height);
-            s.a2x_uf = true;
-        }
-
+        public bitmapData: any = null;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -117,64 +69,51 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
+
         public updateMatrix(): void {
             let s: any = this;
+            let bitmapData: any = s.bitmapData;
+            let bw = bitmapData.width;
+            let bh = bitmapData.height;
+            if (bw == 0 || bh == 0) return;
             super.updateMatrix();
             //滤镜,这里一定是UF
             if (s.a2x_uf) {
-                let bitmapData: any = s._bitmapData;
-                let bw = s._bounds.width, bh = s._bounds.height;
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {
-                    let newW = bw + 20, newH = bh + 20;
                     if (!(s._cacheImg instanceof Object)) {
                         s._cacheImg = window.document.createElement("canvas");
-                        s._cacheImg.width = newW;
-                        s._cacheImg.height = newH;
+                        s._cacheImg.width = bw;
+                        s._cacheImg.height = bh;
                     }
                     let _canvas = s._cacheImg;
                     let ctx = _canvas.getContext("2d");
-                    ctx.clearRect(0, 0, newW, newH);
+                    ctx.clearRect(0, 0, bw, bh);
                     ctx.shadowBlur = 0;
                     ctx.shadowColor = "#0";
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
                     ////////////////////
-                    ctx.drawImage(s._bitmapData, 0, 0, bw, bh, 10, 10, bw, bh);
+                    ctx.drawImage(bitmapData, 0, 0, bw, bh, 10, 10, bw, bh);
                     /////////////////////
                     if (cfLen > 0) {
-                        let imageData = ctx.getImageData(0, 0, newW, newH);
+                        let imageData = ctx.getImageData(0, 0, bw, bh);
                         for (let i = 0; i < cfLen; i++) {
                             cf[i].drawFilter(imageData);
                         }
                         ctx.putImageData(imageData, 0, 0);
                     }
                     s._texture = s._cacheImg;
-                    s.offsetY = -10;
-                    s.offsetX = -10;
-                    s.rect.x = 0;
-                    s.rect.y = 0;
-                    s.rect.width = newW;
-                    s.rect.height = newH;
                 } else {
                     s._texture = bitmapData;
-                    s.offsetY = 0;
-                    s.offsetX = 0;
-                    s.rect.x = s.rectX;
-                    s.rect.y = s.rectY;
-                    s.rect.width = bw;
-                    s.rect.height = bh;
                 }
-                //因为这里offset有可能再次改变，需要再次更新下matrix
-                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
-                s.cMatrix.setFrom(s._matrix);
-                s.cMatrix.prepend(s.parent.cMatrix);
-            }else{
-                if(s._rect.width==0){
-                    s._bounds.width=s._rect.width=s._bitmapData.width;
-                    s._bounds.height=s._rect.height=s._bitmapData.height;
-                }
+            }
+            if (s._bounds.width != bw || s._bounds.height != bh) {
+                s._bounds.width = bw;
+                s._bounds.height = bh;
+                //_bounds改变
+                s._updateSplitBounds();
             }
             s.a2x_uf = false;
             s.a2x_um = false;
@@ -256,7 +195,7 @@ namespace annie {
             //清除相应的数据引用
             let s = this;
             super.destroy();
-            s._bitmapData = null;
+            s.bitmapData = null;
             s._cacheImg = null;
         }
     }

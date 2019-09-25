@@ -98,10 +98,10 @@ namespace annie {
         public parent: Sprite = null;
 
         //显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
-        protected cAlpha: number = 1;
+        public cAlpha: number = 1;
 
         //显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
-        protected cMatrix: Matrix = new Matrix();
+        public cMatrix: Matrix = new Matrix();
 
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
@@ -221,7 +221,6 @@ namespace annie {
                 s.a2x_um = true;
             }
         }
-
 
         private _scaleX: number = 1;
 
@@ -498,7 +497,7 @@ namespace annie {
          * @param {annie.Point} point
          * @return {annie.Point}
          */
-        public localToGlobal(point: Point, bp: Point = null): Point{
+        public localToGlobal(point: Point, bp: Point = null): Point {
             return this.cMatrix.transformPoint(point.x, point.y, bp);
         }
 
@@ -530,13 +529,13 @@ namespace annie {
             }
             p.x += s._offsetX;
             p.y += s._offsetY;
-            if (s._bounds.isPointIn(p)){
+            if (s._bounds.isPointIn(p)) {
                 return s;
             }
             return null;
         }
 
-        public getBounds(): Rectangle {
+        public getBounds(): Rectangle{
             return this._bounds;
         }
 
@@ -548,17 +547,21 @@ namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        public getTransformRect(matrix:annie.Matrix): void {
+        public getTransformRect(matrix: annie.Matrix,bounds:annie.Rectangle=null): void {
             let s = this;
-            s.getBounds();
-            let x: number = s._bounds.x, y: number = s._bounds.y, w: number = s._bounds.width,
-                h: number = s._bounds.height;
+            if(bounds==void 0) {
+                s.getBounds();
+                bounds=s._bounds;
+            }
+            let x: number = bounds.x, y: number = bounds.y, w: number = bounds.width,
+                h: number = bounds.height;
             matrix.transformPoint(x, y, DisplayObject._p1);
             matrix.transformPoint(x + w, y, DisplayObject._p2);
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         }
+
         /**
          * 更新函数
          * @method update
@@ -620,6 +623,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -632,38 +636,39 @@ namespace annie {
             let s = this;
             if (s._visible) {
                 if (s.cAlpha > 0) {
-                    //是否不在可视范围
-                    s.getTransformRect(s.cMatrix);
-                    if (Rectangle.testRectCross(DisplayObject._transformRect, renderObj.viewPort)){
-                        let cf = s.cFilters;
-                        let cfLen = cf.length;
-                        let fId = -1;
-                        if (cfLen) {
-                            for (let i = 0; i < cfLen; i++) {
-                                if (s.cFilters[i].type == "Shadow") {
-                                    fId = i;
-                                    break;
-                                }
+                    //检查所有bounds矩阵是否在可视范围里
+                    let sbl=s._splitBoundsList;
+                    for(let i=0;i<sbl.length;i++){
+                        s.getTransformRect(s.cMatrix,sbl[i].rect);
+                        sbl[i].isDraw=Rectangle.testRectCross(DisplayObject._transformRect, renderObj.viewPort);
+                    }
+                    let cf = s.cFilters;
+                    let cfLen = cf.length;
+                    let fId = -1;
+                    if (cfLen) {
+                        for (let i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                fId = i;
+                                break;
                             }
                         }
-                        if (fId >= 0) {
-                            let ctx: any = renderObj["_ctx"];
-                            ctx.shadowBlur = cf[fId].blur;
-                            ctx.shadowColor = cf[fId].color;
-                            ctx.shadowOffsetX = cf[fId].offsetX;
-                            ctx.shadowOffsetY = cf[fId].offsetY;
-                            renderObj.draw(s);
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        } else {
-                            renderObj.draw(s);
-                        }
+                    }
+                    if (fId >= 0) {
+                        let ctx: any = renderObj["_ctx"];
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        renderObj.draw(s);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    } else {
+                        renderObj.draw(s);
                     }
                 }
             }
         }
-
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
@@ -714,9 +719,10 @@ namespace annie {
         //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
         public static _canvas: any = window.document.createElement("canvas");
         // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-        protected _texture: any = null;
+        public _texture: any = null;
         public static _transformRect: Rectangle = new annie.Rectangle();
         protected _bounds: Rectangle = new Rectangle();
+        public _splitBoundsList: Array<{ isDraw: boolean, rect: Rectangle }> = [];
 
         /**
          * 停止这个显示对象上的所有声音
@@ -732,6 +738,29 @@ namespace annie {
                     sounds[i].stop();
                 }
             }
+        }
+        public boundsRow: number = 1;
+        public boundsCol: number = 1;
+        /**
+         * 更新bounds矩阵
+         * @private
+         */
+        protected _updateSplitBounds(): void {
+            let s = this;
+            let sbl: any = [];
+            if(s._bounds.width*s._bounds.height>0){
+                let rw = Math.ceil(s._bounds.width / s.boundsRow);
+                let rh = Math.ceil(s._bounds.height / s.boundsCol);
+                for (let i = 0; i < s.boundsRow; i++) {
+                    for (let j = 0; j < s.boundsCol; j++) {
+                        sbl.push({
+                            isDraw: true,
+                            rect: new Rectangle(i * rw + s._bounds.x, j * rh + s._bounds.y, rw, rh)
+                        });
+                    }
+                }
+            }
+            s._splitBoundsList=sbl;
         }
 
         /**
@@ -812,10 +841,8 @@ namespace annie {
                 }
             }
         }
-
         //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
-
         public destroy(): void {
             let s: any = this;
             //清除相应的数据引用
@@ -823,19 +850,18 @@ namespace annie {
             for (let i = 0; i < s.soundList.length; i++) {
                 s.soundList[i].destroy();
             }
+            s.soundList = null;
             s._a2x_res_obj = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
             s.stage = null;
             s._bounds = null;
-            s._dragBounds = null;
-            s._lastDragPoint = null;
+            s._splitBoundsList = null;
             s.cFilters = null;
             s._matrix = null;
             s.cMatrix = null;
             s._texture = null;
-            s._visible = false;
             super.destroy();
         }
 
@@ -902,7 +928,6 @@ namespace annie {
                 annie.Stage._dragBounds.height = 0;
             }
         }
-
         /**
          * 停止鼠标跟随
          * @method stopDrag

@@ -1694,6 +1694,9 @@ var annie;
             // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
             _this._texture = null;
             _this._bounds = new annie.Rectangle();
+            _this._splitBoundsList = [];
+            _this.boundsRow = 1;
+            _this.boundsCol = 1;
             /**
              * 当前对象包含的声音列表
              * @property soundList
@@ -2122,10 +2125,14 @@ var annie;
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        DisplayObject.prototype.getTransformRect = function (matrix) {
+        DisplayObject.prototype.getTransformRect = function (matrix, bounds) {
+            if (bounds === void 0) { bounds = null; }
             var s = this;
-            s.getBounds();
-            var x = s._bounds.x, y = s._bounds.y, w = s._bounds.width, h = s._bounds.height;
+            if (bounds == void 0) {
+                s.getBounds();
+                bounds = s._bounds;
+            }
+            var x = bounds.x, y = bounds.y, w = bounds.width, h = bounds.height;
             matrix.transformPoint(x, y, DisplayObject._p1);
             matrix.transformPoint(x + w, y, DisplayObject._p2);
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
@@ -2206,34 +2213,36 @@ var annie;
             var s = this;
             if (s._visible) {
                 if (s.cAlpha > 0) {
-                    //是否不在可视范围
-                    s.getTransformRect(s.cMatrix);
-                    if (annie.Rectangle.testRectCross(DisplayObject._transformRect, renderObj.viewPort)) {
-                        var cf = s.cFilters;
-                        var cfLen = cf.length;
-                        var fId = -1;
-                        if (cfLen) {
-                            for (var i = 0; i < cfLen; i++) {
-                                if (s.cFilters[i].type == "Shadow") {
-                                    fId = i;
-                                    break;
-                                }
+                    //检查所有bounds矩阵是否在可视范围里
+                    var sbl = s._splitBoundsList;
+                    for (var i = 0; i < sbl.length; i++) {
+                        s.getTransformRect(s.cMatrix, sbl[i].rect);
+                        sbl[i].isDraw = annie.Rectangle.testRectCross(DisplayObject._transformRect, renderObj.viewPort);
+                    }
+                    var cf = s.cFilters;
+                    var cfLen = cf.length;
+                    var fId = -1;
+                    if (cfLen) {
+                        for (var i = 0; i < cfLen; i++) {
+                            if (s.cFilters[i].type == "Shadow") {
+                                fId = i;
+                                break;
                             }
                         }
-                        if (fId >= 0) {
-                            var ctx = renderObj["_ctx"];
-                            ctx.shadowBlur = cf[fId].blur;
-                            ctx.shadowColor = cf[fId].color;
-                            ctx.shadowOffsetX = cf[fId].offsetX;
-                            ctx.shadowOffsetY = cf[fId].offsetY;
-                            renderObj.draw(s);
-                            ctx.shadowBlur = 0;
-                            ctx.shadowOffsetX = 0;
-                            ctx.shadowOffsetY = 0;
-                        }
-                        else {
-                            renderObj.draw(s);
-                        }
+                    }
+                    if (fId >= 0) {
+                        var ctx = renderObj["_ctx"];
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        renderObj.draw(s);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    }
+                    else {
+                        renderObj.draw(s);
                     }
                 }
             }
@@ -2302,6 +2311,27 @@ var annie;
                     sounds[i].stop();
                 }
             }
+        };
+        /**
+         * 更新bounds矩阵
+         * @private
+         */
+        DisplayObject.prototype._updateSplitBounds = function () {
+            var s = this;
+            var sbl = [];
+            if (s._bounds.width * s._bounds.height > 0) {
+                var rw = Math.ceil(s._bounds.width / s.boundsRow);
+                var rh = Math.ceil(s._bounds.height / s.boundsCol);
+                for (var i = 0; i < s.boundsRow; i++) {
+                    for (var j = 0; j < s.boundsCol; j++) {
+                        sbl.push({
+                            isDraw: true,
+                            rect: new annie.Rectangle(i * rw + s._bounds.x, j * rh + s._bounds.y, rw, rh)
+                        });
+                    }
+                }
+            }
+            s._splitBoundsList = sbl;
         };
         /**
          * @method getSound
@@ -2377,19 +2407,18 @@ var annie;
             for (var i = 0; i < s.soundList.length; i++) {
                 s.soundList[i].destroy();
             }
+            s.soundList = null;
             s._a2x_res_obj = null;
             s.mask = null;
             s.filters = null;
             s.parent = null;
             s.stage = null;
             s._bounds = null;
-            s._dragBounds = null;
-            s._lastDragPoint = null;
+            s._splitBoundsList = null;
             s.cFilters = null;
             s._matrix = null;
             s.cMatrix = null;
             s._texture = null;
-            s._visible = false;
             _super.prototype.destroy.call(this);
         };
         DisplayObject.prototype._onRemoveEvent = function (isReSetMc) {
@@ -2520,14 +2549,19 @@ var annie;
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        function Bitmap(bitmapData, rect) {
-            if (rect === void 0) { rect = null; }
+        function Bitmap(bitmapData) {
             var _this = _super.call(this) || this;
-            _this._bitmapData = null;
             _this._cacheImg = null;
-            _this.rectX = 0;
-            _this.rectY = 0;
-            _this._rect = null;
+            /**
+             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+             * HTML的一个Image对象或者是canvas对象或者是video对象
+             * @property bitmapData
+             * @public
+             * @since 1.0.0
+             * @type {any}
+             * @default null
+             */
+            _this.bitmapData = null;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -2539,126 +2573,55 @@ var annie;
             _this.hitTestWidthPixel = false;
             var s = _this;
             s._instanceType = "annie.Bitmap";
-            s._bitmapData = bitmapData;
-            s.rect = rect;
+            s.bitmapData = bitmapData;
             return _this;
         }
-        Object.defineProperty(Bitmap.prototype, "rect", {
-            get: function () {
-                return this._rect;
-            },
-            /**
-             * 设置显示元素的绘制区间
-             * @property rect
-             * @param {annie.Rectangle} value
-             */
-            set: function (value) {
-                var s = this;
-                if (value instanceof annie.Rectangle) {
-                    s._bounds.width = value.width;
-                    s._bounds.height = value.height;
-                    s.rectX = value.x;
-                    s.rectY = value.y;
-                    s._rect = new annie.Rectangle(value.x, value.y, value.width, value.height);
-                }
-                else {
-                    s.rectX = 0;
-                    s.rectY = 0;
-                    s._bounds.width = s._bitmapData.width;
-                    s._bounds.height = s._bitmapData.height;
-                    s._rect = new annie.Rectangle(0, 0, s._bounds.width, s._bounds.height);
-                }
-                s.a2x_uf = true;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Bitmap.prototype, "bitmapData", {
-            /**
-             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * HTML的一个Image对象或者是canvas对象或者是video对象
-             * @property bitmapData
-             * @public
-             * @since 1.0.0
-             * @type {any}
-             * @default null
-             */
-            get: function () {
-                return this._bitmapData;
-            },
-            set: function (value) {
-                var s = this;
-                s._bitmapData = value;
-                s._bounds.width = value.width;
-                s._bounds.height = value.height;
-                s.rectX = 0;
-                s.rectY = 0;
-                s._rect = new annie.Rectangle(0, 0, value.width, value.height);
-                s.a2x_uf = true;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Bitmap.prototype.updateMatrix = function () {
             var s = this;
+            var bitmapData = s.bitmapData;
+            var bw = bitmapData.width;
+            var bh = bitmapData.height;
+            if (bw == 0 || bh == 0)
+                return;
             _super.prototype.updateMatrix.call(this);
             //滤镜,这里一定是UF
             if (s.a2x_uf) {
-                var bitmapData = s._bitmapData;
-                var bw = s._bounds.width, bh = s._bounds.height;
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
-                    var newW = bw + 20, newH = bh + 20;
                     if (!(s._cacheImg instanceof Object)) {
                         s._cacheImg = window.document.createElement("canvas");
-                        s._cacheImg.width = newW;
-                        s._cacheImg.height = newH;
+                        s._cacheImg.width = bw;
+                        s._cacheImg.height = bh;
                     }
                     var _canvas = s._cacheImg;
                     var ctx = _canvas.getContext("2d");
-                    ctx.clearRect(0, 0, newW, newH);
+                    ctx.clearRect(0, 0, bw, bh);
                     ctx.shadowBlur = 0;
                     ctx.shadowColor = "#0";
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
                     ////////////////////
-                    ctx.drawImage(s._bitmapData, 0, 0, bw, bh, 10, 10, bw, bh);
+                    ctx.drawImage(bitmapData, 0, 0, bw, bh, 10, 10, bw, bh);
                     /////////////////////
                     if (cfLen > 0) {
-                        var imageData = ctx.getImageData(0, 0, newW, newH);
+                        var imageData = ctx.getImageData(0, 0, bw, bh);
                         for (var i = 0; i < cfLen; i++) {
                             cf[i].drawFilter(imageData);
                         }
                         ctx.putImageData(imageData, 0, 0);
                     }
                     s._texture = s._cacheImg;
-                    s.offsetY = -10;
-                    s.offsetX = -10;
-                    s.rect.x = 0;
-                    s.rect.y = 0;
-                    s.rect.width = newW;
-                    s.rect.height = newH;
                 }
                 else {
                     s._texture = bitmapData;
-                    s.offsetY = 0;
-                    s.offsetX = 0;
-                    s.rect.x = s.rectX;
-                    s.rect.y = s.rectY;
-                    s.rect.width = bw;
-                    s.rect.height = bh;
                 }
-                //因为这里offset有可能再次改变，需要再次更新下matrix
-                s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
-                s.cMatrix.setFrom(s._matrix);
-                s.cMatrix.prepend(s.parent.cMatrix);
             }
-            else {
-                if (s._rect.width == 0) {
-                    s._bounds.width = s._rect.width = s._bitmapData.width;
-                    s._bounds.height = s._rect.height = s._bitmapData.height;
-                }
+            if (s._bounds.width != bw || s._bounds.height != bh) {
+                s._bounds.width = bw;
+                s._bounds.height = bh;
+                //_bounds改变
+                s._updateSplitBounds();
             }
             s.a2x_uf = false;
             s.a2x_um = false;
@@ -2742,7 +2705,7 @@ var annie;
             //清除相应的数据引用
             var s = this;
             _super.prototype.destroy.call(this);
-            s._bitmapData = null;
+            s.bitmapData = null;
             s._cacheImg = null;
         };
         return Bitmap;
@@ -3140,6 +3103,7 @@ var annie;
             s._bounds.y = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._updateSplitBounds();
             s.a2x_ut = true;
         };
         /**
@@ -3444,6 +3408,7 @@ var annie;
                         s._bounds.y = 10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
+                        s._updateSplitBounds();
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
@@ -3933,15 +3898,24 @@ var annie;
             var len = s.children.length;
             var hitDisplayObject;
             var child;
+            var maskObjList = {};
             //这里特别注意是从上往下遍历
             for (var i = len - 1; i >= 0; i--) {
                 child = s.children[i];
                 if (child._isUseToMask > 0)
                     continue;
-                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                    //看看点是否在遮罩内
-                    if (!child.mask.hitTestPoint(hitPoint, isGlobalPoint)) {
-                        //如果都不在遮罩里面,那还检测什么直接检测下一个
+                if (child.mask != void 0) {
+                    if (maskObjList[child.mask._instanceId] != void 0) {
+                        //看看点是否在遮罩内
+                        if (child.mask.hitTestPoint(hitPoint, isGlobalPoint)) {
+                            //如果都不在遮罩里面,那还检测什么直接检测下一个
+                            maskObjList[child.mask._instanceId] = true;
+                        }
+                        else {
+                            maskObjList[child.mask._instanceId] = false;
+                        }
+                    }
+                    if (maskObjList[child.mask._instanceId] == false) {
                         continue;
                     }
                 }
@@ -5828,6 +5802,7 @@ var annie;
                 s._bounds.y = 10;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
+                s._updateSplitBounds();
             }
             _super.prototype.updateMatrix.call(this);
             if (s.a2x_ut || s.a2x_uf) {
@@ -8059,46 +8034,49 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this, texture = target._texture, ctx = s._ctx, tm = target.cMatrix;
-            if (texture instanceof Object && texture.width > 0) {
-                if (ctx.globalAlpha != target.cAlpha) {
-                    ctx.globalAlpha = target.cAlpha;
-                }
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (target instanceof annie.Bitmap) {
-                    var rect = target.rect;
-                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height);
-                }
-                else {
-                    ctx.drawImage(texture, 0, 0);
-                }
-                /*//getBounds
-                let rect=target.getBounds();
-                //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-                s._ctx.beginPath();
-                s._ctx.lineWidth=4;
-                s._ctx.strokeStyle="#ff0000";
-                s._ctx.moveTo(rect.x,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
-                s._ctx.lineTo(rect.x,rect.y+rect.height);
-                s._ctx.closePath();
-                s._ctx.stroke();
-                //getTransformRect
-                s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-                target.getTransformRect(target.cMatrix);
-                rect=DisplayObject._transformRect;
-                s._ctx.beginPath();
-                s._ctx.lineWidth=2;
-                s._ctx.strokeStyle="#00ff00";
-                s._ctx.moveTo(rect.x,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
-                s._ctx.lineTo(rect.x,rect.y+rect.height);
-                s._ctx.closePath();
-                s._ctx.stroke();
-                */
-                //
+            if (ctx.globalAlpha != target.cAlpha) {
+                ctx.globalAlpha = target.cAlpha;
             }
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            // if (target instanceof annie.Bitmap) {
+            //     ctx.drawImage(texture, 0, 0);
+            // } else {
+            //     ctx.drawImage(texture, 0, 0);
+            var sbl = target._splitBoundsList;
+            var rect = null;
+            for (var i = 0; i < sbl.length; i++) {
+                if (sbl[i].isDraw) {
+                    rect = sbl[i].rect;
+                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+                }
+            }
+            /*//getBounds
+            let rect=target.getBounds();
+            //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+            s._ctx.beginPath();
+            s._ctx.lineWidth=4;
+            s._ctx.strokeStyle="#ff0000";
+            s._ctx.moveTo(rect.x,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+            s._ctx.lineTo(rect.x,rect.y+rect.height);
+            s._ctx.closePath();
+            s._ctx.stroke();
+            //getTransformRect
+            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+            target.getTransformRect(target.cMatrix);
+            rect=DisplayObject._transformRect;
+            s._ctx.beginPath();
+            s._ctx.lineWidth=2;
+            s._ctx.strokeStyle="#00ff00";
+            s._ctx.moveTo(rect.x,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+            s._ctx.lineTo(rect.x,rect.y+rect.height);
+            s._ctx.closePath();
+            s._ctx.stroke();
+            */
+            //
         };
         CanvasRender.prototype.end = function () {
         };
@@ -9377,6 +9355,7 @@ var annie;
                     case 2:
                         //bitmap
                         obj = b(sceneName, children[i]);
+                        //分析是不是分割图
                         break;
                     case 3:
                         //shape

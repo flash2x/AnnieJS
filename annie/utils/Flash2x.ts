@@ -883,6 +883,8 @@ namespace annie {
                     case 2:
                         //bitmap
                         obj = b(sceneName, children[i]);
+                        //分析是不是分割图
+
                         break;
                     case 3:
                         //shape

@@ -337,6 +337,7 @@ namespace annie {
             s._bounds.y = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._updateSplitBounds();
             s.a2x_ut = true;
         }
 
@@ -703,6 +704,7 @@ namespace annie {
                         s._bounds.y = 10;
                         s._bounds.width = w - 20;
                         s._bounds.height = h - 20;
+                        s._updateSplitBounds();
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;

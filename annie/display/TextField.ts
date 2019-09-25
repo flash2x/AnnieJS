@@ -487,6 +487,7 @@ namespace annie {
                 s._bounds.y = 10;
                 s._bounds.height = maxH;
                 s._bounds.width = maxW;
+                s._updateSplitBounds();
             }
             super.updateMatrix();
             if (s.a2x_ut|| s.a2x_uf) {

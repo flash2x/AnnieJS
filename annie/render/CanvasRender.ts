@@ -24,7 +24,7 @@ namespace annie {
          * @property viewPort
          *
          */
-        public viewPort:annie.Rectangle=new annie.Rectangle();
+        public viewPort: annie.Rectangle = new annie.Rectangle();
         /**
          * @property _ctx
          * @protected
@@ -115,6 +115,7 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
+
         /**
          * 调用渲染
          * @public
@@ -122,47 +123,51 @@ namespace annie {
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          */
-        public draw(target: any): void {
+        public draw(target: DisplayObject): void {
             let s = this, texture = target._texture, ctx = s._ctx, tm = target.cMatrix;
-            if(texture instanceof Object&&texture.width>0) {
-                if (ctx.globalAlpha != target.cAlpha) {
-                    ctx.globalAlpha = target.cAlpha
-                }
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (target instanceof annie.Bitmap) {
-                    let rect: any = target.rect;
-                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height);
-                } else {
-                    ctx.drawImage(texture, 0, 0);
-                }
-                /*//getBounds
-                let rect=target.getBounds();
-                //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-                s._ctx.beginPath();
-                s._ctx.lineWidth=4;
-                s._ctx.strokeStyle="#ff0000";
-                s._ctx.moveTo(rect.x,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
-                s._ctx.lineTo(rect.x,rect.y+rect.height);
-                s._ctx.closePath();
-                s._ctx.stroke();
-                //getTransformRect
-                s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-                target.getTransformRect(target.cMatrix);
-                rect=DisplayObject._transformRect;
-                s._ctx.beginPath();
-                s._ctx.lineWidth=2;
-                s._ctx.strokeStyle="#00ff00";
-                s._ctx.moveTo(rect.x,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y);
-                s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
-                s._ctx.lineTo(rect.x,rect.y+rect.height);
-                s._ctx.closePath();
-                s._ctx.stroke();
-                */
-                //
+            if (ctx.globalAlpha != target.cAlpha) {
+                ctx.globalAlpha = target.cAlpha
             }
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            // if (target instanceof annie.Bitmap) {
+            //     ctx.drawImage(texture, 0, 0);
+            // } else {
+            //     ctx.drawImage(texture, 0, 0);
+            let sbl = target._splitBoundsList;
+            let rect = null;
+            for (let i = 0; i < sbl.length; i++) {
+                if (sbl[i].isDraw) {
+                    rect = sbl[i].rect;
+                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height,rect.x, rect.y, rect.width, rect.height);
+                }
+            }
+            /*//getBounds
+            let rect=target.getBounds();
+            //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+            s._ctx.beginPath();
+            s._ctx.lineWidth=4;
+            s._ctx.strokeStyle="#ff0000";
+            s._ctx.moveTo(rect.x,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+            s._ctx.lineTo(rect.x,rect.y+rect.height);
+            s._ctx.closePath();
+            s._ctx.stroke();
+            //getTransformRect
+            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+            target.getTransformRect(target.cMatrix);
+            rect=DisplayObject._transformRect;
+            s._ctx.beginPath();
+            s._ctx.lineWidth=2;
+            s._ctx.strokeStyle="#00ff00";
+            s._ctx.moveTo(rect.x,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+            s._ctx.lineTo(rect.x,rect.y+rect.height);
+            s._ctx.closePath();
+            s._ctx.stroke();
+            */
+            //
         }
 
         public end() {
@@ -196,10 +201,11 @@ namespace annie {
             c.height = s._stage.divHeight * devicePixelRatio;
             c.style.width = s._stage.divWidth + "px";
             c.style.height = s._stage.divHeight + "px";
-            s.viewPort.width=c.width;
-            s.viewPort.height=c.height;
+            s.viewPort.width = c.width;
+            s.viewPort.height = c.height;
 
         }
+
         destroy(): void {
             let s = this;
             s.rootContainer = null;
