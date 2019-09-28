@@ -474,7 +474,7 @@ declare namespace annieUI {
         pageList: Array<any>;
         /**
          * 页面对象的类列表
-         * @property pageList
+         * @property pageClassList
          * @type {Array}
          * @public
          */

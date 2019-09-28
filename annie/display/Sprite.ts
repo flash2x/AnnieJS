@@ -298,11 +298,16 @@ namespace annie {
             if (!s.visible || !s.mouseEnable) return null;
             //如果有设置鼠标活动区域，则优先使用活动区域
             if(s._hitArea instanceof annie.Rectangle){
-                s._bounds.x=s._hitArea.x;
-                s._bounds.y=s._hitArea.y;
-                s._bounds.width=s._hitArea.width;
-                s._bounds.height=s._hitArea.height;
-                return super.hitTestPoint(hitPoint,isGlobalPoint);
+                let p: Point=hitPoint;
+                if (isGlobalPoint) {
+                    p = s.globalToLocal(hitPoint, DisplayObject._bp);
+                }
+                p.x += s._offsetX;
+                p.y += s._offsetY;
+                if (s._hitArea.isPointIn(p)) {
+                    return s;
+                }
+                return null;
             }
             let len = s.children.length;
             let hitDisplayObject: DisplayObject;
@@ -334,7 +339,8 @@ namespace annie {
             return null;
         }
         public getBounds(): Rectangle {
-            let s = this, rect: Rectangle = s._bounds;
+            let s = this;
+            let rect: Rectangle = s._bounds;
             rect.x = 0;
             rect.y = 0;
             rect.width = 0;
@@ -343,7 +349,8 @@ namespace annie {
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     if (children[i].visible && children[i]._isUseToMask == 0)
-                        Rectangle.createFromRects(rect, children[i].getTransformRect());
+                        children[i].getTransformRect();
+                        Rectangle.createFromRects(rect,DisplayObject._transformRect);
                 }
             }
             return rect;

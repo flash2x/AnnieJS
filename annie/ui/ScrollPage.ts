@@ -192,7 +192,7 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
             s._timer=new annie.Timer(20);
             s._timer.addEventListener(annie.Event.TIMER, function () {
                 let view: any = s.view;

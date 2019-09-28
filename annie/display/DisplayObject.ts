@@ -508,7 +508,7 @@ namespace annie {
         public static _p3: Point = new Point();
         public static _p4: Point = new Point();
         protected _isUseToMask: number = 0;
-
+        //TODO 遮罩以外的渲染优化
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -520,7 +520,7 @@ namespace annie {
          */
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            if (!s.visible || !s.mouseEnable) return null;
+            if (!s.visible || !s.mouseEnable ||(s._splitBoundsList.length == 1 && !s._splitBoundsList[0].isDraw)|| (s._splitBoundsList.length == 0)) return null;
             let p: Point;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._bp);
@@ -535,7 +535,7 @@ namespace annie {
             return null;
         }
 
-        public getBounds(): Rectangle{
+        public getBounds(): Rectangle {
             return this._bounds;
         }
 
@@ -547,11 +547,13 @@ namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        public getTransformRect(matrix: annie.Matrix,bounds:annie.Rectangle=null): void {
+        public getTransformRect(matrix: annie.Matrix = null, bounds: annie.Rectangle = null): void {
             let s = this;
-            if(bounds==void 0) {
-                s.getBounds();
-                bounds=s._bounds;
+            if (matrix == void 0) {
+                matrix = s.matrix;
+            }
+            if (bounds == void 0) {
+                bounds = s.getBounds();
             }
             let x: number = bounds.x, y: number = bounds.y, w: number = bounds.width,
                 h: number = bounds.height;
@@ -623,6 +625,23 @@ namespace annie {
                 }
             }
         }
+        protected _checkDrawBounds() {
+            let s = this;
+            //检查所有bounds矩阵是否在可视范围里
+            let sbl = s._splitBoundsList;
+            let dtr=DisplayObject._transformRect;
+            if (s.stage){
+                for (let i = 0; i < sbl.length; i++) {
+                    s.getTransformRect(s.cMatrix, sbl[i].rect);
+                    sbl[i].isDraw = Rectangle.testRectCross(dtr, s.stage.renderObj.viewPort);
+                }
+            }else if(annie._dRender){
+                for (let i = 0; i < sbl.length; i++) {
+                    s.getTransformRect(s.cMatrix, sbl[i].rect);
+                    sbl[i].isDraw = Rectangle.testRectCross(dtr, annie._dRender.viewPort);
+                }
+            }
+        }
 
         /**
          * 调用此方法将显示对象渲染到屏幕
@@ -636,12 +655,6 @@ namespace annie {
             let s = this;
             if (s._visible) {
                 if (s.cAlpha > 0) {
-                    //检查所有bounds矩阵是否在可视范围里
-                    let sbl=s._splitBoundsList;
-                    for(let i=0;i<sbl.length;i++){
-                        s.getTransformRect(s.cMatrix,sbl[i].rect);
-                        sbl[i].isDraw=Rectangle.testRectCross(DisplayObject._transformRect, renderObj.viewPort);
-                    }
                     let cf = s.cFilters;
                     let cfLen = cf.length;
                     let fId = -1;
@@ -669,22 +682,23 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
-         * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
+         * 如果你要同时获取宽高，建议使用 getWH()方法获取宽和高
          * @property  width
          * @public
          * @since 1.0.3
          * @return {number}
          */
         public get width(): number {
-            this.getTransformRect(this.matrix);
+            this.getTransformRect();
             return DisplayObject._transformRect.width;
         }
 
         public set width(value: number) {
             let s = this;
-            s.getTransformRect(s.matrix);
+            s.getTransformRect();
             let w = DisplayObject._transformRect.width;
             if (value > 0 && w > 0) {
                 let sx = value / w;
@@ -692,6 +706,16 @@ namespace annie {
             }
         }
 
+        /**
+         * 获取宽高
+         * @method getWH
+         * @since 1.1.0
+         * @return {{w: number; h: number}}
+         */
+        public getWH():{w:number,h:number}{
+            this.getTransformRect();
+            return {w:DisplayObject._transformRect.width,h:DisplayObject._transformRect.height};
+        }
         /**
          * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
@@ -701,13 +725,13 @@ namespace annie {
          * @return {number}
          */
         public get height(): number {
-            this.getTransformRect(this.matrix);
+            this.getTransformRect();
             return DisplayObject._transformRect.height;
         }
 
         public set height(value: number) {
             let s = this;
-            s.getTransformRect(s.matrix);
+            s.getTransformRect();
             let h = DisplayObject._transformRect.height;
             if (value > 0 && h > 0) {
                 let sy = value / h;
@@ -739,8 +763,10 @@ namespace annie {
                 }
             }
         }
+
         public boundsRow: number = 1;
         public boundsCol: number = 1;
+
         /**
          * 更新bounds矩阵
          * @private
@@ -748,19 +774,20 @@ namespace annie {
         protected _updateSplitBounds(): void {
             let s = this;
             let sbl: any = [];
-            if(s._bounds.width*s._bounds.height>0){
+            let bounds = s.getBounds();
+            if (bounds.width * bounds.height > 0) {
                 let rw = Math.ceil(s._bounds.width / s.boundsRow);
                 let rh = Math.ceil(s._bounds.height / s.boundsCol);
                 for (let i = 0; i < s.boundsRow; i++) {
                     for (let j = 0; j < s.boundsCol; j++) {
                         sbl.push({
                             isDraw: true,
-                            rect: new Rectangle(i * rw + s._bounds.x, j * rh + s._bounds.y, rw, rh)
+                            rect: new Rectangle(i * rw, j * rh, rw, rh)
                         });
                     }
                 }
             }
-            s._splitBoundsList=sbl;
+            s._splitBoundsList = sbl;
         }
 
         /**
@@ -841,8 +868,10 @@ namespace annie {
                 }
             }
         }
+
         //每个Flash文件生成的对象都有一个自带的初始化信息
         private _a2x_res_obj: any = {};
+
         public destroy(): void {
             let s: any = this;
             //清除相应的数据引用
@@ -924,10 +953,11 @@ namespace annie {
             } else {
                 annie.Stage._dragBounds.x = 0;
                 annie.Stage._dragBounds.y = 0;
-                annie.Stage._dragBounds.width = 0;
-                annie.Stage._dragBounds.height = 0;
+                annie.Stage._dragBounds.width = Number.MIN_VALUE;
+                annie.Stage._dragBounds.height = Number.MIN_VALUE;
             }
         }
+
         /**
          * 停止鼠标跟随
          * @method stopDrag

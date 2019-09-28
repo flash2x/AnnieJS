@@ -83,7 +83,7 @@ namespace annieUI {
             stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.mouseEvent, false);
             stage.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.mouseEvent, false);
             stage.addEventListener(annie.MouseEvent.MOUSE_UP, s.mouseEvent, false);
-            stage.addEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent, false);
+            stage.addEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent);
             s._timer=new annie.Timer(20);
             s._timer.addEventListener(annie.Event.TIMER, function (){
                 if(s._isStop){
@@ -167,9 +167,9 @@ namespace annieUI {
         public destroy(): void {
             let s = this;
             s._stage.removeEventListener(annie.MouseEvent.MOUSE_MOVE,s.mouseEvent,false);
-            s._stage.removeEventListener(annie.MouseEvent.MOUSE_OUT,s.mouseEvent,false);
             s._stage.removeEventListener(annie.MouseEvent.MOUSE_UP,s.mouseEvent,false);
             s._stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN,s.mouseEvent,false);
+            s._stage.removeEventListener(annie.MouseEvent.MOUSE_OUT,s.mouseEvent);
             s._timer.stop();
             s._timer.destroy();
             s._timer=null;

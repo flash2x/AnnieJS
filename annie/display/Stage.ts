@@ -569,6 +569,37 @@ namespace annie {
                         cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
                         cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
                         sp = s.globalToLocal(cp, DisplayObject._bp);
+                        if (sd && sd.stage && sd.parent) {
+                            let x1 = sd.x, y1 = sd.y;
+                            lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
+                            if (!Stage._isDragCenter) {
+                                if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
+                                    x1 += lp.x - Stage._lastDragPoint.x;
+                                    y1 += lp.y - Stage._lastDragPoint.y;
+                                }
+                                Stage._lastDragPoint.x = lp.x;
+                                Stage._lastDragPoint.y = lp.y;
+                            } else {
+                                x1 = lp.x;
+                                y1 = lp.y;
+                            }
+                            lp.x = x1;
+                            lp.y = y1;
+                            if (Stage._dragBounds.width != Number.MIN_VALUE) {
+                                if (x1 < Stage._dragBounds.x) {
+                                    x1 = Stage._dragBounds.x;
+                                } else if (x1 > Stage._dragBounds.x + Stage._dragBounds.width) {
+                                    x1 = Stage._dragBounds.x + Stage._dragBounds.width;
+                                }
+                                if (y1 < Stage._dragBounds.y) {
+                                    y1 = Stage._dragBounds.y;
+                                } else if (y1 > Stage._dragBounds.y + Stage._dragBounds.height) {
+                                    y1 = Stage._dragBounds.y + Stage._dragBounds.height;
+                                }
+                            }
+                            sd.x = x1;
+                            sd.y = y1;
+                        }
                         if (s._ml[eLen] instanceof annie.MouseEvent) {
                             event = s._ml[eLen];
                             event.type = item;
@@ -714,37 +745,6 @@ namespace annie {
                                     }
                                 }
                                 s._mp[s._mp.length] = cp;
-                            }
-                            if (sd && sd.stage && sd.parent) {
-                                let x1 = sd.x, y1 = sd.y;
-                                lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
-                                if (!Stage._isDragCenter) {
-                                    if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
-                                        x1 += lp.x - Stage._lastDragPoint.x;
-                                        y1 += lp.y - Stage._lastDragPoint.y;
-                                    }
-                                    Stage._lastDragPoint.x = lp.x;
-                                    Stage._lastDragPoint.y = lp.y;
-                                } else {
-                                    x1 = lp.x;
-                                    y1 = lp.y;
-                                }
-                                lp.x = x1;
-                                lp.y = y1;
-                                if (Stage._dragBounds.width != 0) {
-                                    if (x1 < Stage._dragBounds.x) {
-                                        x1 = Stage._dragBounds.x;
-                                    } else if (x1 > Stage._dragBounds.x + Stage._dragBounds.width) {
-                                        x1 = Stage._dragBounds.x + Stage._dragBounds.width;
-                                    }
-                                    if (y1 < Stage._dragBounds.y) {
-                                        y1 = Stage._dragBounds.y;
-                                    } else if (y1 > Stage._dragBounds.y + Stage._dragBounds.height) {
-                                        y1 = Stage._dragBounds.y + Stage._dragBounds.height;
-                                    }
-                                }
-                                sd.x = x1;
-                                sd.y = y1;
                             }
                             if (item == "onMouseUp") {
                                 delete s._mouseDownPoint[identifier];

@@ -195,9 +195,15 @@ namespace annie{
             _dRender = new CanvasRender(null);
         }
         _dRender.rootContainer = DisplayObject["_canvas"];
-        if(!rect){
-            rect = obj.getTransformRect();
+        if(!obj.stage){
+            obj.updateMatrix();
         }
+        if(!rect){
+            obj.getTransformRect();
+        }else{
+            obj.getTransformRect(obj.matrix,rect);
+        }
+        rect =DisplayObject._transformRect;
         let sp=obj.parent;
         obj.parent=null;
         obj._cp=true;
@@ -209,10 +215,12 @@ namespace annie{
         let h: number =rect.height;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
+        _dRender.viewPort.height = h;
+        _dRender.viewPort.width = w;
         _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
         _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if (bgColor == "") {
+        if (bgColor == ""){
             _dRender._ctx.clearRect(0, 0, w, h);
         } else {
             _dRender._ctx.fillStyle = bgColor;

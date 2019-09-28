@@ -49,7 +49,6 @@ namespace annie {
             this._instanceType = "annie.CanvasRender";
             this._stage = stage;
         }
-
         /**
          * 开始渲染时执行
          * @method begin
@@ -115,7 +114,6 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
-
         /**
          * 调用渲染
          * @public
@@ -124,7 +122,9 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: DisplayObject): void {
-            let s = this, texture = target._texture, ctx = s._ctx, tm = target.cMatrix;
+            let s = this;
+            let texture = target._texture;
+            let ctx = s._ctx, tm = target.cMatrix;
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha
             }
@@ -136,7 +136,7 @@ namespace annie {
             let sbl = target._splitBoundsList;
             let rect = null;
             for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw) {
+                if (sbl[i].isDraw===true) {
                     rect = sbl[i].rect;
                     ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height,rect.x, rect.y, rect.width, rect.height);
                 }
@@ -169,7 +169,6 @@ namespace annie {
             */
             //
         }
-
         public end() {
         };
 

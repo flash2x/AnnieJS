@@ -206,7 +206,7 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseEvent, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseEvent, false);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, mouseEvent);
             s._timer = new annie.Timer(20);
             s._timer.addEventListener(annie.Event.TIMER, function () {
                 var view = s.view;
@@ -546,7 +546,7 @@ var annieUI;
             stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.mouseEvent, false);
             stage.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.mouseEvent, false);
             stage.addEventListener(annie.MouseEvent.MOUSE_UP, s.mouseEvent, false);
-            stage.addEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent, false);
+            stage.addEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent);
             s._timer = new annie.Timer(20);
             s._timer.addEventListener(annie.Event.TIMER, function () {
                 if (s._isStop) {
@@ -638,9 +638,9 @@ var annieUI;
         Scroller.prototype.destroy = function () {
             var s = this;
             s._stage.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s.mouseEvent, false);
-            s._stage.removeEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent, false);
             s._stage.removeEventListener(annie.MouseEvent.MOUSE_UP, s.mouseEvent, false);
             s._stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s.mouseEvent, false);
+            s._stage.removeEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent);
             s._timer.stop();
             s._timer.destroy();
             s._timer = null;
@@ -905,7 +905,7 @@ var annieUI;
             _this.pageList = [];
             /**
              * 页面对象的类列表
-             * @property pageList
+             * @property pageClassList
              * @type {Array}
              * @public
              */
@@ -965,7 +965,7 @@ var annieUI;
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me, false);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me, false);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
             return _this;
         }
         /**

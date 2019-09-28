@@ -1297,7 +1297,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getTransformRect(matrix: annie.Matrix, bounds?: annie.Rectangle): void;
+        getTransformRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
         /**
          * 更新函数
          * @method update
@@ -1306,6 +1306,7 @@ declare namespace annie {
          * @return {void}
          */
         protected updateMatrix(): void;
+        protected _checkDrawBounds(): void;
         /**
          * 调用此方法将显示对象渲染到屏幕
          * @method render
@@ -1317,13 +1318,23 @@ declare namespace annie {
         render(renderObj: IRender | any): void;
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
-         * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
+         * 如果你要同时获取宽高，建议使用 getWH()方法获取宽和高
          * @property  width
          * @public
          * @since 1.0.3
          * @return {number}
          */
         width: number;
+        /**
+         * 获取宽高
+         * @method getWH
+         * @since 1.1.0
+         * @return {{w: number; h: number}}
+         */
+        getWH(): {
+            w: number;
+            h: number;
+        };
         /**
          * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用getWH()方法获取宽和高
@@ -1470,6 +1481,7 @@ declare namespace annie {
          * @default null
          */
         bitmapData: any;
+        protected _bitmapData: any;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -1482,12 +1494,13 @@ declare namespace annie {
         updateMatrix(): void;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
+         * 从Bitmap中剥离出单独的小图以供特殊用途
          * @method convertToImage
          * @static
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
+         * @param {annie.Rectangle} rect 截图范围
          * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
          * @return {Canvas|BitmapData}
          * @example
@@ -1500,7 +1513,7 @@ declare namespace annie {
          *      }
          *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
-        static convertToImage(bitmap: annie.Bitmap, isNeedImage?: boolean): any;
+        static convertToImage(bitmap: annie.Bitmap, rect: Rectangle, isNeedImage?: boolean): any;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean): DisplayObject;
         destroy(): void;
     }
@@ -3857,7 +3870,6 @@ declare namespace annie {
      */
     function getResource(sceneName: string, resName: string): any;
     function d(target: any, info: any): void;
-    function sb(sceneName: string, resName: string): annie.Bitmap;
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧

@@ -333,8 +333,6 @@ namespace annie {
             }
             s._offsetX = 0;
             s._offsetY = 0;
-            s._bounds.x = 0;
-            s._bounds.y = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
             s._updateSplitBounds();
@@ -586,6 +584,8 @@ namespace annie {
             let s: any = this;
             let _canvas: any = s._texture;
             let ctx = _canvas.getContext("2d");
+            let boundsW=s._bounds.width;
+            let boundsH=s._bounds.height;
             if (s.a2x_ut) {
                 //更新缓存
                 let cLen: number = s._command.length;
@@ -698,19 +698,14 @@ namespace annie {
                         leftY -= 20 + lineWidth >> 1;
                         buttonRightX += 20 + lineWidth >> 1;
                         buttonRightY += 20 + lineWidth >> 1;
-                        let w = buttonRightX - leftX;
-                        let h = buttonRightY - leftY;
-                        s._bounds.x = 10;
-                        s._bounds.y = 10;
-                        s._bounds.width = w - 20;
-                        s._bounds.height = h - 20;
-                        s._updateSplitBounds();
+                        boundsW = buttonRightX - leftX;
+                        boundsH= buttonRightY - leftY;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
-                        _canvas.width = w;
-                        _canvas.height = h;
-                        ctx.clearRect(0, 0, w, h);
+                        _canvas.width = boundsW;
+                        _canvas.height = boundsH;
+                        ctx.clearRect(0, 0, boundsW, boundsH);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////
                         s._draw(ctx);
@@ -729,6 +724,14 @@ namespace annie {
                     }
                     ctx.putImageData(imageData, 0, 0);
                 }
+            }
+            if(boundsW!=s._bounds.width||boundsH!=s._bounds.height){
+                s._bounds.width=boundsW;
+                s._bounds.height=boundsH;
+                s._updateSplitBounds();
+                s._checkDrawBounds();
+            }else if(s.a2x_um){
+                s._checkDrawBounds();
             }
             s.a2x_ut = false;
             s.a2x_um = false;
@@ -843,7 +846,6 @@ namespace annie {
                 }
             }
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

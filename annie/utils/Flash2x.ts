@@ -464,12 +464,18 @@ namespace annie {
      */
     export function getResource(sceneName: string, resName: string): any {
         let s = res;
-        if (s[sceneName][resName]) {
+        let obj=s[sceneName][resName];
+        if (obj!=void 0) {
+            //分析是不是分割图
+            let re=/([1-9]\d*)x([1-9]\d*)$/;
+            let resultMatchList=re.exec(resName);
+            if(resultMatchList!=void 0&&resultMatchList.length==3){
+                obj.boundsRowAndCol=[parseInt(resultMatchList[1]),parseInt(resultMatchList[1])];
+            }
             return s[sceneName][resName];
         }
         return null;
     }
-
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
@@ -593,26 +599,6 @@ namespace annie {
         }
         return textObj;
     }
-
-    //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-    export function sb(sceneName: string, resName: string): annie.Bitmap {
-        let sbName: string = "_f2x_s" + resName;
-        if (res[sceneName][sbName] instanceof Object) {
-            return res[sceneName][sbName];
-        } else {
-            let bitmapData: any = null;
-            let bitmap = b(sceneName, resName);
-            if (bitmap instanceof Object) {
-                bitmapData = annie.Bitmap.convertToImage(bitmap, false);
-                res[sceneName][sbName] = bitmapData;
-                return bitmapData;
-            } else {
-                console.log("error:矢量位图填充时,未找到位图资源!");
-                return null;
-            }
-        }
-    }
-
     //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
@@ -626,7 +612,7 @@ namespace annie {
                 } else if (shapeDate[i][1] == 2) {
                     shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
                 } else {
-                    shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
+                    shape.beginBitmapFill(getResource(sceneName, shapeDate[i][2][0]), shapeDate[i][2][1]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endFill();
@@ -638,7 +624,7 @@ namespace annie {
                 } else if (shapeDate[i][1] == 2) {
                     shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 } else {
-                    shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                    shape.beginBitmapStroke(getResource(sceneName, shapeDate[i][2][0]), shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endStroke();
@@ -845,7 +831,7 @@ namespace annie {
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
-                if (Array.isArray(classRoot[children[i]])) {
+                if (classRoot[children[i]] instanceof Array) {
                     objType = classRoot[children[i]][0];
                 } else {
                     objType = classRoot[children[i]].t;
@@ -883,8 +869,6 @@ namespace annie {
                     case 2:
                         //bitmap
                         obj = b(sceneName, children[i]);
-                        //分析是不是分割图
-
                         break;
                     case 3:
                         //shape

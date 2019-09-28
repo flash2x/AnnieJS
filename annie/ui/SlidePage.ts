@@ -143,7 +143,7 @@ namespace annieUI {
         public pageList: Array<any> = [];
         /**
          * 页面对象的类列表
-         * @property pageList
+         * @property pageClassList
          * @type {Array}
          * @public
          */
@@ -214,7 +214,7 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me, false);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me, false);
-            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me, false);
+            s.addEventListener(annie.MouseEvent.MOUSE_OUT, me);
         }
 
         /**

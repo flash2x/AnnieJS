@@ -28,7 +28,7 @@ namespace annie {
             let s = this;
             if (value != s._textAlign) {
                 s._textAlign = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -47,7 +47,7 @@ namespace annie {
             let s = this;
             if (value != s._textAlpha) {
                 s._textAlpha = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -69,7 +69,7 @@ namespace annie {
             let s = this;
             if (value != s._textHeight) {
                 s._textHeight = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -89,7 +89,7 @@ namespace annie {
             let s = this;
             if (value != s._lineHeight) {
                 s._lineHeight = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -111,7 +111,7 @@ namespace annie {
             let s = this;
             if (value != s._textWidth) {
                 s._textWidth = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -133,7 +133,7 @@ namespace annie {
             let s = this;
             if (value != s._lineType) {
                 s._lineType = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -155,7 +155,7 @@ namespace annie {
             let s = this;
             if (value != s._text) {
                 s._text = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -177,7 +177,7 @@ namespace annie {
             let s = this;
             if (value != s._font) {
                 s._font = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -199,7 +199,7 @@ namespace annie {
             let s = this;
             if (value != s._size) {
                 s._size = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -221,7 +221,7 @@ namespace annie {
             let s = this;
             if (value != s._color) {
                 s._color = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -243,7 +243,7 @@ namespace annie {
             let s = this;
             if (value != s._italic) {
                 s._italic = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -265,7 +265,7 @@ namespace annie {
             let s = this;
             if (value != s._bold) {
                 s._bold = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -286,7 +286,7 @@ namespace annie {
             let s = this;
             if (value != s._border) {
                 s._border = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -306,7 +306,7 @@ namespace annie {
             let s = this;
             if (value != s._stroke) {
                 s._stroke = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -326,7 +326,7 @@ namespace annie {
             let s = this;
             if (value != s._strokeColor) {
                 s._strokeColor = value;
-                s.a2x_ut= true;
+                s.a2x_ut = true;
             }
         }
 
@@ -397,100 +397,101 @@ namespace annie {
             //ctx.restore();
             return w;
         }
+
         private realLines: any = [];
-        public  a2x_ut:boolean=true;
+        public a2x_ut: boolean = true;
         public updateMatrix(): void {
             let s: any = this;
             let can = s._texture;
             let ctx = can.getContext("2d");
+            let boundsW=s._bounds.width;
+            let boundsH=s._bounds.height;
             if (s.a2x_ut) {
                 s._text += "";
-                let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
-                let realLines: any = [];
-                s.realLines = realLines;
-                s._prepContext(ctx);
-                let wordW = 0;
-                let lineH = s._lineHeight;
-                if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
-                    realLines[realLines.length] = hardLines[0];
-                    let str = hardLines[0];
-                    let lineW = s._getMeasuredWidth(str);
-                    if (lineW > s._textWidth) {
-                        let w = s._getMeasuredWidth(str[0]);
-                        let lineStr = str[0];
-                        let strLen = str.length;
-                        for (let j = 1; j < strLen; j++) {
-                            wordW = ctx.measureText(str[j]).width;
-                            w += wordW;
-                            if (w > s._textWidth) {
-                                realLines[0] = lineStr;
-                                break;
-                            } else {
-                                lineStr += str[j];
+                if (s._text != "") {
+                    let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
+                    let realLines: any = [];
+                    s.realLines = realLines;
+                    s._prepContext(ctx);
+                    let wordW = 0;
+                    let lineH = s._lineHeight;
+                    if (s._text.indexOf("\n") < 0 && s.lineType == "single") {
+                        realLines[realLines.length] = hardLines[0];
+                        let str = hardLines[0];
+                        let lineW = s._getMeasuredWidth(str);
+                        if (lineW > s._textWidth) {
+                            let w = s._getMeasuredWidth(str[0]);
+                            let lineStr = str[0];
+                            let strLen = str.length;
+                            for (let j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > s._textWidth) {
+                                    realLines[0] = lineStr;
+                                    break;
+                                } else {
+                                    lineStr += str[j];
+                                }
                             }
                         }
-                    }
-                } else {
-                    for (let i = 0, l = hardLines.length; i < l; i++) {
-                        let str = hardLines[i];
-                        if (!str) continue;
-                        let w = s._getMeasuredWidth(str[0]);
-                        let lineStr = str[0];
-                        let strLen = str.length;
-                        for (let j = 1; j < strLen; j++) {
-                            wordW = ctx.measureText(str[j]).width;
-                            w += wordW;
-                            if (w > s._textWidth) {
-                                realLines[realLines.length] = lineStr;
-                                lineStr = str[j];
-                                w = wordW;
-                            } else {
-                                lineStr += str[j];
+                    } else {
+                        for (let i = 0, l = hardLines.length; i < l; i++) {
+                            let str = hardLines[i];
+                            if (!str) continue;
+                            let w = s._getMeasuredWidth(str[0]);
+                            let lineStr = str[0];
+                            let strLen = str.length;
+                            for (let j = 1; j < strLen; j++) {
+                                wordW = ctx.measureText(str[j]).width;
+                                w += wordW;
+                                if (w > s._textWidth) {
+                                    realLines[realLines.length] = lineStr;
+                                    lineStr = str[j];
+                                    w = wordW;
+                                } else {
+                                    lineStr += str[j];
+                                }
                             }
+                            realLines[realLines.length] = lineStr;
                         }
-                        realLines[realLines.length] = lineStr;
                     }
-                }
-                let maxH = lineH * realLines.length;
-                let maxW = s._textWidth;
-                let tx = 0;
-                if (s._textAlign == "center") {
-                    tx = maxW * 0.5;
-                } else if (s._textAlign == "right") {
-                    tx = maxW;
-                }
-                can.width = maxW + 20;
-                can.height = maxH + 20;
-                ctx.clearRect(0, 0, can.width, can.width);
-                if (s.border) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = "#000";
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(10.5, 10.5, maxW, maxH);
-                    ctx.closePath();
-                }
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
-                s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
-                    if (s._stroke > 0) {
-                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                    let maxH = lineH * realLines.length;
+                    let maxW = s._textWidth;
+                    let tx = 0;
+                    if (s._textAlign == "center") {
+                        tx = maxW * 0.5;
+                    } else if (s._textAlign == "right") {
+                        tx = maxW;
                     }
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                    if (s._stroke < 0) {
-                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                    can.width = maxW + 20;
+                    can.height = maxH + 20;
+                    ctx.clearRect(0, 0, can.width, can.width);
+                    if (s.border) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = "#000";
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(10, 10, maxW, maxH);
+                        ctx.closePath();
                     }
-
+                    ctx.setTransform(1, 0, 0, 1, tx + 10, 12);
+                    s._prepContext(ctx);
+                    for (let i = 0; i < realLines.length; i++) {
+                        if (s._stroke > 0) {
+                            ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                        }
+                        ctx.fillText(realLines[i], 0, i * lineH, maxW);
+                        if (s._stroke < 0) {
+                            ctx.strokeText(realLines[i], 0, i * lineH, maxW);
+                        }
+                    }
+                    s.offsetX = -10;
+                    s.offsetY = -10;
+                    boundsH = maxH+10;
+                    boundsW = maxW+10;
                 }
-                s.offsetX = -10;
-                s.offsetY = -10;
-                s._bounds.x = 10;
-                s._bounds.y = 10;
-                s._bounds.height = maxH;
-                s._bounds.width = maxW;
-                s._updateSplitBounds();
             }
             super.updateMatrix();
-            if (s.a2x_ut|| s.a2x_uf) {
+            if (s.a2x_ut || s.a2x_uf) {
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {
@@ -501,7 +502,15 @@ namespace annie {
                     ctx.putImageData(imageData, 0, 0);
                 }
             }
-            s.a2x_ut= false;
+            if(boundsW!=s._bounds.width||boundsH!=s._bounds.height){
+                s._bounds.width=boundsW;
+                s._bounds.height=boundsH;
+                s._updateSplitBounds();
+                s._checkDrawBounds();
+            }else if(s.a2x_um){
+                s._checkDrawBounds();
+            }
+            s.a2x_ut = false;
             s.a2x_um = false;
             s.a2x_ua = false;
             s.a2x_uf = false;

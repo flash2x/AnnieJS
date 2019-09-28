@@ -62,13 +62,13 @@
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
 ## AnnieJS 3.0.1 版本
-    大量优化渲染结构,提升运行效率
     增加annie.Sprite.hitArea属性，设置此属性将直接设置容器鼠标事件接受的区域范围，提升效率。
-    加强annie.DisplayObject.startDrag方法功能。
     加载annie.MovieClip的gotoAndStop,gotoAndPlay方法功能，现在帧数可以是带小数的，以此来加载动画缓功能，或者播放快慢调整
-    更改annie.DisplayObject.mouseEnable属性功能。设置此属性为false后，此显示对象及其子级都将无法获取鼠标事件
+    更改annie.DisplayObject.mouseEnable属性功能，设置此属性为false后，此显示对象及其子级都将无法获取鼠标事件
     修复在非全屏情况下html有滚动条的情况下鼠标位置异常的bug
-    优化渲染功能，显示对象不在可视范围内将不在渲染以或者大尺寸资源可以通过设置分割渲染参数，这样部分内容不在可见范围内也不再渲染
+    优化渲染功能，显示对象不在可视范围内将不在渲染,大尺寸资源在Flash库中将图片资源绑定类名如下:xxx_2x2,这样将大图分成2x2网格进行渲染检测，某一网格不在可视范围就不会渲染这一部分，网格数看需求自行设置。
+    优化遮罩里显示对象的点击性能
+    更改URLLoader加载图片的返回值，之前获取方式:imgObj.src=e.data.response;现在是返回blob,获取方式:imgObj.src=URL.createObjectURL(e.data.response)
     更新vConsole版本
 ## AnnieJS 3.0.0 版本
     更新加载库以支持打包成二进制文件包，提升加载和渲染性能
@@ -275,6 +275,8 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Annie2x 4.2.1
+    优化导出为ts语言下Flash中命名的显示对象导出后类文件中变量为强类型声明,有绑定类的情况下强类型为绑定类，没有强类型的情况下，mc命名后缀带_sp的全部为annie.Sprite，否则为annie.MovieClip.文本强类型不受命名影响
 ## Annie2x 4.2.0
     更新打包后的文件为二进制流，提高加载和渲染性能。旧项目只需要将新的gulpfile.js和package.json替换后用新的工具发布即可。
 ## Annie2x 4.1.10

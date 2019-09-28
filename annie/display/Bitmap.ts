@@ -12,6 +12,7 @@ namespace annie {
      */
     export class Bitmap extends DisplayObject {
         private _cacheImg: any = null;
+
         /**
          * 构造函数
          * @method Bitmap
@@ -47,9 +48,17 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s.bitmapData = bitmapData;
+            if (bitmapData.boundsRowAndCol != void 0) {
+                s.boundsRow = bitmapData.boundsRowAndCol[0];
+                s.boundsCol = bitmapData.boundsRowAndCol[1];
+            }
+            s._bitmapData = bitmapData;
+            let bw = bitmapData.width;
+            let bh = bitmapData.height;
+            s._bounds.width = bw;
+            s._bounds.height = bh;
+            s._updateSplitBounds();
         }
-
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -59,7 +68,26 @@ namespace annie {
          * @type {any}
          * @default null
          */
-        public bitmapData: any = null;
+        public get bitmapData(): any {
+            return this._bitmapData;
+        }
+
+        public set bitmapData(value: any) {
+            let s = this;
+            if (value != s._bitmapData) {
+                s._bitmapData = value;
+                if (value == void 0) {
+                    s._cacheImg = null;
+                    s._texture = null;
+                    s._bounds.width = 0;
+                    s._bounds.height = 0;
+                } else {
+                    s.a2x_uf = true;
+                }
+            }
+        }
+
+        protected _bitmapData: any = null;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -72,13 +100,15 @@ namespace annie {
 
         public updateMatrix(): void {
             let s: any = this;
-            let bitmapData: any = s.bitmapData;
+            let bitmapData: any = s._bitmapData;
+            if (bitmapData == void 0) {
+                return;
+            }
             let bw = bitmapData.width;
             let bh = bitmapData.height;
-            if (bw == 0 || bh == 0) return;
             super.updateMatrix();
             //滤镜,这里一定是UF
-            if (s.a2x_uf) {
+            if (s.a2x_uf && bw * bh > 0) {
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {
@@ -95,7 +125,7 @@ namespace annie {
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
                     ////////////////////
-                    ctx.drawImage(bitmapData, 0, 0, bw, bh, 10, 10, bw, bh);
+                    ctx.drawImage(bitmapData, 0, 0, bw, bh, 0, 0, bw, bh);
                     /////////////////////
                     if (cfLen > 0) {
                         let imageData = ctx.getImageData(0, 0, bw, bh);
@@ -112,8 +142,10 @@ namespace annie {
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                //_bounds改变
                 s._updateSplitBounds();
+                s._checkDrawBounds();
+            } else if (s.a2x_um) {
+                s._checkDrawBounds();
             }
             s.a2x_uf = false;
             s.a2x_um = false;
@@ -122,12 +154,13 @@ namespace annie {
 
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
+         * 从Bitmap中剥离出单独的小图以供特殊用途
          * @method convertToImage
          * @static
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
+         * @param {annie.Rectangle} rect 截图范围
          * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
          * @return {Canvas|BitmapData}
          * @example
@@ -140,19 +173,19 @@ namespace annie {
          *      }
          *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
-        public static convertToImage(bitmap: annie.Bitmap, isNeedImage: boolean = true): any {
+        public static convertToImage(bitmap: annie.Bitmap, rect: Rectangle, isNeedImage: boolean = true): any {
             let _canvas: any;
             if (isNeedImage) {
                 _canvas = annie.DisplayObject._canvas;
             } else {
                 _canvas = window.document.createElement("canvas");
             }
-            let w: number = bitmap._bounds.width,
-                h: number = bitmap._bounds.height,
+            let w: number = rect.width,
+                h: number = rect.height,
                 ctx = _canvas.getContext("2d");
             _canvas.width = w;
             _canvas.height = h;
-            ctx.drawImage(bitmap.bitmapData, bitmap._offsetX, bitmap._offsetY, w, h, 0, 0, w, h);
+            ctx.drawImage(bitmap.bitmapData, rect.x, rect.y, w, h, 0, 0, w, h);
             if (isNeedImage) {
                 let img = new Image();
                 img.src = _canvas.toDataURL();
@@ -195,7 +228,7 @@ namespace annie {
             //清除相应的数据引用
             let s = this;
             super.destroy();
-            s.bitmapData = null;
+            s._bitmapData = null;
             s._cacheImg = null;
         }
     }
