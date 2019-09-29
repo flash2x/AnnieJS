@@ -61,7 +61,7 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
-## AnnieJS 3.0.1 版本
+## AnnieJS 3.1.0 版本
     增加annie.Sprite.hitArea属性，设置此属性将直接设置容器鼠标事件接受的区域范围，提升效率。
     增加annie.MovieClip的gotoAndStop,gotoAndPlay方法功能，现在帧数可以是带小数的，以此来加载动画缓功能，或者播放快慢调整
     增加annie.MovieClip中实现可以直接对子级进行x y scaleX scaleY rotation alpha的更改。
@@ -277,6 +277,7 @@
     支持flash2x 管理类
 # Flash2x 版本更新列表
 ## Annie2x 4.2.1
+    AnnieJS引擎升级到3.1.0版本
     全新的安装包模式，方便版本升级切换及管理
     优化导出为ts类文件中变量为强类型声明。如mc没有绑定类，如果后缀带_sp的则为annie.Sprite，否则为annie.MovieClip
 ## Annie2x 4.2.0
