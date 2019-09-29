@@ -13,7 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._texture = window.document.createElement("canvas");
+            this._texture = document.createElement("canvas");
         }
 
         //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -98,7 +98,6 @@ namespace annie {
          */
         public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
-            s.a2x_ut = true;
             s._command[s._command.length] = [1, commandName, params];
         }
 
@@ -517,7 +516,7 @@ namespace annie {
             if (m) {
                 s._isBitmapFill = null;
             }
-            this.a2x_ut = true;
+            s.a2x_ut = true;
         }
 
         /**
@@ -552,7 +551,7 @@ namespace annie {
             if (m) {
                 s._isBitmapStroke = null;
             }
-            this.a2x_ut = true;
+            s.a2x_ut = true;
         }
 
         /**
@@ -576,9 +575,10 @@ namespace annie {
                     i += 4;
                 }
             }
+            s.a2x_ut=true;
         };
         //是否矢量元素有更新
-        private a2x_ut: boolean = false;
+        private a2x_ut: boolean = true;
 
         public updateMatrix(): void {
             let s: any = this;
@@ -586,7 +586,7 @@ namespace annie {
             let ctx = _canvas.getContext("2d");
             let boundsW=s._bounds.width;
             let boundsH=s._bounds.height;
-            if (s.a2x_ut) {
+            if (s.a2x_ut){
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -703,8 +703,12 @@ namespace annie {
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
+                        boundsH>>=0;
+                        boundsW>>=0;
                         _canvas.width = boundsW;
                         _canvas.height = boundsH;
+                        _canvas.style.width = boundsW / devicePixelRatio + "px";
+                        _canvas.style.height = boundsH / devicePixelRatio + "px";
                         ctx.clearRect(0, 0, boundsW, boundsH);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////
@@ -714,7 +718,7 @@ namespace annie {
                 }
             }
             super.updateMatrix();
-            if (s.a2x_uf || s.a2x_ut) {
+            if (s.a2x_uf) {
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {
@@ -765,7 +769,7 @@ namespace annie {
                     } else if (paramsLen == 6) {
                         let lx = data[2][4];
                         let ly = data[2][5];
-                        if (data[0] == 2) {
+                        if (data[0] == 2){
                             //位图填充
                             lx -= leftX;
                             ly -= leftY;
@@ -788,7 +792,6 @@ namespace annie {
                 ctx.closePath();
             }
         }
-
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             let p: any;

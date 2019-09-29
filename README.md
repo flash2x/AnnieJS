@@ -63,7 +63,8 @@
 # AnnieJS 版本更新列表
 ## AnnieJS 3.0.1 版本
     增加annie.Sprite.hitArea属性，设置此属性将直接设置容器鼠标事件接受的区域范围，提升效率。
-    加载annie.MovieClip的gotoAndStop,gotoAndPlay方法功能，现在帧数可以是带小数的，以此来加载动画缓功能，或者播放快慢调整
+    增加annie.MovieClip的gotoAndStop,gotoAndPlay方法功能，现在帧数可以是带小数的，以此来加载动画缓功能，或者播放快慢调整
+    增加annie.MovieClip中实现可以直接对子级进行x y scaleX scaleY rotation alpha的更改。
     更改annie.DisplayObject.mouseEnable属性功能，设置此属性为false后，此显示对象及其子级都将无法获取鼠标事件
     修复在非全屏情况下html有滚动条的情况下鼠标位置异常的bug
     优化渲染功能，显示对象不在可视范围内将不在渲染,大尺寸资源在Flash库中将图片资源绑定类名如下:xxx_2x2,这样将大图分成2x2网格进行渲染检测，某一网格不在可视范围就不会渲染这一部分，网格数看需求自行设置。

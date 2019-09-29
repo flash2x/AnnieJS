@@ -470,7 +470,7 @@ namespace annie {
                         ctx.beginPath();
                         ctx.strokeStyle = "#000";
                         ctx.lineWidth = 1;
-                        ctx.strokeRect(10, 10, maxW, maxH);
+                        ctx.strokeRect(10, 10, maxW-2, maxH-2);
                         ctx.closePath();
                     }
                     ctx.setTransform(1, 0, 0, 1, tx + 10, 12);
@@ -486,8 +486,8 @@ namespace annie {
                     }
                     s.offsetX = -10;
                     s.offsetY = -10;
-                    boundsH = maxH+10;
-                    boundsW = maxW+10;
+                    boundsH = maxH+10>>0;
+                    boundsW = maxW+10>>0;
                 }
             }
             super.updateMatrix();

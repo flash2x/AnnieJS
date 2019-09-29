@@ -420,7 +420,7 @@ namespace annie {
                             }
                             if (objInfo instanceof Object) {
                                 //这个对象有可能是新来的，有可能是再次进入帧里的。需要对他进行初始化
-                                    annie.d(obj, objInfo);
+                                    annie.d(obj, objInfo,true);
                                 // 检查是否有遮罩
                                 if (objInfo.ma != undefined) {
                                     maskObj = obj;
@@ -569,11 +569,13 @@ namespace annie {
                             }
                             obj.x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
                             obj.y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
-                            obj.scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
-                            obj.scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
-                            obj.skewX = curObjInfo.tr[4] + sx * ff;
-                            obj.skewY = curObjInfo.tr[5] + sy * ff;
-                            obj.alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                            obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
+                            obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
+                            obj._skewX = curObjInfo.tr[4] + sx * ff;
+                            obj._skewY = curObjInfo.tr[5] + sy * ff;
+                            obj._alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                            obj.a2x_um=true;
+                            obj.a2x_ua=true;
                         }
                     }
                 }
@@ -582,17 +584,16 @@ namespace annie {
 
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
-            obj._wantFrame = 0;
-            obj._curFrame = 1;
-            obj._lastFrame = 0;
-            obj._lastFrameObj = null;
-            obj._isFront = true;
-            obj._floatFrame = 0;
-            obj.children.length = 0;
-            if (obj._a2x_mode < -1) {
-                obj._isPlaying = true;
-            } else {
-                obj._isPlaying = false;
+            if(obj._wantFrame==0) {
+                obj._curFrame = 1;
+                obj._lastFrame = 0;
+                obj._isFront = true;
+                obj._floatFrame = 0;
+                if (obj._a2x_mode < -1) {
+                    obj._isPlaying = true;
+                } else {
+                    obj._isPlaying = false;
+                }
             }
         }
         public destroy(): void {

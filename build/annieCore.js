@@ -1623,8 +1623,8 @@ var annie;
         function DisplayObject() {
             var _this = _super.call(this) || this;
             //更新信息对象是否更新矩阵 a2x_ua 是否更新Alpha a2x_uf 是否更新滤镜
-            _this.a2x_um = true;
-            _this.a2x_ua = true;
+            _this.a2x_um = false;
+            _this.a2x_ua = false;
             _this.a2x_uf = false;
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
@@ -1709,6 +1709,8 @@ var annie;
             //每个Flash文件生成的对象都有一个自带的初始化信息
             _this._a2x_res_obj = {};
             _this._isOnStage = false;
+            //x y scaleX scaleY rotation alpha
+            _this._changeTransformInfo = [false, false, false, false, false, false];
             _this._instanceType = "annie.DisplayObject";
             return _this;
         }
@@ -1731,6 +1733,7 @@ var annie;
                     s._lastX = value + s._offsetX;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[0] = true;
             },
             enumerable: true,
             configurable: true
@@ -1784,6 +1787,7 @@ var annie;
                     s._lastY = value + s._offsetY;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[1] = true;
             },
             enumerable: true,
             configurable: true
@@ -1806,6 +1810,7 @@ var annie;
                     s._scaleX = value;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[2] = true;
             },
             enumerable: true,
             configurable: true
@@ -1828,6 +1833,7 @@ var annie;
                     s._scaleY = value;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[3] = true;
             },
             enumerable: true,
             configurable: true
@@ -1850,6 +1856,7 @@ var annie;
                     s._rotation = value;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[4] = true;
             },
             enumerable: true,
             configurable: true
@@ -1872,6 +1879,7 @@ var annie;
                     s._alpha = value;
                     s.a2x_ua = true;
                 }
+                s._changeTransformInfo[5] = true;
             },
             enumerable: true,
             configurable: true
@@ -1894,6 +1902,7 @@ var annie;
                     s._skewX = value;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[4] = true;
             },
             enumerable: true,
             configurable: true
@@ -1916,6 +1925,7 @@ var annie;
                     s._skewY = value;
                     s.a2x_um = true;
                 }
+                s._changeTransformInfo[4] = true;
             },
             enumerable: true,
             configurable: true
@@ -2339,7 +2349,7 @@ var annie;
             }
         };
         /**
-         * 更新bounds矩阵
+         * 更新boundsList矩阵
          * @private
          */
         DisplayObject.prototype._updateSplitBounds = function () {
@@ -2347,14 +2357,22 @@ var annie;
             var sbl = [];
             var bounds = s.getBounds();
             if (bounds.width * bounds.height > 0) {
-                var rw = Math.ceil(s._bounds.width / s.boundsRow);
-                var rh = Math.ceil(s._bounds.height / s.boundsCol);
-                for (var i = 0; i < s.boundsRow; i++) {
-                    for (var j = 0; j < s.boundsCol; j++) {
-                        sbl.push({
-                            isDraw: true,
-                            rect: new annie.Rectangle(i * rw, j * rh, rw, rh)
-                        });
+                if (s.boundsRow == 1 && s.boundsCol == 1) {
+                    sbl.push({
+                        isDraw: true,
+                        rect: bounds
+                    });
+                }
+                else {
+                    var rw = Math.ceil(s._bounds.width / s.boundsRow);
+                    var rh = Math.ceil(s._bounds.height / s.boundsCol);
+                    for (var i = 0; i < s.boundsRow; i++) {
+                        for (var j = 0; j < s.boundsCol; j++) {
+                            sbl.push({
+                                isDraw: true,
+                                rect: new annie.Rectangle(i * rw, j * rh, rw, rh)
+                            });
+                        }
                     }
                 }
             }
@@ -2515,6 +2533,16 @@ var annie;
          */
         DisplayObject.prototype.stopDrag = function () {
             annie.Stage._dragDisplay = null;
+        };
+        /**
+         * 如果你在mc更改了对象的x y sacle rotation alpha，最后想还原，不再需要自我控制，可以调用些方法
+         * @method clearCustomTransform
+         * @since 3.1.0
+         */
+        DisplayObject.prototype.clearCustomTransform = function () {
+            for (var i = 0; i < 6; i++) {
+                this._changeTransformInfo[i] = false;
+            }
         };
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
         DisplayObject._bp = new annie.Point();
@@ -2854,11 +2882,12 @@ var annie;
                         i += 4;
                     }
                 }
+                s.a2x_ut = true;
             };
             //是否矢量元素有更新
-            _this.a2x_ut = false;
+            _this.a2x_ut = true;
             _this._instanceType = "annie.Shape";
-            _this._texture = window.document.createElement("canvas");
+            _this._texture = document.createElement("canvas");
             return _this;
         }
         /**
@@ -2935,7 +2964,6 @@ var annie;
          */
         Shape.prototype.addDraw = function (commandName, params) {
             var s = this;
-            s.a2x_ut = true;
             s._command[s._command.length] = [1, commandName, params];
         };
         /**
@@ -3308,7 +3336,7 @@ var annie;
             if (m) {
                 s._isBitmapFill = null;
             }
-            this.a2x_ut = true;
+            s.a2x_ut = true;
         };
         /**
          * 设置虚线参数
@@ -3342,7 +3370,7 @@ var annie;
             if (m) {
                 s._isBitmapStroke = null;
             }
-            this.a2x_ut = true;
+            s.a2x_ut = true;
         };
         Shape.prototype.updateMatrix = function () {
             var s = this;
@@ -3470,8 +3498,12 @@ var annie;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
+                        boundsH >>= 0;
+                        boundsW >>= 0;
                         _canvas.width = boundsW;
                         _canvas.height = boundsH;
+                        _canvas.style.width = boundsW / annie.devicePixelRatio + "px";
+                        _canvas.style.height = boundsH / annie.devicePixelRatio + "px";
                         ctx.clearRect(0, 0, boundsW, boundsH);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////
@@ -3481,7 +3513,7 @@ var annie;
                 }
             }
             _super.prototype.updateMatrix.call(this);
-            if (s.a2x_uf || s.a2x_ut) {
+            if (s.a2x_uf) {
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
@@ -4986,7 +5018,7 @@ var annie;
                             }
                             if (objInfo instanceof Object) {
                                 //这个对象有可能是新来的，有可能是再次进入帧里的。需要对他进行初始化
-                                annie.d(obj, objInfo);
+                                annie.d(obj, objInfo, true);
                                 // 检查是否有遮罩
                                 if (objInfo.ma != undefined) {
                                     maskObj = obj;
@@ -5138,11 +5170,13 @@ var annie;
                             }
                             obj.x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
                             obj.y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
-                            obj.scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
-                            obj.scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
-                            obj.skewX = curObjInfo.tr[4] + sx * ff;
-                            obj.skewY = curObjInfo.tr[5] + sy * ff;
-                            obj.alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                            obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
+                            obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
+                            obj._skewX = curObjInfo.tr[4] + sx * ff;
+                            obj._skewY = curObjInfo.tr[5] + sy * ff;
+                            obj._alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                            obj.a2x_um = true;
+                            obj.a2x_ua = true;
                         }
                     }
                 }
@@ -5150,18 +5184,17 @@ var annie;
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
-            obj._wantFrame = 0;
-            obj._curFrame = 1;
-            obj._lastFrame = 0;
-            obj._lastFrameObj = null;
-            obj._isFront = true;
-            obj._floatFrame = 0;
-            obj.children.length = 0;
-            if (obj._a2x_mode < -1) {
-                obj._isPlaying = true;
-            }
-            else {
-                obj._isPlaying = false;
+            if (obj._wantFrame == 0) {
+                obj._curFrame = 1;
+                obj._lastFrame = 0;
+                obj._isFront = true;
+                obj._floatFrame = 0;
+                if (obj._a2x_mode < -1) {
+                    obj._isPlaying = true;
+                }
+                else {
+                    obj._isPlaying = false;
+                }
             }
         };
         MovieClip.prototype.destroy = function () {
@@ -5859,7 +5892,7 @@ var annie;
                         ctx.beginPath();
                         ctx.strokeStyle = "#000";
                         ctx.lineWidth = 1;
-                        ctx.strokeRect(10, 10, maxW, maxH);
+                        ctx.strokeRect(10, 10, maxW - 2, maxH - 2);
                         ctx.closePath();
                     }
                     ctx.setTransform(1, 0, 0, 1, tx + 10, 12);
@@ -5875,8 +5908,8 @@ var annie;
                     }
                     s.offsetX = -10;
                     s.offsetY = -10;
-                    boundsH = maxH + 10;
-                    boundsW = maxW + 10;
+                    boundsH = maxH + 10 >> 0;
+                    boundsW = maxW + 10 >> 0;
                 }
             }
             _super.prototype.updateMatrix.call(this);
@@ -6528,6 +6561,8 @@ var annie;
                 script_1.src = "libs/vconsole.min.js";
             }
             var s = _this;
+            s.a2x_ua = true;
+            s.a2x_um = true;
             s._instanceType = "annie.Stage";
             s.stage = s;
             s._isOnStage = true;
@@ -8124,10 +8159,6 @@ var annie;
                 ctx.globalAlpha = target.cAlpha;
             }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            // if (target instanceof annie.Bitmap) {
-            //     ctx.drawImage(texture, 0, 0);
-            // } else {
-            //     ctx.drawImage(texture, 0, 0);
             var sbl = target._splitBoundsList;
             var rect = null;
             for (var i = 0; i < sbl.length; i++) {
@@ -8136,8 +8167,9 @@ var annie;
                     ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
                 }
             }
-            /*//getBounds
-            let rect=target.getBounds();
+            /*
+            //getBounds
+            rect=target.getBounds();
             //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             s._ctx.beginPath();
             s._ctx.lineWidth=4;
@@ -8161,8 +8193,8 @@ var annie;
             s._ctx.lineTo(rect.x,rect.y+rect.height);
             s._ctx.closePath();
             s._ctx.stroke();
-            */
             //
+            */
         };
         CanvasRender.prototype.end = function () {
         };
@@ -9019,35 +9051,82 @@ var annie;
         return new annie.Bitmap(annie.res[sceneName][resName]);
     }
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
-    function d(target, info) {
+    function d(target, info, isMc) {
+        if (isMc === void 0) { isMc = false; }
         var _a;
         if (target._a2x_res_obj == info) {
             return;
         }
         else {
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-            if (info.tr == void 0 || info.tr.length == 1) {
+            if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             var lastInfo = target._a2x_res_obj;
-            if (lastInfo.tr != info.tr) {
-                _a = info.tr, target.x = _a[0], target.y = _a[1], target.scaleX = _a[2], target.scaleY = _a[3], target.skewX = _a[4], target.skewY = _a[5];
-            }
-            if (info.w != void 0) {
-                target.textWidth = info.w;
-                target.textHeight = info.h;
-            }
             if (info.al == void 0) {
                 info.al = 1;
             }
-            target.alpha = info.al;
+            if (isMc) {
+                if (lastInfo.tr != info.tr) {
+                    var isUmChange = false;
+                    if (!target._changeTransformInfo[0] && target._x != info.tr[0]) {
+                        target._x = info.tr[0];
+                        target._lastX = target._x + target._offsetX;
+                        isUmChange = true;
+                    }
+                    if (!target._changeTransformInfo[1] && target._y != info.tr[1]) {
+                        target._y = info.tr[1];
+                        target._lastY = target._y + target._offsetY;
+                        isUmChange = true;
+                    }
+                    if (!target._changeTransformInfo[2] && target._scaleX != info.tr[2]) {
+                        target._scaleX = info.tr[2];
+                        isUmChange = true;
+                    }
+                    if (!target._changeTransformInfo[3] && target._scaleY != info.tr[3]) {
+                        target._scaleY = info.tr[3];
+                        isUmChange = true;
+                    }
+                    if (!target._changeTransformInfo[4]) {
+                        if (target._skewX != info.tr[4]) {
+                            target._skewX = info.tr[4];
+                            isUmChange = true;
+                        }
+                        if (target._skewY != info.tr[5]) {
+                            target._skewY = info.tr[5];
+                            isUmChange = true;
+                        }
+                    }
+                    target.a2x_um = isUmChange;
+                }
+                if (!target._changeTransformInfo[5] && target._alpha != info.al) {
+                    target._alpha = info.al;
+                    target.a2x_ua = true;
+                }
+            }
+            else {
+                if (lastInfo.tr != info.tr) {
+                    _a = info.tr, target._x = _a[0], target._y = _a[1], target._scaleX = _a[2], target._scaleY = _a[3], target._skewX = _a[4], target._skewY = _a[5];
+                    target._lastX = target._x + target._offsetX;
+                    target._lastY = target._y + target._offsetY;
+                    target.a2x_um = true;
+                }
+                target._alpha = info.al;
+                target.a2x_ua = true;
+            }
+            if (info.w != undefined) {
+                target.textWidth = info.w;
+                target.textHeight = info.h;
+            }
             //动画播放模式 图形 按钮 动画
-            if (info.t != void 0 && target instanceof annie.MovieClip) {
+            if (info.t != undefined) {
                 if (info.t == -1) {
                     //initButton
-                    target.initButton();
+                    if (target.initButton) {
+                        target.initButton();
+                    }
                 }
-                target["_a2x_mode"] = info.t;
+                target._mode = info.t;
             }
             ///////////////////////////////////////////
             //添加滤镜

@@ -129,20 +129,17 @@ namespace annie {
                 ctx.globalAlpha = target.cAlpha
             }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            // if (target instanceof annie.Bitmap) {
-            //     ctx.drawImage(texture, 0, 0);
-            // } else {
-            //     ctx.drawImage(texture, 0, 0);
             let sbl = target._splitBoundsList;
             let rect = null;
             for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw===true) {
+                if (sbl[i].isDraw===true){
                     rect = sbl[i].rect;
                     ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height,rect.x, rect.y, rect.width, rect.height);
                 }
             }
-            /*//getBounds
-            let rect=target.getBounds();
+            /*
+            //getBounds
+            rect=target.getBounds();
             //s._ctx.setTransform(1, 0, 0, 1, 0, 0);
             s._ctx.beginPath();
             s._ctx.lineWidth=4;
@@ -166,8 +163,8 @@ namespace annie {
             s._ctx.lineTo(rect.x,rect.y+rect.height);
             s._ctx.closePath();
             s._ctx.stroke();
-            */
             //
+            */
         }
         public end() {
         };

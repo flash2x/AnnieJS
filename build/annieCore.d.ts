@@ -1363,7 +1363,7 @@ declare namespace annie {
         boundsRow: number;
         boundsCol: number;
         /**
-         * 更新bounds矩阵
+         * 更新boundsList矩阵
          * @private
          */
         protected _updateSplitBounds(): void;
@@ -1423,6 +1423,13 @@ declare namespace annie {
          * @method stopDrag
          */
         stopDrag(): void;
+        private _changeTransformInfo;
+        /**
+         * 如果你在mc更改了对象的x y sacle rotation alpha，最后想还原，不再需要自我控制，可以调用些方法
+         * @method clearCustomTransform
+         * @since 3.1.0
+         */
+        clearCustomTransform(): void;
     }
 }
 /**
@@ -3869,7 +3876,7 @@ declare namespace annie {
      * @return {any}
      */
     function getResource(sceneName: string, resName: string): any;
-    function d(target: any, info: any): void;
+    function d(target: any, info: any, isMc?: boolean): void;
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧

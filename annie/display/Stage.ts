@@ -301,6 +301,8 @@ namespace annie {
                 script.src = "libs/vconsole.min.js";
             }
             let s: Stage = this;
+            s.a2x_ua=true;
+            s.a2x_um=true;
             s._instanceType = "annie.Stage";
             s.stage = s;
             s._isOnStage = true;
