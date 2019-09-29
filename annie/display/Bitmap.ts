@@ -11,28 +11,8 @@ namespace annie {
      * @since 1.0.0
      */
     export class Bitmap extends DisplayObject {
-        private _bitmapData: any = null;
-        private _realCacheImg: any = null;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 有时候一张贴图，我们只需要显示他的部分。其他不显示,对你可能猜到了
-         * SpriteSheet就用到了这个属性。默认为null表示全尺寸显示bitmapData需要显示的范围
-         * @property rect
-         * @public
-         * @since 1.0.0
-         * @type {annie.Rectangle}
-         * @default null
-         */
-        get rect(): annie.Rectangle{
-            return this._rect;
-        }
-        set rect(value: annie.Rectangle){
-            let s:any=this;
-            s._rect = value;
-            s._UI.UD=true;
-        }
-        private _rect: Rectangle = null;
-        private _isCache: boolean = false;
+        private _cacheImg: any = null;
+
         /**
          * 构造函数
          * @method Bitmap
@@ -64,12 +44,20 @@ namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        public constructor(bitmapData: any = null, rect: Rectangle = null){
+        public constructor(bitmapData: any) {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            s._rect = rect;
-            s.bitmapData = bitmapData;
+            if (bitmapData.boundsRowAndCol != void 0) {
+                s.boundsRow = bitmapData.boundsRowAndCol[0];
+                s.boundsCol = bitmapData.boundsRowAndCol[1];
+            }
+            s._bitmapData = bitmapData;
+            let bw = bitmapData.width;
+            let bh = bitmapData.height;
+            s._bounds.width = bw;
+            s._bounds.height = bh;
+            s._updateSplitBounds();
         }
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -82,19 +70,24 @@ namespace annie {
          */
         public get bitmapData(): any {
             return this._bitmapData;
-        };
+        }
 
         public set bitmapData(value: any) {
             let s = this;
-            s._setProperty("_bitmapData", value, 3);
-            if (!value) {
-                s._bounds.width = s._bounds.height = 0;
-            } else {
-                s._bounds.width = s._rect ? s._rect.width : value.width;
-                s._bounds.height = s._rect ? s._rect.height : value.height;
+            if (value != s._bitmapData) {
+                s._bitmapData = value;
+                if (value == void 0) {
+                    s._cacheImg = null;
+                    s._texture = null;
+                    s._bounds.width = 0;
+                    s._bounds.height = 0;
+                } else {
+                    s.a2x_uf = true;
+                }
             }
         }
 
+        protected _bitmapData: any = null;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
@@ -104,87 +97,70 @@ namespace annie {
          * @since 1.1.0
          */
         public hitTestWidthPixel: boolean = false;
+
         public updateMatrix(): void {
-            let s = this;
+            let s: any = this;
+            let bitmapData: any = s._bitmapData;
+            if (bitmapData == void 0) {
+                return;
+            }
+            let bw = bitmapData.width;
+            let bh = bitmapData.height;
             super.updateMatrix();
-            //滤镜
-            let bitmapData = s._bitmapData;
-            if ((s._UI.UD || s._UI.UF) && bitmapData) {
-                if (bitmapData.width == 0 || bitmapData.height == 0) return;
-                s._UI.UD = false;
-                if (s.cFilters.length > 0) {
-                    if (!s._realCacheImg) {
-                        s._realCacheImg = window.document.createElement("canvas");
+            //滤镜,这里一定是UF
+            if (s.a2x_uf && bw * bh > 0) {
+                let cf: any = s.cFilters;
+                let cfLen = cf.length;
+                if (cfLen > 0) {
+                    if (!(s._cacheImg instanceof Object)) {
+                        s._cacheImg = window.document.createElement("canvas");
+                        s._cacheImg.width = bw;
+                        s._cacheImg.height = bh;
                     }
-                    let _canvas = s._realCacheImg;
-                    let tr = s._rect;
-                    let w = tr ? tr.width : bitmapData.width;
-                    let h = tr ? tr.height : bitmapData.height;
-                    let newW = w + 20;
-                    let newH = h + 20;
-                    _canvas.width = newW;
-                    _canvas.height = newH;
+                    let _canvas = s._cacheImg;
                     let ctx = _canvas.getContext("2d");
-                    ctx.clearRect(0, 0, newW, newH);
-                    ctx.translate(10, 10);
+                    ctx.clearRect(0, 0, bw, bh);
                     ctx.shadowBlur = 0;
                     ctx.shadowColor = "#0";
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = 0;
                     ////////////////////
-                    if (tr) {
-                        ctx.drawImage(s._bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                    } else {
-                        ctx.drawImage(s._bitmapData, 0, 0);
-                    }
+                    ctx.drawImage(bitmapData, 0, 0, bw, bh, 0, 0, bw, bh);
                     /////////////////////
-                    let cf = s.cFilters;
-                    let cfLen = cf.length;
                     if (cfLen > 0) {
-                        let imageData = ctx.getImageData(0, 0, newW, newH);
+                        let imageData = ctx.getImageData(0, 0, bw, bh);
                         for (let i = 0; i < cfLen; i++) {
                             cf[i].drawFilter(imageData);
                         }
                         ctx.putImageData(imageData, 0, 0);
                     }
-                    //s._realCacheImg.src = _canvas.toDataURL("image/png");
-                    s._texture = s._realCacheImg;
-                    s._offsetX = -10;
-                    s._offsetY = -10;
-                    s._isCache = true;
+                    s._texture = s._cacheImg;
                 } else {
-                    s._isCache = false;
-                    s._offsetX = 0;
-                    s._offsetY = 0;
                     s._texture = bitmapData;
                 }
-                let bw: number;
-                let bh: number;
-                if (s._rect) {
-                    bw = s._rect.width;
-                    bh = s._rect.height;
-                } else {
-                    bw = s._texture.width + s._offsetX * 2;
-                    bh = s._texture.height + s._offsetY * 2;
-                }
+            }
+            if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                //给webgl更新新
-                // s._texture.updateTexture = true;
+                s._updateSplitBounds();
+                s._checkDrawBounds();
+            } else if (s.a2x_um) {
+                s._checkDrawBounds();
             }
-            s._UI.UF = false;
-            s._UI.UM = false;
-            s._UI.UA = false;
+            s.a2x_uf = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
         }
 
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 从SpriteSheet的大图中剥离出单独的小图以供特殊用途
+         * 从Bitmap中剥离出单独的小图以供特殊用途
          * @method convertToImage
          * @static
          * @public
          * @since 1.0.0
          * @param {annie.Bitmap} bitmap
+         * @param {annie.Rectangle} rect 截图范围
          * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
          * @return {Canvas|BitmapData}
          * @example
@@ -197,73 +173,63 @@ namespace annie {
          *      }
          *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
          */
-        public static convertToImage(bitmap: annie.Bitmap, isNeedImage: boolean = true): any {
-            if (!bitmap._rect) {
-                return bitmap.bitmapData;
+        public static convertToImage(bitmap: annie.Bitmap, rect: Rectangle, isNeedImage: boolean = true): any {
+            let _canvas: any;
+            if (isNeedImage) {
+                _canvas = annie.DisplayObject._canvas;
             } else {
-                let _canvas = window.document.createElement("canvas");
-                let w: number = bitmap._rect.width;
-                let h: number = bitmap._rect.height;
-                _canvas.width = w;
-                _canvas.height = h;
-                // _canvas.style.width = w / devicePixelRatio + "px";
-                // _canvas.style.height = h / devicePixelRatio + "px";
-                let ctx = _canvas.getContext("2d");
-                let tr = bitmap._rect;
-                ctx.drawImage(bitmap.bitmapData, tr.x, tr.y, w, h, 0, 0, w, h);
-                if (isNeedImage) {
-                    var img = new Image();
-                    img.src = _canvas.toDataURL();
-                    return img;
-                } else {
-                    return _canvas;
-                }
+                _canvas = window.document.createElement("canvas");
+            }
+            let w: number = rect.width,
+                h: number = rect.height,
+                ctx = _canvas.getContext("2d");
+            _canvas.width = w;
+            _canvas.height = h;
+            ctx.drawImage(bitmap.bitmapData, rect.x, rect.y, w, h, 0, 0, w, h);
+            if (isNeedImage) {
+                let img = new Image();
+                img.src = _canvas.toDataURL();
+                return img;
+            } else {
+                return _canvas;
             }
         }
-        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false,isMustMouseEnable:boolean=false): DisplayObject {
+
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            let obj = super.hitTestPoint(hitPoint, isGlobalPoint,isMustMouseEnable);
-            if (obj) {
-                if (s.hitTestWidthPixel) {
-                    let p:any;
-                    if(isGlobalPoint) {
-                        p = s.globalToLocal(hitPoint);
-                    }else{
-                        p= hitPoint;
-                    }
-                    p.x += s._offsetX;
-                    p.y += s._offsetY;
-                    let image = s._texture;
-                    if (!image || image.width == 0 || image.height == 0) {
-                        return null;
-                    }
-                    let _canvas = DisplayObject["_canvas"];
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    let ctx = _canvas["getContext"]('2d');
-                    ctx.clearRect(0, 0, 1, 1);
-                    if (s._rect) {
-                        p.x += s._rect.x;
-                        p.y += s._rect.y;
-                    }
-                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-                    ctx.drawImage(image, 0, 0);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                } else {
-                    return s;
+            if (s.hitTestWidthPixel) {
+                let texture = s._texture;
+                if (texture.width == 0) {
+                    return null;
                 }
+                let p: any;
+                if (isGlobalPoint) {
+                    p = s.globalToLocal(hitPoint);
+                } else {
+                    p = hitPoint;
+                }
+                let _canvas = DisplayObject._canvas, ctx = _canvas.getContext('2d');
+                _canvas.width = 1;
+                _canvas.height = 1;
+                ctx.clearRect(0, 0, 1, 1);
+                ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
+                ctx.drawImage(texture, 0, 0);
+                if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                    return s;
+                } else {
+                    return null;
+                }
+            } else {
+                return super.hitTestPoint(hitPoint, isGlobalPoint);
             }
-            return null;
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;
-            s._bitmapData = null;
-            s._realCacheImg = null;
-            s._rect = null;
             super.destroy();
+            s._bitmapData = null;
+            s._cacheImg = null;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace annie {
         public constructor() {
             super();
             this._instanceType = "annie.Shape";
-            this._texture = window.document.createElement("canvas");
+            this._texture = document.createElement("canvas");
         }
 
         //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -86,15 +86,6 @@ namespace annie {
 
         private _isBitmapStroke: Array<number>;
         private _isBitmapFill: Array<number>;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否对矢量使用像素碰撞 默认开启
-         * @property hitTestWidthPixel
-         * @type {boolean}
-         * @default true
-         * @since 1.1.0
-         */
-        public hitTestWidthPixel: boolean = true;
 
         /**
          * 添加一条绘画指令,具体可以查阅Html Canvas画图方法
@@ -107,7 +98,6 @@ namespace annie {
          */
         public addDraw(commandName: string, params: Array<any>): void {
             let s = this;
-            s._UI.UD = true;
             s._command[s._command.length] = [1, commandName, params];
         }
 
@@ -336,7 +326,6 @@ namespace annie {
         public clear(): void {
             let s = this;
             s._command = [];
-            s._UI.UD = true;
             if (s._texture) {
                 s._texture.width = 0;
                 s._texture.height = 0;
@@ -345,6 +334,8 @@ namespace annie {
             s._offsetY = 0;
             s._bounds.width = 0;
             s._bounds.height = 0;
+            s._updateSplitBounds();
+            s.a2x_ut = true;
         }
 
         /**
@@ -414,12 +405,12 @@ namespace annie {
             }
             s._fill(Shape.getBitmapStyle(image));
         }
+
         private _fill(fillStyle: any): void {
             let s = this;
             let c = s._command;
             c[c.length] = [0, "fillStyle", fillStyle];
             c[c.length] = [1, "beginPath", []];
-            s._UI.UD = true;
         }
 
         /**
@@ -504,8 +495,9 @@ namespace annie {
             c[c.length] = [0, "miterLimit", miter];
             c[c.length] = [0, "strokeStyle", strokeStyle];
             c[c.length] = [1, "beginPath", []];
-            this._UI.UD = true;
+
         }
+
         /**
          * 结束填充
          * @method endFill
@@ -524,7 +516,9 @@ namespace annie {
             if (m) {
                 s._isBitmapFill = null;
             }
+            s.a2x_ut = true;
         }
+
         /**
          * 设置虚线参数
          * @method setLineDash
@@ -533,10 +527,11 @@ namespace annie {
          * @since 2.0.2
          * @return {void}
          */
-        public setLineDash(data:Array<number>=[]):void{
+        public setLineDash(data: Array<number> = []): void {
             let c = this._command;
-            c[c.length] = [1, "setLineDash", [data,0]];
+            c[c.length] = [1, "setLineDash", [data, 0]];
         }
+
         /**
          * 结束画线
          * @method endStroke
@@ -556,6 +551,7 @@ namespace annie {
             if (m) {
                 s._isBitmapStroke = null;
             }
+            s.a2x_ut = true;
         }
 
         /**
@@ -579,11 +575,18 @@ namespace annie {
                     i += 4;
                 }
             }
+            s.a2x_ut=true;
         };
+        //是否矢量元素有更新
+        private a2x_ut: boolean = true;
+
         public updateMatrix(): void {
-            let s = this;
-            super.updateMatrix();
-            if (s._UI.UD || s._UI.UF) {
+            let s: any = this;
+            let _canvas: any = s._texture;
+            let ctx = _canvas.getContext("2d");
+            let boundsW=s._bounds.width;
+            let boundsH=s._bounds.height;
+            if (s.a2x_ut){
                 //更新缓存
                 let cLen: number = s._command.length;
                 let leftX: number;
@@ -695,62 +698,66 @@ namespace annie {
                         leftY -= 20 + lineWidth >> 1;
                         buttonRightX += 20 + lineWidth >> 1;
                         buttonRightY += 20 + lineWidth >> 1;
-                        let w = buttonRightX - leftX;
-                        let h = buttonRightY - leftY;
-                        s._offsetX = leftX;
-                        s._offsetY = leftY;
-                        s._bounds.x = leftX + 10;
-                        s._bounds.y = leftY + 10;
-                        s._bounds.width = w - 20;
-                        s._bounds.height = h - 20;
+                        boundsW = buttonRightX - leftX;
+                        boundsH= buttonRightY - leftY;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        if (!s._isUseToMask) {
-                            let _canvas: any = s._texture;
-                            let ctx = _canvas["getContext"]('2d');
-                            _canvas.width = w;
-                            _canvas.height = h;
-                            ctx.clearRect(0, 0, w, h);
-                            ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                            ////////////////////
-                            s._draw(ctx);
-                            ///////////////////////////
-                            //滤镜
-                            let cf = s.cFilters;
-                            let cfLen = cf.length;
-                            if (cfLen > 0) {
-                                let imageData = ctx.getImageData(0, 0, w, h);
-                                for (let i = 0; i < cfLen; i++) {
-                                    cf[i].drawFilter(imageData);
-                                }
-                                ctx.putImageData(imageData, 0, 0);
-                            }
-                            //给webgl更新新
-                            //_canvas.updateMatrixTexture = true;
-                        }
+                        s.offsetX = leftX;
+                        s.offsetY = leftY;
+                        boundsH>>=0;
+                        boundsW>>=0;
+                        _canvas.width = boundsW;
+                        _canvas.height = boundsH;
+                        _canvas.style.width = boundsW / devicePixelRatio + "px";
+                        _canvas.style.height = boundsH / devicePixelRatio + "px";
+                        ctx.clearRect(0, 0, boundsW, boundsH);
+                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
+                        ///////////////////////////
+                        s._draw(ctx);
+                        ///////////////////////////
                     }
                 }
-                s._UI.UD = false;
             }
-            s._UI.UM = false;
-            s._UI.UA = false;
-            s._UI.UF = false;
+            super.updateMatrix();
+            if (s.a2x_uf) {
+                let cf: any = s.cFilters;
+                let cfLen = cf.length;
+                if (cfLen > 0) {
+                    let imageData = ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+                    for (let i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                }
+            }
+            if(boundsW!=s._bounds.width||boundsH!=s._bounds.height){
+                s._bounds.width=boundsW;
+                s._bounds.height=boundsH;
+                s._updateSplitBounds();
+                s._checkDrawBounds();
+            }else if(s.a2x_um){
+                s._checkDrawBounds();
+            }
+            s.a2x_ut = false;
+            s.a2x_um = false;
+            s.a2x_ua = false;
+            s.a2x_uf = false;
         }
-        private _draw(ctx: any,isMask:boolean=false): void {
+        private _draw(ctx: any, isMask: boolean = false): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;
             let data: any;
             let leftX: number = s._offsetX;
             let leftY: number = s._offsetY;
-            let isStroke=false;
-            if(isMask){
+            let isStroke = false;
+            if (isMask) {
                 ctx.beginPath();
             }
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
-                if (data[0] > 0){
+                if (data[0] > 0) {
                     let paramsLen = data[2].length;
-                    if(isMask&&(isStroke||data[1] == "beginPath"||data[1] == "closePath"||paramsLen==0)) continue;
+                    if (isMask && (isStroke || data[1] == "beginPath" || data[1] == "closePath" || paramsLen == 0)) continue;
                     if (paramsLen == 0) {
                         ctx[data[1]]();
                     } else if (paramsLen == 2) {
@@ -762,7 +769,7 @@ namespace annie {
                     } else if (paramsLen == 6) {
                         let lx = data[2][4];
                         let ly = data[2][5];
-                        if (data[0] == 2) {
+                        if (data[0] == 2){
                             //位图填充
                             lx -= leftX;
                             ly -= leftY;
@@ -770,53 +777,44 @@ namespace annie {
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {
-                    if(isMask) {
+                    if (isMask) {
                         if (data[1] == "strokeStyle") {
                             isStroke = true;
                         } else if (data[1] == "fillStyle") {
                             isStroke = false;
                         }
-                    }else {
+                    } else {
                         ctx[data[1]] = data[2];
                     }
                 }
             }
-            if(isMask){
+            if (isMask) {
                 ctx.closePath();
             }
         }
-        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false, isMustMouseEnable: boolean = false): DisplayObject {
+        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            let obj = super.hitTestPoint(hitPoint, isGlobalPoint, isMustMouseEnable);
-            if (obj) {
-                if (!s._isUseToMask && s.hitTestWidthPixel) {
-                    let p: any;
-                    if (isGlobalPoint) {
-                        p = s.globalToLocal(hitPoint);
-                    } else {
-                        p = hitPoint;
-                    }
-                    let image = s._texture;
-                    if (!image || image.width == 0 || image.height == 0) {
-                        return null;
-                    }
-                    let _canvas = DisplayObject["_canvas"];
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    p.x -= s._offsetX;
-                    p.y -= s._offsetY;
-                    let ctx = _canvas["getContext"]('2d');
-                    ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-                    ctx.drawImage(image, 0, 0);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                } else {
-                    return s;
-                }
+            let p: any;
+            if (isGlobalPoint) {
+                p = s.globalToLocal(hitPoint);
+            } else {
+                p = hitPoint;
             }
-            return null;
+            let texture = s._texture;
+            if (texture.width == 0) {
+                return null;
+            }
+            let _canvas = DisplayObject._canvas,ctx = _canvas.getContext('2d');
+            _canvas.width = 1;
+            _canvas.height = 1;
+            ctx.clearRect(0, 0, 1, 1);
+            ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
+            ctx.drawImage(texture, 0, 0);
+            if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                return s;
+            } else {
+                return null;
+            }
         }
 
         /**
@@ -838,15 +836,15 @@ namespace annie {
                 if (c[i][0] == 0) {
                     if (c[i][1] == "fillStyle" && infoObj.fillColor && c[i][2] != infoObj.fillColor) {
                         c[i][2] = infoObj.fillColor;
-                        s._UI.UD = true;
+                        s.a2x_ut = true;
                     }
                     if (c[i][1] == "strokeStyle" && infoObj.strokeColor && c[i][2] != infoObj.strokeColor) {
                         c[i][2] = infoObj.strokeColor;
-                        s._UI.UD = true;
+                        s.a2x_ut = true;
                     }
                     if (c[i][1] == "lineWidth" && infoObj.lineWidth && c[i][2] != infoObj.lineWidth) {
                         c[i][2] = infoObj.lineWidth;
-                        s._UI.UD = true;
+                        s.a2x_ut = true;
                     }
                 }
             }

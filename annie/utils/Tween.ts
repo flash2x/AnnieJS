@@ -86,9 +86,9 @@ namespace annie {
                         }
                         break;
                     case "yoyo":
-                        if (data[item] === false) {
+                        if (data[item] == false) {
                             s._isLoop = 0;
-                        } else if (data[item] === true) {
+                        } else if (data[item] == true) {
                             s._isLoop = Number.MAX_VALUE;
                         } else {
                             s._isLoop = data[item];
@@ -171,7 +171,7 @@ namespace annie {
                         s.currentFrame = 1;
                     } else {
                         if (cf) {
-                            cf(s._isLoop==0,pm);
+                            cf(pm,s._isLoop==0);
                         }
                         if (s._isLoop > 0) {
                             s._isFront = false;
@@ -186,7 +186,7 @@ namespace annie {
                 s.currentFrame--;
                 if (s.currentFrame < 0) {
                     if (cf) {
-                        cf(s._isLoop==0,pm);
+                        cf(pm,s._isLoop==0);
                     }
                     if (s._isLoop > 0) {
                         s._isFront = true;
@@ -223,7 +223,7 @@ namespace annie {
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是data.completeParams的值,第二个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
@@ -245,7 +245,7 @@ namespace annie {
          * @param {Object} data 包含target对象的各种数字类型属性及其他一些方法属性
          * @param {number:boolean} data.yoyo 是否像摆钟一样来回循环,默认为false.设置为true则会无限循环,或想只运行指定的摆动次数,将此参数设置为数字就行了。
          * @param {number:boolean} data.loop 是否循环播放。
-         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束;第二个是data.completeParams的值
+         * @param {Function} data.onComplete 完成结束函数. 默认为null. 两个参数，第一个是data.completeParams的值,第二个是true或者false，表示是否真的结束了,或者是一次yoyo,一次loop的结束
          * @param {Array} data.completeParams 完成函数参数. 默认为null，可以给完成函数里传参数
          * @param {Function} data.onUpdate 进入每帧后执行函数,回传参数是当前的Tween时间比.默认为null
          * @param {Function} data.ease 缓动类型方法
@@ -574,7 +574,7 @@ namespace annie {
          */
         public static exponentialIn(k: number): number {
 
-            return k === 0 ? 0 : Math.pow(1024, k - 1);
+            return k == 0 ? 0 : Math.pow(1024, k - 1);
 
         }
 
@@ -589,7 +589,7 @@ namespace annie {
          */
         public static exponentialOut(k: number): number {
 
-            return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+            return k == 1 ? 1 : 1 - Math.pow(2, -10 * k);
 
         }
 
@@ -603,10 +603,10 @@ namespace annie {
          * @return {number}
          */
         public static exponentialInOut(k: number): number {
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
             if ((k *= 2) < 1) {
@@ -675,11 +675,11 @@ namespace annie {
          */
         public static elasticIn(k: number): number {
 
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
 
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
 
@@ -698,11 +698,11 @@ namespace annie {
          */
         public static elasticOut(k: number): number {
 
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
 
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
             return Math.pow(2, -10 * k) * Math.sin((k - 0.1) * 5 * Math.PI) + 1;
@@ -719,10 +719,10 @@ namespace annie {
          * @return {number}
          */
         public static elasticInOut(k: number): number {
-            if (k === 0) {
+            if (k == 0) {
                 return 0;
             }
-            if (k === 1) {
+            if (k == 1) {
                 return 1;
             }
 

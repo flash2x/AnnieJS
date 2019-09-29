@@ -103,6 +103,14 @@ namespace annie {
          */
         public static ON_SCROLL_START="onScrollStart";
         /**
+         * annie.Scroller组件开始滑动事件
+         * @property ON_SCROLL_ING
+         * @static
+         * @since 3.1.0
+         * @type {string}
+         */
+        public static ON_SCROLL_ING="onScrollIng";
+        /**
          * annie.ScrollPage组件滑动到结束位置事件
          * @property ON_SCROLL_TO_END
          * @static
@@ -293,18 +301,6 @@ namespace annie {
         public stopImmediatePropagation():void{
             this._pd=true;
         }
-
-        /**
-         * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。
-         * @method stopPropagation
-         * @public
-         * @since 2.0.0
-         * @return {void}
-         */
-        public stopPropagation():void{
-            this._bpd=true;
-        }
-        private  _bpd:boolean=false;
         //是否阻止事件向下冒泡
         private _pd:boolean=false;
 
@@ -327,7 +323,6 @@ namespace annie {
             let s=this;
             s.target=target;
             s._pd=false;
-            s._bpd=false;
             s.type=type;
         }
     }

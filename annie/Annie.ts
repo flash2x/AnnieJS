@@ -1,7 +1,7 @@
 /**
  * @class annie
  */
-namespace annie {
+namespace annie{
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 全局eval,相比自带的eval annie.Eval始终是全局的上下文。不会因为使用的位置和环境而改变上下文。
@@ -36,7 +36,7 @@ namespace annie {
      *      console.log(annie.version);
      */
 
-    export let version:string="3.0.0";
+    export let version:string="3.0.1";
 
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -166,7 +166,7 @@ namespace annie {
         req.send();
     }
     // 作为将显示对象导出成图片的render渲染器
-    let _dRender: any = null;
+    export let _dRender: any = null;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -178,7 +178,7 @@ namespace annie {
      * @param {string} bgColor 颜色值如 #fff,rgba(255,23,34,44)等！默认值为空的情况下，jpeg格式的话就是黑色底，png格式的话就是透明底
      * @return {string} base64格式数据
      * @example
-     *      annie.toDisplayDataURL(DisplayObj, {
+     *      annie.toDisplayDataURL(DisplayObj,{
      *               x: 0,
      *               y: 32,
      *               width: 441,
@@ -193,38 +193,45 @@ namespace annie {
     export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
             _dRender = new CanvasRender(null);
-            _dRender.rootContainer = DisplayObject["_canvas"];
         }
-        let objInfo:any = {
-            p: obj.parent,
-            x: obj.x,
-            y: obj.y};
+        _dRender.rootContainer = DisplayObject["_canvas"];
+        if(!obj.stage){
+            obj.updateMatrix();
+        }
+        if(!rect){
+            obj.getTransformRect();
+        }else{
+            obj.getTransformRect(obj.matrix,rect);
+        }
+        rect =DisplayObject._transformRect;
+        let sp=obj.parent;
         obj.parent=null;
         obj._cp=true;
-        obj.x=obj.y=0;
-        if(!rect){
-            rect = obj.getDrawRect();
-        }
-        obj.x=-rect.x;
-        obj.y=-rect.y;
+        let ox=obj.x;
+        let oy=obj.y;
+        obj.x=ox-rect.x;
+        obj.y=oy-rect.y;
         let w: number =rect.width;
         let h: number =rect.height;
         _dRender.rootContainer.width = w;
         _dRender.rootContainer.height = h;
+        _dRender.viewPort.height = h;
+        _dRender.viewPort.width = w;
         _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
         _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
         _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        if (bgColor == "") {
+        if (bgColor == ""){
             _dRender._ctx.clearRect(0, 0, w, h);
         } else {
             _dRender._ctx.fillStyle = bgColor;
             _dRender._ctx.fillRect(0, 0, w, h);
         }
+        obj.updateMatrix();
         obj.render(_dRender);
-        obj.parent = objInfo.p;
+        obj.parent = sp;
         obj._cp=true;
-        obj.x = objInfo.x;
-        obj.y = objInfo.y;
+        obj.x=ox;
+        obj.y=oy;
         if (!typeInfo) {
             typeInfo = {type: "png"};
         }else{
@@ -233,52 +240,6 @@ namespace annie {
             }
         }
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
-    };
-    export let toDisplayCache = function (obj: any): string {
-        if (!_dRender) {
-            _dRender = new CanvasRender(null);
-            _dRender.rootContainer = DisplayObject["_canvas"];
-        }
-        let objInfo = {
-            p: obj.parent,
-            x: obj.x,
-            y: obj.y,
-            scX: obj.scaleX,
-            scY: obj.scaleY,
-            r: obj.rotation,
-            skX: obj.skewX,
-            skY: obj.skewY
-        };
-        obj.parent = null;
-        obj._cp=true;
-        obj.x=obj.y=0;
-        obj.scaleX = obj.scaleY = 1;
-        obj.rotation = obj.skewX = obj.skewY = 0;
-        //设置宽高,如果obj没有添加到舞台上就去截图的话,会出现宽高不准的时候，需要刷新一下。
-        let whObj: any = obj.getBounds();
-        let w: number =  whObj.width;
-        let h: number =  whObj.height;
-        obj.x =-whObj.x;
-        obj.y = -whObj.y;
-        obj._offsetX = whObj.x;
-        obj._offsetY = whObj.y;
-        _dRender.rootContainer.width = w;
-        _dRender.rootContainer.height = h;
-        _dRender.rootContainer.style.width = w / devicePixelRatio + "px";
-        _dRender.rootContainer.style.height = h / devicePixelRatio + "px";
-        _dRender._ctx = _dRender.rootContainer["getContext"]('2d');
-        _dRender._ctx.clearRect(0, 0, w, h);
-        obj.render(_dRender);
-        obj.parent = objInfo.p;
-        obj._cp=true;
-        obj.x = objInfo.x;
-        obj.y = objInfo.y;
-        obj.scaleX = objInfo.scX;
-        obj.scaleY = objInfo.scY;
-        obj.rotation = objInfo.r;
-        obj.skewX = objInfo.skX;
-        obj.skewY = objInfo.skY;
-        return _dRender.rootContainer.toDataURL("image/png");
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>

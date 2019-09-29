@@ -139,7 +139,6 @@ namespace annie {
             _loadRes();
         }
     };
-
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
@@ -185,7 +184,7 @@ namespace annie {
         for (let item in loadContent) {
             mc = loadContent[item];
             if (mc.t == 1) {
-                if (!mc.f) {
+                if (!(mc.f instanceof Object)) {
                     mc.f = [];
                     continue;
                 }
@@ -198,7 +197,7 @@ namespace annie {
                     for (let i = 0; i < count; i++) {
                         frameCon = frameList[i].c;
                         //这帧是否为空
-                        if (frameCon) {
+                        if (frameCon instanceof Object) {
                             for (let j in frameCon) {
                                 let at = frameCon[j].at;
                                 if (at != undefined && at != -1) {
@@ -216,10 +215,10 @@ namespace annie {
                                 }
                             }
                             //上一帧是否为空
-                            if (lastFrameCon) {
+                            if (lastFrameCon instanceof Object) {
                                 for (let j in lastFrameCon) {
                                     //上一帧有，这一帧没有，加进来
-                                    if (!frameCon[j]) {
+                                    if (!(frameCon[j] instanceof Object)) {
                                         frameCon[j] = lastFrameCon[j];
                                     } else {
                                         //上一帧有，这一帧也有那么at就只有-1一种可能
@@ -227,7 +226,7 @@ namespace annie {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] == undefined) {
+                                                if (frameCon[j][m] == void 0) {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -253,8 +252,14 @@ namespace annie {
 
     let _loadResCount = 0;
     let mediaResourceOnload = function (e: any) {
-        URL.revokeObjectURL(e.target.url);
-        e.target.onload = null;
+        if (e != void 0) {
+            URL.revokeObjectURL(e.target.url);
+            if (e.target instanceof Image) {
+                e.target.onload = null;
+            } else {
+                e.target.mediaResourceOnload = null;
+            }
+        }
         _loadResCount--;
         if (_loadResCount == 0) {
             _checkComplete();
@@ -283,9 +288,19 @@ namespace annie {
                     else if (e.data.type == "sound") {
                         //声音
                         var audio: any = new Audio();
-                        audio.src = URL.createObjectURL(loadContent);
+                        _loadResCount++;
+                        if (annie.osType == "ios") {
+                            var sFileReader = new FileReader();
+                            sFileReader.onload = function () {
+                                audio.src = sFileReader.result;
+                                mediaResourceOnload(null);
+                            };
+                            sFileReader.readAsDataURL(loadContent);
+                        } else {
+                            audio.onloadedmetadata = mediaResourceOnload;
+                            audio.src = URL.createObjectURL(loadContent);
+                        }
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                        _checkComplete();
                     } else {
                         _checkComplete();
                     }
@@ -295,7 +310,7 @@ namespace annie {
             }
         } else {
             //解析swf
-            let fileReader: FileReader = new FileReader();
+            let fileReader: any = new FileReader();
             let state = 0;
             let lastIndex = 0;
             let currIndex = 1;
@@ -332,22 +347,24 @@ namespace annie {
                         lastIndex = currIndex;
                         currIndex += JSONData[i].src;
                         if (JSONData[i].type == "image") {
-                            let image = new Image();
+                            let image: any = new Image();
                             image.onload = mediaResourceOnload;
                             image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
                             annie.res[scene][JSONData[i].id] = image;
                         } else if (JSONData[i].type == "sound") {
                             let audio: any = new Audio();
+                            if (annie.osType == "ios") {
+                                let sFileReader = new FileReader();
+                                sFileReader.onload = function () {
+                                    audio.src = sFileReader.result;
+                                    mediaResourceOnload(null);
+                                };
+                                sFileReader.readAsDataURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
+                            } else {
+                                audio.onloadedmetadata = mediaResourceOnload;
+                                audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
+                            }
                             annie.res[scene][JSONData[i].id] = audio;
-                            let audioReader: any = new FileReader();
-                            audioReader.onload = function () {
-                                audio.src = audioReader.result;
-                                _loadResCount--;
-                                if (_loadResCount == 0){
-                                    _checkComplete();
-                                }
-                            };
-                            audioReader.readAsDataURL(loadContent.slice(lastIndex, currIndex,"audio/mp3"));
                         } else if (JSONData[i].type == "json") {
                             if (JSONData[i].id == "_a2x_con") {
                                 fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
@@ -450,7 +467,14 @@ namespace annie {
      */
     export function getResource(sceneName: string, resName: string): any {
         let s = res;
-        if (s[sceneName][resName]) {
+        let obj = s[sceneName][resName];
+        if (obj != void 0) {
+            //分析是不是分割图
+            let re = /([1-9]\d*)x([1-9]\d*)$/;
+            let resultMatchList = re.exec(resName);
+            if (resultMatchList != void 0 && resultMatchList.length == 3) {
+                obj.boundsRowAndCol = [parseInt(resultMatchList[1]), parseInt(resultMatchList[1])];
+            }
             return s[sceneName][resName];
         }
         return null;
@@ -462,27 +486,69 @@ namespace annie {
     }
 
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
-    export function d(target: any, info: any, parentFrame: number = 1): void {
+    export function d(target: any, info: any, isMc: boolean = false): void {
         if (target._a2x_res_obj == info) {
             return;
         } else {
-            //是不是文本
             //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
             if (info.tr == undefined || info.tr.length == 1) {
                 info.tr = [0, 0, 1, 1, 0, 0];
             }
             let lastInfo = target._a2x_res_obj;
-            if (lastInfo.tr != info.tr) {
-                [target.x, target.y, target.scaleX, target.scaleY, target.skewX, target.skewY] = info.tr;
+            if (info.al == void 0) {
+                info.al = 1;
+            }
+            if(isMc){
+                if (lastInfo.tr!= info.tr){
+                    let isUmChange:boolean=false;
+                    if(!target._changeTransformInfo[0]&&target._x!=info.tr[0]){
+                        target._x=info.tr[0];
+                        target._lastX=target._x+target._offsetX;
+                        isUmChange=true;
+                    }
+                    if(!target._changeTransformInfo[1]&&target._y!=info.tr[1]){
+                        target._y=info.tr[1];
+                        target._lastY=target._y+target._offsetY;
+                        isUmChange=true;
+                    }
+                    if(!target._changeTransformInfo[2]&&target._scaleX!=info.tr[2]){
+                        target._scaleX=info.tr[2];
+                        isUmChange=true;
+                    }
+                    if(!target._changeTransformInfo[3]&&target._scaleY!=info.tr[3]){
+                        target._scaleY=info.tr[3];
+                        isUmChange=true;
+                    }
+                    if(!target._changeTransformInfo[4]){
+                        if(target._skewX!=info.tr[4]){
+                            target._skewX=info.tr[4];
+                            isUmChange=true;
+                        }
+                        if(target._skewY!=info.tr[5]){
+                            target._skewY=info.tr[5];
+                            isUmChange=true;
+                        }
+                    }
+                    target.a2x_um=isUmChange;
+                }
+                if(!target._changeTransformInfo[5]&&target._alpha!=info.al) {
+                    target._alpha = info.al;
+                    target.a2x_ua = true;
+                }
+            }else{
+                if(lastInfo.tr != info.tr){
+                    [target._x, target._y, target._scaleX, target._scaleY, target._skewX, target._skewY] = info.tr;
+                    target._lastX=target._x+target._offsetX;
+                    target._lastY=target._y+target._offsetY;
+                    target.a2x_um=true;
+                }
+                target._alpha = info.al;
+                target.a2x_ua=true;
             }
             if (info.w != undefined) {
                 target.textWidth = info.w;
                 target.textHeight = info.h;
-                if (target._instanceType == "annie.TextField") {
-                    target.y += 2;
-                }
             }
-            target.alpha = info.al == undefined ? 1 : info.al;
             //动画播放模式 图形 按钮 动画
             if (info.t != undefined) {
                 if (info.t == -1) {
@@ -496,7 +562,7 @@ namespace annie {
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {
-                if (info.fi != undefined) {
+                if (info.fi != void 0) {
                     let filters: any = [];
                     let blur: any;
                     let color: any;
@@ -525,8 +591,7 @@ namespace annie {
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
-                            //console.log("部分滤镜效果未实现");
-                            //其他还示实现
+                            //TODO 其他还示实现
                         }
                     }
                     if (filters.length > 0) {
@@ -584,30 +649,6 @@ namespace annie {
         return textObj;
     }
 
-    //获取矢量位图填充所需要的位图,为什么写这个方法,是因为作为矢量填充的位图不能存在于SpriteSheet中,要单独画出来才能正确的填充到矢量中
-    export function sb(sceneName: string, resName: string): annie.Bitmap {
-        let sbName: string = "_f2x_s" + resName;
-        if (res[sceneName][sbName]) {
-            return res[sceneName][sbName];
-        } else {
-            let bitmapData: any = null;
-            let bitmap = b(sceneName, resName);
-            if (bitmap) {
-                if (bitmap.rect) {
-                    //从SpriteSheet中取出Image单独存放
-                    bitmapData = annie.Bitmap.convertToImage(bitmap, false);
-                } else {
-                    bitmapData = bitmap.bitmapData;
-                }
-                res[sceneName][sbName] = bitmapData;
-                return bitmapData;
-            } else {
-                console.log("error:矢量位图填充时,未找到位图资源!");
-                return null;
-            }
-        }
-    }
-
     //创建一个Shape矢量对象,此方法一般给Annie2x工具自动调用
     function g(sceneName: string, resName: string): Shape {
         let shapeDate = res[sceneName]._a2x_con[resName][1];
@@ -621,7 +662,7 @@ namespace annie {
                 } else if (shapeDate[i][1] == 2) {
                     shape.beginRadialGradientFill(shapeDate[i][2][0], shapeDate[i][2][1]);
                 } else {
-                    shape.beginBitmapFill(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1]);
+                    shape.beginBitmapFill(getResource(sceneName, shapeDate[i][2][0]), shapeDate[i][2][1]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endFill();
@@ -633,7 +674,7 @@ namespace annie {
                 } else if (shapeDate[i][1] == 2) {
                     shape.beginRadialGradientStroke(shapeDate[i][2][0], shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 } else {
-                    shape.beginBitmapStroke(b(sceneName, shapeDate[i][2][0]).bitmapData, shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
+                    shape.beginBitmapStroke(getResource(sceneName, shapeDate[i][2][0]), shapeDate[i][2][1], shapeDate[i][4], shapeDate[i][5], shapeDate[i][6], shapeDate[i][7]);
                 }
                 shape.decodePath(shapeDate[i][3]);
                 shape.endStroke();
@@ -688,11 +729,11 @@ namespace annie {
         }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? "text" : info.responseType;
-        if (info.success != undefined) {
+        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "text" : info.dataType) : info.responseType;
+        if (info.success instanceof Object) {
             urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
-        if (info.error != undefined) {
+        if (info.error instanceof Object) {
             urlLoader.addEventListener(annie.Event.ERROR, info.error);
         }
         urlLoader.load(info.url);
@@ -785,7 +826,7 @@ namespace annie {
         let i: number;
         if (resClass.tf > 1) {
             isMc = true;
-            if (resClass.timeLine == undefined) {
+            if (resClass.timeLine == void 0) {
                 //将时间轴丰满,抽出脚本，抽出标签
                 let keyFrameCount = resClass.f.length;
                 let timeLine: Array<number> = [];
@@ -813,12 +854,12 @@ namespace annie {
                 }
                 resClass.timeLine = timeLine;
                 //初始化标签对象方便gotoAndStop gotoAndPlay
-                if (!resClass.f) resClass.f = [];
-                if (!resClass.a) resClass.a = {};
-                if (!resClass.s) resClass.s = {};
-                if (!resClass.e) resClass.e = {};
+                if (!(resClass.f instanceof Object)) resClass.f = [];
+                if (!(resClass.a instanceof Object)) resClass.a = {};
+                if (!(resClass.s instanceof Object)) resClass.s = {};
+                if (!(resClass.e instanceof Object)) resClass.e = {};
                 let label: any = {};
-                if (!resClass.l) {
+                if (!(resClass.l instanceof Object)) {
                     resClass.l = [];
                 } else {
                     for (let index in resClass.l) {
@@ -831,7 +872,7 @@ namespace annie {
             }
         }
         let children = resClass.c;
-        if (children) {
+        if (children instanceof Object) {
             let allChildren: any = [];
             let objCount = children.length;
             let obj: any = null;
@@ -840,7 +881,7 @@ namespace annie {
             let maskTillId = 0;
             for (i = 0; i < objCount; i++) {
                 //if (children[i].indexOf("_$") == 0) {
-                if (Array.isArray(classRoot[children[i]])) {
+                if (classRoot[children[i]] instanceof Array) {
                     objType = classRoot[children[i]][0];
                 } else {
                     objType = classRoot[children[i]].t;
@@ -896,11 +937,11 @@ namespace annie {
                     } else {
                         d(obj, resClass.f[0].c[index]);
                         // 检查是否有遮罩
-                        if (resClass.f[0].c[index].ma != undefined) {
+                        if (resClass.f[0].c[index].ma != void 0) {
                             maskObj = obj;
                             maskTillId = resClass.f[0].c[index].ma - 1;
                         } else {
-                            if (maskObj && i <= maskTillId) {
+                            if (maskObj instanceof Object && i <= maskTillId) {
                                 obj.mask = maskObj;
                                 if (i == maskTillId) {
                                     maskObj = null;
@@ -915,7 +956,7 @@ namespace annie {
                     //如果是声音，还要把i这个顺序保存下来
                     if (objType == 5) {
                         obj.isPlaying = false;
-                        if (!target._a2x_sounds) {
+                        if (!(target._a2x_sounds instanceof Object)) {
                             target._a2x_sounds = {};
                         }
                         target._a2x_sounds[i] = obj;
@@ -925,7 +966,7 @@ namespace annie {
             if (isMc) {
                 //将mc里面的实例按照时间轴上的图层排序
                 let ol = resClass.ol;
-                if (ol) {
+                if (ol instanceof Object) {
                     for (let o = 0; o < ol.length; o++) {
                         target._a2x_res_children[o] = [ol[o], allChildren[ol[o] - 1]];
                     }

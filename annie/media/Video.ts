@@ -41,7 +41,7 @@ namespace annie {
             s.media.poster="";
             s.media.preload="auto";
             s.media.controls=false;
-            if(width&&height) {
+            if(width&&height){
                 s.media.width = width;
                 s.media.height = height;
             }

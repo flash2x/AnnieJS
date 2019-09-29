@@ -44,6 +44,8 @@ namespace annie {
         /**
          * 销毁一个对象
          * 销毁之前一定要做完其他善后工作，否则有可能会出错
+         * 特别注意不能在对象自身方法或事件里调用此方法。
+         * 比如，不要在显示对象自身的 annie.Event.ON_REMOVE_TO_STAGE 或者其他类似事件调用，一定会报错
          * @method destroy
          * @since 2.0.0
          * @public
@@ -77,11 +79,7 @@ namespace annie {
             let count: number = 0;
             if (type == "") {
                 //返回所有鼠标事件数
-                for (let item in EventDispatcher._MECO) {
-                    if (item.indexOf("onMouse") == 0) {
-                        count += EventDispatcher._MECO[item];
-                    }
-                }
+                count=EventDispatcher._totalMEC;
             } else {
                 if (EventDispatcher._MECO[type]) {
                     count = EventDispatcher._MECO[type];
@@ -114,7 +112,7 @@ namespace annie {
             if(!useCapture){
                 eventTypes=s.eventTypes1;
             }
-            if (!eventTypes[type]) {
+            if (!(eventTypes[type] instanceof Object)) {
                 eventTypes[type] = [];
             }
             if (eventTypes[type].indexOf(listener) < 0) {
@@ -160,10 +158,10 @@ namespace annie {
         public dispatchEvent(event: any, data: any = null,useCapture = true): boolean {
             let s = this;
             if (typeof(event) == "string") {
-                if (!s._defaultEvent) {
-                    s._defaultEvent = new annie.Event(event);
-                } else {
+                if (s._defaultEvent instanceof annie.Event) {
                     s._defaultEvent.reset(event, s);
+                } else {
+                    s._defaultEvent = new annie.Event(event);
                 }
                 event = s._defaultEvent;
             }
@@ -171,17 +169,17 @@ namespace annie {
             if(!useCapture){
                 listeners=s.eventTypes1[event.type];
             }
-            if (listeners) {
-                let len = listeners.length;
-                if (event.target == null) {
+            if (listeners instanceof Array) {
+                if (!(event.target instanceof Object)) {
                     event.target = s;
                 }
-                if (data != null) {
+                if(data!=void 0) {
                     event.data = data;
                 }
+                let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    if(!event["_pd"]) {
-                        if (listeners[i]) {
+                    if(!event._pd){
+                        if (listeners[i] instanceof Function) {
                             listeners[i](event);
                         } else {
                             listeners.splice(i, 1);
@@ -206,11 +204,11 @@ namespace annie {
         public hasEventListener(type: string, useCapture = true): boolean {
             let s = this;
             if (useCapture) {
-                if (s.eventTypes[type] && s.eventTypes[type].length > 0) {
+                if (s.eventTypes[type] instanceof Array && s.eventTypes[type].length > 0) {
                     return true
                 }
             } else {
-                if (s.eventTypes1[type] && s.eventTypes1[type].length > 0) {
+                if (s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
                     return true
                 }
             }
@@ -233,10 +231,10 @@ namespace annie {
             if(!useCapture){
                 listeners=s.eventTypes1[type];
             }
-            if (listeners) {
+            if (listeners instanceof Array) {
                 let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    if (listeners[i] === listener) {
+                    if (listeners[i] == listener) {
                         listeners.splice(i, 1);
                         if (type.indexOf("onMouse") == 0) {
                             s._changeMouseCount(type, false);
@@ -272,8 +270,16 @@ namespace annie {
             s.eventTypes1 = {};
             s.eventTypes = {};
         }
-        destroy(): void {
-            this.removeAllEventListener();
+
+        /**
+         *
+         */
+        public destroy(): void {
+            let s:any=this;
+            s.removeAllEventListener();
+            s.eventTypes1=null;
+            s.eventTypes=null;
+            s._defaultEvent=null;
         }
     }
 }

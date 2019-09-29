@@ -148,6 +148,14 @@ declare namespace annieUI {
          */
         isSpringBack: boolean;
         /**
+         * 是否允许通过鼠标去滚动
+         * @property isCanUseMouseScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        isCanUseMouseScroll: boolean;
+        private _timer;
+        /**
          * 构造函数
          * @method  ScrollPage
          * @param {number} vW 可视区域宽
@@ -173,7 +181,7 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         setViewRect(w: number, h: number, isVertical: boolean): void;
-        private onMouseEvent(e);
+        private onMouseEvent;
         /**
          * 滚到指定的坐标位置
          * @method scrollTo
@@ -190,7 +198,83 @@ declare namespace annieUI {
          * @type {number}
          * @since 2.0.1
          */
-        currentPos: number;
+        readonly currentPos: number;
+    }
+}
+/**
+ * @module annieUI
+ */
+declare namespace annieUI {
+    /**
+     * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
+     * @class annieUI.Scroller
+     * @public
+     * @extends annie.AObject
+     * @since 3.1.0
+     */
+    class Scroller extends annie.EventDispatcher {
+        /**
+         * annieUI.Scroller组件滑动到开始位置事件
+         * @event annie.Event.ON_SCROLL_ING
+         * @since 3.1.0
+         */
+        /**
+         * 滑动方向
+         * @property isVertical
+         * @type {boolean}
+         */
+        isVertical: boolean;
+        /**
+         * 手指按下后的滑动速度，值越大，滑动越快
+         * @property speed
+         * @protected
+         * @since 3.1.0
+         * @type {number}
+         */
+        speed: number;
+        /**
+         * 滚动的最大速度，直接影响一次滑动之后最长可以滚多远
+         * @property maxSpeed
+         * @public
+         * @since 3.1.0
+         * @default 100
+         * @type {number}
+         */
+        maxSpeed: number;
+        /**
+         * 松开手指后的自然滚动的摩擦力，摩擦力越大，停止的越快
+         * @property fSpeed
+         * @since 3.1.0
+         * @type {number}
+         */
+        fSpeed: number;
+        private _isMouseDownState;
+        private _moveDis;
+        /**
+         * 是否允许通过鼠标去滚动
+         * @property isCanScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        isCanScroll: boolean;
+        private _isStop;
+        private _timer;
+        private _stage;
+        private _maxDis;
+        private _lastValue;
+        private _frame;
+        constructor();
+        /**
+         * 初始化函数
+         * @method  ScrollPage
+         * @param {annie.Stage} Stage
+         * @param {number} maxDis
+         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         */
+        init(stage: annie.Stage, maxDis: number, isVertical?: boolean): void;
+        mouseEvent: any;
+        private onMouseEvent;
+        destroy(): void;
     }
 }
 /**
@@ -351,7 +435,7 @@ declare namespace annieUI {
         isPageFollowToMove: boolean;
         /**
          * 页面的跟随缓动系数率，默认0.7
-         * @property reBound
+         * @property follow
          * @type {number}
          * @public
          * @since 1.0.3
@@ -390,7 +474,7 @@ declare namespace annieUI {
         pageList: Array<any>;
         /**
          * 页面对象的类列表
-         * @property pageList
+         * @property pageClassList
          * @type {Array}
          * @public
          */
@@ -404,6 +488,13 @@ declare namespace annieUI {
          * @public
          */
         isMouseDown: boolean;
+        /**
+         * 是否允许通过鼠标去滚动
+         * @property isCanUseMouseScroll
+         * @type {boolean}
+         * @since 3.0.1
+         */
+        isCanUseMouseScroll: boolean;
         /**
          * 是否可以下一页
          * @property canSlideNext
@@ -440,8 +531,8 @@ declare namespace annieUI {
          * @public
          * @since 1.0.0
          */
-        private setMask(w, h);
-        private onMouseEvent(e);
+        private setMask;
+        private onMouseEvent;
         /**
          * 滑动到指定页
          * @method slideTo
@@ -558,19 +649,19 @@ declare namespace annieUI {
         private md;
         private mu;
         private mm;
-        private drawPage(num, movePoint);
-        private checkLimit(point, limitPoint, limitGap);
-        private getPage(index);
-        private getBookArr(point, actionPoint1, actionPoint2);
-        private getLayerArr(point1, point2, actionPoint1, actionPoint2, limitPoint1, limitPoint2);
-        private getShape(shape, pointArr);
-        private setShadowMask(shape, g_width, g_height);
-        private getShadow(shape, point1, point2, arg);
-        private setPage(pageNum);
-        private onMouseDown(e);
-        private onMouseUp(e);
-        private onMouseMove(e);
-        private checkArea(point);
+        private drawPage;
+        private checkLimit;
+        private getPage;
+        private getBookArr;
+        private getLayerArr;
+        private getShape;
+        private setShadowMask;
+        private getShadow;
+        private setPage;
+        private onMouseDown;
+        private onMouseUp;
+        private onMouseMove;
+        private checkArea;
         /**
          * 跳到指定的页数
          * @method flipTo
@@ -602,11 +693,11 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         endPage(): void;
-        private flushPage();
-        private onEnterFrame(e);
-        private arc(argR, argN1, argN2);
-        private angle(target1, target2);
-        private pos(target1, target2);
+        private flushPage;
+        private onEnterFrame;
+        private arc;
+        private angle;
+        private pos;
         destroy(): void;
     }
 }
@@ -654,7 +745,7 @@ declare namespace annieUI {
          * @since 1.0.9
          * @return {DisplayObject}
          */
-        loadingView: DisplayObject;
+        readonly loadingView: DisplayObject;
         /**
          * 构造函数
          * @method ScrollList
@@ -676,7 +767,7 @@ declare namespace annieUI {
          * @since 1.0.9
          */
         updateData(data: Array<any>, isReset?: boolean): void;
-        private flushData();
+        private flushData;
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置
          * @method setViewRect
@@ -687,7 +778,7 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         setViewRect(w: number, h: number, isVertical: boolean): void;
-        private _updateViewRect();
+        private _updateViewRect;
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9
@@ -740,24 +831,6 @@ declare namespace annieUI {
          */
         bgColor: any;
         /**
-         * 画板宽
-         * @property drawWidth
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        drawWidth: number;
-        /**
-         * 画板高
-         * @property drawHeight
-         * @type {number}
-         * @readonly
-         * @public
-         * @since 1.1.1
-         */
-        drawHeight: number;
-        /**
          * 总步数数据
          * @property totalStepList
          * @protected
@@ -778,6 +851,7 @@ declare namespace annieUI {
          * @type {number}
          */
         protected currentStepId: number;
+        protected static _getDrawCanvas(width: number, height: number): HTMLCanvasElement;
         /**
          * 构造函数
          * @method DrawingBoard
@@ -787,9 +861,9 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         constructor(width: number, height: number, bgColor?: any);
-        private onMouseDown(e);
-        private onMouseUp(e);
-        private onMouseMove(e);
+        private onMouseDown;
+        private onMouseUp;
+        private onMouseMove;
         /**
          * 重置画板
          * @method reset

@@ -46,10 +46,9 @@ namespace annieUI {
             s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
             s.photo.crossOrigin="";
-            s.bitmap = new annie.Bitmap();
             s.maskObj = new annie.Shape();
             s.photo.onload = function (e: any) {
-                s.bitmap.bitmapData = s.photo;
+                s.bitmap = new annie.Bitmap(s.photo);
                 s.maskObj.clear();
                 s.maskObj.beginFill("#000000");
                 let scale = s.radio / (s.photo.width < s.photo.height ? s.photo.width : s.photo.height);
@@ -62,11 +61,12 @@ namespace annieUI {
                     s.maskObj.drawRect(0, 0, s.radioW, s.radioH);
                 }
                 s.maskObj.endFill();
+                s.addChild(s.bitmap);
+                s.addChild(s.maskObj);
+                s.bitmap.mask = s.maskObj;
                 s.dispatchEvent("onComplete");
             };
-            s.addChild(s.bitmap);
-            s.addChild(s.maskObj);
-            s.bitmap.mask = s.maskObj;
+
         }
         private photo: any;
         private bitmap: Bitmap;

@@ -47,7 +47,7 @@ namespace annie {
         public iosTouchendPreventDefault: boolean = true;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否禁止引擎所在的canvas的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
+         * 是否禁止引擎所在的DIV的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
          * @property isPreventDefaultEvent
          * @since 1.0.9
          * @default true
@@ -117,19 +117,7 @@ namespace annie {
         }
 
         private static _pause: boolean = false;
-        /**
-         * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
-         * @property viewRect
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {annie.Rectangle}
-         * @default {x:0,y:0,width:0,height:0}
-         * @readonly
-         * @example
-         *      //始终让一个对象顶对齐，或者
-         */
-        public viewRect: Rectangle = new Rectangle();
+        private _viewRect: Rectangle = new Rectangle();
         /**
          * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
          * @property isMultiTouch
@@ -138,7 +126,7 @@ namespace annie {
          */
         public isMultiTouch: boolean = false;
         /**
-         * 开启或关闭多个手指的鼠标事件 目前仅支持两点 旋转 缩放
+         * 开启或关闭多个手指的鼠标事件
          * @property isMultiMouse
          * @since 1.1.3
          * @type {boolean}
@@ -206,6 +194,8 @@ namespace annie {
          * @type {number}
          */
         public divWidth: number = 0;
+        private _isFullScreen:boolean=true;
+
         /**
          * 舞台的背景色
          * 默认就是透明背景
@@ -213,10 +203,31 @@ namespace annie {
          * @property bgColor
          * @public
          * @since 1.0.0
-         * @type {string}
-         * @default "";
+         * @type {number} 0xFFFFFFFF R G B A
+         * @default -1 不填充;
          */
-        public bgColor: string = "";
+        public set bgColor(value: number) {
+            if (value != this._bgColor) {
+                this._bgColor = value;
+                let a = value >> 24 & 0xff;
+                let r = value >> 16 & 0xff;
+                let g = value >> 8 & 0xff;
+                let b = value & 0xff;
+                this._bgColorStr = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+                this._bgColorRGBA.a = a / 255;
+                this._bgColorRGBA.r = r / 255;
+                this._bgColorRGBA.g = g / 255;
+                this._bgColorRGBA.b = b / 255;
+            }
+        };
+
+        public get bgColor(): number {
+            return this._bgColor;
+        };
+
+        private _bgColor: number = -1;
+        public _bgColorStr: string = "rgba(0,0,0,0)";
+        public _bgColorRGBA: { r: number, g: number, b: number, a: number } = {r: 0, g: 0, b: 0, a: 0};
 
         /**
          * 舞台的缩放模式
@@ -258,16 +269,12 @@ namespace annie {
         }
 
         private _scaleMode: string = "onScale";
-
         //原始为60的刷新速度时的计数器
         private _flush: number = 0;
-
         // 当前的刷新次数计数器
         private _currentFlush: number = 0;
-        public static _dragDisplay: DisplayObject = null;
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
-        private _floatDisplayList: Array<FloatDisplay> = [];
 
         /**
          * 显示对象入口函数
@@ -294,9 +301,12 @@ namespace annie {
                 script.src = "libs/vconsole.min.js";
             }
             let s: Stage = this;
+            s.a2x_ua=true;
+            s.a2x_um=true;
             s._instanceType = "annie.Stage";
             s.stage = s;
-            s.name = "stageInstance_" + s.instanceId;
+            s._isOnStage = true;
+            s.name = rootDivId;
             let div: any = document.getElementById(rootDivId);
             s.renderType = renderType;
             s.desWidth = desW;
@@ -306,30 +316,28 @@ namespace annie {
             s._scaleMode = scaleMode;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
-            //目前具支持canvas
-            s.renderObj = new CanvasRender(s);
-            /* webgl 直到对2d的支持非常成熟了再考虑开启
+            //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
                 s.renderObj = new CanvasRender(s);
             } else {
                 //webgl
-                s.renderObj = new WGRender(s);
-            }*/
-            // let rc = s.renderObj.rootContainer;
+                //s.renderObj = new WebGLRender(s);
+            }
+            s.renderObj.init();
             let rc = s.rootDiv;
-            s.mouseEvent = s.onMouseEvent.bind(s);
+            s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
             }
-            if('ontouchstart' in rc) {
+            if ('ontouchstart' in rc) {
                 rc.addEventListener("touchstart", s.mouseEvent, false);
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);
+                rc.addEventListener('touchcancel', s.mouseEvent, false);
             }
-            s.renderObj.init();
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
         }
@@ -339,12 +347,7 @@ namespace annie {
         public render(renderObj: IRender): void {
             renderObj.begin();
             super.render(renderObj);
-            let s = this;
-            let sf: any = s._floatDisplayList;
-            let len = sf.length;
-            for (let i = 0; i < len; i++) {
-                sf[i].updateStyle();
-            }
+            renderObj.end();
         }
 
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
@@ -353,9 +356,8 @@ namespace annie {
         private _mp: any = [];
 
         //刷新mouse或者touch事件
-        private _initMouseEvent(event: MouseEvent, cp: Point, sp: Point, identifier: number): void {
-            event["_pd"] = false;
-            event["_bpd"] = false;
+        private _initMouseEvent(event: any, cp: Point, sp: Point, identifier: number): void {
+            event._pd = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
@@ -365,17 +367,16 @@ namespace annie {
 
         // 鼠标按下事件的对象池
         private _mouseDownPoint: any = {};
-        public isReUpdate: boolean = false;
 
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
             //看看是否有resize
-            let callState = 2;
-            let needUpdate = false;
             if (s._flush == 0) {
                 s.resize();
-                needUpdate = true;
+                s._onEnterFrameEvent();
+                s.updateMatrix();
+                s.render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
@@ -383,23 +384,12 @@ namespace annie {
                     s.resize();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        needUpdate = true;
+                        s._onEnterFrameEvent();
+                        s.updateMatrix();
+                        s.render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
-            }
-            if (needUpdate) {
-                //到时最好是检查下死循环
-                do {
-                    s.isReUpdate = false;
-                    s.updateEventAndScript(callState);
-                    callState++;
-                    if (callState > 100) {
-                        trace("出现无限死循环,请检查");
-                        s.isReUpdate = false;
-                    }
-                } while (s.isReUpdate);
-                s.render(s.renderObj);
             }
         }
 
@@ -445,7 +435,9 @@ namespace annie {
             if (div.style.width != "") {
                 vW = parseInt(div.style.width);
                 vH = parseInt(div.style.height);
+                this._isFullScreen=false;
             } else {
+                this._isFullScreen=true;
                 vW = document.documentElement.clientWidth;
                 vH = document.documentElement.clientHeight;
             }
@@ -459,7 +451,8 @@ namespace annie {
             mousemove: "onMouseMove",
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
-            touchend: "onMouseUp"
+            touchend: "onMouseUp",
+            touchcancel:"onMouseUp"
         };
         private muliPoints: Array<any> = [];
         //当document有鼠标或触摸事件时调用
@@ -467,33 +460,46 @@ namespace annie {
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
         private mouseEvent: any = null;
+        public static _dragDisplay: annie.DisplayObject = null;
+        public static _dragBounds: annie.Rectangle = new annie.Rectangle();
+        public static _lastDragPoint: annie.Point = new annie.Point();
+        public static _isDragCenter: boolean = false;
+        public _isMouseClickCanvas: boolean = true;
 
-        private onMouseEvent(e: any): void {
+        private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this;
-            //判断是否有drag的显示对象
-            let sd: any = Stage._dragDisplay;
-            let offX = e.target.offsetLeft;
-            let offY = e.target.offsetTop;
-            let tp = e.target.parentNode;
-            while (tp.nodeName != "BODY") {
-                offX += tp.offsetLeft;
-                offY += tp.offsetTop;
-                tp = tp.parentNode;
+            let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
+            if (e.target.id == "_a2x_canvas") {
+                s._isMouseClickCanvas = true;
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
+                }
+            } else {
+                s._isMouseClickCanvas = false;
             }
+            if(!s._isFullScreen) {
+                offSetX = c.getBoundingClientRect().left + c.scrollLeft;
+                offSetY = c.getBoundingClientRect().top + c.scrollTop;
+            }
+            let sd: any = Stage._dragDisplay;
             if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX - offX;
-                    s._mP1.y = e.targetTouches[0].clientY - offY;
-                    s._mP2.x = e.targetTouches[1].clientX - offX;
-                    s._mP2.y = e.targetTouches[1].clientY - offY;
+                    s._mP1.x = e.targetTouches[0].clientX - offSetX;
+                    s._mP1.y = e.targetTouches[0].clientY - offSetY;
+                    s._mP2.x = e.targetTouches[1].clientX - offSetX;
+                    s._mP2.y = e.targetTouches[1].clientY - offSetY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
                     if (s.muliPoints.length >= 2) {
                         //如果有事件，抛事件
-                        if (!s._touchEvent) {
+                        if (!(s._touchEvent instanceof annie.TouchEvent)) {
                             s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
                             s._touchEvent.target = s;
                         }
@@ -510,12 +516,12 @@ namespace annie {
                 } else {
                     s.muliPoints.length = 0;
                 }
-                if (sd) {
-                    sd._lastDragPoint.x = Number.MAX_VALUE;
-                    sd._lastDragPoint.y = Number.MAX_VALUE;
-                }
                 s._mouseDownPoint = {};
                 s._lastDpList = {};
+                if (sd) {
+                    Stage._lastDragPoint.x = Number.MAX_VALUE;
+                    Stage._lastDragPoint.y = Number.MAX_VALUE;
+                }
             } else {
                 if (s.muliPoints.length > 0) {
                     s._touchEvent.rotate = 0;
@@ -531,7 +537,7 @@ namespace annie {
                 if (EventDispatcher._totalMEC > 0) {
                     let points: any;
                     let item = s._mouseEventTypes[e.type];
-                    let events: any;
+                    let events: any = [];
                     let event: any;
                     //stageMousePoint
                     let sp: Point;
@@ -552,46 +558,75 @@ namespace annie {
                             points = [e.changedTouches[0]];
                         }
                     }
-                    for (let o = 0; o < points.length; o++) {
+                    let pLen = points.length;
+                    for (let o = 0; o < pLen; o++) {
                         eLen = 0;
-                        events = [];
+                        events.length = 0;
                         identifier = "m" + points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         } else {
                             cp = new Point();
                         }
-                        cp.x = (points[o].clientX - offX) * devicePixelRatio;
-                        cp.y = (points[o].clientY - offY) * devicePixelRatio;
-                        //这个地方检查是所有显示对象列表里是否有添加任何鼠标或触碰事件,有的话就检测,没有的话就算啦。
+                        cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
+                        cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
                         sp = s.globalToLocal(cp, DisplayObject._bp);
-                        //if (EventDispatcher.getMouseEventCount() > 0) {
-                        if (!s._ml[eLen]) {
-                            event = new MouseEvent(item);
-                            s._ml[eLen] = event;
-                        } else {
+                        if (sd && sd.stage && sd.parent) {
+                            let x1 = sd.x, y1 = sd.y;
+                            lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
+                            if (!Stage._isDragCenter) {
+                                if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
+                                    x1 += lp.x - Stage._lastDragPoint.x;
+                                    y1 += lp.y - Stage._lastDragPoint.y;
+                                }
+                                Stage._lastDragPoint.x = lp.x;
+                                Stage._lastDragPoint.y = lp.y;
+                            } else {
+                                x1 = lp.x;
+                                y1 = lp.y;
+                            }
+                            lp.x = x1;
+                            lp.y = y1;
+                            if (Stage._dragBounds.width != Number.MIN_VALUE) {
+                                if (x1 < Stage._dragBounds.x) {
+                                    x1 = Stage._dragBounds.x;
+                                } else if (x1 > Stage._dragBounds.x + Stage._dragBounds.width) {
+                                    x1 = Stage._dragBounds.x + Stage._dragBounds.width;
+                                }
+                                if (y1 < Stage._dragBounds.y) {
+                                    y1 = Stage._dragBounds.y;
+                                } else if (y1 > Stage._dragBounds.y + Stage._dragBounds.height) {
+                                    y1 = Stage._dragBounds.y + Stage._dragBounds.height;
+                                }
+                            }
+                            sd.x = x1;
+                            sd.y = y1;
+                        }
+                        if (s._ml[eLen] instanceof annie.MouseEvent) {
                             event = s._ml[eLen];
                             event.type = item;
+                        } else {
+                            event = new MouseEvent(item);
+                            s._ml[eLen] = event;
                         }
                         events[events.length] = event;
                         s._initMouseEvent(event, cp, sp, identifier);
                         eLen++;
-                        //}
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                             //清空上次存在的显示列表
                         } else if (item == "onMouseUp") {
-                            if (s._mouseDownPoint[identifier]) {
+                            if (s._mouseDownPoint[identifier] instanceof annie.Point) {
                                 if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
                                     //click事件
                                     //这个地方检查是所有显示对象列表里是否有添加对应的事件
                                     if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                        if (!s._ml[eLen]) {
-                                            event = new MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event;
-                                        } else {
+                                        if (s._ml[eLen] instanceof annie.MouseEvent) {
                                             event = s._ml[eLen];
                                             event.type = "onMouseClick";
+                                        } else {
+                                            event = new MouseEvent("onMouseClick");
+                                            s._ml[eLen] = event;
                                         }
                                         events[events.length] = event;
                                         s._initMouseEvent(event, cp, sp, identifier);
@@ -602,35 +637,33 @@ namespace annie {
                         }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            let d: any = s.hitTestPoint(cp, true, true);
+                            let d: any = s.hitTestPoint(cp, true);
                             let displayList: Array<DisplayObject> = [];
-                            if (d) {
+                            if (d instanceof annie.DisplayObject) {
                                 //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
                                 //找出真正的target,因为有些父级可能会mouseChildren=false;
-                                while (d) {
-                                    if (d["mouseChildren"] === false) {
+                                do {
+                                    if (d instanceof annie.Sprite && d.mouseChildren == false) {
                                         //丢掉之前的层级,因为根本没用了
                                         displayList.length = 0;
                                     }
                                     displayList[displayList.length] = d;
                                     d = d.parent;
-                                }
+                                } while (d instanceof annie.DisplayObject)
                             } else {
-                                displayList[displayList.length] = s;
+                                displayList[0] = s;
                             }
                             let len: number = displayList.length;
                             for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
                                 for (let j = 0; j < eLen; j++) {
-                                    if (!events[j]["_bpd"]) {
-                                        if (d.hasEventListener(events[j].type)) {
-                                            events[j].currentTarget = d;
-                                            events[j].target = displayList[0];
-                                            lp = d.globalToLocal(cp, DisplayObject._bp);
-                                            events[j].localX = lp.x;
-                                            events[j].localY = lp.y;
-                                            d.dispatchEvent(events[j]);
-                                        }
+                                    if (!events[j]._pd && d.hasEventListener(events[j].type)) {
+                                        events[j].currentTarget = d;
+                                        events[j].target = displayList[0];
+                                        lp = d.globalToLocal(cp, DisplayObject._bp);
+                                        events[j].localX = lp.x;
+                                        events[j].localY = lp.y;
+                                        d.dispatchEvent(events[j]);
                                     }
                                 }
                             }
@@ -639,49 +672,47 @@ namespace annie {
                             for (let i = len - 1; i >= 0; i--) {
                                 d = displayList[i];
                                 for (let j = 0; j < eLen; j++) {
-                                    if (!events[j]["_bpd"]) {
-                                        if (d.hasEventListener(events[j].type)) {
-                                            events[j].currentTarget = d;
-                                            events[j].target = displayList[eLen - 1];
-                                            lp = d.globalToLocal(cp, DisplayObject._bp);
-                                            events[j].localX = lp.x;
-                                            events[j].localY = lp.y;
-                                            d.dispatchEvent(events[j], null, false);
-                                        }
+                                    if (!events[j]._pd && d.hasEventListener(events[j].type, false)) {
+                                        events[j].currentTarget = d;
+                                        events[j].target = displayList[eLen - 1];
+                                        lp = d.globalToLocal(cp, DisplayObject._bp);
+                                        events[j].localX = lp.x;
+                                        events[j].localY = lp.y;
+                                        d.dispatchEvent(events[j], null, false);
                                     }
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
                             if (item != "onMouseDown") {
                                 if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
-                                    if (s._lastDpList[identifier]) {
+                                    if (s._lastDpList[identifier] instanceof Array) {
                                         //从第二个开始，因为第一个对象始终是stage顶级对象
                                         let len1 = s._lastDpList[identifier].length;
                                         let len2 = displayList.length;
                                         len = len1 > len2 ? len1 : len2;
                                         let isDiff = false;
-                                        let overEvent: annie.MouseEvent;
-                                        let outEvent: annie.MouseEvent;
+                                        let overEvent: any;
+                                        let outEvent: any;
                                         for (let i = 1; i < len; i++) {
                                             if (!isDiff) {
                                                 if (s._lastDpList[identifier][i] != displayList[i]) {
                                                     //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
                                                     isDiff = true;
-                                                    if (!s._ml[eLen]) {
-                                                        overEvent = new MouseEvent("onMouseOver");
-                                                        s._ml[eLen] = overEvent;
-                                                    } else {
+                                                    if (s._ml[eLen] instanceof annie.MouseEvent) {
                                                         overEvent = s._ml[eLen];
                                                         overEvent.type = "onMouseOver";
+                                                    } else {
+                                                        overEvent = new MouseEvent("onMouseOver");
+                                                        s._ml[eLen] = overEvent;
                                                     }
                                                     s._initMouseEvent(overEvent, cp, sp, identifier);
                                                     eLen++;
-                                                    if (!s._ml[eLen]) {
-                                                        outEvent = new MouseEvent("onMouseOut");
-                                                        s._ml[eLen] = outEvent;
-                                                    } else {
+                                                    if (s._ml[eLen] instanceof annie.MouseEvent) {
                                                         outEvent = s._ml[eLen];
                                                         outEvent.type = "onMouseOut";
+                                                    } else {
+                                                        outEvent = new MouseEvent("onMouseOut");
+                                                        s._ml[eLen] = outEvent;
                                                     }
                                                     s._initMouseEvent(outEvent, cp, sp, identifier);
                                                 }
@@ -689,30 +720,26 @@ namespace annie {
                                             if (isDiff) {
                                                 if (s._lastDpList[identifier][i]) {
                                                     //触发onMouseOut事件
-                                                    if (!outEvent["_bpd"]) {
-                                                        d = s._lastDpList[identifier][i];
-                                                        if (d.hasEventListener("onMouseOut")) {
-                                                            outEvent.currentTarget = d;
-                                                            outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                            lp = d.globalToLocal(cp, DisplayObject._bp);
-                                                            outEvent.localX = lp.x;
-                                                            outEvent.localY = lp.y;
-                                                            d.dispatchEvent(outEvent);
-                                                        }
+                                                    d = s._lastDpList[identifier][i];
+                                                    if (!outEvent._pd && d.hasEventListener("onMouseOut")) {
+                                                        outEvent.currentTarget = d;
+                                                        outEvent.target = s._lastDpList[identifier][len1 - 1];
+                                                        lp = d.globalToLocal(cp, DisplayObject._bp);
+                                                        outEvent.localX = lp.x;
+                                                        outEvent.localY = lp.y;
+                                                        d.dispatchEvent(outEvent);
                                                     }
                                                 }
-                                                if (displayList[i]) {
+                                                d = displayList[i];
+                                                if (d instanceof annie.DisplayObject) {
                                                     //触发onMouseOver事件
-                                                    if (!overEvent["_bpd"]) {
-                                                        d = displayList[i];
-                                                        if (d.hasEventListener("onMouseOver")) {
-                                                            overEvent.currentTarget = d;
-                                                            overEvent.target = displayList[len2 - 1];
-                                                            lp = d.globalToLocal(cp, DisplayObject._bp);
-                                                            overEvent.localX = lp.x;
-                                                            overEvent.localY = lp.y;
-                                                            d.dispatchEvent(overEvent);
-                                                        }
+                                                    if (!overEvent._pd && d.hasEventListener("onMouseOver")) {
+                                                        overEvent.currentTarget = d;
+                                                        overEvent.target = displayList[len2 - 1];
+                                                        lp = d.globalToLocal(cp, DisplayObject._bp);
+                                                        overEvent.localX = lp.x;
+                                                        overEvent.localY = lp.y;
+                                                        d.dispatchEvent(overEvent);
                                                     }
                                                 }
                                             }
@@ -721,60 +748,17 @@ namespace annie {
                                 }
                                 s._mp[s._mp.length] = cp;
                             }
-                            if (sd && sd.stage && sd.parent) {
-                                let x1 = sd.x, y1 = sd.y;
-                                lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
-                                if (!sd._isDragCenter) {
-                                    if (sd._lastDragPoint.x != Number.MAX_VALUE) {
-                                        x1 += lp.x - sd._lastDragPoint.x;
-                                        y1 += lp.y - sd._lastDragPoint.y;
-                                    }
-                                    sd._lastDragPoint.x = lp.x;
-                                    sd._lastDragPoint.y = lp.y;
-                                } else {
-                                    x1 = lp.x;
-                                    y1 = lp.y;
-                                }
-                                lp.x = x1;
-                                lp.y = y1;
-                                if (sd._dragBounds.width != 0) {
-                                    if (!sd._dragBounds.isPointIn(lp)) {
-                                        if (x1 < sd._dragBounds.x) {
-                                            x1 = sd._dragBounds.x;
-                                        } else if (x1 > sd._dragBounds.x + sd._dragBounds.width) {
-                                            x1 = sd._dragBounds.x + sd._dragBounds.width;
-                                        }
-                                        if (y1 < sd._dragBounds.y) {
-                                            y1 = sd._dragBounds.y;
-                                        } else if (y1 > sd._dragBounds.y + sd._dragBounds.height) {
-                                            y1 = sd._dragBounds.y + sd._dragBounds.height;
-                                        }
-                                    }
-                                }
-                                sd.x = x1;
-                                sd.y = y1;
-                            }
                             if (item == "onMouseUp") {
-                                if (sd && sd.stage) {
-                                    sd._lastDragPoint.x = Number.MAX_VALUE;
-                                    sd._lastDragPoint.y = Number.MAX_VALUE;
-                                }
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
+                                if (sd) {
+                                    Stage._lastDragPoint.x = Number.MAX_VALUE;
+                                    Stage._lastDragPoint.y = Number.MAX_VALUE;
+                                }
                             } else {
                                 s._lastDpList[identifier] = displayList;
                             }
                         }
-                    }
-                }
-            }
-            if (e.target.id == "_a2x_canvas") {
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
                     }
                 }
             }
@@ -790,9 +774,9 @@ namespace annie {
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             //设备是否为竖屏
-            let isDivH = divH > divW;
+            let isDivH = divH >= divW;
             //内容是否为竖屏内容
-            let isDesH = desH > desW;
+            let isDesH = desH >= desW;
             let scaleY = 1;
             let scaleX = 1;
             s.x = (divW - desW) >> 1;
@@ -832,11 +816,6 @@ namespace annie {
             }
             s.scaleX = scaleX;
             s.scaleY = scaleY;
-            // s.viewRect=new annie.Rectangle();
-            s.viewRect.x = (desW - divW / scaleX) >> 1;
-            s.viewRect.y = (desH - divH / scaleY) >> 1;
-            s.viewRect.width = desW - s.viewRect.x * 2;
-            s.viewRect.height = desH - s.viewRect.y * 2;
             if (s.autoSteering) {
                 if (isDesH == isDivH) {
                     s.rotation = 0;
@@ -850,6 +829,10 @@ namespace annie {
             } else {
                 s.rotation = 0;
             }
+            s._viewRect.x = (desW - divW / scaleX) >> 1;
+            s._viewRect.y = (desH - divH / scaleY) >> 1;
+            s._viewRect.width = desW - s._viewRect.x * 2;
+            s._viewRect.height = desH - s._viewRect.y * 2;
         };
 
         /**
@@ -867,16 +850,16 @@ namespace annie {
             if (s.divWidth == 0 || s.divHeight == 0) {
                 let whObj: any = s.getRootDivWH(s.rootDiv);
                 if (whObj.w == 0 || whObj.h == 0) return;
-                s._UI.UM = true;
+                s.a2x_um = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
                 s.renderObj.reSize();
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
-            }else if(s.autoResize){
+            } else if (s.autoResize) {
                 let whObj: any = s.getRootDivWH(s.rootDiv);
-                if (s.divWidth != whObj.w || s.divHeight != whObj.h){
-                    s._UI.UM = true;
+                if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
+                    s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
                     s.renderObj.reSize();
@@ -885,9 +868,23 @@ namespace annie {
                 }
             }
         };
-        public getBounds(): Rectangle {
-            return this.viewRect;
+
+        /**
+         * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
+         * @property viewRect
+         * @public
+         * @readonly
+         * @since 1.0.0
+         * @type {annie.Rectangle}
+         * @default {x:0,y:0,width:0,height:0}
+         * @readonly
+         * @example
+         *      //始终让一个对象顶对齐，或者
+         */
+        public get viewRect(): Rectangle {
+            return this._viewRect;
         }
+
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
@@ -923,7 +920,7 @@ namespace annie {
             let isHave: boolean = false;
             let len = Stage.allUpdateObjList.length;
             for (let i = 0; i < len; i++) {
-                if (Stage.allUpdateObjList[i] === target) {
+                if (Stage.allUpdateObjList[i] == target) {
                     isHave = true;
                     break;
                 }
@@ -945,12 +942,13 @@ namespace annie {
         public static removeUpdateObj(target: any): void {
             let len = Stage.allUpdateObjList.length;
             for (let i = 0; i < len; i++) {
-                if (Stage.allUpdateObjList[i] === target) {
+                if (Stage.allUpdateObjList[i] == target) {
                     Stage.allUpdateObjList.splice(i, 1);
                     break;
                 }
             }
         }
+
         public destroy(): void {
             super.destroy();
             let s = this;
@@ -960,6 +958,7 @@ namespace annie {
                 rc.removeEventListener("touchstart", s.mouseEvent, false);
                 rc.removeEventListener('touchmove', s.mouseEvent, false);
                 rc.removeEventListener('touchend', s.mouseEvent, false);
+                rc.removeEventListener('touchcancel', s.mouseEvent, false);
             } else {
                 rc.removeEventListener("mousedown", s.mouseEvent, false);
                 rc.removeEventListener('mousemove', s.mouseEvent, false);

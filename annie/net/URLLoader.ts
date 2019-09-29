@@ -44,6 +44,7 @@ namespace annie {
          * @event annie.Event.ABORT
          * @since 1.0.0
          */
+
         /**
          * annie.URLLoader开始事件
          * @event annie.Event.START
@@ -92,12 +93,12 @@ namespace annie {
                 let extStr = urlSplit[urlSplit.length - 1];
                 let ext = extStr.split("?")[0].toLocaleLowerCase();
                 if ("." + ext == annie.suffixName) {
-                    if(annie._isReleased) {
+                    if (annie._isReleased) {
                         s.responseType = "swf";
-                    }else{
+                    } else {
                         s.responseType = "js";
                     }
-                }else if (ext == "mp3" || ext == "ogg" || ext == "wav") {
+                } else if (ext == "mp3" || ext == "ogg" || ext == "wav") {
                     s.responseType = "sound";
                 } else if (ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif") {
                     s.responseType = "image";
@@ -120,7 +121,7 @@ namespace annie {
                 }
             }
             let reSendTimes = 0;
-            if (!s._req) {
+            if (!(s._req instanceof XMLHttpRequest)) {
                 s._req = new XMLHttpRequest();
                 s._req.withCredentials = false;
                 s._req.onprogress = function (event: any): void {
@@ -133,20 +134,10 @@ namespace annie {
                     } else {
                         //断线重连
                         s._req.abort();
-                        if (!s.data) {
-                            s._req.send();
+                        if (s.data instanceof Object) {
+                            s._req.send(s.data);
                         } else {
-                            if (contentType == "form") {
-                                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                                s._req.send(s._fqs(s.data, null));
-                            } else {
-                                var type = "application/json";
-                                if (contentType != "json") {
-                                    type = "multipart/form-data";
-                                }
-                                s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                                s._req.send(s.data);
-                            }
+                            s._req.send();
                         }
                     }
                 };
@@ -158,6 +149,10 @@ namespace annie {
                     let item: any;
                     switch (s.responseType) {
                         case "css":
+                            item = document.createElement("link");
+                            item.rel = "stylesheet";
+                            item.href = s.url;
+                            break;
                         case "video":
                             item = s.url;
                             break;
@@ -178,13 +173,13 @@ namespace annie {
                     s.dispatchEvent(e);
                 };
             }
-            if (s.data && s.method.toLocaleLowerCase() == "get") {
+            if (s.data instanceof Object && s.method.toLocaleLowerCase() == "get") {
                 s.url = s._fus(url, s.data);
                 s.data = null;
             } else {
                 s.url = url;
             }
-            if (s.responseType=="swf"||s.responseType=="image"||s.responseType=="sound") {
+            if (s.responseType == "swf" || s.responseType == "image" || s.responseType == "sound") {
                 s._req.responseType = "blob";
             } else {
                 s._req.responseType = "";
@@ -196,20 +191,16 @@ namespace annie {
                 }
                 s.headers.length = 0;
             }
-            if (!s.data) {
-                s._req.send();
+            if (contentType == "form") {
+                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+                s._req.send(s._fqs(s.data, null));
             } else {
-                if (contentType == "form") {
-                    s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
-                    s._req.send(s._fqs(s.data, null));
-                } else {
-                    var type = "application/json";
-                    if (contentType != "json") {
-                        type = "multipart/form-data";
-                    }
-                    s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
-                    s._req.send(s.data);
+                var type = "application/json";
+                if (contentType != "json") {
+                    type = "multipart/form-data";
                 }
+                s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                s._req.send(s.data);
             }
         }
 
@@ -247,11 +238,11 @@ namespace annie {
          * @default null
          * @type {Object}
          */
-        public data: Object = null;
+        public data: any = null;
         //格式化post请求参数
         private _fqs = function (data: any, query: any): string {
             let params: any = [];
-            if (data) {
+            if (data instanceof Object) {
                 for (let n in data) {
                     params.push(encodeURIComponent(n) + "=" + encodeURIComponent(data[n]));
                 }
@@ -265,7 +256,7 @@ namespace annie {
         //格式化get 请求参数
         private _fus = function (src: any, data: any): string {
             let s = this;
-            if (data == null || data == "") {
+            if (data ==void 0) {
                 return src;
             }
             let query: any = [];

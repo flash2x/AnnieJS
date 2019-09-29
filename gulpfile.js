@@ -32,7 +32,7 @@ var coreList =[
     "annie/filters/Filters.ts",
     "annie/render/IRender.ts",
     "annie/render/CanvasRender.ts",
-    // "annie/render/WGRender.ts",
+    // "annie/render/WebGLRender.ts",
     "annie/net/URLLoader.ts",
     "annie/utils/Flash2x.ts",
     "annie/utils/Tween.ts",
@@ -43,6 +43,7 @@ var coreList =[
 var uiList=[
     "build/annieCore.d.ts",
     "annie/ui/ScrollPage.ts",
+    "annie/ui/Scroller.ts",
     "annie/ui/FacePhoto.ts",
     "annie/ui/SlidePage.ts",
     "annie/ui/FlipBook.ts",
@@ -60,7 +61,7 @@ var onBuildCore = function(){
     var outDir = "build";
     var tsResult = gulp.src(coreList).pipe(ts(op));
         tsResult.dts.pipe(gulp.dest(outDir));
-        tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 var onBuildUI = function(){
     var op = {
@@ -72,7 +73,7 @@ var onBuildUI = function(){
     var outDir = "build";
     var tsResult = gulp.src(uiList).pipe(ts(op));
         tsResult.dts.pipe(gulp.dest(outDir));
-        tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 var onBuildDoc = function(){
     del([

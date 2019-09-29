@@ -41,7 +41,7 @@ namespace annie {
          */
         public constructor(inputType:number=0){
             super();
-            var input: any = null;
+            let input: any = null;
             let s: InputText = this;
             s._instanceType = "annie.InputText";
            if(inputType<2){
@@ -53,16 +53,16 @@ namespace annie {
                 input.style.overflow = "hidden";
             }
             s.inputType = inputType;
-            var remove = function (){
-                if (s.isAutoDownKeyBoard&&annie.osType!="pc") {
+            let remove = function (){
+                if (s.stage._isMouseClickCanvas&&s.isAutoDownKeyBoard&&annie.osType!="pc") {
                     s.htmlElement && s.htmlElement.blur();
                 }
             }.bind(s);
             s.addEventListener(Event.REMOVE_TO_STAGE, function (e: Event) {
-                s.stage.removeEventListener(annie.MouseEvent.MOUSE_UP, remove);
+                s.stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN, remove);
             });
             s.addEventListener(Event.ADD_TO_STAGE, function (e: Event) {
-                s.stage.addEventListener(annie.MouseEvent.MOUSE_UP, remove);
+                s.stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, remove);
             });
             s.init(input);
         }
@@ -294,7 +294,6 @@ namespace annie {
                 s.htmlElement.value = value;
             }
         }
-
         /**
          * 输入文本的最大输入字数
          * @public
@@ -304,7 +303,7 @@ namespace annie {
          */
         public get maxCharacters():number{
             let l:any=this.htmlElement.getAttribute("maxlength");
-            if(l===null){
+            if(l==null){
                 return 0;
             }else{
                 return l;
