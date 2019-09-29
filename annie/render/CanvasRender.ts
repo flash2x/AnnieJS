@@ -199,9 +199,7 @@ namespace annie {
             c.style.height = s._stage.divHeight + "px";
             s.viewPort.width = c.width;
             s.viewPort.height = c.height;
-
         }
-
         destroy(): void {
             let s = this;
             s.rootContainer = null;

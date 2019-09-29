@@ -277,7 +277,8 @@
     支持flash2x 管理类
 # Flash2x 版本更新列表
 ## Annie2x 4.2.1
-    优化导出为ts语言下Flash中命名的显示对象导出后类文件中变量为强类型声明,有绑定类的情况下强类型为绑定类，没有强类型的情况下，mc命名后缀带_sp的全部为annie.Sprite，否则为annie.MovieClip.文本强类型不受命名影响
+    全新的安装包模式，方便版本升级切换及管理
+    优化导出为ts类文件中变量为强类型声明。如mc没有绑定类，如果后缀带_sp的则为annie.Sprite，否则为annie.MovieClip
 ## Annie2x 4.2.0
     更新打包后的文件为二进制流，提高加载和渲染性能。旧项目只需要将新的gulpfile.js和package.json替换后用新的工具发布即可。
 ## Annie2x 4.1.10
