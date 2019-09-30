@@ -499,8 +499,7 @@ namespace annie {
                 info.al = 1;
             }
             if(isMc){
-                if (lastInfo.tr!= info.tr){
-                    let isUmChange:boolean=false;
+                    let isUmChange:boolean=target.a2x_um;
                     if(!target._changeTransformInfo[0]&&target._x!=info.tr[0]){
                         target._x=info.tr[0];
                         target._lastX=target._x+target._offsetX;
@@ -522,15 +521,16 @@ namespace annie {
                     if(!target._changeTransformInfo[4]){
                         if(target._skewX!=info.tr[4]){
                             target._skewX=info.tr[4];
+                            target._rotation=0;
                             isUmChange=true;
                         }
                         if(target._skewY!=info.tr[5]){
                             target._skewY=info.tr[5];
+                            target._rotation=0;
                             isUmChange=true;
                         }
                     }
                     target.a2x_um=isUmChange;
-                }
                 if(!target._changeTransformInfo[5]&&target._alpha!=info.al) {
                     target._alpha = info.al;
                     target.a2x_ua = true;

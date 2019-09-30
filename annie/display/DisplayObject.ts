@@ -260,8 +260,10 @@ namespace annie {
 
         public set rotation(value: number) {
             let s = this;
-            if (value != s._rotation) {
+            if (value != s._rotation||s._skewX!=0||s._skewY!=0) {
                 s._rotation = value;
+                s._skewX=0;
+                s._skewY=0;
                 s.a2x_um = true;
             }
             s._changeTransformInfo[4]=true;
@@ -305,8 +307,9 @@ namespace annie {
 
         public set skewX(value: number){
             let s = this;
-            if (value != s._skewX) {
+            if (value != s._skewX||s._rotation!=0) {
                 s._skewX = value;
+                s._rotation=0;
                 s.a2x_um = true;
             }
             s._changeTransformInfo[4]=true;
@@ -328,8 +331,9 @@ namespace annie {
 
         public set skewY(value: number) {
             let s = this;
-            if (value != s._skewY) {
+            if (value != s._skewY||s._rotation!=0) {
                 s._skewY = value;
+                s._rotation=0;
                 s.a2x_um = true;
             }
             s._changeTransformInfo[4]=true;
@@ -577,7 +581,7 @@ namespace annie {
         protected updateMatrix(): void {
             let s = this;
             let isHadParent: boolean = s.parent instanceof annie.Sprite;
-            if (s.a2x_um) {
+            if (s.a2x_um){
                 s._matrix.createBox(s._lastX, s._lastY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX - s._offsetX, s._anchorY - s._offsetY);
             }
             if (s._cp) {
@@ -979,8 +983,9 @@ namespace annie {
          * @since 3.1.0
          */
         public clearCustomTransform(){
+            let s=this;
             for(let i=0;i<6;i++){
-                this._changeTransformInfo[i]=false;
+                s._changeTransformInfo[i]=false;
             }
         }
     }

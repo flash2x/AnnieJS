@@ -1852,8 +1852,10 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s._rotation) {
+                if (value != s._rotation || s._skewX != 0 || s._skewY != 0) {
                     s._rotation = value;
+                    s._skewX = 0;
+                    s._skewY = 0;
                     s.a2x_um = true;
                 }
                 s._changeTransformInfo[4] = true;
@@ -1898,8 +1900,9 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s._skewX) {
+                if (value != s._skewX || s._rotation != 0) {
                     s._skewX = value;
+                    s._rotation = 0;
                     s.a2x_um = true;
                 }
                 s._changeTransformInfo[4] = true;
@@ -1921,8 +1924,9 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s._skewY) {
+                if (value != s._skewY || s._rotation != 0) {
                     s._skewY = value;
+                    s._rotation = 0;
                     s.a2x_um = true;
                 }
                 s._changeTransformInfo[4] = true;
@@ -2540,8 +2544,9 @@ var annie;
          * @since 3.1.0
          */
         DisplayObject.prototype.clearCustomTransform = function () {
+            var s = this;
             for (var i = 0; i < 6; i++) {
-                this._changeTransformInfo[i] = false;
+                s._changeTransformInfo[i] = false;
             }
         };
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
@@ -5168,8 +5173,10 @@ var annie;
                             else if (sy < -180) {
                                 sy += 360;
                             }
-                            obj.x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
-                            obj.y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
+                            obj._x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
+                            obj._lastX = obj._x + obj._offsetX;
+                            obj._y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
+                            obj._lastY = obj._y + obj._offsetY;
                             obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
                             obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
                             obj._skewX = curObjInfo.tr[4] + sx * ff;
@@ -9067,38 +9074,38 @@ var annie;
                 info.al = 1;
             }
             if (isMc) {
-                if (lastInfo.tr != info.tr) {
-                    var isUmChange = false;
-                    if (!target._changeTransformInfo[0] && target._x != info.tr[0]) {
-                        target._x = info.tr[0];
-                        target._lastX = target._x + target._offsetX;
-                        isUmChange = true;
-                    }
-                    if (!target._changeTransformInfo[1] && target._y != info.tr[1]) {
-                        target._y = info.tr[1];
-                        target._lastY = target._y + target._offsetY;
-                        isUmChange = true;
-                    }
-                    if (!target._changeTransformInfo[2] && target._scaleX != info.tr[2]) {
-                        target._scaleX = info.tr[2];
-                        isUmChange = true;
-                    }
-                    if (!target._changeTransformInfo[3] && target._scaleY != info.tr[3]) {
-                        target._scaleY = info.tr[3];
-                        isUmChange = true;
-                    }
-                    if (!target._changeTransformInfo[4]) {
-                        if (target._skewX != info.tr[4]) {
-                            target._skewX = info.tr[4];
-                            isUmChange = true;
-                        }
-                        if (target._skewY != info.tr[5]) {
-                            target._skewY = info.tr[5];
-                            isUmChange = true;
-                        }
-                    }
-                    target.a2x_um = isUmChange;
+                var isUmChange = target.a2x_um;
+                if (!target._changeTransformInfo[0] && target._x != info.tr[0]) {
+                    target._x = info.tr[0];
+                    target._lastX = target._x + target._offsetX;
+                    isUmChange = true;
                 }
+                if (!target._changeTransformInfo[1] && target._y != info.tr[1]) {
+                    target._y = info.tr[1];
+                    target._lastY = target._y + target._offsetY;
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[2] && target._scaleX != info.tr[2]) {
+                    target._scaleX = info.tr[2];
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[3] && target._scaleY != info.tr[3]) {
+                    target._scaleY = info.tr[3];
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[4]) {
+                    if (target._skewX != info.tr[4]) {
+                        target._skewX = info.tr[4];
+                        target._rotation = 0;
+                        isUmChange = true;
+                    }
+                    if (target._skewY != info.tr[5]) {
+                        target._skewY = info.tr[5];
+                        target._rotation = 0;
+                        isUmChange = true;
+                    }
+                }
+                target.a2x_um = isUmChange;
                 if (!target._changeTransformInfo[5] && target._alpha != info.al) {
                     target._alpha = info.al;
                     target.a2x_ua = true;
