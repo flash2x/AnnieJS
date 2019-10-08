@@ -771,10 +771,24 @@ namespace annie {
                 }
             }
         }
+
+        /**
+         * 渲染网格行数
+         * @property boundsRow
+         * @since 3.10
+         * @type {number}
+         */
         public boundsRow: number = 1;
+        /**
+         * 渲染网格列数
+         * @property boundsCol
+         * @since 3.10
+         * @type {number}
+         */
         public boundsCol: number = 1;
         /**
          * 更新boundsList矩阵
+         * @method _updateSplitBounds
          * @private
          */
         protected _updateSplitBounds(): void {
