@@ -45,7 +45,6 @@ namespace annieUI {
             let s = this;
             s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
-            s.photo.crossOrigin="";
             s.maskObj = new annie.Shape();
             s.photo.onload = function (e: any) {
                 s.bitmap = new annie.Bitmap(s.photo);
@@ -86,6 +85,8 @@ namespace annieUI {
          */
         public init(src: string, w: number,h:number, maskType: number = 0): void {
             let s = this;
+            s._bounds.width=w;
+            s._bounds.height=h;
             s.radioW = w;
             s.radioH = h;
             if(w>h){
@@ -93,6 +94,7 @@ namespace annieUI {
             }else{
                 s.radio=h;
             }
+            s.photo.corssOrigin="anonymous";
             if (s.photo.src != src)
                 s.photo.src = src;
             if (s.maskType != maskType)

@@ -285,17 +285,17 @@ namespace annieUI {
             s.viewWidth = w;
             s.viewHeight = h;
             s.maskObj.endFill();
-            s.isVertical = isVertical;
-            if (isVertical) {
+            if(isVertical!=void 0){
+                s.isVertical = isVertical;
+            }
+            if (s.isVertical) {
                 s.distance = s.viewHeight;
                 s.paramXY = "y";
             } else {
                 s.distance = s.viewWidth;
                 s.paramXY = "x";
             }
-            s.isVertical = isVertical;
         }
-
         private onMouseEvent(e: annie.MouseEvent): void {
             let s = this;
             if (s.isCanUseMouseScroll){
@@ -360,7 +360,6 @@ namespace annieUI {
                 }
             }
         }
-
         /**
          * 滚到指定的坐标位置
          * @method scrollTo
@@ -404,7 +403,6 @@ namespace annieUI {
                 s.view[s.paramXY] = -dis;
             }
         }
-
         public destroy(): void {
             let s = this;
             s.maskObj = null;

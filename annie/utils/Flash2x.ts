@@ -557,7 +557,7 @@ namespace annie {
                         target.initButton();
                     }
                 }
-                target._mode = info.t;
+                target._a2x_mode = info.t;
             }
             ///////////////////////////////////////////
             //添加滤镜

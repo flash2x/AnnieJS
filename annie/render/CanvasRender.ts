@@ -150,9 +150,9 @@ namespace annie {
             s._ctx.lineTo(rect.x,rect.y+rect.height);
             s._ctx.closePath();
             s._ctx.stroke();
-            //getTransformRect
+            //getDrawRect
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            target.getTransformRect(target.cMatrix);
+            target.getDrawRect(target.cMatrix);
             rect=DisplayObject._transformRect;
             s._ctx.beginPath();
             s._ctx.lineWidth=2;

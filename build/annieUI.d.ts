@@ -266,7 +266,7 @@ declare namespace annieUI {
         constructor();
         /**
          * 初始化函数
-         * @method  ScrollPage
+         * @method  init
          * @param {annie.Stage} Stage
          * @param {number} maxDis
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
