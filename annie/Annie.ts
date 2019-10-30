@@ -36,7 +36,7 @@ namespace annie{
      *      console.log(annie.version);
      */
 
-    export let version:string="3.1.0";
+    export let version:string="3.1.2";
 
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -53,7 +53,7 @@ namespace annie{
     export let osType: string = (function () {
         let n = navigator.userAgent.toLocaleLowerCase();
         let reg1 = /android/;
-        let reg2 = /iphone|ipod|ipad/;
+        let reg2 = /iphone/;
         if (reg1.test(n)) {
             return "android";
         } else if (reg2.test(n)){
@@ -157,9 +157,10 @@ namespace annie{
      * @static
      * @example
      *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
+     *           annie.sendToURL("http://www.annie2x.com?key1=value&key2=value");
      *      })
      */
+    //TODO 增加post请求
     export function sendToURL(url: string): void {
         let req = new XMLHttpRequest();
         req.open("get", url, true);
@@ -199,9 +200,9 @@ namespace annie{
             obj.updateMatrix();
         }
         if(!rect){
-            obj.getTransformRect();
+            obj.getDrawRect();
         }else{
-            obj.getTransformRect(obj.matrix,rect);
+            obj.getDrawRect(obj.matrix,rect);
         }
         rect =DisplayObject._transformRect;
         let sp=obj.parent;

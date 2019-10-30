@@ -306,8 +306,10 @@ var annieUI;
             s.viewWidth = w;
             s.viewHeight = h;
             s.maskObj.endFill();
-            s.isVertical = isVertical;
-            if (isVertical) {
+            if (isVertical != void 0) {
+                s.isVertical = isVertical;
+            }
+            if (s.isVertical) {
                 s.distance = s.viewHeight;
                 s.paramXY = "y";
             }
@@ -315,7 +317,6 @@ var annieUI;
                 s.distance = s.viewWidth;
                 s.paramXY = "x";
             }
-            s.isVertical = isVertical;
         };
         ScrollPage.prototype.onMouseEvent = function (e) {
             var s = this;
@@ -532,7 +533,7 @@ var annieUI;
         }
         /**
          * 初始化函数
-         * @method  ScrollPage
+         * @method  init
          * @param {annie.Stage} Stage
          * @param {number} maxDis
          * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
@@ -698,7 +699,6 @@ var annieUI;
             var s = _this;
             s._instanceType = "annieUI.FacePhoto";
             s.photo = new Image();
-            s.photo.crossOrigin = "";
             s.maskObj = new annie.Shape();
             s.photo.onload = function (e) {
                 s.bitmap = new annie.Bitmap(s.photo);
@@ -733,6 +733,8 @@ var annieUI;
         FacePhoto.prototype.init = function (src, w, h, maskType) {
             if (maskType === void 0) { maskType = 0; }
             var s = this;
+            s._bounds.width = w;
+            s._bounds.height = h;
             s.radioW = w;
             s.radioH = h;
             if (w > h) {
@@ -741,6 +743,7 @@ var annieUI;
             else {
                 s.radio = h;
             }
+            s.photo.corssOrigin = "anonymous";
             if (s.photo.src != src)
                 s.photo.src = src;
             if (s.maskType != maskType)

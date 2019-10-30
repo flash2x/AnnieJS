@@ -86,7 +86,7 @@ var onBuildDoc = function(){
     };
     var outDir = "libs";
     var tsResult = gulp.src(coreList.concat(uiList.slice(1))).pipe(ts(op));
-        tsResult.js.pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir));
 };
 var onBuildLast = function(){
     gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));

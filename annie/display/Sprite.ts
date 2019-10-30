@@ -349,7 +349,7 @@ namespace annie {
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     if (children[i].visible && children[i]._isUseToMask == 0)
-                        children[i].getTransformRect();
+                        children[i].getDrawRect();
                         Rectangle.createFromRects(rect,DisplayObject._transformRect);
                 }
             }
@@ -357,53 +357,56 @@ namespace annie {
         }
         public updateMatrix(): void {
             let s = this;
-            if (!s._visible) return;
-            super.updateMatrix();
-            let children: any = s.children;
-            let len: number = children.length;
-            for (let i = 0; i < len; i++) {
-                children[i].updateMatrix();
+            if (s._visible){
+                super.updateMatrix();
+                let children: any = s.children;
+                let len: number = children.length;
+                for (let i = 0; i < len; i++) {
+                    children[i].updateMatrix();
+                }
+                s.a2x_ua = false;
+                s.a2x_uf = false;
+                s.a2x_um = false;
             }
-            s.a2x_ua = false;
-            s.a2x_uf = false;
-            s.a2x_um = false;
         }
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (!s._visible) return;
-            let maskObj: any;
-            let child: any;
-            let children: any = s.children;
-            let len: number = children.length;
-            for (let i = 0; i < len; i++) {
-                child = children[i];
-                if (child._isUseToMask > 0) continue;
-                if (maskObj instanceof annie.DisplayObject) {
-                    if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                        if (child.mask != maskObj){
+            if (s._visible&&s.cAlpha>0) {
+                let maskObj: any;
+                let child: any;
+                let children: any = s.children;
+                let len: number = children.length;
+                for (let i = 0; i < len; i++) {
+                    child = children[i];
+                    if (child._isUseToMask > 0) continue;
+                    if (maskObj instanceof annie.DisplayObject) {
+                        if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                            if (child.mask != maskObj) {
+                                renderObj.endMask();
+                                maskObj = child.mask;
+                                renderObj.beginMask(maskObj);
+                            }
+                        } else {
                             renderObj.endMask();
+                            maskObj = null;
+                        }
+                    } else {
+                        if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                             maskObj = child.mask;
                             renderObj.beginMask(maskObj);
                         }
-                    } else {
-                        renderObj.endMask();
-                        maskObj = null;
                     }
-                } else {
-                    if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                        maskObj = child.mask;
-                        renderObj.beginMask(maskObj);
-                    }
+                    child.render(renderObj);
                 }
-                child.render(renderObj);
-            }
-            if (maskObj instanceof annie.DisplayObject) {
-                renderObj.endMask();
+                if (maskObj instanceof annie.DisplayObject) {
+                    renderObj.endMask();
+                }
             }
         }
         public _onRemoveEvent(isReSetMc:boolean):void{
             let s = this;
             let child: any = null;
+            //这里用concat 隔离出一个新的children是非常重要的一步
             let children = s.children.concat();
             let len =children.length;
             for (let i = len - 1; i >= 0; i--){
@@ -418,6 +421,7 @@ namespace annie {
         public _onAddEvent():void{
             let s = this;
             let child: any = null;
+            //这里用concat 隔离出一个新的children是非常重要的一步
             let children = s.children.concat();
             let len =children.length;
             for (let i = len - 1; i >= 0; i--) {
@@ -431,16 +435,18 @@ namespace annie {
         }
         public _onEnterFrameEvent():void{
             let s = this;
-            let child: any = null;
-            let children = s.children.concat();
-            let len =children.length;
-            for (let i = len - 1; i >= 0; i--){
-                child = children[i];
-                if (child instanceof annie.DisplayObject && child._isOnStage){
-                    child._onEnterFrameEvent();
+            if (s._visible) {
+                let child: any = null;
+                let children = s.children.concat();
+                let len = children.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    child = children[i];
+                    if (child && child._isOnStage&&child._visible) {
+                        child._onEnterFrameEvent();
+                    }
                 }
+                super._onEnterFrameEvent();
             }
-            super._onEnterFrameEvent();
         }
         /**
          * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。

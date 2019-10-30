@@ -82,8 +82,12 @@ namespace annie {
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
+            s.htmlElement.style.panding=0;
+            s.htmlElement.style.margin=0;
             s.htmlElement.onblur = function (){
-                document.body.scrollTop = 0;
+                if(annie.osType=="ios"){
+                    window.scrollTo({top:0,left:0,behavior:"smooth"});
+                }
             };
         }
         /**

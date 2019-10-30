@@ -944,7 +944,7 @@ declare namespace annie {
          */
         isPointIn(point: Point): boolean;
         /**
-         * 将多个矩形合成为一个矩形,并将结果存到第一个矩形参数，并返回
+         * 将多个矩形合成为一个矩形,并将结果存到第一个矩形参数返回
          * @method createFromRects
          * @param {annie.Rectangle} rect
          * @param {..arg} arg
@@ -960,21 +960,11 @@ declare namespace annie {
          * @static
          * @public
          * @since 1.0.0
-         * @param {annie.Point} p1
+         * @param {annie.Point} rect
          * @param {..arg} ary
          * @return {annie.Rectangle}
          */
         static createFromPoints(rect: Rectangle, ...arg: Point[]): Rectangle;
-        /**
-         * 通过两个点来确定一个矩形
-         * @method createRectForm2Point
-         * @static
-         * @param rect
-         * @param p1
-         * @param p2
-         * @return {void}
-         */
-        static createRectForm2Point(rect: Rectangle, p1: Point, p2: Point): void;
         /**
          * 判读两个矩形是否相交
          * @method testRectCross
@@ -985,7 +975,6 @@ declare namespace annie {
          * @return {boolean}
          */
         static testRectCross(ra: Rectangle, rb: Rectangle): boolean;
-        destroy(): void;
     }
 }
 /**
@@ -1292,12 +1281,12 @@ declare namespace annie {
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
-         * @method getTransformRect
+         * @method getDrawRect
          * @public
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getTransformRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
+        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
         /**
          * 更新函数
          * @method update
@@ -1360,10 +1349,23 @@ declare namespace annie {
          * @return {void}
          */
         stopAllSounds(): void;
+        /**
+         * 渲染网格行数
+         * @property boundsRow
+         * @since 3.10
+         * @type {number}
+         */
         boundsRow: number;
+        /**
+         * 渲染网格列数
+         * @property boundsCol
+         * @since 3.10
+         * @type {number}
+         */
         boundsCol: number;
         /**
          * 更新boundsList矩阵
+         * @method _updateSplitBounds
          * @private
          */
         protected _updateSplitBounds(): void;
@@ -1427,6 +1429,7 @@ declare namespace annie {
         /**
          * 如果你在mc更改了对象的x y sacle rotation alpha，最后想还原，不再需要自我控制，可以调用些方法
          * @method clearCustomTransform
+         * @public
          * @since 3.1.0
          */
         clearCustomTransform(): void;
@@ -2337,7 +2340,6 @@ declare namespace annie {
          * @readonly
          */
         readonly totalFrames: number;
-        private _lastFrame;
         private _floatFrame;
         /**
          * 构造函数
@@ -2456,7 +2458,11 @@ declare namespace annie {
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
         private _a2x_sounds;
+        _onAddEvent(): void;
+        private _a2x_is_updateFrame;
+        _updateFrame(): void;
         _onEnterFrameEvent(): void;
+        render(renderObj: IRender): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         private _updateFloatFrame;
         private static _resetMC;
@@ -4644,7 +4650,7 @@ declare namespace annie {
      * @static
      * @example
      *      submitBtn.addEventListener(annie.MouseEvent.CLICK,function (e) {
-     *           annie.sendToURL("http://www.annie2x.com??key1=value&key2=value");
+     *           annie.sendToURL("http://www.annie2x.com?key1=value&key2=value");
      *      })
      */
     function sendToURL(url: string): void;
