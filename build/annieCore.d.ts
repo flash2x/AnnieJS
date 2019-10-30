@@ -1429,6 +1429,7 @@ declare namespace annie {
         /**
          * 如果你在mc更改了对象的x y sacle rotation alpha，最后想还原，不再需要自我控制，可以调用些方法
          * @method clearCustomTransform
+         * @public
          * @since 3.1.0
          */
         clearCustomTransform(): void;
