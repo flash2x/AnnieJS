@@ -4841,7 +4841,7 @@ var annie;
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
-            if (s._isOnStage) {
+            if (s._isOnStage && s._a2x_is_updateFrame) {
                 s._updateFrame();
             }
         };
@@ -4860,7 +4860,7 @@ var annie;
                 s._wantFrame -= 1;
             }
             s._isPlaying = false;
-            if (s._isOnStage) {
+            if (s._isOnStage && s._a2x_is_updateFrame) {
                 s._updateFrame();
             }
         };
@@ -4896,7 +4896,7 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
-            if (s._isOnStage) {
+            if (s._isOnStage && s._a2x_is_updateFrame) {
                 s._updateFrame();
             }
         };
@@ -4949,7 +4949,7 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
-            if (s._isOnStage) {
+            if (s._isOnStage && s._a2x_is_updateFrame) {
                 s._updateFrame();
             }
         };
@@ -4960,7 +4960,6 @@ var annie;
         MovieClip.prototype._updateFrame = function () {
             var s = this;
             if (!s._a2x_is_updateFrame || s._wantFrame != s._curFrame) {
-                s._a2x_is_updateFrame = true;
                 if (s._a2x_res_class.tf > 1) {
                     if (s._a2x_mode >= 0) {
                         s._isPlaying = false;
@@ -5118,6 +5117,7 @@ var annie;
                     }
                     s._floatFrame = 0;
                 }
+                s._a2x_is_updateFrame = true;
             }
         };
         MovieClip.prototype._onEnterFrameEvent = function () {

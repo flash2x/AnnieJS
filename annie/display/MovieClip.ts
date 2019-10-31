@@ -256,7 +256,7 @@ namespace annie {
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
-            if(s._isOnStage){
+            if(s._isOnStage&&s._a2x_is_updateFrame){
                 s._updateFrame();
             }
         }
@@ -275,7 +275,7 @@ namespace annie {
                 s._wantFrame -= 1;
             }
             s._isPlaying = false;
-            if(s._isOnStage){
+            if(s._isOnStage&&s._a2x_is_updateFrame){
                 s._updateFrame();
             }
         }
@@ -308,7 +308,7 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
-            if(s._isOnStage){
+            if(s._isOnStage&&s._a2x_is_updateFrame){
                 s._updateFrame();
             }
         }
@@ -358,7 +358,7 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
-            if(s._isOnStage){
+            if(s._isOnStage&&s._a2x_is_updateFrame){
                 s._updateFrame();
             }
         }
@@ -372,7 +372,6 @@ namespace annie {
         public _updateFrame(): void {
             let s: any = this;
             if(!s._a2x_is_updateFrame||s._wantFrame != s._curFrame){
-                s._a2x_is_updateFrame=true;
                 if (s._a2x_res_class.tf > 1) {
                     if (s._a2x_mode >= 0) {
                         s._isPlaying = false;
@@ -523,6 +522,7 @@ namespace annie {
                     }
                     s._floatFrame = 0;
                 }
+                s._a2x_is_updateFrame=true;
             }
         }
         public _onEnterFrameEvent(): void {
