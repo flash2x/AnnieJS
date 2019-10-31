@@ -256,6 +256,9 @@ namespace annie {
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
+            if(s._isOnStage){
+                s._updateFrame();
+            }
         }
 
         /**
@@ -272,6 +275,9 @@ namespace annie {
                 s._wantFrame -= 1;
             }
             s._isPlaying = false;
+            if(s._isOnStage){
+                s._updateFrame();
+            }
         }
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
@@ -302,6 +308,9 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
+            if(s._isOnStage){
+                s._updateFrame();
+            }
         }
 
         /**
@@ -349,6 +358,9 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
+            if(s._isOnStage){
+                s._updateFrame();
+            }
         }
         //flash声音管理
         private _a2x_sounds: any = null;
@@ -359,7 +371,7 @@ namespace annie {
         private _a2x_is_updateFrame:boolean=false;
         public _updateFrame(): void {
             let s: any = this;
-            if(!s._a2x_is_updateFrame){
+            if(!s._a2x_is_updateFrame||s._wantFrame != s._curFrame){
                 s._a2x_is_updateFrame=true;
                 if (s._a2x_res_class.tf > 1) {
                     if (s._a2x_mode >= 0) {
@@ -370,8 +382,22 @@ namespace annie {
                             s._wantFrame = 1;
                         }
                         s._floatFrame = s.parent._floatFrame;
+                    }else {
+                        if (s._isPlaying && s._wantFrame == s._curFrame) {
+                            if (s._isFront) {
+                                s._wantFrame++;
+                                if (s._wantFrame > s._a2x_res_class.tf) {
+                                    s._wantFrame = 1;
+                                }
+                            } else {
+                                s._wantFrame--;
+                                if (s._wantFrame < 1) {
+                                    s._wantFrame = s._a2x_res_class.tf;
+                                }
+                            }
+                        }
                     }
-                    if (s._wantFrame != s._curFrame) {
+                    if (s._wantFrame != s._curFrame){
                         s._curFrame = s._wantFrame;
                         let timeLineObj = s._a2x_res_class;
                         //先确定是哪一帧
@@ -496,27 +522,14 @@ namespace annie {
                         s._updateFloatFrame();
                     }
                     s._floatFrame = 0;
-                    if (s._isPlaying){
-                        if (s._isFront) {
-                            s._wantFrame++;
-                            if (s._wantFrame > s._a2x_res_class.tf) {
-                                s._wantFrame = 1;
-                            }
-                        } else {
-                            s._wantFrame--;
-                            if (s._wantFrame < 1) {
-                                s._wantFrame = s._a2x_res_class.tf;
-                            }
-                        }
-                    }
                 }
             }
         }
         public _onEnterFrameEvent(): void {
             let s = this;
             if (s._visible) {
-                s._updateFrame();
                 super._onEnterFrameEvent();
+                s._updateFrame();
             }
         }
         public render(renderObj: IRender): void {
@@ -592,6 +605,7 @@ namespace annie {
             obj._curFrame = 0;
             obj._isFront = true;
             obj._floatFrame = 0;
+            obj._a2x_is_updateFrame=false;
             if (obj._a2x_mode < -1) {
                 obj._isPlaying = true;
             } else {
