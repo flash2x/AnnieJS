@@ -256,9 +256,6 @@ namespace annie {
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
-            if(s._isOnStage&&s._a2x_is_updateFrame){
-                s._updateFrame();
-            }
         }
 
         /**
@@ -308,9 +305,6 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
-            if(s._isOnStage&&s._a2x_is_updateFrame){
-                s._updateFrame();
-            }
         }
 
         /**
@@ -358,9 +352,6 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
-            if(s._isOnStage&&s._a2x_is_updateFrame){
-                s._updateFrame();
-            }
         }
         //flash声音管理
         private _a2x_sounds: any = null;
@@ -371,7 +362,8 @@ namespace annie {
         private _a2x_is_updateFrame:boolean=false;
         public _updateFrame(): void {
             let s: any = this;
-            if(!s._a2x_is_updateFrame||s._wantFrame != s._curFrame){
+            if(!s._a2x_is_updateFrame){
+                s._a2x_is_updateFrame=true;
                 if (s._a2x_res_class.tf > 1) {
                     if (s._a2x_mode >= 0) {
                         s._isPlaying = false;
@@ -382,7 +374,7 @@ namespace annie {
                         }
                         s._floatFrame = s.parent._floatFrame;
                     }else {
-                        if (s._isPlaying && s._wantFrame == s._curFrame) {
+                        if(s._isPlaying && s._wantFrame == s._curFrame&&s._visible) {
                             if (s._isFront) {
                                 s._wantFrame++;
                                 if (s._wantFrame > s._a2x_res_class.tf) {
@@ -522,15 +514,12 @@ namespace annie {
                     }
                     s._floatFrame = 0;
                 }
-                s._a2x_is_updateFrame=true;
             }
         }
         public _onEnterFrameEvent(): void {
             let s = this;
-            if (s._visible) {
-                super._onEnterFrameEvent();
-                s._updateFrame();
-            }
+            super._onEnterFrameEvent();
+            s._updateFrame();
         }
         public render(renderObj: IRender): void {
             super.render(renderObj);
@@ -538,6 +527,7 @@ namespace annie {
         }
         public _onRemoveEvent(isReSetMc: boolean) {
             super._onRemoveEvent(isReSetMc);
+            this._a2x_is_updateFrame=false;
             if (isReSetMc)
                 MovieClip._resetMC(this);
         }
@@ -605,7 +595,6 @@ namespace annie {
             obj._curFrame = 0;
             obj._isFront = true;
             obj._floatFrame = 0;
-            obj._a2x_is_updateFrame=false;
             if (obj._a2x_mode < -1) {
                 obj._isPlaying = true;
             } else {

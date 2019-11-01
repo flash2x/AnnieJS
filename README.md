@@ -61,6 +61,8 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.1.3 版本
+    修复annie.MovieClip的visible=false后,再次为true后执行gotoAndPlay/gotoAndStop方法后，渲染却还停留在上一帧的bug
 ## AnnieJS 3.1.2 版本
     修复annie.MovieClip初次添加到显示列表中偶尔会掉帧导致闪屏的bug
     调整annie.InputText的padding，margin的默认样式，尽量让android和ios上表现一致
@@ -282,6 +284,10 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Annie2x 4.2.4
+    AnnieJS引擎升级到3.1.3版本
+    修复ts版打包发布出错的bug
+    修复ts初次发布没有生成main.ts文件的bug
 ## Annie2x 4.2.3
     AnnieJS引擎升级到3.1.2版本
     修复导出输入文本命名后，H5会报错的bug

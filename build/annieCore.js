@@ -2479,7 +2479,8 @@ var annie;
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         };
         DisplayObject.prototype._onEnterFrameEvent = function () {
-            this.dispatchEvent(annie.Event.ENTER_FRAME);
+            if (this._visible)
+                this.dispatchEvent(annie.Event.ENTER_FRAME);
         };
         /**
          * 启动鼠标或者触摸拖动
@@ -4116,15 +4117,13 @@ var annie;
         };
         Sprite.prototype._onEnterFrameEvent = function () {
             var s = this;
-            if (s._visible) {
-                var child = null;
-                var children = s.children.concat();
-                var len = children.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    child = children[i];
-                    if (child && child._isOnStage && child._visible) {
-                        child._onEnterFrameEvent();
-                    }
+            var child = null;
+            var children = s.children.concat();
+            var len = children.length;
+            for (var i = len - 1; i >= 0; i--) {
+                child = children[i];
+                if (child && child._isOnStage) {
+                    child._onEnterFrameEvent();
                 }
                 _super.prototype._onEnterFrameEvent.call(this);
             }
@@ -4841,9 +4840,6 @@ var annie;
                 s._wantFrame += 1;
             }
             s._isPlaying = false;
-            if (s._isOnStage && s._a2x_is_updateFrame) {
-                s._updateFrame();
-            }
         };
         /**
          * 将播放头向前移一帧并停在下一帧,如果本身在第一帧则不做任何反应
@@ -4896,9 +4892,6 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
-            if (s._isOnStage && s._a2x_is_updateFrame) {
-                s._updateFrame();
-            }
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -4949,9 +4942,6 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
-            if (s._isOnStage && s._a2x_is_updateFrame) {
-                s._updateFrame();
-            }
         };
         MovieClip.prototype._onAddEvent = function () {
             _super.prototype._onAddEvent.call(this);
@@ -4959,7 +4949,8 @@ var annie;
         };
         MovieClip.prototype._updateFrame = function () {
             var s = this;
-            if (!s._a2x_is_updateFrame || s._wantFrame != s._curFrame) {
+            if (!s._a2x_is_updateFrame) {
+                s._a2x_is_updateFrame = true;
                 if (s._a2x_res_class.tf > 1) {
                     if (s._a2x_mode >= 0) {
                         s._isPlaying = false;
@@ -4972,7 +4963,7 @@ var annie;
                         s._floatFrame = s.parent._floatFrame;
                     }
                     else {
-                        if (s._isPlaying && s._wantFrame == s._curFrame) {
+                        if (s._isPlaying && s._wantFrame == s._curFrame && s._visible) {
                             if (s._isFront) {
                                 s._wantFrame++;
                                 if (s._wantFrame > s._a2x_res_class.tf) {
@@ -5117,15 +5108,12 @@ var annie;
                     }
                     s._floatFrame = 0;
                 }
-                s._a2x_is_updateFrame = true;
             }
         };
         MovieClip.prototype._onEnterFrameEvent = function () {
             var s = this;
-            if (s._visible) {
-                _super.prototype._onEnterFrameEvent.call(this);
-                s._updateFrame();
-            }
+            _super.prototype._onEnterFrameEvent.call(this);
+            s._updateFrame();
         };
         MovieClip.prototype.render = function (renderObj) {
             _super.prototype.render.call(this, renderObj);
@@ -5133,6 +5121,7 @@ var annie;
         };
         MovieClip.prototype._onRemoveEvent = function (isReSetMc) {
             _super.prototype._onRemoveEvent.call(this, isReSetMc);
+            this._a2x_is_updateFrame = false;
             if (isReSetMc)
                 MovieClip._resetMC(this);
         };
@@ -5202,7 +5191,6 @@ var annie;
             obj._curFrame = 0;
             obj._isFront = true;
             obj._floatFrame = 0;
-            obj._a2x_is_updateFrame = false;
             if (obj._a2x_mode < -1) {
                 obj._isPlaying = true;
             }
