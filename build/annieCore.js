@@ -1532,6 +1532,83 @@ var annie;
 var annie;
 (function (annie) {
     /**
+     * 定时器类
+     * @class annie.Timer
+     * @public
+     * @since 1.0.9
+     */
+    var BlendMode = /** @class */ (function () {
+        function BlendMode() {
+        }
+        BlendMode.getBlendMode = function (mode) {
+            return this._modeList[mode];
+        };
+        BlendMode.NORMAL = 0;
+        //public static LAYER:number=1;
+        BlendMode.DARKEN = 2;
+        BlendMode.MULTIPLY = 3;
+        BlendMode.LIGHTEN = 4;
+        BlendMode.SCREEN = 5;
+        BlendMode.OVERLAY = 6;
+        BlendMode.HARDLIGHT = 7;
+        BlendMode.ADD = 8;
+        BlendMode.SUBTRACT = 9;
+        BlendMode.DIFFERENCE = 10;
+        BlendMode.INVERT = 11;
+        BlendMode.ALPHA = 12;
+        BlendMode.ERASE = 13;
+        BlendMode.SOURCE_IN = 14;
+        BlendMode.SOFT_LIGHT = 15;
+        BlendMode.XOR = 16;
+        BlendMode.COPY = 17;
+        BlendMode.HUE = 18;
+        BlendMode.SATURATION = 19;
+        BlendMode.COLOR = 20;
+        BlendMode.LUMINOSITY = 21;
+        BlendMode.EXCLUSION = 22;
+        BlendMode.COLOR_BURN = 23;
+        BlendMode.COLOR_DODGE = 24;
+        BlendMode.SOURCE_OUT = 25;
+        BlendMode.SOURCE_ATOP = 26;
+        BlendMode._modeList = [
+            "source-over",
+            "layer",
+            "darken",
+            "multiply",
+            "lighten",
+            "screen",
+            "overlay",
+            "hard-light",
+            "add",
+            "subtract",
+            "difference",
+            "invert",
+            "alpha",
+            "erase",
+            "source-in",
+            "soft-light",
+            "xor",
+            "copy",
+            "hue",
+            "saturation",
+            "color",
+            "luminosity",
+            "exclusion",
+            "color-burn",
+            "color-dodge",
+            "source-out",
+            "source-atop"
+        ];
+        return BlendMode;
+    }());
+    annie.BlendMode = BlendMode;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
      * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
      * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
@@ -1660,6 +1737,17 @@ var annie;
             _this._anchorX = 0;
             _this._anchorY = 0;
             _this._visible = true;
+            /**
+             * 显示对象的混合模式
+             * 支持的混合模式大概有
+             * @property blendMode
+             * @public
+             * @since 1.0.0
+             * @type {number}
+             * @default 0
+             */
+            _this.blendMode = 0;
+            _this.cBlendMode = 0;
             _this._matrix = new annie.Matrix();
             _this._mask = null;
             _this._filters = [];
@@ -1988,16 +2076,6 @@ var annie;
         });
         Object.defineProperty(DisplayObject.prototype, "matrix", {
             /**
-             * 显示对象的混合模式
-             * 支持的混合模式大概有
-             * @property blendMode
-             * @public
-             * @since 1.0.0
-             * @type {string}
-             * @default 0
-             */
-            //public blendMode: string = "normal";
-            /**
              * 显示对象的变形矩阵
              * @property matrix
              * @public
@@ -2203,6 +2281,14 @@ var annie;
                     }
                 }
             }
+            if (isHadParent) {
+                if (s.parent.cBlendMode > 0) {
+                    s.cBlendMode = s.parent.cBlendMode;
+                }
+                else {
+                    s.cBlendMode = s.blendMode;
+                }
+            }
         };
         DisplayObject.prototype._checkDrawBounds = function () {
             var s = this;
@@ -2270,11 +2356,13 @@ var annie;
              * @return {number}
              */
             get: function () {
+                this.updateMatrix();
                 this.getDrawRect();
                 return DisplayObject._transformRect.width;
             },
             set: function (value) {
                 var s = this;
+                s.updateMatrix();
                 s.getDrawRect();
                 var w = DisplayObject._transformRect.width;
                 if (value > 0 && w > 0) {
@@ -2292,6 +2380,7 @@ var annie;
          * @return {{w: number; h: number}}
          */
         DisplayObject.prototype.getWH = function () {
+            this.updateMatrix();
             this.getDrawRect();
             return { w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height };
         };
@@ -2305,11 +2394,13 @@ var annie;
              * @return {number}
              */
             get: function () {
+                this.updateMatrix();
                 this.getDrawRect();
                 return DisplayObject._transformRect.height;
             },
             set: function (value) {
                 var s = this;
+                s.updateMatrix();
                 s.getDrawRect();
                 var h = DisplayObject._transformRect.height;
                 if (value > 0 && h > 0) {
@@ -2598,12 +2689,12 @@ var annie;
             /**
              * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
              * 是否对图片对象使用像素碰撞检测透明度，默认关闭
-             * @property hitTestWidthPixel
+             * @property hitTestWithPixel
              * @type {boolean}
              * @default false
              * @since 1.1.0
              */
-            _this.hitTestWidthPixel = false;
+            _this.hitTestWithPixel = false;
             var s = _this;
             s._instanceType = "annie.Bitmap";
             if (bitmapData.boundsRowAndCol != void 0) {
@@ -2750,7 +2841,7 @@ var annie;
         Bitmap.prototype.hitTestPoint = function (hitPoint, isGlobalPoint) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             var s = this;
-            if (s.hitTestWidthPixel) {
+            if (s.hitTestWithPixel) {
                 var texture = s._texture;
                 if (texture.width == 0) {
                     return null;
@@ -3512,8 +3603,10 @@ var annie;
                 }
             }
             if (boundsW != s._bounds.width || boundsH != s._bounds.height) {
-                s._bounds.width = boundsW;
-                s._bounds.height = boundsH;
+                s._bounds.x = 10;
+                s._bounds.y = 10;
+                s._bounds.width = boundsW - 20;
+                s._bounds.height = boundsH - 20;
                 s._updateSplitBounds();
                 s._checkDrawBounds();
             }
@@ -5301,17 +5394,12 @@ var annie;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            var ws = s.getStyle(she, "width");
-            var hs = s.getStyle(she, "height");
-            var w = 0, h = 0;
-            if (ws.indexOf("px")) {
-                w = parseInt(ws);
-            }
-            if (hs.indexOf("px")) {
-                h = parseInt(hs);
-            }
-            s._bounds.width = w;
-            s._bounds.height = h;
+            var w = she.width || s.getStyle(she, "width");
+            var h = she.height || s.getStyle(she, "height");
+            s._bounds.width = parseInt(w);
+            s._bounds.height = parseInt(h);
+            s._updateSplitBounds();
+            s._checkDrawBounds();
             s.htmlElement = she;
         };
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
@@ -6485,10 +6573,17 @@ var annie;
              * @type {number}
              */
             _this.divWidth = 0;
+            /**
+             * 舞台的背景色
+             * 默认为""就是透明背景
+             * 可能设置一个颜色值改变舞台背景
+             * @property bgColor
+             * @public
+             * @since 1.0.0
+             * @type {string} #FFFFFF" 或 RGB(255,255,255) 或 RGBA(255,255,255,255)
+             */
+            _this.bgColor = "";
             _this._isFullScreen = true;
-            _this._bgColor = -1;
-            _this._bgColorStr = "rgba(0,0,0,0)";
-            _this._bgColorRGBA = { r: 0, g: 0, b: 0, a: 0 };
             _this._scaleMode = "onScale";
             //原始为60的刷新速度时的计数器
             _this._flush = 0;
@@ -6589,7 +6684,7 @@ var annie;
                 //s.renderObj = new WebGLRender(s);
             }
             s.renderObj.init();
-            var rc = s.rootDiv;
+            var rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
@@ -6638,39 +6733,6 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Stage.prototype, "bgColor", {
-            get: function () {
-                return this._bgColor;
-            },
-            /**
-             * 舞台的背景色
-             * 默认就是透明背景
-             * 可能设置一个颜色值改变舞台背景
-             * @property bgColor
-             * @public
-             * @since 1.0.0
-             * @type {number} 0xFFFFFFFF R G B A
-             * @default -1 不填充;
-             */
-            set: function (value) {
-                if (value != this._bgColor) {
-                    this._bgColor = value;
-                    var a = value >> 24 & 0xff;
-                    var r = value >> 16 & 0xff;
-                    var g = value >> 8 & 0xff;
-                    var b = value & 0xff;
-                    this._bgColorStr = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
-                    this._bgColorRGBA.a = a / 255;
-                    this._bgColorRGBA.r = r / 255;
-                    this._bgColorRGBA.g = g / 255;
-                    this._bgColorRGBA.b = b / 255;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        ;
         Object.defineProperty(Stage.prototype, "scaleMode", {
             /**
              * 舞台的缩放模式
@@ -6806,14 +6868,6 @@ var annie;
             var s = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
             if (e.target.id == "_a2x_canvas") {
                 s._isMouseClickCanvas = true;
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
             }
             else {
                 s._isMouseClickCanvas = false;
@@ -7111,6 +7165,14 @@ var annie;
                             }
                         }
                     }
+                }
+            }
+            if (s.isPreventDefaultEvent) {
+                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                    e.preventDefault();
+                }
+                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                    e.preventDefault();
                 }
             }
         };
@@ -8078,6 +8140,7 @@ var annie;
              *
              */
             _this.viewPort = new annie.Rectangle();
+            _this._blendMode = 0;
             _this._instanceType = "annie.CanvasRender";
             _this._stage = stage;
             return _this;
@@ -8091,12 +8154,10 @@ var annie;
         CanvasRender.prototype.begin = function () {
             var s = this, c = s.rootContainer;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (s._stage.bgColor != -1) {
-                s._ctx.fillStyle = s._stage._bgColorStr;
+            s._ctx.clearRect(0, 0, c.width, c.height);
+            if (s._stage.bgColor != "") {
+                s._ctx.fillStyle = s._stage.bgColor;
                 s._ctx.fillRect(0, 0, c.width, c.height);
-            }
-            else {
-                s._ctx.clearRect(0, 0, c.width, c.height);
             }
         };
         /**
@@ -8160,6 +8221,10 @@ var annie;
             var ctx = s._ctx, tm = target.cMatrix;
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha;
+            }
+            if (s._blendMode != target.cBlendMode) {
+                ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.cBlendMode);
+                s._blendMode = target.cBlendMode;
             }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             var sbl = target._splitBoundsList;
@@ -9069,6 +9134,10 @@ var annie;
             if (info.al == void 0) {
                 info.al = 1;
             }
+            if (info.m == void 0) {
+                info.m = 0;
+            }
+            target.blendMode = info.m;
             if (isMc) {
                 var isUmChange = target.a2x_um;
                 if (!target._changeTransformInfo[0] && target._x != info.tr[0]) {

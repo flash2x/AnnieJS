@@ -83,17 +83,12 @@ namespace annie {
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            let ws = s.getStyle(she, "width");
-            let hs = s.getStyle(she, "height");
-            let w = 0, h = 0;
-            if (ws.indexOf("px")) {
-                w = parseInt(ws);
-            }
-            if (hs.indexOf("px")) {
-                h = parseInt(hs);
-            }
-            s._bounds.width = w;
-            s._bounds.height = h;
+            let w = she.width||s.getStyle(she, "width");
+            let h = she.height||s.getStyle(she, "height");
+            s._bounds.width = parseInt(w);
+            s._bounds.height = parseInt(h);
+            s._updateSplitBounds();
+            s._checkDrawBounds();
             s.htmlElement = she;
         }
 
@@ -163,7 +158,6 @@ namespace annie {
         public render(renderObj: IRender) {
 
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

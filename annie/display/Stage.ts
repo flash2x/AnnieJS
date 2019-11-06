@@ -194,41 +194,17 @@ namespace annie {
          * @type {number}
          */
         public divWidth: number = 0;
-        private _isFullScreen:boolean=true;
-
         /**
          * 舞台的背景色
-         * 默认就是透明背景
+         * 默认为""就是透明背景
          * 可能设置一个颜色值改变舞台背景
          * @property bgColor
          * @public
          * @since 1.0.0
-         * @type {number} 0xFFFFFFFF R G B A
-         * @default -1 不填充;
+         * @type {string} #FFFFFF" 或 RGB(255,255,255) 或 RGBA(255,255,255,255)
          */
-        public set bgColor(value: number) {
-            if (value != this._bgColor) {
-                this._bgColor = value;
-                let a = value >> 24 & 0xff;
-                let r = value >> 16 & 0xff;
-                let g = value >> 8 & 0xff;
-                let b = value & 0xff;
-                this._bgColorStr = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
-                this._bgColorRGBA.a = a / 255;
-                this._bgColorRGBA.r = r / 255;
-                this._bgColorRGBA.g = g / 255;
-                this._bgColorRGBA.b = b / 255;
-            }
-        };
-
-        public get bgColor(): number {
-            return this._bgColor;
-        };
-
-        private _bgColor: number = -1;
-        public _bgColorStr: string = "rgba(0,0,0,0)";
-        public _bgColorRGBA: { r: number, g: number, b: number, a: number } = {r: 0, g: 0, b: 0, a: 0};
-
+        public bgColor:string="";
+        private _isFullScreen:boolean=true;
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -325,7 +301,7 @@ namespace annie {
                 //s.renderObj = new WebGLRender(s);
             }
             s.renderObj.init();
-            let rc = s.rootDiv;
+            let rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType == "pc") {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
@@ -471,14 +447,6 @@ namespace annie {
             let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
             if (e.target.id == "_a2x_canvas") {
                 s._isMouseClickCanvas = true;
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
             } else {
                 s._isMouseClickCanvas = false;
             }
@@ -487,7 +455,7 @@ namespace annie {
                 offSetY = c.getBoundingClientRect().top + c.scrollTop;
             }
             let sd: any = Stage._dragDisplay;
-            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
+            if(s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
                     s._mP1.x = e.targetTouches[0].clientX - offSetX;
@@ -760,6 +728,14 @@ namespace annie {
                             }
                         }
                     }
+                }
+            }
+            if (s.isPreventDefaultEvent) {
+                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                    e.preventDefault();
+                }
+                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                    e.preventDefault();
                 }
             }
         };

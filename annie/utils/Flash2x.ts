@@ -498,6 +498,10 @@ namespace annie {
             if (info.al == void 0) {
                 info.al = 1;
             }
+            if(info.m==void 0){
+                info.m=0;
+            }
+            target.blendMode=info.m;
             if(isMc){
                     let isUmChange:boolean=target.a2x_um;
                     if(!target._changeTransformInfo[0]&&target._x!=info.tr[0]){
@@ -559,6 +563,7 @@ namespace annie {
                 }
                 target._a2x_mode = info.t;
             }
+
             ///////////////////////////////////////////
             //添加滤镜
             if (lastInfo.fi != info.fi) {

@@ -12,7 +12,6 @@ namespace annie {
      */
     export class Bitmap extends DisplayObject {
         private _cacheImg: any = null;
-
         /**
          * 构造函数
          * @method Bitmap
@@ -86,17 +85,16 @@ namespace annie {
                 }
             }
         }
-
         protected _bitmapData: any = null;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
-         * @property hitTestWidthPixel
+         * @property hitTestWithPixel
          * @type {boolean}
          * @default false
          * @since 1.1.0
          */
-        public hitTestWidthPixel: boolean = false;
+        public hitTestWithPixel: boolean = false;
 
         public updateMatrix(): void {
             let s: any = this;
@@ -194,10 +192,9 @@ namespace annie {
                 return _canvas;
             }
         }
-
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            if (s.hitTestWidthPixel) {
+            if (s.hitTestWithPixel) {
                 let texture = s._texture;
                 if (texture.width == 0) {
                     return null;
@@ -223,7 +220,6 @@ namespace annie {
                 return super.hitTestPoint(hitPoint, isGlobalPoint);
             }
         }
-
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

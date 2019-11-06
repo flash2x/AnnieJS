@@ -982,6 +982,47 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
+     * 定时器类
+     * @class annie.Timer
+     * @public
+     * @since 1.0.9
+     */
+    class BlendMode {
+        static NORMAL: number;
+        static DARKEN: number;
+        static MULTIPLY: number;
+        static LIGHTEN: number;
+        static SCREEN: number;
+        static OVERLAY: number;
+        static HARDLIGHT: number;
+        static ADD: number;
+        static SUBTRACT: number;
+        static DIFFERENCE: number;
+        static INVERT: number;
+        static ALPHA: number;
+        static ERASE: number;
+        static SOURCE_IN: number;
+        static SOFT_LIGHT: number;
+        static XOR: number;
+        static COPY: number;
+        static HUE: number;
+        static SATURATION: number;
+        static COLOR: number;
+        static LUMINOSITY: number;
+        static EXCLUSION: number;
+        static COLOR_BURN: number;
+        static COLOR_DODGE: number;
+        static SOURCE_OUT: number;
+        static SOURCE_ATOP: number;
+        private static _modeList;
+        static getBlendMode(mode: number): string;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
      * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
      * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
@@ -1208,9 +1249,11 @@ declare namespace annie {
          * @property blendMode
          * @public
          * @since 1.0.0
-         * @type {string}
+         * @type {number}
          * @default 0
          */
+        blendMode: number;
+        cBlendMode: number;
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -1495,12 +1538,12 @@ declare namespace annie {
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 是否对图片对象使用像素碰撞检测透明度，默认关闭
-         * @property hitTestWidthPixel
+         * @property hitTestWithPixel
          * @type {boolean}
          * @default false
          * @since 1.1.0
          */
-        hitTestWidthPixel: boolean;
+        hitTestWithPixel: boolean;
         updateMatrix(): void;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -3031,26 +3074,17 @@ declare namespace annie {
          * @type {number}
          */
         divWidth: number;
-        private _isFullScreen;
         /**
          * 舞台的背景色
-         * 默认就是透明背景
+         * 默认为""就是透明背景
          * 可能设置一个颜色值改变舞台背景
          * @property bgColor
          * @public
          * @since 1.0.0
-         * @type {number} 0xFFFFFFFF R G B A
-         * @default -1 不填充;
+         * @type {string} #FFFFFF" 或 RGB(255,255,255) 或 RGBA(255,255,255,255)
          */
-        bgColor: number;
-        private _bgColor;
-        _bgColorStr: string;
-        _bgColorRGBA: {
-            r: number;
-            g: number;
-            b: number;
-            a: number;
-        };
+        bgColor: string;
+        private _isFullScreen;
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -3645,7 +3679,7 @@ declare namespace annie {
          * @protected
          * @default null
          */
-        protected _ctx: any;
+        _ctx: any;
         /**
          * @protected _stage
          * @protected
@@ -3682,6 +3716,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         endMask(): void;
+        private _blendMode;
         /**
          * 调用渲染
          * @public

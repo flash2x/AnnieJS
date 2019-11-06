@@ -380,10 +380,9 @@ namespace annie {
                 s.a2x_um = false;
             }
         }
-
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._visible && s.cAlpha > 0) {
+            if (s._visible && s.cAlpha > 0){
                 let maskObj: any;
                 let child: any;
                 let children: any = s.children;
@@ -415,7 +414,6 @@ namespace annie {
                 }
             }
         }
-
         public _onRemoveEvent(isReSetMc: boolean): void {
             let s = this;
             let child: any = null;
@@ -453,7 +451,7 @@ namespace annie {
             let len = children.length;
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
-                if (child && child._isOnStage) {
+                if (child && child._isOnStage){
                     child._onEnterFrameEvent();
                 }
                 super._onEnterFrameEvent();

@@ -30,7 +30,7 @@ namespace annie {
          * @protected
          * @default null
          */
-        protected _ctx: any;
+        public _ctx: any;
         /**
          * @protected _stage
          * @protected
@@ -49,6 +49,7 @@ namespace annie {
             this._instanceType = "annie.CanvasRender";
             this._stage = stage;
         }
+
         /**
          * 开始渲染时执行
          * @method begin
@@ -58,14 +59,12 @@ namespace annie {
         public begin(): void {
             let s = this, c = s.rootContainer;
             s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (s._stage.bgColor != -1) {
-                s._ctx.fillStyle = s._stage._bgColorStr;
-                s._ctx.fillRect(0, 0, c.width, c.height);
-            } else {
-                s._ctx.clearRect(0, 0, c.width, c.height);
+            s._ctx.clearRect(0, 0, c.width, c.height);
+            if(s._stage.bgColor!=""){
+                s._ctx.fillStyle=s._stage.bgColor;
+                s._ctx.fillRect(0,0,c.width,c.height);
             }
         }
-
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -114,6 +113,7 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
+        private _blendMode: number = 0;
         /**
          * 调用渲染
          * @public
@@ -128,13 +128,17 @@ namespace annie {
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha
             }
+            if (s._blendMode != target.cBlendMode){
+                ctx.globalCompositeOperation = BlendMode.getBlendMode(target.cBlendMode);
+                s._blendMode = target.cBlendMode;
+            }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             let sbl = target._splitBoundsList;
             let rect = null;
             for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw===true){
+                if (sbl[i].isDraw === true) {
                     rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height,rect.x, rect.y, rect.width, rect.height);
+                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
                 }
             }
             /*
@@ -166,6 +170,7 @@ namespace annie {
             //
             */
         }
+
         public end() {
         };
 
@@ -200,6 +205,7 @@ namespace annie {
             s.viewPort.width = c.width;
             s.viewPort.height = c.height;
         }
+
         destroy(): void {
             let s = this;
             s.rootContainer = null;

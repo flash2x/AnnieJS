@@ -579,7 +579,6 @@ namespace annie {
         };
         //是否矢量元素有更新
         private a2x_ut: boolean = true;
-
         public updateMatrix(): void {
             let s: any = this;
             let _canvas: any = s._texture;
@@ -730,8 +729,10 @@ namespace annie {
                 }
             }
             if(boundsW!=s._bounds.width||boundsH!=s._bounds.height){
-                s._bounds.width=boundsW;
-                s._bounds.height=boundsH;
+                s._bounds.x=10;
+                s._bounds.y=10;
+                s._bounds.width=boundsW-20;
+                s._bounds.height=boundsH-20;
                 s._updateSplitBounds();
                 s._checkDrawBounds();
             }else if(s.a2x_um){

@@ -61,6 +61,10 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.1.4 版本
+    修复无法获取annie.FloatDisplay鼠标事件的bug
+    修复初始化后马上获取显示对像宽高为0的bug
+    增加显示对象的blendMode属性，以支持混合模式
 ## AnnieJS 3.1.3 版本
     修复annie.MovieClip的visible=false后,再次为true后执行gotoAndPlay/gotoAndStop方法后，渲染却还停留在上一帧的bug
 ## AnnieJS 3.1.2 版本

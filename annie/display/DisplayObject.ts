@@ -413,11 +413,12 @@ namespace annie {
          * @property blendMode
          * @public
          * @since 1.0.0
-         * @type {string}
+         * @type {number}
          * @default 0
          */
 
-        //public blendMode: string = "normal";
+        public blendMode: number = 0;
+        public cBlendMode: number = 0;
         /**
          * 显示对象的变形矩阵
          * @property matrix
@@ -542,11 +543,9 @@ namespace annie {
             }
             return null;
         }
-
         public getBounds(): Rectangle {
             return this._bounds;
         }
-
         /**
          * 获取对象形变后外切矩形。
          * 可以从这个方法中读取到此显示对象变形后x方向上的宽和y方向上的高
@@ -632,8 +631,14 @@ namespace annie {
                     }
                 }
             }
+            if(isHadParent){
+                if(s.parent.cBlendMode>0){
+                    s.cBlendMode=s.parent.cBlendMode;
+                }else{
+                    s.cBlendMode=s.blendMode;
+                }
+            }
         }
-
         protected _checkDrawBounds() {
             let s = this;
             //检查所有bounds矩阵是否在可视范围里
@@ -699,12 +704,14 @@ namespace annie {
          * @return {number}
          */
         public get width(): number {
+            this.updateMatrix();
             this.getDrawRect();
             return DisplayObject._transformRect.width;
         }
 
         public set width(value: number) {
             let s = this;
+            s.updateMatrix();
             s.getDrawRect();
             let w = DisplayObject._transformRect.width;
             if (value > 0 && w > 0) {
@@ -720,6 +727,7 @@ namespace annie {
          * @return {{w: number; h: number}}
          */
         public getWH(): { w: number, h: number } {
+            this.updateMatrix();
             this.getDrawRect();
             return {w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height};
         }
@@ -733,12 +741,14 @@ namespace annie {
          * @return {number}
          */
         public get height(): number {
+            this.updateMatrix();
             this.getDrawRect();
             return DisplayObject._transformRect.height;
         }
 
         public set height(value: number) {
             let s = this;
+            s.updateMatrix();
             s.getDrawRect();
             let h = DisplayObject._transformRect.height;
             if (value > 0 && h > 0) {

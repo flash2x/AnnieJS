@@ -15,6 +15,7 @@ var coreList =[
     "annie/geom/Point.ts",
     "annie/geom/Matrix.ts",
     "annie/geom/Rectangle.ts",
+    "annie/utils/BlendMode.ts",
     "annie/display/DisplayObject.ts",
     "annie/display/bitmap.ts",
     "annie/display/Shape.ts",

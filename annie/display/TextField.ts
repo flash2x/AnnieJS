@@ -501,7 +501,7 @@ namespace annie {
                     ctx.putImageData(imageData, 0, 0);
                 }
             }
-            if (boundsW != s._bounds.width || boundsH != s._bounds.height) {
+            if (boundsW != s._bounds.width || boundsH != s._bounds.height){
                 s._bounds.width = boundsW;
                 s._bounds.height = boundsH;
                 s._updateSplitBounds();
