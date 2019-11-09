@@ -145,7 +145,6 @@ namespace annie {
                 return elements;
             }
         }
-
         /**
          * 添加一个child到Sprite中并指定添加到哪个层级
          * @method addChildAt
@@ -382,38 +381,40 @@ namespace annie {
         }
         public render(renderObj: IRender): void {
             let s: any = this;
-            if (s._visible && s.cAlpha > 0){
+            let len: number = s.children.length;
+            if (s._visible && s.cAlpha > 0 && len > 0) {
+                let children: any = s.children;
+                let ro: any = renderObj;
                 let maskObj: any;
                 let child: any;
-                let children: any = s.children;
-                let len: number = children.length;
                 for (let i = 0; i < len; i++) {
                     child = children[i];
                     if (child._isUseToMask > 0) continue;
                     if (maskObj instanceof annie.DisplayObject) {
                         if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                             if (child.mask != maskObj) {
-                                renderObj.endMask();
+                                ro.endMask();
                                 maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
+                                ro.beginMask(maskObj);
                             }
                         } else {
-                            renderObj.endMask();
+                            ro.endMask();
                             maskObj = null;
                         }
                     } else {
                         if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                             maskObj = child.mask;
-                            renderObj.beginMask(maskObj);
+                            ro.beginMask(maskObj);
                         }
                     }
-                    child.render(renderObj);
+                    child.render(ro);
                 }
                 if (maskObj instanceof annie.DisplayObject) {
-                    renderObj.endMask();
+                    ro.endMask();
                 }
             }
         }
+
         public _onRemoveEvent(isReSetMc: boolean): void {
             let s = this;
             let child: any = null;
@@ -429,6 +430,7 @@ namespace annie {
             }
             super._onRemoveEvent(isReSetMc);
         }
+
         public _onAddEvent(): void {
             let s = this;
             let child: any = null;
@@ -444,6 +446,7 @@ namespace annie {
             }
             super._onAddEvent();
         }
+
         public _onEnterFrameEvent(): void {
             let s = this;
             let child: any = null;
@@ -451,12 +454,13 @@ namespace annie {
             let len = children.length;
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
-                if (child && child._isOnStage){
+                if (child && child._isOnStage) {
                     child._onEnterFrameEvent();
                 }
                 super._onEnterFrameEvent();
             }
         }
+
         /**
          * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。
          * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。

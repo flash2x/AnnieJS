@@ -409,14 +409,13 @@ namespace annie {
         public _visible: boolean = true;
         /**
          * 显示对象的混合模式
-         * 支持的混合模式大概有
+         * 支持的混合模式大概有23种，具体查看annie.BlendMode
          * @property blendMode
          * @public
          * @since 1.0.0
          * @type {number}
          * @default 0
          */
-
         public blendMode: number = 0;
         public cBlendMode: number = 0;
         /**
@@ -570,7 +569,6 @@ namespace annie {
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         }
-
         /**
          * 更新函数
          * @method update

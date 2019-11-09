@@ -1555,7 +1555,7 @@ var annie;
         BlendMode.SUBTRACT = 9;
         BlendMode.DIFFERENCE = 10;
         BlendMode.INVERT = 11;
-        BlendMode.ALPHA = 12;
+        // public static ALPHA:number=12;
         BlendMode.ERASE = 13;
         BlendMode.SOURCE_IN = 14;
         BlendMode.SOFT_LIGHT = 15;
@@ -1739,7 +1739,7 @@ var annie;
             _this._visible = true;
             /**
              * 显示对象的混合模式
-             * 支持的混合模式大概有
+             * 支持的混合模式大概有23种，具体查看annie.BlendMode
              * @property blendMode
              * @public
              * @since 1.0.0
@@ -4143,11 +4143,12 @@ var annie;
         };
         Sprite.prototype.render = function (renderObj) {
             var s = this;
-            if (s._visible && s.cAlpha > 0) {
+            var len = s.children.length;
+            if (s._visible && s.cAlpha > 0 && len > 0) {
+                var children = s.children;
+                var ro = renderObj;
                 var maskObj = void 0;
                 var child = void 0;
-                var children = s.children;
-                var len = children.length;
                 for (var i = 0; i < len; i++) {
                     child = children[i];
                     if (child._isUseToMask > 0)
@@ -4155,26 +4156,26 @@ var annie;
                     if (maskObj instanceof annie.DisplayObject) {
                         if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                             if (child.mask != maskObj) {
-                                renderObj.endMask();
+                                ro.endMask();
                                 maskObj = child.mask;
-                                renderObj.beginMask(maskObj);
+                                ro.beginMask(maskObj);
                             }
                         }
                         else {
-                            renderObj.endMask();
+                            ro.endMask();
                             maskObj = null;
                         }
                     }
                     else {
                         if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                             maskObj = child.mask;
-                            renderObj.beginMask(maskObj);
+                            ro.beginMask(maskObj);
                         }
                     }
-                    child.render(renderObj);
+                    child.render(ro);
                 }
                 if (maskObj instanceof annie.DisplayObject) {
-                    renderObj.endMask();
+                    ro.endMask();
                 }
             }
         };
@@ -8152,12 +8153,12 @@ var annie;
          * @public
          */
         CanvasRender.prototype.begin = function () {
-            var s = this, c = s.rootContainer;
-            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            s._ctx.clearRect(0, 0, c.width, c.height);
+            var s = this, c = s.rootContainer, ctx = s._ctx;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, c.width, c.height);
             if (s._stage.bgColor != "") {
-                s._ctx.fillStyle = s._stage.bgColor;
-                s._ctx.fillRect(0, 0, c.width, c.height);
+                ctx.fillStyle = s._stage.bgColor;
+                ctx.fillRect(0, 0, c.width, c.height);
             }
         };
         /**
@@ -8168,18 +8169,18 @@ var annie;
          * @since 1.0.0
          */
         CanvasRender.prototype.beginMask = function (target) {
-            var s = this;
-            s._ctx.save();
-            s._ctx.globalAlpha = 0;
+            var s = this, ctx = s._ctx;
+            ctx.save();
+            ctx.globalAlpha = 0;
             s.drawMask(target);
-            s._ctx.clip();
+            ctx.clip();
         };
         CanvasRender.prototype.drawMask = function (target) {
-            var s = this, tm = target.cMatrix;
-            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            s._ctx.translate(-target._offsetX, -target._offsetY);
+            var s = this, tm = target.cMatrix, ctx = s._ctx;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            ctx.translate(-target._offsetX, -target._offsetY);
             if (target._instanceType == "annie.Shape") {
-                target._draw(s._ctx, true);
+                target._draw(ctx, true);
             }
             else if (target._instanceType == "annie.Sprite") {
                 target._updateState = 0;
@@ -8196,7 +8197,7 @@ var annie;
             }
             else {
                 var bounds = target._bounds;
-                s._ctx.rect(0, 0, bounds.width, bounds.height);
+                ctx.rect(0, 0, bounds.width, bounds.height);
             }
         };
         /**

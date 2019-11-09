@@ -21,7 +21,7 @@ namespace annie {
         public static SUBTRACT:number=9;
         public static DIFFERENCE:number=10;
         public static INVERT:number=11;
-        public static ALPHA:number=12;
+        // public static ALPHA:number=12;
         public static ERASE:number=13;
         public static SOURCE_IN:number=14;
         public static SOFT_LIGHT:number=15;

@@ -999,7 +999,6 @@ declare namespace annie {
         static SUBTRACT: number;
         static DIFFERENCE: number;
         static INVERT: number;
-        static ALPHA: number;
         static ERASE: number;
         static SOURCE_IN: number;
         static SOFT_LIGHT: number;
@@ -1245,7 +1244,7 @@ declare namespace annie {
         _visible: boolean;
         /**
          * 显示对象的混合模式
-         * 支持的混合模式大概有
+         * 支持的混合模式大概有23种，具体查看annie.BlendMode
          * @property blendMode
          * @public
          * @since 1.0.0
@@ -3724,7 +3723,7 @@ declare namespace annie {
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          */
-        draw(target: DisplayObject): void;
+        draw(target: any): void;
         end(): void;
         /**
          * 初始化渲染器

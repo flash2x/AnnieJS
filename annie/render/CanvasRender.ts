@@ -57,14 +57,15 @@ namespace annie {
          * @public
          */
         public begin(): void {
-            let s = this, c = s.rootContainer;
-            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            s._ctx.clearRect(0, 0, c.width, c.height);
-            if(s._stage.bgColor!=""){
-                s._ctx.fillStyle=s._stage.bgColor;
-                s._ctx.fillRect(0,0,c.width,c.height);
+            let s = this, c = s.rootContainer, ctx = s._ctx;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, c.width, c.height);
+            if (s._stage.bgColor != "") {
+                ctx.fillStyle = s._stage.bgColor;
+                ctx.fillRect(0, 0, c.width, c.height);
             }
         }
+
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -73,19 +74,19 @@ namespace annie {
          * @since 1.0.0
          */
         public beginMask(target: any): void {
-            let s: CanvasRender = this;
-            s._ctx.save();
-            s._ctx.globalAlpha = 0;
+            let s: CanvasRender = this, ctx = s._ctx;
+            ctx.save();
+            ctx.globalAlpha = 0;
             s.drawMask(target);
-            s._ctx.clip();
+            ctx.clip();
         }
 
         private drawMask(target: any): void {
-            let s = this, tm = target.cMatrix;
-            s._ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            s._ctx.translate(-target._offsetX, -target._offsetY);
+            let s = this, tm = target.cMatrix, ctx = s._ctx;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            ctx.translate(-target._offsetX, -target._offsetY);
             if (target._instanceType == "annie.Shape") {
-                target._draw(s._ctx, true);
+                target._draw(ctx, true);
             } else if (target._instanceType == "annie.Sprite") {
                 target._updateState = 0;
                 for (let i = 0; i < target.children.length; i++) {
@@ -100,7 +101,7 @@ namespace annie {
             }
             else {
                 let bounds = target._bounds;
-                s._ctx.rect(0, 0, bounds.width, bounds.height);
+                ctx.rect(0, 0, bounds.width, bounds.height);
             }
         }
 
@@ -113,7 +114,9 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
+
         private _blendMode: number = 0;
+
         /**
          * 调用渲染
          * @public
@@ -121,14 +124,14 @@ namespace annie {
          * @method draw
          * @param {annie.DisplayObject} target 显示对象
          */
-        public draw(target: DisplayObject): void {
+        public draw(target: any): void {
             let s = this;
             let texture = target._texture;
             let ctx = s._ctx, tm = target.cMatrix;
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha
             }
-            if (s._blendMode != target.cBlendMode){
+            if (s._blendMode != target.cBlendMode) {
                 ctx.globalCompositeOperation = BlendMode.getBlendMode(target.cBlendMode);
                 s._blendMode = target.cBlendMode;
             }
