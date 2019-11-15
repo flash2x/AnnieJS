@@ -725,6 +725,12 @@ var annie;
              * @public
              */
             _this.identifier = 0;
+            /**
+             * 当前时间戳
+             * @property timeStamp
+             * @type {number}
+             */
+            _this.timeStamp = 0;
             _this._instanceType = "annie.MouseEvent";
             return _this;
         }
@@ -2176,7 +2182,7 @@ var annie;
         DisplayObject.prototype.hitTestPoint = function (hitPoint, isGlobalPoint) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             var s = this;
-            if (!s.visible || !s.mouseEnable || (s._splitBoundsList.length == 1 && !s._splitBoundsList[0].isDraw) || (s._splitBoundsList.length == 0))
+            if (!s.visible || !s.mouseEnable)
                 return null;
             var p;
             if (isGlobalPoint) {
@@ -4067,7 +4073,7 @@ var annie;
             if (!s.visible || !s.mouseEnable)
                 return null;
             //如果有设置鼠标活动区域，则优先使用活动区域
-            if (s._hitArea instanceof annie.Rectangle) {
+            if (s._hitArea) {
                 var p = hitPoint;
                 if (isGlobalPoint) {
                     p = s.globalToLocal(hitPoint, annie.DisplayObject._bp);
@@ -4857,6 +4863,7 @@ var annie;
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
+                s.addEventListener("onMuseOver", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
@@ -4896,6 +4903,11 @@ var annie;
                 if (e.type == "onMouseDown") {
                     if (s._curFrame > 2) {
                         frame = 3;
+                    }
+                }
+                else if (e.type == "onMouseOver") {
+                    if (s._curFrame > 1) {
+                        frame = 2;
                     }
                 }
                 else {
@@ -6781,12 +6793,13 @@ var annie;
             renderObj.end();
         };
         //刷新mouse或者touch事件
-        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier) {
+        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, timeStamp) {
             event._pd = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
+            event.timeStamp = timeStamp;
             event.identifier = identifier;
         };
         //循环刷新页面的函数
@@ -7010,7 +7023,7 @@ var annie;
                             s._ml[eLen] = event_1;
                         }
                         events[events.length] = event_1;
-                        s._initMouseEvent(event_1, cp, sp, identifier);
+                        s._initMouseEvent(event_1, cp, sp, identifier, e.timeStamp);
                         eLen++;
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -8219,6 +8232,8 @@ var annie;
         CanvasRender.prototype.draw = function (target) {
             var s = this;
             var texture = target._texture;
+            if (texture.width == 0 || texture.height == 0)
+                return;
             var ctx = s._ctx, tm = target.cMatrix;
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha;

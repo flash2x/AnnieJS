@@ -127,6 +127,7 @@ namespace annie {
         public draw(target: any): void {
             let s = this;
             let texture = target._texture;
+            if(texture.width==0||texture.height==0)return;
             let ctx = s._ctx, tm = target.cMatrix;
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha

@@ -332,12 +332,13 @@ namespace annie {
         private _mp: any = [];
 
         //刷新mouse或者touch事件
-        private _initMouseEvent(event: any, cp: Point, sp: Point, identifier: number): void {
+        private _initMouseEvent(event: any, cp: Point, sp: Point, identifier: number,timeStamp:number): void {
             event._pd = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
+            event.timeStamp=timeStamp;
             event.identifier = identifier;
         }
 
@@ -578,7 +579,7 @@ namespace annie {
                             s._ml[eLen] = event;
                         }
                         events[events.length] = event;
-                        s._initMouseEvent(event, cp, sp, identifier);
+                        s._initMouseEvent(event, cp, sp, identifier,e.timeStamp);
                         eLen++;
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;

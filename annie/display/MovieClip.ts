@@ -180,6 +180,7 @@ namespace annie {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
+                s.addEventListener("onMuseOver", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s.gotoAndStop(1);
@@ -220,7 +221,11 @@ namespace annie {
                     if (s._curFrame > 2) {
                         frame = 3;
                     }
-                } else {
+                }else if(e.type=="onMouseOver"){
+                    if (s._curFrame > 1) {
+                        frame = 2;
+                    }
+                }else {
                     frame = 1;
                 }
                 s.gotoAndStop(frame);

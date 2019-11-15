@@ -305,7 +305,7 @@ namespace annie {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
             //如果有设置鼠标活动区域，则优先使用活动区域
-            if (s._hitArea instanceof annie.Rectangle) {
+            if (s._hitArea) {
                 let p: Point = hitPoint;
                 if (isGlobalPoint) {
                     p = s.globalToLocal(hitPoint, DisplayObject._bp);
@@ -364,7 +364,6 @@ namespace annie {
             }
             return rect;
         }
-
         public updateMatrix(): void {
             let s = this;
             if (s._visible) {

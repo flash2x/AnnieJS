@@ -61,6 +61,11 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.1.5 版本
+    重写annieUI.Scroller类，更流畅更强大
+    重写annieUI.ScrollPage类,使用更简单
+    重写annieUI.ScrollList类,使用更简单
+    新增annieUI.MCScroller类,专门用来控制时间轴动画的滑动播放
 ## AnnieJS 3.1.4 版本
     修复无法获取annie.FloatDisplay鼠标事件的bug
     修复初始化后马上获取显示对像宽高为0的bug

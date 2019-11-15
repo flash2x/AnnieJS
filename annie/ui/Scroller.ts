@@ -9,171 +9,536 @@ namespace annieUI {
      * @extends annie.AObject
      * @since 3.1.0
      */
-    export class Scroller extends annie.EventDispatcher{
+    export class Scroller extends annie.EventDispatcher {
         //Event
         /**
-         * annieUI.Scroller组件滑动到开始位置事件
+         * annieUI.Scroller 组件滑动到开始位置事件
          * @event annie.Event.ON_SCROLL_ING
          * @since 3.1.0
          */
-
         /**
-         * 滑动方向
-         * @property isVertical
+         * annieUI.Scroller 组件滑动到开始位置事件
+         * @event annie.Event.ON_SCROLL_TO_HEAD
+         * @since 3.1.5
+         */
+        /**
+         * annieUI.Scroller 组件停止滑动事件
+         * @event annie.Event.ON_SCROLL_STOP
+         * @since 3.1.5
+         */
+        /**
+         * annieUI.Scroller 组件开始滑动事件
+         * @event annie.Event.ON_SCROLL_START
+         * @since 3.1.5
+         */
+        /**
+         * annieUI.Scroller 组件滑动到结束位置事件
+         * @event annie.Event.ON_SCROLL_TO_END
+         * @since 3.1.5
+         */
+        protected _container: annie.DisplayObject;
+        /**
+         * 是否纵向滚动
+         * @property isScrollY
          * @type {boolean}
-         */
-        public isVertical: boolean = true;
-        /**
-         * 手指按下后的滑动速度，值越大，滑动越快
-         * @property speed
-         * @protected
-         * @since 3.1.0
-         * @type {number}
-         */
-        public speed:number=0.2;
-        /**
-         * 滚动的最大速度，直接影响一次滑动之后最长可以滚多远
-         * @property maxSpeed
          * @public
-         * @since 3.1.0
-         * @default 100
-         * @type {number}
+         * @since 3.1.5
+         * @default true;
          */
-        public maxSpeed: number = 15;
+        public isScrollY:boolean = true;
         /**
-         * 松开手指后的自然滚动的摩擦力，摩擦力越大，停止的越快
-         * @property fSpeed
-         * @since 3.1.0
-         * @type {number}
-         */
-        public fSpeed:number=0.1;
-        private _isMouseDownState: number = 0;
-        private _moveDis: number = 0;
-        /**
-         * 是否允许通过鼠标去滚动
-         * @property isCanScroll
+         * 是否横向滚动
+         * @property isScrollX
          * @type {boolean}
-         * @since 3.0.1
+         * @since 3.1.5
+         * @public
+         * @default true;
          */
-        public isCanScroll: boolean = true;
-        private _isStop:boolean=false;
-        private _timer:annie.Timer;
-        private _stage:annie.Stage=null;
-        private _maxDis:number=1;
-        //最后鼠标经过的坐标值
-        private _lastValue: number = 0;
-        private _frame = 1;
-        constructor() {
+        public isScrollX:boolean = true;
+        /**
+         * 是否松开鼠标后让其自由缓冲滑动
+         * @property isMomentum
+         * @type {boolean}
+         * @since 3.1.5
+         * @public
+         * @default true;
+         */
+        public isMomentum:boolean = true;
+        /**
+         * 是否滑到边界后有回弹效果
+         * @property isBounce
+         * @type {boolean}
+         * @since 3.1.5
+         * @public
+         * @default true;
+         */
+        public isBounce:boolean = true;
+        /**
+         * 回弹的动效时长,单位:ms
+         * @property bounceTime
+         * @type {number}
+         * @public
+         * @since 3.1.5
+         * @default 300
+         */
+        public bounceTime: number = 300;
+        /**
+         * 是否需要横向纵向保护，有些时候你想纵向滑动，但鼠标也轻微的左右飘了，如果不lock刚好左右滑动也被允许的话，则左右也会滑动，横向滑动则相反。
+         * 如果想鼠标不那么灵敏的话，可以加上一把锁，这样左右滑的时候上下不会滑，上下滑的时候左右不会滑
+         * @property isLocked
+         * @type {boolean}
+         * @public
+         * @since 3.1.5
+         * @default 300
+         */
+        public isLocked:boolean = true;
+        /**
+         * 锁的像素范围
+         * @property lockDis
+         * @type {number}
+         * @since 3.1.5
+         * @public
+         * @default 5
+         */
+        public lockDis: number = 5;
+        /**
+         * 当前滑动的x坐标 更改此参数则需要调用resetPosition()方法生效
+         * @property curX
+         * @type {number}
+         * @since 3.1.5
+         * @default 0
+         */
+        public curX: number = 0;
+        /**
+         * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
+         * @property curY
+         * @type {number}
+         * @since 3.1.5
+         * @default 0
+         */
+        public curY: number = 0;
+        /**
+         * 当前显示范围的宽
+         * @property viewWidth
+         * @type {number}
+         * @since 3.1.5
+         * @default 0
+         * @readonly
+         */
+        public get viewWidth():number{
+           return this._viewWidth;
+        }
+        public _viewWidth:number=0;
+        /**
+         * 当前显示范围的高
+         * @property viewHeight
+         * @type {number}
+         * @since 3.1.5
+         * @default 0
+         * @readonly
+         */
+        public get viewHeight():number{
+           return this._viewHeight;
+        }
+        public _viewHeight:number=0;
+        /**
+         * 当前横向的滑动范围
+         * @property scrollWidth
+         * @type {number}
+         * @since 3.1.5
+         * @default 0
+         * @readonly
+         */
+        public get scrollWidth():number{
+           return this._scrollWidth;
+        }
+        public _scrollWidth:number=0;
+        /**
+         * 当前纵向的滑动范围
+         * @property scrollHeight
+         * @type {number}
+         * @since 3.1.5
+         * @default 0
+         * @readonly
+         */
+        public get scrollHeight():number{
+            return this._scrollHeight;
+        }
+        public _scrollHeight:number=0;
+        /**
+         * 是否正在滑动中
+         * @property isRunning
+         * @type {boolean}
+         * @since 3.1.5
+         * @default false
+         */
+        public isRunning: boolean;
+        private startX: number = 0;
+        private startY: number = 0;
+        private maxScrollX: number;
+        private maxScrollY: number;
+        private endTime: number;
+        private mouseStatus: number=0;
+        private distX: number;
+        private distY: number;
+        private startTime: number;
+        private absStartX: number;
+        private absStartY: number;
+        private pointX: number;
+        private pointY: number;
+        private deceleration: number = 0.0006;
+        private destTime: number;
+        private destX: number;
+        private destY: number;
+        private duration: number;
+        private easingFn: Function;
+        /**
+         * 初始化
+         * @method Scroller
+         * @param {annie.DisplayObject} container
+         * @param {number} viewWidth
+         * @param {number} viewHeight
+         * @param {number} scrollWidth
+         * @param {number} scrollHeight
+         */
+        constructor(container: annie.DisplayObject, viewWidth: number, viewHeight: number, scrollWidth: number, scrollHeight: number) {
             super();
             let s = this;
             s._instanceType = "annieUI.Scroller";
+            s._mouseEvent = s.onMouseEvent.bind(s);
+            s._enterFrame = s.onEnterFrame.bind(s);
+            s.init(container, viewWidth, viewHeight, scrollWidth, scrollHeight);
         }
         /**
-         * 初始化函数
-         * @method  init
-         * @param {annie.Stage} Stage
-         * @param {number} maxDis
-         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * 初始化，也可以反复调用此方法重用scroller
+         * @method init
+         * @param {annie.DisplayObject} container
+         * @param {number} viewWidth
+         * @param {number} viewHeight
+         * @param {number} scrollWidth
+         * @param {number} scrollHeight
+         * @public
+         * @since 3.1.5
          */
-        public init(stage: annie.Stage,maxDis:number,isVertical: boolean = true) {
+        public init(container: annie.DisplayObject, viewWidth: number, viewHeight: number, scrollWidth: number, scrollHeight: number) {
             let s = this;
-            s.mouseEvent = s.onMouseEvent.bind(s);
-            s._stage=stage;
-            s._maxDis=maxDis;
-            stage.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.mouseEvent, false);
-            stage.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.mouseEvent, false);
-            stage.addEventListener(annie.MouseEvent.MOUSE_UP, s.mouseEvent, false);
-            stage.addEventListener(annie.MouseEvent.MOUSE_OUT, s.mouseEvent);
-            s._timer=new annie.Timer(20);
-            s._timer.addEventListener(annie.Event.TIMER, function (){
-                if(s._isStop){
-                    let frame=s._frame;
-                    if (Math.abs(frame - s._moveDis) > 0.001) {
-                        frame += s.fSpeed * (s._moveDis - frame);
-                        if (frame < 1) {
-                            frame = 1;
-                            s._isStop=true;
-                        } else if (frame >s._maxDis) {
-                            frame = s._maxDis;
-                            s._isStop=true;
-                        }
-                        s.dispatchEvent("onScrollIng",frame);
-                        s._frame=frame;
-                    }else{
-                        s._isStop=false;
-                    }
-                }
-            });
-            s._timer.start();
+            if(s._container&&s._container!=container){
+               //移除
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent, false);
+                s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
+            }
+            if(s._container!=container) {
+                s._container = container;
+                container.addEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
+                container.addEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
+                container.addEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
+                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
+                container.addEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
+            }
+            s.isRunning = false;
+            s.endTime = 0;
+            s.setViewWHAndScrollWH(viewWidth,viewHeight,scrollWidth,scrollHeight);
         }
-        public mouseEvent:any=null;
-        private onMouseEvent(e: annie.MouseEvent): void {
-            let s = this;
-            if (s.isCanScroll){
-                let frame = s._frame;
-                let moveDis=s._moveDis;
-                if (e.type == annie.MouseEvent.MOUSE_DOWN) {
-                    if (s.isVertical) {
-                        s._lastValue = e.localY;
-                    } else {
-                        s._lastValue = e.localX;
+
+        /**
+         * 当更改了viewWidth,viewHeight其中一个或两个同时也更改了scrollWidth,scrollHeight其中的一个或者两个
+         * 需要调用此方法重置，如果只是单方面更改了viewWidth,viewHeight其中一个或两个,则可以调用setViewWH()
+         * 如果只是更改了scrollWidth,scrollHeight其中的一个或者两个，则可以调用setScrollWH()
+         * @method setViewWHAndScrollWH
+         * @public
+         * @since 3.1.5
+         * @param {number} viewWidth
+         * @param {number} viewHeight
+         * @param {number} scrollWidth
+         * @param {number} scrollHeight
+         */
+        public setViewWHAndScrollWH(viewWidth:number,viewHeight:number,scrollWidth:number,scrollHeight:number):void{
+            let s=this;
+            s._viewHeight = viewHeight;
+            s._viewWidth = viewWidth;
+            s._scrollWidth = scrollWidth;
+            s._scrollHeight = scrollHeight;
+            s._updateViewAndScroll();
+        }
+        /**
+         * 当更改了viewWidth,viewHeight其中一个或两个,需要调用此方法重置.
+         * @method setViewWH
+         * @public
+         * @since 3.1.5
+         * @param {number} viewWidth
+         * @param {number} viewHeight
+         */
+        public setViewWH(viewWidth:number,viewHeight:number){
+            let s=this;
+            s._viewHeight = viewHeight;
+            s._viewWidth = viewWidth;
+            s._updateViewAndScroll();
+        }
+        /**
+         * 当更改了scrollWidth,scrollHeight其中的一个或者两个,需要调用此方法重置.
+         * @method setScrollWH
+         * @public
+         * @since 3.1.5
+         * @param {number} scrollWidth
+         * @param {number} scrollHeight
+         */
+        public setScrollWH(scrollWidth:number,scrollHeight:number){
+            let s=this;
+            s._scrollWidth = scrollWidth;
+            s._scrollHeight = scrollHeight;
+            s._updateViewAndScroll();
+        }
+        public _updateViewAndScroll(){
+            let s=this;
+            s.maxScrollX = s.viewWidth - s.scrollWidth;
+            s.maxScrollY = s.viewHeight - s.scrollHeight;
+            if (!s.isScrollX) {
+                s.maxScrollX = 0;
+                s._scrollWidth = s.viewWidth;
+            }
+            if (!s.isScrollY) {
+                s.maxScrollY = 0;
+                s._scrollHeight = s.viewHeight;
+            }
+            s.resetPosition();
+        }
+        private _mouseEvent:Function = null;
+        private _enterFrame:Function=null;
+        private onEnterFrame(e:annie.Event){
+            let s=this;
+            if (s.isRunning) {
+                let now = Date.now(),
+                    newX, newY,
+                    easing;
+                if (now >= s.destTime) {
+                    s.isRunning = false;
+                    s._translate(s.destX, s.destY);
+                    if (!s.resetPosition(s.bounceTime)) {
+                        s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
                     }
-                    moveDis = 0;
-                    s._isMouseDownState = 1;
-                    s._isStop=false;
-                } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                    if (s._isMouseDownState < 1) {
-                        return;
-                    }
-                    s._isMouseDownState = 2;
-                    let currentValue: number;
-                    if (s.isVertical) {
-                        currentValue = e.localY;
-                    } else {
-                        currentValue = e.localX;
-                    }
-                    moveDis = s._lastValue-currentValue;
-                    if (moveDis > s.maxSpeed) {
-                        moveDis = s.maxSpeed;
-                    } else if (moveDis < -s.maxSpeed) {
-                        moveDis = -s.maxSpeed;
-                    }
-                    if (moveDis != 0) {
-                        frame += moveDis*s.speed;
-                        if (frame < 1) {
-                            frame = 1;
-                        } else if (frame >s._maxDis) {
-                            frame = s._maxDis;
-                        }
-                        s._frame = frame;
-                        //触发事件
-                        s.dispatchEvent("onScrollIng",s._frame);
-                    }
-                    s._lastValue = currentValue;
                 } else {
-                    moveDis*=6;
-                    moveDis+=s._frame;
-                    if (moveDis < 1) {
-                        moveDis = 1;
-                    } else if (moveDis >s._maxDis) {
-                        moveDis = s._maxDis;
-                    }
-                    s._isMouseDownState = 0;
-                    s._isStop=true;
+                    now = (now - s.startTime) / s.duration;
+                    easing = s.easingFn(now);
+                    newX = (s.destX - s.startX) * easing + s.startX;
+                    newY = (s.destY - s.startY) * easing + s.startY;
+                    s._translate(newX, newY);
                 }
-                s._moveDis=moveDis;
+            }
+        }
+        private onMouseEvent(e: annie.MouseEvent): void {
+            let s=this;
+            if (e.type == annie.MouseEvent.MOUSE_DOWN) {
+                s.isRunning = false;
+                s.mouseStatus = 1;
+                s.distX = 0;
+                s.distY = 0;
+                s.startTime = Date.now();
+                s.startX = s.curX;
+                s.startY = s.curY;
+                s.absStartX = s.curX;
+                s.absStartY = s.curY;
+                s.pointX = e.localX;
+                s.pointY = e.localY;
+            } else if (e.type == annie.MouseEvent.MOUSE_MOVE){
+                if(s.mouseStatus<1)return;
+                let deltaX = e.localX - s.pointX,
+                    deltaY = e.localY - s.pointY,
+                    timestamp = Date.now(),
+                    newX, newY,
+                    absDistX, absDistY;
+                s.pointX = e.localX;
+                s.pointY = e.localY;
+                s.distX += deltaX;
+                s.distY += deltaY;
+                absDistX = Math.abs(s.distX);
+                absDistY = Math.abs(s.distY);
+                if (timestamp - s.endTime > 300 && (absDistX < 10 && absDistY < 10)) {
+                    return;
+                }
+                if (s.isLocked) {
+                    if (absDistX > absDistY + s.lockDis) {
+                        deltaY = 0;
+                    } else if (absDistY >= absDistX + s.lockDis) {
+                        deltaX = 0;
+                    }
+                }
+                deltaX = s.isScrollX ? deltaX : 0;
+                deltaY = s.isScrollY ? deltaY : 0;
+                newX = s.curX + deltaX;
+                newY = s.curY + deltaY;
+                if (newX > 0 || newX < s.maxScrollX) {
+                    newX = s.isBounce ? s.curX + deltaX / 3 : newX > 0 ? 0 : s.maxScrollX;
+                }
+                if (newY > 0 || newY < s.maxScrollY) {
+                    newY = s.isBounce ? s.curY + deltaY / 3 : newY > 0 ? 0 : s.maxScrollY;
+                }
+                if (s.mouseStatus==1) {
+                    s.dispatchEvent(annie.Event.ON_SCROLL_START);
+                }
+                s.mouseStatus=2;
+                s._translate(newX, newY);
+                if (timestamp - s.startTime > 300) {
+                    s.startTime = timestamp;
+                    s.startX = s.curX;
+                    s.startY = s.curY;
+                }
+            } else {
+                s.endTime = Date.now();
+                let momentumX: any,
+                    momentumY: any,
+                    duration: number = s.endTime - s.startTime,
+                    newX: number = s.curX,
+                    newY: number = s.curY,
+                    time: number = 0,
+                    easing: Function = null;
+                if (s.resetPosition(s.bounceTime)) {
+                    return;
+                }
+                if (s.mouseStatus!=2) {
+                    return;
+                }
+                s.mouseStatus=0;
+                s.scrollTo(newX, newY);
+                if (s.isMomentum && duration < 300) {
+                    momentumX = s.isScrollX ? Scroller.toMomentum(s.curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth/2 : 0, s.deceleration) : {
+                        destination: newX,
+                        duration: 0
+                    };
+                    momentumY = s.isScrollY ? Scroller.toMomentum(s.curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight/2 : 0, s.deceleration) : {
+                        destination: newY,
+                        duration: 0
+                    };
+                    newX = momentumX.destination;
+                    newY = momentumY.destination;
+                    time = Math.max(momentumX.duration, momentumY.duration);
+                }
+                if (newX != s.curX || newY != s.curY) {
+                    if (newX > 0 || newX < s.maxScrollX || newY > 0 || newY < s.maxScrollY) {
+                        easing = annie.Tween.quadraticOut;
+                    }
+                    s.scrollTo(newX, newY, time, easing);
+                    return;
+                }
+                s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
             }
         }
         public destroy(): void {
             let s = this;
-            s._stage.removeEventListener(annie.MouseEvent.MOUSE_MOVE,s.mouseEvent,false);
-            s._stage.removeEventListener(annie.MouseEvent.MOUSE_UP,s.mouseEvent,false);
-            s._stage.removeEventListener(annie.MouseEvent.MOUSE_DOWN,s.mouseEvent,false);
-            s._stage.removeEventListener(annie.MouseEvent.MOUSE_OUT,s.mouseEvent);
-            s._timer.stop();
-            s._timer.destroy();
-            s._timer=null;
+            if(s._container) {
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
+                s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
+            }
+            s._container=null;
+            s.easingFn=null;
             super.destroy();
         }
+
+        /**
+         * 重新复位，当更改了curX curY参数时可调用此方法更新
+         * @method resetPosition
+         * @param {number} time ms 是否需要花时间有滚动效果.
+         * @return {boolean}
+         * @since 3.1.5
+         * @public
+         */
+        public resetPosition(time: number = 0): boolean {
+            let s=this;
+            let x = s.curX,
+                y = s.curY;
+            time = time || 0;
+            if (!s.isScrollX || s.curX > 0) {
+                x = 0;
+            } else if (s.curX < s.maxScrollX) {
+                x = s.maxScrollX;
+            }
+            if (!s.isScrollY || s.curY > 0) {
+                y = 0;
+            } else if (s.curY < s.maxScrollY) {
+                y = s.maxScrollY;
+            }
+            if (x == s.curX && y == s.curY) {
+                return false;
+            }
+            s.scrollTo(x, y, time, null);
+            return true;
+        }
+
+        /**
+         * 从设置的x,y坐标滑过来。 注意x y位置是负数，想想为什么
+         * @method scrollBy
+         * @param {number} x 从哪个x坐标滑过来
+         * @param {number} y 从哪个y坐标滑过来
+         * @param {number} time 滑动时长 ms,0的话没效果直接跳
+         * @param {Function} easing annie.Tween中指定的缓存方法
+         * @public
+         * @since 3.1.5
+         */
+        public scrollBy(x: number, y: number, time: number = 0, easing: Function = null) {
+            let s=this;
+            x = s.curX + x;
+            y = s.curY + y;
+            time = time || 0;
+            s.scrollTo(x, y, time, easing);
+        }/**
+         * 滑动到设置的x,y坐标。 注意x y位置是负数，想想为什么
+         * @method scrollBy
+         * @param {number} x 要滑去的x坐标
+         * @param {number} y 要滑去的y坐标
+         * @param {number} time 滑动时长 ms,0的话没效果直接跳
+         * @param {Function} easing annie.Tween中指定的缓存方法
+         * @public
+         * @since 3.1.5
+         */
+        public scrollTo(x: number, y: number, time: number = 0, easing: Function = null) {
+            let s=this;
+            if (!time) {
+                s._translate(x, y);
+            } else {
+                easing = easing || annie.Tween.circularOut;
+                s.startX = s.curX;
+                s.startY = s.curY;
+                s.startTime = Date.now();
+                s.destTime = s.startTime + time;
+                s.destX = x;
+                s.destY = y;
+                s.duration = time;
+                s.easingFn = easing;
+                s.isRunning = true;
+            }
+        }
+        private _translate(x: number, y: number) {
+            let s=this;
+            s.curX = x;
+            s.curY = y;
+            s.dispatchEvent(annie.Event.ON_SCROLL_ING,{posX:x,posY:y});
+        }
+        private static toMomentum(current: number, start: number, time: number, lowerMargin: number, wrapperSize: number, deceleration: number) {
+            let distance = current - start,
+                speed = Math.abs(distance) / time,
+                destination,
+                duration;
+            deceleration = deceleration === undefined ? 0.0006 : deceleration;
+            destination = current + (speed * speed) / (2 * deceleration) * (distance < 0 ? -1 : 1);
+            duration = speed / deceleration;
+            if (destination < lowerMargin) {
+                destination = wrapperSize ? lowerMargin - (wrapperSize / 2.5 * (speed / 8)) : lowerMargin;
+                distance = Math.abs(destination - current);
+                duration = distance / speed;
+            } else if (destination > 0) {
+                destination = wrapperSize ? wrapperSize / 2.5 * (speed / 8) : 0;
+                distance = Math.abs(current) + destination;
+                duration = distance / speed;
+            }
+            return {
+                destination: destination,
+                duration: duration
+            };
+        };
     }
 }

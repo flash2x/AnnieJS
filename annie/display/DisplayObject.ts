@@ -528,7 +528,7 @@ namespace annie {
          */
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            if (!s.visible || !s.mouseEnable || (s._splitBoundsList.length == 1 && !s._splitBoundsList[0].isDraw) || (s._splitBoundsList.length == 0)) return null;
+            if (!s.visible || !s.mouseEnable) return null;
             let p: Point;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._bp);
@@ -537,7 +537,7 @@ namespace annie {
             }
             p.x += s._offsetX;
             p.y += s._offsetY;
-            if (s._bounds.isPointIn(p)) {
+            if (s._bounds.isPointIn(p)){
                 return s;
             }
             return null;

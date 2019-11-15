@@ -569,6 +569,12 @@ declare namespace annie {
          */
         identifier: any;
         /**
+         * 当前时间戳
+         * @property timeStamp
+         * @type {number}
+         */
+        timeStamp: number;
+        /**
          * @method MouseEvent
          * @public
          * @since 1.0.0

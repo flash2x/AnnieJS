@@ -130,6 +130,12 @@ namespace annie {
          */
         public identifier:any=0;
         /**
+         * 当前时间戳
+         * @property timeStamp
+         * @type {number}
+         */
+        public timeStamp:number=0;
+        /**
          * @method MouseEvent
          * @public
          * @since 1.0.0
