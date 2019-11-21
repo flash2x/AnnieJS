@@ -579,7 +579,7 @@ namespace annie {
                             s._ml[eLen] = event;
                         }
                         events[events.length] = event;
-                        s._initMouseEvent(event, cp, sp, identifier,e.timeStamp);
+                        s._initMouseEvent(event, cp, sp, identifier, e.timeStamp);
                         eLen++;
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -731,13 +731,18 @@ namespace annie {
                     }
                 }
             }
-            if (s.isPreventDefaultEvent) {
-                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                    e.preventDefault();
+            if (e.target.id == "_a2x_canvas") {
+                s._isMouseClickCanvas = true;
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
                 }
-                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                    e.preventDefault();
-                }
+            } else {
+                s._isMouseClickCanvas = false;
             }
         };
 

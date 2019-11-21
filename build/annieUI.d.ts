@@ -107,7 +107,8 @@ declare namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        curX: number;
+        readonly curX: number;
+        protected _curX: number;
         /**
          * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
          * @property curY
@@ -115,7 +116,8 @@ declare namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        curY: number;
+        readonly curY: number;
+        protected _curY: number;
         /**
          * 当前显示范围的宽
          * @property viewWidth
@@ -242,14 +244,6 @@ declare namespace annieUI {
         private onEnterFrame;
         private onMouseEvent;
         destroy(): void;
-        /**
-         * 重新复位，当更改了curX curY参数时可调用此方法更新
-         * @method resetPosition
-         * @param {number} time ms 是否需要花时间有滚动效果.
-         * @return {boolean}
-         * @since 3.1.5
-         * @public
-         */
         resetPosition(time?: number): boolean;
         /**
          * 从设置的x,y坐标滑过来。 注意x y位置是负数，想想为什么
@@ -281,7 +275,7 @@ declare namespace annieUI {
  */
 declare namespace annieUI {
     /**
-     * 用滚动的方式播放MC
+     * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
      * @public
      * @extends annie.Scroller
@@ -289,9 +283,30 @@ declare namespace annieUI {
      */
     class MCScroller extends annieUI.Scroller {
         private _mc;
+        /**
+         * 滑动的速率，值越大，滑动越慢,默认是10
+         * @property rate
+         * @param {number} value
+         * @since 3.1.5
+         * @public
+         */
         rate: number;
         private _rate;
-        readonly isVertical: boolean;
+        /**
+         * 鼠标滑动的方向，默认纵向
+         * @property isVertical
+         * @since 3.1.5
+         * @public
+         * @return {boolean}
+         */
+        isVertical: boolean;
+        /**
+         * 只读，获取当前mc的frame具体值，带小数
+         * @property curFramePos
+         * @readonly
+         * @return {number}
+         */
+        readonly curFramePos: number;
         private _isVertical;
         /**
          * 构造函数
@@ -352,43 +367,15 @@ declare namespace annieUI {
          */
         readonly view: DisplayObject;
         protected _view: DisplayObject;
-        protected scroll: annieUI.Scroller;
         /**
-         * 当前显示范围的宽
-         * @property viewWidth
-         * @type {number}
-         * @since 3.1.5
-         * @default 0
+         * scroller滑动控制器
+         * @property scroller
          * @readonly
-         */
-        readonly viewWidth: number;
-        /**
-         * 当前显示范围的高
-         * @property viewHeight
-         * @type {number}
+         * @public
          * @since 3.1.5
-         * @default 0
-         * @readonly
          */
-        readonly viewHeight: number;
-        /**
-         * 当前横向的滑动范围
-         * @property scrollWidth
-         * @type {number}
-         * @since 3.1.5
-         * @default 0
-         * @readonly
-         */
-        readonly scrollWidth: number;
-        /**
-         * 当前纵向的滑动范围
-         * @property scrollHeight
-         * @type {number}
-         * @since 3.1.5
-         * @default 0
-         * @readonly
-         */
-        readonly scrollHeight: number;
+        readonly scroller: annieUI.Scroller;
+        _scroller: annieUI.Scroller;
         /**
          * 构造函数
          * @method  ScrollPage
@@ -415,15 +402,6 @@ declare namespace annieUI {
          * @since 3.1.5
          */
         setViewWH(viewWidth: number, viewHeight: number): void;
-        /**
-         * 设置滑动的长度和宽度，如果只需要一个方向上可滑动，可以将view的宽或者高等于滑动的宽或者高
-         * @method setScrollWH
-         * @param {number}scrollWidth 设置滑动区域的宽
-         * @param {number}scrollHeight 设置滑动区域的高
-         * @public
-         * @since 3.1.5
-         */
-        setScrollWH(scrollWidth: number, scrollHeight: number): void;
         destroy(): void;
     }
 }
@@ -467,6 +445,7 @@ declare namespace annieUI {
         private _lastFirstId;
         private _distance;
         private _paramXY;
+        isVertical: boolean;
         private _isVertical;
         private _maxDistance;
         /**
@@ -489,7 +468,6 @@ declare namespace annieUI {
          * @since 1.0.9
          */
         constructor(itemClassName: any, itemWidth: number, itemHeight: number, viewWidth: number, viewHeight: number, isVertical?: boolean, step?: number);
-        setViewWH(viewWidth: number, viewHeight: number): void;
         /**
          * 更新列表数据
          * @method updateData

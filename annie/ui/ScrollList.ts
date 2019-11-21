@@ -41,9 +41,16 @@ namespace annieUI {
         private _lastFirstId: number = -1;
         private _distance: number = 0;
         private _paramXY: string = "y";
+        public  set isVertical(value:boolean){
+            let s=this;
+                s._isVertical=value;
+                s._updateItems();
+        }
+        public get isVertical():boolean{
+            return this._isVertical;
+        }
         private _isVertical:boolean=true;
         private _maxDistance:number=0;
-
         /**
          * 获取下拉滚动的loadingView对象
          * @property loadingView
@@ -53,7 +60,6 @@ namespace annieUI {
         public get loadingView(): DisplayObject {
             return this.downL;
         }
-
         /**
          * 构造函数
          * @method ScrollList
@@ -76,18 +82,9 @@ namespace annieUI {
             s._itemClass = itemClassName;
             s._itemCount = 0;
             s._cols = step;
-            s._isVertical=isVertical;
-            s._updateItems();
+            s.isVertical=isVertical;
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
         }
-        public setViewWH(viewWidth: number, viewHeight: number): void {
-            super.setViewWH(viewWidth, viewHeight);
-            let s = this;
-            if (s._isInit) {
-                s._updateItems();
-            }
-        }
-
         /**
          * 更新列表数据
          * @method updateData
@@ -97,12 +94,14 @@ namespace annieUI {
          */
         public updateData(data: Array<any>, isReset: boolean = false): void {
             let s: any = this;
-            if (!s._isInit || isReset) {
-                s.data = data;
-            } else {
-                s.data = s.data.concat(data);
+            if(data) {
+                if (!s._isInit || isReset) {
+                    s.data=data;
+                } else {
+                    s.data = s.data.concat(data);
+                }
+                s._isInit = 1;
             }
-            s._isInit = 1;
             s._lastFirstId = -1;
             s._maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -116,11 +115,11 @@ namespace annieUI {
         private resetMaxDistance() {
             let s = this;
             if (s._isVertical) {
-                s.scroll._scrollHeight = s._maxDistance;
+                s.scroller._scrollHeight = s._maxDistance;
             } else {
-                s.scroll._scrollWidth = s._maxDistance;
+                s.scroller._scrollWidth = s._maxDistance;
             }
-            s.scroll._updateViewAndScroll();
+            s.scroller._updateViewAndScroll();
         }
 
         private flushData() {
@@ -171,13 +170,13 @@ namespace annieUI {
                 s._paramXY = "y";
                 s._itemRow = s._itemH;
                 s._itemCol = s._itemW;
-                s._distance = s.scroll.viewHeight;
+                s._distance = s._scroller.viewHeight;
             } else {
                 s._disParam = "y";
                 s._paramXY = "x";
                 s._itemRow = s._itemW;
                 s._itemCol = s._itemH;
-                s._distance = s.scroll.viewWidth;
+                s._distance = s._scroller.viewWidth;
             }
             let newCount: number = (Math.ceil(s._distance / s._itemRow) + 1) * s._cols;
             if (newCount != s._itemCount) {

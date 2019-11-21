@@ -137,14 +137,19 @@ namespace annie {
                 s._blendMode = target.cBlendMode;
             }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            let sbl = target._splitBoundsList;
-            let rect = null;
-            for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw === true) {
-                    rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+            if(s._stage) {
+                let sbl = target._splitBoundsList;
+                let rect = null;
+                for (let i = 0; i < sbl.length; i++) {
+                    if (sbl[i].isDraw === true) {
+                        rect = sbl[i].rect;
+                        ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+                    }
                 }
+            }else{
+                ctx.drawImage(texture,0,0);
             }
+
             /*
             //getBounds
             rect=target.getBounds();

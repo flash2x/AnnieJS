@@ -108,7 +108,10 @@ namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        public curX: number = 0;
+        public get curX():number {
+            return this._curX;
+        }
+        protected _curX:number=0;
         /**
          * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
          * @property curY
@@ -116,7 +119,10 @@ namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        public curY: number = 0;
+        public get curY():number{
+            return this._curY;
+        }
+        protected _curY:number=0;
         /**
          * 当前显示范围的宽
          * @property viewWidth
@@ -177,7 +183,7 @@ namespace annieUI {
         private startY: number = 0;
         private maxScrollX: number;
         private maxScrollY: number;
-        private endTime: number;
+        private endTime: number=0;
         private mouseStatus: number=0;
         private distX: number;
         private distY: number;
@@ -227,7 +233,7 @@ namespace annieUI {
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             if(s._container!=container) {
@@ -303,7 +309,7 @@ namespace annieUI {
                 s.maxScrollY = 0;
                 s._scrollHeight = s.viewHeight;
             }
-            s.resetPosition();
+            s.resetPosition(200);
         }
         private _mouseEvent:Function = null;
         private _enterFrame:Function=null;
@@ -336,10 +342,10 @@ namespace annieUI {
                 s.distX = 0;
                 s.distY = 0;
                 s.startTime = Date.now();
-                s.startX = s.curX;
-                s.startY = s.curY;
-                s.absStartX = s.curX;
-                s.absStartY = s.curY;
+                s.startX = s._curX;
+                s.startY = s._curY;
+                s.absStartX = s._curX;
+                s.absStartY = s._curY;
                 s.pointX = e.localX;
                 s.pointY = e.localY;
             } else if (e.type == annie.MouseEvent.MOUSE_MOVE){
@@ -367,13 +373,13 @@ namespace annieUI {
                 }
                 deltaX = s.isScrollX ? deltaX : 0;
                 deltaY = s.isScrollY ? deltaY : 0;
-                newX = s.curX + deltaX;
-                newY = s.curY + deltaY;
+                newX = s._curX + deltaX;
+                newY = s._curY + deltaY;
                 if (newX > 0 || newX < s.maxScrollX) {
-                    newX = s.isBounce ? s.curX + deltaX / 3 : newX > 0 ? 0 : s.maxScrollX;
+                    newX = s.isBounce ? s._curX + deltaX / 3 : newX > 0 ? 0 : s.maxScrollX;
                 }
                 if (newY > 0 || newY < s.maxScrollY) {
-                    newY = s.isBounce ? s.curY + deltaY / 3 : newY > 0 ? 0 : s.maxScrollY;
+                    newY = s.isBounce ? s._curY + deltaY / 3 : newY > 0 ? 0 : s.maxScrollY;
                 }
                 if (s.mouseStatus==1) {
                     s.dispatchEvent(annie.Event.ON_SCROLL_START);
@@ -382,16 +388,16 @@ namespace annieUI {
                 s._translate(newX, newY);
                 if (timestamp - s.startTime > 300) {
                     s.startTime = timestamp;
-                    s.startX = s.curX;
-                    s.startY = s.curY;
+                    s.startX = s._curX;
+                    s.startY = s._curY;
                 }
             } else {
                 s.endTime = Date.now();
                 let momentumX: any,
                     momentumY: any,
                     duration: number = s.endTime - s.startTime,
-                    newX: number = s.curX,
-                    newY: number = s.curY,
+                    newX: number = s._curX,
+                    newY: number = s._curY,
                     time: number = 0,
                     easing: Function = null;
                 if (s.resetPosition(s.bounceTime)) {
@@ -403,11 +409,11 @@ namespace annieUI {
                 s.mouseStatus=0;
                 s.scrollTo(newX, newY);
                 if (s.isMomentum && duration < 300) {
-                    momentumX = s.isScrollX ? Scroller.toMomentum(s.curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth/2 : 0, s.deceleration) : {
+                    momentumX = s.isScrollX ? Scroller.toMomentum(s._curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth/2 : 0, s.deceleration) : {
                         destination: newX,
                         duration: 0
                     };
-                    momentumY = s.isScrollY ? Scroller.toMomentum(s.curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight/2 : 0, s.deceleration) : {
+                    momentumY = s.isScrollY ? Scroller.toMomentum(s._curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight/2 : 0, s.deceleration) : {
                         destination: newY,
                         duration: 0
                     };
@@ -415,7 +421,7 @@ namespace annieUI {
                     newY = momentumY.destination;
                     time = Math.max(momentumX.duration, momentumY.duration);
                 }
-                if (newX != s.curX || newY != s.curY) {
+                if (newX != s._curX || newY != s._curY) {
                     if (newX > 0 || newX < s.maxScrollX || newY > 0 || newY < s.maxScrollY) {
                         easing = annie.Tween.quadraticOut;
                     }
@@ -438,31 +444,22 @@ namespace annieUI {
             s.easingFn=null;
             super.destroy();
         }
-
-        /**
-         * 重新复位，当更改了curX curY参数时可调用此方法更新
-         * @method resetPosition
-         * @param {number} time ms 是否需要花时间有滚动效果.
-         * @return {boolean}
-         * @since 3.1.5
-         * @public
-         */
         public resetPosition(time: number = 0): boolean {
             let s=this;
-            let x = s.curX,
-                y = s.curY;
+            let x = s._curX,
+                y = s._curY;
             time = time || 0;
-            if (!s.isScrollX || s.curX > 0) {
+            if (!s.isScrollX || s._curX > 0) {
                 x = 0;
-            } else if (s.curX < s.maxScrollX) {
+            } else if (s._curX < s.maxScrollX) {
                 x = s.maxScrollX;
             }
-            if (!s.isScrollY || s.curY > 0) {
+            if (!s.isScrollY || s._curY > 0) {
                 y = 0;
-            } else if (s.curY < s.maxScrollY) {
+            } else if (s._curY < s.maxScrollY) {
                 y = s.maxScrollY;
             }
-            if (x == s.curX && y == s.curY) {
+            if (x == s._curX && y == s._curY) {
                 return false;
             }
             s.scrollTo(x, y, time, null);
@@ -481,8 +478,8 @@ namespace annieUI {
          */
         public scrollBy(x: number, y: number, time: number = 0, easing: Function = null) {
             let s=this;
-            x = s.curX + x;
-            y = s.curY + y;
+            x = s._curX + x;
+            y = s._curY + y;
             time = time || 0;
             s.scrollTo(x, y, time, easing);
         }/**
@@ -501,8 +498,8 @@ namespace annieUI {
                 s._translate(x, y);
             } else {
                 easing = easing || annie.Tween.circularOut;
-                s.startX = s.curX;
-                s.startY = s.curY;
+                s.startX = s._curX;
+                s.startY = s._curY;
                 s.startTime = Date.now();
                 s.destTime = s.startTime + time;
                 s.destX = x;
@@ -514,8 +511,8 @@ namespace annieUI {
         }
         private _translate(x: number, y: number) {
             let s=this;
-            s.curX = x;
-            s.curY = y;
+            s._curX = x;
+            s._curY = y;
             s.dispatchEvent(annie.Event.ON_SCROLL_ING,{posX:x,posY:y});
         }
         private static toMomentum(current: number, start: number, time: number, lowerMargin: number, wrapperSize: number, deceleration: number) {

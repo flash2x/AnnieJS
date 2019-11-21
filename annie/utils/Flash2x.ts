@@ -367,14 +367,16 @@ namespace annie {
                             annie.res[scene][JSONData[i].id] = audio;
                         } else if (JSONData[i].type == "json") {
                             if (JSONData[i].id == "_a2x_con") {
-                                fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                                let conReader:any=new FileReader();
+                                conReader.onload=function(){
+                                    annie.res[scene]["_a2x_con"] = JSON.parse(conReader.result);
+                                    _parseContent(annie.res[scene]["_a2x_con"]);
+                                    conReader.onload=null;
+                                };
+                                conReader.readAsText(loadContent.slice(lastIndex, currIndex));
                             }
                         }
                     }
-                } else if (state == 4) {
-                    state++;
-                    annie.res[scene]["_a2x_con"] = JSON.parse(fileReader.result);
-                    _parseContent(annie.res[scene]["_a2x_con"]);
                 }
             };
         }

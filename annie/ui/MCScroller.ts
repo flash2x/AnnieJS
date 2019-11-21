@@ -3,7 +3,7 @@
  */
 namespace annieUI {
     /**
-     * 用滚动的方式播放MC
+     * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
      * @public
      * @extends annie.Scroller
@@ -22,10 +22,14 @@ namespace annieUI {
         public set rate(value:number){
             let s=this;
             if(value!=s._rate){
+                let curFrame=s.curFramePos-1;
+                s._rate=value;
                 let sw:number=0,sh:number=0;
                 if(s._isVertical){
+                    s._curX=-curFrame*value;
                     sh=s._mc.totalFrames*value;
                 }else{
+                    s._curY=-curFrame*value;
                     sw=s._mc.totalFrames*value;
                 }
                 s.setScrollWH(sw,sh);
@@ -39,7 +43,6 @@ namespace annieUI {
         /**
          * 鼠标滑动的方向，默认纵向
          * @property isVertical
-         * @readonly
          * @since 3.1.5
          * @public
          * @return {boolean}
@@ -47,7 +50,22 @@ namespace annieUI {
         public get isVertical():boolean{
             return this._isVertical;
         }
-
+        public set isVertical(value:boolean){
+            let s=this;
+            if(value!=s._isVertical){
+                if(value){
+                    s._curX=s._curY;
+                    s._scrollWidth=s._scrollHeight;
+                    s._scrollHeight=0;
+                }else{
+                    s._curY=s._curX;
+                    s._scrollHeight=s._scrollWidth;
+                    s._scrollWidth=0;
+                }
+                s._isVertical=value;
+                s._updateViewAndScroll();
+            }
+        }
         /**
          * 只读，获取当前mc的frame具体值，带小数
          * @property curFramePos
@@ -81,13 +99,7 @@ namespace annieUI {
             s._isVertical=isVertical;
             s.rate=rate;
             s.addEventListener(annie.Event.ON_SCROLL_ING,function (e:annie.Event) {
-                let frame:number=1;
-                if(isVertical){
-                    frame=s.curX/rate;
-                }else{
-                    frame=s.curY/rate;
-                }
-                mc.gotoAndStop(Math.abs(frame)+1);
+                mc.gotoAndStop(s.curFramePos);
             })
         }
     }

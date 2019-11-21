@@ -100,28 +100,15 @@ var annieUI;
              * @default 5
              */
             _this.lockDis = 5;
-            /**
-             * 当前滑动的x坐标 更改此参数则需要调用resetPosition()方法生效
-             * @property curX
-             * @type {number}
-             * @since 3.1.5
-             * @default 0
-             */
-            _this.curX = 0;
-            /**
-             * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
-             * @property curY
-             * @type {number}
-             * @since 3.1.5
-             * @default 0
-             */
-            _this.curY = 0;
+            _this._curX = 0;
+            _this._curY = 0;
             _this._viewWidth = 0;
             _this._viewHeight = 0;
             _this._scrollWidth = 0;
             _this._scrollHeight = 0;
             _this.startX = 0;
             _this.startY = 0;
+            _this.endTime = 0;
             _this.mouseStatus = 0;
             _this.deceleration = 0.0006;
             _this._mouseEvent = null;
@@ -133,6 +120,34 @@ var annieUI;
             s.init(container, viewWidth, viewHeight, scrollWidth, scrollHeight);
             return _this;
         }
+        Object.defineProperty(Scroller.prototype, "curX", {
+            /**
+             * 当前滑动的x坐标 更改此参数则需要调用resetPosition()方法生效
+             * @property curX
+             * @type {number}
+             * @since 3.1.5
+             * @default 0
+             */
+            get: function () {
+                return this._curX;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Scroller.prototype, "curY", {
+            /**
+             * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
+             * @property curY
+             * @type {number}
+             * @since 3.1.5
+             * @default 0
+             */
+            get: function () {
+                return this._curY;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Scroller.prototype, "viewWidth", {
             /**
              * 当前显示范围的宽
@@ -211,7 +226,7 @@ var annieUI;
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             if (s._container != container) {
@@ -286,7 +301,7 @@ var annieUI;
                 s.maxScrollY = 0;
                 s._scrollHeight = s.viewHeight;
             }
-            s.resetPosition();
+            s.resetPosition(200);
         };
         Scroller.prototype.onEnterFrame = function (e) {
             var s = this;
@@ -316,10 +331,10 @@ var annieUI;
                 s.distX = 0;
                 s.distY = 0;
                 s.startTime = Date.now();
-                s.startX = s.curX;
-                s.startY = s.curY;
-                s.absStartX = s.curX;
-                s.absStartY = s.curY;
+                s.startX = s._curX;
+                s.startY = s._curY;
+                s.absStartX = s._curX;
+                s.absStartY = s._curY;
                 s.pointX = e.localX;
                 s.pointY = e.localY;
             }
@@ -346,13 +361,13 @@ var annieUI;
                 }
                 deltaX = s.isScrollX ? deltaX : 0;
                 deltaY = s.isScrollY ? deltaY : 0;
-                newX = s.curX + deltaX;
-                newY = s.curY + deltaY;
+                newX = s._curX + deltaX;
+                newY = s._curY + deltaY;
                 if (newX > 0 || newX < s.maxScrollX) {
-                    newX = s.isBounce ? s.curX + deltaX / 3 : newX > 0 ? 0 : s.maxScrollX;
+                    newX = s.isBounce ? s._curX + deltaX / 3 : newX > 0 ? 0 : s.maxScrollX;
                 }
                 if (newY > 0 || newY < s.maxScrollY) {
-                    newY = s.isBounce ? s.curY + deltaY / 3 : newY > 0 ? 0 : s.maxScrollY;
+                    newY = s.isBounce ? s._curY + deltaY / 3 : newY > 0 ? 0 : s.maxScrollY;
                 }
                 if (s.mouseStatus == 1) {
                     s.dispatchEvent(annie.Event.ON_SCROLL_START);
@@ -361,13 +376,13 @@ var annieUI;
                 s._translate(newX, newY);
                 if (timestamp - s.startTime > 300) {
                     s.startTime = timestamp;
-                    s.startX = s.curX;
-                    s.startY = s.curY;
+                    s.startX = s._curX;
+                    s.startY = s._curY;
                 }
             }
             else {
                 s.endTime = Date.now();
-                var momentumX = void 0, momentumY = void 0, duration = s.endTime - s.startTime, newX = s.curX, newY = s.curY, time = 0, easing = null;
+                var momentumX = void 0, momentumY = void 0, duration = s.endTime - s.startTime, newX = s._curX, newY = s._curY, time = 0, easing = null;
                 if (s.resetPosition(s.bounceTime)) {
                     return;
                 }
@@ -377,11 +392,11 @@ var annieUI;
                 s.mouseStatus = 0;
                 s.scrollTo(newX, newY);
                 if (s.isMomentum && duration < 300) {
-                    momentumX = s.isScrollX ? Scroller.toMomentum(s.curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth / 2 : 0, s.deceleration) : {
+                    momentumX = s.isScrollX ? Scroller.toMomentum(s._curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth / 2 : 0, s.deceleration) : {
                         destination: newX,
                         duration: 0
                     };
-                    momentumY = s.isScrollY ? Scroller.toMomentum(s.curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight / 2 : 0, s.deceleration) : {
+                    momentumY = s.isScrollY ? Scroller.toMomentum(s._curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight / 2 : 0, s.deceleration) : {
                         destination: newY,
                         duration: 0
                     };
@@ -389,7 +404,7 @@ var annieUI;
                     newY = momentumY.destination;
                     time = Math.max(momentumX.duration, momentumY.duration);
                 }
-                if (newX != s.curX || newY != s.curY) {
+                if (newX != s._curX || newY != s._curY) {
                     if (newX > 0 || newX < s.maxScrollX || newY > 0 || newY < s.maxScrollY) {
                         easing = annie.Tween.quadraticOut;
                     }
@@ -412,32 +427,24 @@ var annieUI;
             s.easingFn = null;
             _super.prototype.destroy.call(this);
         };
-        /**
-         * 重新复位，当更改了curX curY参数时可调用此方法更新
-         * @method resetPosition
-         * @param {number} time ms 是否需要花时间有滚动效果.
-         * @return {boolean}
-         * @since 3.1.5
-         * @public
-         */
         Scroller.prototype.resetPosition = function (time) {
             if (time === void 0) { time = 0; }
             var s = this;
-            var x = s.curX, y = s.curY;
+            var x = s._curX, y = s._curY;
             time = time || 0;
-            if (!s.isScrollX || s.curX > 0) {
+            if (!s.isScrollX || s._curX > 0) {
                 x = 0;
             }
-            else if (s.curX < s.maxScrollX) {
+            else if (s._curX < s.maxScrollX) {
                 x = s.maxScrollX;
             }
-            if (!s.isScrollY || s.curY > 0) {
+            if (!s.isScrollY || s._curY > 0) {
                 y = 0;
             }
-            else if (s.curY < s.maxScrollY) {
+            else if (s._curY < s.maxScrollY) {
                 y = s.maxScrollY;
             }
-            if (x == s.curX && y == s.curY) {
+            if (x == s._curX && y == s._curY) {
                 return false;
             }
             s.scrollTo(x, y, time, null);
@@ -457,8 +464,8 @@ var annieUI;
             if (time === void 0) { time = 0; }
             if (easing === void 0) { easing = null; }
             var s = this;
-            x = s.curX + x;
-            y = s.curY + y;
+            x = s._curX + x;
+            y = s._curY + y;
             time = time || 0;
             s.scrollTo(x, y, time, easing);
         }; /**
@@ -480,8 +487,8 @@ var annieUI;
             }
             else {
                 easing = easing || annie.Tween.circularOut;
-                s.startX = s.curX;
-                s.startY = s.curY;
+                s.startX = s._curX;
+                s.startY = s._curY;
                 s.startTime = Date.now();
                 s.destTime = s.startTime + time;
                 s.destX = x;
@@ -493,8 +500,8 @@ var annieUI;
         };
         Scroller.prototype._translate = function (x, y) {
             var s = this;
-            s.curX = x;
-            s.curY = y;
+            s._curX = x;
+            s._curY = y;
             s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: x, posY: y });
         };
         Scroller.toMomentum = function (current, start, time, lowerMargin, wrapperSize, deceleration) {
@@ -528,7 +535,7 @@ var annieUI;
 var annieUI;
 (function (annieUI) {
     /**
-     * 用滚动的方式播放MC
+     * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
      * @public
      * @extends annie.Scroller
@@ -557,14 +564,7 @@ var annieUI;
             s._isVertical = isVertical;
             s.rate = rate;
             s.addEventListener(annie.Event.ON_SCROLL_ING, function (e) {
-                var frame = 1;
-                if (isVertical) {
-                    frame = e.data.posY / rate;
-                }
-                else {
-                    frame = e.data.posX / rate;
-                }
-                mc.gotoAndStop(Math.abs(frame) + 1);
+                mc.gotoAndStop(s.curFramePos);
             });
             return _this;
         }
@@ -572,14 +572,25 @@ var annieUI;
             get: function () {
                 return this._rate;
             },
+            /**
+             * 滑动的速率，值越大，滑动越慢,默认是10
+             * @property rate
+             * @param {number} value
+             * @since 3.1.5
+             * @public
+             */
             set: function (value) {
                 var s = this;
                 if (value != s._rate) {
+                    var curFrame = s.curFramePos - 1;
+                    s._rate = value;
                     var sw = 0, sh = 0;
                     if (s._isVertical) {
+                        s._curX = -curFrame * value;
                         sh = s._mc.totalFrames * value;
                     }
                     else {
+                        s._curY = -curFrame * value;
                         sw = s._mc.totalFrames * value;
                     }
                     s.setScrollWH(sw, sh);
@@ -590,8 +601,53 @@ var annieUI;
         });
         ;
         Object.defineProperty(MCScroller.prototype, "isVertical", {
+            /**
+             * 鼠标滑动的方向，默认纵向
+             * @property isVertical
+             * @since 3.1.5
+             * @public
+             * @return {boolean}
+             */
             get: function () {
                 return this._isVertical;
+            },
+            set: function (value) {
+                var s = this;
+                if (value != s._isVertical) {
+                    if (value) {
+                        s._curX = s._curY;
+                        s._scrollWidth = s._scrollHeight;
+                        s._scrollHeight = 0;
+                    }
+                    else {
+                        s._curY = s._curX;
+                        s._scrollHeight = s._scrollWidth;
+                        s._scrollWidth = 0;
+                    }
+                    s._isVertical = value;
+                    s._updateViewAndScroll();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MCScroller.prototype, "curFramePos", {
+            /**
+             * 只读，获取当前mc的frame具体值，带小数
+             * @property curFramePos
+             * @readonly
+             * @return {number}
+             */
+            get: function () {
+                var s = this;
+                var frame = 1;
+                if (s._isVertical) {
+                    frame = s.curX / s._rate;
+                }
+                else {
+                    frame = s.curY / s._rate;
+                }
+                return Math.abs(frame) + 1;
             },
             enumerable: true,
             configurable: true
@@ -676,19 +732,19 @@ var annieUI;
             s.view.mask = s.maskObj;
             s.maskObj["_isUseToMask"] = 0;
             s.maskObj.alpha = 0;
-            s.setViewWH(viewWidth, viewHeight);
-            s.scroll = new annieUI.Scroller(s, viewWidth, viewHeight, scrollWidth, scrollHeight);
-            s.scroll.addEventListener(annie.Event.ON_SCROLL_ING, function (e) {
+            s._scroller = new annieUI.Scroller(s, viewWidth, viewHeight, scrollWidth, scrollHeight);
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_ING, function (e) {
                 s._view.y = e.data.posY;
                 s._view.x = e.data.posX;
                 s.dispatchEvent(e);
             });
-            s.scroll.addEventListener(annie.Event.ON_SCROLL_START, function (e) {
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_START, function (e) {
                 s.dispatchEvent(e);
             });
-            s.scroll.addEventListener(annie.Event.ON_SCROLL_STOP, function (e) {
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_STOP, function (e) {
                 s.dispatchEvent(e);
             });
+            s.setViewWH(viewWidth, viewHeight);
             return _this;
         }
         Object.defineProperty(ScrollPage.prototype, "view", {
@@ -705,74 +761,16 @@ var annieUI;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ScrollPage.prototype, "viewWidth", {
+        Object.defineProperty(ScrollPage.prototype, "scroller", {
             /**
-             * 当前显示范围的宽
-             * @property viewWidth
-             * @type {number}
-             * @since 3.1.5
-             * @default 0
+             * scroller滑动控制器
+             * @property scroller
              * @readonly
+             * @public
+             * @since 3.1.5
              */
             get: function () {
-                if (this.scroll) {
-                    return this.scroll.viewWidth;
-                }
-                return 0;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ScrollPage.prototype, "viewHeight", {
-            /**
-             * 当前显示范围的高
-             * @property viewHeight
-             * @type {number}
-             * @since 3.1.5
-             * @default 0
-             * @readonly
-             */
-            get: function () {
-                if (this.scroll) {
-                    return this.scroll.viewHeight;
-                }
-                return 0;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ScrollPage.prototype, "scrollWidth", {
-            /**
-             * 当前横向的滑动范围
-             * @property scrollWidth
-             * @type {number}
-             * @since 3.1.5
-             * @default 0
-             * @readonly
-             */
-            get: function () {
-                if (this.scroll) {
-                    return this.scroll.scrollWidth;
-                }
-                return 0;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ScrollPage.prototype, "scrollHeight", {
-            /**
-             * 当前纵向的滑动范围
-             * @property scrollHeight
-             * @type {number}
-             * @since 3.1.5
-             * @default 0
-             * @readonly
-             */
-            get: function () {
-                if (this.scroll) {
-                    return this.scroll.scrollHeight;
-                }
-                return 0;
+                return this._scroller;
             },
             enumerable: true,
             configurable: true
@@ -795,25 +793,10 @@ var annieUI;
                 s.scroll.setViewWH(viewWidth, viewHeight);
             }
         };
-        /**
-         * 设置滑动的长度和宽度，如果只需要一个方向上可滑动，可以将view的宽或者高等于滑动的宽或者高
-         * @method setScrollWH
-         * @param {number}scrollWidth 设置滑动区域的宽
-         * @param {number}scrollHeight 设置滑动区域的高
-         * @public
-         * @since 3.1.5
-         */
-        ScrollPage.prototype.setScrollWH = function (scrollWidth, scrollHeight) {
-            var s = this;
-            if (s.scroll) {
-                s.scroll.setScrollWH(scrollWidth, scrollHeight);
-            }
-        };
         ScrollPage.prototype.destroy = function () {
             var s = this;
-            s.maskObj = null;
-            s._view = null;
-            s.scroll.destroy();
+            s._scroller.destroy();
+            s._scroller = null;
             _super.prototype.destroy.call(this);
         };
         return ScrollPage;
@@ -867,11 +850,22 @@ var annieUI;
             s._itemClass = itemClassName;
             s._itemCount = 0;
             s._cols = step;
-            s._isVertical = isVertical;
-            s._updateItems();
+            s.isVertical = isVertical;
             s.addEventListener(annie.Event.ENTER_FRAME, s.flushData.bind(s));
             return _this;
         }
+        Object.defineProperty(ScrollList.prototype, "isVertical", {
+            get: function () {
+                return this._isVertical;
+            },
+            set: function (value) {
+                var s = this;
+                s._isVertical = value;
+                s._updateItems();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(ScrollList.prototype, "loadingView", {
             /**
              * 获取下拉滚动的loadingView对象
@@ -885,13 +879,6 @@ var annieUI;
             enumerable: true,
             configurable: true
         });
-        ScrollList.prototype.setViewWH = function (viewWidth, viewHeight) {
-            _super.prototype.setViewWH.call(this, viewWidth, viewHeight);
-            var s = this;
-            if (s._isInit) {
-                s._updateItems();
-            }
-        };
         /**
          * 更新列表数据
          * @method updateData
@@ -902,13 +889,15 @@ var annieUI;
         ScrollList.prototype.updateData = function (data, isReset) {
             if (isReset === void 0) { isReset = false; }
             var s = this;
-            if (!s._isInit || isReset) {
-                s.data = data;
+            if (data) {
+                if (!s._isInit || isReset) {
+                    s.data = data;
+                }
+                else {
+                    s.data = s.data.concat(data);
+                }
+                s._isInit = 1;
             }
-            else {
-                s.data = s.data.concat(data);
-            }
-            s._isInit = 1;
             s._lastFirstId = -1;
             s._maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
@@ -921,12 +910,12 @@ var annieUI;
         ScrollList.prototype.resetMaxDistance = function () {
             var s = this;
             if (s._isVertical) {
-                s.scroll._scrollHeight = s._maxDistance;
+                s.scroller._scrollHeight = s._maxDistance;
             }
             else {
-                s.scroll._scrollWidth = s._maxDistance;
+                s.scroller._scrollWidth = s._maxDistance;
             }
-            s.scroll._updateViewAndScroll();
+            s.scroller._updateViewAndScroll();
         };
         ScrollList.prototype.flushData = function () {
             var s = this;
@@ -977,14 +966,14 @@ var annieUI;
                 s._paramXY = "y";
                 s._itemRow = s._itemH;
                 s._itemCol = s._itemW;
-                s._distance = s.scroll.viewHeight;
+                s._distance = s._scroller.viewHeight;
             }
             else {
                 s._disParam = "y";
                 s._paramXY = "x";
                 s._itemRow = s._itemW;
                 s._itemCol = s._itemH;
-                s._distance = s.scroll.viewWidth;
+                s._distance = s._scroller.viewWidth;
             }
             var newCount = (Math.ceil(s._distance / s._itemRow) + 1) * s._cols;
             if (newCount != s._itemCount) {

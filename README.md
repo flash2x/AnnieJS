@@ -66,6 +66,7 @@
     重写annieUI.ScrollPage类,使用更简单
     重写annieUI.ScrollList类,使用更简单
     新增annieUI.MCScroller类,专门用来控制时间轴动画的滑动播放
+    修复打包后文件如果很大(大概在30M以上)在ios13无法顺利加载完成的bug
 ## AnnieJS 3.1.4 版本
     修复无法获取annie.FloatDisplay鼠标事件的bug
     修复初始化后马上获取显示对像宽高为0的bug

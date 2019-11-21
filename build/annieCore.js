@@ -7181,13 +7181,19 @@ var annie;
                     }
                 }
             }
-            if (s.isPreventDefaultEvent) {
-                if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                    e.preventDefault();
+            if (e.target.id == "_a2x_canvas") {
+                s._isMouseClickCanvas = true;
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
                 }
-                if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                    e.preventDefault();
-                }
+            }
+            else {
+                s._isMouseClickCanvas = false;
             }
         };
         ;
@@ -8243,13 +8249,18 @@ var annie;
                 s._blendMode = target.cBlendMode;
             }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            var sbl = target._splitBoundsList;
-            var rect = null;
-            for (var i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw === true) {
-                    rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+            if (s._stage) {
+                var sbl = target._splitBoundsList;
+                var rect = null;
+                for (var i = 0; i < sbl.length; i++) {
+                    if (sbl[i].isDraw === true) {
+                        rect = sbl[i].rect;
+                        ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+                    }
                 }
+            }
+            else {
+                ctx.drawImage(texture, 0, 0);
             }
             /*
             //getBounds
@@ -9012,7 +9023,13 @@ var annie;
                         }
                         else if (JSONData_1[i].type == "json") {
                             if (JSONData_1[i].id == "_a2x_con") {
-                                fileReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                                var conReader_1 = new FileReader();
+                                conReader_1.onload = function () {
+                                    annie.res[scene]["_a2x_con"] = JSON.parse(conReader_1.result);
+                                    _parseContent(annie.res[scene]["_a2x_con"]);
+                                    conReader_1.onload = null;
+                                };
+                                conReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
                             }
                         }
                     };
@@ -9020,11 +9037,6 @@ var annie;
                     for (var i = 1; i < JSONData_1.length; i++) {
                         _loop_1(i);
                     }
-                }
-                else if (state_1 == 4) {
-                    state_1++;
-                    annie.res[scene]["_a2x_con"] = JSON.parse(fileReader_1.result);
-                    _parseContent(annie.res[scene]["_a2x_con"]);
                 }
             };
         }
@@ -10690,7 +10702,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.1.4";
+    annie.version = "3.1.5";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

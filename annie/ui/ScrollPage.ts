@@ -54,63 +54,18 @@ namespace annieUI {
             return this._view;
         }
         protected _view: DisplayObject = null;
-        protected scroll: annieUI.Scroller;
         /**
-         * 当前显示范围的宽
-         * @property viewWidth
-         * @type {number}
-         * @since 3.1.5
-         * @default 0
+         * scroller滑动控制器
+         * @property scroller
          * @readonly
-         */
-        public get viewWidth():number{
-            if(this.scroll){
-                return this.scroll.viewWidth;
-            }
-            return 0;
-        }
-        /**
-         * 当前显示范围的高
-         * @property viewHeight
-         * @type {number}
+         * @public
          * @since 3.1.5
-         * @default 0
-         * @readonly
          */
-        public get viewHeight():number{
-            if(this.scroll){
-                return this.scroll.viewHeight;
-            }
-            return 0;
+        public get scroller(): annieUI.Scroller{
+            return this._scroller;
         }
-        /**
-         * 当前横向的滑动范围
-         * @property scrollWidth
-         * @type {number}
-         * @since 3.1.5
-         * @default 0
-         * @readonly
-         */
-        public get scrollWidth():number{
-            if(this.scroll){
-                return this.scroll.scrollWidth;
-            }
-            return 0;
-        }
-        /**
-         * 当前纵向的滑动范围
-         * @property scrollHeight
-         * @type {number}
-         * @since 3.1.5
-         * @default 0
-         * @readonly
-         */
-        public get scrollHeight():number{
-            if(this.scroll){
-                return this.scroll.scrollHeight;
-            }
-            return 0;
-        }
+        public _scroller:annieUI.Scroller;
+
         /**
          * 构造函数
          * @method  ScrollPage
@@ -141,19 +96,19 @@ namespace annieUI {
             s.view.mask = s.maskObj;
             s.maskObj["_isUseToMask"] = 0;
             s.maskObj.alpha = 0;
-            s.setViewWH(viewWidth, viewHeight);
-            s.scroll = new annieUI.Scroller(s, viewWidth, viewHeight, scrollWidth, scrollHeight);
-            s.scroll.addEventListener(annie.Event.ON_SCROLL_ING, function (e: annie.Event) {
+            s._scroller = new annieUI.Scroller(s, viewWidth, viewHeight, scrollWidth, scrollHeight);
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_ING, function (e: annie.Event) {
                 s._view.y = e.data.posY;
                 s._view.x = e.data.posX;
                 s.dispatchEvent(e);
             });
-            s.scroll.addEventListener(annie.Event.ON_SCROLL_START, function (e: annie.Event) {
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_START, function (e: annie.Event) {
                 s.dispatchEvent(e);
             });
-            s.scroll.addEventListener(annie.Event.ON_SCROLL_STOP, function (e: annie.Event) {
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_STOP, function (e: annie.Event) {
                 s.dispatchEvent(e);
-            })
+            });
+            s.setViewWH(viewWidth, viewHeight);
         }
         /**
          * 设置可见区域，可见区域的坐标始终在本地坐标中0,0点位置，如果只需要一个方向上可滑动，可以将view的宽或者高等于滑动的宽或者高
@@ -173,25 +128,10 @@ namespace annieUI {
                s.scroll.setViewWH(viewWidth,viewHeight);
             }
         }
-        /**
-         * 设置滑动的长度和宽度，如果只需要一个方向上可滑动，可以将view的宽或者高等于滑动的宽或者高
-         * @method setScrollWH
-         * @param {number}scrollWidth 设置滑动区域的宽
-         * @param {number}scrollHeight 设置滑动区域的高
-         * @public
-         * @since 3.1.5
-         */
-        public setScrollWH(scrollWidth:number,scrollHeight:number){
-            let s=this;
-            if(s.scroll){
-                s.scroll.setScrollWH(scrollWidth,scrollHeight);
-            }
-        }
         public destroy(): void {
             let s = this;
-            s.maskObj = null;
-            s._view = null;
-            s.scroll.destroy();
+            s._scroller.destroy();
+            s._scroller=null;
             super.destroy();
         }
     }
