@@ -442,12 +442,19 @@ namespace annie {
         public static _lastDragPoint: annie.Point = new annie.Point();
         public static _isDragCenter: boolean = false;
         public _isMouseClickCanvas: boolean = true;
-
         private _onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
             if (e.target.id == "_a2x_canvas") {
                 s._isMouseClickCanvas = true;
+                if (s.isPreventDefaultEvent) {
+                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
+                        e.preventDefault();
+                    }
+                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
+                        e.preventDefault();
+                    }
+                }
             } else {
                 s._isMouseClickCanvas = false;
             }
@@ -730,19 +737,6 @@ namespace annie {
                         }
                     }
                 }
-            }
-            if (e.target.id == "_a2x_canvas") {
-                s._isMouseClickCanvas = true;
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
-            } else {
-                s._isMouseClickCanvas = false;
             }
         };
 
