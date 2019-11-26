@@ -4095,7 +4095,7 @@ var annie;
                 if (child._isUseToMask > 0)
                     continue;
                 if (child.mask != void 0) {
-                    if (maskObjList[child.mask._instanceId] != void 0) {
+                    if (maskObjList[child.mask._instanceId] == void 0) {
                         //看看点是否在遮罩内
                         if (child.mask.hitTestPoint(hitPoint, isGlobalPoint)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
@@ -4110,7 +4110,7 @@ var annie;
                     }
                 }
                 hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint);
-                if (hitDisplayObject instanceof annie.DisplayObject) {
+                if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
             }
@@ -8195,22 +8195,16 @@ var annie;
             if (target._instanceType == "annie.Shape") {
                 target._draw(ctx, true);
             }
-            else if (target._instanceType == "annie.Sprite") {
-                target._updateState = 0;
-                for (var i = 0; i < target.children.length; i++) {
-                    s.drawMask(target.children[i]);
-                }
-            }
-            else if (target._instanceType == "annie.MovieClip") {
-                target._frameState = 0;
-                target._updateState = 0;
+            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
                 for (var i = 0; i < target.children.length; i++) {
                     s.drawMask(target.children[i]);
                 }
             }
             else {
                 var bounds = target._bounds;
+                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
+                ctx.closePath();
             }
         };
         /**

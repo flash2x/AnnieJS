@@ -324,9 +324,9 @@ namespace annie {
             //这里特别注意是从上往下遍历
             for (let i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if (child._isUseToMask > 0) continue;
+                if(child._isUseToMask > 0) continue;
                 if (child.mask != void 0) {
-                    if (maskObjList[child.mask._instanceId] != void 0) {
+                    if (maskObjList[child.mask._instanceId] == void 0) {
                         //看看点是否在遮罩内
                         if (child.mask.hitTestPoint(hitPoint, isGlobalPoint)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
@@ -340,7 +340,7 @@ namespace annie {
                     }
                 }
                 hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint);
-                if (hitDisplayObject instanceof annie.DisplayObject) {
+                if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
             }

@@ -87,21 +87,16 @@ namespace annie {
             ctx.translate(-target._offsetX, -target._offsetY);
             if (target._instanceType == "annie.Shape") {
                 target._draw(ctx, true);
-            } else if (target._instanceType == "annie.Sprite") {
-                target._updateState = 0;
-                for (let i = 0; i < target.children.length; i++) {
-                    s.drawMask(target.children[i]);
-                }
-            } else if (target._instanceType == "annie.MovieClip") {
-                target._frameState = 0;
-                target._updateState = 0;
+            } else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
                 for (let i = 0; i < target.children.length; i++) {
                     s.drawMask(target.children[i]);
                 }
             }
             else {
                 let bounds = target._bounds;
+                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
+                ctx.closePath();
             }
         }
 
@@ -127,7 +122,7 @@ namespace annie {
         public draw(target: any): void {
             let s = this;
             let texture = target._texture;
-            if(texture.width==0||texture.height==0)return;
+            if (texture.width == 0 || texture.height == 0) return;
             let ctx = s._ctx, tm = target.cMatrix;
             if (ctx.globalAlpha != target.cAlpha) {
                 ctx.globalAlpha = target.cAlpha
@@ -137,7 +132,7 @@ namespace annie {
                 s._blendMode = target.cBlendMode;
             }
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if(s._stage) {
+            if (s._stage) {
                 let sbl = target._splitBoundsList;
                 let rect = null;
                 for (let i = 0; i < sbl.length; i++) {
@@ -146,8 +141,8 @@ namespace annie {
                         ctx.drawImage(texture, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
                     }
                 }
-            }else{
-                ctx.drawImage(texture,0,0);
+            } else {
+                ctx.drawImage(texture, 0, 0);
             }
 
             /*
