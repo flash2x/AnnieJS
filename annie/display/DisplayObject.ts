@@ -576,7 +576,7 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        protected updateMatrix(): void {
+        protected updateMatrix():void {
             let s = this;
             let isHadParent: boolean = s.parent instanceof annie.Sprite;
             if (s.a2x_um) {
@@ -957,7 +957,7 @@ namespace annie {
             }
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         }
-        public _onEnterFrameEvent(): void {
+        public _onEnterFrameEvent(mcSpeed:number=1): void {
             if(this._visible)
             this.dispatchEvent(annie.Event.ENTER_FRAME);
         }

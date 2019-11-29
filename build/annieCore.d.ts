@@ -1457,7 +1457,7 @@ declare namespace annie {
         _isOnStage: boolean;
         _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
-        _onEnterFrameEvent(): void;
+        _onEnterFrameEvent(mcSpeed?: number): void;
         /**
          * 启动鼠标或者触摸拖动
          * @method startDrag
@@ -1961,6 +1961,17 @@ declare namespace annie {
         constructor();
         destroy(): void;
         /**
+         * 容器类所有动画的播放速度，默认是1.如果有嵌套的话，速度相乘；
+         * @property mcSpeed
+         * @public
+         * @type {number}
+         * @since 3.1.5
+         * @default 1
+         *
+         */
+        mcSpeed: number;
+        protected _cMcSpeed: number;
+        /**
          * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
          * @property mouseChildren
@@ -2071,7 +2082,7 @@ declare namespace annie {
         render(renderObj: IRender): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
-        _onEnterFrameEvent(): void;
+        _onEnterFrameEvent(mcSpeed?: number): void;
         /**
          * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。
          * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。
@@ -2509,7 +2520,7 @@ declare namespace annie {
         _onAddEvent(): void;
         private _a2x_is_updateFrame;
         _updateFrame(): void;
-        _onEnterFrameEvent(): void;
+        _onEnterFrameEvent(mcSpeed: number): void;
         render(renderObj: IRender): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         private _updateFloatFrame;

@@ -351,7 +351,7 @@ namespace annie {
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
-                s._onEnterFrameEvent();
+                s._onEnterFrameEvent(1);
                 s.updateMatrix();
                 s.render(s.renderObj);
             } else {

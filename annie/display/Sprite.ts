@@ -38,6 +38,17 @@ namespace annie {
         }
 
         /**
+         * 容器类所有动画的播放速度，默认是1.如果有嵌套的话，速度相乘；
+         * @property mcSpeed
+         * @public
+         * @type {number}
+         * @since 3.1.5
+         * @default 1
+         *
+         */
+        public mcSpeed:number=1;
+        protected _cMcSpeed:number=1;
+        /**
          * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
          * @property mouseChildren
@@ -346,7 +357,6 @@ namespace annie {
             }
             return null;
         }
-
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -446,17 +456,18 @@ namespace annie {
             super._onAddEvent();
         }
 
-        public _onEnterFrameEvent(): void {
+        public _onEnterFrameEvent(mcSpeed:number=1): void {
             let s = this;
             let child: any = null;
+            s._cMcSpeed=s.mcSpeed*mcSpeed;
             let children = s.children.concat();
             let len = children.length;
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child && child._isOnStage) {
-                    child._onEnterFrameEvent();
+                    child._onEnterFrameEvent(s._cMcSpeed);
                 }
-                super._onEnterFrameEvent();
+                super._onEnterFrameEvent(s._cMcSpeed);
             }
         }
 
