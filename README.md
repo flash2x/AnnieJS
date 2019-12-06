@@ -62,6 +62,7 @@
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
 ## AnnieJS 3.1.5 版本
+    增加控制时间轴速度属性，可以加快或减慢时间轴动画
     重写annieUI.Scroller类，更流畅更强大
     重写annieUI.ScrollPage类,使用更简单
     重写annieUI.ScrollList类,使用更简单
@@ -69,6 +70,8 @@
     修复打包后文件如果很大(大概在30M以上)在ios13无法顺利加载完成的bug
     修复遮罩后,背遮罩外的区域还可以接受鼠标事件的bug
     修复多重嵌套遮罩后以图片为遮罩的效果无效的bug
+    修复对未添加到舞台的对象进行截图时无法截图多帧动画元素的bug
+    修复annie.Input输入文本在ios和android位置表现差异的bug
 ## AnnieJS 3.1.4 版本
     修复无法获取annie.FloatDisplay鼠标事件的bug
     修复初始化后马上获取显示对像宽高为0的bug

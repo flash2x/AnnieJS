@@ -195,6 +195,7 @@ namespace annie{
         }
         _dRender.rootContainer = DisplayObject["_canvas"];
         if(!obj.stage){
+            obj._onFlushFrame();
             obj.updateMatrix();
         }
         if(!rect){

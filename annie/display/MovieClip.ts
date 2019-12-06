@@ -348,7 +348,6 @@ namespace annie {
                 }
                 s._floatFrame = 0;
             } else if (typeof(frameIndex) == "number") {
-                s._floatFrame -= frameIndex;
                 if (frameIndex > timeLineObj.tf) {
                     frameIndex = timeLineObj.tf;
                 } else if (frameIndex < 1) {
@@ -365,9 +364,7 @@ namespace annie {
             super._onAddEvent();
             this._updateFrame();
         }
-
         private _a2x_is_updateFrame: boolean = false;
-
         public _updateFrame(): void {
             let s: any = this;
             if (!s._a2x_is_updateFrame) {
@@ -380,12 +377,11 @@ namespace annie {
                         } else {
                             s._wantFrame = 1;
                         }
-                        s._floatFrame = s.parent._floatFrame;
                     } else {
                         if (s._isPlaying && s._wantFrame == s._curFrame && s._visible) {
                             if (s._isFront) {
                                 s._wantFrame += s._cMcSpeed;
-                                if (s._wantFrame > s._a2x_res_class.tf) {
+                                if (s._wantFrame > s._a2x_res_class.tf){
                                     s._wantFrame = 1;
                                 }
                             } else {
@@ -409,7 +405,7 @@ namespace annie {
                             let objId: number = 0;
                             let obj: any = null;
                             let objInfo: any = null;
-                            let frameIndex = curFrame - 1;
+                            let frameIndex = wantFrame - 1;
                             let curFrameScript: any;
                             let isFront = s._isFront;
                             let curFrameObj: any = timeLineObj.f[timeLineObj.timeLine[frameIndex]];
@@ -476,7 +472,7 @@ namespace annie {
                                 }
                             }
                             //如果发现不是图形动画，则执行脚本
-                            if (s._a2x_mode < 0) {
+                            if (s._a2x_mode < 0){
                                 //更新完所有后再来确定事件和脚本
                                 let isCodeScript = false;
                                 //有没有用户后期通过代码调用加入的脚本,有就直接调用然后不再调用时间轴代码
@@ -530,9 +526,9 @@ namespace annie {
             }
         }
 
-        public _onEnterFrameEvent(mcSpeed: number): void {
+        public _onFlushFrame(mcSpeed: number=1): void {
             let s = this;
-            super._onEnterFrameEvent(mcSpeed);
+            super._onFlushFrame(mcSpeed);
             s._updateFrame();
         }
 

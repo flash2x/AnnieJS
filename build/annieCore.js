@@ -2575,7 +2575,7 @@ var annie;
             }
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         };
-        DisplayObject.prototype._onEnterFrameEvent = function (mcSpeed) {
+        DisplayObject.prototype._onFlushFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
             if (this._visible)
                 this.dispatchEvent(annie.Event.ENTER_FRAME);
@@ -4227,7 +4227,7 @@ var annie;
             }
             _super.prototype._onAddEvent.call(this);
         };
-        Sprite.prototype._onEnterFrameEvent = function (mcSpeed) {
+        Sprite.prototype._onFlushFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
             var s = this;
             var child = null;
@@ -4237,9 +4237,9 @@ var annie;
             for (var i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child && child._isOnStage) {
-                    child._onEnterFrameEvent(s._cMcSpeed);
+                    child._onFlushFrame(s._cMcSpeed);
                 }
-                _super.prototype._onEnterFrameEvent.call(this, s._cMcSpeed);
+                _super.prototype._onFlushFrame.call(this, s._cMcSpeed);
             }
         };
         Object.defineProperty(Sprite.prototype, "hitArea", {
@@ -5048,7 +5048,6 @@ var annie;
                 s._floatFrame = 0;
             }
             else if (typeof (frameIndex) == "number") {
-                s._floatFrame -= frameIndex;
                 if (frameIndex > timeLineObj.tf) {
                     frameIndex = timeLineObj.tf;
                 }
@@ -5075,7 +5074,6 @@ var annie;
                         else {
                             s._wantFrame = 1;
                         }
-                        s._floatFrame = s.parent._floatFrame;
                     }
                     else {
                         if (s._isPlaying && s._wantFrame == s._curFrame && s._visible) {
@@ -5106,7 +5104,7 @@ var annie;
                             var objId = 0;
                             var obj = null;
                             var objInfo = null;
-                            var frameIndex = curFrame - 1;
+                            var frameIndex = wantFrame - 1;
                             var curFrameScript = void 0;
                             var isFront = s._isFront;
                             var curFrameObj = timeLineObj.f[timeLineObj.timeLine[frameIndex]];
@@ -5230,9 +5228,10 @@ var annie;
                 }
             }
         };
-        MovieClip.prototype._onEnterFrameEvent = function (mcSpeed) {
+        MovieClip.prototype._onFlushFrame = function (mcSpeed) {
+            if (mcSpeed === void 0) { mcSpeed = 1; }
             var s = this;
-            _super.prototype._onEnterFrameEvent.call(this, mcSpeed);
+            _super.prototype._onFlushFrame.call(this, mcSpeed);
             s._updateFrame();
         };
         MovieClip.prototype.render = function (renderObj) {
@@ -5391,7 +5390,7 @@ var annie;
                     }
                     else {
                         if (s.htmlElement && s.visible) {
-                            style.display = "inline";
+                            style.display = "inline-block";
                         }
                     }
                 }
@@ -5444,8 +5443,8 @@ var annie;
             }
             return null;
         };
-        FloatDisplay.prototype._onEnterFrameEvent = function () {
-            _super.prototype._onEnterFrameEvent.call(this);
+        FloatDisplay.prototype._onFlushFrame = function () {
+            _super.prototype._onFlushFrame.call(this);
             var s = this;
             var o = s.htmlElement;
             if (o) {
@@ -5466,7 +5465,7 @@ var annie;
                         }
                     }
                 }
-                var show = visible ? "inline" : "none";
+                var show = visible ? "inline-block" : "none";
                 if (show != style.display) {
                     style.display = show;
                 }
@@ -6144,7 +6143,7 @@ var annie;
             s.htmlElement.style.outline = "none";
             s.htmlElement.style.borderWidth = "thin";
             s.htmlElement.style.borderColor = "#000";
-            s.htmlElement.style.panding = 0;
+            s.htmlElement.style.padding = 0;
             s.htmlElement.style.margin = 0;
             s.htmlElement.onblur = function () {
                 if (annie.osType == "ios") {
@@ -6177,8 +6176,8 @@ var annie;
             /////////////////////设置边框//////////////
             s.border = showBorder;
             //color:blue; text-align:center"
-            if (s.inputType == 2) {
-                s.htmlElement.style.lineHeight = lineHeight + "px";
+            if (s.inputType != 2) {
+                s.lineHeight = lineHeight;
             }
         };
         Object.defineProperty(InputText.prototype, "lineHeight", {
@@ -6299,6 +6298,9 @@ var annie;
              */
             set: function (value) {
                 this.htmlElement.style.height = value + "px";
+                if (this.inputType != 2) {
+                    this.htmlElement.style.lineHeight = value + "px";
+                }
             },
             enumerable: true,
             configurable: true
@@ -6822,7 +6824,7 @@ var annie;
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
-                s._onEnterFrameEvent(1);
+                s._onFlushFrame(1);
                 s.updateMatrix();
                 s.render(s.renderObj);
             }
@@ -6834,7 +6836,7 @@ var annie;
                 }
                 else {
                     if (s._currentFlush == s._flush) {
-                        s._onEnterFrameEvent();
+                        s._onFlushFrame();
                         s.updateMatrix();
                         s.render(s.renderObj);
                     }
@@ -10869,6 +10871,7 @@ var annie;
         }
         annie._dRender.rootContainer = annie.DisplayObject["_canvas"];
         if (!obj.stage) {
+            obj._onFlushFrame();
             obj.updateMatrix();
         }
         if (!rect) {

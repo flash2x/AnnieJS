@@ -108,9 +108,22 @@ var annieUI;
             _this._scrollHeight = 0;
             _this.startX = 0;
             _this.startY = 0;
+            _this.maxScrollX = 0;
+            _this.maxScrollY = 0;
             _this.endTime = 0;
             _this.mouseStatus = 0;
+            _this.distX = 0;
+            _this.distY = 0;
+            _this.startTime = 0;
+            _this.absStartX = 0;
+            _this.absStartY = 0;
+            _this.pointX = 0;
+            _this.pointY = 0;
             _this.deceleration = 0.0006;
+            _this.destTime = 0;
+            _this.destX = 0;
+            _this.destY = 0;
+            _this.duration = 0;
             _this._mouseEvent = null;
             _this._enterFrame = null;
             var s = _this;
@@ -561,8 +574,8 @@ var annieUI;
             s._instanceType = "annieUI.MCScroller";
             s._mc = mc;
             s.isBounce = false;
-            s._isVertical = isVertical;
             s.rate = rate;
+            s.isVertical = isVertical;
             s.addEventListener(annie.Event.ON_SCROLL_ING, function (e) {
                 mc.gotoAndStop(s.curFramePos);
             });
@@ -582,8 +595,8 @@ var annieUI;
             set: function (value) {
                 var s = this;
                 if (value != s._rate) {
-                    var curFrame = s.curFramePos - 1;
                     s._rate = value;
+                    var curFrame = s.curFramePos - 1;
                     var sw = 0, sh = 0;
                     if (s._isVertical) {
                         s._curX = -curFrame * value;
@@ -642,10 +655,10 @@ var annieUI;
                 var s = this;
                 var frame = 1;
                 if (s._isVertical) {
-                    frame = s.curX / s._rate;
+                    frame = s._curY / s._rate;
                 }
                 else {
-                    frame = s.curY / s._rate;
+                    frame = s._curX / s._rate;
                 }
                 return Math.abs(frame) + 1;
             },

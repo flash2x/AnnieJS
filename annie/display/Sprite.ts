@@ -456,7 +456,7 @@ namespace annie {
             super._onAddEvent();
         }
 
-        public _onEnterFrameEvent(mcSpeed:number=1): void {
+        public _onFlushFrame(mcSpeed:number=1): void {
             let s = this;
             let child: any = null;
             s._cMcSpeed=s.mcSpeed*mcSpeed;
@@ -465,9 +465,9 @@ namespace annie {
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child && child._isOnStage) {
-                    child._onEnterFrameEvent(s._cMcSpeed);
+                    child._onFlushFrame(s._cMcSpeed);
                 }
-                super._onEnterFrameEvent(s._cMcSpeed);
+                super._onFlushFrame(s._cMcSpeed);
             }
         }
 

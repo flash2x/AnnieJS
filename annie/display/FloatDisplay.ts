@@ -55,7 +55,7 @@ namespace annie {
                         s.stage.rootDiv.insertBefore(s.htmlElement, s.stage.rootDiv.childNodes[0]);
                     } else {
                         if (s.htmlElement && s.visible) {
-                            style.display = "inline";
+                            style.display = "inline-block";
                         }
                     }
                 }
@@ -108,8 +108,8 @@ namespace annie {
             return null;
         }
 
-        public _onEnterFrameEvent(): void {
-            super._onEnterFrameEvent();
+        public _onFlushFrame(): void {
+            super._onFlushFrame();
             let s: any = this;
             let o = s.htmlElement;
             if (o) {
@@ -129,7 +129,7 @@ namespace annie {
                         }
                     }
                 }
-                let show = visible ? "inline" : "none";
+                let show = visible ? "inline-block" : "none";
                 if (show != style.display) {
                     style.display = show;
                 }

@@ -957,7 +957,7 @@ namespace annie {
             }
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         }
-        public _onEnterFrameEvent(mcSpeed:number=1): void {
+        public _onFlushFrame(mcSpeed:number=1): void {
             if(this._visible)
             this.dispatchEvent(annie.Event.ENTER_FRAME);
         }

@@ -22,8 +22,8 @@ namespace annieUI {
         public set rate(value:number){
             let s=this;
             if(value!=s._rate){
-                let curFrame=s.curFramePos-1;
                 s._rate=value;
+                let curFrame=s.curFramePos-1;
                 let sw:number=0,sh:number=0;
                 if(s._isVertical){
                     s._curX=-curFrame*value;
@@ -76,9 +76,9 @@ namespace annieUI {
             let s=this;
             let frame:number=1;
             if(s._isVertical){
-                frame=s.curX/s._rate;
+                frame=s._curY/s._rate;
             }else{
-                frame=s.curY/s._rate;
+                frame=s._curX/s._rate;
             }
             return Math.abs(frame)+1;
         }
@@ -96,8 +96,8 @@ namespace annieUI {
             s._instanceType = "annieUI.MCScroller";
             s._mc=mc;
             s.isBounce=false;
-            s._isVertical=isVertical;
             s.rate=rate;
+            s.isVertical=isVertical;
             s.addEventListener(annie.Event.ON_SCROLL_ING,function (e:annie.Event) {
                 mc.gotoAndStop(s.curFramePos);
             })

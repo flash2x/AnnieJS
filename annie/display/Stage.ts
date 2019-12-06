@@ -351,7 +351,7 @@ namespace annie {
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
-                s._onEnterFrameEvent(1);
+                s._onFlushFrame(1);
                 s.updateMatrix();
                 s.render(s.renderObj);
             } else {
@@ -361,7 +361,7 @@ namespace annie {
                     s.resize();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s._onEnterFrameEvent();
+                        s._onFlushFrame();
                         s.updateMatrix();
                         s.render(s.renderObj);
                     }
@@ -810,7 +810,6 @@ namespace annie {
             s._viewRect.width = desW - s._viewRect.x * 2;
             s._viewRect.height = desH - s._viewRect.y * 2;
         };
-
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -844,7 +843,6 @@ namespace annie {
                 }
             }
         };
-
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -860,7 +858,6 @@ namespace annie {
         public get viewRect(): Rectangle {
             return this._viewRect;
         }
-
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
@@ -869,7 +866,6 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
-
         //刷新所有定时器
         private static flushAll(): void {
             if (!Stage._pause) {

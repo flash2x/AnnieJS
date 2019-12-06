@@ -181,22 +181,22 @@ namespace annieUI {
         public isRunning: boolean;
         private startX: number = 0;
         private startY: number = 0;
-        private maxScrollX: number;
-        private maxScrollY: number;
+        private maxScrollX: number=0;
+        private maxScrollY: number=0;
         private endTime: number=0;
         private mouseStatus: number=0;
-        private distX: number;
-        private distY: number;
-        private startTime: number;
-        private absStartX: number;
-        private absStartY: number;
-        private pointX: number;
-        private pointY: number;
+        private distX: number=0;
+        private distY: number=0;
+        private startTime: number=0;
+        private absStartX: number=0;
+        private absStartY: number=0;
+        private pointX: number=0;
+        private pointY: number=0;
         private deceleration: number = 0.0006;
-        private destTime: number;
-        private destX: number;
-        private destY: number;
-        private duration: number;
+        private destTime: number=0;
+        private destX: number=0;
+        private destY: number=0;
+        private duration: number=0;
         private easingFn: Function;
         /**
          * 初始化
