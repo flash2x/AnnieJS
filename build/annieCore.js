@@ -225,12 +225,12 @@ var annie;
             if (useCapture === void 0) { useCapture = true; }
             var s = this;
             if (useCapture) {
-                if (s.eventTypes[type] instanceof Array && s.eventTypes[type].length > 0) {
+                if (s.eventTypes && s.eventTypes[type] instanceof Array && s.eventTypes[type].length > 0) {
                     return true;
                 }
             }
             else {
-                if (s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
+                if (s.eventTypes1 && s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
                     return true;
                 }
             }
@@ -2709,6 +2709,7 @@ var annie;
                 s.boundsCol = bitmapData.boundsRowAndCol[1];
             }
             s._bitmapData = bitmapData;
+            s._texture = bitmapData;
             var bw = bitmapData.width;
             var bh = bitmapData.height;
             s._bounds.width = bw;
@@ -2757,7 +2758,7 @@ var annie;
             var bh = bitmapData.height;
             _super.prototype.updateMatrix.call(this);
             //滤镜,这里一定是UF
-            if (s.a2x_uf && bw * bh > 0) {
+            if (s.a2x_uf) {
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
@@ -5416,6 +5417,9 @@ var annie;
             else {
                 she = htmlElement;
             }
+            if (s.htmlElement) {
+                s.removeHtmlElement();
+            }
             var style = she.style;
             style.position = "absolute";
             style.display = "none";
@@ -5494,8 +5498,7 @@ var annie;
         };
         FloatDisplay.prototype.render = function (renderObj) {
         };
-        FloatDisplay.prototype.destroy = function () {
-            //清除相应的数据引用
+        FloatDisplay.prototype.removeHtmlElement = function () {
             var s = this;
             var elem = s.htmlElement;
             if (elem) {
@@ -5506,7 +5509,11 @@ var annie;
                 s._isAdded = false;
                 s.htmlElement = null;
             }
+        };
+        FloatDisplay.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
+            //清除相应的数据引用
+            this.removeHtmlElement();
         };
         return FloatDisplay;
     }(annie.DisplayObject));

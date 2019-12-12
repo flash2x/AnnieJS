@@ -2579,6 +2579,7 @@ declare namespace annie {
         _onFlushFrame(): void;
         updateMatrix(): void;
         render(renderObj: IRender): void;
+        private removeHtmlElement;
         destroy(): void;
     }
 }

@@ -72,6 +72,9 @@
     修复多重嵌套遮罩后以图片为遮罩的效果无效的bug
     修复对未添加到舞台的对象进行截图时无法截图多帧动画元素的bug
     修复annie.Input输入文本在ios和android位置表现差异的bug
+    修复在鼠标事件里销毁对象时特殊情况下会发生错误的bug
+    优化annie.FloatDisplay,多次调用init()方法重复使用时会从dom中删除上次引用的htmlElement元素
+    修复annie.Bitmap类初始化时传入的Image对象未加载完成会报错的bug
 ## AnnieJS 3.1.4 版本
     修复无法获取annie.FloatDisplay鼠标事件的bug
     修复初始化后马上获取显示对像宽高为0的bug

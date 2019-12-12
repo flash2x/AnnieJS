@@ -52,6 +52,7 @@ namespace annie {
                 s.boundsCol = bitmapData.boundsRowAndCol[1];
             }
             s._bitmapData = bitmapData;
+            s._texture = bitmapData;
             let bw = bitmapData.width;
             let bh = bitmapData.height;
             s._bounds.width = bw;
@@ -106,7 +107,7 @@ namespace annie {
             let bh = bitmapData.height;
             super.updateMatrix();
             //滤镜,这里一定是UF
-            if (s.a2x_uf && bw * bh > 0) {
+            if (s.a2x_uf) {
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {

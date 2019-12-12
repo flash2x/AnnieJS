@@ -204,11 +204,11 @@ namespace annie {
         public hasEventListener(type: string, useCapture = true): boolean {
             let s = this;
             if (useCapture) {
-                if (s.eventTypes[type] instanceof Array && s.eventTypes[type].length > 0) {
+                if (s.eventTypes&&s.eventTypes[type] instanceof Array && s.eventTypes[type].length > 0) {
                     return true
                 }
             } else {
-                if (s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
+                if (s.eventTypes1&&s.eventTypes1[type] instanceof Array && s.eventTypes1[type].length > 0) {
                     return true
                 }
             }

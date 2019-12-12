@@ -79,6 +79,9 @@ namespace annie {
             } else {
                 she = htmlElement;
             }
+            if(s.htmlElement){
+                s.removeHtmlElement();
+            }
             let style = she.style;
             style.position = "absolute";
             style.display = "none";
@@ -158,8 +161,7 @@ namespace annie {
         public render(renderObj: IRender) {
 
         }
-        public destroy(): void {
-            //清除相应的数据引用
+        private removeHtmlElement():void{
             let s = this;
             let elem = s.htmlElement;
             if (elem) {
@@ -170,7 +172,11 @@ namespace annie {
                 s._isAdded = false;
                 s.htmlElement = null;
             }
+        }
+        public destroy(): void {
             super.destroy();
+            //清除相应的数据引用
+            this.removeHtmlElement();
         }
     }
 }
