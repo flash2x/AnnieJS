@@ -402,6 +402,7 @@ namespace annie {
         public set visible(value: boolean) {
             let s = this;
             if (value != s._visible) {
+                s.a2x_um=true;
                 s._visible = value;
             }
         }
