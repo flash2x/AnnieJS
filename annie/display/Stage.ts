@@ -203,8 +203,9 @@ namespace annie {
          * @since 1.0.0
          * @type {string} #FFFFFF" 或 RGB(255,255,255) 或 RGBA(255,255,255,255)
          */
-        public bgColor:string="";
-        private _isFullScreen:boolean=true;
+        public bgColor: string = "";
+        private _isFullScreen: boolean = true;
+
         /**
          * 舞台的缩放模式
          * 默认为空就是无缩放的真实大小
@@ -277,8 +278,8 @@ namespace annie {
                 script.src = "libs/vconsole.min.js";
             }
             let s: Stage = this;
-            s.a2x_ua=true;
-            s.a2x_um=true;
+            s.a2x_ua = true;
+            s.a2x_um = true;
             s._instanceType = "annie.Stage";
             s.stage = s;
             s._isOnStage = true;
@@ -332,13 +333,13 @@ namespace annie {
         private _mp: any = [];
 
         //刷新mouse或者touch事件
-        private _initMouseEvent(event: any, cp: Point, sp: Point, identifier: number,timeStamp:number): void {
+        private _initMouseEvent(event: any, cp: Point, sp: Point, identifier: number, timeStamp: number): void {
             event._pd = false;
             event.clientX = cp.x;
             event.clientY = cp.y;
             event.stageX = sp.x;
             event.stageY = sp.y;
-            event.timeStamp=timeStamp;
+            event.timeStamp = timeStamp;
             event.identifier = identifier;
         }
 
@@ -412,9 +413,9 @@ namespace annie {
             if (div.style.width != "") {
                 vW = parseInt(div.style.width);
                 vH = parseInt(div.style.height);
-                this._isFullScreen=false;
+                this._isFullScreen = false;
             } else {
-                this._isFullScreen=true;
+                this._isFullScreen = true;
                 vW = document.documentElement.clientWidth;
                 vH = document.documentElement.clientHeight;
             }
@@ -429,7 +430,7 @@ namespace annie {
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
-            touchcancel:"onMouseUp"
+            touchcancel: "onMouseUp"
         };
         private muliPoints: Array<any> = [];
         //当document有鼠标或触摸事件时调用
@@ -442,6 +443,7 @@ namespace annie {
         public static _lastDragPoint: annie.Point = new annie.Point();
         public static _isDragCenter: boolean = false;
         public _isMouseClickCanvas: boolean = true;
+
         private _onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
@@ -458,12 +460,12 @@ namespace annie {
             } else {
                 s._isMouseClickCanvas = false;
             }
-            if(!s._isFullScreen) {
+            if (!s._isFullScreen) {
                 offSetX = c.getBoundingClientRect().left + c.scrollLeft;
                 offSetY = c.getBoundingClientRect().top + c.scrollTop;
             }
             let sd: any = Stage._dragDisplay;
-            if(s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
+            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
                 if (e.targetTouches.length == 2) {
                     //求角度和距离
                     s._mP1.x = e.targetTouches[0].clientX - offSetX;
@@ -525,20 +527,26 @@ namespace annie {
                     let eLen: number;
                     let identifier: any;
                     if (osType == "pc") {
-                        e.identifier = 0;
+                        e.identifier = "pc0";
                         points = [e];
                     } else {
                         if (s.isMultiMouse) {
                             points = e.changedTouches;
                         } else {
-                            points = [e.changedTouches[0]];
+                            let fp = e.changedTouches[0];
+                            if ((s._lastDpList[fp.identifier]!=void 0)||(item == "onMouseDown" && !s._lastDpList.isStart)) {
+                                s._lastDpList.isStart = true;
+                                points = [fp];
+                            } else {
+                                return;
+                            }
                         }
                     }
                     let pLen = points.length;
                     for (let o = 0; o < pLen; o++) {
                         eLen = 0;
                         events.length = 0;
-                        identifier = "m" + points[o].identifier;
+                        identifier = points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         } else {
@@ -727,6 +735,7 @@ namespace annie {
                             if (item == "onMouseUp") {
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
+                                s._lastDpList.isStart = false;
                                 if (sd) {
                                     Stage._lastDragPoint.x = Number.MAX_VALUE;
                                     Stage._lastDragPoint.y = Number.MAX_VALUE;
@@ -810,6 +819,7 @@ namespace annie {
             s._viewRect.width = desW - s._viewRect.x * 2;
             s._viewRect.height = desH - s._viewRect.y * 2;
         };
+
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
          * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -843,6 +853,7 @@ namespace annie {
                 }
             }
         };
+
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
          * @property viewRect
@@ -858,6 +869,7 @@ namespace annie {
         public get viewRect(): Rectangle {
             return this._viewRect;
         }
+
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
@@ -866,6 +878,7 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
+
         //刷新所有定时器
         private static flushAll(): void {
             if (!Stage._pause) {

@@ -581,8 +581,8 @@ namespace annie {
         private a2x_ut: boolean = true;
         public updateMatrix(): void {
             let s: any = this;
-            let _canvas: any = s._texture;
-            let ctx = _canvas.getContext("2d");
+            let canvas: any = s._texture;
+            let ctx = canvas.getContext("2d");
             let boundsW=s._bounds.width;
             let boundsH=s._bounds.height;
             if (s.a2x_ut){
@@ -704,10 +704,10 @@ namespace annie {
                         s.offsetY = leftY;
                         boundsH>>=0;
                         boundsW>>=0;
-                        _canvas.width = boundsW;
-                        _canvas.height = boundsH;
-                        _canvas.style.width = boundsW / devicePixelRatio + "px";
-                        _canvas.style.height = boundsH / devicePixelRatio + "px";
+                        canvas.width = boundsW;
+                        canvas.height = boundsH;
+                        canvas.style.width = boundsW / devicePixelRatio + "px";
+                        canvas.style.height = boundsH / devicePixelRatio + "px";
                         ctx.clearRect(0, 0, boundsW, boundsH);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////
@@ -721,7 +721,7 @@ namespace annie {
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {
-                    let imageData = ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     for (let i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
@@ -817,7 +817,6 @@ namespace annie {
                 return null;
             }
         }
-
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor

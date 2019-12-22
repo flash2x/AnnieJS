@@ -91,6 +91,9 @@ namespace annie {
                 for (let i = 0; i < target.children.length; i++) {
                     s.drawMask(target.children[i]);
                 }
+                if(target._a2x_is_updateFrame){
+                    target._a2x_is_updateFrame=false;
+                }
             }
             else {
                 let bounds = target._bounds;

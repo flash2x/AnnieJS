@@ -403,8 +403,8 @@ namespace annie {
 
         public updateMatrix(): void {
             let s: any = this;
-            let can = s._texture;
-            let ctx = can.getContext("2d");
+            let canvas = s._texture;
+            let ctx = canvas.getContext("2d");
             let boundsW = s._bounds.width;
             let boundsH = s._bounds.height;
             if (s.a2x_ut) {
@@ -463,9 +463,9 @@ namespace annie {
                 } else if (s._textAlign == "right") {
                     tx = maxW;
                 }
-                can.width = maxW + 20;
-                can.height = maxH + 20;
-                ctx.clearRect(0, 0, can.width, can.width);
+                canvas.width = maxW + 20;
+                canvas.height = maxH + 20;
+                ctx.clearRect(0, 0, canvas.width, canvas.width);
                 if (s.border) {
                     ctx.beginPath();
                     ctx.strokeStyle = "#000";
@@ -490,11 +490,11 @@ namespace annie {
                 boundsW = maxW + 10 >> 0;
             }
             super.updateMatrix();
-            if (s.a2x_ut || s.a2x_uf) {
+            if (s.a2x_uf) {
                 let cf: any = s.cFilters;
                 let cfLen = cf.length;
                 if (cfLen > 0) {
-                    let imageData = ctx.getImageData(0, 0, can.width, can.height);
+                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     for (let i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }

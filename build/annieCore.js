@@ -2074,6 +2074,7 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (value != s._visible) {
+                    s.a2x_um = true;
                     s._visible = value;
                 }
             },
@@ -3464,7 +3465,7 @@ var annie;
             var ctx = _canvas.getContext("2d");
             var boundsW = s._bounds.width;
             var boundsH = s._bounds.height;
-            if (s.a2x_ut) {
+            if (s.a2x_ut || s.a2x_uf) {
                 //更新缓存
                 var cLen = s._command.length;
                 var leftX = void 0;
@@ -5945,7 +5946,7 @@ var annie;
             var ctx = can.getContext("2d");
             var boundsW = s._bounds.width;
             var boundsH = s._bounds.height;
-            if (s.a2x_ut) {
+            if (s.a2x_ut || s.a2x_uf) {
                 s._text += "";
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
@@ -6986,7 +6987,7 @@ var annie;
                     var eLen = void 0;
                     var identifier = void 0;
                     if (annie.osType == "pc") {
-                        e.identifier = 0;
+                        e.identifier = "pc0";
                         points = [e];
                     }
                     else {
@@ -6994,14 +6995,21 @@ var annie;
                             points = e.changedTouches;
                         }
                         else {
-                            points = [e.changedTouches[0]];
+                            var fp = e.changedTouches[0];
+                            if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
+                                s._lastDpList.isStart = true;
+                                points = [fp];
+                            }
+                            else {
+                                return;
+                            }
                         }
                     }
                     var pLen = points.length;
                     for (var o = 0; o < pLen; o++) {
                         eLen = 0;
                         events.length = 0;
-                        identifier = "m" + points[o].identifier;
+                        identifier = points[o].identifier;
                         if (s._mp.length > 0) {
                             cp = s._mp.shift();
                         }
@@ -7200,6 +7208,7 @@ var annie;
                             if (item == "onMouseUp") {
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
+                                s._lastDpList.isStart = false;
                                 if (sd) {
                                     Stage._lastDragPoint.x = Number.MAX_VALUE;
                                     Stage._lastDragPoint.y = Number.MAX_VALUE;
@@ -8221,6 +8230,9 @@ var annie;
             else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
                 for (var i = 0; i < target.children.length; i++) {
                     s.drawMask(target.children[i]);
+                }
+                if (target._a2x_is_updateFrame) {
+                    target._a2x_is_updateFrame = false;
                 }
             }
             else {
