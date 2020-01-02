@@ -473,7 +473,7 @@ namespace annie {
                     ctx.strokeRect(10, 10, maxW - 2, maxH - 2);
                     ctx.closePath();
                 }
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 12);
+                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
                 for (let i = 0; i < realLines.length; i++) {
                     if (s._stroke > 0) {

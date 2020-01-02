@@ -702,12 +702,12 @@ namespace annie {
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
-                        boundsH>>=0;
-                        boundsW>>=0;
+                        boundsH=Math.ceil(boundsH);
+                        boundsW=Math.ceil(boundsW);
                         canvas.width = boundsW;
                         canvas.height = boundsH;
-                        canvas.style.width = boundsW / devicePixelRatio + "px";
-                        canvas.style.height = boundsH / devicePixelRatio + "px";
+                        canvas.style.width = (boundsW / devicePixelRatio) + "px";
+                        canvas.style.height = (boundsH / devicePixelRatio) + "px";
                         ctx.clearRect(0, 0, boundsW, boundsH);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////

@@ -47,16 +47,23 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            if (bitmapData.boundsRowAndCol != void 0) {
-                s.boundsRow = bitmapData.boundsRowAndCol[0];
-                s.boundsCol = bitmapData.boundsRowAndCol[1];
-            }
             s._bitmapData = bitmapData;
             s._texture = bitmapData;
             let bw = bitmapData.width;
             let bh = bitmapData.height;
             s._bounds.width = bw;
             s._bounds.height = bh;
+            if (bitmapData.boundsRowAndCol != void 0) {
+                s.boundsRow = bitmapData.boundsRowAndCol[0];
+                s.boundsCol = bitmapData.boundsRowAndCol[1];
+            }else{
+                if(bw>0){
+                    s.boundsRow = Math.ceil(bw/800);
+                }
+                if(bh>0){
+                    s.boundsCol = Math.ceil(bh/800);
+                }
+            }
             s._updateSplitBounds();
         }
         /**
@@ -141,6 +148,12 @@ namespace annie {
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
+                if(bw>0){
+                    s.boundsRow = Math.ceil(bw/800);
+                }
+                if(bh>0){
+                    s.boundsCol = Math.ceil(bh/800);
+                }
                 s._updateSplitBounds();
                 s._checkDrawBounds();
             } else if (s.a2x_um) {

@@ -2705,16 +2705,24 @@ var annie;
             _this.hitTestWithPixel = false;
             var s = _this;
             s._instanceType = "annie.Bitmap";
-            if (bitmapData.boundsRowAndCol != void 0) {
-                s.boundsRow = bitmapData.boundsRowAndCol[0];
-                s.boundsCol = bitmapData.boundsRowAndCol[1];
-            }
             s._bitmapData = bitmapData;
             s._texture = bitmapData;
             var bw = bitmapData.width;
             var bh = bitmapData.height;
             s._bounds.width = bw;
             s._bounds.height = bh;
+            if (bitmapData.boundsRowAndCol != void 0) {
+                s.boundsRow = bitmapData.boundsRowAndCol[0];
+                s.boundsCol = bitmapData.boundsRowAndCol[1];
+            }
+            else {
+                if (bw > 0) {
+                    s.boundsRow = Math.ceil(bw / 800);
+                }
+                if (bh > 0) {
+                    s.boundsCol = Math.ceil(bh / 800);
+                }
+            }
             s._updateSplitBounds();
             return _this;
         }
@@ -2794,6 +2802,12 @@ var annie;
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
+                if (bw > 0) {
+                    s.boundsRow = Math.ceil(bw / 800);
+                }
+                if (bh > 0) {
+                    s.boundsCol = Math.ceil(bh / 800);
+                }
                 s._updateSplitBounds();
                 s._checkDrawBounds();
             }
@@ -3461,11 +3475,11 @@ var annie;
         };
         Shape.prototype.updateMatrix = function () {
             var s = this;
-            var _canvas = s._texture;
-            var ctx = _canvas.getContext("2d");
+            var canvas = s._texture;
+            var ctx = canvas.getContext("2d");
             var boundsW = s._bounds.width;
             var boundsH = s._bounds.height;
-            if (s.a2x_ut || s.a2x_uf) {
+            if (s.a2x_ut) {
                 //更新缓存
                 var cLen = s._command.length;
                 var leftX = void 0;
@@ -3585,12 +3599,12 @@ var annie;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s.offsetX = leftX;
                         s.offsetY = leftY;
-                        boundsH >>= 0;
-                        boundsW >>= 0;
-                        _canvas.width = boundsW;
-                        _canvas.height = boundsH;
-                        _canvas.style.width = boundsW / annie.devicePixelRatio + "px";
-                        _canvas.style.height = boundsH / annie.devicePixelRatio + "px";
+                        boundsH = Math.ceil(boundsH);
+                        boundsW = Math.ceil(boundsW);
+                        canvas.width = boundsW;
+                        canvas.height = boundsH;
+                        canvas.style.width = (boundsW / annie.devicePixelRatio) + "px";
+                        canvas.style.height = (boundsH / annie.devicePixelRatio) + "px";
                         ctx.clearRect(0, 0, boundsW, boundsH);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////
@@ -3604,7 +3618,7 @@ var annie;
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
-                    var imageData = ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+                    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     for (var i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
@@ -5942,11 +5956,11 @@ var annie;
         };
         TextField.prototype.updateMatrix = function () {
             var s = this;
-            var can = s._texture;
-            var ctx = can.getContext("2d");
+            var canvas = s._texture;
+            var ctx = canvas.getContext("2d");
             var boundsW = s._bounds.width;
             var boundsH = s._bounds.height;
-            if (s.a2x_ut || s.a2x_uf) {
+            if (s.a2x_ut) {
                 s._text += "";
                 var hardLines = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 var realLines = [];
@@ -6007,9 +6021,9 @@ var annie;
                 else if (s._textAlign == "right") {
                     tx = maxW;
                 }
-                can.width = maxW + 20;
-                can.height = maxH + 20;
-                ctx.clearRect(0, 0, can.width, can.width);
+                canvas.width = maxW + 20;
+                canvas.height = maxH + 20;
+                ctx.clearRect(0, 0, canvas.width, canvas.width);
                 if (s.border) {
                     ctx.beginPath();
                     ctx.strokeStyle = "#000";
@@ -6017,7 +6031,7 @@ var annie;
                     ctx.strokeRect(10, 10, maxW - 2, maxH - 2);
                     ctx.closePath();
                 }
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 12);
+                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
                 s._prepContext(ctx);
                 for (var i = 0; i < realLines.length; i++) {
                     if (s._stroke > 0) {
@@ -6034,11 +6048,11 @@ var annie;
                 boundsW = maxW + 10 >> 0;
             }
             _super.prototype.updateMatrix.call(this);
-            if (s.a2x_ut || s.a2x_uf) {
+            if (s.a2x_uf) {
                 var cf = s.cFilters;
                 var cfLen = cf.length;
                 if (cfLen > 0) {
-                    var imageData = ctx.getImageData(0, 0, can.width, can.height);
+                    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     for (var i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }

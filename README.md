@@ -79,6 +79,7 @@
     修复隐藏对象舞台发生旋转后，隐藏的对象未跟着旋转的bug
     修复动画对象作为遮罩，遮罩动画不起作用的bug
     修复多指滑动屏幕导致鼠标事件错乱的bug
+    优化图片资源切片功能，当图片资源的宽或者高超过800但又没有在Flash库中对图片资源做切片设置的话则AnnieJS会自动对图片资源做智能切片。
 ## AnnieJS 3.1.4 版本
     修复无法获取annie.FloatDisplay鼠标事件的bug
     修复初始化后马上获取显示对像宽高为0的bug
@@ -306,6 +307,11 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Annie2x 4.2.5
+    AnnieJS引擎升级到3.1.5版本
+    将gulp升级到4.x,支持nodeJS 10.x以上版本
+    支持javascript es6及更高版本
+    支持导出blendMode属性
 ## Annie2x 4.2.4
     AnnieJS引擎升级到3.1.3版本
     修复ts版打包发布出错的bug
