@@ -364,7 +364,9 @@ namespace annie {
             super._onAddEvent();
             this._updateFrame();
         }
+
         private _a2x_is_updateFrame: boolean = false;
+
         public _updateFrame(): void {
             let s: any = this;
             if (!s._a2x_is_updateFrame) {
@@ -381,7 +383,7 @@ namespace annie {
                         if (s._isPlaying && s._wantFrame == s._curFrame && s._visible) {
                             if (s._isFront) {
                                 s._wantFrame += s._cMcSpeed;
-                                if (s._wantFrame > s._a2x_res_class.tf){
+                                if (s._wantFrame > s._a2x_res_class.tf) {
                                     s._wantFrame = 1;
                                 }
                             } else {
@@ -472,7 +474,7 @@ namespace annie {
                                 }
                             }
                             //如果发现不是图形动画，则执行脚本
-                            if (s._a2x_mode < 0){
+                            if (s._a2x_mode < 0) {
                                 //更新完所有后再来确定事件和脚本
                                 let isCodeScript = false;
                                 //有没有用户后期通过代码调用加入的脚本,有就直接调用然后不再调用时间轴代码
@@ -520,13 +522,12 @@ namespace annie {
                             //帧数带小数点的，所以执行微调
                             s._updateFloatFrame();
                         }
-                        s._floatFrame = 0;
                     }
                 }
             }
         }
 
-        public _onFlushFrame(mcSpeed: number=1): void {
+        public _onFlushFrame(mcSpeed: number = 1): void {
             let s = this;
             super._onFlushFrame(mcSpeed);
             s._updateFrame();
@@ -554,55 +555,53 @@ namespace annie {
             let obj: any = null;
             let nextObjInfo: any = null;
             let curObjInfo: any = null;
-            let nextFrameIndex = s._curFrame;
+            let nextFrameIndex = Math.floor(s._curFrame);
             let curFrameObj: any = s._lastFrameObj;
             let ff = s._floatFrame;
             let nextFrameObj: any = timeLineObj.f[timeLineObj.timeLine[nextFrameIndex]];
-            if (nextFrameObj != void 0 && curFrameObj != void 0 && curFrameObj != nextFrameObj) {
-                for (let i = childCount - 1; i >= 0; i--) {
-                    objId = allChildren[i][0];
-                    obj = allChildren[i][1];
-                    if (nextFrameObj.c instanceof Object && curFrameObj.c instanceof Object) {
-                        nextObjInfo = nextFrameObj.c[objId];
-                        curObjInfo = curFrameObj.c[objId];
-                        //更新对象信息
-                        if (curObjInfo != void 0 && nextObjInfo != void 0) {
-                            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-                            if (nextObjInfo.tr == void 0 || nextObjInfo.tr.length == 1) {
-                                nextObjInfo.tr = [0, 0, 1, 1, 0, 0];
-                            }
-                            if (nextObjInfo.al == void 0) {
-                                nextObjInfo.al = 1;
-                            }
-                            var sx = nextObjInfo.tr[4] - curObjInfo.tr[4];
-                            var sy = nextObjInfo.tr[5] - curObjInfo.tr[5];
-                            if (sx > 180) {
-                                sx -= 360;
-                            } else if (sx < -180) {
-                                sx += 360;
-                            }
-                            if (sy > 180) {
-                                sy -= 360;
-                            } else if (sy < -180) {
-                                sy += 360;
-                            }
-                            obj._x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
-                            obj._lastX = obj._x + obj._offsetX;
-                            obj._y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
-                            obj._lastY = obj._y + obj._offsetY;
-                            obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
-                            obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
-                            obj._skewX = curObjInfo.tr[4] + sx * ff;
-                            obj._skewY = curObjInfo.tr[5] + sy * ff;
-                            obj._alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
-                            obj.a2x_um = true;
-                            obj.a2x_ua = true;
+            for (let i = childCount - 1; i >= 0; i--) {
+                objId = allChildren[i][0];
+                obj = allChildren[i][1];
+                if (nextFrameObj&&nextFrameObj.c&&curFrameObj&&curFrameObj.c) {
+                    nextObjInfo = nextFrameObj.c[objId];
+                    curObjInfo = curFrameObj.c[objId];
+                    //更新对象信息
+                    if (curObjInfo != void 0 && nextObjInfo != void 0) {
+                        //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+                        if (nextObjInfo.tr == void 0 || nextObjInfo.tr.length == 1) {
+                            nextObjInfo.tr = [0, 0, 1, 1, 0, 0];
                         }
+                        if (nextObjInfo.al == void 0) {
+                            nextObjInfo.al = 1;
+                        }
+                        var sx = nextObjInfo.tr[4] - curObjInfo.tr[4];
+                        var sy = nextObjInfo.tr[5] - curObjInfo.tr[5];
+                        if (sx > 180) {
+                            sx -= 360;
+                        } else if (sx < -180) {
+                            sx += 360;
+                        }
+                        if (sy > 180) {
+                            sy -= 360;
+                        } else if (sy < -180) {
+                            sy += 360;
+                        }
+                        obj._x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
+                        obj._lastX = obj._x + obj._offsetX;
+                        obj._y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
+                        obj._lastY = obj._y + obj._offsetY;
+                        obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
+                        obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
+                        obj._skewX = curObjInfo.tr[4] + sx * ff;
+                        obj._skewY = curObjInfo.tr[5] + sy * ff;
+                        obj._alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                        obj.a2x_um = true;
+                        obj.a2x_ua = true;
                     }
                 }
             }
+            s._floatFrame = 0;
         }
-
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             obj._wantFrame = 1;

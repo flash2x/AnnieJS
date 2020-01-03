@@ -74,7 +74,7 @@ namespace annieUI {
          */
         public get curFramePos():number{
             let s=this;
-            let frame:number=1;
+            let frame:number=0;
             if(s._isVertical){
                 frame=s._curY/s._rate;
             }else{
@@ -98,7 +98,7 @@ namespace annieUI {
             s.isBounce=false;
             s.rate=rate;
             s.isVertical=isVertical;
-            s.addEventListener(annie.Event.ON_SCROLL_ING,function (e:annie.Event) {
+            s.addEventListener(annie.Event.ON_SCROLL_ING,function (e:annie.Event){
                 mc.gotoAndStop(s.curFramePos);
             })
         }

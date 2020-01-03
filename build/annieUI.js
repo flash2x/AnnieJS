@@ -653,7 +653,7 @@ var annieUI;
              */
             get: function () {
                 var s = this;
-                var frame = 1;
+                var frame = 0;
                 if (s._isVertical) {
                     frame = s._curY / s._rate;
                 }

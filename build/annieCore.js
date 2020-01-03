@@ -5239,7 +5239,6 @@ var annie;
                             //帧数带小数点的，所以执行微调
                             s._updateFloatFrame();
                         }
-                        s._floatFrame = 0;
                     }
                 }
             }
@@ -5270,55 +5269,54 @@ var annie;
             var obj = null;
             var nextObjInfo = null;
             var curObjInfo = null;
-            var nextFrameIndex = s._curFrame;
+            var nextFrameIndex = Math.floor(s._curFrame);
             var curFrameObj = s._lastFrameObj;
             var ff = s._floatFrame;
             var nextFrameObj = timeLineObj.f[timeLineObj.timeLine[nextFrameIndex]];
-            if (nextFrameObj != void 0 && curFrameObj != void 0 && curFrameObj != nextFrameObj) {
-                for (var i = childCount - 1; i >= 0; i--) {
-                    objId = allChildren[i][0];
-                    obj = allChildren[i][1];
-                    if (nextFrameObj.c instanceof Object && curFrameObj.c instanceof Object) {
-                        nextObjInfo = nextFrameObj.c[objId];
-                        curObjInfo = curFrameObj.c[objId];
-                        //更新对象信息
-                        if (curObjInfo != void 0 && nextObjInfo != void 0) {
-                            //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
-                            if (nextObjInfo.tr == void 0 || nextObjInfo.tr.length == 1) {
-                                nextObjInfo.tr = [0, 0, 1, 1, 0, 0];
-                            }
-                            if (nextObjInfo.al == void 0) {
-                                nextObjInfo.al = 1;
-                            }
-                            var sx = nextObjInfo.tr[4] - curObjInfo.tr[4];
-                            var sy = nextObjInfo.tr[5] - curObjInfo.tr[5];
-                            if (sx > 180) {
-                                sx -= 360;
-                            }
-                            else if (sx < -180) {
-                                sx += 360;
-                            }
-                            if (sy > 180) {
-                                sy -= 360;
-                            }
-                            else if (sy < -180) {
-                                sy += 360;
-                            }
-                            obj._x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
-                            obj._lastX = obj._x + obj._offsetX;
-                            obj._y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
-                            obj._lastY = obj._y + obj._offsetY;
-                            obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
-                            obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
-                            obj._skewX = curObjInfo.tr[4] + sx * ff;
-                            obj._skewY = curObjInfo.tr[5] + sy * ff;
-                            obj._alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
-                            obj.a2x_um = true;
-                            obj.a2x_ua = true;
+            for (var i = childCount - 1; i >= 0; i--) {
+                objId = allChildren[i][0];
+                obj = allChildren[i][1];
+                if (nextFrameObj && nextFrameObj.c && curFrameObj && curFrameObj.c) {
+                    nextObjInfo = nextFrameObj.c[objId];
+                    curObjInfo = curFrameObj.c[objId];
+                    //更新对象信息
+                    if (curObjInfo != void 0 && nextObjInfo != void 0) {
+                        //信息设置的时候看看是不是文本，如果有文本的话还需要设置宽和高
+                        if (nextObjInfo.tr == void 0 || nextObjInfo.tr.length == 1) {
+                            nextObjInfo.tr = [0, 0, 1, 1, 0, 0];
                         }
+                        if (nextObjInfo.al == void 0) {
+                            nextObjInfo.al = 1;
+                        }
+                        var sx = nextObjInfo.tr[4] - curObjInfo.tr[4];
+                        var sy = nextObjInfo.tr[5] - curObjInfo.tr[5];
+                        if (sx > 180) {
+                            sx -= 360;
+                        }
+                        else if (sx < -180) {
+                            sx += 360;
+                        }
+                        if (sy > 180) {
+                            sy -= 360;
+                        }
+                        else if (sy < -180) {
+                            sy += 360;
+                        }
+                        obj._x = curObjInfo.tr[0] + (nextObjInfo.tr[0] - curObjInfo.tr[0]) * ff;
+                        obj._lastX = obj._x + obj._offsetX;
+                        obj._y = curObjInfo.tr[1] + (nextObjInfo.tr[1] - curObjInfo.tr[1]) * ff;
+                        obj._lastY = obj._y + obj._offsetY;
+                        obj._scaleX = curObjInfo.tr[2] + (nextObjInfo.tr[2] - curObjInfo.tr[2]) * ff;
+                        obj._scaleY = curObjInfo.tr[3] + (nextObjInfo.tr[3] - curObjInfo.tr[3]) * ff;
+                        obj._skewX = curObjInfo.tr[4] + sx * ff;
+                        obj._skewY = curObjInfo.tr[5] + sy * ff;
+                        obj._alpha = curObjInfo.al + (nextObjInfo.al - curObjInfo.al) * ff;
+                        obj.a2x_um = true;
+                        obj.a2x_ua = true;
                     }
                 }
             }
+            s._floatFrame = 0;
         };
         MovieClip._resetMC = function (obj) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
