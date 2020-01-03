@@ -562,7 +562,7 @@ namespace annie {
             for (let i = childCount - 1; i >= 0; i--) {
                 objId = allChildren[i][0];
                 obj = allChildren[i][1];
-                if (nextFrameObj&&nextFrameObj.c&&curFrameObj&&curFrameObj.c) {
+                if (nextFrameObj&&nextFrameObj.c&&curFrameObj&&curFrameObj.c){
                     nextObjInfo = nextFrameObj.c[objId];
                     curObjInfo = curFrameObj.c[objId];
                     //更新对象信息
