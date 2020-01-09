@@ -58,10 +58,10 @@ namespace annie {
                 s.boundsCol = bitmapData.boundsRowAndCol[1];
             }else{
                 if(bw>0){
-                    s.boundsRow = Math.ceil(bw/800);
+                    s.boundsRow = Math.ceil(bw/1000);
                 }
                 if(bh>0){
-                    s.boundsCol = Math.ceil(bh/800);
+                    s.boundsCol = Math.ceil(bh/1000);
                 }
             }
             s._updateSplitBounds();
@@ -149,10 +149,10 @@ namespace annie {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 if(bw>0){
-                    s.boundsRow = Math.ceil(bw/800);
+                    s.boundsRow = Math.ceil(bw/1000);
                 }
                 if(bh>0){
-                    s.boundsCol = Math.ceil(bh/800);
+                    s.boundsCol = Math.ceil(bh/1000);
                 }
                 s._updateSplitBounds();
                 s._checkDrawBounds();
@@ -215,7 +215,7 @@ namespace annie {
                 }
                 let p: any;
                 if (isGlobalPoint) {
-                    p = s.globalToLocal(hitPoint);
+                    p = s.globalToLocal(hitPoint,DisplayObject._p1);
                 } else {
                     p = hitPoint;
                 }

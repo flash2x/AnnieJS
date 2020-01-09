@@ -795,15 +795,15 @@ namespace annie {
         }
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            let p: any;
-            if (isGlobalPoint) {
-                p = s.globalToLocal(hitPoint);
-            } else {
-                p = hitPoint;
-            }
             let texture = s._texture;
             if (texture.width == 0) {
                 return null;
+            }
+            let p: any=hitPoint;
+            if (isGlobalPoint) {
+                p = s.globalToLocal(hitPoint,DisplayObject._p1);
+            } else {
+                p = hitPoint;
             }
             let _canvas = DisplayObject._canvas,ctx = _canvas.getContext('2d');
             _canvas.width = 1;

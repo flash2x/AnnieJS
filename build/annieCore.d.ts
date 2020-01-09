@@ -1309,7 +1309,6 @@ declare namespace annie {
          * @return {annie.Point}
          */
         localToGlobal(point: Point, bp?: Point): Point;
-        static _bp: Point;
         static _p1: Point;
         static _p2: Point;
         static _p3: Point;
@@ -2516,6 +2515,7 @@ declare namespace annie {
          * @return {void}
          */
         gotoAndPlay(frameIndex: number | string, isFront?: boolean): void;
+        private _onCheckUpdateFrame;
         private _a2x_sounds;
         _onAddEvent(): void;
         private _a2x_is_updateFrame;
@@ -3186,6 +3186,8 @@ declare namespace annie {
             h: number;
         };
         private _mouseEventTypes;
+        private sp;
+        private lp;
         private muliPoints;
         private _mP1;
         private _mP2;

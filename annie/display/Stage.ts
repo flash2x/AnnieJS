@@ -432,6 +432,10 @@ namespace annie {
             touchend: "onMouseUp",
             touchcancel: "onMouseUp"
         };
+        //stageMousePoint
+        private sp: Point=new annie.Point();
+        //localPoint;
+        private lp: Point=new annie.Point();
         private muliPoints: Array<any> = [];
         //当document有鼠标或触摸事件时调用
         private _mP1: Point = new Point();
@@ -517,10 +521,6 @@ namespace annie {
                     let item = s._mouseEventTypes[e.type];
                     let events: any = [];
                     let event: any;
-                    //stageMousePoint
-                    let sp: Point;
-                    //localPoint;
-                    let lp: Point;
                     //clientPoint
                     let cp: Point;
                     //事件个数
@@ -554,23 +554,23 @@ namespace annie {
                         }
                         cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
                         cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
-                        sp = s.globalToLocal(cp, DisplayObject._bp);
+                        s.globalToLocal(cp,s.sp);
                         if (sd && sd.stage && sd.parent) {
                             let x1 = sd.x, y1 = sd.y;
-                            lp = sd.parent.globalToLocal(cp, DisplayObject._bp);
+                            sd.parent.globalToLocal(cp, s.lp);
                             if (!Stage._isDragCenter) {
                                 if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
-                                    x1 += lp.x - Stage._lastDragPoint.x;
-                                    y1 += lp.y - Stage._lastDragPoint.y;
+                                    x1 += s.lp.x - Stage._lastDragPoint.x;
+                                    y1 += s.lp.y - Stage._lastDragPoint.y;
                                 }
-                                Stage._lastDragPoint.x = lp.x;
-                                Stage._lastDragPoint.y = lp.y;
+                                Stage._lastDragPoint.x = s.lp.x;
+                                Stage._lastDragPoint.y = s.lp.y;
                             } else {
-                                x1 = lp.x;
-                                y1 = lp.y;
+                                x1 = s.lp.x;
+                                y1 = s.lp.y;
                             }
-                            lp.x = x1;
-                            lp.y = y1;
+                            s.lp.x = x1;
+                            s.lp.y = y1;
                             if (Stage._dragBounds.width != Number.MIN_VALUE) {
                                 if (x1 < Stage._dragBounds.x) {
                                     x1 = Stage._dragBounds.x;
@@ -594,7 +594,7 @@ namespace annie {
                             s._ml[eLen] = event;
                         }
                         events[events.length] = event;
-                        s._initMouseEvent(event, cp, sp, identifier, e.timeStamp);
+                        s._initMouseEvent(event, cp, s.sp, identifier, e.timeStamp);
                         eLen++;
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -613,7 +613,7 @@ namespace annie {
                                             s._ml[eLen] = event;
                                         }
                                         events[events.length] = event;
-                                        s._initMouseEvent(event, cp, sp, identifier);
+                                        s._initMouseEvent(event, cp, s.sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -644,9 +644,9 @@ namespace annie {
                                     if (!events[j]._pd && d.hasEventListener(events[j].type)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[0];
-                                        lp = d.globalToLocal(cp, DisplayObject._bp);
-                                        events[j].localX = lp.x;
-                                        events[j].localY = lp.y;
+                                        d.globalToLocal(cp, s.lp);
+                                        events[j].localX = s.lp.x;
+                                        events[j].localY = s.lp.y;
                                         d.dispatchEvent(events[j]);
                                     }
                                 }
@@ -659,9 +659,9 @@ namespace annie {
                                     if (!events[j]._pd && d.hasEventListener(events[j].type, false)) {
                                         events[j].currentTarget = d;
                                         events[j].target = displayList[eLen - 1];
-                                        lp = d.globalToLocal(cp, DisplayObject._bp);
-                                        events[j].localX = lp.x;
-                                        events[j].localY = lp.y;
+                                        d.globalToLocal(cp, s.lp);
+                                        events[j].localX = s.lp.x;
+                                        events[j].localY = s.lp.y;
                                         d.dispatchEvent(events[j], null, false);
                                     }
                                 }
@@ -689,7 +689,7 @@ namespace annie {
                                                         overEvent = new MouseEvent("onMouseOver");
                                                         s._ml[eLen] = overEvent;
                                                     }
-                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(overEvent, cp, s.sp, identifier);
                                                     eLen++;
                                                     if (s._ml[eLen] instanceof annie.MouseEvent) {
                                                         outEvent = s._ml[eLen];
@@ -698,7 +698,7 @@ namespace annie {
                                                         outEvent = new MouseEvent("onMouseOut");
                                                         s._ml[eLen] = outEvent;
                                                     }
-                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(outEvent, cp, s.sp, identifier);
                                                 }
                                             }
                                             if (isDiff) {
@@ -708,9 +708,9 @@ namespace annie {
                                                     if (!outEvent._pd && d.hasEventListener("onMouseOut")) {
                                                         outEvent.currentTarget = d;
                                                         outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                        lp = d.globalToLocal(cp, DisplayObject._bp);
-                                                        outEvent.localX = lp.x;
-                                                        outEvent.localY = lp.y;
+                                                        d.globalToLocal(cp,s.lp);
+                                                        outEvent.localX = s.lp.x;
+                                                        outEvent.localY = s.lp.y;
                                                         d.dispatchEvent(outEvent);
                                                     }
                                                 }
@@ -720,9 +720,9 @@ namespace annie {
                                                     if (!overEvent._pd && d.hasEventListener("onMouseOver")) {
                                                         overEvent.currentTarget = d;
                                                         overEvent.target = displayList[len2 - 1];
-                                                        lp = d.globalToLocal(cp, DisplayObject._bp);
-                                                        overEvent.localX = lp.x;
-                                                        overEvent.localY = lp.y;
+                                                        d.globalToLocal(cp, s.lp);
+                                                        overEvent.localX = s.lp.x;
+                                                        overEvent.localY = s.lp.y;
                                                         d.dispatchEvent(overEvent);
                                                     }
                                                 }

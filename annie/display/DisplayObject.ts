@@ -402,7 +402,7 @@ namespace annie {
         public set visible(value: boolean) {
             let s = this;
             if (value != s._visible) {
-                s.a2x_um=true;
+                s._cp=true;
                 s._visible = value;
             }
         }
@@ -508,9 +508,7 @@ namespace annie {
         public localToGlobal(point: Point, bp: Point = null): Point {
             return this.cMatrix.transformPoint(point.x, point.y, bp);
         }
-
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-        public static _bp: Point = new Point();
         public static _p1: Point = new Point();
         public static _p2: Point = new Point();
         public static _p3: Point = new Point();
@@ -530,15 +528,13 @@ namespace annie {
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
-            let p: Point;
+            let p: Point= hitPoint;
             if (isGlobalPoint) {
-                p = s.globalToLocal(hitPoint, DisplayObject._bp);
-            } else {
-                p = hitPoint;
+                p = s.globalToLocal(hitPoint, DisplayObject._p1);
             }
-            p.x += s._offsetX;
-            p.y += s._offsetY;
-            if (s._bounds.isPointIn(p)){
+            DisplayObject._p1.x=p.x+s._offsetX;
+            DisplayObject._p1.y=p.y+s._offsetY;
+            if (s._bounds.isPointIn(DisplayObject._p1)){
                 return s;
             }
             return null;
@@ -812,13 +808,21 @@ namespace annie {
                         rect: bounds
                     });
                 } else {
-                    let rw = Math.ceil(s._bounds.width / s.boundsRow);
-                    let rh = Math.ceil(s._bounds.height / s.boundsCol);
                     for (let i = 0; i < s.boundsRow; i++) {
                         for (let j = 0; j < s.boundsCol; j++) {
+                            let newX=i*1000;
+                            let newY=j*1000;
+                            let newW=bounds.width-newX;
+                            let newH=bounds.height-newY;
+                            if(newW>1000){
+                                newW=1000;
+                            }
+                            if(newH>1000){
+                                newH=1000;
+                            }
                             sbl.push({
                                 isDraw: true,
-                                rect: new Rectangle(i * rw, j * rh, rw, rh)
+                                rect: new Rectangle(newX, newY, newW,newH)
                             });
                         }
                     }
@@ -1008,7 +1012,7 @@ namespace annie {
          * @public
          * @since 3.1.0
          */
-        public clearCustomTransform() {
+        public clearCustomTransform(){
             let s = this;
             for (let i = 0; i < 6; i++) {
                 s._changeTransformInfo[i] = false;

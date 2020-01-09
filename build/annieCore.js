@@ -2074,7 +2074,7 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (value != s._visible) {
-                    s.a2x_um = true;
+                    s._cp = true;
                     s._visible = value;
                 }
             },
@@ -2185,16 +2185,13 @@ var annie;
             var s = this;
             if (!s.visible || !s.mouseEnable)
                 return null;
-            var p;
+            var p = hitPoint;
             if (isGlobalPoint) {
-                p = s.globalToLocal(hitPoint, DisplayObject._bp);
+                p = s.globalToLocal(hitPoint, DisplayObject._p1);
             }
-            else {
-                p = hitPoint;
-            }
-            p.x += s._offsetX;
-            p.y += s._offsetY;
-            if (s._bounds.isPointIn(p)) {
+            DisplayObject._p1.x = p.x + s._offsetX;
+            DisplayObject._p1.y = p.y + s._offsetY;
+            if (s._bounds.isPointIn(DisplayObject._p1)) {
                 return s;
             }
             return null;
@@ -2450,13 +2447,21 @@ var annie;
                     });
                 }
                 else {
-                    var rw = Math.ceil(s._bounds.width / s.boundsRow);
-                    var rh = Math.ceil(s._bounds.height / s.boundsCol);
                     for (var i = 0; i < s.boundsRow; i++) {
                         for (var j = 0; j < s.boundsCol; j++) {
+                            var newX = i * 1000;
+                            var newY = j * 1000;
+                            var newW = bounds.width - newX;
+                            var newH = bounds.height - newY;
+                            if (newW > 1000) {
+                                newW = 1000;
+                            }
+                            if (newH > 1000) {
+                                newH = 1000;
+                            }
                             sbl.push({
                                 isDraw: true,
-                                rect: new annie.Rectangle(i * rw, j * rh, rw, rh)
+                                rect: new annie.Rectangle(newX, newY, newW, newH)
                             });
                         }
                     }
@@ -2631,7 +2636,6 @@ var annie;
             }
         };
         //为了 hitTestPoint，localToGlobal，globalToLocal等方法不复新不重复生成新的点对象而节约内存
-        DisplayObject._bp = new annie.Point();
         DisplayObject._p1 = new annie.Point();
         DisplayObject._p2 = new annie.Point();
         DisplayObject._p3 = new annie.Point();
@@ -2717,10 +2721,10 @@ var annie;
             }
             else {
                 if (bw > 0) {
-                    s.boundsRow = Math.ceil(bw / 800);
+                    s.boundsRow = Math.ceil(bw / 1000);
                 }
                 if (bh > 0) {
-                    s.boundsCol = Math.ceil(bh / 800);
+                    s.boundsCol = Math.ceil(bh / 1000);
                 }
             }
             s._updateSplitBounds();
@@ -2803,10 +2807,10 @@ var annie;
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 if (bw > 0) {
-                    s.boundsRow = Math.ceil(bw / 800);
+                    s.boundsRow = Math.ceil(bw / 1000);
                 }
                 if (bh > 0) {
-                    s.boundsCol = Math.ceil(bh / 800);
+                    s.boundsCol = Math.ceil(bh / 1000);
                 }
                 s._updateSplitBounds();
                 s._checkDrawBounds();
@@ -2871,7 +2875,7 @@ var annie;
                 }
                 var p = void 0;
                 if (isGlobalPoint) {
-                    p = s.globalToLocal(hitPoint);
+                    p = s.globalToLocal(hitPoint, annie.DisplayObject._p1);
                 }
                 else {
                     p = hitPoint;
@@ -3703,16 +3707,16 @@ var annie;
         Shape.prototype.hitTestPoint = function (hitPoint, isGlobalPoint) {
             if (isGlobalPoint === void 0) { isGlobalPoint = false; }
             var s = this;
-            var p;
-            if (isGlobalPoint) {
-                p = s.globalToLocal(hitPoint);
-            }
-            else {
-                p = hitPoint;
-            }
             var texture = s._texture;
             if (texture.width == 0) {
                 return null;
+            }
+            var p = hitPoint;
+            if (isGlobalPoint) {
+                p = s.globalToLocal(hitPoint, annie.DisplayObject._p1);
+            }
+            else {
+                p = hitPoint;
             }
             var _canvas = annie.DisplayObject._canvas, ctx = _canvas.getContext('2d');
             _canvas.width = 1;
@@ -4101,17 +4105,20 @@ var annie;
             if (!s.visible || !s.mouseEnable)
                 return null;
             //如果有设置鼠标活动区域，则优先使用活动区域
+            var p = hitPoint;
             if (s._hitArea) {
-                var p = hitPoint;
                 if (isGlobalPoint) {
-                    p = s.globalToLocal(hitPoint, annie.DisplayObject._bp);
+                    p = s.globalToLocal(hitPoint, annie.DisplayObject._p1);
                 }
-                p.x += s._offsetX;
-                p.y += s._offsetY;
-                if (s._hitArea.isPointIn(p)) {
+                annie.DisplayObject._p1.x = p.x + s._offsetX;
+                annie.DisplayObject._p1.y = p.y + s._offsetY;
+                if (s._hitArea.isPointIn(annie.DisplayObject._p1)) {
                     return s;
                 }
                 return null;
+            }
+            if (!isGlobalPoint) {
+                p = s.localToGlobal(hitPoint, new annie.Point());
             }
             var len = s.children.length;
             var hitDisplayObject;
@@ -4125,7 +4132,7 @@ var annie;
                 if (child.mask != void 0) {
                     if (maskObjList[child.mask._instanceId] == void 0) {
                         //看看点是否在遮罩内
-                        if (child.mask.hitTestPoint(hitPoint, isGlobalPoint)) {
+                        if (child.mask.hitTestPoint(p, true)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
                             maskObjList[child.mask._instanceId] = true;
                         }
@@ -4137,7 +4144,7 @@ var annie;
                         continue;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint);
+                hitDisplayObject = child.hitTestPoint(p, true);
                 if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
@@ -4975,6 +4982,7 @@ var annie;
                 s._wantFrame = s._a2x_res_class.tf;
             }
             s._isPlaying = false;
+            s._onCheckUpdateFrame();
         };
         /**
          * 将播放头向前移一帧并停在下一帧,如果本身在第一帧则不做任何反应
@@ -4990,9 +4998,7 @@ var annie;
                 s._wantFrame = 1;
             }
             s._isPlaying = false;
-            if (s._isOnStage && s._a2x_is_updateFrame) {
-                s._updateFrame();
-            }
+            s._onCheckUpdateFrame();
         };
         /**
          * 将播放头跳转到指定帧并停在那一帧,如果本身在第一帧则不做任何反应
@@ -5024,6 +5030,7 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
+            s._onCheckUpdateFrame();
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -5072,10 +5079,20 @@ var annie;
                 }
             }
             s._wantFrame = frameIndex;
+            s._onCheckUpdateFrame();
+        };
+        MovieClip.prototype._onCheckUpdateFrame = function () {
+            var s = this;
+            if (s._wantFrame != s._curFrame) {
+                s._a2x_is_updateFrame = false;
+                if (s._isOnStage) {
+                    s._updateFrame();
+                }
+            }
         };
         MovieClip.prototype._onAddEvent = function () {
             _super.prototype._onAddEvent.call(this);
-            this._updateFrame();
+            this._onCheckUpdateFrame();
         };
         MovieClip.prototype._updateFrame = function () {
             var s = this;
@@ -6655,6 +6672,10 @@ var annie;
                 touchend: "onMouseUp",
                 touchcancel: "onMouseUp"
             };
+            //stageMousePoint
+            _this.sp = new annie.Point();
+            //localPoint;
+            _this.lp = new annie.Point();
             _this.muliPoints = [];
             //当document有鼠标或触摸事件时调用
             _this._mP1 = new annie.Point();
@@ -6989,10 +7010,6 @@ var annie;
                     var item = s._mouseEventTypes[e.type];
                     var events = [];
                     var event_1;
-                    //stageMousePoint
-                    var sp = void 0;
-                    //localPoint;
-                    var lp = void 0;
                     //clientPoint
                     var cp = void 0;
                     //事件个数
@@ -7030,24 +7047,24 @@ var annie;
                         }
                         cp.x = (points[o].clientX - offSetX) * annie.devicePixelRatio;
                         cp.y = (points[o].clientY - offSetY) * annie.devicePixelRatio;
-                        sp = s.globalToLocal(cp, annie.DisplayObject._bp);
+                        s.globalToLocal(cp, s.sp);
                         if (sd && sd.stage && sd.parent) {
                             var x1 = sd.x, y1 = sd.y;
-                            lp = sd.parent.globalToLocal(cp, annie.DisplayObject._bp);
+                            sd.parent.globalToLocal(cp, s.lp);
                             if (!Stage._isDragCenter) {
                                 if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
-                                    x1 += lp.x - Stage._lastDragPoint.x;
-                                    y1 += lp.y - Stage._lastDragPoint.y;
+                                    x1 += s.lp.x - Stage._lastDragPoint.x;
+                                    y1 += s.lp.y - Stage._lastDragPoint.y;
                                 }
-                                Stage._lastDragPoint.x = lp.x;
-                                Stage._lastDragPoint.y = lp.y;
+                                Stage._lastDragPoint.x = s.lp.x;
+                                Stage._lastDragPoint.y = s.lp.y;
                             }
                             else {
-                                x1 = lp.x;
-                                y1 = lp.y;
+                                x1 = s.lp.x;
+                                y1 = s.lp.y;
                             }
-                            lp.x = x1;
-                            lp.y = y1;
+                            s.lp.x = x1;
+                            s.lp.y = y1;
                             if (Stage._dragBounds.width != Number.MIN_VALUE) {
                                 if (x1 < Stage._dragBounds.x) {
                                     x1 = Stage._dragBounds.x;
@@ -7074,7 +7091,7 @@ var annie;
                             s._ml[eLen] = event_1;
                         }
                         events[events.length] = event_1;
-                        s._initMouseEvent(event_1, cp, sp, identifier, e.timeStamp);
+                        s._initMouseEvent(event_1, cp, s.sp, identifier, e.timeStamp);
                         eLen++;
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -7095,7 +7112,7 @@ var annie;
                                             s._ml[eLen] = event_1;
                                         }
                                         events[events.length] = event_1;
-                                        s._initMouseEvent(event_1, cp, sp, identifier);
+                                        s._initMouseEvent(event_1, cp, s.sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -7127,9 +7144,9 @@ var annie;
                                     if (!events[j]._pd && d_2.hasEventListener(events[j].type)) {
                                         events[j].currentTarget = d_2;
                                         events[j].target = displayList[0];
-                                        lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                        events[j].localX = lp.x;
-                                        events[j].localY = lp.y;
+                                        d_2.globalToLocal(cp, s.lp);
+                                        events[j].localX = s.lp.x;
+                                        events[j].localY = s.lp.y;
                                         d_2.dispatchEvent(events[j]);
                                     }
                                 }
@@ -7142,9 +7159,9 @@ var annie;
                                     if (!events[j]._pd && d_2.hasEventListener(events[j].type, false)) {
                                         events[j].currentTarget = d_2;
                                         events[j].target = displayList[eLen - 1];
-                                        lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                        events[j].localX = lp.x;
-                                        events[j].localY = lp.y;
+                                        d_2.globalToLocal(cp, s.lp);
+                                        events[j].localX = s.lp.x;
+                                        events[j].localY = s.lp.y;
                                         d_2.dispatchEvent(events[j], null, false);
                                     }
                                 }
@@ -7173,7 +7190,7 @@ var annie;
                                                         overEvent = new annie.MouseEvent("onMouseOver");
                                                         s._ml[eLen] = overEvent;
                                                     }
-                                                    s._initMouseEvent(overEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(overEvent, cp, s.sp, identifier);
                                                     eLen++;
                                                     if (s._ml[eLen] instanceof annie.MouseEvent) {
                                                         outEvent = s._ml[eLen];
@@ -7183,7 +7200,7 @@ var annie;
                                                         outEvent = new annie.MouseEvent("onMouseOut");
                                                         s._ml[eLen] = outEvent;
                                                     }
-                                                    s._initMouseEvent(outEvent, cp, sp, identifier);
+                                                    s._initMouseEvent(outEvent, cp, s.sp, identifier);
                                                 }
                                             }
                                             if (isDiff) {
@@ -7193,9 +7210,9 @@ var annie;
                                                     if (!outEvent._pd && d_2.hasEventListener("onMouseOut")) {
                                                         outEvent.currentTarget = d_2;
                                                         outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                        lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                                        outEvent.localX = lp.x;
-                                                        outEvent.localY = lp.y;
+                                                        d_2.globalToLocal(cp, s.lp);
+                                                        outEvent.localX = s.lp.x;
+                                                        outEvent.localY = s.lp.y;
                                                         d_2.dispatchEvent(outEvent);
                                                     }
                                                 }
@@ -7205,9 +7222,9 @@ var annie;
                                                     if (!overEvent._pd && d_2.hasEventListener("onMouseOver")) {
                                                         overEvent.currentTarget = d_2;
                                                         overEvent.target = displayList[len2 - 1];
-                                                        lp = d_2.globalToLocal(cp, annie.DisplayObject._bp);
-                                                        overEvent.localX = lp.x;
-                                                        overEvent.localY = lp.y;
+                                                        d_2.globalToLocal(cp, s.lp);
+                                                        overEvent.localX = s.lp.x;
+                                                        overEvent.localY = s.lp.y;
                                                         d_2.dispatchEvent(overEvent);
                                                     }
                                                 }
@@ -9246,8 +9263,10 @@ var annie;
                     target._lastY = target._y + target._offsetY;
                     target.a2x_um = true;
                 }
-                target._alpha = info.al;
-                target.a2x_ua = true;
+                if (target._alpha != info.al) {
+                    target._alpha = info.al;
+                    target.a2x_ua = true;
+                }
             }
             if (info.w != undefined) {
                 target.textWidth = info.w;
@@ -10737,7 +10756,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.1.5";
+    annie.version = "3.1.6";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

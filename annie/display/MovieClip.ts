@@ -262,6 +262,7 @@ namespace annie {
                 s._wantFrame = s._a2x_res_class.tf;
             }
             s._isPlaying = false;
+            s._onCheckUpdateFrame();
         }
 
         /**
@@ -278,9 +279,7 @@ namespace annie {
                 s._wantFrame = 1;
             }
             s._isPlaying = false;
-            if (s._isOnStage && s._a2x_is_updateFrame) {
-                s._updateFrame();
-            }
+            s._onCheckUpdateFrame();
         }
 
         /**
@@ -310,6 +309,7 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
+            s._onCheckUpdateFrame();
         }
 
         /**
@@ -355,6 +355,18 @@ namespace annie {
                 }
             }
             s._wantFrame = <number>frameIndex;
+            s._onCheckUpdateFrame();
+
+        }
+
+        private _onCheckUpdateFrame(): void {
+            let s = this;
+            if (s._wantFrame != s._curFrame) {
+                s._a2x_is_updateFrame = false;
+                if(s._isOnStage) {
+                    s._updateFrame();
+                }
+            }
         }
 
         //flash声音管理
@@ -362,7 +374,7 @@ namespace annie {
 
         public _onAddEvent(): void {
             super._onAddEvent();
-            this._updateFrame();
+            this._onCheckUpdateFrame();
         }
 
         private _a2x_is_updateFrame: boolean = false;
@@ -562,7 +574,7 @@ namespace annie {
             for (let i = childCount - 1; i >= 0; i--) {
                 objId = allChildren[i][0];
                 obj = allChildren[i][1];
-                if (nextFrameObj&&nextFrameObj.c&&curFrameObj&&curFrameObj.c){
+                if (nextFrameObj && nextFrameObj.c && curFrameObj && curFrameObj.c) {
                     nextObjInfo = nextFrameObj.c[objId];
                     curObjInfo = curFrameObj.c[objId];
                     //更新对象信息
@@ -602,6 +614,7 @@ namespace annie {
             }
             s._floatFrame = 0;
         }
+
         private static _resetMC(obj: any) {
             //判断obj是否是动画,是的话则还原成动画初始时的状态
             obj._wantFrame = 1;

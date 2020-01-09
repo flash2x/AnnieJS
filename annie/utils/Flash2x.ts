@@ -548,8 +548,10 @@ namespace annie {
                     target._lastY=target._y+target._offsetY;
                     target.a2x_um=true;
                 }
-                target._alpha = info.al;
-                target.a2x_ua=true;
+                if(target._alpha!=info.al) {
+                    target._alpha = info.al;
+                    target.a2x_ua = true;
+                }
             }
             if (info.w != undefined) {
                 target.textWidth = info.w;

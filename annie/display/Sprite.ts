@@ -311,22 +311,24 @@ namespace annie {
                 s.removeChildAt(0);
             }
         }
-
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
             //如果有设置鼠标活动区域，则优先使用活动区域
+            let p: Point = hitPoint;
             if (s._hitArea) {
-                let p: Point = hitPoint;
-                if (isGlobalPoint) {
-                    p = s.globalToLocal(hitPoint, DisplayObject._bp);
+                if (isGlobalPoint){
+                    p = s.globalToLocal(hitPoint, DisplayObject._p1);
                 }
-                p.x += s._offsetX;
-                p.y += s._offsetY;
-                if (s._hitArea.isPointIn(p)) {
+                DisplayObject._p1.x=p.x+s._offsetX;
+                DisplayObject._p1.y=p.y+s._offsetY;
+                if (s._hitArea.isPointIn(DisplayObject._p1)) {
                     return s;
                 }
                 return null;
+            }
+            if(!isGlobalPoint){
+                p=s.localToGlobal(hitPoint,new Point());
             }
             let len = s.children.length;
             let hitDisplayObject: DisplayObject;
@@ -339,7 +341,7 @@ namespace annie {
                 if (child.mask != void 0) {
                     if (maskObjList[child.mask._instanceId] == void 0) {
                         //看看点是否在遮罩内
-                        if (child.mask.hitTestPoint(hitPoint, isGlobalPoint)) {
+                        if (child.mask.hitTestPoint(p, true)) {
                             //如果都不在遮罩里面,那还检测什么直接检测下一个
                             maskObjList[child.mask._instanceId] = true;
                         } else {
@@ -350,7 +352,7 @@ namespace annie {
                         continue;
                     }
                 }
-                hitDisplayObject = child.hitTestPoint(hitPoint, isGlobalPoint);
+                hitDisplayObject = child.hitTestPoint(p, true);
                 if (hitDisplayObject) {
                     return hitDisplayObject;
                 }
