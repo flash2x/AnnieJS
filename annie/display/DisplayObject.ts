@@ -477,6 +477,9 @@ namespace annie {
 
         public set filters(value: any[]) {
             this._filters = value;
+            if(value){
+                console.log("使用滤镜非常耗性能...性能...能...")
+            }
             this.a2x_uf = true;
         }
 

@@ -626,8 +626,8 @@ var annieUI;
             },
             set: function (value) {
                 var s = this;
-                if (value != s._isVertical) {
-                    if (value) {
+                if (s._isVertical != value) {
+                    if (!value) {
                         s._curX = s._curY;
                         s._scrollWidth = s._scrollHeight;
                         s._scrollHeight = 0;

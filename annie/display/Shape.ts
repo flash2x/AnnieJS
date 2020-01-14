@@ -799,19 +799,14 @@ namespace annie {
             if (texture.width == 0) {
                 return null;
             }
-            let p: any=hitPoint;
+            let p: any;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint,DisplayObject._p1);
             } else {
                 p = hitPoint;
             }
-            let _canvas = DisplayObject._canvas,ctx = _canvas.getContext('2d');
-            _canvas.width = 1;
-            _canvas.height = 1;
-            ctx.clearRect(0, 0, 1, 1);
-            ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-            ctx.drawImage(texture, 0, 0);
-            if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+            let ctx = texture.getContext('2d');
+            if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
                 return s;
             } else {
                 return null;

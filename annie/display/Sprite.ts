@@ -314,8 +314,8 @@ namespace annie {
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
+            let p: Point=hitPoint;
             //如果有设置鼠标活动区域，则优先使用活动区域
-            let p: Point = hitPoint;
             if (s._hitArea) {
                 if (isGlobalPoint){
                     p = s.globalToLocal(hitPoint, DisplayObject._p1);

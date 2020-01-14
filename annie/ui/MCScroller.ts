@@ -10,7 +10,7 @@ namespace annieUI {
      * @since 3.1.5
      */
     export class MCScroller extends annieUI.Scroller {
-        private _mc:annie.MovieClip=null;
+        private _mc: annie.MovieClip = null;
 
         /**
          * 滑动的速率，值越大，滑动越慢,默认是10
@@ -19,26 +19,28 @@ namespace annieUI {
          * @since 3.1.5
          * @public
          */
-        public set rate(value:number){
-            let s=this;
-            if(value!=s._rate){
-                s._rate=value;
-                let curFrame=s.curFramePos-1;
-                let sw:number=0,sh:number=0;
-                if(s._isVertical){
-                    s._curX=-curFrame*value;
-                    sh=s._mc.totalFrames*value;
-                }else{
-                    s._curY=-curFrame*value;
-                    sw=s._mc.totalFrames*value;
+        public set rate(value: number) {
+            let s = this;
+            if (value != s._rate) {
+                s._rate = value;
+                let curFrame = s.curFramePos - 1;
+                let sw: number = 0, sh: number = 0;
+                if (s._isVertical) {
+                    s._curX = -curFrame * value;
+                    sh = s._mc.totalFrames * value;
+                } else {
+                    s._curY = -curFrame * value;
+                    sw = s._mc.totalFrames * value;
                 }
-                s.setScrollWH(sw,sh);
+                s.setScrollWH(sw, sh);
             }
         };
-        public get rate():number{
+
+        public get rate(): number {
             return this._rate;
         }
-        private _rate:number=0;
+
+        private _rate: number = 0;
 
         /**
          * 鼠标滑动的方向，默认纵向
@@ -47,42 +49,46 @@ namespace annieUI {
          * @public
          * @return {boolean}
          */
-        public get isVertical():boolean{
+        public get isVertical(): boolean {
             return this._isVertical;
         }
-        public set isVertical(value:boolean){
-            let s=this;
-            if(value!=s._isVertical){
-                if(value){
-                    s._curX=s._curY;
-                    s._scrollWidth=s._scrollHeight;
-                    s._scrollHeight=0;
-                }else{
-                    s._curY=s._curX;
-                    s._scrollHeight=s._scrollWidth;
-                    s._scrollWidth=0;
+
+        public set isVertical(value: boolean) {
+            let s = this;
+            if(s._isVertical!=value) {
+                if (!value) {
+                    s._curX = s._curY;
+                    s._scrollWidth = s._scrollHeight;
+                    s._scrollHeight = 0;
+                } else {
+                    s._curY = s._curX;
+                    s._scrollHeight = s._scrollWidth;
+                    s._scrollWidth = 0;
                 }
-                s._isVertical=value;
+                s._isVertical = value;
                 s._updateViewAndScroll();
             }
         }
+
         /**
          * 只读，获取当前mc的frame具体值，带小数
          * @property curFramePos
          * @readonly
          * @return {number}
          */
-        public get curFramePos():number{
-            let s=this;
-            let frame:number=0;
-            if(s._isVertical){
-                frame=s._curY/s._rate;
-            }else{
-                frame=s._curX/s._rate;
+        public get curFramePos(): number {
+            let s = this;
+            let frame: number = 0;
+            if (s._isVertical) {
+                frame = s._curY / s._rate;
+            } else {
+                frame = s._curX / s._rate;
             }
-            return Math.abs(frame)+1;
+            return Math.abs(frame) + 1;
         }
-        private _isVertical:boolean=true;
+
+        private _isVertical: boolean = true;
+
         /**
          * 构造函数
          * @method MCScroller
@@ -90,15 +96,15 @@ namespace annieUI {
          * @param {number} rate mc 灵敏度，值越大滑动越慢，默认为10
          * @param {boolean} isVertical 是横向还是竖向滑动，默认是竖向
          */
-        constructor(mc:annie.MovieClip,rate:number=10,isVertical: boolean = true){
-            super(mc,0,0,0,0);
-            let s=this;
+        constructor(mc: annie.MovieClip, rate: number = 10, isVertical: boolean = true) {
+            super(mc, 0, 0, 0, 0);
+            let s = this;
             s._instanceType = "annieUI.MCScroller";
-            s._mc=mc;
-            s.isBounce=false;
-            s.rate=rate;
-            s.isVertical=isVertical;
-            s.addEventListener(annie.Event.ON_SCROLL_ING,function (e:annie.Event){
+            s._mc = mc;
+            s.isBounce = false;
+            s.rate = rate;
+            s.isVertical = isVertical;
+            s.addEventListener(annie.Event.ON_SCROLL_ING, function (e: annie.Event) {
                 mc.gotoAndStop(s.curFramePos);
             })
         }
