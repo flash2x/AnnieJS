@@ -2141,6 +2141,9 @@ var annie;
             },
             set: function (value) {
                 this._filters = value;
+                if (value) {
+                    console.log("使用滤镜非常耗性能...性能...能...");
+                }
                 this.a2x_uf = true;
             },
             enumerable: true,
@@ -3711,20 +3714,15 @@ var annie;
             if (texture.width == 0) {
                 return null;
             }
-            var p = hitPoint;
+            var p;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, annie.DisplayObject._p1);
             }
             else {
                 p = hitPoint;
             }
-            var _canvas = annie.DisplayObject._canvas, ctx = _canvas.getContext('2d');
-            _canvas.width = 1;
-            _canvas.height = 1;
-            ctx.clearRect(0, 0, 1, 1);
-            ctx.setTransform(1, 0, 0, 1, -p.x, -p.y);
-            ctx.drawImage(texture, 0, 0);
-            if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+            var ctx = texture.getContext('2d');
+            if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
                 return s;
             }
             else {
@@ -4104,8 +4102,8 @@ var annie;
             var s = this;
             if (!s.visible || !s.mouseEnable)
                 return null;
-            //如果有设置鼠标活动区域，则优先使用活动区域
             var p = hitPoint;
+            //如果有设置鼠标活动区域，则优先使用活动区域
             if (s._hitArea) {
                 if (isGlobalPoint) {
                     p = s.globalToLocal(hitPoint, annie.DisplayObject._p1);
