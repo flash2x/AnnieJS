@@ -158,7 +158,6 @@ namespace annie {
      *           annie.sendToURL("http://www.annie2x.com?key1=value&key2=value");
      *      })
      */
-    //TODO 增加post请求
     export function sendToURL(url: string): void {
         let req = new XMLHttpRequest();
         req.open("get", url, true);

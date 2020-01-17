@@ -596,7 +596,7 @@ namespace annie {
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default :
-                            //TODO 其他还示实现
+                            //其他还先未实现
                         }
                     }
                     if (filters.length > 0) {

@@ -385,11 +385,6 @@ namespace annie {
             let s = this;
             if (s._visible) {
                 super._updateMatrix(isOffCanvas);
-                if(s._isCache&&!isOffCanvas){
-                    s.a2x_ua = false;
-                    s.a2x_um = false;
-                    return;
-                }
                 let children: any = s.children;
                 let len: number = children.length;
                 for (let i = 0; i < len; i++) {

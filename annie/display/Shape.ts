@@ -574,16 +574,6 @@ namespace annie {
             }
             s.a2x_ut = true;
         };
-
-        /**
-         * 解析SVG
-         * @method decodeSVG
-         * @param {String} data
-         * @since 3.2.0
-         */
-        public decodeSVG(data: string){
-            //TODO 解析SVG
-        }
         //是否矢量元素有更新
         private a2x_ut: boolean = true;
         protected _updateMatrix(isOffCanvas: boolean = false): void {

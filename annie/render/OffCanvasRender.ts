@@ -54,9 +54,6 @@ namespace annie {
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (color == "") {
                 ctx.clearRect(0, 0, c.width, c.height);
-            } else {
-                ctx.fillStyle = color;
-                ctx.fillRect(0, 0, c.width, c.height);
             }
         }
 

@@ -1519,7 +1519,7 @@ declare namespace annie {
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
+         * @param {Image|Video|Canvas} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
          * @param {annie.Rectangle} rect 设置显示Image的区域,不设置值则全部显示Image的内容，小程序或者小游戏里没有这个参数
          * @example
          *      //html5
@@ -1926,13 +1926,6 @@ declare namespace annie {
          * @return {void}
          */
         decodePath(data: Array<number>): void;
-        /**
-         * 解析SVG
-         * @method decodeSVG
-         * @param {String} data
-         * @since 3.2.0
-         */
-        decodeSVG(data: string): void;
         private a2x_ut;
         protected _updateMatrix(isOffCanvas?: boolean): void;
         private _draw;

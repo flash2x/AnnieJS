@@ -2735,7 +2735,7 @@ var annie;
          * @method Bitmap
          * @since 1.0.0
          * @public
-         * @param {Image|Video|other} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
+         * @param {Image|Video|Canvas} bitmapData 一个HTMl Image的实例,小程序或者小游戏里则只能是一个图片的地址
          * @param {annie.Rectangle} rect 设置显示Image的区域,不设置值则全部显示Image的内容，小程序或者小游戏里没有这个参数
          * @example
          *      //html5
@@ -3479,15 +3479,6 @@ var annie;
             s.a2x_ut = true;
         };
         ;
-        /**
-         * 解析SVG
-         * @method decodeSVG
-         * @param {String} data
-         * @since 3.2.0
-         */
-        Shape.prototype.decodeSVG = function (data) {
-            //TODO 解析SVG
-        };
         Shape.prototype._updateMatrix = function (isOffCanvas) {
             if (isOffCanvas === void 0) { isOffCanvas = false; }
             var s = this;
@@ -4137,11 +4128,6 @@ var annie;
             var s = this;
             if (s._visible) {
                 _super.prototype._updateMatrix.call(this, isOffCanvas);
-                if (s._isCache && !isOffCanvas) {
-                    s.a2x_ua = false;
-                    s.a2x_um = false;
-                    return;
-                }
                 var children = s.children;
                 var len = children.length;
                 for (var i = 0; i < len; i++) {
@@ -8374,10 +8360,6 @@ var annie;
             if (color == "") {
                 ctx.clearRect(0, 0, c.width, c.height);
             }
-            else {
-                ctx.fillStyle = color;
-                ctx.fillRect(0, 0, c.width, c.height);
-            }
         };
         /**
          * 开始有遮罩时调用
@@ -9407,7 +9389,7 @@ var annie;
                                 filters[filters.length] = new ColorFilter(info.fi[i][1]);
                                 break;
                             default:
-                            //TODO 其他还示实现
+                            //其他还先未实现
                         }
                     }
                     if (filters.length > 0) {
@@ -10973,7 +10955,6 @@ var annie;
      *           annie.sendToURL("http://www.annie2x.com?key1=value&key2=value");
      *      })
      */
-    //TODO 增加post请求
     function sendToURL(url) {
         var req = new XMLHttpRequest();
         req.open("get", url, true);
