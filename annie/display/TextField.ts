@@ -5,15 +5,15 @@ namespace annie {
     /**
      * 动态文本类,有时需要在canvas里有一个动态文本,能根据我们的显示内容来改变
      * @class annie.TextField
-     * @extends annie.DisplayObject
+     * @extends annie.Bitmap
      * @since 1.0.0
      * @public
      */
-    export class TextField extends DisplayObject {
+    export class TextField extends Bitmap {
         public constructor() {
-            super();
+            super(null);
             this._instanceType = "annie.TextField";
-            this._texture = window.document.createElement("canvas");
+            this.bitmapData = window.document.createElement("canvas");
         }
 
         /**
@@ -153,9 +153,18 @@ namespace annie {
          */
         public set text(value: string) {
             let s = this;
+            value+="";
             if (value != s._text) {
                 s._text = value;
-                s.a2x_ut = true;
+                if(s._text==""){
+                    s.a2x_ut = false;
+                    s._texture=null;
+                    s._bitmapData.width=0;
+                    s._bitmapData.height=0;
+                    s.clearBounds();
+                }else{
+                    s.a2x_ut = true;
+                }
             }
         }
 
@@ -361,23 +370,6 @@ namespace annie {
         }
 
         /**
-         * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
-         * @method getTextWidth
-         * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
-         * @since 2.0.0
-         * @public
-         * @return {number}
-         */
-        public getTextWidth(lineIndex: number = 0) {
-            let s = this;
-            s.updateMatrix();
-            let can = s._texture;
-            let ctx = can.getContext("2d");
-            let obj: any = ctx.measureText(s.realLines[lineIndex]);
-            return obj.width;
-        }
-
-        /**
          * 获取当前文本行数
          * @property lines
          * @type {number}
@@ -391,7 +383,7 @@ namespace annie {
 
         // 获取文本宽
         private _getMeasuredWidth(text: string): number {
-            let ctx = this._texture.getContext("2d");
+            let ctx = this._bitmapData.getContext("2d");
             //ctx.save();
             let w = ctx.measureText(text).width;
             //ctx.restore();
@@ -400,15 +392,12 @@ namespace annie {
 
         private realLines: any = [];
         public a2x_ut: boolean = true;
-
-        public updateMatrix(): void {
+        protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s: any = this;
-            let canvas = s._texture;
-            let ctx = canvas.getContext("2d");
-            let boundsW = s._bounds.width;
-            let boundsH = s._bounds.height;
             if (s.a2x_ut) {
-                s._text += "";
+                let texture = s._bitmapData;
+                let ctx = texture.getContext("2d");
+                s.a2x_ut = false;
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
                 let realLines: any = [];
                 s.realLines = realLines;
@@ -455,25 +444,25 @@ namespace annie {
                         realLines[realLines.length] = lineStr;
                     }
                 }
-                let maxH = lineH * realLines.length;
-                let maxW = s._textWidth;
+                let maxH = lineH * realLines.length+4 >> 0;
+                let maxW = s._textWidth >> 0;
                 let tx = 0;
                 if (s._textAlign == "center") {
                     tx = maxW * 0.5;
                 } else if (s._textAlign == "right") {
                     tx = maxW;
                 }
-                canvas.width = maxW + 20;
-                canvas.height = maxH + 20;
-                ctx.clearRect(0, 0, canvas.width, canvas.width);
+                texture.width = maxW;
+                texture.height = maxH;
+                ctx.clearRect(0, 0, texture.width, texture.width);
                 if (s.border) {
                     ctx.beginPath();
                     ctx.strokeStyle = "#000";
                     ctx.lineWidth = 1;
-                    ctx.strokeRect(10, 10, maxW - 2, maxH - 2);
+                    ctx.strokeRect(0, 0, maxW, maxH);
                     ctx.closePath();
                 }
-                ctx.setTransform(1, 0, 0, 1, tx + 10, 10);
+                ctx.setTransform(1, 0, 0, 1, tx + 2, 2);
                 s._prepContext(ctx);
                 for (let i = 0; i < realLines.length; i++) {
                     if (s._stroke > 0) {
@@ -484,35 +473,13 @@ namespace annie {
                         ctx.strokeText(realLines[i], 0, i * lineH, maxW);
                     }
                 }
-                s.offsetX = -10;
-                s.offsetY = -10;
-                boundsH = maxH + 10 >> 0;
-                boundsW = maxW + 10 >> 0;
-            }
-            super.updateMatrix();
-            if (s.a2x_uf) {
-                let cf: any = s.cFilters;
-                let cfLen = cf.length;
-                if (cfLen > 0) {
-                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    for (let i = 0; i < cfLen; i++) {
-                        cf[i].drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
+                if (s._filters.length > 0) {
+                    s.a2x_uf = true;
+                } else {
+                    s._texture = texture;
                 }
             }
-            if (boundsW != s._bounds.width || boundsH != s._bounds.height){
-                s._bounds.width = boundsW;
-                s._bounds.height = boundsH;
-                s._updateSplitBounds();
-                s._checkDrawBounds();
-            } else if (s.a2x_um) {
-                s._checkDrawBounds();
-            }
-            s.a2x_ut = false;
-            s.a2x_um = false;
-            s.a2x_ua = false;
-            s.a2x_uf = false;
+            super._updateMatrix(isOffCanvas);
         }
     }
 }

@@ -337,7 +337,7 @@ namespace annieUI {
             }
             s.stageMP.x = e.clientX;
             s.stageMP.y = e.clientY;
-            var p: Point = s.globalToLocal(s.stageMP);
+            let p: Point = s.globalToLocal(s.stageMP);
             s.stageMP=p;
             s.timerArg0 = s.checkArea(p);
             s.timerArg0 = s.timerArg0 < 0 ? -s.timerArg0 : s.timerArg0;
@@ -354,7 +354,7 @@ namespace annieUI {
             if (s.state == "start") {
                 s.stageMP.x = e.clientX;
                 s.stageMP.y = e.clientY;
-                var p: Point = s.globalToLocal(s.stageMP);
+                let p: Point = s.globalToLocal(s.stageMP);
                 s.timerArg1 = s.checkArea(p);
                 s.state = "auto";
                 s.stageMP=p;
@@ -366,7 +366,7 @@ namespace annieUI {
             if (s.state == "start") {
                 s.stageMP.x = e.clientX;
                 s.stageMP.y = e.clientY;
-                var p: Point = s.globalToLocal(s.stageMP);
+                let p: Point = s.globalToLocal(s.stageMP);
                 s.stageMP=p;
             }
         }
@@ -503,10 +503,10 @@ namespace annieUI {
             let u: number;
             if (s.state == "start") {
                 u = s.speed;
-                var p:Point =s.stageMP;
+                let p:Point =s.stageMP;
                 s.px += (p.x - s.px) * u >> 0;
                 s.py += (p.y - s.py) * u >> 0;
-                var np=new Point(s.px,s.py);
+                let np=new Point(s.px,s.py);
                 s.drawPage(s.timerArg0,np);
             } else if (s.state == "auto") {
                 if (Math.abs(toPos.x - s.px) > s.bW * 1.5 && s.timerArg1 > 0) {

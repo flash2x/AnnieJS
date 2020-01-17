@@ -67,7 +67,7 @@ namespace annie {
          * @return {void}
          */
         public updateAfterEvent():void{
-            this.target.updateMatrix();
+            this.target._updateMatrix();
         }
         public destroy():void {
             //清除相应的数据引用

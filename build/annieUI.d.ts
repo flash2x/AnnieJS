@@ -380,17 +380,16 @@ declare namespace annieUI {
          * 构造函数
          * @method  ScrollPage
          * @param {annie.DisplayObject} view 需要滚动的显示对象，可为空，为空的话则会自动生成一个显示容器。
-         * @param {number} vW 可视区域宽
-         * @param {number} vH 可视区域高
-         * @param {number} maxDistance 最大滚动的长度
-         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @param {number} viewWidth 可视区域宽
+         * @param {number} viewHeight 可视区域高
+         * @param {number} scrollWidth 可滚动的宽度
+         * @param {number} scrollHeight 可滚动的高度
          * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annieUI.ScrollPage(null,640,1040,640,1040*4);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
          *          s.sPage.mouseEnable=false;
-         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
          */
         constructor(container: annie.DisplayObject, viewWidth: number, viewHeight: number, scrollWidth: number, scrollHeight: number);
         /**

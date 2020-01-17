@@ -106,7 +106,7 @@ namespace annieUI {
             s._maxDistance = Math.ceil(s.data.length / s._cols) * s._itemRow;
             if (s.downL) {
                 s.downL[s._paramXY] = Math.max(s._distance, s._maxDistance);
-                var wh = s.downL.getWH();
+                let wh = s.downL.getWH();
                 s._maxDistance += (s._paramXY == "x" ? wh.width : wh.height);
             }
             s.resetMaxDistance();

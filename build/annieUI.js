@@ -689,17 +689,16 @@ var annieUI;
          * 构造函数
          * @method  ScrollPage
          * @param {annie.DisplayObject} view 需要滚动的显示对象，可为空，为空的话则会自动生成一个显示容器。
-         * @param {number} vW 可视区域宽
-         * @param {number} vH 可视区域高
-         * @param {number} maxDistance 最大滚动的长度
-         * @param {boolean} isVertical 是纵向还是横向，也就是说是滚x还是滚y,默认值为沿y方向滚动
+         * @param {number} viewWidth 可视区域宽
+         * @param {number} viewHeight 可视区域高
+         * @param {number} scrollWidth 可滚动的宽度
+         * @param {number} scrollHeight 可滚动的高度
          * @example
-         *      s.sPage=new annieUI.ScrollPage(640,s.stage.viewRect.height,4943);
+         *      s.sPage=new annieUI.ScrollPage(null,640,1040,640,1040*4);
          *          s.addChild(s.sPage);
          *          s.sPage.view.addChild(new home.Content());
          *          s.sPage.y=s.stage.viewRect.y;
          *          s.sPage.mouseEnable=false;
-         * <p><a href="https://github.com/flash2x/demo3" target="_blank">测试链接</a></p>
          */
         function ScrollPage(container, viewWidth, viewHeight, scrollWidth, scrollHeight) {
             var _this = _super.call(this) || this;
@@ -743,6 +742,8 @@ var annieUI;
             s.addChild(s.maskObj);
             s.addChild(s._view);
             s.view.mask = s.maskObj;
+            s.maskObj.x = -1;
+            s.maskObj.y = -1;
             s.maskObj["_isUseToMask"] = 0;
             s.maskObj.alpha = 0;
             s._scroller = new annieUI.Scroller(s, viewWidth, viewHeight, scrollWidth, scrollHeight);
@@ -800,7 +801,7 @@ var annieUI;
             var s = this;
             s.maskObj.clear();
             s.maskObj.beginFill("#000000");
-            s.maskObj.drawRect(0, 0, viewWidth, viewHeight);
+            s.maskObj.drawRect(0, 0, viewWidth + 2, viewHeight + 2);
             s.maskObj.endFill();
             if (s.scroll) {
                 s.scroll.setViewWH(viewWidth, viewHeight);
@@ -2270,7 +2271,7 @@ var annieUI;
             _this.currentStepId = 0;
             var s = _this;
             s._instanceType = "annieUI.DrawingBoard";
-            s.context = s.bitmapData.getContext('2d');
+            s.context = s._texture.getContext('2d');
             s.context.lineCap = "round";
             s.context.lineJoin = "round";
             s.reset(bgColor);

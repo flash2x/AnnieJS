@@ -149,7 +149,7 @@ namespace annie {
             if (s._ease) {
                 per = s._ease(per);
             }
-            var isHave: boolean = false;
+            let isHave: boolean = false;
             for (let item in s._disData) {
                 isHave = true;
                 s.target[item] = s._startData[item] + s._disData[item] * per;

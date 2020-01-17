@@ -111,8 +111,8 @@ namespace annie {
             return null;
         }
 
-        public _onFlushFrame(): void {
-            super._onFlushFrame();
+        public _onUpdateFrame(): void {
+            super._onUpdateFrame();
             let s: any = this;
             let o = s.htmlElement;
             if (o) {
@@ -138,27 +138,29 @@ namespace annie {
                 }
             }
         }
-        public updateMatrix(): void {
+        protected _updateMatrix(isOffCanvas:boolean=false):void {
             let s = this;
             let o = s.htmlElement;
             if (!s._visible || !o) return;
-            super.updateMatrix();
+            super._updateMatrix(isOffCanvas);
             if (s.a2x_um || s.a2x_ua || s.a2x_uf) {
                 let style = o.style;
                 if (s.a2x_um) {
-                    let mtx = s.cMatrix;
+                    let mtx = s._cMatrix;
                     let d = annie.devicePixelRatio;
                     style.transform = style.webkitTransform = "matrix(" + (mtx.a / d).toFixed(4) + "," + (mtx.b / d).toFixed(4) + "," + (mtx.c / d).toFixed(4) + "," + (mtx.d / d).toFixed(4) + "," + (mtx.tx / d).toFixed(4) + "," + (mtx.ty / d).toFixed(4) + ")";
                 }
                 if (s.a2x_ua) {
-                    style.opacity = s.cAlpha;
+                    style.opacity = s._cAlpha;
                 }
             }
-            s.a2x_uf = false;
-            s.a2x_um = false;
-            s.a2x_ua = false;
+            if(!isOffCanvas) {
+                s.a2x_uf = false;
+                s.a2x_um = false;
+                s.a2x_ua = false;
+            }
         }
-        public render(renderObj: IRender) {
+        public _render(renderObj: IRender) {
 
         }
         private removeHtmlElement():void{

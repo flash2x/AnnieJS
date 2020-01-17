@@ -149,9 +149,9 @@ namespace annie {
          * @since 1.0.9
          */
         public kill():void{
-            var len=Timer._timerList.length;
-            var s:any=this;
-            for(var i=0;i<len;i++){
+            let len=Timer._timerList.length;
+            let s:any=this;
+            for(let i=0;i<len;i++){
                 if(Timer._timerList[i]._instanceId==s._instanceId){
                     Timer._timerList.splice(i,1);
                     break;
@@ -180,7 +180,7 @@ namespace annie {
         private static _timerList:Array<any>=[];
         private static flush():void{
             var len=Timer._timerList.length;
-            for(var i=len-1;i>=0;i--){
+            for(let i=len-1;i>=0;i--){
                 if(Timer._timerList[i] ) {
                     Timer._timerList[i].update();
                 }else{

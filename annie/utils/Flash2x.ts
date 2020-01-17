@@ -280,17 +280,17 @@ namespace annie {
                     if (e.data.type == "image") {
                         //图片
                         _loadResCount++;
-                        var image = new Image();
+                        let image = new Image();
                         image.onload = mediaResourceOnload;
                         image.src = URL.createObjectURL(loadContent);
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
                     }
                     else if (e.data.type == "sound") {
                         //声音
-                        var audio: any = new Audio();
+                        let audio: any = new Audio();
                         _loadResCount++;
                         if (annie.osType == "ios") {
-                            var sFileReader = new FileReader();
+                            let sFileReader = new FileReader();
                             sFileReader.onload = function () {
                                 audio.src = sFileReader.result;
                                 mediaResourceOnload(null);
@@ -392,7 +392,7 @@ namespace annie {
             _loadRes();
         } else {
             res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
-            var info: any = {};
+            let info: any = {};
             info.sceneName = _loadSceneNames[_loadIndex];
             _loadIndex++;
             info.sceneId = _loadIndex;
@@ -508,12 +508,10 @@ namespace annie {
                     let isUmChange:boolean=target.a2x_um;
                     if(!target._changeTransformInfo[0]&&target._x!=info.tr[0]){
                         target._x=info.tr[0];
-                        target._lastX=target._x+target._offsetX;
                         isUmChange=true;
                     }
                     if(!target._changeTransformInfo[1]&&target._y!=info.tr[1]){
                         target._y=info.tr[1];
-                        target._lastY=target._y+target._offsetY;
                         isUmChange=true;
                     }
                     if(!target._changeTransformInfo[2]&&target._scaleX!=info.tr[2]){
@@ -544,8 +542,6 @@ namespace annie {
             }else{
                 if(lastInfo.tr != info.tr){
                     [target._x, target._y, target._scaleX, target._scaleY, target._skewX, target._skewY] = info.tr;
-                    target._lastX=target._x+target._offsetX;
-                    target._lastY=target._y+target._offsetY;
                     target.a2x_um=true;
                 }
                 if(target._alpha!=info.al) {

@@ -10,13 +10,13 @@ namespace annie {
         draw(target:any):void;
         /**
          * 初始化事件
-         * @param stage
+         * @param canvas
          */
-        init():void;
+        init(canvas:any):void;
         /**
          * 改变尺寸
          */
-        reSize():void;
+        reSize(width:number,height:number):void;
         /**
          * 开始遮罩
          * @param target
@@ -33,7 +33,7 @@ namespace annie {
         /**
          * 开始渲染
          */
-        begin():void;
+        begin(color:string):void;
 
         /**
          * 结束渲染

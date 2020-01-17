@@ -20,7 +20,7 @@ namespace annie {
          */
         public constructor(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
             super();
-            var s = this;
+            let s = this;
             s._instanceType = "annie.Rectangle";
             s.x = x;
             s.y = y;

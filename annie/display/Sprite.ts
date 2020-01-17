@@ -23,6 +23,7 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Sprite";
+            s.hitTestWithPixel=true;
         }
 
         public destroy(): void {
@@ -46,8 +47,8 @@ namespace annie {
          * @default 1
          *
          */
-        public mcSpeed:number=1;
-        protected _cMcSpeed:number=1;
+        public mcSpeed: number = 1;
+        protected _cMcSpeed: number = 1;
         /**
          * 是否可以让children接收鼠标事件
          * 鼠标事件将不会往下冒泡
@@ -156,6 +157,7 @@ namespace annie {
                 return elements;
             }
         }
+
         /**
          * 添加一个child到Sprite中并指定添加到哪个层级
          * @method addChildAt
@@ -298,6 +300,16 @@ namespace annie {
         }
 
         /**
+         * 如果对容器缓存为位图过,则会更新缓存,没事别乱调用
+         * @method updateCache
+         * @since 3.2.0
+         * @return {void}
+         */
+        public updateCache(): void {
+            this.a2x_uf = true;
+        }
+
+        /**
          * 移除Sprite上的所有child
          * @method removeAllChildren
          * @public
@@ -313,22 +325,13 @@ namespace annie {
         }
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
-            if (!s.visible || !s.mouseEnable) return null;
-            let p: Point=hitPoint;
-            //如果有设置鼠标活动区域，则优先使用活动区域
-            if (s._hitArea) {
-                if (isGlobalPoint){
-                    p = s.globalToLocal(hitPoint, DisplayObject._p1);
-                }
-                DisplayObject._p1.x=p.x+s._offsetX;
-                DisplayObject._p1.y=p.y+s._offsetY;
-                if (s._hitArea.isPointIn(DisplayObject._p1)) {
-                    return s;
-                }
-                return null;
+            if (!s._visible || !s.mouseEnable) return null;
+            if(s._isCache){
+                return super.hitTestPoint(hitPoint,isGlobalPoint);
             }
-            if(!isGlobalPoint){
-                p=s.localToGlobal(hitPoint,new Point());
+            let p: Point = hitPoint;
+            if (!isGlobalPoint) {
+                p = s.localToGlobal(hitPoint, new Point());
             }
             let len = s.children.length;
             let hitDisplayObject: DisplayObject;
@@ -337,7 +340,7 @@ namespace annie {
             //这里特别注意是从上往下遍历
             for (let i = len - 1; i >= 0; i--) {
                 child = s.children[i];
-                if(child._isUseToMask > 0) continue;
+                if (child._isUseToMask > 0) continue;
                 if (child.mask != void 0) {
                     if (maskObjList[child.mask._instanceId] == void 0) {
                         //看看点是否在遮罩内
@@ -359,6 +362,7 @@ namespace annie {
             }
             return null;
         }
+
         public getBounds(): Rectangle {
             let s = this;
             let rect: Rectangle = s._bounds;
@@ -376,52 +380,76 @@ namespace annie {
             }
             return rect;
         }
-        public updateMatrix(): void {
+
+        protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s = this;
             if (s._visible) {
-                super.updateMatrix();
+                super._updateMatrix(isOffCanvas);
+                if(s._isCache&&!isOffCanvas){
+                    s.a2x_ua = false;
+                    s.a2x_um = false;
+                    return;
+                }
                 let children: any = s.children;
                 let len: number = children.length;
                 for (let i = 0; i < len; i++) {
-                    children[i].updateMatrix();
+                    children[i]._updateMatrix(isOffCanvas);
                 }
-                s.a2x_ua = false;
-                s.a2x_uf = false;
-                s.a2x_um = false;
+                //所有未缓存的信息还是一如既往的更新,保持信息同步
+                if (s.a2x_uf) {
+                    s.a2x_uf = false;
+                    if (s._isCache) {
+                        //更新缓存
+                        annie.createCache(s);
+                        s._updateSplitBounds();
+                        s._checkDrawBounds();
+                    }
+                }
+                if (!isOffCanvas){
+                    s.a2x_ua = false;
+                    s.a2x_um = false;
+                }
             }
         }
-        public render(renderObj: IRender): void {
+        public _render(renderObj: IRender): void {
             let s: any = this;
-            let len: number = s.children.length;
-            if (s._visible && s.cAlpha > 0 && len > 0) {
-                let children: any = s.children;
-                let ro: any = renderObj;
-                let maskObj: any;
-                let child: any;
-                for (let i = 0; i < len; i++) {
-                    child = children[i];
-                    if (child._isUseToMask > 0) continue;
-                    if (maskObj instanceof annie.DisplayObject) {
-                        if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                            if (child.mask != maskObj) {
+            if (s._isCache && s.parent) {
+                //这里为什么要加上s.parent判断呢，因为离屏渲染也是走的这个方法，显然离屏渲染就是为了生成缓存的，当然就不能直接走缓存这个逻辑
+                super._render(renderObj);
+            } else {
+                let len: number = s.children.length;
+                if (s._visible && s._cAlpha > 0 && len > 0) {
+                    let children: any = s.children;
+                    let ro: any = renderObj;
+                    let maskObj: any;
+                    let child: any;
+                    for (let i = 0; i < len; i++) {
+                        child = children[i];
+                        if (child._isUseToMask > 0) {
+                            continue;
+                        }
+                        if (maskObj instanceof annie.DisplayObject) {
+                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
+                                    ro.endMask();
+                                    maskObj = child.mask;
+                                    ro.beginMask(maskObj);
+                                }
+                            } else {
                                 ro.endMask();
+                                maskObj = null;
+                            }
+                        } else {
+                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                                 maskObj = child.mask;
                                 ro.beginMask(maskObj);
                             }
-                        } else {
-                            ro.endMask();
-                            maskObj = null;
                         }
-                    } else {
-                        if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                            maskObj = child.mask;
-                            ro.beginMask(maskObj);
-                        }
+                        child._render(ro);
                     }
-                    child.render(ro);
-                }
-                if (maskObj instanceof annie.DisplayObject) {
-                    ro.endMask();
+                    if (maskObj instanceof annie.DisplayObject) {
+                        ro.endMask();
+                    }
                 }
             }
         }
@@ -441,7 +469,6 @@ namespace annie {
             }
             super._onRemoveEvent(isReSetMc);
         }
-
         public _onAddEvent(): void {
             let s = this;
             let child: any = null;
@@ -458,36 +485,19 @@ namespace annie {
             super._onAddEvent();
         }
 
-        public _onFlushFrame(mcSpeed:number=1): void {
+        public _onUpdateFrame(mcSpeed: number = 1, isOffCanvas: boolean = false): void {
             let s = this;
+            s._cMcSpeed = s.mcSpeed * mcSpeed;
+            super._onUpdateFrame(s._cMcSpeed, isOffCanvas);
             let child: any = null;
-            s._cMcSpeed=s.mcSpeed*mcSpeed;
             let children = s.children.concat();
             let len = children.length;
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
-                if (child && child._isOnStage) {
-                    child._onFlushFrame(s._cMcSpeed);
+                if (child) {
+                    child._onUpdateFrame(s._cMcSpeed, isOffCanvas);
                 }
-                super._onFlushFrame(s._cMcSpeed);
             }
         }
-
-        /**
-         * annie.Sprite显示容器的接受鼠标点击的区域。一但设置，容器里所有子级将不会触发任何鼠标相关的事件。
-         * 相当于 mouseChildren=false,但在有大量子级显示对象的情况下，此方法的性能搞出mouseChildren几个数量级，建议使用。
-         * @property hitArea
-         * @param {annie.Rectangle} rect
-         * @since 3.0.1
-         */
-        public set hitArea(rect: annie.Rectangle) {
-            this._hitArea = rect;
-        }
-
-        public get hitArea(): annie.Rectangle {
-            return this._hitArea;
-        }
-
-        private _hitArea: annie.Rectangle = null;
     }
 }

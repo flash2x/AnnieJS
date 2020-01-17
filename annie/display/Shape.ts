@@ -4,16 +4,18 @@
 namespace annie {
     /**
      * 矢量对象
-     * @class annie.Shape
+     * @class annie.Bitmap
      * @extends annie.DisplayObject
      * @since 1.0.0
      * @public
      */
-    export class Shape extends DisplayObject {
+    export class Shape extends Bitmap {
         public constructor() {
-            super();
-            this._instanceType = "annie.Shape";
-            this._texture = document.createElement("canvas");
+            super(null);
+            let s=this;
+            s._instanceType = "annie.Shape";
+            s.hitTestWithPixel=true;
+            s.bitmapData = document.createElement("canvas");
         }
 
         //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -326,16 +328,11 @@ namespace annie {
         public clear(): void {
             let s = this;
             s._command = [];
-            if (s._texture) {
-                s._texture.width = 0;
-                s._texture.height = 0;
-            }
-            s._offsetX = 0;
-            s._offsetY = 0;
-            s._bounds.width = 0;
-            s._bounds.height = 0;
-            s._updateSplitBounds();
-            s.a2x_ut = true;
+            s._texture=null;
+            s._bitmapData.width=0;
+            s._bitmapData.height=0;
+            s.a2x_ut = false;
+            s.clearBounds();
         }
 
         /**
@@ -562,7 +559,7 @@ namespace annie {
          * @since 1.0.0
          * @return {void}
          */
-        public decodePath = function (data: any): void {
+        public decodePath(data: Array<number>): void {
             let s = this;
             let instructions = ["moveTo", "lineTo", "quadraticCurveTo", "bezierCurveTo", "closePath"];
             let count = data.length;
@@ -575,18 +572,27 @@ namespace annie {
                     i += 4;
                 }
             }
-            s.a2x_ut=true;
+            s.a2x_ut = true;
         };
+
+        /**
+         * 解析SVG
+         * @method decodeSVG
+         * @param {String} data
+         * @since 3.2.0
+         */
+        public decodeSVG(data: string){
+            //TODO 解析SVG
+        }
         //是否矢量元素有更新
         private a2x_ut: boolean = true;
-        public updateMatrix(): void {
+        protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s: any = this;
-            let canvas: any = s._texture;
-            let ctx = canvas.getContext("2d");
-            let boundsW=s._bounds.width;
-            let boundsH=s._bounds.height;
             if (s.a2x_ut){
-                //更新缓存
+                let texture: any = s._bitmapData;
+                let ctx = texture.getContext("2d");
+                s.a2x_ut = false;
+                //更新矢量
                 let cLen: number = s._command.length;
                 let leftX: number;
                 let leftY: number;
@@ -693,55 +699,36 @@ namespace annie {
                             leftX = 0;
                             leftY = 0;
                         }
-                        leftX -= 20 + lineWidth >> 1;
-                        leftY -= 20 + lineWidth >> 1;
-                        buttonRightX += 20 + lineWidth >> 1;
-                        buttonRightY += 20 + lineWidth >> 1;
-                        boundsW = buttonRightX - leftX;
-                        boundsH= buttonRightY - leftY;
+                        leftX -= 2 + lineWidth;
+                        leftY -= 2 + lineWidth;
+                        buttonRightX += 2 + lineWidth;
+                        buttonRightY += 2 + lineWidth;
+                        let width = buttonRightX - leftX;
+                        let height = buttonRightY - leftY;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        s.offsetX = leftX;
-                        s.offsetY = leftY;
-                        boundsH=Math.ceil(boundsH);
-                        boundsW=Math.ceil(boundsW);
-                        canvas.width = boundsW;
-                        canvas.height = boundsH;
-                        canvas.style.width = (boundsW / devicePixelRatio) + "px";
-                        canvas.style.height = (boundsH / devicePixelRatio) + "px";
-                        ctx.clearRect(0, 0, boundsW, boundsH);
+                        s._offsetX = leftX;
+                        s._offsetY = leftY;
+                        s._bounds.x = leftX;
+                        s._bounds.y = leftY;
+                        height = Math.ceil(height);
+                        width = Math.ceil(width);
+                        texture.width = width;
+                        texture.height = height;
+                        texture.style.width = (width / devicePixelRatio) + "px";
+                        texture.style.height = (height / devicePixelRatio) + "px";
+                        ctx.clearRect(0, 0, width, height);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
                         ///////////////////////////
                         s._draw(ctx);
                         ///////////////////////////
                     }
                 }
-            }
-            super.updateMatrix();
-            if (s.a2x_uf) {
-                let cf: any = s.cFilters;
-                let cfLen = cf.length;
-                if (cfLen > 0) {
-                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    for (let i = 0; i < cfLen; i++) {
-                        cf[i].drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
+                s._texture=texture;
+                if(s._filters.length>0){
+                    s.a2x_uf=true;
                 }
             }
-            if(boundsW!=s._bounds.width||boundsH!=s._bounds.height){
-                s._bounds.x=10;
-                s._bounds.y=10;
-                s._bounds.width=boundsW-20;
-                s._bounds.height=boundsH-20;
-                s._updateSplitBounds();
-                s._checkDrawBounds();
-            }else if(s.a2x_um){
-                s._checkDrawBounds();
-            }
-            s.a2x_ut = false;
-            s.a2x_um = false;
-            s.a2x_ua = false;
-            s.a2x_uf = false;
+            super._updateMatrix(isOffCanvas);
         }
         private _draw(ctx: any, isMask: boolean = false): void {
             let s = this;
@@ -770,7 +757,7 @@ namespace annie {
                     } else if (paramsLen == 6) {
                         let lx = data[2][4];
                         let ly = data[2][5];
-                        if (data[0] == 2){
+                        if (data[0] == 2) {
                             //位图填充
                             lx -= leftX;
                             ly -= leftY;
@@ -791,25 +778,6 @@ namespace annie {
             }
             if (isMask) {
                 ctx.closePath();
-            }
-        }
-        public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
-            let s = this;
-            let texture = s._texture;
-            if (texture.width == 0) {
-                return null;
-            }
-            let p: any;
-            if (isGlobalPoint) {
-                p = s.globalToLocal(hitPoint,DisplayObject._p1);
-            } else {
-                p = hitPoint;
-            }
-            let ctx = texture.getContext('2d');
-            if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
-                return s;
-            } else {
-                return null;
             }
         }
         /**
@@ -844,6 +812,7 @@ namespace annie {
                 }
             }
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

@@ -4,13 +4,13 @@
 namespace annie {
     /**
      * Canvas 渲染器
-     * @class annie.CanvasRender
+     * @class annie.OffCanvasRender
      * @extends annie.AObject
      * @implements IRender
      * @public
      * @since 1.0.0
      */
-    export class CanvasRender extends AObject implements IRender {
+    export class OffCanvasRender extends AObject implements IRender {
         /**
          * 渲染器所在最上层的对象
          * @property rootContainer
@@ -19,35 +19,28 @@ namespace annie {
          * @type {any}
          * @default null
          */
-        public rootContainer: any = null;
+        public rootContainer: any;
         /**
          * @property viewPort
          *
          */
-        public viewPort: annie.Rectangle = new annie.Rectangle();
+        public viewPort: annie.Rectangle;
         /**
          * @property _ctx
          * @protected
          * @default null
          */
         public _ctx: any;
-        /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage: Stage;
+
 
         /**
-         * @method CanvasRender
-         * @param {annie.Stage} stage
+         * @method OffCanvasRender
          * @public
          * @since 1.0.0
          */
-        public constructor(stage: Stage) {
+        public constructor() {
             super();
-            this._instanceType = "annie.CanvasRender";
-            this._stage = stage;
+            this._instanceType = "annie.OffCanvasRender";
         }
 
         /**
@@ -75,7 +68,7 @@ namespace annie {
          * @since 1.0.0
          */
         public beginMask(target: any): void {
-            let s: CanvasRender = this, ctx = s._ctx;
+            let s: any = this, ctx = s._ctx;
             ctx.save();
             ctx.globalAlpha = 0;
             s.drawMask(target);
@@ -83,7 +76,7 @@ namespace annie {
         }
 
         private drawMask(target: any): void {
-            let s = this, tm = target._cMatrix, ctx = s._ctx;
+            let s = this, tm = target._ocMatrix, ctx = s._ctx;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
                 target._draw(ctx, true);
@@ -122,11 +115,11 @@ namespace annie {
         public draw(target: any): void {
             let s = this;
             let texture = target._texture;
-            if (!texture||texture.width == 0 || texture.height == 0) return;
-            let ctx = s._ctx, tm;
-            tm = target._cMatrix;
-            if (ctx.globalAlpha != target._cAlpha) {
-                ctx.globalAlpha = target._cAlpha
+            if (texture.width == 0 || texture.height == 0) return;
+            let ctx = s._ctx;
+            let tm = target._ocMatrix;
+            if (ctx.globalAlpha != target._ocAlpha) {
+                ctx.globalAlpha = target._ocAlpha;
             }
             if (s._blendMode != target.blendMode) {
                 ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
@@ -136,52 +129,11 @@ namespace annie {
             if (target._offsetX != 0 || target._offsetY != 0) {
                 ctx.translate(target._offsetX, target._offsetY);
             }
-            let sbl = target._splitBoundsList;
-            let rect = null;
-            let bounds=target._bounds;
-            let startX=0-bounds.x;
-            let startY=0-bounds.y;
-            for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw === true) {
-                    rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x+startX, rect.y+startY, rect.width, rect.height, rect.x+startX, rect.y+startY, rect.width, rect.height);
-                }
-            }
-
-            //getBounds
-            /*let rect1=target.getBounds();
-            rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);
-            s._ctx.beginPath();
-            s._ctx.lineWidth=4;
-            s._ctx.strokeStyle="#ff0000";
-            s._ctx.moveTo(rect.x,rect.y);
-            s._ctx.lineTo(rect.x+rect.width,rect.y);
-            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
-            s._ctx.lineTo(rect.x,rect.y+rect.height);
-            s._ctx.closePath();
-            s._ctx.stroke();
-
-            //getDrawRect
-            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
-            target.getDrawRect(target._cMatrix);
-            rect1=DisplayObject._transformRect;
-            rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);
-            s._ctx.beginPath();
-            s._ctx.lineWidth=2;
-            s._ctx.strokeStyle="#00ff00";
-            s._ctx.moveTo(rect.x,rect.y);
-            s._ctx.lineTo(rect.x+rect.width,rect.y);
-            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
-            s._ctx.lineTo(rect.x,rect.y+rect.height);
-            s._ctx.closePath();
-            s._ctx.stroke();
-            //*/
-
+            ctx.drawImage(texture, 0, 0);
         }
+        public end(){
 
-        public end() {
         };
-
         /**
          * 初始化渲染器
          * @public
@@ -191,8 +143,6 @@ namespace annie {
         public init(canvas: any): void {
             let s = this;
             s.rootContainer = canvas;
-            s._stage.rootDiv.appendChild(s.rootContainer);
-            s.rootContainer.id = "_a2x_canvas";
             s._ctx = canvas.getContext('2d');
         }
 
@@ -206,8 +156,6 @@ namespace annie {
             let s = this, c = s.rootContainer;
             c.width = width;
             c.height = height;
-            s.viewPort.width = c.width;
-            s.viewPort.height = c.height;
             c.style.width = Math.ceil(width / devicePixelRatio) + "px";
             c.style.height = Math.ceil(height / devicePixelRatio) + "px";
         }
@@ -215,7 +163,6 @@ namespace annie {
         destroy(): void {
             let s = this;
             s.rootContainer = null;
-            s._stage = null;
             s._ctx = null;
         }
     }

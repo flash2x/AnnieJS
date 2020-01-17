@@ -194,7 +194,7 @@ namespace annieUI {
          */
         constructor(vW: number, vH: number, isVertical: boolean = true, ease: Function = null) {
             super();
-            var s = this;
+            let s = this;
             s.isVertical = isVertical;
             s._ease = ease;
             if (isVertical) {
@@ -210,7 +210,7 @@ namespace annieUI {
             s.maskObj["_isUseToMask"] = 0;
             s.maskObj.alpha = 0;
             s.setMask(vW, vH);
-            var me = s.onMouseEvent.bind(s);
+            let me = s.onMouseEvent.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, me, false);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, me, false);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, me, false);
@@ -435,7 +435,7 @@ namespace annieUI {
          * @public
          */
         public addPageList(classList: any): void {
-            var s = this;
+            let s = this;
             s.pageClassList = s.pageClassList.concat(classList);
             if (s.listLen == 0 && s.pageClassList.length > 0) {
                 let pageFirst = new s.pageClassList[0]();

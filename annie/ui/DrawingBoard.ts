@@ -68,12 +68,14 @@ namespace annieUI {
          * @type {number}
          */
         protected currentStepId: number = 0;
-        protected static _getDrawCanvas(width:number,height:number):HTMLCanvasElement{
-            let canvas:HTMLCanvasElement=document.createElement("canvas");
-            canvas.width=width;
-            canvas.height=height;
+
+        protected static _getDrawCanvas(width: number, height: number): HTMLCanvasElement {
+            let canvas: HTMLCanvasElement = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
             return canvas;
         }
+
         /**
          * 构造函数
          * @method DrawingBoard
@@ -82,21 +84,22 @@ namespace annieUI {
          * @param bgColor 背景色 默认透明
          * @since 1.1.1
          */
-        constructor(width:number,height:number, bgColor: any = ""){
-            super(DrawingBoard._getDrawCanvas(width,height));
-            var s = this;
+        constructor(width: number, height: number, bgColor: any = "") {
+            super(DrawingBoard._getDrawCanvas(width, height));
+            let s = this;
             s._instanceType = "annieUI.DrawingBoard";
-            s.context=s.bitmapData.getContext('2d');
+            s.context = s._texture.getContext('2d');
             s.context.lineCap = "round";
             s.context.lineJoin = "round";
             s.reset(bgColor);
-            var mouseDown = s.onMouseDown.bind(s);
-            var mouseMove = s.onMouseMove.bind(s);
-            var mouseUp = s.onMouseUp.bind(s);
+            let mouseDown = s.onMouseDown.bind(s);
+            let mouseMove = s.onMouseMove.bind(s);
+            let mouseUp = s.onMouseUp.bind(s);
             s.addEventListener(annie.MouseEvent.MOUSE_DOWN, mouseDown);
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
         }
+
         private onMouseDown(e: annie.MouseEvent): void {
             let s = this;
             s._isMouseDown = true;
@@ -114,9 +117,10 @@ namespace annieUI {
             s.addStepObj.sy = ly;
             s.addStepObj.ps = [];
         };
+
         private onMouseUp(e: annie.MouseEvent): void {
             let s = this;
-            if(s._isMouseDown) {
+            if (s._isMouseDown) {
                 s._isMouseDown = false;
                 if (s.addStepObj.ps && s.addStepObj.ps.length > 0) {
                     s.currentStepId++;
@@ -124,6 +128,7 @@ namespace annieUI {
                 }
             }
         };
+
         private onMouseMove(e: annie.MouseEvent): void {
             let s = this;
             if (s._isMouseDown) {
@@ -199,13 +204,14 @@ namespace annieUI {
             }
             return true;
         }
+
         public destroy(): void {
-            let s=this;
-           s.context=null;
-           s.totalStepList=null;
-           s.drawColor=null;
-           s.bgColor=null;
-           s.addStepObj=null;
+            let s = this;
+            s.context = null;
+            s.totalStepList = null;
+            s.drawColor = null;
+            s.bgColor = null;
+            s.addStepObj = null;
             super.destroy();
         }
     }

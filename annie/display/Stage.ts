@@ -301,7 +301,7 @@ namespace annie {
                 //webgl
                 //s.renderObj = new WebGLRender(s);
             }
-            s.renderObj.init();
+            s.renderObj.init(document.createElement('canvas'));
             let rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType == "pc") {
@@ -321,9 +321,9 @@ namespace annie {
 
         private _touchEvent: annie.TouchEvent;
 
-        public render(renderObj: IRender): void {
-            renderObj.begin();
-            super.render(renderObj);
+        public _render(renderObj: IRender): void {
+            renderObj.begin(this.bgColor);
+            super._render(renderObj);
             renderObj.end();
         }
 
@@ -352,9 +352,9 @@ namespace annie {
             //看看是否有resize
             if (s._flush == 0) {
                 s.resize();
-                s._onFlushFrame(1);
-                s.updateMatrix();
-                s.render(s.renderObj);
+                s._onUpdateFrame(1);
+                s._updateMatrix();
+                s._render(s.renderObj);
             } else {
                 //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
                 if (s._currentFlush == 0) {
@@ -362,9 +362,9 @@ namespace annie {
                     s.resize();
                 } else {
                     if (s._currentFlush == s._flush) {
-                        s._onFlushFrame();
-                        s.updateMatrix();
-                        s.render(s.renderObj);
+                        s._onUpdateFrame();
+                        s._updateMatrix();
+                        s._render(s.renderObj);
                     }
                     s._currentFlush--;
                 }
@@ -832,22 +832,21 @@ namespace annie {
          */
         public resize = function (): void {
             let s: Stage = this;
+            let whObj: any = s.getRootDivWH(s.rootDiv);
             if (s.divWidth == 0 || s.divHeight == 0) {
-                let whObj: any = s.getRootDivWH(s.rootDiv);
                 if (whObj.w == 0 || whObj.h == 0) return;
                 s.a2x_um = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
-                s.renderObj.reSize();
+                s.renderObj.reSize(whObj.w*annie.devicePixelRatio,whObj.h*annie.devicePixelRatio);
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
             } else if (s.autoResize) {
-                let whObj: any = s.getRootDivWH(s.rootDiv);
                 if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
                     s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
-                    s.renderObj.reSize();
+                    s.renderObj.reSize(whObj.w*annie.devicePixelRatio,whObj.h*annie.devicePixelRatio);
                     s.setAlign();
                     s.dispatchEvent("onResize");
                 }

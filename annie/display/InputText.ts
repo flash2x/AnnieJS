@@ -250,7 +250,7 @@ namespace annie {
          * @since 1.0.3
          */
         public set color(value: string) {
-            var ss = this.htmlElement.style;
+            let ss = this.htmlElement.style;
             ss.color = value;
         }
 
