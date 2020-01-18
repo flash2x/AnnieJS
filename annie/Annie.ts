@@ -35,7 +35,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    export let version: string = "3.1.6";
+    export let version: string = "3.2.0";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
