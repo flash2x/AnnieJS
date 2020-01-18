@@ -62,6 +62,9 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.2.0 版本
+    大量底层优化
+    增加位图缓存功能
 ## AnnieJS 3.1.6 版本
     优化MovieClip类，现在gotoAndStop,gotoAndPlay,nexrFrame,prevFrame等方法运行后都将时时更新帧数据，不再需要等待渲染更新流程后才更新
     优化Bitmap类的大图自动切片渲染功能，更合理
