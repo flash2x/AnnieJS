@@ -192,8 +192,9 @@ namespace annie {
     export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
             _dRender = new OffCanvasRender();
-            _dRender.init(DisplayObject["_canvas"]);
         }
+        //一定要更新一次
+        obj._updateMatrix();
         if (!rect) {
             rect = obj.getBounds();
         }
@@ -207,6 +208,7 @@ namespace annie {
         obj._updateMatrix(true);
         let w: number = Math.ceil(rect.width);
         let h: number = Math.ceil(rect.height);
+        _dRender.init(DisplayObject["_canvas"]);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
         obj._render(_dRender);

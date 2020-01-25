@@ -251,7 +251,7 @@ namespace annie {
          * @public
          * @type {string}
          */
-        public static ON_DRAW_PERCENT:string="onDrawTime";
+        public static ON_DRAW_PERCENT:string="onDrawPercent";
         /**
          * 事件类型名
          * @property type

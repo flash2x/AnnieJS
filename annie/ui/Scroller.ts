@@ -301,6 +301,12 @@ namespace annieUI {
             let s=this;
             s.maxScrollX = s.viewWidth - s.scrollWidth;
             s.maxScrollY = s.viewHeight - s.scrollHeight;
+            if(s.maxScrollX>0){
+                s.maxScrollX=0;
+            }
+            if(s.maxScrollY>0){
+                s.maxScrollY=0;
+            }
             if (!s.isScrollX) {
                 s.maxScrollX = 0;
                 s._scrollWidth = s.viewWidth;
@@ -324,6 +330,11 @@ namespace annieUI {
                     s._translate(s.destX, s.destY);
                     if (!s.resetPosition(s.bounceTime)) {
                         s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
+                        if(s._curX==0&&s._curY==0){
+                            s.dispatchEvent(annie.Event.ON_SCROLL_TO_HEAD);
+                        }else if(s._curX==s.maxScrollX&&s._curY==s.maxScrollY){
+                            s.dispatchEvent(annie.Event.ON_SCROLL_TO_END);
+                        }
                     }
                 } else {
                     now = (now - s.startTime) / s.duration;
@@ -509,7 +520,7 @@ namespace annieUI {
                 s.isRunning = true;
             }
         }
-        private _translate(x: number, y: number) {
+        public _translate(x: number, y: number) {
             let s=this;
             s._curX = x;
             s._curY = y;

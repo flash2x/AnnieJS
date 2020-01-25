@@ -10,8 +10,6 @@ namespace annieUI {
      * @since 3.1.5
      */
     export class MCScroller extends annieUI.Scroller {
-        private _mc: annie.MovieClip = null;
-
         /**
          * 滑动的速率，值越大，滑动越慢,默认是10
          * @property rate
@@ -21,16 +19,17 @@ namespace annieUI {
          */
         public set rate(value: number) {
             let s = this;
+            let mc:any=s._container;
             if (value != s._rate) {
                 s._rate = value;
                 let curFrame = s.curFramePos - 1;
                 let sw: number = 0, sh: number = 0;
                 if (s._isVertical) {
                     s._curX = -curFrame * value;
-                    sh = s._mc.totalFrames * value;
+                    sh = mc.totalFrames * value;
                 } else {
                     s._curY = -curFrame * value;
-                    sw = s._mc.totalFrames * value;
+                    sw = mc.totalFrames * value;
                 }
                 s.setScrollWH(sw, sh);
             }
@@ -100,13 +99,15 @@ namespace annieUI {
             super(mc, 0, 0, 0, 0);
             let s = this;
             s._instanceType = "annieUI.MCScroller";
-            s._mc = mc;
             s.isBounce = false;
             s.rate = rate;
             s.isVertical = isVertical;
-            s.addEventListener(annie.Event.ON_SCROLL_ING, function (e: annie.Event) {
-                mc.gotoAndStop(s.curFramePos);
-            })
+        }
+        public _translate(x: number, y: number) {
+            super._translate(x,y);
+            let s=this;
+            let mc:any=s._container;
+            mc.gotoAndStop(s.curFramePos);
         }
     }
 }

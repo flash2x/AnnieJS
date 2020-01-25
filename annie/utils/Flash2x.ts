@@ -169,7 +169,7 @@ namespace annie {
         if (_progressCallback) {
             let ww: any = window;
             let total = e.data.totalBytes;
-            if (annie.osType == "android" && ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
+            if (ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
                 total = ww.swfBytes[_loadSceneNames[_loadIndex]];
             }
             _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);

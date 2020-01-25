@@ -306,6 +306,12 @@ var annieUI;
             var s = this;
             s.maxScrollX = s.viewWidth - s.scrollWidth;
             s.maxScrollY = s.viewHeight - s.scrollHeight;
+            if (s.maxScrollX > 0) {
+                s.maxScrollX = 0;
+            }
+            if (s.maxScrollY > 0) {
+                s.maxScrollY = 0;
+            }
             if (!s.isScrollX) {
                 s.maxScrollX = 0;
                 s._scrollWidth = s.viewWidth;
@@ -325,6 +331,12 @@ var annieUI;
                     s._translate(s.destX, s.destY);
                     if (!s.resetPosition(s.bounceTime)) {
                         s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
+                        if (s._curX == 0 && s._curY == 0) {
+                            s.dispatchEvent(annie.Event.ON_SCROLL_TO_HEAD);
+                        }
+                        else if (s._curX == s.maxScrollX && s._curY == s.maxScrollY) {
+                            s.dispatchEvent(annie.Event.ON_SCROLL_TO_END);
+                        }
                     }
                 }
                 else {
@@ -567,18 +579,13 @@ var annieUI;
             if (rate === void 0) { rate = 10; }
             if (isVertical === void 0) { isVertical = true; }
             var _this = _super.call(this, mc, 0, 0, 0, 0) || this;
-            _this._mc = null;
             _this._rate = 0;
             _this._isVertical = true;
             var s = _this;
             s._instanceType = "annieUI.MCScroller";
-            s._mc = mc;
             s.isBounce = false;
             s.rate = rate;
             s.isVertical = isVertical;
-            s.addEventListener(annie.Event.ON_SCROLL_ING, function (e) {
-                mc.gotoAndStop(s.curFramePos);
-            });
             return _this;
         }
         Object.defineProperty(MCScroller.prototype, "rate", {
@@ -594,17 +601,18 @@ var annieUI;
              */
             set: function (value) {
                 var s = this;
+                var mc = s._container;
                 if (value != s._rate) {
                     s._rate = value;
                     var curFrame = s.curFramePos - 1;
                     var sw = 0, sh = 0;
                     if (s._isVertical) {
                         s._curX = -curFrame * value;
-                        sh = s._mc.totalFrames * value;
+                        sh = mc.totalFrames * value;
                     }
                     else {
                         s._curY = -curFrame * value;
-                        sw = s._mc.totalFrames * value;
+                        sw = mc.totalFrames * value;
                     }
                     s.setScrollWH(sw, sh);
                 }
@@ -665,6 +673,12 @@ var annieUI;
             enumerable: true,
             configurable: true
         });
+        MCScroller.prototype._translate = function (x, y) {
+            _super.prototype._translate.call(this, x, y);
+            var s = this;
+            var mc = s._container;
+            mc.gotoAndStop(s.curFramePos);
+        };
         return MCScroller;
     }(annieUI.Scroller));
     annieUI.MCScroller = MCScroller;
@@ -756,6 +770,12 @@ var annieUI;
                 s.dispatchEvent(e);
             });
             s._scroller.addEventListener(annie.Event.ON_SCROLL_STOP, function (e) {
+                s.dispatchEvent(e);
+            });
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_TO_HEAD, function (e) {
+                s.dispatchEvent(e);
+            });
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_TO_END, function (e) {
                 s.dispatchEvent(e);
             });
             s.setViewWH(viewWidth, viewHeight);
@@ -2363,10 +2383,10 @@ var annieUI;
             }
             if (s.bgColor != "") {
                 s.context.fillStyle = s.bgColor;
-                s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                s.context.fillRect(0, 0, s._bitmapData.width, s._bitmapData.height);
             }
             else {
-                s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                s.context.clearRect(0, 0, s._bitmapData.width, s._bitmapData.height);
             }
             s.currentStepId = 0;
             s.totalStepList = [];
@@ -2452,7 +2472,7 @@ var annieUI;
          */
         /**
          * 构造函数
-         * 请监听 "onDrawTime"事件来判断刮完多少百分比了。
+         * 请监听 annie.Event.ON_DRAW_PERCENT事件来判断刮完多少百分比了。
          * @method ScratchCard
          * @param width 宽
          * @param height 高
@@ -2480,7 +2500,7 @@ var annieUI;
                         s._currentDraw++;
                         //抛事件
                         var per = Math.floor(s._currentDraw / s._totalDraw * 100);
-                        s.dispatchEvent("onDrawTime", { per: per });
+                        s.dispatchEvent("onDrawPercent", { per: per });
                     }
                 }
             });
@@ -2502,8 +2522,8 @@ var annieUI;
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
-                var dw = Math.floor(s._bounds.width / s._drawRadius);
-                var dh = Math.floor(s._bounds.height / s._drawRadius);
+                var dw = Math.floor(s._bitmapData.width / s._drawRadius);
+                var dh = Math.floor(s._bitmapData.height / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (var i = 0; i < dw; i++) {
                     s._drawList[i] = [];
@@ -2530,8 +2550,8 @@ var annieUI;
             set: function (value) {
                 var s = this;
                 s._drawRadius = value;
-                var dw = Math.floor(s._bounds.width / s._drawRadius);
-                var dh = Math.floor(s._bounds.height / s._drawRadius);
+                var dw = Math.floor(s._bitmapData.width / s._drawRadius);
+                var dh = Math.floor(s._bitmapData.height / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (var i = 0; i < dw; i++) {
                     s._drawList[i] = [];

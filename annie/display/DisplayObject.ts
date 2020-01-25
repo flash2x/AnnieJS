@@ -666,8 +666,6 @@ namespace annie {
                     s._ocMatrix = new Matrix();
                 }
                 if (isHadParent) {
-                    cm = s._ocMatrix;
-                    ca = s._ocAlpha;
                     pcm = s.parent._ocMatrix;
                     pca = s.parent._ocAlpha;
                 } else {
@@ -677,6 +675,15 @@ namespace annie {
                     s._ocAlpha = 1;
                     return;
                 }
+                cm = s._ocMatrix;
+                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                cm.setFrom(s._matrix);
+                ca = s._alpha;
+                if (isHadParent) {
+                    cm.prepend(pcm);
+                    ca *= pca
+                }
+                s._ocAlpha = ca;
             } else {
                 cm = s._cMatrix;
                 ca = s._cAlpha;
@@ -684,39 +691,35 @@ namespace annie {
                     pcm = s.parent._cMatrix;
                     pca = s.parent._cAlpha;
                 }
-            }
-            if (s.a2x_um) {
-                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-            }
-            if (s._cp) {
-                s.a2x_um = s.a2x_ua = true;
+                if (s.a2x_um){
+                    s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                }
+                if (s._cp) {
+                    s.a2x_um = s.a2x_ua = true;
+                } else {
+                    if (isHadParent) {
+                        let PUI = s.parent;
+                        if (PUI.a2x_um) {
+                            s.a2x_um = true;
+                        }
+                        if (PUI.a2x_ua) {
+                            s.a2x_ua = true;
+                        }
+                    }
+                }
+                if (s.a2x_um) {
+                    cm.setFrom(s._matrix);
+                    if (isHadParent) {
+                        cm.prepend(pcm);
+                    }
+                }
+                if (s.a2x_ua) {
+                    ca = s._alpha;
+                    if (isHadParent) {
+                        ca *= pca
+                    }
+                }
                 s._cp = false;
-            } else {
-                if (isHadParent) {
-                    let PUI = s.parent;
-                    if (PUI.a2x_um) {
-                        s.a2x_um = true;
-                    }
-                    if (PUI.a2x_ua) {
-                        s.a2x_ua = true;
-                    }
-                }
-            }
-            if (s.a2x_um || isOffCanvas) {
-                cm.setFrom(s._matrix);
-                if (isHadParent) {
-                    cm.prepend(pcm);
-                }
-            }
-            if (s.a2x_ua || isOffCanvas) {
-                ca = s._alpha;
-                if (isHadParent) {
-                    ca *= pca
-                }
-            }
-            if (isOffCanvas) {
-                s._ocAlpha = ca;
-            } else {
                 s._cAlpha = ca;
             }
         }

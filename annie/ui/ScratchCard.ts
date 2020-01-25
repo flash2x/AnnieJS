@@ -19,7 +19,7 @@ namespace annieUI {
          */
         /**
          * 构造函数
-         * 请监听 "onDrawTime"事件来判断刮完多少百分比了。
+         * 请监听 annie.Event.ON_DRAW_PERCENT事件来判断刮完多少百分比了。
          * @method ScratchCard
          * @param width 宽
          * @param height 高
@@ -43,7 +43,7 @@ namespace annieUI {
                         s._currentDraw++;
                         //抛事件
                         let per = Math.floor(s._currentDraw / s._totalDraw * 100);
-                        s.dispatchEvent("onDrawTime", {per: per});
+                        s.dispatchEvent("onDrawPercent", {per: per});
                     }
                 }
             })
@@ -67,8 +67,8 @@ namespace annieUI {
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
-                let dw: number = Math.floor(s._bounds.width / s._drawRadius);
-                let dh: number = Math.floor(s._bounds.height  / s._drawRadius);
+                let dw: number = Math.floor(s._bitmapData.width / s._drawRadius);
+                let dh: number = Math.floor(s._bitmapData.height  / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (let i = 0; i < dw; i++) {
                     s._drawList[i] = [];
@@ -95,8 +95,8 @@ namespace annieUI {
         public set drawRadius(value: number) {
             let s = this;
             s._drawRadius = value;
-            let dw: number = Math.floor(s._bounds.width / s._drawRadius);
-            let dh: number = Math.floor(s._bounds.height  / s._drawRadius);
+            let dw: number = Math.floor(s._bitmapData.width / s._drawRadius);
+            let dh: number = Math.floor(s._bitmapData.height  / s._drawRadius);
             s._totalDraw = dw * dh;
             for (let i = 0; i < dw; i++) {
                 s._drawList[i] = [];

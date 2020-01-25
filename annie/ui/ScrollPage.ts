@@ -109,6 +109,12 @@ namespace annieUI {
             s._scroller.addEventListener(annie.Event.ON_SCROLL_STOP, function (e: annie.Event) {
                 s.dispatchEvent(e);
             });
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_TO_HEAD, function (e: annie.Event) {
+                s.dispatchEvent(e);
+            });
+            s._scroller.addEventListener(annie.Event.ON_SCROLL_TO_END, function (e: annie.Event) {
+                s.dispatchEvent(e);
+            });
             s.setViewWH(viewWidth, viewHeight);
         }
         /**

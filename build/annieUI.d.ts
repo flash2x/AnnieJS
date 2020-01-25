@@ -266,7 +266,7 @@ declare namespace annieUI {
          * @since 3.1.5
          */
         scrollTo(x: number, y: number, time?: number, easing?: Function): void;
-        private _translate;
+        _translate(x: number, y: number): void;
         private static toMomentum;
     }
 }
@@ -282,7 +282,6 @@ declare namespace annieUI {
      * @since 3.1.5
      */
     class MCScroller extends annieUI.Scroller {
-        private _mc;
         /**
          * 滑动的速率，值越大，滑动越慢,默认是10
          * @property rate
@@ -316,6 +315,7 @@ declare namespace annieUI {
          * @param {boolean} isVertical 是横向还是竖向滑动，默认是竖向
          */
         constructor(mc: annie.MovieClip, rate?: number, isVertical?: boolean);
+        _translate(x: number, y: number): void;
     }
 }
 /**
@@ -1026,7 +1026,7 @@ declare namespace annieUI {
          */
         /**
          * 构造函数
-         * 请监听 "onDrawTime"事件来判断刮完多少百分比了。
+         * 请监听 annie.Event.ON_DRAW_PERCENT事件来判断刮完多少百分比了。
          * @method ScratchCard
          * @param width 宽
          * @param height 高

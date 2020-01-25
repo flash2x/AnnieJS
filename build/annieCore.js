@@ -633,7 +633,7 @@ var annie;
          * @public
          * @type {string}
          */
-        Event.ON_DRAW_PERCENT = "onDrawTime";
+        Event.ON_DRAW_PERCENT = "onDrawPercent";
         return Event;
     }(annie.AObject));
     annie.Event = Event;
@@ -2326,8 +2326,6 @@ var annie;
                     s._ocMatrix = new annie.Matrix();
                 }
                 if (isHadParent) {
-                    cm = s._ocMatrix;
-                    ca = s._ocAlpha;
                     pcm = s.parent._ocMatrix;
                     pca = s.parent._ocAlpha;
                 }
@@ -2338,6 +2336,15 @@ var annie;
                     s._ocAlpha = 1;
                     return;
                 }
+                cm = s._ocMatrix;
+                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                cm.setFrom(s._matrix);
+                ca = s._alpha;
+                if (isHadParent) {
+                    cm.prepend(pcm);
+                    ca *= pca;
+                }
+                s._ocAlpha = ca;
             }
             else {
                 cm = s._cMatrix;
@@ -2346,41 +2353,36 @@ var annie;
                     pcm = s.parent._cMatrix;
                     pca = s.parent._cAlpha;
                 }
-            }
-            if (s.a2x_um) {
-                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-            }
-            if (s._cp) {
-                s.a2x_um = s.a2x_ua = true;
+                if (s.a2x_um) {
+                    s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                }
+                if (s._cp) {
+                    s.a2x_um = s.a2x_ua = true;
+                }
+                else {
+                    if (isHadParent) {
+                        var PUI = s.parent;
+                        if (PUI.a2x_um) {
+                            s.a2x_um = true;
+                        }
+                        if (PUI.a2x_ua) {
+                            s.a2x_ua = true;
+                        }
+                    }
+                }
+                if (s.a2x_um) {
+                    cm.setFrom(s._matrix);
+                    if (isHadParent) {
+                        cm.prepend(pcm);
+                    }
+                }
+                if (s.a2x_ua) {
+                    ca = s._alpha;
+                    if (isHadParent) {
+                        ca *= pca;
+                    }
+                }
                 s._cp = false;
-            }
-            else {
-                if (isHadParent) {
-                    var PUI = s.parent;
-                    if (PUI.a2x_um) {
-                        s.a2x_um = true;
-                    }
-                    if (PUI.a2x_ua) {
-                        s.a2x_ua = true;
-                    }
-                }
-            }
-            if (s.a2x_um || isOffCanvas) {
-                cm.setFrom(s._matrix);
-                if (isHadParent) {
-                    cm.prepend(pcm);
-                }
-            }
-            if (s.a2x_ua || isOffCanvas) {
-                ca = s._alpha;
-                if (isHadParent) {
-                    ca *= pca;
-                }
-            }
-            if (isOffCanvas) {
-                s._ocAlpha = ca;
-            }
-            else {
                 s._cAlpha = ca;
             }
         };
@@ -8945,7 +8947,7 @@ var annie;
         if (_progressCallback) {
             var ww = window;
             var total = e.data.totalBytes;
-            if (annie.osType == "android" && ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
+            if (ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
                 total = ww.swfBytes[_loadSceneNames[_loadIndex]];
             }
             _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
@@ -10992,8 +10994,9 @@ var annie;
         if (bgColor === void 0) { bgColor = ""; }
         if (!annie._dRender) {
             annie._dRender = new annie.OffCanvasRender();
-            annie._dRender.init(annie.DisplayObject["_canvas"]);
         }
+        //一定要更新一次
+        obj._updateMatrix();
         if (!rect) {
             rect = obj.getBounds();
         }
@@ -11007,6 +11010,7 @@ var annie;
         obj._updateMatrix(true);
         var w = Math.ceil(rect.width);
         var h = Math.ceil(rect.height);
+        annie._dRender.init(annie.DisplayObject["_canvas"]);
         annie._dRender.reSize(w, h);
         annie._dRender.begin(bgColor);
         obj._render(annie._dRender);
