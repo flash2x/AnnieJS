@@ -255,9 +255,10 @@ declare namespace annieUI {
          * @public
          * @since 3.1.5
          */
-        scrollBy(x: number, y: number, time?: number, easing?: Function): void; /**
+        scrollBy(x: number, y: number, time?: number, easing?: Function): void;
+        /**
          * 滑动到设置的x,y坐标。 注意x y位置是负数，想想为什么
-         * @method scrollBy
+         * @method scrollTo
          * @param {number} x 要滑去的x坐标
          * @param {number} y 要滑去的y坐标
          * @param {number} time 滑动时长 ms,0的话没效果直接跳
