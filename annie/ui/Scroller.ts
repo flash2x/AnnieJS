@@ -45,7 +45,7 @@ namespace annieUI {
          * @since 3.1.5
          * @default true;
          */
-        public isScrollY:boolean = true;
+        public isScrollY: boolean = true;
         /**
          * 是否横向滚动
          * @property isScrollX
@@ -54,7 +54,7 @@ namespace annieUI {
          * @public
          * @default true;
          */
-        public isScrollX:boolean = true;
+        public isScrollX: boolean = true;
         /**
          * 是否松开鼠标后让其自由缓冲滑动
          * @property isMomentum
@@ -63,7 +63,7 @@ namespace annieUI {
          * @public
          * @default true;
          */
-        public isMomentum:boolean = true;
+        public isMomentum: boolean = true;
         /**
          * 是否滑到边界后有回弹效果
          * @property isBounce
@@ -72,7 +72,7 @@ namespace annieUI {
          * @public
          * @default true;
          */
-        public isBounce:boolean = true;
+        public isBounce: boolean = true;
         /**
          * 回弹的动效时长,单位:ms
          * @property bounceTime
@@ -91,7 +91,7 @@ namespace annieUI {
          * @since 3.1.5
          * @default 300
          */
-        public isLocked:boolean = true;
+        public isLocked: boolean = true;
         /**
          * 锁的像素范围
          * @property lockDis
@@ -101,6 +101,7 @@ namespace annieUI {
          * @default 5
          */
         public lockDis: number = 5;
+
         /**
          * 当前滑动的x坐标 更改此参数则需要调用resetPosition()方法生效
          * @property curX
@@ -108,10 +109,12 @@ namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        public get curX():number {
+        public get curX(): number {
             return this._curX;
         }
-        protected _curX:number=0;
+
+        protected _curX: number = 0;
+
         /**
          * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
          * @property curY
@@ -119,10 +122,12 @@ namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        public get curY():number{
+        public get curY(): number {
             return this._curY;
         }
-        protected _curY:number=0;
+
+        protected _curY: number = 0;
+
         /**
          * 当前显示范围的宽
          * @property viewWidth
@@ -131,10 +136,12 @@ namespace annieUI {
          * @default 0
          * @readonly
          */
-        public get viewWidth():number{
-           return this._viewWidth;
+        public get viewWidth(): number {
+            return this._viewWidth;
         }
-        public _viewWidth:number=0;
+
+        public _viewWidth: number = 0;
+
         /**
          * 当前显示范围的高
          * @property viewHeight
@@ -143,10 +150,12 @@ namespace annieUI {
          * @default 0
          * @readonly
          */
-        public get viewHeight():number{
-           return this._viewHeight;
+        public get viewHeight(): number {
+            return this._viewHeight;
         }
-        public _viewHeight:number=0;
+
+        public _viewHeight: number = 0;
+
         /**
          * 当前横向的滑动范围
          * @property scrollWidth
@@ -155,10 +164,12 @@ namespace annieUI {
          * @default 0
          * @readonly
          */
-        public get scrollWidth():number{
-           return this._scrollWidth;
+        public get scrollWidth(): number {
+            return this._scrollWidth;
         }
-        public _scrollWidth:number=0;
+
+        public _scrollWidth: number = 0;
+
         /**
          * 当前纵向的滑动范围
          * @property scrollHeight
@@ -167,10 +178,11 @@ namespace annieUI {
          * @default 0
          * @readonly
          */
-        public get scrollHeight():number{
+        public get scrollHeight(): number {
             return this._scrollHeight;
         }
-        public _scrollHeight:number=0;
+
+        public _scrollHeight: number = 0;
         /**
          * 是否正在滑动中
          * @property isRunning
@@ -181,23 +193,24 @@ namespace annieUI {
         public isRunning: boolean;
         private startX: number = 0;
         private startY: number = 0;
-        private maxScrollX: number=0;
-        private maxScrollY: number=0;
-        private endTime: number=0;
-        private mouseStatus: number=0;
-        private distX: number=0;
-        private distY: number=0;
-        private startTime: number=0;
-        private absStartX: number=0;
-        private absStartY: number=0;
-        private pointX: number=0;
-        private pointY: number=0;
+        private maxScrollX: number = 0;
+        private maxScrollY: number = 0;
+        private endTime: number = 0;
+        private mouseStatus: number = 0;
+        private distX: number = 0;
+        private distY: number = 0;
+        private startTime: number = 0;
+        private absStartX: number = 0;
+        private absStartY: number = 0;
+        private pointX: number = 0;
+        private pointY: number = 0;
         private deceleration: number = 0.0006;
-        private destTime: number=0;
-        private destX: number=0;
-        private destY: number=0;
-        private duration: number=0;
+        private destTime: number = 0;
+        private destX: number = 0;
+        private destY: number = 0;
+        private duration: number = 0;
         private easingFn: Function;
+
         /**
          * 初始化
          * @method Scroller
@@ -215,6 +228,7 @@ namespace annieUI {
             s._enterFrame = s.onEnterFrame.bind(s);
             s.init(container, viewWidth, viewHeight, scrollWidth, scrollHeight);
         }
+
         /**
          * 初始化，也可以反复调用此方法重用scroller
          * @method init
@@ -228,15 +242,15 @@ namespace annieUI {
          */
         public init(container: annie.DisplayObject, viewWidth: number, viewHeight: number, scrollWidth: number, scrollHeight: number) {
             let s = this;
-            if(s._container&&s._container!=container){
-               //移除
+            if (s._container && s._container != container) {
+                //移除
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
-            if(s._container!=container) {
+            if (s._container != container) {
                 s._container = container;
                 container.addEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
@@ -246,7 +260,7 @@ namespace annieUI {
             }
             s.isRunning = false;
             s.endTime = 0;
-            s.setViewWHAndScrollWH(viewWidth,viewHeight,scrollWidth,scrollHeight);
+            s.setViewWHAndScrollWH(viewWidth, viewHeight, scrollWidth, scrollHeight);
         }
 
         /**
@@ -261,14 +275,15 @@ namespace annieUI {
          * @param {number} scrollWidth
          * @param {number} scrollHeight
          */
-        public setViewWHAndScrollWH(viewWidth:number,viewHeight:number,scrollWidth:number,scrollHeight:number):void{
-            let s=this;
+        public setViewWHAndScrollWH(viewWidth: number, viewHeight: number, scrollWidth: number, scrollHeight: number): void {
+            let s = this;
             s._viewHeight = viewHeight;
             s._viewWidth = viewWidth;
             s._scrollWidth = scrollWidth;
             s._scrollHeight = scrollHeight;
             s._updateViewAndScroll();
         }
+
         /**
          * 当更改了viewWidth,viewHeight其中一个或两个,需要调用此方法重置.
          * @method setViewWH
@@ -277,12 +292,13 @@ namespace annieUI {
          * @param {number} viewWidth
          * @param {number} viewHeight
          */
-        public setViewWH(viewWidth:number,viewHeight:number){
-            let s=this;
+        public setViewWH(viewWidth: number, viewHeight: number) {
+            let s = this;
             s._viewHeight = viewHeight;
             s._viewWidth = viewWidth;
             s._updateViewAndScroll();
         }
+
         /**
          * 当更改了scrollWidth,scrollHeight其中的一个或者两个,需要调用此方法重置.
          * @method setScrollWH
@@ -291,21 +307,22 @@ namespace annieUI {
          * @param {number} scrollWidth
          * @param {number} scrollHeight
          */
-        public setScrollWH(scrollWidth:number,scrollHeight:number){
-            let s=this;
+        public setScrollWH(scrollWidth: number, scrollHeight: number) {
+            let s = this;
             s._scrollWidth = scrollWidth;
             s._scrollHeight = scrollHeight;
             s._updateViewAndScroll();
         }
-        public _updateViewAndScroll(){
-            let s=this;
+
+        public _updateViewAndScroll() {
+            let s = this;
             s.maxScrollX = s.viewWidth - s.scrollWidth;
             s.maxScrollY = s.viewHeight - s.scrollHeight;
-            if(s.maxScrollX>0){
-                s.maxScrollX=0;
+            if (s.maxScrollX > 0) {
+                s.maxScrollX = 0;
             }
-            if(s.maxScrollY>0){
-                s.maxScrollY=0;
+            if (s.maxScrollY > 0) {
+                s.maxScrollY = 0;
             }
             if (!s.isScrollX) {
                 s.maxScrollX = 0;
@@ -317,10 +334,12 @@ namespace annieUI {
             }
             s.resetPosition(200);
         }
-        private _mouseEvent:Function = null;
-        private _enterFrame:Function=null;
-        private onEnterFrame(e:annie.Event){
-            let s=this;
+
+        private _mouseEvent: Function = null;
+        private _enterFrame: Function = null;
+
+        private onEnterFrame(e: annie.Event) {
+            let s = this;
             if (s.isRunning) {
                 let now = Date.now(),
                     newX, newY,
@@ -330,9 +349,9 @@ namespace annieUI {
                     s._translate(s.destX, s.destY);
                     if (!s.resetPosition(s.bounceTime)) {
                         s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
-                        if(s._curX==0&&s._curY==0){
+                        if (s._curX == 0 && s._curY == 0) {
                             s.dispatchEvent(annie.Event.ON_SCROLL_TO_HEAD);
-                        }else if(s._curX==s.maxScrollX&&s._curY==s.maxScrollY){
+                        } else if (s._curX == s.maxScrollX && s._curY == s.maxScrollY) {
                             s.dispatchEvent(annie.Event.ON_SCROLL_TO_END);
                         }
                     }
@@ -345,8 +364,9 @@ namespace annieUI {
                 }
             }
         }
+
         private onMouseEvent(e: annie.MouseEvent): void {
-            let s=this;
+            let s = this;
             if (e.type == annie.MouseEvent.MOUSE_DOWN) {
                 s.isRunning = false;
                 s.mouseStatus = 1;
@@ -359,8 +379,10 @@ namespace annieUI {
                 s.absStartY = s._curY;
                 s.pointX = e.localX;
                 s.pointY = e.localY;
-            } else if (e.type == annie.MouseEvent.MOUSE_MOVE){
-                if(s.mouseStatus<1)return;
+            } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
+                if (s.mouseStatus < 1) {
+                    return;
+                }
                 let deltaX = e.localX - s.pointX,
                     deltaY = e.localY - s.pointY,
                     timestamp = Date.now(),
@@ -392,10 +414,10 @@ namespace annieUI {
                 if (newY > 0 || newY < s.maxScrollY) {
                     newY = s.isBounce ? s._curY + deltaY / 3 : newY > 0 ? 0 : s.maxScrollY;
                 }
-                if (s.mouseStatus==1) {
+                if (s.mouseStatus == 1) {
                     s.dispatchEvent(annie.Event.ON_SCROLL_START);
                 }
-                s.mouseStatus=2;
+                s.mouseStatus = 2;
                 s._translate(newX, newY);
                 if (timestamp - s.startTime > 300) {
                     s.startTime = timestamp;
@@ -412,19 +434,21 @@ namespace annieUI {
                     time: number = 0,
                     easing: Function = null;
                 if (s.resetPosition(s.bounceTime)) {
+                    s.mouseStatus = 0;
                     return;
                 }
-                if (s.mouseStatus!=2) {
+                if (s.mouseStatus != 2) {
+                    s.mouseStatus = 0;
                     return;
                 }
-                s.mouseStatus=0;
+                s.mouseStatus = 0;
                 s.scrollTo(newX, newY);
                 if (s.isMomentum && duration < 300) {
-                    momentumX = s.isScrollX ? Scroller.toMomentum(s._curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth/2 : 0, s.deceleration) : {
+                    momentumX = s.isScrollX ? Scroller.toMomentum(s._curX, s.startX, duration, s.maxScrollX, s.isBounce ? s.viewWidth / 2 : 0, s.deceleration) : {
                         destination: newX,
                         duration: 0
                     };
-                    momentumY = s.isScrollY ? Scroller.toMomentum(s._curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight/2 : 0, s.deceleration) : {
+                    momentumY = s.isScrollY ? Scroller.toMomentum(s._curY, s.startY, duration, s.maxScrollY, s.isBounce ? s.viewHeight / 2 : 0, s.deceleration) : {
                         destination: newY,
                         duration: 0
                     };
@@ -442,21 +466,23 @@ namespace annieUI {
                 s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
             }
         }
+
         public destroy(): void {
             let s = this;
-            if(s._container) {
+            if (s._container) {
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
-            s._container=null;
-            s.easingFn=null;
+            s._container = null;
+            s.easingFn = null;
             super.destroy();
         }
+
         public resetPosition(time: number = 0): boolean {
-            let s=this;
+            let s = this;
             let x = s._curX,
                 y = s._curY;
             time = time || 0;
@@ -488,12 +514,13 @@ namespace annieUI {
          * @since 3.1.5
          */
         public scrollBy(x: number, y: number, time: number = 0, easing: Function = null) {
-            let s=this;
+            let s = this;
             x = s._curX + x;
             y = s._curY + y;
             time = time || 0;
             s.scrollTo(x, y, time, easing);
         }
+
         /**
          * 滑动到设置的x,y坐标。 注意x y位置是负数，想想为什么
          * @method scrollTo
@@ -505,7 +532,7 @@ namespace annieUI {
          * @since 3.1.5
          */
         public scrollTo(x: number, y: number, time: number = 0, easing: Function = null) {
-            let s=this;
+            let s = this;
             if (!time) {
                 s._translate(x, y);
             } else {
@@ -521,12 +548,14 @@ namespace annieUI {
                 s.isRunning = true;
             }
         }
+
         public _translate(x: number, y: number) {
-            let s=this;
+            let s = this;
             s._curX = x;
             s._curY = y;
-            s.dispatchEvent(annie.Event.ON_SCROLL_ING,{posX:x,posY:y});
+            s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: x, posY: y});
         }
+
         private static toMomentum(current: number, start: number, time: number, lowerMargin: number, wrapperSize: number, deceleration: number) {
             let distance = current - start,
                 speed = Math.abs(distance) / time,

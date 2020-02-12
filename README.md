@@ -314,6 +314,9 @@
     支持urlLoader 加载类
     支持flash2x 管理类
 # Flash2x 版本更新列表
+## Annie2x 4.2.6
+    AnnieJS引擎升级到3.2.0版本
+    支持导出ES6
 ## Annie2x 4.2.5
     AnnieJS引擎升级到3.1.5版本
     将gulp升级到4.x,支持nodeJS 10.x以上版本

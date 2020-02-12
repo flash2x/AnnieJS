@@ -364,8 +364,9 @@ var annieUI;
                 s.pointY = e.localY;
             }
             else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
-                if (s.mouseStatus < 1)
+                if (s.mouseStatus < 1) {
                     return;
+                }
                 var deltaX = e.localX - s.pointX, deltaY = e.localY - s.pointY, timestamp = Date.now(), newX = void 0, newY = void 0, absDistX = void 0, absDistY = void 0;
                 s.pointX = e.localX;
                 s.pointY = e.localY;
@@ -409,9 +410,11 @@ var annieUI;
                 s.endTime = Date.now();
                 var momentumX = void 0, momentumY = void 0, duration = s.endTime - s.startTime, newX = s._curX, newY = s._curY, time = 0, easing = null;
                 if (s.resetPosition(s.bounceTime)) {
+                    s.mouseStatus = 0;
                     return;
                 }
                 if (s.mouseStatus != 2) {
+                    s.mouseStatus = 0;
                     return;
                 }
                 s.mouseStatus = 0;
