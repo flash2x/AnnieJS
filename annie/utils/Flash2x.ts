@@ -150,6 +150,12 @@ namespace annie {
     function onCFGComplete(e: Event): void {
         //配置文件加载完成
         let resList: any = e.data.response;
+        for(let i=resList.length-1;i>=0;i--){
+            if(resList[i].type=="imageRect"){
+                res[_loadSceneNames[_loadIndex]][resList[i].id]=resList[i];
+                resList.splice(i,1);
+            }
+        }
         _currentConfig.push(resList);
         _totalLoadRes += resList.length;
         _loadIndex++;
@@ -316,7 +322,7 @@ namespace annie {
             let currIndex = 1;
             let JSONData: any;
             fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size));
-            fileReader.onload = function () {
+            fileReader.onload = function (){
                 if (state == 0) {
                     //获取JSON有多少字节
                     state++;
@@ -344,36 +350,41 @@ namespace annie {
                     Eval(fileReader.result);
                     //解析JSON数据
                     for (let i = 1; i < JSONData.length; i++) {
-                        lastIndex = currIndex;
-                        currIndex += JSONData[i].src;
-                        if (JSONData[i].type == "image") {
-                            let image: any = new Image();
-                            image.onload = mediaResourceOnload;
-                            image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
-                            annie.res[scene][JSONData[i].id] = image;
-                        } else if (JSONData[i].type == "sound") {
-                            let audio: any = new Audio();
-                            if (annie.osType == "ios") {
-                                let sFileReader = new FileReader();
-                                sFileReader.onload = function () {
-                                    audio.src = sFileReader.result;
-                                    mediaResourceOnload(null);
-                                };
-                                sFileReader.readAsDataURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
-                            } else {
-                                audio.onloadedmetadata = mediaResourceOnload;
-                                audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
-                            }
-                            annie.res[scene][JSONData[i].id] = audio;
-                        } else if (JSONData[i].type == "json") {
-                            if (JSONData[i].id == "_a2x_con") {
-                                let conReader:any=new FileReader();
-                                conReader.onload=function(){
-                                    annie.res[scene]["_a2x_con"] = JSON.parse(conReader.result);
-                                    _parseContent(annie.res[scene]["_a2x_con"]);
-                                    conReader.onload=null;
-                                };
-                                conReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                        if (JSONData[i].type == "imageRect") {
+                            annie.res[scene][JSONData[i].id]=JSONData[i];
+                            mediaResourceOnload(null);
+                        }else {
+                            lastIndex = currIndex;
+                            currIndex += JSONData[i].src;
+                            if (JSONData[i].type == "image") {
+                                let image: any = new Image();
+                                image.onload = mediaResourceOnload;
+                                image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
+                                annie.res[scene][JSONData[i].id] = image;
+                            } else if (JSONData[i].type == "sound") {
+                                let audio: any = new Audio();
+                                if (annie.osType == "ios") {
+                                    let sFileReader = new FileReader();
+                                    sFileReader.onload = function () {
+                                        audio.src = sFileReader.result;
+                                        mediaResourceOnload(null);
+                                    };
+                                    sFileReader.readAsDataURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
+                                } else {
+                                    audio.onloadedmetadata = mediaResourceOnload;
+                                    audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
+                                }
+                                annie.res[scene][JSONData[i].id] = audio;
+                            } else if (JSONData[i].type == "json") {
+                                if (JSONData[i].id == "_a2x_con") {
+                                    let conReader: any = new FileReader();
+                                    conReader.onload = function () {
+                                        annie.res[scene]["_a2x_con"] = JSON.parse(conReader.result);
+                                        _parseContent(annie.res[scene]["_a2x_con"]);
+                                        conReader.onload = null;
+                                    };
+                                    conReader.readAsText(loadContent.slice(lastIndex, currIndex));
+                                }
                             }
                         }
                     }
@@ -384,8 +395,9 @@ namespace annie {
 
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
-        if (!_isReleased)
+        if (!_isReleased) {
             _currentConfig[_loadIndex].shift();
+        }
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         if (!_isReleased && _currentConfig[_loadIndex].length > 0) {
@@ -484,7 +496,12 @@ namespace annie {
 
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
-        return new annie.Bitmap(res[sceneName][resName]);
+        var resObj:any=res[sceneName][resName];
+        if(resObj.type=="imageRect"){
+            return new annie.Bitmap(res[sceneName]["_$a2xSS"+resObj.ssIndex],new annie.Rectangle(resObj.x,resObj.y,resObj.w,resObj.h));
+        }else {
+            return new annie.Bitmap(resObj);
+        }
     }
 
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用

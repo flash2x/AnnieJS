@@ -126,7 +126,11 @@ namespace annie {
             if (target._offsetX != 0 || target._offsetY != 0) {
                 ctx.translate(target._offsetX, target._offsetY);
             }
-            ctx.drawImage(texture, 0, 0);
+            if(!target._a2x_rect) {
+                ctx.drawImage(texture, 0, 0);
+            }else{
+                ctx.drawImage(texture, target._a2x_rect.x, target._a2x_rect.y, target._a2x_rect.width, target._a2x_rect.height, 0, 0, target._a2x_rect.width, target._a2x_rect.height);
+            }
         }
         public end(){
 

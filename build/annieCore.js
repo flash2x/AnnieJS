@@ -2763,12 +2763,17 @@ var annie;
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        function Bitmap(bitmapData) {
+        function Bitmap(bitmapData, rect) {
+            if (rect === void 0) { rect = null; }
             var _this = _super.call(this) || this;
+            _this._a2x_rect = null;
             _this._cacheCanvas = null;
             _this._bitmapData = null;
             var s = _this;
             s._instanceType = "annie.Bitmap";
+            if (rect != void 0) {
+                s._a2x_rect = new annie.Rectangle(rect.x, rect.y, rect.width, rect.height);
+            }
             s.bitmapData = bitmapData;
             return _this;
         }
@@ -2805,8 +2810,8 @@ var annie;
                 s._texture = null;
                 return;
             }
-            var bw = texture.width;
-            var bh = texture.height;
+            var bw = s._a2x_rect ? s._a2x_rect.width : texture.width;
+            var bh = s._a2x_rect ? s._a2x_rect.height : texture.height;
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
@@ -2852,7 +2857,12 @@ var annie;
                     for (var i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
-                    ctx.putImageData(imageData, 0, 0);
+                    if (s._a2x_rect) {
+                        ctx.putImageData(imageData, s._a2x_rect.x, s._a2x_rect.y, bw, bh, 0, 0, bw, bh);
+                    }
+                    else {
+                        ctx.putImageData(imageData, 0, 0);
+                    }
                     s._texture = canvas;
                 }
                 else {
@@ -8244,14 +8254,26 @@ var annie;
                 ctx.translate(target._offsetX, target._offsetY);
             }
             var sbl = target._splitBoundsList;
-            var rect = null;
+            var sblLen = sbl.length;
             var bounds = target._bounds;
-            var startX = 0 - bounds.x;
-            var startY = 0 - bounds.y;
-            for (var i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw === true) {
-                    rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x + startX, rect.y + startY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
+            var tRect = target._a2x_rect;
+            var startX = -bounds.x;
+            var startY = -bounds.y;
+            if (sblLen == 1 && !tRect) {
+                ctx.drawImage(texture, 0, 0);
+            }
+            else {
+                var tStarX = 0;
+                var tStarY = 0;
+                if (tRect) {
+                    tStarX = tRect.x;
+                    tStarY = tRect.y;
+                }
+                for (var i = 0; i < sblLen; i++) {
+                    if (sbl[i].isDraw === true) {
+                        var rect = sbl[i].rect;
+                        ctx.drawImage(texture, rect.x + startX + tStarX, rect.y + startY + tStarY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
+                    }
                 }
             }
             //getBounds
@@ -8429,7 +8451,12 @@ var annie;
             if (target._offsetX != 0 || target._offsetY != 0) {
                 ctx.translate(target._offsetX, target._offsetY);
             }
-            ctx.drawImage(texture, 0, 0);
+            if (!target._a2x_rect) {
+                ctx.drawImage(texture, 0, 0);
+            }
+            else {
+                ctx.drawImage(texture, target._a2x_rect.x, target._a2x_rect.y, target._a2x_rect.width, target._a2x_rect.height, 0, 0, target._a2x_rect.width, target._a2x_rect.height);
+            }
         };
         OffCanvasRender.prototype.end = function () {
         };
@@ -8929,6 +8956,12 @@ var annie;
     function onCFGComplete(e) {
         //配置文件加载完成
         var resList = e.data.response;
+        for (var i = resList.length - 1; i >= 0; i--) {
+            if (resList[i].type == "imageRect") {
+                annie.res[_loadSceneNames[_loadIndex]][resList[i].id] = resList[i];
+                resList.splice(i, 1);
+            }
+        }
         _currentConfig.push(resList);
         _totalLoadRes += resList.length;
         _loadIndex++;
@@ -9130,39 +9163,45 @@ var annie;
                     state_1++;
                     annie.Eval(fileReader_1.result);
                     var _loop_1 = function (i) {
-                        lastIndex_1 = currIndex_1;
-                        currIndex_1 += JSONData_1[i].src;
-                        if (JSONData_1[i].type == "image") {
-                            var image = new Image();
-                            image.onload = mediaResourceOnload;
-                            image.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
-                            annie.res[scene][JSONData_1[i].id] = image;
+                        if (JSONData_1[i].type == "imageRect") {
+                            annie.res[scene][JSONData_1[i].id] = JSONData_1[i];
+                            mediaResourceOnload(null);
                         }
-                        else if (JSONData_1[i].type == "sound") {
-                            var audio_2 = new Audio();
-                            if (annie.osType == "ios") {
-                                var sFileReader_2 = new FileReader();
-                                sFileReader_2.onload = function () {
-                                    audio_2.src = sFileReader_2.result;
-                                    mediaResourceOnload(null);
-                                };
-                                sFileReader_2.readAsDataURL(loadContent.slice(lastIndex_1, currIndex_1, "audio/mp3"));
+                        else {
+                            lastIndex_1 = currIndex_1;
+                            currIndex_1 += JSONData_1[i].src;
+                            if (JSONData_1[i].type == "image") {
+                                var image = new Image();
+                                image.onload = mediaResourceOnload;
+                                image.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1));
+                                annie.res[scene][JSONData_1[i].id] = image;
                             }
-                            else {
-                                audio_2.onloadedmetadata = mediaResourceOnload;
-                                audio_2.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1, "audio/mp3"));
+                            else if (JSONData_1[i].type == "sound") {
+                                var audio_2 = new Audio();
+                                if (annie.osType == "ios") {
+                                    var sFileReader_2 = new FileReader();
+                                    sFileReader_2.onload = function () {
+                                        audio_2.src = sFileReader_2.result;
+                                        mediaResourceOnload(null);
+                                    };
+                                    sFileReader_2.readAsDataURL(loadContent.slice(lastIndex_1, currIndex_1, "audio/mp3"));
+                                }
+                                else {
+                                    audio_2.onloadedmetadata = mediaResourceOnload;
+                                    audio_2.src = URL.createObjectURL(loadContent.slice(lastIndex_1, currIndex_1, "audio/mp3"));
+                                }
+                                annie.res[scene][JSONData_1[i].id] = audio_2;
                             }
-                            annie.res[scene][JSONData_1[i].id] = audio_2;
-                        }
-                        else if (JSONData_1[i].type == "json") {
-                            if (JSONData_1[i].id == "_a2x_con") {
-                                var conReader_1 = new FileReader();
-                                conReader_1.onload = function () {
-                                    annie.res[scene]["_a2x_con"] = JSON.parse(conReader_1.result);
-                                    _parseContent(annie.res[scene]["_a2x_con"]);
-                                    conReader_1.onload = null;
-                                };
-                                conReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                            else if (JSONData_1[i].type == "json") {
+                                if (JSONData_1[i].id == "_a2x_con") {
+                                    var conReader_1 = new FileReader();
+                                    conReader_1.onload = function () {
+                                        annie.res[scene]["_a2x_con"] = JSON.parse(conReader_1.result);
+                                        _parseContent(annie.res[scene]["_a2x_con"]);
+                                        conReader_1.onload = null;
+                                    };
+                                    conReader_1.readAsText(loadContent.slice(lastIndex_1, currIndex_1));
+                                }
                             }
                         }
                     };
@@ -9176,8 +9215,9 @@ var annie;
     }
     //检查所有资源是否全加载完成
     function _checkComplete() {
-        if (!annie._isReleased)
+        if (!annie._isReleased) {
             _currentConfig[_loadIndex].shift();
+        }
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
         if (!annie._isReleased && _currentConfig[_loadIndex].length > 0) {
@@ -9277,7 +9317,13 @@ var annie;
     annie.getResource = getResource;
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName, resName) {
-        return new annie.Bitmap(annie.res[sceneName][resName]);
+        var resObj = annie.res[sceneName][resName];
+        if (resObj.type == "imageRect") {
+            return new annie.Bitmap(annie.res[sceneName]["_$a2xSS" + resObj.ssIndex], new annie.Rectangle(resObj.x, resObj.y, resObj.w, resObj.h));
+        }
+        else {
+            return new annie.Bitmap(resObj);
+        }
     }
     //用一个对象批量设置另一个对象的属性值,此方法一般给Annie2x工具自动调用
     function d(target, info, isMc) {
@@ -10833,7 +10879,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.0";
+    annie.version = "4.0.0";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

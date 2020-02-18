@@ -137,17 +137,27 @@ namespace annie {
                 ctx.translate(target._offsetX, target._offsetY);
             }
             let sbl = target._splitBoundsList;
-            let rect = null;
+            let sblLen=sbl.length;
             let bounds=target._bounds;
-            let startX=0-bounds.x;
-            let startY=0-bounds.y;
-            for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw === true) {
-                    rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x+startX, rect.y+startY, rect.width, rect.height, rect.x+startX, rect.y+startY, rect.width, rect.height);
+            let tRect=target._a2x_rect;
+            let startX=-bounds.x;
+            let startY=-bounds.y;
+            if(sblLen==1&&!tRect){
+                ctx.drawImage(texture,0,0);
+            }else {
+                let tStarX=0;
+                let tStarY=0;
+                if(tRect){
+                    tStarX=tRect.x;
+                    tStarY=tRect.y;
+                }
+                for (let i = 0; i < sblLen; i++) {
+                    if (sbl[i].isDraw === true) {
+                        let rect = sbl[i].rect;
+                        ctx.drawImage(texture, rect.x + startX + tStarX, rect.y + startY + tStarY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
+                    }
                 }
             }
-
             //getBounds
             /*let rect1=target.getBounds();
             rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);
@@ -176,7 +186,6 @@ namespace annie {
             s._ctx.closePath();
             s._ctx.stroke();
             //*/
-
         }
 
         public end() {

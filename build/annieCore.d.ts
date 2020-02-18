@@ -1545,7 +1545,8 @@ declare namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        constructor(bitmapData: any);
+        constructor(bitmapData: any, rect?: Rectangle);
+        private _a2x_rect;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
