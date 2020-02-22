@@ -296,12 +296,13 @@ namespace annie {
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                s.renderObj = new CanvasRender(s);
+                s.renderObj = new CanvasRender();
             } else {
                 //webgl
-                //s.renderObj = new WebGLRender(s);
+                s.renderObj = new WebGLRender();
             }
             s.renderObj.init(document.createElement('canvas'));
+            s.rootDiv.appendChild(s.renderObj.rootContainer);
             let rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType == "pc") {
@@ -322,8 +323,9 @@ namespace annie {
         private _touchEvent: annie.TouchEvent;
 
         public _render(renderObj: IRender): void {
-            renderObj.begin(this.bgColor);
-            super._render(renderObj);
+            let s=this;
+            renderObj.begin(s.bgColor);
+            renderObj.draw(s);
             renderObj.end();
         }
 

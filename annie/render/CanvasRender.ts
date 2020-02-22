@@ -31,23 +31,15 @@ namespace annie {
          * @default null
          */
         public _ctx: any;
-        /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage: Stage;
 
         /**
          * @method CanvasRender
-         * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
-        public constructor(stage: Stage) {
+        public constructor() {
             super();
             this._instanceType = "annie.CanvasRender";
-            this._stage = stage;
         }
 
         /**
@@ -121,40 +113,73 @@ namespace annie {
          */
         public draw(target: any): void {
             let s = this;
-            let texture = target._texture;
-            if (!texture||texture.width == 0 || texture.height == 0) return;
-            let ctx = s._ctx, tm;
-            tm = target._cMatrix;
-            if (ctx.globalAlpha != target._cAlpha) {
-                ctx.globalAlpha = target._cAlpha
-            }
-            if (s._blendMode != target.blendMode) {
-                ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
-                s._blendMode = target.blendMode;
-            }
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target._offsetX != 0 || target._offsetY != 0) {
-                ctx.translate(target._offsetX, target._offsetY);
-            }
-            let sbl = target._splitBoundsList;
-            let sblLen=sbl.length;
-            let bounds=target._bounds;
-            let tRect=target._a2x_rect;
-            let startX=-bounds.x;
-            let startY=-bounds.y;
-            if(sblLen==1&&!tRect){
-                ctx.drawImage(texture,0,0);
-            }else {
-                let tStarX=0;
-                let tStarY=0;
-                if(tRect){
-                    tStarX=tRect.x;
-                    tStarY=tRect.y;
-                }
-                for (let i = 0; i < sblLen; i++) {
-                    if (sbl[i].isDraw === true) {
-                        let rect = sbl[i].rect;
-                        ctx.drawImage(texture, rect.x + startX + tStarX, rect.y + startY + tStarY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
+            if (target._visible && target._cAlpha > 0) {
+                let isContainer: boolean = target instanceof annie.Sprite;
+                if (!isContainer|| target._isCache){
+                    let texture = target._texture;
+                    if (!texture || texture.width == 0 || texture.height == 0) return;
+                    let ctx = s._ctx, tm;
+                    tm = target._cMatrix;
+                    if (ctx.globalAlpha != target._cAlpha) {
+                        ctx.globalAlpha = target._cAlpha
+                    }
+                    if (s._blendMode != target.blendMode) {
+                        ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
+                        s._blendMode = target.blendMode;
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                    let sbl = target._splitBoundsList;
+                    let sblLen = sbl.length;
+                    let drawRect = target._a2x_drawRect;
+                    if (sblLen == 1&&(!drawRect.isSheetSprite||target._isCache)) {
+                        ctx.drawImage(texture, 0, 0);
+                    } else {
+                        let tStarX = 0;
+                        let tStarY = 0;
+                        if (drawRect.isSheetSprite) {
+                            tStarX = drawRect.x;
+                            tStarY = drawRect.y;
+                        }
+                        for (let i = 0; i < sblLen; i++) {
+                            if (sbl[i].isDraw === true) {
+                                let rect = sbl[i].rect;
+                                ctx.drawImage(texture, rect.x  + tStarX, rect.y  + tStarY, rect.width, rect.height, rect.x , rect.y , rect.width, rect.height);
+                            }
+                        }
+                    }
+                } else {
+                    let len: number = target.children.length;
+                    if (len > 0) {
+                        let children: any = target.children;
+                        let maskObj: any;
+                        let child: any;
+                        for (let i = 0; i < len; i++) {
+                            child = children[i];
+                            if (child._isUseToMask > 0) {
+                                continue;
+                            }
+                            if (maskObj instanceof annie.DisplayObject) {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        s.endMask();
+                                        maskObj = child.mask;
+                                        s.beginMask(maskObj);
+                                    }
+                                } else {
+                                    s.endMask();
+                                    maskObj = null;
+                                }
+                            } else {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            s.draw(child);
+                        }
+                        if (maskObj instanceof annie.DisplayObject) {
+                            s.endMask();
+                        }
                     }
                 }
             }
@@ -200,7 +225,6 @@ namespace annie {
         public init(canvas: any): void {
             let s = this;
             s.rootContainer = canvas;
-            s._stage.rootDiv.appendChild(s.rootContainer);
             s.rootContainer.id = "_a2x_canvas";
             s._ctx = canvas.getContext('2d');
         }
@@ -224,7 +248,6 @@ namespace annie {
         destroy(): void {
             let s = this;
             s.rootContainer = null;
-            s._stage = null;
             s._ctx = null;
         }
     }

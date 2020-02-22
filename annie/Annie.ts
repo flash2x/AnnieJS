@@ -198,8 +198,8 @@ namespace annie {
         if (!rect) {
             rect = obj.getBounds();
         }
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
+        _dRender._offsetX=rect.x;
+        _dRender._offsetY=rect.y;
         //先更新
         let parent = obj.parent;
         obj.parent = null;
@@ -211,7 +211,8 @@ namespace annie {
         _dRender.init(DisplayObject["_canvas"]);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
-        obj._render(_dRender);
+        _dRender.draw(obj);
+        _dRender.end();
         obj.parent = parent;
         if (!typeInfo) {
             typeInfo = {type: "png"};
@@ -229,20 +230,24 @@ namespace annie {
         let parent = obj.parent;
         //这里不需要执行_onUpdateFrame
         let rect = obj.getBounds();
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
+        obj.getDrawRect();
+        let x=DisplayObject._transformRect.x;
+        let y=DisplayObject._transformRect.y;
+        _dRender._offsetX=rect.x;
+        _dRender._offsetY=rect.y;
         //先更新
         obj.parent = null;
         obj._updateMatrix(true);
         if (!obj._texture) {
             obj._texture = document.createElement("canvas");
         }
-        _dRender.init(obj._texture);
         let w: number = Math.ceil(rect.width);
         let h: number = Math.ceil(rect.height);
+        _dRender.init(obj._texture);
         _dRender.reSize(w, h);
         _dRender.begin("");
-        obj._render(_dRender);
+        _dRender.draw(obj);
+        _dRender.end();
         //看看是否有滤镜
         let cf: any = obj._filters;
         let cfLen = cf.length;
@@ -255,6 +260,9 @@ namespace annie {
             ctx.putImageData(imageData, 0, 0);
         }
         obj.parent = parent;
+        obj._offsetX=x-obj.x;
+        obj._offsetY=y-obj.y;
+        obj.a2x_um=true;
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>

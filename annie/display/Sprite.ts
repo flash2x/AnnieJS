@@ -384,12 +384,6 @@ namespace annie {
         protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s = this;
             if (s._visible) {
-                super._updateMatrix(isOffCanvas);
-                let children: any = s.children;
-                let len: number = children.length;
-                for (let i = 0; i < len; i++) {
-                    children[i]._updateMatrix(isOffCanvas);
-                }
                 //所有未缓存的信息还是一如既往的更新,保持信息同步
                 if (s.a2x_uf) {
                     s.a2x_uf = false;
@@ -398,7 +392,15 @@ namespace annie {
                         annie.createCache(s);
                         s._updateSplitBounds();
                         s._checkDrawBounds();
+                    }else{
+                        s.a2x_um=true;
                     }
+                }
+                super._updateMatrix(isOffCanvas);
+                let children: any = s.children;
+                let len: number = children.length;
+                for (let i = 0; i < len; i++) {
+                    children[i]._updateMatrix(isOffCanvas);
                 }
                 if (!isOffCanvas){
                     s.a2x_ua = false;
@@ -406,49 +408,6 @@ namespace annie {
                 }
             }
         }
-        public _render(renderObj: IRender): void {
-            let s: any = this;
-            if (s._isCache && s.parent) {
-                //这里为什么要加上s.parent判断呢，因为离屏渲染也是走的这个方法，显然离屏渲染就是为了生成缓存的，当然就不能直接走缓存这个逻辑
-                super._render(renderObj);
-            } else {
-                let len: number = s.children.length;
-                if (s._visible && s._cAlpha > 0 && len > 0) {
-                    let children: any = s.children;
-                    let ro: any = renderObj;
-                    let maskObj: any;
-                    let child: any;
-                    for (let i = 0; i < len; i++) {
-                        child = children[i];
-                        if (child._isUseToMask > 0) {
-                            continue;
-                        }
-                        if (maskObj instanceof annie.DisplayObject) {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
-                                    ro.endMask();
-                                    maskObj = child.mask;
-                                    ro.beginMask(maskObj);
-                                }
-                            } else {
-                                ro.endMask();
-                                maskObj = null;
-                            }
-                        } else {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                ro.beginMask(maskObj);
-                            }
-                        }
-                        child._render(ro);
-                    }
-                    if (maskObj instanceof annie.DisplayObject) {
-                        ro.endMask();
-                    }
-                }
-            }
-        }
-
         public _onRemoveEvent(isReSetMc: boolean): void {
             let s = this;
             let child: any = null;

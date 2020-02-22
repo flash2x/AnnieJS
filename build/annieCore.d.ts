@@ -1099,6 +1099,17 @@ declare namespace annie {
          */
         readonly isCache: boolean;
         _isCache: boolean;
+        _a2x_drawRect: {
+            isSheetSprite: boolean;
+            x: number;
+            y: number;
+            w: number;
+            h: number;
+            uvX: number;
+            uvY: number;
+            uvW: number;
+            uvH: number;
+        };
         /**
          * 是否将这个对象缓存为位图了
          * @property cacheAsBitmap
@@ -1367,7 +1378,6 @@ declare namespace annie {
          */
         getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
         protected _updateMatrix(isOffCanvas?: boolean): void;
-        protected _render(renderObj: IRender | any): void;
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用 getWH()方法获取宽和高
@@ -1545,8 +1555,7 @@ declare namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        constructor(bitmapData: any, rect?: Rectangle);
-        private _a2x_rect;
+        constructor(bitmapData: any, rect?: any);
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -2094,7 +2103,6 @@ declare namespace annie {
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean): DisplayObject;
         getBounds(): Rectangle;
         protected _updateMatrix(isOffCanvas?: boolean): void;
-        _render(renderObj: IRender): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
         _onUpdateFrame(mcSpeed?: number, isOffCanvas?: boolean): void;
@@ -3696,18 +3704,11 @@ declare namespace annie {
          */
         _ctx: any;
         /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage;
-        /**
          * @method CanvasRender
-         * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
-        constructor(stage: Stage);
+        constructor();
         /**
          * 开始渲染时执行
          * @method begin
@@ -3845,6 +3846,361 @@ declare namespace annie {
          */
         reSize(width: number, height: number): void;
         destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.WebGLRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 4.0.0
+     */
+    class WebGLRender extends AObject implements IRender {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 4.0.0
+         * @type {any}
+         * @default null
+         */
+        rootContainer: any;
+        /**
+         * @property viewPort
+         *
+         */
+        viewPort: annie.Rectangle;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
+        _ctx: any;
+        /**
+         * @method WebGLRender
+         * @public
+         * @since 4.0.0
+         */
+        constructor();
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 4.0.0
+         * @public
+         */
+        begin(color: string): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 4.0.0
+         */
+        beginMask(target: any): void;
+        private drawMask;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 4.0.0
+         */
+        endMask(): void;
+        private _blendMode;
+        /**
+         * 调用渲染
+         * @public
+         * @since 4.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        end(): void;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 4.0.0
+         * @method init
+         */
+        init(canvas: any): void;
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 4.0.0
+         * @method reSize
+         */
+        reSize(width: number, height: number): void;
+        destroy(): void;
+        /**
+         * Specifies whether or not the browser's WebGL implementation should try to perform anti-aliasing.
+         * @property _antialias
+         * @protected
+         * @type {Boolean}
+         * @default false
+         */
+        _antialias: boolean;
+        /**
+         * Specifies whether or not StageGL is handling colours as premultiplied alpha.
+         * @property _premultiply
+         * @protected
+         * @type {Boolean}
+         * @default false
+         */
+        _premultiply: boolean;
+        /**
+         * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
+         * @property _autoPurge
+         * @protected
+         * @type {Integer}
+         * @default null
+         */
+        _autoPurge: number;
+        /**
+         * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates. Regular canvas display
+         * uses Top-Left values of [0,0] where WebGL uses a Center [0,0] Top-Right [1,1] (euclidean) system.
+         * @property _projectionMatrix
+         * @protected
+         * @type {Float32Array}
+         * @default null
+         */
+        _projectionMatrix: Float32Array;
+        _projectionMatrixFlip: Float32Array;
+        /**
+         * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
+         * @property _clearColor
+         * @protected
+         * @type {Object}
+         * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
+         */
+        _clearColor: any;
+        /**
+         * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
+         * modify otherwise internal buffers may be incorrect sizes.
+         * @property _maxCardsPerBatch
+         * @protected
+         * @type {Number}
+         * @default WebGLRender.DEFAULT_MAX_BATCH_SIZE (10000)
+         */
+        _maxCardsPerBatch: number;
+        /**
+         * The shader program used to draw the current batch.
+         * @property _activeShader
+         * @protected
+         * @type {WebGLProgram}
+         * @default null
+         */
+        _activeShader: any;
+        /**
+         * The vertex position data for the current draw call.
+         * @property _vertices
+         * @protected
+         * @type {Float32Array}
+         * @default null
+         */
+        _vertices: Float32Array;
+        /**
+         * The WebGL buffer attached to {{#crossLink "StageGL/_vertices:property"}}{{/crossLink}}.
+         * @property _vertexPositionBuffer
+         * @protected
+         * @type {WebGLBuffer}
+         * @default null
+         */
+        _vertexPositionBuffer: any;
+        /**
+         * The vertex U/V data for the current draw call.
+         * @property _uvs
+         * @protected
+         * @type {Float32Array}
+         * @default null
+         */
+        _uvs: Float32Array;
+        /**
+         * The WebGL buffer attached to {{#crossLink "StageGL/_uvs:property"}}{{/crossLink}}.
+         * @property _uvPositionBuffer
+         * @protected
+         * @type {WebGLBuffer}
+         * @default null
+         */
+        _uvPositionBuffer: any;
+        /**
+         * The vertex indices data for the current draw call.
+         * @property _indices
+         * @protected
+         * @type {Float32Array}
+         * @default null
+         */
+        _indices: Float32Array;
+        /**
+         * The WebGL buffer attached to {{#crossLink "StageGL/_indices:property"}}{{/crossLink}}.
+         * @property _textureIndexBuffer
+         * @protected
+         * @type {WebGLBuffer}
+         * @default null
+         */
+        _textureIndexBuffer: any;
+        /**
+         * The vertices data for the current draw call.
+         * @property _alphas
+         * @protected
+         * @type {Float32Array}
+         * @default null
+         */
+        _alphas: Float32Array;
+        /**
+         * The WebGL buffer attached to {{#crossLink "StageGL/_alphas:property"}}{{/crossLink}}.
+         * @property _alphaBuffer
+         * @protected
+         * @type {WebGLBuffer}
+         * @default null
+         */
+        _alphaBuffer: any;
+        /**
+         * An index based lookup of every WebGL Texture currently in use.
+         * @property _drawTexture
+         * @protected
+         * @type {Dictionary}
+         */
+        _textureDictionary: any;
+        /**
+         * An array of all the textures currently loaded into the GPU. The index in the array matches the GPU index.
+         * @property _batchTextures
+         * @protected
+         * @type {Array}
+         */
+        _batchTextures: Array<any>;
+        /**
+         * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during initialization
+         * via `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`. The WebGL spec states that the lowest guaranteed value is 8,
+         * but it could be higher. Do not set this value higher than the value returned by the GPU. Setting it lower will
+         * probably reduce performance, but may be advisable to reserve slots for custom filter work.
+         * NOTE: Can also act as a length for {{#crossLink "StageGL/_batchTextures:property"}}.
+         * @property _batchTextureCount
+         * @protected
+         * @type {Number}
+         * @default 8
+         */
+        _batchTextureCount: number;
+        /**
+         * The location at which the last texture was inserted into a GPU slot in {{#crossLink "StageGL/_batchTextures:property"}}{{/crossLink}}.
+         * Manual control of this variable can yield improvements in performance by intelligently replacing textures
+         * inside a batch to reduce texture re-load. It is impossible to write automated general use code, as it requires
+         * display list look ahead inspection and/or render foreknowledge.
+         * @property _lastTextureInsert
+         * @protected
+         * @type {Number}
+         * @default -1
+         */
+        _lastTextureInsert: number;
+        /**
+         * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
+         * can occur per draw.
+         * @property _batchId
+         * @protected
+         * @type {Number}
+         * @default 0
+         */
+        _batchID: number;
+        /**
+         * Used to ensure every canvas used as a texture source has a unique ID.
+         * @property _lastTrackedCanvas
+         * @protected
+         * @type {Number}
+         * @default 0
+         */
+        _lastTrackedCanvas: number;
+        /**
+         * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
+         * @property INDICIES_PER_CARD
+         * @static
+         * @final
+         * @type {Number}
+         * @default 6
+         * @readonly
+         */
+        static INDICIES_PER_CARD: number;
+        /**
+         * Default U/V rect for dealing with full coverage from an image source.
+         * @property UV_RECT
+         * @static
+         * @final
+         * @type {Object}
+         * @default {t:0, l:0, b:1, r:1}
+         * @readonly
+         */
+        static UV_RECT: any;
+        /**
+         * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+         * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
+         * pre-compile.
+         * @property REGULAR_VARYING_HEADER
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        static REGULAR_VARYING_HEADER: string;
+        /**
+         * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
+         * all expected objects. Shader code may contain templates that are replaced pre-compile.
+         * @property REGULAR_VERTEX_HEADER
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        static REGULAR_VERTEX_HEADER: string;
+        /**
+         * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
+         * all expected objects. Shader code may contain templates that are replaced pre-compile.
+         * @property REGULAR_FRAGMENT_HEADER
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        static REGULAR_FRAGMENT_HEADER: string;
+        /**
+         * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
+         * templates that are replaced pre-compile.
+         * @property REGULAR_VERTEX_BODY
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        static REGULAR_VERTEX_BODY: string;
+        /**
+         * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
+         * contain templates that are replaced pre-compile.
+         * @property REGULAR_FRAGMENT_BODY
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        static REGULAR_FRAGMENT_BODY: string;
+        static REGULAR_FRAG_COLOR_NORMAL: string;
+        static REGULAR_FRAG_COLOR_PREMULTIPLY: string;
+        releaseTexture(displayObject: any): void;
+        _createShaderProgram(): void;
+        updateViewport(): void;
+        getBaseTexture(): any;
+        setTextureParams(): void;
+        _getShaderProgram(): any;
+        _createShader(type: any, str: string): any;
+        _createBuffers(): void;
+        _storeID: number;
+        _createTexture(texData: any): any;
+        _pushTextureToBatch(texture: any): void;
+        _updateTextureData(texture: any): void;
+        _killTextureObject(texture: any): void;
+        batchCardCount: number;
+        _drawBatchGroup(container: annie.Sprite): void;
+        _drawBuffers(): void;
     }
 }
 /**

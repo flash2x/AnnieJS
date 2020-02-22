@@ -110,31 +110,71 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: any): void {
-            let s = this;
-            let texture = target._texture;
-            if (texture.width == 0 || texture.height == 0) return;
-            let ctx = s._ctx;
-            let tm = target._ocMatrix;
-            if (ctx.globalAlpha != target._ocAlpha) {
-                ctx.globalAlpha = target._ocAlpha;
-            }
-            if (s._blendMode != target.blendMode) {
-                ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
-                s._blendMode = target.blendMode;
-            }
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target._offsetX != 0 || target._offsetY != 0) {
-                ctx.translate(target._offsetX, target._offsetY);
-            }
-            if(!target._a2x_rect) {
-                ctx.drawImage(texture, 0, 0);
-            }else{
-                ctx.drawImage(texture, target._a2x_rect.x, target._a2x_rect.y, target._a2x_rect.width, target._a2x_rect.height, 0, 0, target._a2x_rect.width, target._a2x_rect.height);
+            let s:any = this;
+            if (target._visible && target._cAlpha > 0) {
+                let isContainer: boolean = target instanceof annie.Sprite;
+                //判断parent很重要
+                if (!isContainer || (target._isCache&&target.parent!=void 0)) {
+                    let texture = target._texture;
+                    if (texture.width == 0 || texture.height == 0) return;
+                    let ctx = s._ctx;
+                    let tm = target._ocMatrix;
+                    if (ctx.globalAlpha != target._ocAlpha) {
+                        ctx.globalAlpha = target._ocAlpha;
+                    }
+                    if (s._blendMode != target.blendMode) {
+                        ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
+                        s._blendMode = target.blendMode;
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx-s._offsetX, tm.ty-s._offsetY);
+                    let drawRect=target._a2x_drawRect;
+                    if (!drawRect.isSpriteSheet||target._isCache) {
+                        ctx.drawImage(texture, 0, 0);
+                    } else {
+                        ctx.drawImage(texture, drawRect.x, drawRect.y, drawRect.width, drawRect.height, 0, 0, drawRect.width, drawRect.height);
+                    }
+                }else{
+                    let len: number = target.children.length;
+                    if (len > 0) {
+                        let children: any = target.children;
+                        let maskObj: any;
+                        let child: any;
+                        for (let i = 0; i < len; i++) {
+                            child = children[i];
+                            if (child._isUseToMask > 0) {
+                                continue;
+                            }
+                            if (maskObj instanceof annie.DisplayObject) {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        s.endMask();
+                                        maskObj = child.mask;
+                                        s.beginMask(maskObj);
+                                    }
+                                } else {
+                                    s.endMask();
+                                    maskObj = null;
+                                }
+                            } else {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            s.draw(child);
+                        }
+                        if (maskObj instanceof annie.DisplayObject) {
+                            s.endMask();
+                        }
+                    }
+                }
             }
         }
-        public end(){
+
+        public end() {
 
         };
+
         /**
          * 初始化渲染器
          * @public

@@ -696,10 +696,8 @@ namespace annie {
                         let width = buttonRightX - leftX;
                         let height = buttonRightY - leftY;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        s._offsetX = leftX;
+                        s._offsetX= leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX;
-                        s._bounds.y = leftY;
                         height = Math.ceil(height);
                         width = Math.ceil(width);
                         texture.width = width;

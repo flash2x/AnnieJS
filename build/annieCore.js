@@ -1685,6 +1685,7 @@ var annie;
             _this.a2x_ua = false;
             _this.a2x_uf = false;
             _this._isCache = false;
+            _this._a2x_drawRect = { isSheetSprite: false, x: 0, y: 0, w: 0, h: 0, uvX: 0, uvY: 0, uvW: 0, uvH: 0 };
             _this._cacheAsBitmap = false;
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
@@ -1822,6 +1823,8 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (value != s._cacheAsBitmap) {
+                    s._offsetX = 0;
+                    s._offsetY = 0;
                     s._cacheAsBitmap = value;
                     s._isCache = (s._cacheAsBitmap || s._filters.length > 0 || s._blendMode != 0);
                     s.a2x_uf = true;
@@ -2265,7 +2268,7 @@ var annie;
                 var ctx = void 0;
                 if (s.instanceType != "annie.Bitmap") {
                     ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x - s._offsetX, p.y - s._offsetY, 1, 1).data[3] > 0) {
+                    if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
                         return s;
                     }
                 }
@@ -2275,7 +2278,7 @@ var annie;
                     _canvas.width = 1;
                     _canvas.height = 1;
                     ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, p.x - s._offsetX, p.y - s._offsetY);
+                    ctx.setTransform(1, 0, 0, 1, p.x, p.y);
                     ctx.drawImage(texture, 0, 0);
                     if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                         return s;
@@ -2331,13 +2334,11 @@ var annie;
                 }
                 else {
                     s._ocMatrix.identity();
-                    s._ocMatrix.tx = -s._offsetX;
-                    s._ocMatrix.ty = -s._offsetY;
                     s._ocAlpha = 1;
                     return;
                 }
                 cm = s._ocMatrix;
-                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                s._matrix.createBox(s._x + s._offsetX, s._y + s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 cm.setFrom(s._matrix);
                 ca = s._alpha;
                 if (isHadParent) {
@@ -2354,7 +2355,7 @@ var annie;
                     pca = s.parent._cAlpha;
                 }
                 if (s.a2x_um) {
-                    s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                    s._matrix.createBox(s._x + s._offsetX, s._y + s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 }
                 if (s._cp) {
                     s.a2x_um = s.a2x_ua = true;
@@ -2384,12 +2385,6 @@ var annie;
                 }
                 s._cp = false;
                 s._cAlpha = ca;
-            }
-        };
-        DisplayObject.prototype._render = function (renderObj) {
-            var s = this;
-            if (s._visible && s._cAlpha > 0) {
-                renderObj.draw(s);
             }
         };
         Object.defineProperty(DisplayObject.prototype, "width", {
@@ -2503,7 +2498,7 @@ var annie;
                             }
                             sbl.push({
                                 isDraw: true,
-                                rect: new annie.Rectangle(newX + bounds.x, newY + bounds.y, newW, newH)
+                                rect: new annie.Rectangle(newX, newY, newW, newH)
                             });
                         }
                     }
@@ -2766,13 +2761,17 @@ var annie;
         function Bitmap(bitmapData, rect) {
             if (rect === void 0) { rect = null; }
             var _this = _super.call(this) || this;
-            _this._a2x_rect = null;
             _this._cacheCanvas = null;
             _this._bitmapData = null;
             var s = _this;
             s._instanceType = "annie.Bitmap";
             if (rect != void 0) {
-                s._a2x_rect = new annie.Rectangle(rect.x, rect.y, rect.width, rect.height);
+                var drawRect = s._a2x_drawRect;
+                drawRect.isSheetSprite = true;
+                drawRect.x = rect.x;
+                drawRect.y = rect.x;
+                drawRect.w = rect.width;
+                drawRect.h = rect.height;
             }
             s.bitmapData = bitmapData;
             return _this;
@@ -2810,8 +2809,13 @@ var annie;
                 s._texture = null;
                 return;
             }
-            var bw = s._a2x_rect ? s._a2x_rect.width : texture.width;
-            var bh = s._a2x_rect ? s._a2x_rect.height : texture.height;
+            var drawRect = s._a2x_drawRect;
+            var bw = texture.width;
+            var bh = texture.height;
+            if (drawRect.isSheetSprite) {
+                bw = drawRect.w;
+                bh = drawRect.h;
+            }
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
@@ -2857,8 +2861,8 @@ var annie;
                     for (var i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
-                    if (s._a2x_rect) {
-                        ctx.putImageData(imageData, s._a2x_rect.x, s._a2x_rect.y, bw, bh, 0, 0, bw, bh);
+                    if (drawRect.isSheetSprite) {
+                        ctx.putImageData(imageData, drawRect.x, drawRect.y, bw, bh, 0, 0, bw, bh);
                     }
                     else {
                         ctx.putImageData(imageData, 0, 0);
@@ -3617,8 +3621,6 @@ var annie;
                         ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
                         s._offsetX = leftX;
                         s._offsetY = leftY;
-                        s._bounds.x = leftX;
-                        s._bounds.y = leftY;
                         height = Math.ceil(height);
                         width = Math.ceil(width);
                         texture.width = width;
@@ -4139,12 +4141,6 @@ var annie;
             if (isOffCanvas === void 0) { isOffCanvas = false; }
             var s = this;
             if (s._visible) {
-                _super.prototype._updateMatrix.call(this, isOffCanvas);
-                var children = s.children;
-                var len = children.length;
-                for (var i = 0; i < len; i++) {
-                    children[i]._updateMatrix(isOffCanvas);
-                }
                 //所有未缓存的信息还是一如既往的更新,保持信息同步
                 if (s.a2x_uf) {
                     s.a2x_uf = false;
@@ -4154,55 +4150,19 @@ var annie;
                         s._updateSplitBounds();
                         s._checkDrawBounds();
                     }
+                    else {
+                        s.a2x_um = true;
+                    }
+                }
+                _super.prototype._updateMatrix.call(this, isOffCanvas);
+                var children = s.children;
+                var len = children.length;
+                for (var i = 0; i < len; i++) {
+                    children[i]._updateMatrix(isOffCanvas);
                 }
                 if (!isOffCanvas) {
                     s.a2x_ua = false;
                     s.a2x_um = false;
-                }
-            }
-        };
-        Sprite.prototype._render = function (renderObj) {
-            var s = this;
-            if (s._isCache && s.parent) {
-                //这里为什么要加上s.parent判断呢，因为离屏渲染也是走的这个方法，显然离屏渲染就是为了生成缓存的，当然就不能直接走缓存这个逻辑
-                _super.prototype._render.call(this, renderObj);
-            }
-            else {
-                var len = s.children.length;
-                if (s._visible && s._cAlpha > 0 && len > 0) {
-                    var children = s.children;
-                    var ro = renderObj;
-                    var maskObj = void 0;
-                    var child = void 0;
-                    for (var i = 0; i < len; i++) {
-                        child = children[i];
-                        if (child._isUseToMask > 0) {
-                            continue;
-                        }
-                        if (maskObj instanceof annie.DisplayObject) {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
-                                    ro.endMask();
-                                    maskObj = child.mask;
-                                    ro.beginMask(maskObj);
-                                }
-                            }
-                            else {
-                                ro.endMask();
-                                maskObj = null;
-                            }
-                        }
-                        else {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                ro.beginMask(maskObj);
-                            }
-                        }
-                        child._render(ro);
-                    }
-                    if (maskObj instanceof annie.DisplayObject) {
-                        ro.endMask();
-                    }
                 }
             }
         };
@@ -6697,13 +6657,14 @@ var annie;
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                s.renderObj = new annie.CanvasRender(s);
+                s.renderObj = new annie.CanvasRender();
             }
             else {
                 //webgl
-                //s.renderObj = new WebGLRender(s);
+                s.renderObj = new annie.WebGLRender();
             }
             s.renderObj.init(document.createElement('canvas'));
+            s.rootDiv.appendChild(s.renderObj.rootContainer);
             var rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.osType == "pc") {
@@ -6795,8 +6756,9 @@ var annie;
             configurable: true
         });
         Stage.prototype._render = function (renderObj) {
-            renderObj.begin(this.bgColor);
-            _super.prototype._render.call(this, renderObj);
+            var s = this;
+            renderObj.begin(s.bgColor);
+            renderObj.draw(s);
             renderObj.end();
         };
         //刷新mouse或者touch事件
@@ -8145,11 +8107,10 @@ var annie;
         __extends(CanvasRender, _super);
         /**
          * @method CanvasRender
-         * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
-        function CanvasRender(stage) {
+        function CanvasRender() {
             var _this = _super.call(this) || this;
             /**
              * 渲染器所在最上层的对象
@@ -8167,7 +8128,6 @@ var annie;
             _this.viewPort = new annie.Rectangle();
             _this._blendMode = 0;
             _this._instanceType = "annie.CanvasRender";
-            _this._stage = stage;
             return _this;
         }
         /**
@@ -8237,42 +8197,78 @@ var annie;
          */
         CanvasRender.prototype.draw = function (target) {
             var s = this;
-            var texture = target._texture;
-            if (!texture || texture.width == 0 || texture.height == 0)
-                return;
-            var ctx = s._ctx, tm;
-            tm = target._cMatrix;
-            if (ctx.globalAlpha != target._cAlpha) {
-                ctx.globalAlpha = target._cAlpha;
-            }
-            if (s._blendMode != target.blendMode) {
-                ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
-                s._blendMode = target.blendMode;
-            }
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target._offsetX != 0 || target._offsetY != 0) {
-                ctx.translate(target._offsetX, target._offsetY);
-            }
-            var sbl = target._splitBoundsList;
-            var sblLen = sbl.length;
-            var bounds = target._bounds;
-            var tRect = target._a2x_rect;
-            var startX = -bounds.x;
-            var startY = -bounds.y;
-            if (sblLen == 1 && !tRect) {
-                ctx.drawImage(texture, 0, 0);
-            }
-            else {
-                var tStarX = 0;
-                var tStarY = 0;
-                if (tRect) {
-                    tStarX = tRect.x;
-                    tStarY = tRect.y;
+            if (target._visible && target._cAlpha > 0) {
+                var isContainer = target instanceof annie.Sprite;
+                if (!isContainer || target._isCache) {
+                    var texture = target._texture;
+                    if (!texture || texture.width == 0 || texture.height == 0)
+                        return;
+                    var ctx = s._ctx, tm = void 0;
+                    tm = target._cMatrix;
+                    if (ctx.globalAlpha != target._cAlpha) {
+                        ctx.globalAlpha = target._cAlpha;
+                    }
+                    if (s._blendMode != target.blendMode) {
+                        ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
+                        s._blendMode = target.blendMode;
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                    var sbl = target._splitBoundsList;
+                    var sblLen = sbl.length;
+                    var drawRect = target._a2x_drawRect;
+                    if (sblLen == 1 && (!drawRect.isSheetSprite || target._isCache)) {
+                        ctx.drawImage(texture, 0, 0);
+                    }
+                    else {
+                        var tStarX = 0;
+                        var tStarY = 0;
+                        if (drawRect.isSheetSprite) {
+                            tStarX = drawRect.x;
+                            tStarY = drawRect.y;
+                        }
+                        for (var i = 0; i < sblLen; i++) {
+                            if (sbl[i].isDraw === true) {
+                                var rect = sbl[i].rect;
+                                ctx.drawImage(texture, rect.x + tStarX, rect.y + tStarY, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+                            }
+                        }
+                    }
                 }
-                for (var i = 0; i < sblLen; i++) {
-                    if (sbl[i].isDraw === true) {
-                        var rect = sbl[i].rect;
-                        ctx.drawImage(texture, rect.x + startX + tStarX, rect.y + startY + tStarY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
+                else {
+                    var len = target.children.length;
+                    if (len > 0) {
+                        var children = target.children;
+                        var maskObj = void 0;
+                        var child = void 0;
+                        for (var i = 0; i < len; i++) {
+                            child = children[i];
+                            if (child._isUseToMask > 0) {
+                                continue;
+                            }
+                            if (maskObj instanceof annie.DisplayObject) {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        s.endMask();
+                                        maskObj = child.mask;
+                                        s.beginMask(maskObj);
+                                    }
+                                }
+                                else {
+                                    s.endMask();
+                                    maskObj = null;
+                                }
+                            }
+                            else {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            s.draw(child);
+                        }
+                        if (maskObj instanceof annie.DisplayObject) {
+                            s.endMask();
+                        }
                     }
                 }
             }
@@ -8317,7 +8313,6 @@ var annie;
         CanvasRender.prototype.init = function (canvas) {
             var s = this;
             s.rootContainer = canvas;
-            s._stage.rootDiv.appendChild(s.rootContainer);
             s.rootContainer.id = "_a2x_canvas";
             s._ctx = canvas.getContext('2d');
         };
@@ -8339,7 +8334,6 @@ var annie;
         CanvasRender.prototype.destroy = function () {
             var s = this;
             s.rootContainer = null;
-            s._stage = null;
             s._ctx = null;
         };
         return CanvasRender;
@@ -8435,27 +8429,68 @@ var annie;
          */
         OffCanvasRender.prototype.draw = function (target) {
             var s = this;
-            var texture = target._texture;
-            if (texture.width == 0 || texture.height == 0)
-                return;
-            var ctx = s._ctx;
-            var tm = target._ocMatrix;
-            if (ctx.globalAlpha != target._ocAlpha) {
-                ctx.globalAlpha = target._ocAlpha;
-            }
-            if (s._blendMode != target.blendMode) {
-                ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
-                s._blendMode = target.blendMode;
-            }
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target._offsetX != 0 || target._offsetY != 0) {
-                ctx.translate(target._offsetX, target._offsetY);
-            }
-            if (!target._a2x_rect) {
-                ctx.drawImage(texture, 0, 0);
-            }
-            else {
-                ctx.drawImage(texture, target._a2x_rect.x, target._a2x_rect.y, target._a2x_rect.width, target._a2x_rect.height, 0, 0, target._a2x_rect.width, target._a2x_rect.height);
+            if (target._visible && target._cAlpha > 0) {
+                var isContainer = target instanceof annie.Sprite;
+                //判断parent很重要
+                if (!isContainer || (target._isCache && target.parent != void 0)) {
+                    var texture = target._texture;
+                    if (texture.width == 0 || texture.height == 0)
+                        return;
+                    var ctx = s._ctx;
+                    var tm = target._ocMatrix;
+                    if (ctx.globalAlpha != target._ocAlpha) {
+                        ctx.globalAlpha = target._ocAlpha;
+                    }
+                    if (s._blendMode != target.blendMode) {
+                        ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
+                        s._blendMode = target.blendMode;
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx - s._offsetX, tm.ty - s._offsetY);
+                    var drawRect = target._a2x_drawRect;
+                    if (!drawRect.isSpriteSheet || target._isCache) {
+                        ctx.drawImage(texture, 0, 0);
+                    }
+                    else {
+                        ctx.drawImage(texture, drawRect.x, drawRect.y, drawRect.width, drawRect.height, 0, 0, drawRect.width, drawRect.height);
+                    }
+                }
+                else {
+                    var len = target.children.length;
+                    if (len > 0) {
+                        var children = target.children;
+                        var maskObj = void 0;
+                        var child = void 0;
+                        for (var i = 0; i < len; i++) {
+                            child = children[i];
+                            if (child._isUseToMask > 0) {
+                                continue;
+                            }
+                            if (maskObj instanceof annie.DisplayObject) {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    if (child.mask != maskObj) {
+                                        s.endMask();
+                                        maskObj = child.mask;
+                                        s.beginMask(maskObj);
+                                    }
+                                }
+                                else {
+                                    s.endMask();
+                                    maskObj = null;
+                                }
+                            }
+                            else {
+                                if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            s.draw(child);
+                        }
+                        if (maskObj instanceof annie.DisplayObject) {
+                            s.endMask();
+                        }
+                    }
+                }
             }
         };
         OffCanvasRender.prototype.end = function () {
@@ -8493,6 +8528,851 @@ var annie;
         return OffCanvasRender;
     }(annie.AObject));
     annie.OffCanvasRender = OffCanvasRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * Canvas 渲染器
+     * @class annie.WebGLRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 4.0.0
+     */
+    var WebGLRender = /** @class */ (function (_super) {
+        __extends(WebGLRender, _super);
+        /**
+         * @method WebGLRender
+         * @public
+         * @since 4.0.0
+         */
+        function WebGLRender() {
+            var _this = _super.call(this) || this;
+            /**
+             * 渲染器所在最上层的对象
+             * @property rootContainer
+             * @public
+             * @since 4.0.0
+             * @type {any}
+             * @default null
+             */
+            _this.rootContainer = null;
+            /**
+             * @property viewPort
+             *
+             */
+            _this.viewPort = new annie.Rectangle();
+            _this._blendMode = 0;
+            /**
+             * Specifies whether or not the browser's WebGL implementation should try to perform anti-aliasing.
+             * @property _antialias
+             * @protected
+             * @type {Boolean}
+             * @default false
+             */
+            _this._antialias = false;
+            /**
+             * Specifies whether or not StageGL is handling colours as premultiplied alpha.
+             * @property _premultiply
+             * @protected
+             * @type {Boolean}
+             * @default false
+             */
+            _this._premultiply = false;
+            /**
+             * Internal value of {{#crossLink "StageGL/autoPurge"}}{{/crossLink}}
+             * @property _autoPurge
+             * @protected
+             * @type {Integer}
+             * @default null
+             */
+            _this._autoPurge = 0;
+            /**
+             * A 2D projection matrix used to convert WebGL's viewspace into canvas co-ordinates. Regular canvas display
+             * uses Top-Left values of [0,0] where WebGL uses a Center [0,0] Top-Right [1,1] (euclidean) system.
+             * @property _projectionMatrix
+             * @protected
+             * @type {Float32Array}
+             * @default null
+             */
+            _this._projectionMatrix = null;
+            _this._projectionMatrixFlip = null;
+            /**
+             * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
+             * @property _clearColor
+             * @protected
+             * @type {Object}
+             * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
+             */
+            _this._clearColor = { r: 1.0, g: 1.0, b: 1.0, a: 1.00 };
+            /**
+             * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
+             * modify otherwise internal buffers may be incorrect sizes.
+             * @property _maxCardsPerBatch
+             * @protected
+             * @type {Number}
+             * @default WebGLRender.DEFAULT_MAX_BATCH_SIZE (10000)
+             */
+            _this._maxCardsPerBatch = 10000;
+            /**
+             * The shader program used to draw the current batch.
+             * @property _activeShader
+             * @protected
+             * @type {WebGLProgram}
+             * @default null
+             */
+            _this._activeShader = null;
+            /**
+             * The vertex position data for the current draw call.
+             * @property _vertices
+             * @protected
+             * @type {Float32Array}
+             * @default null
+             */
+            _this._vertices = null;
+            /**
+             * The WebGL buffer attached to {{#crossLink "StageGL/_vertices:property"}}{{/crossLink}}.
+             * @property _vertexPositionBuffer
+             * @protected
+             * @type {WebGLBuffer}
+             * @default null
+             */
+            _this._vertexPositionBuffer = null;
+            /**
+             * The vertex U/V data for the current draw call.
+             * @property _uvs
+             * @protected
+             * @type {Float32Array}
+             * @default null
+             */
+            _this._uvs = null;
+            /**
+             * The WebGL buffer attached to {{#crossLink "StageGL/_uvs:property"}}{{/crossLink}}.
+             * @property _uvPositionBuffer
+             * @protected
+             * @type {WebGLBuffer}
+             * @default null
+             */
+            _this._uvPositionBuffer = null;
+            /**
+             * The vertex indices data for the current draw call.
+             * @property _indices
+             * @protected
+             * @type {Float32Array}
+             * @default null
+             */
+            _this._indices = null;
+            /**
+             * The WebGL buffer attached to {{#crossLink "StageGL/_indices:property"}}{{/crossLink}}.
+             * @property _textureIndexBuffer
+             * @protected
+             * @type {WebGLBuffer}
+             * @default null
+             */
+            _this._textureIndexBuffer = null;
+            /**
+             * The vertices data for the current draw call.
+             * @property _alphas
+             * @protected
+             * @type {Float32Array}
+             * @default null
+             */
+            _this._alphas = null;
+            /**
+             * The WebGL buffer attached to {{#crossLink "StageGL/_alphas:property"}}{{/crossLink}}.
+             * @property _alphaBuffer
+             * @protected
+             * @type {WebGLBuffer}
+             * @default null
+             */
+            _this._alphaBuffer = null;
+            /**
+             * An index based lookup of every WebGL Texture currently in use.
+             * @property _drawTexture
+             * @protected
+             * @type {Dictionary}
+             */
+            _this._textureDictionary = {};
+            /**
+             * An array of all the textures currently loaded into the GPU. The index in the array matches the GPU index.
+             * @property _batchTextures
+             * @protected
+             * @type {Array}
+             */
+            _this._batchTextures = [];
+            /**
+             * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during initialization
+             * via `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`. The WebGL spec states that the lowest guaranteed value is 8,
+             * but it could be higher. Do not set this value higher than the value returned by the GPU. Setting it lower will
+             * probably reduce performance, but may be advisable to reserve slots for custom filter work.
+             * NOTE: Can also act as a length for {{#crossLink "StageGL/_batchTextures:property"}}.
+             * @property _batchTextureCount
+             * @protected
+             * @type {Number}
+             * @default 8
+             */
+            _this._batchTextureCount = 8;
+            /**
+             * The location at which the last texture was inserted into a GPU slot in {{#crossLink "StageGL/_batchTextures:property"}}{{/crossLink}}.
+             * Manual control of this variable can yield improvements in performance by intelligently replacing textures
+             * inside a batch to reduce texture re-load. It is impossible to write automated general use code, as it requires
+             * display list look ahead inspection and/or render foreknowledge.
+             * @property _lastTextureInsert
+             * @protected
+             * @type {Number}
+             * @default -1
+             */
+            _this._lastTextureInsert = -1;
+            /**
+             * The current batch being drawn, A batch consists of a call to `drawElements` on the GPU. Many of these calls
+             * can occur per draw.
+             * @property _batchId
+             * @protected
+             * @type {Number}
+             * @default 0
+             */
+            _this._batchID = 0;
+            /**
+             * Used to ensure every canvas used as a texture source has a unique ID.
+             * @property _lastTrackedCanvas
+             * @protected
+             * @type {Number}
+             * @default 0
+             */
+            _this._lastTrackedCanvas = 0;
+            _this._storeID = 0;
+            _this.batchCardCount = 0;
+            _this._instanceType = "annie.WebGLRender";
+            return _this;
+        }
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 4.0.0
+         * @public
+         */
+        WebGLRender.prototype.begin = function (color) {
+            var s = this;
+            var gl = s._ctx;
+            gl.clearColor(s._clearColor.r, s._clearColor.g, s._clearColor.b, s._clearColor.a);
+        };
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 4.0.0
+         */
+        WebGLRender.prototype.beginMask = function (target) {
+        };
+        WebGLRender.prototype.drawMask = function (target) {
+        };
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 4.0.0
+         */
+        WebGLRender.prototype.endMask = function () {
+        };
+        /**
+         * 调用渲染
+         * @public
+         * @since 4.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        WebGLRender.prototype.draw = function (target) {
+            var s = this;
+            s.batchCardCount = 0;
+            s._drawBatchGroup(target);
+            s._drawBuffers();
+        };
+        WebGLRender.prototype.end = function () {
+        };
+        ;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 4.0.0
+         * @method init
+         */
+        WebGLRender.prototype.init = function (canvas) {
+            var s = this;
+            s.rootContainer = canvas;
+            s.rootContainer.id = "_a2x_webgl";
+            var options = {
+                depth: false,
+                alpha: true,
+                stencil: true,
+                antialias: false,
+                premultipliedAlpha: false,
+                preserveDrawingBuffer: false
+            };
+            var gl;
+            try {
+                gl = canvas.getContext('webgl', options) || canvas.getContext("experimental-webgl", options);
+            }
+            catch (e) {
+                console.log("No Supported WebGL");
+                return;
+            }
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, s._premultiply);
+            //gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+            s._ctx = gl;
+            s._batchTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+            s._createShaderProgram();
+            s._createBuffers();
+            for (var i = 0; i < s._batchTextureCount; i++) {
+                s._batchTextures[i] = s.getBaseTexture();
+            }
+        };
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 4.0.0
+         * @method reSize
+         */
+        WebGLRender.prototype.reSize = function (width, height) {
+            var s = this, c = s.rootContainer;
+            c.width = width;
+            c.height = height;
+            s.viewPort.width = width;
+            s.viewPort.height = height;
+            c.style.width = Math.ceil(width / annie.devicePixelRatio) + "px";
+            c.style.height = Math.ceil(height / annie.devicePixelRatio) + "px";
+            var gl = s._ctx;
+            gl.viewportWidth = width;
+            gl.viewportHeight = height;
+            s.updateViewport();
+        };
+        WebGLRender.prototype.destroy = function () {
+            var s = this;
+            s.rootContainer = null;
+            s._ctx = null;
+        };
+        WebGLRender.prototype.releaseTexture = function (displayObject) {
+            var s = this;
+            var isHadTexture = true;
+            if (displayObject.children) {
+                for (var i = 0; i < displayObject.children.length; i++) {
+                    s.releaseTexture(displayObject.children[i]);
+                }
+                if (!displayObject._isCache) {
+                    isHadTexture = false;
+                }
+            }
+            if (isHadTexture) {
+                var imageData = displayObject._texture;
+                if (imageData._storeID != void 0) {
+                    s._killTextureObject(s._textureDictionary[imageData._storeID]);
+                    delete imageData._storeID;
+                }
+            }
+        };
+        ;
+        WebGLRender.prototype._createShaderProgram = function () {
+            var s = this;
+            var success = false;
+            while (!success) {
+                try {
+                    s._activeShader = s._getShaderProgram();
+                    success = true;
+                }
+                catch (e) {
+                    s._batchTextureCount -= 4;
+                    if (s._batchTextureCount < 1) {
+                        s._batchTextureCount = 1;
+                    }
+                }
+            }
+        };
+        ;
+        WebGLRender.prototype.updateViewport = function () {
+            var s = this;
+            var width = s.viewPort.width, height = s.viewPort.height;
+            var gl = s._ctx;
+            if (gl) {
+                gl.viewport(0, 0, width, height);
+                s._projectionMatrix = new Float32Array([
+                    2 / width, 0, 0, 0,
+                    0, -2 / height, 1, 0,
+                    0, 0, 1, 0,
+                    -1, 1, 0.1, 0
+                ]);
+                s._projectionMatrixFlip = new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                s._projectionMatrixFlip.set(s._projectionMatrix);
+                s._projectionMatrixFlip[5] *= -1;
+                s._projectionMatrixFlip[13] *= -1;
+            }
+        };
+        ;
+        WebGLRender.prototype.getBaseTexture = function () {
+            var s = this;
+            var gl = s._ctx;
+            var width = 1;
+            var height = 1;
+            var texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, // target
+            0, // level of detail
+            gl.RGBA, // internal format
+            width, height, 0, // width, height, border (only for array/null sourced textures)
+            gl.RGBA, // format (match internal format)
+            gl.UNSIGNED_BYTE, // type of texture(pixel color depth)
+            null // image data, we can do null because we're doing array data
+            );
+            texture.width = width;
+            texture.height = height;
+            s.setTextureParams();
+            return texture;
+        };
+        ;
+        WebGLRender.prototype.setTextureParams = function () {
+            var gl = this._ctx;
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        };
+        ;
+        WebGLRender.prototype._getShaderProgram = function () {
+            var s = this;
+            var gl = s._ctx;
+            gl.useProgram(null);
+            var targetVtx = WebGLRender.REGULAR_VERTEX_HEADER + WebGLRender.REGULAR_VERTEX_BODY;
+            var targetFrag = WebGLRender.REGULAR_FRAGMENT_HEADER + WebGLRender.REGULAR_FRAGMENT_BODY;
+            var vertexShader = s._createShader(gl.VERTEX_SHADER, targetVtx);
+            var fragmentShader = s._createShader(gl.FRAGMENT_SHADER, targetFrag);
+            var shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+            gl.useProgram(shaderProgram);
+            shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
+            gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+            shaderProgram.uvPositionAttribute = gl.getAttribLocation(shaderProgram, "uvPosition");
+            gl.enableVertexAttribArray(shaderProgram.uvPositionAttribute);
+            shaderProgram.textureIndexAttribute = gl.getAttribLocation(shaderProgram, "textureIndex");
+            gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
+            shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
+            gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
+            var samplers = [];
+            for (var i = 0; i < s._batchTextureCount; i++) {
+                samplers[i] = i;
+            }
+            shaderProgram.samplerData = samplers;
+            shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+            gl.uniform1iv(shaderProgram.samplerUniform, samplers);
+            shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
+            return shaderProgram;
+        };
+        ;
+        WebGLRender.prototype._createShader = function (type, str) {
+            var s = this;
+            var gl = s._ctx;
+            // inject the static number
+            str = str.replace(/{{count}}/g, s._batchTextureCount + "");
+            // TODO: WebGL 2.0 does not need this support
+            var insert = "";
+            for (var i = 1; i < s._batchTextureCount; i++) {
+                insert += "} else if (indexPicker <= " + i + ".5) { color = texture2D(uSampler[" + i + "], vTextureCoord);";
+            }
+            str = str.replace(/{{alternates}}/g, insert);
+            str = str.replace(/{{fragColor}}/g, s._premultiply ? WebGLRender.REGULAR_FRAG_COLOR_PREMULTIPLY : WebGLRender.REGULAR_FRAG_COLOR_NORMAL);
+            // actually compile the shader
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, str);
+            gl.compileShader(shader);
+            return shader;
+        };
+        ;
+        WebGLRender.prototype._createBuffers = function () {
+            var s = this;
+            var gl = s._ctx;
+            var groupCount = s._maxCardsPerBatch * WebGLRender.INDICIES_PER_CARD;
+            var groupSize, i, l;
+            var vertexPositionBuffer = s._vertexPositionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+            groupSize = 2;
+            var vertices = s._vertices = new Float32Array(groupCount * groupSize);
+            for (i = 0, l = vertices.length; i < l; i += groupSize) {
+                vertices[i] = vertices[i + 1] = 0;
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+            vertexPositionBuffer.itemSize = groupSize;
+            vertexPositionBuffer.numItems = groupCount;
+            // where on the texture it gets its information
+            var uvPositionBuffer = s._uvPositionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
+            groupSize = 2;
+            var uvs = s._uvs = new Float32Array(groupCount * groupSize);
+            for (i = 0, l = uvs.length; i < l; i += groupSize) {
+                uvs[i] = uvs[i + 1] = 0;
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
+            uvPositionBuffer.itemSize = groupSize;
+            uvPositionBuffer.numItems = groupCount;
+            // what texture it should use
+            var textureIndexBuffer = s._textureIndexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
+            groupSize = 1;
+            var indices = s._indices = new Float32Array(groupCount * groupSize);
+            for (i = 0, l = indices.length; i < l; i++) {
+                indices[i] = 0;
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, indices, gl.DYNAMIC_DRAW);
+            textureIndexBuffer.itemSize = groupSize;
+            textureIndexBuffer.numItems = groupCount;
+            // what alpha it should have
+            var alphaBuffer = s._alphaBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
+            groupSize = 1;
+            var alphas = s._alphas = new Float32Array(groupCount * groupSize);
+            for (i = 0, l = alphas.length; i < l; i++) {
+                alphas[i] = 1;
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
+            alphaBuffer.itemSize = groupSize;
+            alphaBuffer.numItems = groupCount;
+        };
+        ;
+        WebGLRender.prototype._createTexture = function (texData) {
+            var s = this;
+            var storeID = s._storeID++;
+            var texture;
+            if (storeID < s._batchTextureCount) {
+                texture = s._batchTextures[storeID];
+            }
+            else {
+                texture = s.getBaseTexture();
+            }
+            texture._activeIndex = -1;
+            s._textureDictionary[storeID] = texture;
+            texData._storeID = storeID;
+            texture._storeID = storeID;
+            texture._imageData = texData;
+            return texture;
+        };
+        ;
+        WebGLRender.prototype._pushTextureToBatch = function (texture) {
+            var s = this;
+            if (texture._activeIndex == -1 || s._batchTextures[texture._activeIndex] != texture) {
+                var found = -1;
+                var start = (s._lastTextureInsert + 1) % s._batchTextureCount;
+                var look = start;
+                do {
+                    if (s._batchTextures[look]._batchID != s._batchID) {
+                        found = look;
+                        break;
+                    }
+                    look = (look + 1) % s._batchTextureCount;
+                } while (look !== start);
+                if (found == -1) {
+                    s._drawBuffers();
+                    s.batchCardCount = 0;
+                    found = start;
+                }
+                texture._activeIndex = found;
+                s._lastTextureInsert = found;
+                s._batchTextures[found] = texture;
+                s._updateTextureData(texture);
+            }
+            else {
+                //看看是滞需要更新贴图
+                //s._updateTextureImageData(texture);
+            }
+            texture._batchID = s._batchID;
+        };
+        ;
+        WebGLRender.prototype._updateTextureData = function (texture) {
+            var s = this;
+            var gl = s._ctx;
+            gl.activeTexture(gl.TEXTURE0 + texture._activeIndex);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            s.setTextureParams();
+            try {
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture._imageData);
+            }
+            catch (e) {
+            }
+        };
+        ;
+        WebGLRender.prototype._killTextureObject = function (texture) {
+            if (!texture) {
+                return;
+            }
+            var s = this;
+            var gl = s._ctx;
+            if (texture._storeID !== undefined) {
+                delete s._textureDictionary[texture._storeID];
+                delete texture._imageData._storeID;
+                delete texture._storeID;
+                try {
+                    if (texture._frameBuffer) {
+                        gl.deleteFramebuffer(texture._frameBuffer);
+                        delete texture._frameBuffer;
+                    }
+                }
+                catch (e) {
+                }
+                try {
+                    gl.deleteTexture(texture);
+                }
+                catch (e) {
+                }
+            }
+        };
+        ;
+        WebGLRender.prototype._drawBatchGroup = function (container) {
+            var s = this;
+            var subL, subT, subR, subB;
+            var l = container.children.length;
+            for (var i = 0; i < l; i++) {
+                var item = container.children[i];
+                if (!item._visible || item._cAlpha < 0) {
+                    continue;
+                }
+                if (item.children && !item._isCache) {
+                    s._drawBatchGroup(item);
+                    continue;
+                }
+                var image = item._texture;
+                if (!image || image.width <= 0) {
+                    continue;
+                }
+                if (s.batchCardCount + 1 > s._maxCardsPerBatch) {
+                    s._drawBuffers();
+                    s.batchCardCount = 0;
+                }
+                var uvRect = void 0, texIndex = void 0, texture = void 0, drawRect = void 0;
+                var uvs = s._uvs;
+                var vertices = s._vertices;
+                var texI = s._indices;
+                var alphas = s._alphas;
+                if (image._storeID == void 0) {
+                    texture = s._createTexture(image);
+                }
+                else {
+                    texture = s._textureDictionary[image._storeID];
+                    if (!texture) {
+                        continue;
+                    }
+                }
+                drawRect = item._a2x_drawRect;
+                s._pushTextureToBatch(texture);
+                texIndex = texture._activeIndex;
+                if (drawRect.isSheetSprite) {
+                    // calculate uvs
+                    if (!item._uvRect) {
+                        item._uvRect = {};
+                    }
+                    uvRect = item._uvRect;
+                    uvRect.t = (drawRect.y) / image.height;
+                    uvRect.l = (drawRect.x) / image.width;
+                    uvRect.b = (drawRect.y + drawRect.h) / image.height;
+                    uvRect.r = (drawRect.x + drawRect.w) / image.width;
+                    // calculate vertices
+                    subL = 0;
+                    subT = 0;
+                    subR = drawRect.w + subL;
+                    subB = drawRect.h + subT;
+                }
+                else {
+                    // calculate uvs
+                    uvRect = WebGLRender.UV_RECT;
+                    // calculate vertices
+                    subL = 0;
+                    subT = 0;
+                    subR = image.width + subL;
+                    subB = image.height + subT;
+                }
+                var offV1 = s.batchCardCount * WebGLRender.INDICIES_PER_CARD;
+                var offV2 = offV1 << 1;
+                var iMtx = item._cMatrix;
+                vertices[offV2] = subL * iMtx.a + subT * iMtx.c + iMtx.tx;
+                vertices[offV2 + 1] = subL * iMtx.b + subT * iMtx.d + iMtx.ty;
+                vertices[offV2 + 2] = subL * iMtx.a + subB * iMtx.c + iMtx.tx;
+                vertices[offV2 + 3] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
+                vertices[offV2 + 4] = subR * iMtx.a + subT * iMtx.c + iMtx.tx;
+                vertices[offV2 + 5] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
+                vertices[offV2 + 6] = vertices[offV2 + 2];
+                vertices[offV2 + 7] = vertices[offV2 + 3];
+                vertices[offV2 + 8] = vertices[offV2 + 4];
+                vertices[offV2 + 9] = vertices[offV2 + 5];
+                vertices[offV2 + 10] = subR * iMtx.a + subB * iMtx.c + iMtx.tx;
+                vertices[offV2 + 11] = subR * iMtx.b + subB * iMtx.d + iMtx.ty;
+                // apply uvs
+                uvs[offV2] = uvRect.l;
+                uvs[offV2 + 1] = uvRect.t;
+                uvs[offV2 + 2] = uvRect.l;
+                uvs[offV2 + 3] = uvRect.b;
+                uvs[offV2 + 4] = uvRect.r;
+                uvs[offV2 + 5] = uvRect.t;
+                uvs[offV2 + 6] = uvRect.l;
+                uvs[offV2 + 7] = uvRect.b;
+                uvs[offV2 + 8] = uvRect.r;
+                uvs[offV2 + 9] = uvRect.t;
+                uvs[offV2 + 10] = uvRect.r;
+                uvs[offV2 + 11] = uvRect.b;
+                // apply texture
+                texI[offV1] = texI[offV1 + 1] = texI[offV1 + 2] = texI[offV1 + 3] = texI[offV1 + 4] = texI[offV1 + 5] = texIndex;
+                // apply alpha
+                alphas[offV1] = alphas[offV1 + 1] = alphas[offV1 + 2] = alphas[offV1 + 3] = alphas[offV1 + 4] = alphas[offV1 + 5] = item._cAlpha;
+                s.batchCardCount++;
+            }
+        };
+        ;
+        WebGLRender.prototype._drawBuffers = function () {
+            var s = this;
+            var gl = s._ctx;
+            if (s.batchCardCount <= 0) {
+                return;
+            }
+            var shaderProgram = s._activeShader;
+            var vertexPositionBuffer = s._vertexPositionBuffer;
+            var textureIndexBuffer = s._textureIndexBuffer;
+            var uvPositionBuffer = s._uvPositionBuffer;
+            var alphaBuffer = s._alphaBuffer;
+            //gl.useProgram(shaderProgram);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, s._vertices);
+            gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
+            gl.vertexAttribPointer(shaderProgram.textureIndexAttribute, textureIndexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, s._indices);
+            gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
+            gl.vertexAttribPointer(shaderProgram.uvPositionAttribute, uvPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, s._uvs);
+            gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
+            gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, s._alphas);
+            gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, s._projectionMatrix);
+            for (var i = 0; i < s._batchTextureCount; i++) {
+                var texture = s._batchTextures[i];
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                s.setTextureParams();
+            }
+            gl.drawArrays(gl.TRIANGLES, 0, s.batchCardCount * WebGLRender.INDICIES_PER_CARD);
+            s._batchID++;
+            if (s._batchID == Number.MAX_VALUE) {
+                s._batchID = 0;
+            }
+        };
+        ;
+        /**
+         * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
+         * @property INDICIES_PER_CARD
+         * @static
+         * @final
+         * @type {Number}
+         * @default 6
+         * @readonly
+         */
+        WebGLRender.INDICIES_PER_CARD = 6;
+        /**
+         * Default U/V rect for dealing with full coverage from an image source.
+         * @property UV_RECT
+         * @static
+         * @final
+         * @type {Object}
+         * @default {t:0, l:0, b:1, r:1}
+         * @readonly
+         */
+        WebGLRender.UV_RECT = { t: 0, l: 0, b: 1, r: 1 };
+        /**
+         * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
+         * regular shader is designed to render all expected objects. Shader code may contain templates that are replaced
+         * pre-compile.
+         * @property REGULAR_VARYING_HEADER
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        WebGLRender.REGULAR_VARYING_HEADER = "precision mediump float;" +
+            "varying vec2 vTextureCoord;" +
+            "varying lowp float indexPicker;" +
+            "varying lowp float alphaValue;";
+        /**
+         * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
+         * all expected objects. Shader code may contain templates that are replaced pre-compile.
+         * @property REGULAR_VERTEX_HEADER
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        WebGLRender.REGULAR_VERTEX_HEADER = WebGLRender.REGULAR_VARYING_HEADER +
+            "attribute vec2 vertexPosition;" +
+            "attribute vec2 uvPosition;" +
+            "attribute lowp float textureIndex;" +
+            "attribute lowp float objectAlpha;" +
+            "uniform mat4 pMatrix;";
+        /**
+         * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
+         * all expected objects. Shader code may contain templates that are replaced pre-compile.
+         * @property REGULAR_FRAGMENT_HEADER
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        WebGLRender.REGULAR_FRAGMENT_HEADER = WebGLRender.REGULAR_VARYING_HEADER +
+            "uniform sampler2D uSampler[{{count}}];";
+        /**
+         * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
+         * templates that are replaced pre-compile.
+         * @property REGULAR_VERTEX_BODY
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        WebGLRender.REGULAR_VERTEX_BODY = "void main(void) {" +
+            "gl_Position = vec4(" +
+            "(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
+            "(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
+            "pMatrix[3][2]," +
+            "1.0" +
+            ");" +
+            "alphaValue = objectAlpha;" +
+            "indexPicker = textureIndex;" +
+            "vTextureCoord = uvPosition;" +
+            "}";
+        /**
+         * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
+         * contain templates that are replaced pre-compile.
+         * @property REGULAR_FRAGMENT_BODY
+         * @static
+         * @final
+         * @type {String}
+         * @readonly
+         */
+        WebGLRender.REGULAR_FRAGMENT_BODY = "void main(void) {" +
+            "vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
+            "if (indexPicker <= 0.5) {" +
+            "color = texture2D(uSampler[0], vTextureCoord);" +
+            "{{alternates}}" +
+            "}" +
+            "{{fragColor}}" +
+            "}";
+        WebGLRender.REGULAR_FRAG_COLOR_NORMAL = "gl_FragColor = vec4(color.rgb, color.a * alphaValue);";
+        WebGLRender.REGULAR_FRAG_COLOR_PREMULTIPLY = "if(color.a > 0.001) {" +
+            "gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);" +
+            "} else {" +
+            "gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
+            "}";
+        return WebGLRender;
+    }(annie.AObject));
+    annie.WebGLRender = WebGLRender;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -11046,8 +11926,8 @@ var annie;
         if (!rect) {
             rect = obj.getBounds();
         }
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
+        annie._dRender._offsetX = rect.x;
+        annie._dRender._offsetY = rect.y;
         //先更新
         var parent = obj.parent;
         obj.parent = null;
@@ -11059,7 +11939,8 @@ var annie;
         annie._dRender.init(annie.DisplayObject["_canvas"]);
         annie._dRender.reSize(w, h);
         annie._dRender.begin(bgColor);
-        obj._render(annie._dRender);
+        annie._dRender.draw(obj);
+        annie._dRender.end();
         obj.parent = parent;
         if (!typeInfo) {
             typeInfo = { type: "png" };
@@ -11078,20 +11959,24 @@ var annie;
         var parent = obj.parent;
         //这里不需要执行_onUpdateFrame
         var rect = obj.getBounds();
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
+        obj.getDrawRect();
+        var x = annie.DisplayObject._transformRect.x;
+        var y = annie.DisplayObject._transformRect.y;
+        annie._dRender._offsetX = rect.x;
+        annie._dRender._offsetY = rect.y;
         //先更新
         obj.parent = null;
         obj._updateMatrix(true);
         if (!obj._texture) {
             obj._texture = document.createElement("canvas");
         }
-        annie._dRender.init(obj._texture);
         var w = Math.ceil(rect.width);
         var h = Math.ceil(rect.height);
+        annie._dRender.init(obj._texture);
         annie._dRender.reSize(w, h);
         annie._dRender.begin("");
-        obj._render(annie._dRender);
+        annie._dRender.draw(obj);
+        annie._dRender.end();
         //看看是否有滤镜
         var cf = obj._filters;
         var cfLen = cf.length;
@@ -11104,6 +11989,9 @@ var annie;
             ctx.putImageData(imageData, 0, 0);
         }
         obj.parent = parent;
+        obj._offsetX = x - obj.x;
+        obj._offsetY = y - obj.y;
+        obj.a2x_um = true;
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>

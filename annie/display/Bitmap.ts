@@ -42,17 +42,21 @@ namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        public constructor(bitmapData: any,rect:Rectangle=null) {
+        public constructor(bitmapData: any,rect:any=null) {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
             if(rect!=void 0){
-                s._a2x_rect=new annie.Rectangle(rect.x,rect.y,rect.width,rect.height);
+                let drawRect:any=s._a2x_drawRect;
+                drawRect.isSheetSprite=true;
+                drawRect.x=rect.x;
+                drawRect.y=rect.x;
+                drawRect.w=rect.width;
+                drawRect.h=rect.height;
             }
             s.bitmapData = bitmapData;
 
         }
-        private _a2x_rect:Rectangle=null;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -84,8 +88,13 @@ namespace annie {
                 s._texture = null;
                 return;
             }
-            let bw = s._a2x_rect?s._a2x_rect.width:texture.width;
-            let bh = s._a2x_rect?s._a2x_rect.height:texture.height;
+            let drawRect:any=s._a2x_drawRect;
+            let bw = texture.width;
+            let bh =texture.height;
+            if(drawRect.isSheetSprite){
+                bw=drawRect.w;
+                bh=drawRect.h;
+            }
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
@@ -130,8 +139,8 @@ namespace annie {
                     for (let i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
-                    if(s._a2x_rect){
-                        ctx.putImageData(imageData, s._a2x_rect.x,s._a2x_rect.y,bw,bh,0, 0,bw,bh);
+                    if(drawRect.isSheetSprite){
+                        ctx.putImageData(imageData, drawRect.x,drawRect.y,bw,bh,0, 0,bw,bh);
                     }else{
                         ctx.putImageData(imageData, 0, 0);
                     }

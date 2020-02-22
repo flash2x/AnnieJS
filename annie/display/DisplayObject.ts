@@ -88,7 +88,7 @@ namespace annie {
         }
 
         public _isCache: boolean = false;
-
+        public _a2x_drawRect:{isSheetSprite:boolean,x:number,y:number,w:number,h:number,uvX:number,uvY:number,uvW:number,uvH:number}={isSheetSprite:false,x:0,y:0,w:0,h:0,uvX:0,uvY:0,uvW:0,uvH:0};
         /**
          * 是否将这个对象缓存为位图了
          * @property cacheAsBitmap
@@ -102,6 +102,8 @@ namespace annie {
         public set cacheAsBitmap(value: boolean) {
             let s = this;
             if (value != s._cacheAsBitmap) {
+                s._offsetX=0;
+                s._offsetY=0;
                 s._cacheAsBitmap = value;
                 s._isCache = (s._cacheAsBitmap || s._filters.length > 0 || s._blendMode != 0);
                 s.a2x_uf = true;
@@ -606,7 +608,7 @@ namespace annie {
                 let ctx;
                 if (s.instanceType != "annie.Bitmap"){
                     ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x - s._offsetX, p.y - s._offsetY, 1, 1).data[3] > 0) {
+                    if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
                         return s
                     }
                 } else {
@@ -615,7 +617,7 @@ namespace annie {
                     _canvas.width = 1;
                     _canvas.height = 1;
                     ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, p.x - s._offsetX, p.y - s._offsetY);
+                    ctx.setTransform(1, 0, 0, 1, p.x, p.y);
                     ctx.drawImage(texture, 0, 0);
                     if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                         return s
@@ -657,7 +659,6 @@ namespace annie {
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         }
-
         protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s = this, cm: Matrix, pcm: Matrix, ca: number, pca: number;
             let isHadParent: boolean = s.parent instanceof annie.Sprite;
@@ -670,13 +671,11 @@ namespace annie {
                     pca = s.parent._ocAlpha;
                 } else {
                     s._ocMatrix.identity();
-                    s._ocMatrix.tx = -s._offsetX;
-                    s._ocMatrix.ty = -s._offsetY;
                     s._ocAlpha = 1;
                     return;
                 }
                 cm = s._ocMatrix;
-                s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                s._matrix.createBox(s._x+s._offsetX, s._y+s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 cm.setFrom(s._matrix);
                 ca = s._alpha;
                 if (isHadParent) {
@@ -691,8 +690,8 @@ namespace annie {
                     pcm = s.parent._cMatrix;
                     pca = s.parent._cAlpha;
                 }
-                if (s.a2x_um){
-                    s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+               if (s.a2x_um){
+                    s._matrix.createBox(s._x+s._offsetX, s._y+s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 }
                 if (s._cp) {
                     s.a2x_um = s.a2x_ua = true;
@@ -723,15 +722,6 @@ namespace annie {
                 s._cAlpha = ca;
             }
         }
-
-
-        protected _render(renderObj: IRender | any): void {
-            let s = this;
-            if (s._visible && s._cAlpha > 0) {
-                renderObj.draw(s);
-            }
-        }
-
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用 getWH()方法获取宽和高
@@ -864,7 +854,7 @@ namespace annie {
                             }
                             sbl.push({
                                 isDraw: true,
-                                rect: new Rectangle(newX + bounds.x, newY + bounds.y, newW, newH)
+                                rect: new Rectangle(newX , newY , newW, newH)
                             });
                         }
                     }
