@@ -1437,11 +1437,11 @@ declare namespace annie {
          */
         boundsCol: number;
         /**
-         * 更新boundsList矩阵
-         * @method _updateSplitBounds
+         * 更新渲染器需要的优化信息
+         * @method _updateSplitBoundInfo
          * @private
          */
-        protected _updateSplitBounds(): void;
+        protected _updateSplitBoundInfo(): void;
         protected _checkDrawBounds(): void;
         /**
          * @method getSound

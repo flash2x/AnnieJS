@@ -88,7 +88,18 @@ namespace annie {
         }
 
         public _isCache: boolean = false;
-        public _a2x_drawRect:{isSheetSprite:boolean,x:number,y:number,w:number,h:number,uvX:number,uvY:number,uvW:number,uvH:number}={isSheetSprite:false,x:0,y:0,w:0,h:0,uvX:0,uvY:0,uvW:0,uvH:0};
+        public _a2x_drawRect: { isSheetSprite: boolean, x: number, y: number, w: number, h: number, uvX: number, uvY: number, uvW: number, uvH: number } = {
+            isSheetSprite: false,
+            x: 0,
+            y: 0,
+            w: 0,
+            h: 0,
+            uvX: 0,
+            uvY: 0,
+            uvW: 0,
+            uvH: 0
+        };
+
         /**
          * 是否将这个对象缓存为位图了
          * @property cacheAsBitmap
@@ -102,8 +113,8 @@ namespace annie {
         public set cacheAsBitmap(value: boolean) {
             let s = this;
             if (value != s._cacheAsBitmap) {
-                s._offsetX=0;
-                s._offsetY=0;
+                s._offsetX = 0;
+                s._offsetY = 0;
                 s._cacheAsBitmap = value;
                 s._isCache = (s._cacheAsBitmap || s._filters.length > 0 || s._blendMode != 0);
                 s.a2x_uf = true;
@@ -606,7 +617,7 @@ namespace annie {
             }
             if (s.hitTestWithPixel) {
                 let ctx;
-                if (s.instanceType != "annie.Bitmap"){
+                if (s.instanceType != "annie.Bitmap") {
                     ctx = texture.getContext('2d');
                     if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
                         return s
@@ -623,8 +634,8 @@ namespace annie {
                         return s
                     }
                 }
-            }else{
-                if (s._bounds.isPointIn(p)){
+            } else {
+                if (s._bounds.isPointIn(p)) {
                     return s;
                 }
             }
@@ -659,6 +670,7 @@ namespace annie {
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         }
+
         protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s = this, cm: Matrix, pcm: Matrix, ca: number, pca: number;
             let isHadParent: boolean = s.parent instanceof annie.Sprite;
@@ -675,7 +687,7 @@ namespace annie {
                     return;
                 }
                 cm = s._ocMatrix;
-                s._matrix.createBox(s._x+s._offsetX, s._y+s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                s._matrix.createBox(s._x + s._offsetX, s._y + s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 cm.setFrom(s._matrix);
                 ca = s._alpha;
                 if (isHadParent) {
@@ -690,8 +702,8 @@ namespace annie {
                     pcm = s.parent._cMatrix;
                     pca = s.parent._cAlpha;
                 }
-               if (s.a2x_um){
-                    s._matrix.createBox(s._x+s._offsetX, s._y+s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+                if (s.a2x_um) {
+                    s._matrix.createBox(s._x + s._offsetX, s._y + s._offsetY, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
                 }
                 if (s._cp) {
                     s.a2x_um = s.a2x_ua = true;
@@ -722,6 +734,7 @@ namespace annie {
                 s._cAlpha = ca;
             }
         }
+
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用 getWH()方法获取宽和高
@@ -825,44 +838,38 @@ namespace annie {
         public boundsCol: number = 1;
 
         /**
-         * 更新boundsList矩阵
-         * @method _updateSplitBounds
+         * 更新渲染器需要的优化信息
+         * @method _updateSplitBoundInfo
          * @private
          */
-        protected _updateSplitBounds(): void {
+        protected _updateSplitBoundInfo(): void {
             let s = this;
             let sbl: any = [];
-            let bounds = s.getBounds();
-            if (bounds.width * bounds.height > 0) {
-                if (s.boundsRow == 1 && s.boundsCol == 1) {
+            let bounds = s._bounds;
+            let boxCount = 1024;
+            s.boundsRow = Math.ceil(bounds.width / boxCount);
+            s.boundsCol = Math.ceil(bounds.height / boxCount);
+            for (let i = 0; i < s.boundsRow; i++) {
+                for (let j = 0; j < s.boundsCol; j++) {
+                    let newX = i * boxCount;
+                    let newY = j * boxCount;
+                    let newW = bounds.width - newX;
+                    let newH = bounds.height - newY;
+                    if (newW > boxCount) {
+                        newW = boxCount;
+                    }
+                    if (newH > boxCount) {
+                        newH = boxCount;
+                    }
                     sbl.push({
                         isDraw: true,
-                        rect: bounds
+                        rect: new Rectangle(newX, newY, newW, newH)
                     });
-                } else {
-                    for (let i = 0; i < s.boundsRow; i++) {
-                        for (let j = 0; j < s.boundsCol; j++) {
-                            let newX = i * 1000;
-                            let newY = j * 1000;
-                            let newW = bounds.width - newX;
-                            let newH = bounds.height - newY;
-                            if (newW > 1000) {
-                                newW = 1000;
-                            }
-                            if (newH > 1000) {
-                                newH = 1000;
-                            }
-                            sbl.push({
-                                isDraw: true,
-                                rect: new Rectangle(newX , newY , newW, newH)
-                            });
-                        }
-                    }
                 }
             }
             s._splitBoundsList = sbl;
+            s._checkDrawBounds();
         }
-
         protected _checkDrawBounds() {
             let s = this;
             //检查所有bounds矩阵是否在可视范围里

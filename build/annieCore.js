@@ -1685,7 +1685,17 @@ var annie;
             _this.a2x_ua = false;
             _this.a2x_uf = false;
             _this._isCache = false;
-            _this._a2x_drawRect = { isSheetSprite: false, x: 0, y: 0, w: 0, h: 0, uvX: 0, uvY: 0, uvW: 0, uvH: 0 };
+            _this._a2x_drawRect = {
+                isSheetSprite: false,
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0,
+                uvX: 0,
+                uvY: 0,
+                uvW: 0,
+                uvH: 0
+            };
             _this._cacheAsBitmap = false;
             /**
              * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
@@ -2468,43 +2478,37 @@ var annie;
             }
         };
         /**
-         * 更新boundsList矩阵
-         * @method _updateSplitBounds
+         * 更新渲染器需要的优化信息
+         * @method _updateSplitBoundInfo
          * @private
          */
-        DisplayObject.prototype._updateSplitBounds = function () {
+        DisplayObject.prototype._updateSplitBoundInfo = function () {
             var s = this;
             var sbl = [];
-            var bounds = s.getBounds();
-            if (bounds.width * bounds.height > 0) {
-                if (s.boundsRow == 1 && s.boundsCol == 1) {
+            var bounds = s._bounds;
+            var boxCount = 1024;
+            s.boundsRow = Math.ceil(bounds.width / boxCount);
+            s.boundsCol = Math.ceil(bounds.height / boxCount);
+            for (var i = 0; i < s.boundsRow; i++) {
+                for (var j = 0; j < s.boundsCol; j++) {
+                    var newX = i * boxCount;
+                    var newY = j * boxCount;
+                    var newW = bounds.width - newX;
+                    var newH = bounds.height - newY;
+                    if (newW > boxCount) {
+                        newW = boxCount;
+                    }
+                    if (newH > boxCount) {
+                        newH = boxCount;
+                    }
                     sbl.push({
                         isDraw: true,
-                        rect: bounds
+                        rect: new annie.Rectangle(newX, newY, newW, newH)
                     });
-                }
-                else {
-                    for (var i = 0; i < s.boundsRow; i++) {
-                        for (var j = 0; j < s.boundsCol; j++) {
-                            var newX = i * 1000;
-                            var newY = j * 1000;
-                            var newW = bounds.width - newX;
-                            var newH = bounds.height - newY;
-                            if (newW > 1000) {
-                                newW = 1000;
-                            }
-                            if (newH > 1000) {
-                                newH = 1000;
-                            }
-                            sbl.push({
-                                isDraw: true,
-                                rect: new annie.Rectangle(newX, newY, newW, newH)
-                            });
-                        }
-                    }
                 }
             }
             s._splitBoundsList = sbl;
+            s._checkDrawBounds();
         };
         DisplayObject.prototype._checkDrawBounds = function () {
             var s = this;
@@ -2816,26 +2820,21 @@ var annie;
                 bw = drawRect.w;
                 bh = drawRect.h;
             }
-            if (s._bounds.width != bw || s._bounds.height != bh) {
-                s._bounds.width = bw;
-                s._bounds.height = bh;
-                if (bw > 0) {
-                    s.boundsRow = Math.ceil(bw / 1000);
-                }
-                if (bh > 0) {
-                    s.boundsCol = Math.ceil(bh / 1000);
-                }
-                s._updateSplitBounds();
-                s._checkDrawBounds();
-                if (s._filters.length > 0) {
-                    s.a2x_uf = true;
-                }
-                s._texture = texture;
-            }
-            else if (s.a2x_um) {
-                s._checkDrawBounds();
-            }
             if (!isOffCanvas) {
+                if (s._bounds.width != bw || s._bounds.height != bh) {
+                    s._bounds.width = bw;
+                    s._bounds.height = bh;
+                    if (bw * bh > 0) {
+                        s._updateSplitBoundInfo();
+                    }
+                    if (s._filters.length > 0) {
+                        s.a2x_uf = true;
+                    }
+                    s._texture = texture;
+                }
+                else if (s.a2x_um) {
+                    s._checkDrawBounds();
+                }
                 s.a2x_um = false;
                 s.a2x_ua = false;
             }
@@ -4147,8 +4146,11 @@ var annie;
                     if (s._isCache) {
                         //更新缓存
                         annie.createCache(s);
-                        s._updateSplitBounds();
-                        s._checkDrawBounds();
+                        var bw = s._texture.width;
+                        var bh = s._texture.height;
+                        if (bw * bh > 0) {
+                            s._updateSplitBoundInfo();
+                        }
                     }
                     else {
                         s.a2x_um = true;
@@ -4161,6 +4163,9 @@ var annie;
                     children[i]._updateMatrix(isOffCanvas);
                 }
                 if (!isOffCanvas) {
+                    if (s._isCache && s.a2x_um) {
+                        s._checkDrawBounds();
+                    }
                     s.a2x_ua = false;
                     s.a2x_um = false;
                 }
@@ -5396,8 +5401,6 @@ var annie;
             var h = she.height || s.getStyle(she, "height");
             s._bounds.width = parseInt(w);
             s._bounds.height = parseInt(h);
-            s._updateSplitBounds();
-            s._checkDrawBounds();
             s.htmlElement = she;
         };
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
@@ -10181,18 +10184,7 @@ var annie;
      * @return {any}
      */
     function getResource(sceneName, resName) {
-        var s = annie.res;
-        var obj = s[sceneName][resName];
-        if (obj != void 0) {
-            //分析是不是分割图
-            var re = /([1-9]\d*)x([1-9]\d*)$/;
-            var resultMatchList = re.exec(resName);
-            if (resultMatchList != void 0 && resultMatchList.length == 3) {
-                obj.boundsRowAndCol = [parseInt(resultMatchList[1]), parseInt(resultMatchList[1])];
-            }
-            return s[sceneName][resName];
-        }
-        return null;
+        return annie.res[sceneName][resName];
     }
     annie.getResource = getResource;
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用

@@ -42,21 +42,22 @@ namespace annie {
          *
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
-        public constructor(bitmapData: any,rect:any=null) {
+        public constructor(bitmapData: any, rect: any = null) {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            if(rect!=void 0){
-                let drawRect:any=s._a2x_drawRect;
-                drawRect.isSheetSprite=true;
-                drawRect.x=rect.x;
-                drawRect.y=rect.x;
-                drawRect.w=rect.width;
-                drawRect.h=rect.height;
+            if (rect != void 0) {
+                let drawRect: any = s._a2x_drawRect;
+                drawRect.isSheetSprite = true;
+                drawRect.x = rect.x;
+                drawRect.y = rect.x;
+                drawRect.w = rect.width;
+                drawRect.h = rect.height;
             }
             s.bitmapData = bitmapData;
 
         }
+
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -88,43 +89,38 @@ namespace annie {
                 s._texture = null;
                 return;
             }
-            let drawRect:any=s._a2x_drawRect;
+            let drawRect: any = s._a2x_drawRect;
             let bw = texture.width;
-            let bh =texture.height;
-            if(drawRect.isSheetSprite){
-                bw=drawRect.w;
-                bh=drawRect.h;
-            }
-            if (s._bounds.width != bw || s._bounds.height != bh) {
-                s._bounds.width = bw;
-                s._bounds.height = bh;
-                if (bw > 0) {
-                    s.boundsRow = Math.ceil(bw / 1000);
-                }
-                if (bh > 0) {
-                    s.boundsCol = Math.ceil(bh / 1000);
-                }
-                s._updateSplitBounds();
-                s._checkDrawBounds();
-                if (s._filters.length > 0) {
-                    s.a2x_uf = true;
-                }
-                s._texture = texture;
-            } else if (s.a2x_um) {
-                s._checkDrawBounds();
-            }
+            let bh = texture.height;
             if (!isOffCanvas) {
+                if (drawRect.isSheetSprite){
+                    bw = drawRect.w;
+                    bh = drawRect.h;
+                }
+                if (s._bounds.width != bw || s._bounds.height != bh) {
+                    s._bounds.width = bw;
+                    s._bounds.height = bh;
+                    if (bw*bh > 0) {
+                        s._updateSplitBoundInfo();
+                    }
+                    if (s._filters.length > 0){
+                        s.a2x_uf = true;
+                    }
+                    s._texture = texture;
+                } else if (s.a2x_um) {
+                    s._checkDrawBounds();
+                }
                 s.a2x_um = false;
                 s.a2x_ua = false;
             }
             if (s.a2x_uf) {
                 s.a2x_uf = false;
-                if(!s._cacheCanvas){
-                    s._cacheCanvas=document.createElement("canvas");
+                if (!s._cacheCanvas) {
+                    s._cacheCanvas = document.createElement("canvas");
                 }
                 let canvas = s._cacheCanvas;
-                canvas.width=bw;
-                canvas.heigth=bh;
+                canvas.width = bw;
+                canvas.heigth = bh;
                 canvas.style.width = Math.ceil(bw / devicePixelRatio) + "px";
                 canvas.style.height = Math.ceil(bh / devicePixelRatio) + "px";
                 let ctx = canvas.getContext("2d");
@@ -139,13 +135,13 @@ namespace annie {
                     for (let i = 0; i < cfLen; i++) {
                         cf[i].drawFilter(imageData);
                     }
-                    if(drawRect.isSheetSprite){
-                        ctx.putImageData(imageData, drawRect.x,drawRect.y,bw,bh,0, 0,bw,bh);
-                    }else{
+                    if (drawRect.isSheetSprite) {
+                        ctx.putImageData(imageData, drawRect.x, drawRect.y, bw, bh, 0, 0, bw, bh);
+                    } else {
                         ctx.putImageData(imageData, 0, 0);
                     }
                     s._texture = canvas;
-                }else{
+                } else {
                     s._texture = texture;
                 }
             }
@@ -193,6 +189,7 @@ namespace annie {
                 return _canvas;
             }
         }
+
         public destroy(): void {
             //清除相应的数据引用
             let s = this;

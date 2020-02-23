@@ -480,18 +480,7 @@ namespace annie {
      * @return {any}
      */
     export function getResource(sceneName: string, resName: string): any {
-        let s = res;
-        let obj = s[sceneName][resName];
-        if (obj != void 0) {
-            //分析是不是分割图
-            let re = /([1-9]\d*)x([1-9]\d*)$/;
-            let resultMatchList = re.exec(resName);
-            if (resultMatchList != void 0 && resultMatchList.length == 3) {
-                obj.boundsRowAndCol = [parseInt(resultMatchList[1]), parseInt(resultMatchList[1])];
-            }
-            return s[sceneName][resName];
-        }
-        return null;
+        return res[sceneName][resName];
     }
 
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用

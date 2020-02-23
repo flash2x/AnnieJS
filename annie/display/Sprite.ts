@@ -387,11 +387,14 @@ namespace annie {
                 //所有未缓存的信息还是一如既往的更新,保持信息同步
                 if (s.a2x_uf) {
                     s.a2x_uf = false;
-                    if (s._isCache) {
+                    if (s._isCache){
                         //更新缓存
                         annie.createCache(s);
-                        s._updateSplitBounds();
-                        s._checkDrawBounds();
+                        let bw=s._texture.width;
+                        let bh=s._texture.height;
+                        if (bw*bh > 0) {
+                            s._updateSplitBoundInfo();
+                        }
                     }else{
                         s.a2x_um=true;
                     }
@@ -403,6 +406,9 @@ namespace annie {
                     children[i]._updateMatrix(isOffCanvas);
                 }
                 if (!isOffCanvas){
+                    if(s._isCache&&s.a2x_um){
+                        s._checkDrawBounds();
+                    }
                     s.a2x_ua = false;
                     s.a2x_um = false;
                 }
