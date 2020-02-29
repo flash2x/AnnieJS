@@ -2489,21 +2489,15 @@ var annie;
                     });
                 }
                 else {
+                    var br = s._bounds.width / s.boundsRow;
+                    var bc = s._bounds.height / s.boundsCol;
                     for (var i = 0; i < s.boundsRow; i++) {
                         for (var j = 0; j < s.boundsCol; j++) {
-                            var newX = i * 1000;
-                            var newY = j * 1000;
-                            var newW = bounds.width - newX;
-                            var newH = bounds.height - newY;
-                            if (newW > 1000) {
-                                newW = 1000;
-                            }
-                            if (newH > 1000) {
-                                newH = 1000;
-                            }
+                            var newX = i * br;
+                            var newY = j * bc;
                             sbl.push({
                                 isDraw: true,
-                                rect: new annie.Rectangle(newX + bounds.x, newY + bounds.y, newW, newH)
+                                rect: new annie.Rectangle(newX + bounds.x, newY + bounds.y, br, bc)
                             });
                         }
                     }
@@ -2810,12 +2804,6 @@ var annie;
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                if (bw > 0) {
-                    s.boundsRow = Math.ceil(bw / 1000);
-                }
-                if (bh > 0) {
-                    s.boundsCol = Math.ceil(bh / 1000);
-                }
                 s._updateSplitBounds();
                 s._checkDrawBounds();
                 if (s._filters.length > 0) {

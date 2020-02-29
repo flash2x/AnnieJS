@@ -86,12 +86,6 @@ namespace annie {
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                if (bw > 0) {
-                    s.boundsRow = Math.ceil(bw / 1000);
-                }
-                if (bh > 0) {
-                    s.boundsCol = Math.ceil(bh / 1000);
-                }
                 s._updateSplitBounds();
                 s._checkDrawBounds();
                 if (s._filters.length > 0) {

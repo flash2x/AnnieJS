@@ -850,21 +850,15 @@ namespace annie {
                         rect: bounds
                     });
                 } else {
+                    let br=s._bounds.width/s.boundsRow;
+                    let bc=s._bounds.height/s.boundsCol;
                     for (let i = 0; i < s.boundsRow; i++) {
                         for (let j = 0; j < s.boundsCol; j++) {
-                            let newX = i * 1000;
-                            let newY = j * 1000;
-                            let newW = bounds.width - newX;
-                            let newH = bounds.height - newY;
-                            if (newW > 1000) {
-                                newW = 1000;
-                            }
-                            if (newH > 1000) {
-                                newH = 1000;
-                            }
+                            let newX = i * br;
+                            let newY = j * bc;
                             sbl.push({
                                 isDraw: true,
-                                rect: new Rectangle(newX + bounds.x, newY + bounds.y, newW, newH)
+                                rect: new Rectangle(newX + bounds.x, newY + bounds.y, br, bc)
                             });
                         }
                     }
