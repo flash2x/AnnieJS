@@ -1413,20 +1413,6 @@ declare namespace annie {
          */
         stopAllSounds(): void;
         /**
-         * 渲染网格行数
-         * @property boundsRow
-         * @since 3.10
-         * @type {number}
-         */
-        boundsRow: number;
-        /**
-         * 渲染网格列数
-         * @property boundsCol
-         * @since 3.10
-         * @type {number}
-         */
-        boundsCol: number;
-        /**
          * 更新boundsList矩阵
          * @method _updateSplitBounds
          * @private

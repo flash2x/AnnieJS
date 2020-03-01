@@ -1766,20 +1766,6 @@ var annie;
             _this._bounds = new annie.Rectangle();
             _this._splitBoundsList = [];
             /**
-             * 渲染网格行数
-             * @property boundsRow
-             * @since 3.10
-             * @type {number}
-             */
-            _this.boundsRow = 1;
-            /**
-             * 渲染网格列数
-             * @property boundsCol
-             * @since 3.10
-             * @type {number}
-             */
-            _this.boundsCol = 1;
-            /**
              * 当前对象包含的声音列表
              * @property soundList
              * @public
@@ -2482,24 +2468,32 @@ var annie;
             var sbl = [];
             var bounds = s.getBounds();
             if (bounds.width * bounds.height > 0) {
-                if (s.boundsRow == 1 && s.boundsCol == 1) {
-                    sbl.push({
-                        isDraw: true,
-                        rect: bounds
-                    });
+                var row = 1;
+                var col = 1;
+                if (bounds.width > 1024) {
+                    row = Math.ceil(bounds.width / 1024);
                 }
-                else {
-                    var br = s._bounds.width / s.boundsRow;
-                    var bc = s._bounds.height / s.boundsCol;
-                    for (var i = 0; i < s.boundsRow; i++) {
-                        for (var j = 0; j < s.boundsCol; j++) {
-                            var newX = i * br;
-                            var newY = j * bc;
-                            sbl.push({
-                                isDraw: true,
-                                rect: new annie.Rectangle(newX + bounds.x, newY + bounds.y, br, bc)
-                            });
+                if (bounds.height > 1204) {
+                    col = Math.ceil(bounds.height / 1024);
+                }
+                var br = 1024;
+                var bc = 1024;
+                var newWidth = br + 2;
+                var newHeight = bc + 2;
+                for (var i = 0; i < row; i++) {
+                    for (var j = 0; j < col; j++) {
+                        var newX = i * br;
+                        var newY = j * bc;
+                        if (i == row - 1) {
+                            newWidth = bounds.width - newX;
                         }
+                        if (j == col - 1) {
+                            newHeight = bounds.height - newY;
+                        }
+                        sbl.push({
+                            isDraw: true,
+                            rect: new annie.Rectangle(newX + bounds.x, newY + bounds.y, newWidth, newHeight)
+                        });
                     }
                 }
             }
@@ -9249,18 +9243,7 @@ var annie;
      * @return {any}
      */
     function getResource(sceneName, resName) {
-        var s = annie.res;
-        var obj = s[sceneName][resName];
-        if (obj != void 0) {
-            //分析是不是分割图
-            var re = /([1-9]\d*)x([1-9]\d*)$/;
-            var resultMatchList = re.exec(resName);
-            if (resultMatchList != void 0 && resultMatchList.length == 3) {
-                obj.boundsRowAndCol = [parseInt(resultMatchList[1]), parseInt(resultMatchList[1])];
-            }
-            return s[sceneName][resName];
-        }
-        return null;
+        return annie.res[sceneName][resName];
     }
     annie.getResource = getResource;
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
