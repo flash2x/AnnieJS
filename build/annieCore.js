@@ -4907,7 +4907,7 @@ var annie;
         MovieClip.prototype.nextFrame = function () {
             var s = this;
             s._wantFrame += s._cMcSpeed;
-            if (s._wantFrame < s._a2x_res_class.tf) {
+            if (s._wantFrame > s._a2x_res_class.tf) {
                 s._wantFrame = s._a2x_res_class.tf;
             }
             s._isPlaying = false;
