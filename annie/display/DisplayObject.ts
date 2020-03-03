@@ -821,22 +821,6 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 渲染网格行数
-         * @property boundsRow
-         * @since 3.10
-         * @type {number}
-         */
-        public boundsRow: number = 1;
-        /**
-         * 渲染网格列数
-         * @property boundsCol
-         * @since 3.10
-         * @type {number}
-         */
-        public boundsCol: number = 1;
-
         /**
          * 更新渲染器需要的优化信息
          * @method _updateSplitBoundInfo
@@ -845,26 +829,35 @@ namespace annie {
         protected _updateSplitBoundInfo(): void {
             let s = this;
             let sbl: any = [];
-            let bounds = s._bounds;
-            let boxCount = 1024;
-            s.boundsRow = Math.ceil(bounds.width / boxCount);
-            s.boundsCol = Math.ceil(bounds.height / boxCount);
-            for (let i = 0; i < s.boundsRow; i++) {
-                for (let j = 0; j < s.boundsCol; j++) {
-                    let newX = i * boxCount;
-                    let newY = j * boxCount;
-                    let newW = bounds.width - newX;
-                    let newH = bounds.height - newY;
-                    if (newW > boxCount) {
-                        newW = boxCount;
+            let bounds = s.getBounds();
+            if (bounds.width * bounds.height > 0) {
+                let row = 1;
+                let col = 1;
+                if (bounds.width > 1024) {
+                    row = Math.ceil(bounds.width / 1024);
+                }
+                if (bounds.height > 1204) {
+                    col = Math.ceil(bounds.height / 1024);
+                }
+                let br = 1024;
+                let bc = 1024;
+                let newWidth=br+2;
+                let newHeight=bc+2;
+                for (let i = 0; i < row; i++) {
+                    for (let j = 0; j < col; j++) {
+                        let newX = i * br;
+                        let newY = j * bc;
+                        if(i==row-1){
+                            newWidth=bounds.width-newX;
+                        }
+                        if(j==col-1){
+                            newHeight=bounds.height-newY;
+                        }
+                        sbl.push({
+                            isDraw: true,
+                            rect: new Rectangle(newX + bounds.x, newY + bounds.y, newWidth, newHeight)
+                        });
                     }
-                    if (newH > boxCount) {
-                        newH = boxCount;
-                    }
-                    sbl.push({
-                        isDraw: true,
-                        rect: new Rectangle(newX, newY, newW, newH)
-                    });
                 }
             }
             s._splitBoundsList = sbl;

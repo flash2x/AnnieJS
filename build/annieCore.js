@@ -1777,20 +1777,6 @@ var annie;
             _this._bounds = new annie.Rectangle();
             _this._splitBoundsList = [];
             /**
-             * 渲染网格行数
-             * @property boundsRow
-             * @since 3.10
-             * @type {number}
-             */
-            _this.boundsRow = 1;
-            /**
-             * 渲染网格列数
-             * @property boundsCol
-             * @since 3.10
-             * @type {number}
-             */
-            _this.boundsCol = 1;
-            /**
              * 当前对象包含的声音列表
              * @property soundList
              * @public
@@ -2485,26 +2471,35 @@ var annie;
         DisplayObject.prototype._updateSplitBoundInfo = function () {
             var s = this;
             var sbl = [];
-            var bounds = s._bounds;
-            var boxCount = 1024;
-            s.boundsRow = Math.ceil(bounds.width / boxCount);
-            s.boundsCol = Math.ceil(bounds.height / boxCount);
-            for (var i = 0; i < s.boundsRow; i++) {
-                for (var j = 0; j < s.boundsCol; j++) {
-                    var newX = i * boxCount;
-                    var newY = j * boxCount;
-                    var newW = bounds.width - newX;
-                    var newH = bounds.height - newY;
-                    if (newW > boxCount) {
-                        newW = boxCount;
+            var bounds = s.getBounds();
+            if (bounds.width * bounds.height > 0) {
+                var row = 1;
+                var col = 1;
+                if (bounds.width > 1024) {
+                    row = Math.ceil(bounds.width / 1024);
+                }
+                if (bounds.height > 1204) {
+                    col = Math.ceil(bounds.height / 1024);
+                }
+                var br = 1024;
+                var bc = 1024;
+                var newWidth = br + 2;
+                var newHeight = bc + 2;
+                for (var i = 0; i < row; i++) {
+                    for (var j = 0; j < col; j++) {
+                        var newX = i * br;
+                        var newY = j * bc;
+                        if (i == row - 1) {
+                            newWidth = bounds.width - newX;
+                        }
+                        if (j == col - 1) {
+                            newHeight = bounds.height - newY;
+                        }
+                        sbl.push({
+                            isDraw: true,
+                            rect: new annie.Rectangle(newX + bounds.x, newY + bounds.y, newWidth, newHeight)
+                        });
                     }
-                    if (newH > boxCount) {
-                        newH = boxCount;
-                    }
-                    sbl.push({
-                        isDraw: true,
-                        rect: new annie.Rectangle(newX, newY, newW, newH)
-                    });
                 }
             }
             s._splitBoundsList = sbl;
@@ -2816,11 +2811,11 @@ var annie;
             var drawRect = s._a2x_drawRect;
             var bw = texture.width;
             var bh = texture.height;
-            if (drawRect.isSheetSprite) {
-                bw = drawRect.w;
-                bh = drawRect.h;
-            }
             if (!isOffCanvas) {
+                if (drawRect.isSheetSprite) {
+                    bw = drawRect.w;
+                    bh = drawRect.h;
+                }
                 if (s._bounds.width != bw || s._bounds.height != bh) {
                     s._bounds.width = bw;
                     s._bounds.height = bh;
