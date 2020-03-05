@@ -6683,7 +6683,7 @@ var annie;
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
             }
-            if ('ontouchstart' in rc) {
+            else {
                 rc.addEventListener("touchstart", s.mouseEvent, false);
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);

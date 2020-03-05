@@ -308,8 +308,7 @@ namespace annie {
                 rc.addEventListener("mousedown", s.mouseEvent, false);
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
-            }
-            if ('ontouchstart' in rc) {
+            } else {
                 rc.addEventListener("touchstart", s.mouseEvent, false);
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);
@@ -433,9 +432,9 @@ namespace annie {
             touchcancel: "onMouseUp"
         };
         //stageMousePoint
-        private sp: Point=new annie.Point();
+        private sp: Point = new annie.Point();
         //localPoint;
-        private lp: Point=new annie.Point();
+        private lp: Point = new annie.Point();
         private muliPoints: Array<any> = [];
         //当document有鼠标或触摸事件时调用
         private _mP1: Point = new Point();
@@ -534,7 +533,7 @@ namespace annie {
                             points = e.changedTouches;
                         } else {
                             let fp = e.changedTouches[0];
-                            if ((s._lastDpList[fp.identifier]!=void 0)||(item == "onMouseDown" && !s._lastDpList.isStart)) {
+                            if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
                                 s._lastDpList.isStart = true;
                                 points = [fp];
                             } else {
@@ -554,7 +553,7 @@ namespace annie {
                         }
                         cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
                         cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
-                        s.globalToLocal(cp,s.sp);
+                        s.globalToLocal(cp, s.sp);
                         if (sd && sd.stage && sd.parent) {
                             let x1 = sd.x, y1 = sd.y;
                             sd.parent.globalToLocal(cp, s.lp);
@@ -708,7 +707,7 @@ namespace annie {
                                                     if (!outEvent._pd && d.hasEventListener("onMouseOut")) {
                                                         outEvent.currentTarget = d;
                                                         outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                        d.globalToLocal(cp,s.lp);
+                                                        d.globalToLocal(cp, s.lp);
                                                         outEvent.localX = s.lp.x;
                                                         outEvent.localY = s.lp.y;
                                                         d.dispatchEvent(outEvent);
@@ -838,7 +837,7 @@ namespace annie {
                 s.a2x_um = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
-                s.renderObj.reSize(whObj.w*annie.devicePixelRatio,whObj.h*annie.devicePixelRatio);
+                s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
             } else if (s.autoResize) {
@@ -846,7 +845,7 @@ namespace annie {
                     s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
-                    s.renderObj.reSize(whObj.w*annie.devicePixelRatio,whObj.h*annie.devicePixelRatio);
+                    s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
                     s.setAlign();
                     s.dispatchEvent("onResize");
                 }
