@@ -132,12 +132,16 @@ namespace annieUI {
         private onMouseMove(e: annie.MouseEvent): void {
             let s = this;
             if (s._isMouseDown) {
-                let ctx = s.context;
-                let lx: number = e.localX >> 0;
-                let ly: number = e.localY >> 0;
-                ctx.lineTo(lx, ly);
-                ctx.stroke();
-                s.addStepObj.ps.push(lx, ly);
+                if(s.addStepObj) {
+                    let ctx = s.context;
+                    let lx: number = e.localX >> 0;
+                    let ly: number = e.localY >> 0;
+                    ctx.lineTo(lx, ly);
+                    ctx.stroke();
+                    s.addStepObj.ps.push(lx, ly);
+                }else{
+                    s.onMouseDown(e);
+                }
             }
         };
 
@@ -161,6 +165,8 @@ namespace annieUI {
             }
             s.currentStepId = 0;
             s.totalStepList = [];
+            s.addStepObj = null;
+            s._isMouseDown=false;
         }
 
         /**

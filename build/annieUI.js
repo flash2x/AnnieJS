@@ -2363,12 +2363,17 @@ var annieUI;
         DrawingBoard.prototype.onMouseMove = function (e) {
             var s = this;
             if (s._isMouseDown) {
-                var ctx = s.context;
-                var lx = e.localX >> 0;
-                var ly = e.localY >> 0;
-                ctx.lineTo(lx, ly);
-                ctx.stroke();
-                s.addStepObj.ps.push(lx, ly);
+                if (s.addStepObj) {
+                    var ctx = s.context;
+                    var lx = e.localX >> 0;
+                    var ly = e.localY >> 0;
+                    ctx.lineTo(lx, ly);
+                    ctx.stroke();
+                    s.addStepObj.ps.push(lx, ly);
+                }
+                else {
+                    s.onMouseDown(e);
+                }
             }
         };
         ;
@@ -2394,6 +2399,8 @@ var annieUI;
             }
             s.currentStepId = 0;
             s.totalStepList = [];
+            s.addStepObj = null;
+            s._isMouseDown = false;
         };
         /**
          * 撤销步骤
@@ -2513,8 +2520,8 @@ var annieUI;
         /**
          * 重置刮刮卡
          * @method reset
-         * @param frontColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
-         * @param backColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
+         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。赋值为""会用之前已设置的
+         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。赋值为""会用之前已设置的
          * @since 1.1.1
          * @public
          */
