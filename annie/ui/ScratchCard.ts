@@ -55,12 +55,13 @@ namespace annieUI {
         /**
          * 重置刮刮卡
          * @method reset
-         * @param backColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
+         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。
+         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。
          * @since 1.1.1
          * @public
          */
-        public reset(backColorObj: any = ""): void {
-            super.reset(backColorObj);
+        public reset(frontColorObj: any="",backColorObj: any = ""): void {
+            super.reset(frontColorObj);
             let s = this;
             if (s._drawList) {
                 if (backColorObj != "") {

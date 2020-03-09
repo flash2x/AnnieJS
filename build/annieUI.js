@@ -2513,13 +2513,15 @@ var annieUI;
         /**
          * 重置刮刮卡
          * @method reset
+         * @param frontColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
          * @param backColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
          * @since 1.1.1
          * @public
          */
-        ScratchCard.prototype.reset = function (backColorObj) {
+        ScratchCard.prototype.reset = function (frontColorObj, backColorObj) {
+            if (frontColorObj === void 0) { frontColorObj = ""; }
             if (backColorObj === void 0) { backColorObj = ""; }
-            _super.prototype.reset.call(this, backColorObj);
+            _super.prototype.reset.call(this, frontColorObj);
             var s = this;
             if (s._drawList) {
                 if (backColorObj != "") {

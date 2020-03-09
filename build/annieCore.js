@@ -2397,9 +2397,12 @@ var annie;
                 s._updateMatrix();
                 s.getDrawRect();
                 var w = DisplayObject._transformRect.width;
-                if (value > 0 && w > 0) {
+                if (w > 0) {
                     var sx = value / w;
                     s.scaleX *= sx;
+                }
+                else {
+                    s.scaleX = 1;
                 }
             },
             enumerable: true,
@@ -2435,9 +2438,12 @@ var annie;
                 s._updateMatrix();
                 s.getDrawRect();
                 var h = DisplayObject._transformRect.height;
-                if (value > 0 && h > 0) {
+                if (h > 0) {
                     var sy = value / h;
                     s.scaleY *= sy;
+                }
+                else {
+                    s.scaleY = 1;
                 }
             },
             enumerable: true,

@@ -751,9 +751,11 @@ namespace annie {
             s._updateMatrix();
             s.getDrawRect();
             let w = DisplayObject._transformRect.width;
-            if (value > 0 && w > 0) {
+            if (w > 0) {
                 let sx = value / w;
                 s.scaleX *= sx;
+            }else{
+                s.scaleX=1;
             }
         }
 
@@ -788,9 +790,11 @@ namespace annie {
             s._updateMatrix();
             s.getDrawRect();
             let h = DisplayObject._transformRect.height;
-            if (value > 0 && h > 0) {
+            if (h > 0) {
                 let sy = value / h;
                 s.scaleY *= sy;
+            }else{
+                s.scaleY=1;
             }
         }
 
