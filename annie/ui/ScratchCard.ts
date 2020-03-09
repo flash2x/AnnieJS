@@ -55,8 +55,8 @@ namespace annieUI {
         /**
          * 重置刮刮卡
          * @method reset
-         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。
-         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。
+         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。赋值为""会用之前已设置的
+         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。赋值为""会用之前已设置的
          * @since 1.1.1
          * @public
          */
