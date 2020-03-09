@@ -754,22 +754,12 @@ namespace annie {
             s._updateMatrix();
             s.getDrawRect();
             let w = DisplayObject._transformRect.width;
-            if (value > 0 && w > 0) {
+            if (w > 0) {
                 let sx = value / w;
                 s.scaleX *= sx;
+            }else{
+                s.scaleX=1;
             }
-        }
-
-        /**
-         * 获取宽高
-         * @method getWH
-         * @since 1.1.0
-         * @return {{w: number; h: number}}
-         */
-        public getWH(): { w: number, h: number } {
-            this._updateMatrix();
-            this.getDrawRect();
-            return {w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height};
         }
 
         /**
@@ -791,12 +781,24 @@ namespace annie {
             s._updateMatrix();
             s.getDrawRect();
             let h = DisplayObject._transformRect.height;
-            if (value > 0 && h > 0) {
+            if (h > 0) {
                 let sy = value / h;
                 s.scaleY *= sy;
+            }else{
+                s.scaleY=1;
             }
         }
-
+        /**
+         * 获取宽高
+         * @method getWH
+         * @since 1.1.0
+         * @return {{w: number; h: number}}
+         */
+        public getWH(): { w: number, h: number } {
+            this._updateMatrix();
+            this.getDrawRect();
+            return {w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height};
+        }
         //画缓存位图的时候需要使用
         //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
         public static _canvas: any = window.document.createElement("canvas");
