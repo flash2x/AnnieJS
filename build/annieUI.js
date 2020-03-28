@@ -2392,11 +2392,8 @@ var annieUI;
             }
             if (s.bgColor != "") {
                 s.context.fillStyle = s.bgColor;
-                s.context.fillRect(0, 0, s._bitmapData.width, s._bitmapData.height);
             }
-            else {
-                s.context.clearRect(0, 0, s._bitmapData.width, s._bitmapData.height);
-            }
+            s.context.fillRect(0, 0, s._bitmapData.width, s._bitmapData.height);
             s.currentStepId = 0;
             s.totalStepList = [];
             s.addStepObj = null;

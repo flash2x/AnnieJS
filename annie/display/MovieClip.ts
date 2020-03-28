@@ -177,15 +177,23 @@ namespace annie {
          */
         public initButton(): void {
             let s: any = this;
-            if (s._a2x_mode != -1 && s._a2x_res_class.tf > 1) {
+            if (s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMuseOver", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
-                s.gotoAndStop(1);
                 s._a2x_mode = -1;
+                if(s._clicked) {
+                    if (s.totalFrames > 2) {
+                        s.gotoAndStop(3);
+                    }else{
+                        s.gotoAndStop(2);
+                    }
+                }else{
+                    s.gotoAndStop(1);
+                }
             }
         }
 
@@ -219,11 +227,11 @@ namespace annie {
             if (!s._clicked) {
                 let frame = 2;
                 if (e.type == "onMouseDown") {
-                    if (s._curFrame > 2) {
+                    if (s.totalFrames > 2) {
                         frame = 3;
                     }
                 } else if (e.type == "onMouseOver") {
-                    if (s._curFrame > 1) {
+                    if (s.totalFrames > 1) {
                         frame = 2;
                     }
                 } else {

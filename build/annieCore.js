@@ -2155,14 +2155,13 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (value instanceof Array) {
-                    if (value.length == 0 && s._filters.length == 0) {
-                        return;
+                    if (value.length != 0 || s._filters.length != 0) {
+                        s._filters.length = 0;
+                        for (var i = 0; i < value.length; i++) {
+                            s.filters[i] = value[i];
+                        }
+                        s.a2x_uf = true;
                     }
-                    s._filters.length = 0;
-                    for (var i = 0; i < value.length; i++) {
-                        s.filters[i] = value[i];
-                    }
-                    s.a2x_uf = true;
                 }
                 else {
                     if (s._filters.length > 0) {
@@ -4843,15 +4842,25 @@ var annie;
          */
         MovieClip.prototype.initButton = function () {
             var s = this;
-            if (s._a2x_mode != -1 && s._a2x_res_class.tf > 1) {
+            if (s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
                 s.addEventListener("onMuseOver", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
-                s.gotoAndStop(1);
                 s._a2x_mode = -1;
+                if (s._clicked) {
+                    if (s.totalFrames > 2) {
+                        s.gotoAndStop(3);
+                    }
+                    else {
+                        s.gotoAndStop(2);
+                    }
+                }
+                else {
+                    s.gotoAndStop(1);
+                }
             }
         };
         Object.defineProperty(MovieClip.prototype, "clicked", {
@@ -4885,12 +4894,12 @@ var annie;
             if (!s._clicked) {
                 var frame = 2;
                 if (e.type == "onMouseDown") {
-                    if (s._curFrame > 2) {
+                    if (s.totalFrames > 2) {
                         frame = 3;
                     }
                 }
                 else if (e.type == "onMouseOver") {
-                    if (s._curFrame > 1) {
+                    if (s.totalFrames > 1) {
                         frame = 2;
                     }
                 }
@@ -6112,9 +6121,7 @@ var annie;
             s.htmlElement.style.padding = 0;
             s.htmlElement.style.margin = 0;
             s.htmlElement.onblur = function () {
-                if (annie.osType == "ios") {
-                    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-                }
+                window.scrollTo(0, 0);
             };
         };
         /**
@@ -8992,8 +8999,8 @@ var annie;
                                         if (frameCon[j].at != -1) {
                                             //如果不为空，则更新元素
                                             for (var m in lastFrameCon[j]) {
-                                                //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] == void 0) {
+                                                //这个地方一定要用undefined。因为有些元素可能为0.当然不是所有的元素都要补，比如滤镜，为空就不需要补
+                                                if (frameCon[j][m] == void 0 && m != "fi") {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -10810,7 +10817,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.0";
+    annie.version = "3.2.1";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

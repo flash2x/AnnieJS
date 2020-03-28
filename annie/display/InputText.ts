@@ -85,9 +85,7 @@ namespace annie {
             s.htmlElement.style.padding=0;
             s.htmlElement.style.margin=0;
             s.htmlElement.onblur = function (){
-                if(annie.osType=="ios"){
-                    window.scrollTo({top:0,left:0,behavior:"smooth"});
-                }
+                window.scrollTo(0,0);
             };
         }
         /**

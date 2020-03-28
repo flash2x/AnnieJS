@@ -178,6 +178,7 @@ namespace annie {
 
     //解析加载后的json资源数据
     function _parseContent(loadContent: any) {
+
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         let mc: any;
@@ -225,8 +226,8 @@ namespace annie {
                                         if (frameCon[j].at != -1) {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
-                                                //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] == void 0) {
+                                                //这个地方一定要用undefined。因为有些元素可能为0.当然不是所有的元素都要补，比如滤镜，为空就不需要补
+                                                if (frameCon[j][m] == void 0&&m!="fi") {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -595,6 +596,7 @@ namespace annie {
                     }
                 } else {
                     target.filters = null;
+
                 }
             }
             target._a2x_res_obj = info;

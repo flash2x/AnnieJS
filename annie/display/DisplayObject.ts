@@ -495,14 +495,13 @@ namespace annie {
         public set filters(value: any[]) {
             let s = this;
             if (value instanceof Array) {
-                if (value.length == 0 && s._filters.length == 0) {
-                    return;
+                if (value.length != 0 || s._filters.length != 0) {
+                    s._filters.length = 0;
+                    for (let i = 0; i < value.length; i++) {
+                        s.filters[i] = value[i];
+                    }
+                    s.a2x_uf = true;
                 }
-                s._filters.length = 0;
-                for (let i = 0; i < value.length; i++) {
-                    s.filters[i] = value[i];
-                }
-                s.a2x_uf = true;
             } else {
                 if (s._filters.length > 0) {
                     s._filters.length = 0;
