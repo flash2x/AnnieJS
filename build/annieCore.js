@@ -2402,25 +2402,17 @@ var annie;
                 s._updateMatrix();
                 s.getDrawRect();
                 var w = DisplayObject._transformRect.width;
-                if (value > 0 && w > 0) {
+                if (w > 0) {
                     var sx = value / w;
                     s.scaleX *= sx;
+                }
+                else {
+                    s.scaleX = 1;
                 }
             },
             enumerable: true,
             configurable: true
         });
-        /**
-         * 获取宽高
-         * @method getWH
-         * @since 1.1.0
-         * @return {{w: number; h: number}}
-         */
-        DisplayObject.prototype.getWH = function () {
-            this._updateMatrix();
-            this.getDrawRect();
-            return { w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height };
-        };
         Object.defineProperty(DisplayObject.prototype, "height", {
             /**
              * 获取或者设置显示对象在父级里的y方向的高,不到必要不要用此属性获取高
@@ -2440,14 +2432,28 @@ var annie;
                 s._updateMatrix();
                 s.getDrawRect();
                 var h = DisplayObject._transformRect.height;
-                if (value > 0 && h > 0) {
+                if (h > 0) {
                     var sy = value / h;
                     s.scaleY *= sy;
+                }
+                else {
+                    s.scaleY = 1;
                 }
             },
             enumerable: true,
             configurable: true
         });
+        /**
+         * 获取宽高
+         * @method getWH
+         * @since 1.1.0
+         * @return {{w: number; h: number}}
+         */
+        DisplayObject.prototype.getWH = function () {
+            this._updateMatrix();
+            this.getDrawRect();
+            return { w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height };
+        };
         /**
          * 停止这个显示对象上的所有声音
          * @method stopAllSounds
@@ -4832,7 +4838,16 @@ var annie;
                 s.addEventListener("onMuseOver", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
-                s.gotoAndStop(1);
+                var frame = 1;
+                if (s._clicked) {
+                    if (s.totalFrames > 2) {
+                        frame = 3;
+                    }
+                    else {
+                        frame = 2;
+                    }
+                }
+                s.gotoAndStop(frame);
                 s._a2x_mode = -1;
             }
         };
@@ -4867,12 +4882,12 @@ var annie;
             if (!s._clicked) {
                 var frame = 2;
                 if (e.type == "onMouseDown") {
-                    if (s._curFrame > 2) {
+                    if (s.totalFrames > 2) {
                         frame = 3;
                     }
                 }
                 else if (e.type == "onMouseOver") {
-                    if (s._curFrame > 1) {
+                    if (s.totalFrames > 1) {
                         frame = 2;
                     }
                 }
@@ -6092,9 +6107,7 @@ var annie;
             s.htmlElement.style.padding = 0;
             s.htmlElement.style.margin = 0;
             s.htmlElement.onblur = function () {
-                if (annie.osType == "ios") {
-                    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-                }
+                window.scrollTo(0, 0);
             };
         };
         /**
@@ -6670,7 +6683,7 @@ var annie;
                 rc.addEventListener('mousemove', s.mouseEvent, false);
                 rc.addEventListener('mouseup', s.mouseEvent, false);
             }
-            if ('ontouchstart' in rc) {
+            else {
                 rc.addEventListener("touchstart", s.mouseEvent, false);
                 rc.addEventListener('touchmove', s.mouseEvent, false);
                 rc.addEventListener('touchend', s.mouseEvent, false);
@@ -9916,7 +9929,7 @@ var annie;
                                             //如果不为空，则更新元素
                                             for (var m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] == void 0) {
+                                                if (frameCon[j][m] == void 0 && m != "fi") {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }

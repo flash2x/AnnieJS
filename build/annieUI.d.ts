@@ -1042,11 +1042,12 @@ declare namespace annieUI {
         /**
          * 重置刮刮卡
          * @method reset
-         * @param backColorObj 要更换的被刮出来的图片,不赋值的话默认之前设置的
+         * @param frontColorObj 没刮开之前的图，可以为单色，也可以为位图填充。赋值为""会用之前已设置的
+         * @param backColorObj 被刮开之后的图，可以为单色，也可以为位图填充。赋值为""会用之前已设置的
          * @since 1.1.1
          * @public
          */
-        reset(backColorObj?: any): void;
+        reset(frontColorObj?: any, backColorObj?: any): void;
         /**
          * 撤销步骤 没有任何功能，只是把从基类中的代码移除，调用不会产生任何效果
          * @method cancel

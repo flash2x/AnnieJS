@@ -232,7 +232,7 @@ namespace annie {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.
-                                                if (frameCon[j][m] == void 0) {
+                                                if (frameCon[j][m] == void 0&&m!="fi") {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }

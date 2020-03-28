@@ -184,7 +184,15 @@ namespace annie {
                 s.addEventListener("onMuseOver", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
-                s.gotoAndStop(1);
+                let frame = 1;
+                if (s._clicked) {
+                    if (s.totalFrames > 2) {
+                        frame = 3;
+                    } else {
+                        frame = 2;
+                    }
+                }
+                s.gotoAndStop(frame);
                 s._a2x_mode = -1;
             }
         }
@@ -219,11 +227,11 @@ namespace annie {
             if (!s._clicked) {
                 let frame = 2;
                 if (e.type == "onMouseDown") {
-                    if (s._curFrame > 2) {
+                    if (s.totalFrames > 2) {
                         frame = 3;
                     }
                 } else if (e.type == "onMouseOver") {
-                    if (s._curFrame > 1) {
+                    if (s.totalFrames > 1) {
                         frame = 2;
                     }
                 } else {
@@ -400,7 +408,7 @@ namespace annie {
                         }
                     }
                 }
-                if (s._wantFrame != s._curFrame){
+                if (s._wantFrame != s._curFrame) {
                     let curFrame = Math.floor(s._curFrame);
                     let wantFrame = Math.floor(s._wantFrame);
                     s._floatFrame = s._wantFrame - wantFrame;
@@ -531,6 +539,7 @@ namespace annie {
                 }
             }
         }
+
         public _onUpdateFrame(mcSpeed: number = 1, isOffCanvas: boolean = false): void {
             let s = this;
             let playStatus: boolean;
