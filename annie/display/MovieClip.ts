@@ -177,7 +177,7 @@ namespace annie {
          */
         public initButton(): void {
             let s: any = this;
-            if (s._a2x_res_class.tf > 1) {
+            if (s._a2x_mode != -1&&s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
