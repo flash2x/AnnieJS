@@ -26,6 +26,11 @@ namespace annie {
      */
     export let debug: boolean = false;
     /**
+     * 是否对超大图像资源分割渲染
+     * @type {boolean}
+     */
+    export let isCutDraw: boolean = false;
+    /**
      * annie引擎的版本号
      * @public
      * @since 1.0.1

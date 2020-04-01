@@ -834,16 +834,23 @@ namespace annie {
             if (bounds.width * bounds.height > 0) {
                 let row = 1;
                 let col = 1;
-                if (bounds.width > 1024) {
-                    row = Math.ceil(bounds.width / 1024);
+                let br = 0;
+                let bc = 0;
+                let newWidth=bounds.width;
+                let newHeight=bounds.height;
+                if(annie.isCutDraw) {
+                    br = 1024;
+                    bc = 1024;
+                    newWidth=br+2;
+                    newHeight=bc+2;
+                    if (bounds.width > br) {
+                        row = Math.ceil(bounds.width / br);
+                    }
+                    if (bounds.height > bc) {
+                        col = Math.ceil(bounds.height / bc);
+                    }
+
                 }
-                if (bounds.height > 1204) {
-                    col = Math.ceil(bounds.height / 1024);
-                }
-                let br = 1024;
-                let bc = 1024;
-                let newWidth=br+2;
-                let newHeight=bc+2;
                 for (let i = 0; i < row; i++) {
                     for (let j = 0; j < col; j++) {
                         let newX = i * br;
