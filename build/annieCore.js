@@ -2475,16 +2475,22 @@ var annie;
             if (bounds.width * bounds.height > 0) {
                 var row = 1;
                 var col = 1;
-                if (bounds.width > 1024) {
-                    row = Math.ceil(bounds.width / 1024);
+                var br = 0;
+                var bc = 0;
+                var newWidth = bounds.width;
+                var newHeight = bounds.height;
+                if (annie.isCutDraw) {
+                    br = 1024;
+                    bc = 1024;
+                    newWidth = br + 2;
+                    newHeight = bc + 2;
+                    if (bounds.width > br) {
+                        row = Math.ceil(bounds.width / br);
+                    }
+                    if (bounds.height > bc) {
+                        col = Math.ceil(bounds.height / bc);
+                    }
                 }
-                if (bounds.height > 1204) {
-                    col = Math.ceil(bounds.height / 1024);
-                }
-                var br = 1024;
-                var bc = 1024;
-                var newWidth = br + 2;
-                var newHeight = bc + 2;
                 for (var i = 0; i < row; i++) {
                     for (var j = 0; j < col; j++) {
                         var newX = i * br;
@@ -10807,6 +10813,11 @@ var annie;
      *      annie.debug=true;
      */
     annie.debug = false;
+    /**
+     * 是否对超大图像资源分割渲染
+     * @type {boolean}
+     */
+    annie.isCutDraw = false;
     /**
      * annie引擎的版本号
      * @public
