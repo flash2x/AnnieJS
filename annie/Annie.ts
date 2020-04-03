@@ -60,7 +60,7 @@ namespace annie {
     export let osType: string = (function () {
         let n = navigator.userAgent.toLocaleLowerCase();
         let reg1 = /android/;
-        let reg2 = /iphone/;
+        let reg2 = /iphone|ipad/;
         if (reg1.test(n)) {
             return "android";
         } else if (reg2.test(n)) {
