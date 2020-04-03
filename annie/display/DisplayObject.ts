@@ -619,7 +619,7 @@ namespace annie {
                 let ctx;
                 if (s.instanceType != "annie.Bitmap") {
                     ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x, p.y, 1, 1).data[3] > 0) {
+                    if (ctx.getImageData(p.x>>0, p.y>>0, 1, 1).data[3] > 0) {
                         return s
                     }
                 } else {
@@ -628,7 +628,7 @@ namespace annie {
                     _canvas.width = 1;
                     _canvas.height = 1;
                     ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, p.x, p.y);
+                    ctx.setTransform(1, 0, 0, 1, p.x>>0, p.y>>0);
                     ctx.drawImage(texture, 0, 0);
                     if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                         return s
@@ -835,16 +835,23 @@ namespace annie {
             if (bounds.width * bounds.height > 0) {
                 let row = 1;
                 let col = 1;
-                if (bounds.width > 1024) {
-                    row = Math.ceil(bounds.width / 1024);
+                let br = 0;
+                let bc = 0;
+                let newWidth=bounds.width;
+                let newHeight=bounds.height;
+                if(annie.isCutDraw) {
+                    br = 1024;
+                    bc = 1024;
+                    newWidth=br+2;
+                    newHeight=bc+2;
+                    if (bounds.width > br) {
+                        row = Math.ceil(bounds.width / br);
+                    }
+                    if (bounds.height > bc) {
+                        col = Math.ceil(bounds.height / bc);
+                    }
+
                 }
-                if (bounds.height > 1204) {
-                    col = Math.ceil(bounds.height / 1024);
-                }
-                let br = 1024;
-                let bc = 1024;
-                let newWidth=br+2;
-                let newHeight=bc+2;
                 for (let i = 0; i < row; i++) {
                     for (let j = 0; j < col; j++) {
                         let newX = i * br;

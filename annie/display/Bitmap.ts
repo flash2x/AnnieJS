@@ -119,8 +119,8 @@ namespace annie {
                     s._cacheCanvas = document.createElement("canvas");
                 }
                 let canvas = s._cacheCanvas;
-                canvas.width = bw;
-                canvas.heigth = bh;
+                canvas.width = bw>>0;
+                canvas.heigth = bh>>0;
                 canvas.style.width = Math.ceil(bw / devicePixelRatio) + "px";
                 canvas.style.height = Math.ceil(bh / devicePixelRatio) + "px";
                 let ctx = canvas.getContext("2d");
