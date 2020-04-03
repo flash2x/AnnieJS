@@ -10848,7 +10848,7 @@ var annie;
     annie.osType = (function () {
         var n = navigator.userAgent.toLocaleLowerCase();
         var reg1 = /android/;
-        var reg2 = /iphone/;
+        var reg2 = /iphone|ipad/;
         if (reg1.test(n)) {
             return "android";
         }
