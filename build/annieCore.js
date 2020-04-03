@@ -2250,7 +2250,7 @@ var annie;
                 var ctx = void 0;
                 if (s.instanceType != "annie.Bitmap") {
                     ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x - s._offsetX, p.y - s._offsetY, 1, 1).data[3] > 0) {
+                    if (ctx.getImageData((p.x - s._offsetX) >> 0, (p.y - s._offsetY) >> 0, 1, 1).data[3] > 0) {
                         return s;
                     }
                 }
@@ -10814,8 +10814,12 @@ var annie;
      */
     annie.debug = false;
     /**
+     * @property annie.isCutDraw
      * 是否对超大图像资源分割渲染
      * @type {boolean}
+     * @since 3.2.1
+     * @public
+     * @default false
      */
     annie.isCutDraw = false;
     /**
@@ -10844,7 +10848,7 @@ var annie;
     annie.osType = (function () {
         var n = navigator.userAgent.toLocaleLowerCase();
         var reg1 = /android/;
-        var reg2 = /iphone/;
+        var reg2 = /iphone|ipad/;
         if (reg1.test(n)) {
             return "android";
         }
