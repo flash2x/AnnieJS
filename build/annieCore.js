@@ -6697,17 +6697,13 @@ var annie;
             s.renderObj.init(document.createElement('canvas'));
             var rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
-            if (annie.osType == "pc") {
-                rc.addEventListener("mousedown", s.mouseEvent, false);
-                rc.addEventListener('mousemove', s.mouseEvent, false);
-                rc.addEventListener('mouseup', s.mouseEvent, false);
-            }
-            else {
-                rc.addEventListener("touchstart", s.mouseEvent, false);
-                rc.addEventListener('touchmove', s.mouseEvent, false);
-                rc.addEventListener('touchend', s.mouseEvent, false);
-                rc.addEventListener('touchcancel', s.mouseEvent, false);
-            }
+            rc.addEventListener("mousedown", s.mouseEvent, false);
+            rc.addEventListener('mousemove', s.mouseEvent, false);
+            rc.addEventListener('mouseup', s.mouseEvent, false);
+            rc.addEventListener("touchstart", s.mouseEvent, false);
+            rc.addEventListener('touchmove', s.mouseEvent, false);
+            rc.addEventListener('touchend', s.mouseEvent, false);
+            rc.addEventListener('touchcancel', s.mouseEvent, false);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             return _this;
@@ -6956,7 +6952,7 @@ var annie;
                     //事件个数
                     var eLen = void 0;
                     var identifier = void 0;
-                    if (annie.osType == "pc") {
+                    if (!e.changedTouches) {
                         e.identifier = "pc0";
                         points = [e];
                     }
@@ -10847,13 +10843,13 @@ var annie;
      */
     annie.osType = (function () {
         var n = navigator.userAgent.toLocaleLowerCase();
-        var reg1 = /android/;
-        var reg2 = /iphone|ipad/;
-        if (reg1.test(n)) {
-            return "android";
-        }
-        else if (reg2.test(n)) {
+        var reg1 = /android|mobile/;
+        var reg2 = /iphone|ipad|ipod|ios/;
+        if (reg2.test(n)) {
             return "ios";
+        }
+        else if (reg1.test(n)) {
+            return "android";
         }
         else {
             return "pc";

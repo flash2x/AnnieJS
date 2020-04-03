@@ -304,16 +304,13 @@ namespace annie {
             s.renderObj.init(document.createElement('canvas'));
             let rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
-            if (osType == "pc") {
-                rc.addEventListener("mousedown", s.mouseEvent, false);
-                rc.addEventListener('mousemove', s.mouseEvent, false);
-                rc.addEventListener('mouseup', s.mouseEvent, false);
-            } else {
-                rc.addEventListener("touchstart", s.mouseEvent, false);
-                rc.addEventListener('touchmove', s.mouseEvent, false);
-                rc.addEventListener('touchend', s.mouseEvent, false);
-                rc.addEventListener('touchcancel', s.mouseEvent, false);
-            }
+            rc.addEventListener("mousedown", s.mouseEvent, false);
+            rc.addEventListener('mousemove', s.mouseEvent, false);
+            rc.addEventListener('mouseup', s.mouseEvent, false);
+            rc.addEventListener("touchstart", s.mouseEvent, false);
+            rc.addEventListener('touchmove', s.mouseEvent, false);
+            rc.addEventListener('touchend', s.mouseEvent, false);
+            rc.addEventListener('touchcancel', s.mouseEvent, false);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
         }
@@ -525,7 +522,7 @@ namespace annie {
                     //事件个数
                     let eLen: number;
                     let identifier: any;
-                    if (osType == "pc") {
+                    if (!e.changedTouches) {
                         e.identifier = "pc0";
                         points = [e];
                     } else {
