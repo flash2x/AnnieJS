@@ -605,7 +605,7 @@ namespace annie {
                 let ctx;
                 if (s.instanceType != "annie.Bitmap") {
                     ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x - s._offsetX, p.y - s._offsetY, 1, 1).data[3] > 0) {
+                    if (ctx.getImageData((p.x - s._offsetX)>>0, (p.y - s._offsetY)>>0, 1, 1).data[3] > 0) {
                         return s
                     }
                 } else {
