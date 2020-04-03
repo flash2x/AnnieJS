@@ -59,12 +59,12 @@ namespace annie {
      */
     export let osType: string = (function () {
         let n = navigator.userAgent.toLocaleLowerCase();
-        let reg1 = /android/;
-        let reg2 = /iphone|ipad/;
-        if (reg1.test(n)) {
-            return "android";
-        } else if (reg2.test(n)) {
-            return "ios"
+        let reg1 = /android|mobile/;
+        let reg2 = /iphone|ipad|ipod|ios/;
+        if (reg2.test(n)) {
+            return "ios";
+        } else if (reg1.test(n)) {
+            return "android"
         } else {
             return "pc";
         }
