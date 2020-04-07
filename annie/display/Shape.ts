@@ -728,9 +728,6 @@ namespace annie {
             let leftX: number = s._offsetX;
             let leftY: number = s._offsetY;
             let isStroke = false;
-            if (isMask) {
-                ctx.beginPath();
-            }
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
@@ -765,9 +762,6 @@ namespace annie {
                         ctx[data[1]] = data[2];
                     }
                 }
-            }
-            if (isMask) {
-                ctx.closePath();
             }
         }
         /**
