@@ -3656,9 +3656,6 @@ var annie;
             var leftX = s._offsetX;
             var leftY = s._offsetY;
             var isStroke = false;
-            if (isMask) {
-                ctx.beginPath();
-            }
             for (var i = 0; i < cLen; i++) {
                 data = com[i];
                 if (data[0] > 0) {
@@ -3701,9 +3698,6 @@ var annie;
                         ctx[data[1]] = data[2];
                     }
                 }
-            }
-            if (isMask) {
-                ctx.closePath();
             }
         };
         /**
@@ -8171,7 +8165,9 @@ var annie;
             var s = this, ctx = s._ctx;
             ctx.save();
             ctx.globalAlpha = 0;
+            ctx.beginPath();
             s.drawMask(target);
+            ctx.closePath();
             ctx.clip();
         };
         CanvasRender.prototype.drawMask = function (target) {
@@ -8187,9 +8183,7 @@ var annie;
             }
             else {
                 var bounds = target._bounds;
-                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
-                ctx.closePath();
             }
         };
         /**
