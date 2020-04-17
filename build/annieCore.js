@@ -3926,6 +3926,7 @@ var annie;
             var cp = child.parent;
             if (cp instanceof annie.Sprite) {
                 Sprite._removeFormParent(cp, child);
+                cp.a2x_uf = true;
             }
             len = s.children.length;
             if (index >= len) {
@@ -3945,6 +3946,7 @@ var annie;
                     child._onAddEvent();
                 }
             }
+            s.a2x_uf = true;
         };
         Sprite._removeFormParent = function (cp, child) {
             var cpc = cp.children;
@@ -4053,6 +4055,7 @@ var annie;
                 child.stage = null;
             }
             child.parent = null;
+            s.a2x_uf = true;
         };
         /**
          * 如果对容器缓存为位图过,则会更新缓存,没事别乱调用

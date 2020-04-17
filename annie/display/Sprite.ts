@@ -174,6 +174,7 @@ namespace annie {
             let cp = child.parent;
             if (cp instanceof annie.Sprite) {
                 Sprite._removeFormParent(cp, child);
+                cp.a2x_uf=true;
             }
             len = s.children.length;
             if (index >= len) {
@@ -191,6 +192,7 @@ namespace annie {
                     child._onAddEvent();
                 }
             }
+            s.a2x_uf=true;
         }
 
         private static _removeFormParent(cp: Sprite, child: DisplayObject): void {
@@ -297,6 +299,7 @@ namespace annie {
                 child.stage = null;
             }
             child.parent = null;
+            s.a2x_uf=true;
         }
 
         /**
