@@ -4,8 +4,8 @@
 namespace annie {
     /**
      * 矢量对象
-     * @class annie.Bitmap
-     * @extends annie.DisplayObject
+     * @class annie.Shape
+     * @extends annie.Bitmap
      * @since 1.0.0
      * @public
      */
