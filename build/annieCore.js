@@ -5086,6 +5086,7 @@ var annie;
                     s._floatFrame = s._wantFrame - wantFrame;
                     s._curFrame = s._wantFrame;
                     if (curFrame != wantFrame) {
+                        s.a2x_uf = true;
                         var timeLineObj = s._a2x_res_class;
                         //先确定是哪一帧
                         var allChildren = s._a2x_res_children;
@@ -5237,6 +5238,7 @@ var annie;
         };
         MovieClip.prototype._updateFrameGap = function () {
             var s = this;
+            s.a2x_uf = true;
             var timeLineObj = s._a2x_res_class;
             //先确定是哪一帧
             var allChildren = s._a2x_res_children;

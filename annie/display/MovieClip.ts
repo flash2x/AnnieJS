@@ -414,6 +414,7 @@ namespace annie {
                     s._floatFrame = s._wantFrame - wantFrame;
                     s._curFrame = s._wantFrame;
                     if (curFrame != wantFrame) {
+                        s.a2x_uf=true;
                         let timeLineObj = s._a2x_res_class;
                         //先确定是哪一帧
                         let allChildren = s._a2x_res_children;
@@ -561,6 +562,7 @@ namespace annie {
 
         private _updateFrameGap() {
             let s = this;
+            s.a2x_uf=true;
             let timeLineObj = s._a2x_res_class;
             //先确定是哪一帧
             let allChildren = s._a2x_res_children;

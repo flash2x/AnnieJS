@@ -63,6 +63,8 @@
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
 ## AnnieJS 3.2.1 版本
+    修复MCScroller有时白屏的bug
+    修复MovieClip有滤镜或者色彩或blender变化时，播放动画不更新的bug
     修复在有滤镜情况下添加或者删除子对象，内容不更新的bug
     修复微信开发工具下无法点击的bug
     修复Button在时间轴上设置Clicked=true按钮状态异常的bug
