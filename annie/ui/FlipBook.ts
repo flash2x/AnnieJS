@@ -7,6 +7,13 @@ namespace annieUI {
     import Event=annie.Event;
     import MouseEvent=annie.MouseEvent;
     import Point=annie.Point;
+    /**
+     * 电子杂志组件
+     * @class annieUI.FlipBook
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
     export class FlipBook extends Sprite {
         //Events
         /**

@@ -119,6 +119,14 @@ var annieUI;
             _this.absStartY = 0;
             _this.pointX = 0;
             _this.pointY = 0;
+            /**
+             * 滑动衰减系数，值越大衰减越快
+             * @property deceleration
+             * @type {number}
+             * @public
+             * @since 3.2.1
+             * @default 0.0006
+             */
             _this.deceleration = 0.0006;
             _this.destTime = 0;
             _this.destX = 0;
@@ -529,9 +537,13 @@ var annieUI;
         };
         Scroller.prototype._translate = function (x, y) {
             var s = this;
-            s._curX = x;
-            s._curY = y;
-            s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: x, posY: y });
+            if (x != Number.NaN) {
+                s._curX = x;
+            }
+            if (y != Number.NaN) {
+                s._curY = y;
+            }
+            s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: s._curX, posY: s._curY });
         };
         Scroller.toMomentum = function (current, start, time, lowerMargin, wrapperSize, deceleration) {
             var distance = current - start, speed = Math.abs(distance) / time, destination, duration;
@@ -567,7 +579,7 @@ var annieUI;
      * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
      * @public
-     * @extends annie.Scroller
+     * @extends annieUI.Scroller
      * @since 3.1.5
      */
     var MCScroller = /** @class */ (function (_super) {
@@ -1654,6 +1666,13 @@ var annieUI;
     var Event = annie.Event;
     var MouseEvent = annie.MouseEvent;
     var Point = annie.Point;
+    /**
+     * 电子杂志组件
+     * @class annieUI.FlipBook
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
     var FlipBook = /** @class */ (function (_super) {
         __extends(FlipBook, _super);
         /**

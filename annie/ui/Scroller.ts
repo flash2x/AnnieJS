@@ -204,11 +204,19 @@ namespace annieUI {
         private absStartY: number = 0;
         private pointX: number = 0;
         private pointY: number = 0;
-        private deceleration: number = 0.0006;
+        /**
+         * 滑动衰减系数，值越大衰减越快
+         * @property deceleration
+         * @type {number}
+         * @public
+         * @since 3.2.1
+         * @default 0.0006
+         */
+        public deceleration: number = 0.0006;
         private destTime: number = 0;
         private destX: number = 0;
         private destY: number = 0;
-        private duration: number = 0;
+        public duration: number = 0;
         private easingFn: Function;
 
         /**
@@ -551,9 +559,13 @@ namespace annieUI {
 
         public _translate(x: number, y: number) {
             let s = this;
-            s._curX = x;
-            s._curY = y;
-            s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: x, posY: y});
+            if(x!=Number.NaN) {
+                s._curX = x;
+            }
+            if(y!=Number.NaN){
+                s._curY = y;
+            }
+            s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: s._curX, posY: s._curY});
         }
 
         private static toMomentum(current: number, start: number, time: number, lowerMargin: number, wrapperSize: number, deceleration: number) {

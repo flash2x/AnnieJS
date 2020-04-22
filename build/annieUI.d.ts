@@ -179,11 +179,19 @@ declare namespace annieUI {
         private absStartY;
         private pointX;
         private pointY;
-        private deceleration;
+        /**
+         * 滑动衰减系数，值越大衰减越快
+         * @property deceleration
+         * @type {number}
+         * @public
+         * @since 3.2.1
+         * @default 0.0006
+         */
+        deceleration: number;
         private destTime;
         private destX;
         private destY;
-        private duration;
+        duration: number;
         private easingFn;
         /**
          * 初始化
@@ -279,7 +287,7 @@ declare namespace annieUI {
      * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
      * @public
-     * @extends annie.Scroller
+     * @extends annieUI.Scroller
      * @since 3.1.5
      */
     class MCScroller extends annieUI.Scroller {
@@ -770,6 +778,13 @@ declare namespace annieUI {
  */
 declare namespace annieUI {
     import Sprite = annie.Sprite;
+    /**
+     * 电子杂志组件
+     * @class annieUI.FlipBook
+     * @public
+     * @extends annie.Sprite
+     * @since 1.0.0
+     */
     class FlipBook extends Sprite {
         /**
          * annieUI.FlipBook组件翻页开始事件

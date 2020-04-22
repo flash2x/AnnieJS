@@ -6,7 +6,7 @@ namespace annieUI {
      * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
      * @public
-     * @extends annie.Scroller
+     * @extends annieUI.Scroller
      * @since 3.1.5
      */
     export class MCScroller extends annieUI.Scroller {
