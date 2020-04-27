@@ -529,9 +529,13 @@ var annieUI;
         };
         Scroller.prototype._translate = function (x, y) {
             var s = this;
-            s._curX = x;
-            s._curY = y;
-            s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: x, posY: y });
+            if (x != Number.NaN) {
+                s._curX = x;
+            }
+            if (y != Number.NaN) {
+                s._curY = y;
+            }
+            s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: s._curX, posY: s._curY });
         };
         Scroller.toMomentum = function (current, start, time, lowerMargin, wrapperSize, deceleration) {
             var distance = current - start, speed = Math.abs(distance) / time, destination, duration;

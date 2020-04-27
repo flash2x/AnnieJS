@@ -551,9 +551,13 @@ namespace annieUI {
 
         public _translate(x: number, y: number) {
             let s = this;
-            s._curX = x;
-            s._curY = y;
-            s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: x, posY: y});
+            if(x!=Number.NaN) {
+                s._curX = x;
+            }
+            if(y!=Number.NaN) {
+                s._curY = y;
+            }
+            s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: s._curX, posY: s._curY});
         }
 
         private static toMomentum(current: number, start: number, time: number, lowerMargin: number, wrapperSize: number, deceleration: number) {

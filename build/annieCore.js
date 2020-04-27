@@ -2941,8 +2941,8 @@ var annie;
 (function (annie) {
     /**
      * 矢量对象
-     * @class annie.Bitmap
-     * @extends annie.DisplayObject
+     * @class annie.Shape
+     * @extends annie.Bitmap
      * @since 1.0.0
      * @public
      */
@@ -5088,6 +5088,7 @@ var annie;
                         var addChildren = [];
                         var remChildren = [];
                         if (s._lastFrameObj != curFrameObj) {
+                            s.a2x_uf = true;
                             s._lastFrameObj = curFrameObj;
                             s.children.length = 0;
                             var maskObj = null;
@@ -5225,6 +5226,7 @@ var annie;
         };
         MovieClip.prototype._updateFrameGap = function () {
             var s = this;
+            s.a2x_uf = true;
             var timeLineObj = s._a2x_res_class;
             //先确定是哪一帧
             var allChildren = s._a2x_res_children;
