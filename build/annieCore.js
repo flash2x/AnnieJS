@@ -2260,8 +2260,7 @@ var annie;
                     _canvas.width = 1;
                     _canvas.height = 1;
                     ctx.clearRect(0, 0, 1, 1);
-                    ctx.setTransform(1, 0, 0, 1, p.x - s._offsetX, p.y - s._offsetY);
-                    ctx.drawImage(texture, 0, 0);
+                    ctx.drawImage(texture, p.x - s._offsetX, p.y - s._offsetY, 1, 1, 0, 0, 1, 1);
                     if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                         return s;
                     }
