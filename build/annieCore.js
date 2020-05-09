@@ -2246,17 +2246,10 @@ var annie;
                     return s;
                 }
             }
-            if (s.hitTestWithPixel) {
-                var ctx = void 0;
-                if (s.instanceType != "annie.Bitmap") {
-                    ctx = texture.getContext('2d');
-                    if (ctx.getImageData((p.x - s._offsetX) >> 0, (p.y - s._offsetY) >> 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                }
-                else {
+            if (s._bounds.isPointIn(p)) {
+                if (s.hitTestWithPixel) {
                     var _canvas = DisplayObject._canvas;
-                    ctx = _canvas.getContext('2d');
+                    var ctx = _canvas.getContext('2d');
                     _canvas.width = 1;
                     _canvas.height = 1;
                     ctx.clearRect(0, 0, 1, 1);
@@ -2265,9 +2258,7 @@ var annie;
                         return s;
                     }
                 }
-            }
-            else {
-                if (s._bounds.isPointIn(p)) {
+                else {
                     return s;
                 }
             }

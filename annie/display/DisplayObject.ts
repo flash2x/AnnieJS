@@ -601,16 +601,11 @@ namespace annie {
                     return s;
                 }
             }
-            if (s.hitTestWithPixel) {
-                let ctx;
-                if (s.instanceType != "annie.Bitmap") {
-                    ctx = texture.getContext('2d');
-                    if (ctx.getImageData((p.x - s._offsetX)>>0, (p.y - s._offsetY)>>0, 1, 1).data[3] > 0) {
-                        return s
-                    }
-                } else {
+
+            if (s._bounds.isPointIn(p)) {
+                if (s.hitTestWithPixel) {
                     let _canvas = DisplayObject._canvas;
-                    ctx = _canvas.getContext('2d');
+                    let ctx = _canvas.getContext('2d');
                     _canvas.width = 1;
                     _canvas.height = 1;
                     ctx.clearRect(0, 0, 1, 1);
@@ -618,9 +613,7 @@ namespace annie {
                     if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
                         return s
                     }
-                }
-            } else {
-                if (s._bounds.isPointIn(p)) {
+                } else {
                     return s;
                 }
             }
@@ -752,8 +745,8 @@ namespace annie {
             if (w > 0) {
                 let sx = value / w;
                 s.scaleX *= sx;
-            }else{
-                s.scaleX=1;
+            } else {
+                s.scaleX = 1;
             }
         }
 
@@ -791,8 +784,8 @@ namespace annie {
             if (h > 0) {
                 let sy = value / h;
                 s.scaleY *= sy;
-            }else{
-                s.scaleY=1;
+            } else {
+                s.scaleY = 1;
             }
         }
 
@@ -835,13 +828,13 @@ namespace annie {
                 let col = 1;
                 let br = 0;
                 let bc = 0;
-                let newWidth=bounds.width;
-                let newHeight=bounds.height;
-                if(annie.isCutDraw) {
+                let newWidth = bounds.width;
+                let newHeight = bounds.height;
+                if (annie.isCutDraw) {
                     br = 1024;
                     bc = 1024;
-                    newWidth=br+2;
-                    newHeight=bc+2;
+                    newWidth = br + 2;
+                    newHeight = bc + 2;
                     if (bounds.width > br) {
                         row = Math.ceil(bounds.width / br);
                     }
@@ -854,11 +847,11 @@ namespace annie {
                     for (let j = 0; j < col; j++) {
                         let newX = i * br;
                         let newY = j * bc;
-                        if(i==row-1){
-                            newWidth=bounds.width-newX;
+                        if (i == row - 1) {
+                            newWidth = bounds.width - newX;
                         }
-                        if(j==col-1){
-                            newHeight=bounds.height-newY;
+                        if (j == col - 1) {
+                            newHeight = bounds.height - newY;
                         }
                         sbl.push({
                             isDraw: true,
