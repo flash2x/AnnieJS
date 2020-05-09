@@ -615,26 +615,26 @@ namespace annie {
                     return s;
                 }
             }
-            if (s.hitTestWithPixel) {
-                let ctx;
-                if (s.instanceType != "annie.Bitmap") {
-                    ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x>>0, p.y>>0, 1, 1).data[3] > 0) {
-                        return s
+            if (s._bounds.isPointIn(p)) {
+                if (s.hitTestWithPixel) {
+                    let ctx;
+                    if (s.instanceType != "annie.Bitmap") {
+                        ctx = texture.getContext('2d');
+                        if (ctx.getImageData(p.x >> 0, p.y >> 0, 1, 1).data[3] > 0) {
+                            return s
+                        }
+                    } else {
+                        let _canvas = DisplayObject._canvas;
+                        ctx = _canvas.getContext('2d');
+                        _canvas.width = 1;
+                        _canvas.height = 1;
+                        ctx.clearRect(0, 0, 1, 1);
+                        ctx.drawImage(texture, p.x - s._offsetX, p.y - s._offsetY, 1, 1, 0, 0, 1, 1);
+                        if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                            return s
+                        }
                     }
-                } else {
-                    let _canvas = DisplayObject._canvas;
-                    ctx = _canvas.getContext('2d');
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    ctx.clearRect(0, 0, 1, 1);
-                    ctx.drawImage(texture, p.x - s._offsetX, p.y - s._offsetY, 1, 1, 0, 0, 1, 1);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s
-                    }
-                }
-            } else {
-                if (s._bounds.isPointIn(p)) {
+                }else {
                     return s;
                 }
             }
@@ -756,8 +756,8 @@ namespace annie {
             if (w > 0) {
                 let sx = value / w;
                 s.scaleX *= sx;
-            }else{
-                s.scaleX=1;
+            } else {
+                s.scaleX = 1;
             }
         }
 
@@ -783,10 +783,11 @@ namespace annie {
             if (h > 0) {
                 let sy = value / h;
                 s.scaleY *= sy;
-            }else{
-                s.scaleY=1;
+            } else {
+                s.scaleY = 1;
             }
         }
+
         /**
          * 获取宽高
          * @method getWH
@@ -798,6 +799,7 @@ namespace annie {
             this.getDrawRect();
             return {w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height};
         }
+
         //画缓存位图的时候需要使用
         //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
         public static _canvas: any = window.document.createElement("canvas");
@@ -822,6 +824,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 更新渲染器需要的优化信息
          * @method _updateSplitBoundInfo
@@ -836,13 +839,13 @@ namespace annie {
                 let col = 1;
                 let br = 0;
                 let bc = 0;
-                let newWidth=bounds.width;
-                let newHeight=bounds.height;
-                if(annie.isCutDraw) {
+                let newWidth = bounds.width;
+                let newHeight = bounds.height;
+                if (annie.isCutDraw) {
                     br = 1024;
                     bc = 1024;
-                    newWidth=br+2;
-                    newHeight=bc+2;
+                    newWidth = br + 2;
+                    newHeight = bc + 2;
                     if (bounds.width > br) {
                         row = Math.ceil(bounds.width / br);
                     }
@@ -855,11 +858,11 @@ namespace annie {
                     for (let j = 0; j < col; j++) {
                         let newX = i * br;
                         let newY = j * bc;
-                        if(i==row-1){
-                            newWidth=bounds.width-newX;
+                        if (i == row - 1) {
+                            newWidth = bounds.width - newX;
                         }
-                        if(j==col-1){
-                            newHeight=bounds.height-newY;
+                        if (j == col - 1) {
+                            newHeight = bounds.height - newY;
                         }
                         sbl.push({
                             isDraw: true,
@@ -871,6 +874,7 @@ namespace annie {
             s._splitBoundsList = sbl;
             s._checkDrawBounds();
         }
+
         protected _checkDrawBounds() {
             let s = this;
             //检查所有bounds矩阵是否在可视范围里

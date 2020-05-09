@@ -2260,28 +2260,28 @@ var annie;
                     return s;
                 }
             }
-            if (s.hitTestWithPixel) {
-                var ctx = void 0;
-                if (s.instanceType != "annie.Bitmap") {
-                    ctx = texture.getContext('2d');
-                    if (ctx.getImageData(p.x >> 0, p.y >> 0, 1, 1).data[3] > 0) {
-                        return s;
+            if (s._bounds.isPointIn(p)) {
+                if (s.hitTestWithPixel) {
+                    var ctx = void 0;
+                    if (s.instanceType != "annie.Bitmap") {
+                        ctx = texture.getContext('2d');
+                        if (ctx.getImageData(p.x >> 0, p.y >> 0, 1, 1).data[3] > 0) {
+                            return s;
+                        }
+                    }
+                    else {
+                        var _canvas = DisplayObject._canvas;
+                        ctx = _canvas.getContext('2d');
+                        _canvas.width = 1;
+                        _canvas.height = 1;
+                        ctx.clearRect(0, 0, 1, 1);
+                        ctx.drawImage(texture, p.x - s._offsetX, p.y - s._offsetY, 1, 1, 0, 0, 1, 1);
+                        if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
+                            return s;
+                        }
                     }
                 }
                 else {
-                    var _canvas = DisplayObject._canvas;
-                    ctx = _canvas.getContext('2d');
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    ctx.clearRect(0, 0, 1, 1);
-                    ctx.drawImage(texture, p.x - s._offsetX, p.y - s._offsetY, 1, 1, 0, 0, 1, 1);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s;
-                    }
-                }
-            }
-            else {
-                if (s._bounds.isPointIn(p)) {
                     return s;
                 }
             }
