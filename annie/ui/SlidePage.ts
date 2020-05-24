@@ -333,7 +333,11 @@ namespace annieUI {
                         }
                     } else {
                         if (Math.abs(s._moveDis) > 5 || Math.abs(ts * s.follow << 1) >= s.distance) {
-                            s.slideTo(ts < 0 ? id + 1 : id - 1);
+                            if(ts!=0) {
+                                s.slideTo(ts < 0 ? id + 1 : id - 1);
+                            }else{
+                                s.view[s.paramXY]=-s.currentPageIndex * s.distance;
+                            }
                         } else {
                             let where = -s.currentPageIndex * s.distance;
                             if (where == s.view[s.paramXY]) return;
