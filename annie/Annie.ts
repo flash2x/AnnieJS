@@ -26,15 +26,6 @@ namespace annie {
      */
     export let debug: boolean = false;
     /**
-     * @property annie.isCutDraw
-     * 是否对超大图像资源分割渲染
-     * @type {boolean}
-     * @since 3.2.1
-     * @public
-     * @default false
-     */
-    export let isCutDraw: boolean = false;
-    /**
      * annie引擎的版本号
      * @public
      * @since 1.0.1
@@ -172,9 +163,10 @@ namespace annie {
         req.open("get", url, true);
         req.send();
     }
-
     // 作为将显示对象导出成图片的render渲染器
+/*
     export let _dRender: any = null;
+*/
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -198,7 +190,7 @@ namespace annie {
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
-    export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
+    /*export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
             _dRender = new OffCanvasRender();
         }
@@ -230,8 +222,9 @@ namespace annie {
             }
         }
         return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
-    };
-    export let createCache = function (obj: any): void {
+    };*/
+
+    /*export let createCache = function (obj: any): void {
         if (!_dRender) {
             _dRender = new OffCanvasRender();
         }
@@ -264,7 +257,7 @@ namespace annie {
             ctx.putImageData(imageData, 0, 0);
         }
         obj.parent = parent;
-    };
+    };*/
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组
@@ -277,6 +270,6 @@ namespace annie {
      */
     export let getStagePixels = function (stage: annie.Stage, rect: annie.Rectangle): Array<number> {
         let newPoint: Point = stage.localToGlobal(new Point(rect.x, rect.y));
-        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
+        return CanvasRender._ctx.getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
     }
 }

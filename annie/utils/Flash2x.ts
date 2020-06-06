@@ -6,12 +6,12 @@
 namespace annie {
     import URLLoader = annie.URLLoader;
     import Event = annie.Event;
-    import ColorFilter=annie.ColorFilter;
     import Shape=annie.Shape;
     import Bitmap=annie.Bitmap;
+   /* import ColorFilter=annie.ColorFilter;
     import BlurFilter=annie.BlurFilter;
     import ShadowFilter=annie.ShadowFilter;
-    import ColorMatrixFilter=annie.ColorMatrixFilter;
+    import ColorMatrixFilter=annie.ColorMatrixFilter;*/
     //打包swf用
     export let _isReleased = false;
     export let suffixName = ".swf";
@@ -490,10 +490,6 @@ namespace annie {
             if (info.al == void 0) {
                 info.al = 1;
             }
-            if(info.m==void 0){
-                info.m=0;
-            }
-            target.blendMode=info.m;
             if(isMc){
                     let isUmChange:boolean=target.a2x_um;
                     if(!target._changeTransformInfo[0]&&target._x!=info.tr[0]){
@@ -552,52 +548,6 @@ namespace annie {
                     }
                 }
                 target._a2x_mode = info.t;
-            }
-
-            ///////////////////////////////////////////
-            //添加滤镜
-            if (lastInfo.fi != info.fi) {
-                if (info.fi != void 0) {
-                    let filters: any = [];
-                    let blur: any;
-                    let color: any;
-                    for (let i = 0; i < info.fi.length; i++) {
-                        switch (info.fi[i][0]) {
-                            case 0:
-                                blur = (info.fi[i][2] + info.fi[i][3]) * 0.5;
-                                color = Shape.getRGBA(info.fi[i][10], info.fi[i][11]);
-                                let offsetX = info.fi[i][4] * Math.cos(info.fi[i][1]);
-                                let offsetY = info.fi[i][4] * Math.sin(info.fi[i][1]);
-                                filters[filters.length] = new ShadowFilter(color, offsetX, offsetY, blur);
-                                break;
-                            case 1:
-                                //模糊滤镜
-                                filters[filters.length] = new BlurFilter(info.fi[i][1], info.fi[i][2], info.fi[i][3]);
-                                break;
-                            case 2:
-                                blur = (info.fi[i][1] + info.fi[i][2]) * 0.5;
-                                color = Shape.getRGBA(info.fi[i][7], info.fi[i][6]);
-                                filters[filters.length] = new ShadowFilter(color, 0, 0, blur);
-                                break;
-                            case 6:
-                                filters[filters.length] = new ColorMatrixFilter(info.fi[i][1], info.fi[i][2], info.fi[i][3], info.fi[i][4]);
-                                break;
-                            case 7:
-                                filters[filters.length] = new ColorFilter(info.fi[i][1]);
-                                break;
-                            default :
-                            //其他还先未实现
-                        }
-                    }
-                    if (filters.length > 0) {
-                        target.filters = filters;
-                    } else {
-                        target.filters = null;
-                    }
-                } else {
-                    target.filters = null;
-
-                }
             }
             target._a2x_res_obj = info;
         }

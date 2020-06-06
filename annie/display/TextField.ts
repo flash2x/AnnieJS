@@ -9,11 +9,10 @@ namespace annie {
      * @since 1.0.0
      * @public
      */
-    export class TextField extends Bitmap {
+    export class TextField extends DisplayObject {
         public constructor() {
-            super(null);
+            super();
             this._instanceType = "annie.TextField";
-            this.bitmapData = window.document.createElement("canvas");
         }
 
         /**
@@ -158,9 +157,6 @@ namespace annie {
                 s._text = value;
                 if(s._text==""){
                     s.a2x_ut = false;
-                    s._texture=null;
-                    s._bitmapData.width=0;
-                    s._bitmapData.height=0;
                     s.clearBounds();
                 }else{
                     s.a2x_ut = true;
@@ -383,7 +379,7 @@ namespace annie {
 
         // 获取文本宽
         private _getMeasuredWidth(text: string): number {
-            let ctx = this._bitmapData.getContext("2d");
+            let ctx = CanvasRender._ctx;
             //ctx.save();
             let w = ctx.measureText(text).width;
             //ctx.restore();
@@ -394,13 +390,13 @@ namespace annie {
         public a2x_ut: boolean = true;
         protected _updateMatrix(isOffCanvas: boolean = false): void {
             let s: any = this;
+            super._updateMatrix();
             if (s.a2x_ut) {
-                let texture = s._bitmapData;
-                let ctx = texture.getContext("2d");
+                let ctx = CanvasRender._ctx;
                 s.a2x_ut = false;
                 let hardLines: any = s._text.toString().split(/(?:\r\n|\r|\n)/);
-                let realLines: any = [];
-                s.realLines = realLines;
+                s.realLines.length=0;
+                let realLines=s.realLines;
                 s._prepContext(ctx);
                 let wordW = 0;
                 let lineH = s._lineHeight;
@@ -446,40 +442,49 @@ namespace annie {
                 }
                 let maxH = lineH * realLines.length+4 >> 0;
                 let maxW = s._textWidth >> 0;
-                let tx = 0;
+                s._offsetX = 0;
                 if (s._textAlign == "center") {
-                    tx = maxW * 0.5;
+                    s._offsetX = maxW * 0.5;
                 } else if (s._textAlign == "right") {
-                    tx = maxW;
+                    s._offsetX = maxW;
                 }
-                texture.width = maxW;
-                texture.height = maxH;
-                ctx.clearRect(0, 0, texture.width, texture.width);
-                if (s.border) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = "#000";
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(0, 0, maxW, maxH);
-                    ctx.closePath();
+                s._offsetX+=2;
+                s._offsetY=2;
+                s._bounds.x=s._offsetX;
+                s._bounds.y=s._offsetY;
+                s._bounds.width = maxW;
+                s._bounds.height = maxH;
+                s.a2x_um=true;
+            }
+            if( s.a2x_um){
+                s._checkDrawBounds();
+            }
+            s.a2x_um = false;
+            s.a2x_ua = false;
+        }
+        public _draw(ctx: any, isMask: boolean = false): void {
+            let s=this;
+            let realLines=s.realLines;
+            let lineHeight=s._lineHeight;
+            let w=s._bounds.width;
+            let h=s._bounds.height;
+            if (s.border) {
+                ctx.beginPath();
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(0, 0, w, h);
+                ctx.closePath();
+            }
+            s._prepContext(ctx);
+            for (let i = 0; i < realLines.length; i++) {
+                if (s._stroke > 0) {
+                    ctx.strokeText(realLines[i], 0, i * lineHeight, w);
                 }
-                ctx.setTransform(1, 0, 0, 1, tx + 2, 2);
-                s._prepContext(ctx);
-                for (let i = 0; i < realLines.length; i++) {
-                    if (s._stroke > 0) {
-                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
-                    }
-                    ctx.fillText(realLines[i], 0, i * lineH, maxW);
-                    if (s._stroke < 0) {
-                        ctx.strokeText(realLines[i], 0, i * lineH, maxW);
-                    }
-                }
-                if (s._filters.length > 0) {
-                    s.a2x_uf = true;
-                } else {
-                    s._texture = texture;
+                ctx.fillText(realLines[i], 0, i * lineHeight, w);
+                if (s._stroke < 0) {
+                    ctx.strokeText(realLines[i], 0, i * lineHeight, w);
                 }
             }
-            super._updateMatrix(isOffCanvas);
         }
     }
 }

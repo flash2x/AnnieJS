@@ -988,46 +988,6 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
-     * 定时器类
-     * @class annie.Timer
-     * @public
-     * @since 1.0.9
-     */
-    class BlendMode {
-        static NORMAL: number;
-        static DARKEN: number;
-        static MULTIPLY: number;
-        static LIGHTEN: number;
-        static SCREEN: number;
-        static OVERLAY: number;
-        static HARDLIGHT: number;
-        static ADD: number;
-        static SUBTRACT: number;
-        static DIFFERENCE: number;
-        static INVERT: number;
-        static ERASE: number;
-        static SOURCE_IN: number;
-        static SOFT_LIGHT: number;
-        static XOR: number;
-        static COPY: number;
-        static HUE: number;
-        static SATURATION: number;
-        static COLOR: number;
-        static LUMINOSITY: number;
-        static EXCLUSION: number;
-        static COLOR_BURN: number;
-        static COLOR_DODGE: number;
-        static SOURCE_OUT: number;
-        static SOURCE_ATOP: number;
-        private static _modeList;
-        static getBlendMode(mode: number): string;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
      * 显示对象抽象类,不能直接实例化。一切显示对象的基类,包含了显示对象需要的一切属性
      * DisplayObject 类本身不包含任何用于在屏幕上呈现内容的 API。
      * 因此，如果要创建 DisplayObject 类的自定义子类，您将需要扩展其中一个具有在屏幕
@@ -1090,23 +1050,6 @@ declare namespace annie {
         constructor();
         protected a2x_um: boolean;
         protected a2x_ua: boolean;
-        protected a2x_uf: boolean;
-        /**
-         * 是否被缓存了
-         * @property isCache
-         * @since 3.2.0
-         * @type {boolean}
-         */
-        readonly isCache: boolean;
-        _isCache: boolean;
-        /**
-         * 是否将这个对象缓存为位图了
-         * @property cacheAsBitmap
-         * @since 3.2.0
-         * @return {boolean}
-         */
-        cacheAsBitmap: boolean;
-        private _cacheAsBitmap;
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
@@ -1128,9 +1071,7 @@ declare namespace annie {
          */
         parent: Sprite;
         _cAlpha: number;
-        _ocAlpha: number;
         _cMatrix: Matrix;
-        _ocMatrix: Matrix;
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -1140,7 +1081,6 @@ declare namespace annie {
          * @default false
          */
         mouseEnable: boolean;
-        protected cFilters: any;
         /**
          * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -1263,17 +1203,6 @@ declare namespace annie {
         visible: boolean;
         _visible: boolean;
         /**
-         * 显示对象的混合模式
-         * 支持的混合模式大概有23种，具体查看annie.BlendMode
-         * @property blendMode
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        blendMode: number;
-        private _blendMode;
-        /**
          * 显示对象的变形矩阵
          * @property matrix
          * @public
@@ -1293,17 +1222,6 @@ declare namespace annie {
          */
         mask: DisplayObject;
         private _mask;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 显示对象的滤镜数组
-         * @property filters
-         * @since 1.0.0
-         * @public
-         * @type {Array}
-         * @default null
-         */
-        filters: any[];
-        private _filters;
         _cp: boolean;
         /**
          *将全局坐标转换到本地坐标值
@@ -1338,15 +1256,6 @@ declare namespace annie {
         hitArea: annie.Rectangle;
         private _hitArea;
         /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否对图片对象使用像素碰撞检测透明度，默认关闭
-         * @property hitTestWithPixel
-         * @type {boolean}
-         * @default false
-         * @since 1.1.0
-         */
-        hitTestWithPixel: boolean;
-        /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
          * @public
@@ -1366,7 +1275,8 @@ declare namespace annie {
          * @return {annie.Rectangle}
          */
         getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        protected _updateMatrix(): void;
+        _draw(ctx: any): void;
         protected _render(renderObj: IRender | any): void;
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
@@ -1396,14 +1306,8 @@ declare namespace annie {
          * @return {number}
          */
         height: number;
-        static _canvas: any;
-        _texture: any;
         static _transformRect: Rectangle;
         protected _bounds: Rectangle;
-        _splitBoundsList: Array<{
-            isDraw: boolean;
-            rect: Rectangle;
-        }>;
         /**
          * 停止这个显示对象上的所有声音
          * @method stopAllSounds
@@ -1412,12 +1316,7 @@ declare namespace annie {
          * @return {void}
          */
         stopAllSounds(): void;
-        /**
-         * 更新boundsList矩阵
-         * @method _updateSplitBounds
-         * @private
-         */
-        protected _updateSplitBounds(): void;
+        isNeedDraw: boolean;
         protected _checkDrawBounds(): void;
         /**
          * @method getSound
@@ -1532,6 +1431,7 @@ declare namespace annie {
          * <p><a href="http://test.annie2x.com/annie/Bitmap/index.html" target="_blank">测试链接</a></p>
          */
         constructor(bitmapData: any);
+        _texture: any;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -1542,32 +1442,8 @@ declare namespace annie {
          * @default null
          */
         bitmapData: any;
-        private _cacheCanvas;
-        protected _bitmapData: any;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 从Bitmap中剥离出单独的小图以供特殊用途
-         * @method convertToImage
-         * @static
-         * @public
-         * @since 1.0.0
-         * @param {annie.Bitmap} bitmap
-         * @param {annie.Rectangle} rect 截图范围
-         * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
-         * @return {Canvas|BitmapData}
-         * @example
-         *      var spriteSheetImg = new Image(),
-         *      rect = new annie.Rectangle(0, 0, 200, 200),
-         *      yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
-         *      spriteSheetImg.onload=function(e){
-         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
-         *          console.log(singleSmallImg);
-         *      }
-         *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
-         */
-        static convertToImage(bitmap: annie.Bitmap, rect: Rectangle, isNeedImage?: boolean): any;
-        destroy(): void;
+        protected _updateMatrix(): void;
+        _draw(ctx: any): void;
     }
 }
 /**
@@ -1581,7 +1457,7 @@ declare namespace annie {
      * @since 1.0.0
      * @public
      */
-    class Shape extends Bitmap {
+    class Shape extends DisplayObject {
         constructor();
         private _command;
         /**
@@ -1913,8 +1789,8 @@ declare namespace annie {
          */
         decodePath(data: Array<number>): void;
         private a2x_ut;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
-        private _draw;
+        protected _updateMatrix(): void;
+        _draw(ctx: any, isMask?: boolean): void;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
          * @method changeColor
@@ -2062,13 +1938,6 @@ declare namespace annie {
          */
         removeChildAt(index: number): void;
         /**
-         * 如果对容器缓存为位图过,则会更新缓存,没事别乱调用
-         * @method updateCache
-         * @since 3.2.0
-         * @return {void}
-         */
-        updateCache(): void;
-        /**
          * 移除Sprite上的所有child
          * @method removeAllChildren
          * @public
@@ -2078,7 +1947,7 @@ declare namespace annie {
         removeAllChildren(): void;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean): DisplayObject;
         getBounds(): Rectangle;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        protected _updateMatrix(): void;
         _render(renderObj: IRender): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
@@ -2279,41 +2148,6 @@ declare namespace annie {
          */
         static setAllSoundsVolume(volume: number): void;
         private static _volume;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 视频类
-     * @class annie.Video
-     * @extends annie.Media
-     * @public
-     * @since 1.0.0
-     */
-    class Video extends Media {
-        /**
-         * 构造函数
-         * @method Video
-         * @param src
-         * @param width
-         * @param height
-         * @public
-         * @since 1.0.0
-         * @example
-         *      //切记在微信里视频地址一定要带上完整域名,并且视频尺寸不要超过1136不管是宽还是高，否则后果很严重
-         *      var videoPlayer = new annie.Video('http://test.annie2x.com/biglong/apiDemo/video.mp4');
-         *      videoPlayer.play();//播放视频
-         *      //videoPlayer.pause();//暂停视频
-         *      //videoPlayer.stop();//停止播放
-         *      var floatDisplay=new annie.FloatDisplay();
-         *      floatDisplay.init(videoPlayer);
-         *      //这里的spriteObj是任何一个Sprite类或者其扩展类的实例对象
-         *      spriteObj.addChild(floatDisplay);
-         */
-        constructor(src: any, width?: number, height?: number);
     }
 }
 /**
@@ -2567,7 +2401,7 @@ declare namespace annie {
         init(htmlElement: any): void;
         private getStyle;
         _onUpdateFrame(): void;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        protected _updateMatrix(): void;
         _render(renderObj: IRender): void;
         private removeHtmlElement;
         destroy(): void;
@@ -2584,7 +2418,7 @@ declare namespace annie {
      * @since 1.0.0
      * @public
      */
-    class TextField extends Bitmap {
+    class TextField extends DisplayObject {
         constructor();
         /**
          * 文本的对齐方式
@@ -2740,6 +2574,7 @@ declare namespace annie {
         private realLines;
         a2x_ut: boolean;
         protected _updateMatrix(isOffCanvas?: boolean): void;
+        _draw(ctx: any, isMask?: boolean): void;
     }
 }
 /**
@@ -3242,375 +3077,7 @@ declare namespace annie {
  * @module annie
  */
 declare namespace annie {
-    /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 投影或者发光滤镜
-     * @class annie.ShadowFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    class ShadowFilter extends AObject {
-        /**
-         * 颜色值
-         * @property color
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default black
-         * @type {string}
-         */
-        color: string;
-        /**
-         * x方向投影距离
-         * @property offsetX
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default 2
-         * @type {number}
-         */
-        offsetX: number;
-        /**
-         * y方向投影距离
-         * @property offsetY
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default 2
-         * @type {number}
-         */
-        offsetY: number;
-        /**
-         * 模糊值
-         * @property blur
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default 2
-         * @type {number}
-         */
-        blur: number;
-        /**
-         * 滤镜类型只读
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @default Shadow
-         * @type {string}
-         */
-        type: string;
-        /**
-         * @method ShadowFilter
-         * @param {string} color
-         * @param {number} offsetX
-         * @param {number} offsetY
-         * @param {number} blur
-         */
-        constructor(color?: string, offsetX?: number, offsetY?: number, blur?: number);
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @public
-         * @since 1.0.0
-         * @param {ImageData} imageData
-         */
-        drawFilter(imageData?: ImageData): void;
-        destroy(): void;
-    }
-    /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 普通变色滤镜
-     * @class annie.ColorFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    class ColorFilter extends AObject {
-        /**
-         * @property redMultiplier
-         * @public
-         * @since 1.0.0
-         * @readonly
-         * @type {number}
-         */
-        redMultiplier: number;
-        /**
-         * @property redOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        redOffset: number;
-        /**
-         * @property greenMultiplier
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        greenMultiplier: number;
-        /**
-         * @property greenOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        greenOffset: number;
-        /**
-         * @property blueMultiplier
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blueMultiplier: number;
-        /**
-         * @property blueOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blueOffset: number;
-        /**
-         * @property alphaMultiplier
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        alphaMultiplier: number;
-        /**
-         * @property alphaOffset
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        alphaOffset: number;
-        /**
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {string}
-         */
-        type: string;
-        /**
-         * @method ColorFilter
-         * @param {number} colorArrays 颜色值数据
-         */
-        constructor(colorArrays: number[]);
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        drawFilter(imageData?: ImageData): void;
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        destroy(): void;
-    }
-    /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 矩阵变色滤镜
-     * @class annie.ColorMatrixFilter
-     * @extends annie.AObject
-     * @public
-     * @since 1.0.0
-     */
-    class ColorMatrixFilter extends AObject {
-        /**
-         * @property brightness
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        brightness: number;
-        /**
-         * @property contrast
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        contrast: number;
-        /**
-         * @property saturation
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        saturation: number;
-        /**
-         * @property hue
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        hue: number;
-        /**
-         * 滤镜类型 只读
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {string}
-         */
-        type: string;
-        private colorMatrix;
-        /**
-         * @method ColorMatrixFilter
-         * @param {number} brightness
-         * @param {number} contrast
-         * @param {number} saturation
-         * @param {number} hue
-         * @public
-         * @since 1.0.0
-         */
-        constructor(brightness: number, contrast: number, saturation: number, hue: number);
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        drawFilter(imageData?: ImageData): void;
-        static DELTA_INDEX: number[];
-        private _multiplyMatrix;
-        private _cleanValue;
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        destroy(): void;
-    }
-    /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 模糊滤镜
-     * @class annie.BlurFilter
-     * @extends annie.AOjbect
-     * @public
-     * @since 1.0.0
-     */
-    class BlurFilter extends AObject {
-        /**
-         * 滤镜类型 只读
-         * @property type
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {string}
-         */
-        type: string;
-        /**
-         * 水平模糊量
-         * @property blurX
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blurX: number;
-        /**
-         * 垂直模糊量
-         * @property blurY
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        blurY: number;
-        /**
-         * 模糊品质
-         * @property quality
-         * @public
-         * @readonly
-         * @since 1.0.0
-         * @type {number}
-         */
-        quality: number;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * @method BlurFilter
-         * @public
-         * @since 1.0.0
-         * @param {number} blurX
-         * @param {number} blurY
-         * @param {number} quality
-         * @example
-         *      var imgEle = new Image();
-         *           imgEle.onload = function (e) {
-         *       var rect = new annie.Rectangle(0, 0, 200, 200),
-         *           rectBitmap = new annie.Bitmap(imgEle, rect);
-         *           rectBitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-         *           rectBitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-         *           var blur=new annie.BlurFilter(30,30,1);//实例化模糊滤镜
-         *           rectBitmap.filters=[blur];//为bitmap添加模糊滤镜效果
-         *           s.addChild(rectBitmap);
-         *       }
-         *       imgEle.src = 'http://test.annie2x.com/biglong/logo.jpg';
-         */
-        constructor(blurX?: number, blurY?: number, quality?: number);
-        /**
-         *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
-         * @method toString
-         * @public
-         * @since 1.0.0
-         * @return {string}
-         */
-        toString(): string;
-        private static SHG_TABLE;
-        private static MUL_TABLE;
-        /**
-         * 绘画滤镜效果
-         * @method drawFilter
-         * @param {ImageData} imageData
-         * @since 1.0.0
-         * @public
-         */
-        drawFilter(imageData?: ImageData): boolean;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
     interface IRender {
-        /**
-         * 渲染循环
-         * @param target
-         */
-        draw(target: any): void;
         /**
          * 初始化事件
          * @param canvas
@@ -3679,7 +3146,7 @@ declare namespace annie {
          * @protected
          * @default null
          */
-        _ctx: any;
+        static _ctx: any;
         /**
          * @protected _stage
          * @protected
@@ -3716,104 +3183,6 @@ declare namespace annie {
          * @since 1.0.0
          */
         endMask(): void;
-        private _blendMode;
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        draw(target: any): void;
-        end(): void;
-        /**
-         * 初始化渲染器
-         * @public
-         * @since 1.0.0
-         * @method init
-         */
-        init(canvas: any): void;
-        /**
-         * 当尺寸改变时调用
-         * @public
-         * @since 1.0.0
-         * @method reSize
-         */
-        reSize(width: number, height: number): void;
-        destroy(): void;
-    }
-}
-/**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * Canvas 渲染器
-     * @class annie.OffCanvasRender
-     * @extends annie.AObject
-     * @implements IRender
-     * @public
-     * @since 1.0.0
-     */
-    class OffCanvasRender extends AObject implements IRender {
-        /**
-         * 渲染器所在最上层的对象
-         * @property rootContainer
-         * @public
-         * @since 1.0.0
-         * @type {any}
-         * @default null
-         */
-        rootContainer: any;
-        /**
-         * @property viewPort
-         *
-         */
-        viewPort: annie.Rectangle;
-        /**
-         * @property _ctx
-         * @protected
-         * @default null
-         */
-        _ctx: any;
-        /**
-         * @method OffCanvasRender
-         * @public
-         * @since 1.0.0
-         */
-        constructor();
-        /**
-         * 开始渲染时执行
-         * @method begin
-         * @since 1.0.0
-         * @public
-         */
-        begin(color: string): void;
-        /**
-         * 开始有遮罩时调用
-         * @method beginMask
-         * @param {annie.DisplayObject} target
-         * @public
-         * @since 1.0.0
-         */
-        beginMask(target: any): void;
-        private drawMask;
-        /**
-         * 结束遮罩时调用
-         * @method endMask
-         * @public
-         * @since 1.0.0
-         */
-        endMask(): void;
-        private _blendMode;
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        draw(target: any): void;
         end(): void;
         /**
          * 初始化渲染器
@@ -4660,15 +4029,6 @@ declare namespace annie {
      */
     let debug: boolean;
     /**
-     * @property annie.isCutDraw
-     * 是否对超大图像资源分割渲染
-     * @type {boolean}
-     * @since 3.2.1
-     * @public
-     * @default false
-     */
-    let isCutDraw: boolean;
-    /**
      * annie引擎的版本号
      * @public
      * @since 1.0.1
@@ -4787,7 +4147,6 @@ declare namespace annie {
      *      })
      */
     function sendToURL(url: string): void;
-    let _dRender: any;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -4811,8 +4170,6 @@ declare namespace annie {
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
-    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
-    let createCache: (obj: any) => void;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组

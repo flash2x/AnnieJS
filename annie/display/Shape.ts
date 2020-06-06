@@ -9,13 +9,11 @@ namespace annie {
      * @since 1.0.0
      * @public
      */
-    export class Shape extends Bitmap {
+    export class Shape extends DisplayObject {
         public constructor() {
-            super(null);
+            super();
             let s=this;
             s._instanceType = "annie.Shape";
-            s.hitTestWithPixel=true;
-            s.bitmapData = document.createElement("canvas");
         }
 
         //一个数组，每个元素也是一个数组[类型 0是属性,1是方法,名字 执行的属性或方法名,参数]
@@ -34,7 +32,7 @@ namespace annie {
          */
         public static getGradientColor(points: any, colors: any): any {
             let colorObj: any;
-            let ctx = DisplayObject["_canvas"].getContext("2d");
+            let ctx = CanvasRender._ctx;
             if (points.length == 4) {
                 colorObj = ctx.createLinearGradient(points[0], points[1], points[2], points[3]);
             } else {
@@ -56,7 +54,7 @@ namespace annie {
          * @since 1.0.0
          */
         public static getBitmapStyle(image: any): any {
-            let ctx = DisplayObject["_canvas"].getContext("2d");
+            let ctx = CanvasRender._ctx;
             return ctx.createPattern(image, "repeat");
         }
 
@@ -328,9 +326,6 @@ namespace annie {
         public clear(): void {
             let s = this;
             s._command = [];
-            s._texture=null;
-            s._bitmapData.width=0;
-            s._bitmapData.height=0;
             s.a2x_ut = false;
             s.clearBounds();
         }
@@ -576,11 +571,10 @@ namespace annie {
         };
         //是否矢量元素有更新
         private a2x_ut: boolean = true;
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
+        protected _updateMatrix(): void {
+            super._updateMatrix();
             let s: any = this;
             if (s.a2x_ut){
-                let texture: any = s._bitmapData;
-                let ctx = texture.getContext("2d");
                 s.a2x_ut = false;
                 //更新矢量
                 let cLen: number = s._command.length;
@@ -689,44 +683,35 @@ namespace annie {
                             leftX = 0;
                             leftY = 0;
                         }
-                        leftX -= 2 + lineWidth;
-                        leftY -= 2 + lineWidth;
-                        buttonRightX += 2 + lineWidth;
-                        buttonRightY += 2 + lineWidth;
+                        leftX -=lineWidth;
+                        leftY -=lineWidth;
+                        buttonRightX += lineWidth;
+                        buttonRightY += lineWidth;
                         let width = buttonRightX - leftX;
                         let height = buttonRightY - leftY;
-                        ///////////////////////////是否是遮罩对象,如果是遮罩对象///////////////////////////
-                        s._offsetX = leftX;
-                        s._offsetY = leftY;
+                        // s._offsetX = leftX;
+                        // s._offsetY = leftY;
                         s._bounds.x = leftX;
                         s._bounds.y = leftY;
-                        height = Math.ceil(height);
-                        width = Math.ceil(width);
-                        texture.width = width;
-                        texture.height = height;
-                        texture.style.width = (width / devicePixelRatio) + "px";
-                        texture.style.height = (height / devicePixelRatio) + "px";
-                        ctx.clearRect(0, 0, width, height);
-                        ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        ///////////////////////////
-                        s._draw(ctx);
-                        ///////////////////////////
+                        s._bounds.width = width;
+                        s._bounds.height = height;
+                        s.a2x_um=true;
                     }
                 }
-                s._texture=texture;
-                if(s._filters.length>0){
-                    s.a2x_uf=true;
-                }
             }
-            super._updateMatrix(isOffCanvas);
+            if(s.a2x_um){
+                s._checkDrawBounds();
+            }
+            s.a2x_um = false;
+            s.a2x_ua = false;
         }
-        private _draw(ctx: any, isMask: boolean = false): void {
+        public _draw(ctx: any, isMask: boolean = false): void {
             let s = this;
             let com = s._command;
             let cLen = com.length;
             let data: any;
-            let leftX: number = s._offsetX;
-            let leftY: number = s._offsetY;
+            // let leftX: number = s._offsetX;
+            // let leftY: number = s._offsetY;
             let isStroke = false;
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
@@ -744,11 +729,11 @@ namespace annie {
                     } else if (paramsLen == 6) {
                         let lx = data[2][4];
                         let ly = data[2][5];
-                        if (data[0] == 2) {
+                       /* if (data[0] == 2) {
                             //位图填充
                             lx -= leftX;
                             ly -= leftY;
-                        }
+                        }*/
                         ctx[data[1]](data[2][0], data[2][1], data[2][2], data[2][3], lx, ly);
                     }
                 } else {

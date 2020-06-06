@@ -2417,7 +2417,7 @@ var annieUI;
             if (s.bgColor != "") {
                 s.context.fillStyle = s.bgColor;
             }
-            s.context.fillRect(0, 0, s._bitmapData.width, s._bitmapData.height);
+            s.context.fillRect(0, 0, s._texture.width, s._texture.height);
             s.currentStepId = 0;
             s.totalStepList = [];
             s.addStepObj = null;
@@ -2442,10 +2442,10 @@ var annieUI;
                     s.totalStepList.splice(s.currentStepId, step);
                     if (s.bgColor != "") {
                         s.context.fillStyle = s.bgColor;
-                        s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                        s.context.fillRect(0, 0, s._bounds.width, s._bounds.height);
                     }
                     else {
-                        s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                        s.context.clearRect(0, 0, s._bounds.width, s._bounds.height);
                     }
                     var len = s.totalStepList.length;
                     for (var i = 0; i < len; i++) {
@@ -2556,8 +2556,8 @@ var annieUI;
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
-                var dw = Math.floor(s._bitmapData.width / s._drawRadius);
-                var dh = Math.floor(s._bitmapData.height / s._drawRadius);
+                var dw = Math.floor(s._bounds.width / s._drawRadius);
+                var dh = Math.floor(s._bounds.height / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (var i = 0; i < dw; i++) {
                     s._drawList[i] = [];
@@ -2584,8 +2584,8 @@ var annieUI;
             set: function (value) {
                 var s = this;
                 s._drawRadius = value;
-                var dw = Math.floor(s._bitmapData.width / s._drawRadius);
-                var dh = Math.floor(s._bitmapData.height / s._drawRadius);
+                var dw = Math.floor(s._bounds.width / s._drawRadius);
+                var dh = Math.floor(s._bounds.height / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (var i = 0; i < dw; i++) {
                     s._drawList[i] = [];

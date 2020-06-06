@@ -75,40 +75,6 @@ namespace annie {
         //更新信息对象是否更新矩阵 a2x_ua 是否更新Alpha a2x_uf 是否更新滤镜
         protected a2x_um: boolean = false;
         protected a2x_ua: boolean = false;
-        protected a2x_uf: boolean = false;
-
-        /**
-         * 是否被缓存了
-         * @property isCache
-         * @since 3.2.0
-         * @type {boolean}
-         */
-        public get isCache(): boolean {
-            return this._isCache;
-        }
-
-        public _isCache: boolean = false;
-
-        /**
-         * 是否将这个对象缓存为位图了
-         * @property cacheAsBitmap
-         * @since 3.2.0
-         * @return {boolean}
-         */
-        public get cacheAsBitmap(): boolean {
-            return this._cacheAsBitmap;
-        }
-
-        public set cacheAsBitmap(value: boolean) {
-            let s = this;
-            if (value != s._cacheAsBitmap) {
-                s._cacheAsBitmap = value;
-                s._isCache = (s._cacheAsBitmap || s._filters.length > 0 || s._blendMode != 0);
-                s.a2x_uf = true;
-            }
-        }
-
-        private _cacheAsBitmap: boolean = false;
         /**
          * 此显示对象所在的舞台对象,如果此对象没有被添加到显示对象列表中,此对象为空。
          * @property stage
@@ -131,10 +97,8 @@ namespace annie {
         public parent: Sprite = null;
         //显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
         public _cAlpha: number = 1;
-        public _ocAlpha: number = 1;
         //显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
         public _cMatrix: Matrix = new Matrix();
-        public _ocMatrix: Matrix;
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -144,8 +108,6 @@ namespace annie {
          * @default false
          */
         public mouseEnable: boolean = true;
-        //显示对象上对显示列表上的最终的所有滤镜组
-        protected cFilters: any = [];
         /**
          * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -413,30 +375,6 @@ namespace annie {
         public _visible: boolean = true;
 
         /**
-         * 显示对象的混合模式
-         * 支持的混合模式大概有23种，具体查看annie.BlendMode
-         * @property blendMode
-         * @public
-         * @since 1.0.0
-         * @type {number}
-         * @default 0
-         */
-        public get blendMode(): number {
-            return this._blendMode;
-        }
-
-        public set blendMode(value: number) {
-            let s = this;
-            if (value != s._blendMode) {
-                s._blendMode = value;
-                s._isCache = (s._cacheAsBitmap || s._filters.length > 0 || s._blendMode != 0);
-                s.a2x_uf = true;
-            }
-        }
-
-        private _blendMode: number = 0;
-
-        /**
          * 显示对象的变形矩阵
          * @property matrix
          * @public
@@ -478,41 +416,6 @@ namespace annie {
         }
 
         private _mask: DisplayObject = null;
-
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 显示对象的滤镜数组
-         * @property filters
-         * @since 1.0.0
-         * @public
-         * @type {Array}
-         * @default null
-         */
-        public get filters(): any[] {
-            return this._filters;
-        }
-
-        public set filters(value: any[]) {
-            let s = this;
-            if (value instanceof Array) {
-                if (value.length != 0 || s._filters.length != 0) {
-                    s._filters.length = 0;
-                    for (let i = 0; i < value.length; i++) {
-                        s.filters[i] = value[i];
-                    }
-                    s.a2x_uf = true;
-                }
-            } else {
-                if (s._filters.length > 0) {
-                    s._filters.length = 0;
-                    s.a2x_uf = true;
-                }
-            }
-            s._isCache = (s._cacheAsBitmap || s._filters.length > 0 || s._blendMode != 0);
-        }
-
-        private _filters: any[] = [];
-
         //是否自己的父级发生的改变
         public _cp: boolean = true;
 
@@ -561,18 +464,7 @@ namespace annie {
         public get hitArea(): annie.Rectangle {
             return this._hitArea;
         }
-
         private _hitArea: annie.Rectangle = null;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否对图片对象使用像素碰撞检测透明度，默认关闭
-         * @property hitTestWithPixel
-         * @type {boolean}
-         * @default false
-         * @since 1.1.0
-         */
-        public hitTestWithPixel: boolean = false;
-
         /**
          * 点击碰撞测试,就是舞台上的一个point是否在显示对象内,在则返回该对象，不在则返回null
          * @method hitTestPoint
@@ -585,8 +477,7 @@ namespace annie {
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
-            let texture = s._texture;
-            if (!texture || texture.width == 0 || texture.height == 0) {
+            if (s._bounds.width == 0 || s._bounds.height == 0) {
                 return null;
             }
             let p: any;
@@ -601,21 +492,8 @@ namespace annie {
                     return s;
                 }
             }
-
             if (s._bounds.isPointIn(p)) {
-                if (s.hitTestWithPixel) {
-                    let _canvas = DisplayObject._canvas;
-                    let ctx = _canvas.getContext('2d');
-                    _canvas.width = 1;
-                    _canvas.height = 1;
-                    ctx.clearRect(0, 0, 1, 1);
-                    ctx.drawImage(texture, p.x - s._offsetX, p.y - s._offsetY, 1, 1, 0, 0, 1, 1);
-                    if (ctx.getImageData(0, 0, 1, 1).data[3] > 0) {
-                        return s
-                    }
-                } else {
-                    return s;
-                }
+                return s;
             }
             return null;
         }
@@ -649,77 +527,63 @@ namespace annie {
             Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         }
 
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
+        protected _updateMatrix(): void {
             let s = this, cm: Matrix, pcm: Matrix, ca: number, pca: number;
             let isHadParent: boolean = s.parent instanceof annie.Sprite;
-            if (isOffCanvas) {
-                if (!s._ocMatrix) {
-                    s._ocMatrix = new Matrix();
-                }
-                if (isHadParent) {
-                    pcm = s.parent._ocMatrix;
-                    pca = s.parent._ocAlpha;
-                } else {
-                    s._ocMatrix.identity();
-                    s._ocMatrix.tx = -s._offsetX;
-                    s._ocMatrix.ty = -s._offsetY;
-                    s._ocAlpha = 1;
-                    return;
-                }
-                cm = s._ocMatrix;
+            cm = s._cMatrix;
+            ca = s._cAlpha;
+            if (isHadParent) {
+                pcm = s.parent._cMatrix;
+                pca = s.parent._cAlpha;
+            }
+            if (s.a2x_um) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
+            }
+            if (s._cp) {
+                s.a2x_um = s.a2x_ua = true;
+            } else {
+                if (isHadParent) {
+                    let PUI = s.parent;
+                    if (PUI.a2x_um) {
+                        s.a2x_um = true;
+                    }
+                    if (PUI.a2x_ua) {
+                        s.a2x_ua = true;
+                    }
+                }
+            }
+            if (s.a2x_um) {
                 cm.setFrom(s._matrix);
-                ca = s._alpha;
                 if (isHadParent) {
                     cm.prepend(pcm);
+                }
+            }
+            if (s.a2x_ua) {
+                ca = s._alpha;
+                if (isHadParent) {
                     ca *= pca
                 }
-                s._ocAlpha = ca;
-            } else {
-                cm = s._cMatrix;
-                ca = s._cAlpha;
-                if (isHadParent) {
-                    pcm = s.parent._cMatrix;
-                    pca = s.parent._cAlpha;
-                }
-                if (s.a2x_um) {
-                    s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-                }
-                if (s._cp) {
-                    s.a2x_um = s.a2x_ua = true;
-                } else {
-                    if (isHadParent) {
-                        let PUI = s.parent;
-                        if (PUI.a2x_um) {
-                            s.a2x_um = true;
-                        }
-                        if (PUI.a2x_ua) {
-                            s.a2x_ua = true;
-                        }
-                    }
-                }
-                if (s.a2x_um) {
-                    cm.setFrom(s._matrix);
-                    if (isHadParent) {
-                        cm.prepend(pcm);
-                    }
-                }
-                if (s.a2x_ua) {
-                    ca = s._alpha;
-                    if (isHadParent) {
-                        ca *= pca
-                    }
-                }
-                s._cp = false;
-                s._cAlpha = ca;
             }
+            s._cp = false;
+            s._cAlpha = ca;
         }
 
-
+        public  _draw(ctx:any):void{}
         protected _render(renderObj: IRender | any): void {
             let s = this;
             if (s._visible && s._cAlpha > 0) {
-                renderObj.draw(s);
+                let ctx = CanvasRender._ctx, tm;
+                tm = s._cMatrix;
+                if (ctx.globalAlpha != s._cAlpha) {
+                    ctx.globalAlpha = s._cAlpha
+                }
+                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                if (s._offsetX != 0 || s._offsetY != 0) {
+                    ctx.translate(s._offsetX, s._offsetY);
+                }
+                if (s.isNeedDraw=== true) {
+                    s._draw(ctx);
+                }
             }
         }
 
@@ -788,15 +652,8 @@ namespace annie {
                 s.scaleY = 1;
             }
         }
-
-        //画缓存位图的时候需要使用
-        //<h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-        public static _canvas: any = window.document.createElement("canvas");
-        // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
-        public _texture: any = null;
         public static _transformRect: Rectangle = new annie.Rectangle();
         protected _bounds: Rectangle = new Rectangle();
-        public _splitBoundsList: Array<{ isDraw: boolean, rect: Rectangle }> = [];
 
         /**
          * 停止这个显示对象上的所有声音
@@ -813,66 +670,14 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 更新boundsList矩阵
-         * @method _updateSplitBounds
-         * @private
-         */
-        protected _updateSplitBounds(): void {
-            let s = this;
-            let sbl: any = [];
-            let bounds = s.getBounds();
-            if (bounds.width * bounds.height > 0) {
-                let row = 1;
-                let col = 1;
-                let br = 0;
-                let bc = 0;
-                let newWidth = bounds.width;
-                let newHeight = bounds.height;
-                if (annie.isCutDraw) {
-                    br = 1024;
-                    bc = 1024;
-                    newWidth = br + 2;
-                    newHeight = bc + 2;
-                    if (bounds.width > br) {
-                        row = Math.ceil(bounds.width / br);
-                    }
-                    if (bounds.height > bc) {
-                        col = Math.ceil(bounds.height / bc);
-                    }
-
-                }
-                for (let i = 0; i < row; i++) {
-                    for (let j = 0; j < col; j++) {
-                        let newX = i * br;
-                        let newY = j * bc;
-                        if (i == row - 1) {
-                            newWidth = bounds.width - newX;
-                        }
-                        if (j == col - 1) {
-                            newHeight = bounds.height - newY;
-                        }
-                        sbl.push({
-                            isDraw: true,
-                            rect: new Rectangle(newX + bounds.x, newY + bounds.y, newWidth, newHeight)
-                        });
-                    }
-                }
-            }
-            s._splitBoundsList = sbl;
-        }
-
+        public isNeedDraw:boolean=false;
         protected _checkDrawBounds() {
             let s = this;
             //检查所有bounds矩阵是否在可视范围里
-            let sbl = s._splitBoundsList;
-            let dtr = DisplayObject._transformRect;
             if (s.stage) {
-                for (let i = 0; i < sbl.length; i++) {
-                    s.getDrawRect(s._cMatrix, sbl[i].rect);
-                    sbl[i].isDraw = Rectangle.testRectCross(dtr, s.stage.renderObj.viewPort);
-                }
+                s.getDrawRect(s._cMatrix, s._bounds);
+                let dtr = DisplayObject._transformRect;
+                s.isNeedDraw = Rectangle.testRectCross(dtr, s.stage.renderObj.viewPort);
             }
         }
 
@@ -968,15 +773,11 @@ namespace annie {
             s.soundList = null;
             s._a2x_res_obj = null;
             s.mask = null;
-            s.filters = null;
             s.parent = null;
             s.stage = null;
             s._bounds = null;
-            s._splitBoundsList = null;
-            s.cFilters = null;
             s._matrix = null;
             s._cMatrix = null;
-            s._texture = null;
             super.destroy();
         }
 

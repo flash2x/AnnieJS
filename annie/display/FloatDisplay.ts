@@ -79,18 +79,17 @@ namespace annie {
             } else {
                 she = htmlElement;
             }
-            if(s.htmlElement){
+            if (s.htmlElement) {
                 s.removeHtmlElement();
             }
             let style = she.style;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            let w = she.width||s.getStyle(she, "width");
-            let h = she.height||s.getStyle(she, "height");
+            let w = she.width || s.getStyle(she, "width");
+            let h = she.height || s.getStyle(she, "height");
             s._bounds.width = parseInt(w);
             s._bounds.height = parseInt(h);
-            s._updateSplitBounds();
             s._checkDrawBounds();
             s.htmlElement = she;
         }
@@ -138,12 +137,13 @@ namespace annie {
                 }
             }
         }
-        protected _updateMatrix(isOffCanvas:boolean=false):void {
+
+        protected _updateMatrix(): void {
             let s = this;
             let o = s.htmlElement;
             if (!s._visible || !o) return;
-            super._updateMatrix(isOffCanvas);
-            if (s.a2x_um || s.a2x_ua || s.a2x_uf) {
+            super._updateMatrix();
+            if (s.a2x_um || s.a2x_ua) {
                 let style = o.style;
                 if (s.a2x_um) {
                     let mtx = s._cMatrix;
@@ -154,16 +154,11 @@ namespace annie {
                     style.opacity = s._cAlpha;
                 }
             }
-            if(!isOffCanvas) {
-                s.a2x_uf = false;
-                s.a2x_um = false;
-                s.a2x_ua = false;
-            }
+            s.a2x_um = false;
+            s.a2x_ua = false;
         }
-        public _render(renderObj: IRender) {
-
-        }
-        private removeHtmlElement():void{
+        public _render(renderObj: IRender) {}
+        private removeHtmlElement(): void {
             let s = this;
             let elem = s.htmlElement;
             if (elem) {
@@ -175,6 +170,7 @@ namespace annie {
                 s.htmlElement = null;
             }
         }
+
         public destroy(): void {
             super.destroy();
             //清除相应的数据引用

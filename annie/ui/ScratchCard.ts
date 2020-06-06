@@ -68,8 +68,8 @@ namespace annieUI {
                     s.drawColor = backColorObj;
                 }
                 s._currentDraw = 0;
-                let dw: number = Math.floor(s._bitmapData.width / s._drawRadius);
-                let dh: number = Math.floor(s._bitmapData.height  / s._drawRadius);
+                let dw: number = Math.floor(s._bounds.width / s._drawRadius);
+                let dh: number = Math.floor(s._bounds.height  / s._drawRadius);
                 s._totalDraw = dw * dh;
                 for (let i = 0; i < dw; i++) {
                     s._drawList[i] = [];
@@ -96,8 +96,8 @@ namespace annieUI {
         public set drawRadius(value: number) {
             let s = this;
             s._drawRadius = value;
-            let dw: number = Math.floor(s._bitmapData.width / s._drawRadius);
-            let dh: number = Math.floor(s._bitmapData.height  / s._drawRadius);
+            let dw: number = Math.floor(s._bounds.width / s._drawRadius);
+            let dh: number = Math.floor(s._bounds.height  / s._drawRadius);
             s._totalDraw = dw * dh;
             for (let i = 0; i < dw; i++) {
                 s._drawList[i] = [];

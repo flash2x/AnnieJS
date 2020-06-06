@@ -49,6 +49,9 @@ namespace annie {
             s.bitmapData = bitmapData;
         }
 
+        // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
+        public _texture: any = null;
+
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * HTML的一个Image对象或者是canvas对象或者是video对象
@@ -59,26 +62,22 @@ namespace annie {
          * @default null
          */
         public get bitmapData(): any {
-            return this._bitmapData;
+            return this._texture;
         }
 
         public set bitmapData(value: any) {
             let s = this;
-            if (value != s._bitmapData) {
+            if (value != s._texture) {
                 s.clearBounds();
-                s._bitmapData = value;
                 s._texture = value;
             }
         }
 
-        private _cacheCanvas: any = null;
-        protected _bitmapData: any = null;
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
-            super._updateMatrix(isOffCanvas);
-            let s: any = this;
-            let texture: any = s._bitmapData;
+        protected _updateMatrix(): void {
+            super._updateMatrix();
+            let s = this;
+            let texture: any = s._texture;
             if (!texture || texture.width == 0 || texture.height == 0) {
-                s._texture = null;
                 return;
             }
             let bw = texture.width;
@@ -86,97 +85,17 @@ namespace annie {
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                s._updateSplitBounds();
-                s._checkDrawBounds();
-                if (s._filters.length > 0) {
-                    s.a2x_uf = true;
-                }
-                s._texture = texture;
-            } else if (s.a2x_um) {
+                s.a2x_um = true;
+            }
+            if (s.a2x_um) {
                 s._checkDrawBounds();
             }
-            if (!isOffCanvas) {
-                s.a2x_um = false;
-                s.a2x_ua = false;
-            }
-            if (s.a2x_uf) {
-                s.a2x_uf = false;
-                if(!s._cacheCanvas){
-                    s._cacheCanvas=document.createElement("canvas");
-                }
-                let canvas = s._cacheCanvas;
-                canvas.width=bw;
-                canvas.heigth=bh;
-                canvas.style.width = Math.ceil(bw / devicePixelRatio) + "px";
-                canvas.style.height = Math.ceil(bh / devicePixelRatio) + "px";
-                let ctx = canvas.getContext("2d");
-                ctx.clearRect(0, 0, bw, bh);
-                ////////////////////
-                ctx.drawImage(texture, 0, 0);
-                /////////////////////
-                let cf: any = s._filters;
-                let cfLen = cf.length;
-                if (cfLen > 0) {
-                    let imageData = ctx.getImageData(0, 0, bw, bh);
-                    for (let i = 0; i < cfLen; i++) {
-                        cf[i].drawFilter(imageData);
-                    }
-                    ctx.putImageData(imageData, 0, 0);
-                    s._texture = canvas;
-                }else{
-                    s._texture = texture;
-                }
-            }
+            s.a2x_um = false;
+            s.a2x_ua = false;
         }
-
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 从Bitmap中剥离出单独的小图以供特殊用途
-         * @method convertToImage
-         * @static
-         * @public
-         * @since 1.0.0
-         * @param {annie.Bitmap} bitmap
-         * @param {annie.Rectangle} rect 截图范围
-         * @param {boolean} isNeedImage 是否一定要返回img，如果不为true则有时返回的是canvas
-         * @return {Canvas|BitmapData}
-         * @example
-         *      var spriteSheetImg = new Image(),
-         *      rect = new annie.Rectangle(0, 0, 200, 200),
-         *      yourBitmap = new annie.Bitmap(spriteSheetImg, rect);
-         *      spriteSheetImg.onload=function(e){
-         *          var singleSmallImg = annie.Bitmap.convertToImage(yourBitmap);//convertToImage是annie.Bitmap的一个静态方法
-         *          console.log(singleSmallImg);
-         *      }
-         *      spriteSheetImg.src = 'http://test.annie2x.com/test.jpg';
-         */
-        public static convertToImage(bitmap: annie.Bitmap, rect: Rectangle, isNeedImage: boolean = true): any {
-            let _canvas: any;
-            if (isNeedImage) {
-                _canvas = annie.DisplayObject._canvas;
-            } else {
-                _canvas = window.document.createElement("canvas");
-            }
-            let w: number = rect.width,
-                h: number = rect.height,
-                ctx = _canvas.getContext("2d");
-            _canvas.width = w;
-            _canvas.height = h;
-            ctx.drawImage(bitmap.bitmapData, rect.x, rect.y, w, h, 0, 0, w, h);
-            if (isNeedImage) {
-                let img = new Image();
-                img.src = _canvas.toDataURL();
-                return img;
-            } else {
-                return _canvas;
-            }
-        }
-        public destroy(): void {
-            //清除相应的数据引用
+        public _draw(ctx: any): void {
             let s = this;
-            super.destroy();
-            s._bitmapData = null;
-            s._cacheCanvas = null;
+            ctx.drawImage(s._texture, 0, 0);
         }
     }
 }

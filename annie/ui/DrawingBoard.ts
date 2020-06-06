@@ -99,7 +99,6 @@ namespace annieUI {
             s.addEventListener(annie.MouseEvent.MOUSE_MOVE, mouseMove);
             s.addEventListener(annie.MouseEvent.MOUSE_UP, mouseUp);
         }
-
         private onMouseDown(e: annie.MouseEvent): void {
             let s = this;
             s._isMouseDown = true;
@@ -128,7 +127,6 @@ namespace annieUI {
                 }
             }
         };
-
         private onMouseMove(e: annie.MouseEvent): void {
             let s = this;
             if (s._isMouseDown) {
@@ -144,7 +142,6 @@ namespace annieUI {
                 }
             }
         };
-
         /**
          * 重置画板
          * @method reset
@@ -160,7 +157,7 @@ namespace annieUI {
             if (s.bgColor != "") {
                 s.context.fillStyle = s.bgColor;
             }
-            s.context.fillRect(0, 0, s._bitmapData.width, s._bitmapData.height);
+            s.context.fillRect(0, 0, s._texture.width, s._texture.height);
             s.currentStepId = 0;
             s.totalStepList = [];
             s.addStepObj = null;
@@ -184,9 +181,9 @@ namespace annieUI {
                     s.totalStepList.splice(s.currentStepId, step);
                     if (s.bgColor != "") {
                         s.context.fillStyle = s.bgColor;
-                        s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                        s.context.fillRect(0, 0, s._bounds.width, s._bounds.height);
                     } else {
-                        s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                        s.context.clearRect(0, 0, s._bounds.width, s._bounds.height);
                     }
                     let len: number = s.totalStepList.length;
                     for (let i = 0; i < len; i++) {
