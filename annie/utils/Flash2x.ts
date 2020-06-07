@@ -4,17 +4,13 @@
  * @class annie
  */
 namespace annie {
-    import URLLoader = annie.URLLoader;
-    import Event = annie.Event;
+    declare let require: any;
     import Shape=annie.Shape;
     import Bitmap=annie.Bitmap;
-   /* import ColorFilter=annie.ColorFilter;
-    import BlurFilter=annie.BlurFilter;
-    import ShadowFilter=annie.ShadowFilter;
-    import ColorMatrixFilter=annie.ColorMatrixFilter;*/
     //打包swf用
     export let _isReleased = false;
     export let suffixName = ".swf";
+    export let classPool: any = {};
     //打包swf用
     export let _shareSceneList: any = [];
     //存储加载资源的总对象
@@ -35,12 +31,6 @@ namespace annie {
     let _completeCallback: Function;
     //加载资源时的进度回调
     let _progressCallback: Function;
-    //加载配置文件的加载器
-    let _JSONQueue: URLLoader;
-    //加载资源文件的加载器
-    let _loaderQueue: URLLoader;
-    // 加载器是否初始化过
-    let _isInited: Boolean;
     // 当前加载的资源配置文件内容
     let _currentConfig: any;
     //获取当前加载的时间当作随机数用
@@ -64,8 +54,8 @@ namespace annie {
     export let loadScene = function (sceneName: any, progressFun: Function, completeFun: Function, domain: string = ""): void {
         //加载资源配置文件
         if (_isLoading) {
-            _JSONQueue.loadCancel();
-            _loaderQueue.loadCancel();
+            console.log("当前加载未完成");
+            return;
         }
         _loadSceneNames = [];
         _domain = domain;
@@ -100,15 +90,6 @@ namespace annie {
         if (_loadSceneNames.length == 0) {
             return;
         }
-        if (!_isInited) {
-            _JSONQueue = new URLLoader();
-            _JSONQueue.addEventListener(Event.COMPLETE, onCFGComplete);
-            _loaderQueue = new URLLoader();
-            _loaderQueue.addEventListener(Event.COMPLETE, _onRESComplete);
-            _loaderQueue.addEventListener(Event.PROGRESS, _onRESProgress);
-            _isInited = true;
-        }
-        _loadResCount = 0;
         _loadPer = 0;
         _loadIndex = 0;
         _totalLoadRes = 0;
@@ -117,41 +98,32 @@ namespace annie {
         _completeCallback = completeFun;
         _progressCallback = progressFun;
         _currentConfig = [];
-        if (!_isReleased) {
-            _loadConfig();
-        } else {
-            //加载正式的单个文件
-            //看看是否需要加载共享资源
-            if (_shareSceneList.length > 0 && (!isLoadedScene("f2xShare"))) {
-                for (let i = 0; i < _loadSceneNames.length; i++) {
-                    if (_shareSceneList.indexOf(_loadSceneNames[i]) >= 0) {
-                        _loadSceneNames.unshift("f2xShare");
-                        break;
-                    }
-                }
-            }
-            _loadIndex = 0;
-            _totalLoadRes = _loadSceneNames.length;
-            _loadSinglePer = 1 / _totalLoadRes;
-            for (let i = 0; i < _totalLoadRes; i++) {
-                _currentConfig.push([{src: "src/" + _loadSceneNames[i] + "/" + _loadSceneNames[i] + suffixName}]);
-            }
-            _loadRes();
-        }
+        _loadConfig();
     };
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
-        _JSONQueue.load(_domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json?t=" + _time);
+        if (_domain == "") {
+            //本地
+            let result: any = require("../resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
+            _onCFGComplete(result)
+        } else {
+            //网上
+            app.request({
+                url: _domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json",
+                header: {
+                    "content-type": "application/json"
+                },
+                success(result: any) {
+                    _onCFGComplete(result.data)
+                }
+            })
+        }
     }
 
-    //加载配置文件完成时回调，打包成released线上版时才会用到这个方法。
-    //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
-    function onCFGComplete(e: Event): void {
-        //配置文件加载完成
-        let resList: any = e.data.response;
-        _currentConfig.push(resList);
-        _totalLoadRes += resList.length;
+    function _onCFGComplete(data: any) {
+        _currentConfig.push(data);
+        _totalLoadRes += data.length;
         _loadIndex++;
         if (_loadSceneNames[_loadIndex]) {
             _loadConfig();
@@ -164,21 +136,8 @@ namespace annie {
         }
     }
 
-    // 加载资源过程中调用的回调方法。
-    function _onRESProgress(e: Event): void {
-        if (_progressCallback) {
-            let ww: any = window;
-            let total = e.data.totalBytes;
-            if (ww.swfBytes && ww.swfBytes[_loadSceneNames[_loadIndex]]) {
-                total = ww.swfBytes[_loadSceneNames[_loadIndex]];
-            }
-            _progressCallback((_loadPer + e.data.loadedBytes / total * _loadSinglePer) * 100 >> 0);
-        }
-    }
-
     //解析加载后的json资源数据
     function _parseContent(loadContent: any) {
-
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         let mc: any;
@@ -227,7 +186,7 @@ namespace annie {
                                             //如果不为空，则更新元素
                                             for (let m in lastFrameCon[j]) {
                                                 //这个地方一定要用undefined。因为有些元素可能为0.当然不是所有的元素都要补，比如滤镜，为空就不需要补
-                                                if (frameCon[j][m] == void 0&&m!="fi") {
+                                                if (frameCon[j][m] == void 0 && m != "fi") {
                                                     frameCon[j][m] = lastFrameCon[j][m];
                                                 }
                                             }
@@ -245,151 +204,17 @@ namespace annie {
                 }
             }
         }
-        _loadResCount--;
-        if (_loadResCount == 0) {
-            _checkComplete();
-        }
-    }
-
-    let _loadResCount = 0;
-    let mediaResourceOnload = function (e: any) {
-        if (e != void 0) {
-            URL.revokeObjectURL(e.target.url);
-            if (e.target instanceof Image) {
-                e.target.onload = null;
-            } else {
-                e.target.mediaResourceOnload = null;
-            }
-        }
-        _loadResCount--;
-        if (_loadResCount == 0) {
-            _checkComplete();
-        }
-    };
-
-    // 一个场景加载完成后的事件回调
-    function _onRESComplete(e: Event): void {
-        let scene = _loadSceneNames[_loadIndex];
-        let loadContent: any = e.data.response;
-        if (!_isReleased) {
-            if (e.data.type != "js" && e.data.type != "css") {
-                res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                    _loadResCount++;
-                    _parseContent(loadContent);
-                } else {
-                    if (e.data.type == "image") {
-                        //图片
-                        _loadResCount++;
-                        let image = new Image();
-                        image.onload = mediaResourceOnload;
-                        image.src = URL.createObjectURL(loadContent);
-                        annie.res[scene][_currentConfig[_loadIndex][0].id] = image;
-                    }
-                    else if (e.data.type == "sound") {
-                        //声音
-                        let audio: any = new Audio();
-                        _loadResCount++;
-                        if (annie.osType == "ios") {
-                            let sFileReader = new FileReader();
-                            sFileReader.onload = function () {
-                                audio.src = sFileReader.result;
-                                mediaResourceOnload(null);
-                            };
-                            sFileReader.readAsDataURL(loadContent);
-                        } else {
-                            audio.onloadedmetadata = mediaResourceOnload;
-                            audio.src = URL.createObjectURL(loadContent);
-                        }
-                        annie.res[scene][_currentConfig[_loadIndex][0].id] = audio;
-                    } else {
-                        _checkComplete();
-                    }
-                }
-            } else {
-                _checkComplete();
-            }
-        } else {
-            //解析swf
-            let fileReader: any = new FileReader();
-            let state = 0;
-            let lastIndex = 0;
-            let currIndex = 1;
-            let JSONData: any;
-            fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size));
-            fileReader.onload = function () {
-                if (state == 0) {
-                    //获取JSON有多少字节
-                    state++;
-                    lastIndex = currIndex;
-                    currIndex += parseInt(fileReader.result);
-                    fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size - lastIndex));
-                } else if (state == 1) {
-                    //获取JSON具体字节数
-                    state++;
-                    lastIndex = currIndex;
-                    currIndex += parseInt(fileReader.result);
-                    fileReader.readAsText(loadContent.slice(loadContent.size - currIndex, loadContent.size - lastIndex));
-                } else if (state == 2) {
-                    state++;
-                    lastIndex = 0;
-                    currIndex = 0;
-                    //解析JSON数据
-                    JSONData = JSON.parse(fileReader.result);
-                    lastIndex = currIndex;
-                    currIndex += JSONData[0].src;
-                    _loadResCount = JSONData.length - 1;
-                    fileReader.readAsText(loadContent.slice(lastIndex, currIndex));
-                } else if (state == 3) {
-                    state++;
-                    Eval(fileReader.result);
-                    //解析JSON数据
-                    for (let i = 1; i < JSONData.length; i++) {
-                        lastIndex = currIndex;
-                        currIndex += JSONData[i].src;
-                        if (JSONData[i].type == "image") {
-                            let image: any = new Image();
-                            image.onload = mediaResourceOnload;
-                            image.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex));
-                            annie.res[scene][JSONData[i].id] = image;
-                        } else if (JSONData[i].type == "sound") {
-                            let audio: any = new Audio();
-                            if (annie.osType == "ios") {
-                                let sFileReader = new FileReader();
-                                sFileReader.onload = function () {
-                                    audio.src = sFileReader.result;
-                                    mediaResourceOnload(null);
-                                };
-                                sFileReader.readAsDataURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
-                            } else {
-                                audio.onloadedmetadata = mediaResourceOnload;
-                                audio.src = URL.createObjectURL(loadContent.slice(lastIndex, currIndex, "audio/mp3"));
-                            }
-                            annie.res[scene][JSONData[i].id] = audio;
-                        } else if (JSONData[i].type == "json") {
-                            if (JSONData[i].id == "_a2x_con") {
-                                let conReader:any=new FileReader();
-                                conReader.onload=function(){
-                                    annie.res[scene]["_a2x_con"] = JSON.parse(conReader.result);
-                                    _parseContent(annie.res[scene]["_a2x_con"]);
-                                    conReader.onload=null;
-                                };
-                                conReader.readAsText(loadContent.slice(lastIndex, currIndex));
-                            }
-                        }
-                    }
-                }
-            };
-        }
     }
 
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
-        if (!_isReleased)
-            _currentConfig[_loadIndex].shift();
+        _currentConfig[_loadIndex].shift();
         _loadedLoadRes++;
         _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (!_isReleased && _currentConfig[_loadIndex].length > 0) {
+        if (_progressCallback) {
+            _progressCallback(_loadPer * 100 >> 0);
+        }
+        if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
         } else {
             res[_loadSceneNames[_loadIndex]]._f2x_had_loaded_scene = true;
@@ -412,14 +237,56 @@ namespace annie {
 
     //加载场景资源
     function _loadRes(): void {
-        let url = _domain + _currentConfig[_loadIndex][0].src;
-        if (_isReleased) {
-            _loaderQueue.responseType = "swf";
-            url += "?v=" + _isReleased;
+        let scene = _loadSceneNames[_loadIndex];
+        let type = _currentConfig[_loadIndex][0].type;
+        if (type != "javascript") {
+            let loadContent: any;
+            if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
+                if (_domain == "") {
+                    //本地
+                    loadContent = require("../"+_currentConfig[_loadIndex][0].src);
+                    res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                    _parseContent(loadContent);
+                    _checkComplete();
+                } else {
+                    //服务端
+                    app.request({
+                        url: _domain + _currentConfig[_loadIndex][0].src,
+                        header: {
+                            "content-type": "application/json"
+                        },
+                        success(result: any) {
+                            loadContent = result.data;
+                            res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                            _parseContent(loadContent);
+                            _checkComplete();
+                        }
+                    })
+                }
+            } else {
+                if (type == "image") {
+                    //图片
+                    loadContent = CanvasRender.rootContainer.createImage();
+                    loadContent.onload =  _checkComplete;
+                    loadContent.src = _domain+_currentConfig[_loadIndex][0].src;
+                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                }
+                else if (type == "sound") {
+                    //声音
+                    loadContent = app.createInnerAudioContext();
+                    loadContent.src =  _domain+_currentConfig[_loadIndex][0].src;
+                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                    _checkComplete();
+                }
+            }
         } else {
-            url += "?v=" + _time;
+            if(annie.classPool[_loadSceneNames[_loadIndex]]==null){
+                annie.classPool[_loadSceneNames[_loadIndex]]={};
+            }
+            let className = _currentConfig[_loadIndex][0].src.split("/")[2].split(".")[0];
+            annie.classPool[_loadSceneNames[_loadIndex]][className] = require("../"+_currentConfig[_loadIndex][0].src)[className];
+            _checkComplete();
         }
-        _loaderQueue.load(url);
     }
 
     /**
@@ -459,7 +326,7 @@ namespace annie {
     }
 
     /**
-     * 获取已经加载场景中的资源
+     * 获取已经加载到场景中的资源
      * @method annie.getResource
      * @public
      * @static
@@ -472,6 +339,19 @@ namespace annie {
         return res[sceneName][resName];
     }
 
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} packageName
+     * @param {string} className
+     * @return {any}
+     */
+    export function getDisplay(packageName:string,className:string):any {
+        return new annie.classPool[packageName][className]();
+    }
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
@@ -490,47 +370,47 @@ namespace annie {
             if (info.al == void 0) {
                 info.al = 1;
             }
-            if(isMc){
-                    let isUmChange:boolean=target.a2x_um;
-                    if(!target._changeTransformInfo[0]&&target._x!=info.tr[0]){
-                        target._x=info.tr[0];
-                        isUmChange=true;
+            if (isMc) {
+                let isUmChange: boolean = target.a2x_um;
+                if (!target._changeTransformInfo[0] && target._x != info.tr[0]) {
+                    target._x = info.tr[0];
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[1] && target._y != info.tr[1]) {
+                    target._y = info.tr[1];
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[2] && target._scaleX != info.tr[2]) {
+                    target._scaleX = info.tr[2];
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[3] && target._scaleY != info.tr[3]) {
+                    target._scaleY = info.tr[3];
+                    isUmChange = true;
+                }
+                if (!target._changeTransformInfo[4]) {
+                    if (target._skewX != info.tr[4]) {
+                        target._skewX = info.tr[4];
+                        target._rotation = 0;
+                        isUmChange = true;
                     }
-                    if(!target._changeTransformInfo[1]&&target._y!=info.tr[1]){
-                        target._y=info.tr[1];
-                        isUmChange=true;
+                    if (target._skewY != info.tr[5]) {
+                        target._skewY = info.tr[5];
+                        target._rotation = 0;
+                        isUmChange = true;
                     }
-                    if(!target._changeTransformInfo[2]&&target._scaleX!=info.tr[2]){
-                        target._scaleX=info.tr[2];
-                        isUmChange=true;
-                    }
-                    if(!target._changeTransformInfo[3]&&target._scaleY!=info.tr[3]){
-                        target._scaleY=info.tr[3];
-                        isUmChange=true;
-                    }
-                    if(!target._changeTransformInfo[4]){
-                        if(target._skewX!=info.tr[4]){
-                            target._skewX=info.tr[4];
-                            target._rotation=0;
-                            isUmChange=true;
-                        }
-                        if(target._skewY!=info.tr[5]){
-                            target._skewY=info.tr[5];
-                            target._rotation=0;
-                            isUmChange=true;
-                        }
-                    }
-                    target.a2x_um=isUmChange;
-                if(!target._changeTransformInfo[5]&&target._alpha!=info.al) {
+                }
+                target.a2x_um = isUmChange;
+                if (!target._changeTransformInfo[5] && target._alpha != info.al) {
                     target._alpha = info.al;
                     target.a2x_ua = true;
                 }
-            }else{
-                if(lastInfo.tr != info.tr){
+            } else {
+                if (lastInfo.tr != info.tr) {
                     [target._x, target._y, target._scaleX, target._scaleY, target._skewX, target._skewY] = info.tr;
-                    target.a2x_um=true;
+                    target.a2x_um = true;
                 }
-                if(target._alpha!=info.al) {
+                if (target._alpha != info.al) {
                     target._alpha = info.al;
                     target.a2x_ua = true;
                 }
@@ -573,25 +453,25 @@ namespace annie {
         let textAlpha = textDate[7];
         let border = textDate[12];
         let lineHeight = textDate[8];
-        if (textDate[1] == 0 || textDate[1] == 1) {
-            textObj = new annie.TextField();
-            textObj.text = text;
-            textObj.font = font;
-            textObj.size = size;
-            textObj.textAlign = textAlign;
-            textObj.lineType = lineType;
-            textObj.italic = italic;
-            textObj.bold = bold;
-            textObj.color = color;
-            textObj.textAlpha = textAlpha;
-            textObj.border = border;
-            textObj.lineHeight = lineHeight;
-        } else {
-            textObj = new annie.InputText(textDate[2]);
-            textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
-            textObj.italic = italic;
-            textObj.bold = bold;
-        }
+        // if (textDate[1] == 0 || textDate[1] == 1) {
+        textObj = new annie.TextField();
+        textObj.text = text;
+        textObj.font = font;
+        textObj.size = size;
+        textObj.textAlign = textAlign;
+        textObj.lineType = lineType;
+        textObj.italic = italic;
+        textObj.bold = bold;
+        textObj.color = color;
+        textObj.textAlpha = textAlpha;
+        textObj.border = border;
+        textObj.lineHeight = lineHeight;
+        // } else {
+        /*textObj = new annie.InputText(textDate[2]);
+        textObj.initInfo(text, color, textAlign, size, font, border, lineHeight);
+        textObj.italic = italic;
+        textObj.bold = bold;*/
+        // }
         return textObj;
     }
 
@@ -636,98 +516,6 @@ namespace annie {
 
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
-     * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
-     * @method annie.ajax
-     * @public
-     * @static
-     * @since 1.0.0
-     * @param info 向后台传送数据所需要设置的信息
-     * @param {url} info.url 向后台请求的地址
-     * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
-     * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
-     * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
-     * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
-     * @param {boolean} info.isNeedOption 是否需要添加X-Requested-With 头
-     * @example
-     *      //get
-     *      annie.ajax({
-     *             type: "GET",
-     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
-     *             responseType: 'json',
-     *             success: function (result) {console.log(result)},
-     *             error: function (result) {console.log(result)}
-     *      })
-     *      //post
-     *      annie.ajax({
-     *             type: "POST",
-     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
-     *             data: {phone:'135******58'},
-     *             responseType: 'json',
-     *             success: function (result) {console.log(result)},
-     *             error: function (result) {console.log(result)}
-     *      })
-     */
-    export function ajax(info: any): void {
-        let urlLoader = new URLLoader();
-        if (info.isNeedOption) {
-            urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
-        }
-        urlLoader.method = info.type == undefined ? "get" : info.type;
-        urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "text" : info.dataType) : info.responseType;
-        if (info.success instanceof Object) {
-            urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
-        }
-        if (info.error instanceof Object) {
-            urlLoader.addEventListener(annie.Event.ERROR, info.error);
-        }
-        urlLoader.load(info.url);
-    }
-
-    /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
-     * jsonp调用方法
-     * @method annie.jsonp
-     * @param url
-     * @param type 0或者1 如果是0，后台返回的是data型jsonp 如果是1，后台返回的是方法型jsonp
-     * @param callbackName
-     * @param callbackFun
-     * @static
-     * @since 1.0.4
-     * @example
-     *      annie.jsonp('js/testData.js', 1, 'getdata', function (result) {
-     *          console.log(result);
-     *      })
-     */
-    export function jsonp(url: string, type: number, callbackName: string, callbackFun: any) {
-        let w: any = window;
-        if (type == 1) {
-            w[callbackName] = callbackFun;
-        }
-        let jsonpScript: any = document.createElement('script');
-        let head: any = document.getElementsByTagName('head')[0];
-        jsonpScript.onload = function (e: any) {
-            if (type == 0) {
-                callbackFun(w[callbackName]);
-            }
-            e.path[0].src = "";
-            w[callbackName] = null;
-            delete w[callbackName];
-            head.removeChild(e.path[0]);
-        };
-        head.appendChild(jsonpScript);
-        let param: string;
-        if (url.indexOf("?") > 0) {
-            param = "&";
-        } else {
-            param = "?";
-        }
-        jsonpScript.src = url + param + "a_n_n_i_e=" + Math.random() + "&callback=" + callbackName;
-    }
-
-    /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 获取url地址中的get参数
      * @method annie.getQueryString
      * @static
@@ -759,7 +547,7 @@ namespace annie {
      * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
-        let Root: any = window;
+        let Root: any = annie.classPool;
         //资源树最顶层
         let resRoot: any = res[sceneName];
         //资源树里类对象json数据
@@ -920,6 +708,5 @@ namespace annie {
             }
         }
     }
-
     console.log("https://github.com/flash2x/AnnieJS");
 }

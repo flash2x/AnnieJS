@@ -44,7 +44,7 @@ namespace annieUI {
             super();
             let s = this;
             s._instanceType = "annieUI.FacePhoto";
-            s.photo = new Image();
+            s.photo = annie.CanvasRender.rootContainer.createImage();
             s.maskObj = new annie.Shape();
             s.photo.onload = function (e: any) {
                 s.bitmap = new annie.Bitmap(s.photo);

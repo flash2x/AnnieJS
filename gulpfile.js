@@ -25,16 +25,16 @@ var coreList =[
     // "annie/media/Video.ts",
     //"annie/media/ImageFrames.ts",
     "annie/display/MovieClip.ts",
-    "annie/display/FloatDisplay.ts",
+    // "annie/display/FloatDisplay.ts",
     //"annie/display/VideoPlayer.ts",
     "annie/display/TextField.ts",
-    "annie/display/InputText.ts",
+    // "annie/display/InputText.ts",
     "annie/display/Stage.ts",
     // "annie/filters/Filters.ts",
     "annie/render/IRender.ts",
     "annie/render/CanvasRender.ts",
     // "annie/render/OffCanvasRender.ts",
-    "annie/net/URLLoader.ts",
+    // "annie/net/URLLoader.ts",
     "annie/utils/Flash2x.ts",
     "annie/utils/Tween.ts",
     "annie/utils/Timer.ts",
@@ -49,9 +49,9 @@ var uiList=[
     "annie/ui/ScrollList.ts",
     "annie/ui/FacePhoto.ts",
     "annie/ui/SlidePage.ts",
-    "annie/ui/FlipBook.ts",
-    "annie/ui/DrawingBoard.ts",
-    "annie/ui/ScratchCard.ts"
+    "annie/ui/FlipBook.ts"
+    // "annie/ui/DrawingBoard.ts",
+    // "annie/ui/ScratchCard.ts"
 ];
 var onBuildCore = function(){
     var op = {
@@ -91,6 +91,8 @@ var onBuildDoc = function(){
         return tsResult.js.pipe(gulp.dest(outDir));
 };
 var onBuildLast = function(){
+    gulp.src(["build/add2.js","build/annieUI.js","build/add3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/add2.js","build/annieUI.min.js","build/add3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("build"));
     gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));
     return gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("build"));
 };

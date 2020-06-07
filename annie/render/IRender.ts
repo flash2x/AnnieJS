@@ -7,7 +7,7 @@ namespace annie {
          * 初始化事件
          * @param canvas
          */
-        init(canvas:any):void;
+        init():void;
         /**
          * 改变尺寸
          */
@@ -22,10 +22,6 @@ namespace annie {
          */
         endMask():void;
         /**
-         * 最上层容器对象
-         */
-        rootContainer:any;
-        /**
          * 开始渲染
          */
         begin(color:string):void;
@@ -34,7 +30,7 @@ namespace annie {
          * 结束渲染
          */
         end():void;
-
+        destroy():void;
         /**
          * viewPort
          */

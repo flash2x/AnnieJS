@@ -19,7 +19,7 @@ namespace annie {
          * @type {any}
          * @default null
          */
-        public rootContainer: any = null;
+        public static rootContainer: any = null;
         /**
          * @property viewPort
          *
@@ -31,12 +31,7 @@ namespace annie {
          * @default null
          */
         public static _ctx: any;
-        /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage: Stage;
+
 
         /**
          * @method CanvasRender
@@ -47,7 +42,6 @@ namespace annie {
         public constructor(stage: Stage) {
             super();
             this._instanceType = "annie.CanvasRender";
-            this._stage = stage;
         }
 
         /**
@@ -57,7 +51,7 @@ namespace annie {
          * @public
          */
         public begin(color: string): void {
-            let s = this, c = s.rootContainer, ctx = CanvasRender._ctx;
+            let c = CanvasRender.rootContainer, ctx = CanvasRender._ctx;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (color == "") {
                 ctx.clearRect(0, 0, c.width, c.height);
@@ -118,12 +112,9 @@ namespace annie {
          * @since 1.0.0
          * @method init
          */
-        public init(canvas: any): void {
-            let s = this;
-            s.rootContainer = canvas;
-            s._stage.rootDiv.appendChild(s.rootContainer);
-            s.rootContainer.id = "_a2x_canvas";
-            CanvasRender._ctx = canvas.getContext('2d');
+        public init(): void {
+            annie.CanvasRender._ctx= CanvasRender.rootContainer.getContext("2d");
+            annie.Stage["flushAll"]();
         }
 
         /**
@@ -133,19 +124,13 @@ namespace annie {
          * @method reSize
          */
         public reSize(width: number, height: number): void {
-            let s = this, c = s.rootContainer;
-            c.width = width;
-            c.height = height;
-            s.viewPort.width = c.width;
-            s.viewPort.height = c.height;
-            c.style.width = Math.ceil(width / devicePixelRatio) + "px";
-            c.style.height = Math.ceil(height / devicePixelRatio) + "px";
+            let s = this;
+            s.viewPort.width = width;
+            s.viewPort.height = width;
         }
 
-        destroy(): void {
-            let s = this;
-            s.rootContainer = null;
-            s._stage = null;
+        public destroy(): void {
+            CanvasRender.rootContainer = null;
             CanvasRender._ctx = null;
         }
     }

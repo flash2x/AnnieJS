@@ -121,7 +121,7 @@ namespace annie {
                 }
             }
             let reSendTimes = 0;
-            if (!(s._req instanceof XMLHttpRequest)) {
+            if (s._req ==null) {
                 s._req = new XMLHttpRequest();
                 s._req.withCredentials = false;
                 s._req.onprogress = function (event: any): void {

@@ -2,9 +2,6 @@
  * @module annie
  */
 namespace annie {
-    declare let VConsole: any;
-    declare let trace: any;
-
     /**
      * Stage 表示显示 canvas 内容的整个区域，所有显示对象的顶级显示容器
      * @class annie.Stage
@@ -19,12 +16,6 @@ namespace annie {
          * @since 1.0.0
          */
         /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * annie.Stage舞台尺寸发生变化时触发
-         * @event annie.Event.RESIZE
-         * @since 1.0.0
-         */
-        /**
          * annie引擎暂停或者恢复暂停时触发，这个事件只能在annie.globalDispatcher中监听
          * @event annie.Event.ON_RUN_CHANGED
          * @since 1.0.0
@@ -34,37 +25,6 @@ namespace annie {
          * @event annie.TouchEvent.ON_MULTI_TOUCH
          * @type {string}
          */
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否阻止ios端双击后页面会往上弹的效果，因为如果阻止了，可能有些html元素出现全选框后无法取消
-         * 所以需要自己灵活设置,默认阻止.
-         * @property iosTouchendPreventDefault
-         * @type {boolean}
-         * @default true
-         * @since 1.0.4
-         * @public
-         */
-        public iosTouchendPreventDefault: boolean = true;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 是否禁止引擎所在的DIV的鼠标事件或触摸事件的默认行为，默认为true是禁止的。
-         * @property isPreventDefaultEvent
-         * @since 1.0.9
-         * @default true
-         * @type {boolean}
-         */
-        public isPreventDefaultEvent: boolean = true;
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 整个引擎的最上层的div元素,
-         * 承载canvas的那个div html元素
-         * @property rootDiv
-         * @public
-         * @since 1.0.0
-         * @type {Html Div}
-         * @default null
-         */
-        public rootDiv: any = null;
         /**
          * 当前stage所使用的渲染器
          * 渲染器有两种,一种是canvas 一种是webGl
@@ -117,6 +77,7 @@ namespace annie {
         }
 
         private static _pause: boolean = false;
+        private static stage: Stage = null;
         private _viewRect: Rectangle = new Rectangle();
         /**
          * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
@@ -204,7 +165,6 @@ namespace annie {
          * @type {string} #FFFFFF" 或 RGB(255,255,255) 或 RGBA(255,255,255,255)
          */
         public bgColor: string = "";
-        private _isFullScreen: boolean = true;
 
         /**
          * 舞台的缩放模式
@@ -256,7 +216,7 @@ namespace annie {
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {string} rootDivId
+         * @param {Object} canvas
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
@@ -265,30 +225,18 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public constructor(rootDivId: string = "annieEngine", desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight", renderType: number = 0) {
+        public constructor(canvas: any, desW: number = 640, desH: number = 1040, frameRate: number = 30, scaleMode: string = "fixedHeight", renderType: number = 0) {
             super();
-            if (debug && !Stage._isLoadedVConsole) {
-                Stage._isLoadedVConsole = true;
-                let script: HTMLScriptElement = document.createElement("script");
-                script.onload = function () {
-                    new VConsole();
-                    script.onload = null;
-                };
-                document.head.appendChild(script);
-                script.src = "libs/vconsole.min.js";
-            }
             let s: Stage = this;
             s.a2x_ua = true;
             s.a2x_um = true;
             s._instanceType = "annie.Stage";
             s.stage = s;
             s._isOnStage = true;
-            s.name = rootDivId;
-            let div: any = document.getElementById(rootDivId);
+            s.name = "rootStage";
             s.renderType = renderType;
             s.desWidth = desW;
             s.desHeight = desH;
-            s.rootDiv = div;
             s.setFrameRate(frameRate);
             s._scaleMode = scaleMode;
             s.anchorX = desW >> 1;
@@ -301,18 +249,11 @@ namespace annie {
                 //webgl
                 //s.renderObj = new WebGLRender(s);
             }
-            s.renderObj.init(document.createElement('canvas'));
-            let rc = div;
+            s.renderObj.init();
             s.mouseEvent = s._onMouseEvent.bind(s);
-            rc.addEventListener("mousedown", s.mouseEvent, false);
-            rc.addEventListener('mousemove', s.mouseEvent, false);
-            rc.addEventListener('mouseup', s.mouseEvent, false);
-            rc.addEventListener("touchstart", s.mouseEvent, false);
-            rc.addEventListener('touchmove', s.mouseEvent, false);
-            rc.addEventListener('touchend', s.mouseEvent, false);
-            rc.addEventListener('touchcancel', s.mouseEvent, false);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
+            Stage.stage = s;
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -394,30 +335,6 @@ namespace annie {
             return 60 / (this._flush + 1);
         }
 
-        /**
-         * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-         * 获取引擎所在的div宽高
-         * @method getRootDivWH
-         * @public
-         * @since 1.0.0
-         * @param {HTMLDivElement} div
-         * @return {Object}
-         */
-        public getRootDivWH(div: HTMLDivElement) {
-            let vW = 640;
-            let vH = 960;
-            if (div.style.width != "") {
-                vW = parseInt(div.style.width);
-                vH = parseInt(div.style.height);
-                this._isFullScreen = false;
-            } else {
-                this._isFullScreen = true;
-                vW = document.documentElement.clientWidth;
-                vH = document.documentElement.clientHeight;
-            }
-            return {w: vW, h: vH};
-        }
-
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -437,41 +354,28 @@ namespace annie {
         private _mP1: Point = new Point();
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
+
+        public static onAppTouchEvent(e: any) {
+            Stage.stage.mouseEvent(e);
+        }
+
         private mouseEvent: any = null;
         public static _dragDisplay: annie.DisplayObject = null;
         public static _dragBounds: annie.Rectangle = new annie.Rectangle();
         public static _lastDragPoint: annie.Point = new annie.Point();
         public static _isDragCenter: boolean = false;
-        public _isMouseClickCanvas: boolean = true;
 
         private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
-            if (e.target.id == "_a2x_canvas") {
-                s._isMouseClickCanvas = true;
-                if (s.isPreventDefaultEvent) {
-                    if ((e.type == "touchend") && (annie.osType == "ios") && (s.iosTouchendPreventDefault)) {
-                        e.preventDefault();
-                    }
-                    if ((e.type == "touchmove") || (e.type == "touchstart" && annie.osType == "android")) {
-                        e.preventDefault();
-                    }
-                }
-            } else {
-                s._isMouseClickCanvas = false;
-            }
-            if (!s._isFullScreen) {
-                offSetX = c.getBoundingClientRect().left + c.scrollLeft;
-                offSetY = c.getBoundingClientRect().top + c.scrollTop;
-            }
+            let s: any = this, offSetX = 0, offSetY = 0;
             let sd: any = Stage._dragDisplay;
-            if (s.isMultiTouch && e.targetTouches && e.targetTouches.length > 1) {
-                if (e.targetTouches.length == 2) {
+            if (s.isMultiTouch && e.changedTouches.length > 1) {
+                if (e.changedTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.targetTouches[0].clientX - offSetX;
-                    s._mP1.y = e.targetTouches[0].clientY - offSetY;
-                    s._mP2.x = e.targetTouches[1].clientX - offSetX;
-                    s._mP2.y = e.targetTouches[1].clientY - offSetY;
+                    s._mP1.x = e.changedTouches[0].clientX - offSetX;
+                    s._mP1.y = e.changedTouches[0].clientY - offSetY;
+                    s._mP2.x = e.changedTouches[1].clientX - offSetX;
+                    s._mP2.y = e.changedTouches[1].clientY - offSetY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -522,20 +426,15 @@ namespace annie {
                     //事件个数
                     let eLen: number;
                     let identifier: any;
-                    if (!e.changedTouches) {
-                        e.identifier = "pc0";
-                        points = [e];
+                    if (s.isMultiMouse) {
+                        points = e.changedTouches;
                     } else {
-                        if (s.isMultiMouse) {
-                            points = e.changedTouches;
+                        let fp = e.changedTouches[0];
+                        if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
+                            s._lastDpList.isStart = true;
+                            points = [fp];
                         } else {
-                            let fp = e.changedTouches[0];
-                            if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
-                                s._lastDpList.isStart = true;
-                                points = [fp];
-                            } else {
-                                return;
-                            }
+                            return;
                         }
                     }
                     let pLen = points.length;
@@ -748,8 +647,8 @@ namespace annie {
         //设置舞台的对齐模式
         private setAlign(): void {
             let s = this;
-            let divH = s.divHeight * devicePixelRatio;
-            let divW = s.divWidth * devicePixelRatio;
+            let divH = s.divHeight;
+            let divW = s.divWidth;
             let desH = s.desHeight;
             let desW = s.desWidth;
             s.anchorX = desW >> 1;
@@ -828,21 +727,21 @@ namespace annie {
          */
         public resize = function (): void {
             let s: Stage = this;
-            let whObj: any = s.getRootDivWH(s.rootDiv);
+            let w = CanvasRender.rootContainer.width;
+            let h = CanvasRender.rootContainer.height;
             if (s.divWidth == 0 || s.divHeight == 0) {
-                if (whObj.w == 0 || whObj.h == 0) return;
                 s.a2x_um = true;
-                s.divHeight = whObj.h;
-                s.divWidth = whObj.w;
-                s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
+                s.divWidth = w;
+                s.divHeight = h;
+                s.renderObj.reSize(w, h);
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
             } else if (s.autoResize) {
-                if (s.divWidth != whObj.w || s.divHeight != whObj.h) {
+                if (s.divWidth != w || s.divHeight != h) {
                     s.a2x_um = true;
-                    s.divHeight = whObj.h;
-                    s.divWidth = whObj.w;
-                    s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
+                    s.divHeight = h;
+                    s.divWidth = w;
+                    s.renderObj.reSize(w, h);
                     s.setAlign();
                     s.dispatchEvent("onResize");
                 }
@@ -882,7 +781,7 @@ namespace annie {
                     Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                 }
             }
-            requestAnimationFrame(Stage.flushAll);
+            CanvasRender.rootContainer.requestAnimationFrame(Stage.flushAll);
         }
 
         /**
@@ -933,21 +832,7 @@ namespace annie {
             super.destroy();
             let s = this;
             Stage.removeUpdateObj(s);
-            let rc = s.rootDiv;
-            if (osType != "pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            } else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
-            }
-            rc.style.display = "none";
-            if (rc.parentNode) {
-                rc.parentNode.removeChild(rc);
-            }
+            s.renderObj.destroy();
             s.renderObj = null;
         }
     }

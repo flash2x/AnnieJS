@@ -581,9 +581,9 @@ namespace annie {
                 if (s._offsetX != 0 || s._offsetY != 0) {
                     ctx.translate(s._offsetX, s._offsetY);
                 }
-                if (s.isNeedDraw=== true) {
+                // if (s.isNeedDraw=== true) {
                     s._draw(ctx);
-                }
+                // }
             }
         }
 

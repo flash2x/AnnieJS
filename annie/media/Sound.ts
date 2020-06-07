@@ -2,101 +2,147 @@
  * @module annie
  */
 namespace annie {
+    //declare let WeixinJSBridge:any;
     /**
      * 声音类
      * @class annie.Sound
-     * @extends annie.Media
+     * @extends annie.EventDispatcher
      * @public
      * @since 1.0.0
      */
-    export class Sound extends Media {
-        //Event
+    export class Sound extends annie.EventDispatcher {
         /**
-         * annie.Media相关媒体类的播放刷新事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @event annie.Event.ON_PLAY_UPDATE
-         * @since 1.1.0
+         * html 标签 有可能是audio 或者 video
+         * @property media
+         * @type {Audio}
+         * @public
+         * @since 1.0.0
          */
-        /**
-         * annie.Media相关媒体类的播放完成事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @event annie.Event.ON_PLAY_END
-         * @since 1.1.0
-         */
+        public media: any = null;
+        private _loop: number = 0;
 
-        /**
-         * annie.Media相关媒体类的开始播放事件。像annie.Sound annie.Video都可以捕捉这种事件。
-         * @event annie.Event.ON_PLAY_START
-         * @since 1.1.0
-         */
         /**
          * 构造函数
-         * @method  Sound
+         * @method Sound
+         * @param {string} src
+         * @param {string}type
          * @since 1.0.0
-         * @public
-         * @param src
-         * @example
-         *      var soundPlayer = new annie.Sound('http://test.annie2x.com/biglong/apiDemo/annieBitmap/resource/music.mp3');
-         *          soundPlayer.play();//播放音乐
-         *          //soundPlayer.pause();//暂停音乐
-         *          //soundPlayer.stop();//停止音乐
          */
-        public constructor(src: any) {
-            super(src, "Audio");
-            let s: any = this;
+        public constructor(src: string) {
+            super();
+            let s = this;
             s._instanceType = "annie.Sound";
-            annie.Sound._soundList.push(s);
-            s.volume = Sound._volume;
-        }
-        /**
-         * 从静态声音池中删除声音对象,如果一个声音再也不用了，建议先执行这个方法，再销毁
-         * @method destroy
-         * @public
-         * @since 1.1.1
-         */
-        public destroy(): void {
-            let s: any = this;
-            let len: number = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (!annie.Sound._soundList[i] || annie.Sound._soundList[i] == this) {
-                    annie.Sound._soundList.splice(i, 1);
+            s.media = annie.app.createInnerAudioContext();
+            s.media.src = src;
+            s.media.onEnded(function (e: any) {
+                s.dispatchEvent("onPlayEnd", e);
+                if (s._loop > 1) {
+                    s._loop--;
+                    s.media.startTime = 0;
+                    s.media.play();
                 }
+            });
+            s.media.onPlay(function (e: any) {
+                s.dispatchEvent("onPlayStart", e);
+            });
+            s.media.onTimeUpdate(function (e: any) {
+                s.dispatchEvent("onPlayUpdate", e);
+            });
+            annie.Sound._soundList.push(s);
+        }
+        private _repeate: number = 1;
+        /**
+         * 是否正在播放中
+         * @property  isPlaying
+         * @public
+         * @since 2.0.0
+         * @type {boolean}
+         */
+        public isPlaying: boolean = true;
+
+        /**
+         * 开始播放媒体
+         * @method play
+         * @param {number} start 开始点 默认为0
+         * @param {number} loop 循环次数 默认为1
+         * @public
+         * @since 1.0.0
+         */
+        public play(start: number = 0, loop: number = 0): void {
+            let s = this;
+            s.media.startTime = start;
+            if (loop == 0) {
+                s._loop = s._repeate;
+            } else {
+                s._loop = loop;
+                s._repeate = loop;
             }
-            super.destroy();
+            s.media.play();
+            s.isPlaying = true;
         }
 
         /**
-         * 作用和stop()相同,但你用这个方法停止声音了，用play2()方法才会有效
-         * @method stop2
-         * @since 2.0.0
+         * 停止播放
+         * @method stop
          * @public
-         * @return {void}
+         * @since 1.0.0
          */
-        public stop2(): void {
+        public stop(): void {
+            let s=this;
+            s.media.stop();
+            s.isPlaying=false;
+        }
+        /**
+         * 暂停播放,或者恢复播放
+         * @method pause
+         * @public
+         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
+         * @since 1.0.4
+         */
+        public pause(isPause:boolean=true): void {
+            let s=this;
+            if(isPause){
+                s.media.pause();
+                s.isPlaying=false;
+            }else{
+                s.media.play();
+                s.isPlaying=true;
+            }
+        }
+
+        /**
+         * 每个声音可以有个名字，并且不同的声音名字可以相同
+         * @property name
+         * @type {string}
+         * @since 2.0.0
+         */
+        public name:string="";
+        /**
+         * 设置或者获取音量 从0-1
+         * @since 1.1.0
+         * @property volume
+         * @return {number}
+         */
+        public get volume():number{
+            return this.media.volume
+        }
+        public set volume(value:number){
+            this.media.volume=value;
+        }
+        public stop2() {
             let s = this;
             if (s.isPlaying) {
                 s.media.pause();
             }
         }
-
-        /**
-         * 如果你的项目有背景音乐一直在播放,但可能项目里需要播放视频的时候，需要停止背景音乐或者其他需求，
-         * 视频播放完之后再恢复背景音乐播放。这个时候，你要考虑用户之前是否有主动关闭过背景音乐，有的话，
-         * 这个时候你再调用play()方法或者pause()方法就违背用户意愿。所以你应该调用play2()方法。
-         * 这个方法的原理就是如果用户之前关闭过了，那调用这个方法就不会播放声音，如果没关闭则会播放声音。
-         * @method play2
-         * @since 2.0.0
-         * @public
-         * @return {void}
-         */
         public play2() {
             let s = this;
             if (s.isPlaying) {
-                s.play();
+                s.media.play();
             }
         }
-
         //声音对象池
         private static _soundList: any = [];
-
         /**
          * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
          * @method stopAllSounds
@@ -139,9 +185,9 @@ namespace annie {
          * @since 1.1.1
          * @static
          * @public
-         * @param {number} volume 音量大小，从0-1 在ios里 volume只能是0 或者1，其他无效
+         * @param {number} volume 音量大小，从0-1
          */
-        public static setAllSoundsVolume(volume: number) {
+        public static setAllSoundsVolume(volume: number){
             let len: number = annie.Sound._soundList.length;
             for (var i = len - 1; i >= 0; i--) {
                 if (annie.Sound._soundList[i]) {
@@ -152,7 +198,21 @@ namespace annie {
             }
             Sound._volume = volume;
         }
-
         private static _volume: number = 1;
+        public destroy(){
+            let s=this;
+            let len: number = annie.Sound._soundList.length;
+            for (var i = len - 1; i >= 0; i--) {
+                if (annie.Sound._soundList[i]==s) {
+                    annie.Sound._soundList[i].stop();
+                    annie.Sound._soundList.splice(i,1);
+                    break;
+                }
+            }
+            s.media.offTimeUpdate();
+            s.media.offPlay();
+            s.media.offEnded();
+            s.media = null;
+        }
     }
 }
