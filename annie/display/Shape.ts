@@ -710,8 +710,7 @@ namespace annie {
             let com = s._command;
             let cLen = com.length;
             let data: any;
-            // let leftX: number = s._offsetX;
-            // let leftY: number = s._offsetY;
+            ctx.translate(s._offsetX, s._offsetY);
             let isStroke = false;
             for (let i = 0; i < cLen; i++) {
                 data = com[i];
