@@ -578,9 +578,6 @@ namespace annie {
                     ctx.globalAlpha = s._cAlpha
                 }
                 ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (s._offsetX != 0 || s._offsetY != 0) {
-                    ctx.translate(s._offsetX, s._offsetY);
-                }
                 if (s.isNeedDraw) {
                     s._draw(ctx);
                 }
