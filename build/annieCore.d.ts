@@ -2083,7 +2083,7 @@ declare namespace annie {
          * @param {string}type
          * @since 1.0.0
          */
-        constructor(src: string);
+        constructor(src: any);
         private _repeate;
         /**
          * 是否正在播放中
@@ -2971,6 +2971,7 @@ declare namespace annie {
          * @default null
          */
         static _ctx: any;
+        static context: any;
         /**
          * @method OffCanvasRender
          * @public

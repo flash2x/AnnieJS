@@ -4071,21 +4071,26 @@ var annie;
             _this.name = "";
             var s = _this;
             s._instanceType = "annie.Sound";
-            s.media = annie.app.createInnerAudioContext();
-            s.media.src = src;
-            s.media.onEnded(function (e) {
-                s.dispatchEvent("onPlayEnd", e);
+            if (src instanceof String) {
+                s.media = annie.app.createInnerAudioContext();
+                s.media.src = src;
+            }
+            else {
+                s.media = src;
+            }
+            s.media.onEnded(function () {
+                s.dispatchEvent("onPlayEnd");
                 if (s._loop > 1) {
                     s._loop--;
                     s.media.startTime = 0;
                     s.media.play();
                 }
             });
-            s.media.onPlay(function (e) {
-                s.dispatchEvent("onPlayStart", e);
+            s.media.onPlay(function () {
+                s.dispatchEvent("onPlayStart");
             });
-            s.media.onTimeUpdate(function (e) {
-                s.dispatchEvent("onPlayUpdate", e);
+            s.media.onTimeUpdate(function () {
+                s.dispatchEvent("onPlayUpdate");
             });
             annie.Sound._soundList.push(s);
             return _this;
@@ -6412,8 +6417,8 @@ var annie;
          */
         CanvasRender.prototype.reSize = function (width, height) {
             var s = this;
-            s.viewPort.width = width / annie.devicePixelRatio;
-            s.viewPort.height = width / annie.devicePixelRatio;
+            s.viewPort.width = width;
+            s.viewPort.height = height;
         };
         CanvasRender.prototype.destroy = function () {
             CanvasRender.rootContainer = null;
@@ -6587,8 +6592,7 @@ var annie;
             var c = OffCanvasRender.rootContainer;
             c.width = width;
             c.height = height;
-            c.style.width = Math.ceil(width / annie.devicePixelRatio) + "px";
-            c.style.height = Math.ceil(height / annie.devicePixelRatio) + "px";
+            OffCanvasRender.context.setData({ offCanvasWidth: Math.ceil(width / annie.devicePixelRatio), offCanvasHeight: Math.ceil(height / annie.devicePixelRatio) });
         };
         OffCanvasRender.prototype.destroy = function () {
             OffCanvasRender.rootContainer = null;

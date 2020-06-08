@@ -28,25 +28,29 @@ namespace annie {
          * @param {string}type
          * @since 1.0.0
          */
-        public constructor(src: string) {
+        public constructor(src: any) {
             super();
             let s = this;
             s._instanceType = "annie.Sound";
-            s.media = annie.app.createInnerAudioContext();
-            s.media.src = src;
-            s.media.onEnded(function (e: any) {
-                s.dispatchEvent("onPlayEnd", e);
+            if(src instanceof String){
+                s.media = annie.app.createInnerAudioContext();
+                s.media.src = src;
+            }else{
+                s.media = src;
+            }
+            s.media.onEnded(function () {
+                s.dispatchEvent("onPlayEnd");
                 if (s._loop > 1) {
                     s._loop--;
                     s.media.startTime = 0;
                     s.media.play();
                 }
             });
-            s.media.onPlay(function (e: any) {
-                s.dispatchEvent("onPlayStart", e);
+            s.media.onPlay(function () {
+                s.dispatchEvent("onPlayStart");
             });
-            s.media.onTimeUpdate(function (e: any) {
-                s.dispatchEvent("onPlayUpdate", e);
+            s.media.onTimeUpdate(function () {
+                s.dispatchEvent("onPlayUpdate");
             });
             annie.Sound._soundList.push(s);
         }
