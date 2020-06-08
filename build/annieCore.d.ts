@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      console.log(this.instanceId);
          */
-        instanceId: number;
+        readonly instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @type {string}
          * @readonly
          */
-        instanceType: string;
+        readonly instanceType: string;
         /**
          * 销毁一个对象
          * 销毁之前一定要从显示对象移除，否则将会出错
@@ -92,7 +92,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} isAdd
          */
-        private _changeMouseCount(type, isAdd);
+        private _changeMouseCount;
         private _defaultEvent;
         /**
          * 广播侦听
@@ -1223,7 +1223,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        matrix: Matrix;
+        readonly matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1707,7 +1707,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginBitmapFill(image: any, matrix: Array<number>): void;
-        private _fill(fillStyle);
+        private _fill;
         /**
          * 给线条着色
          * @method beginStroke
@@ -1761,7 +1761,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginBitmapStroke(image: any, matrix: Array<number>, lineWidth?: number, cap?: number, join?: number, miter?: number): void;
-        private _stroke(strokeStyle, width, cap, join, miter);
+        private _stroke;
         /**
          * 结束填充
          * @method endFill
@@ -1794,7 +1794,7 @@ declare namespace annie {
          */
         decodePath: (data: any) => void;
         update(isDrawUpdate?: boolean): void;
-        private _draw(ctx, isMask?);
+        private _draw;
         /**
          * @property _offsetX
          * @protected
@@ -1888,7 +1888,7 @@ declare namespace annie {
          * @return {void}
          */
         removeChild(child: DisplayObject): void;
-        private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
+        private static _getElementsByName;
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
          * @method getChildByName
@@ -1998,7 +1998,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        currentFrame: number;
+        readonly currentFrame: number;
         private _curFrame;
         private _wantFrame;
         private _lastFrameObj;
@@ -2012,7 +2012,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        isPlaying: boolean;
+        readonly isPlaying: boolean;
         private _isPlaying;
         /**
          * 动画的播放方向,是顺着播还是在倒着播
@@ -2023,7 +2023,7 @@ declare namespace annie {
          * @default true
          * @readonly
          */
-        isFront: boolean;
+        readonly isFront: boolean;
         private _isFront;
         /**
          * 当前动画的总帧数
@@ -2034,7 +2034,7 @@ declare namespace annie {
          * @default 1
          * @readonly
          */
-        totalFrames: number;
+        readonly totalFrames: number;
         private _lastFrame;
         /**
          * 构造函数
@@ -2079,7 +2079,7 @@ declare namespace annie {
          * @since 2.0.0
          * @default false
          */
-        isButton: boolean;
+        readonly isButton: boolean;
         private _mode;
         /**
          * 将一个mc变成按钮来使用 如果mc在于2帧,那么点击此mc将自动有被按钮的状态,无需用户自己写代码.
@@ -2091,15 +2091,15 @@ declare namespace annie {
          */
         initButton(): void;
         /**
-         * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
-         * @property clicked
-         * @return {boolean}
-         * @public
-         * @since 2.0.0
-         */
+        * 如果MovieClip设置成了按钮，则通过此属性可以让它定在按下后的状态上，哪怕再点击它并离开它的时候，他也不会变化状态
+        * @property clicked
+        * @return {boolean}
+        * @public
+        * @since 2.0.0
+        */
         clicked: boolean;
         private _clicked;
-        private _mouseEvent(e);
+        private _mouseEvent;
         /**
          * movieClip的当前帧的标签数组,没有则为null
          * @method getCurrentLabel
@@ -2155,7 +2155,7 @@ declare namespace annie {
         update(isDrawUpdate?: boolean): void;
         private _a2x_sounds;
         protected callEventAndFrameScript(callState: number): void;
-        private static _resetMC(obj);
+        private static _resetMC;
         destroy(): void;
     }
 }
@@ -2322,7 +2322,7 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          */
-        private _draw(ctx);
+        private _draw;
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -2331,7 +2331,7 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          */
-        private _getMeasuredWidth(text);
+        private _getMeasuredWidth;
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
          * @method getTextWidth
@@ -2349,7 +2349,7 @@ declare namespace annie {
          * @readonly
          * @since 2.0.0
          */
-        lines: number;
+        readonly lines: number;
         /**
          * 重写 update
          * @method update
@@ -2549,9 +2549,9 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event, cp, sp, identifier);
+        private _initMouseEvent;
         private _mouseDownPoint;
-        private flush();
+        private flush;
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -2603,7 +2603,7 @@ declare namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList;
-        private static flushAll();
+        private static flushAll;
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -2849,7 +2849,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         static from(target: any, totalFrame: number, data: Object): number;
-        private static createTween(target, totalFrame, data, isTo);
+        private static createTween;
         /**
          * 销毁所有正在运行的Tween对象
          * @method killAll
@@ -3169,7 +3169,7 @@ declare namespace annie {
          * @return {number}
          */
         static bounceInOut(k: number): number;
-        private static flush();
+        private static flush;
     }
 }
 /**
@@ -3229,7 +3229,7 @@ declare namespace annie {
          * @since 1.0.9
          * @return {number}
          */
-        currentCount: number;
+        readonly currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -3257,7 +3257,7 @@ declare namespace annie {
          * @since 1.0.9
          * @return {boolean}
          */
-        running: boolean;
+        readonly running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
@@ -3266,9 +3266,9 @@ declare namespace annie {
          * @since 1.0.9
          */
         kill(): void;
-        private update();
+        private update;
         private static _timerList;
-        private static flush();
+        private static flush;
         destroy(): void;
     }
 }
@@ -3286,7 +3286,7 @@ declare namespace annie {
     class SharedCanvas {
         static context: any;
         static view: annie.Bitmap;
-        private static onMouseEvent(e);
+        private static onMouseEvent;
         static init(w: number, h: number): void;
         static resize(w: number, h: number): void;
         static destroy(): void;
@@ -3375,7 +3375,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginMask(target: any): void;
-        private drawMask(target, ctx);
+        private drawMask;
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -3497,6 +3497,17 @@ declare namespace annie {
      * @return {any}
      */
     function getResource(sceneName: string, resName: string): any;
+    /**
+     * 获取已经加载场景中的类
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    function getDisplay(sceneName: string, className: string): any;
     /**
      * 用一个对象批量设置另一个对象的属性值,此方法一般给Flash2x工具自动调用
      * @method annie.d

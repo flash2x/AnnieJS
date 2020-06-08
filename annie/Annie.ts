@@ -190,7 +190,20 @@ namespace annie {
         }
         return null;
     }
-
+    /**
+     * 获取已经加载场景中的类
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 2.0.0
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    export function getDisplay(sceneName:string,className:string):any {
+        let Root: any = GameGlobal;
+        return new Root[sceneName][className]();
+    }
     /**
      * 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Flash2x工具自动调用
      * @method annie.b
