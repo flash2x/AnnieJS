@@ -471,7 +471,20 @@ namespace annie {
     export function getResource(sceneName: string, resName: string): any {
         return res[sceneName][resName];
     }
-
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    export function getDisplay(sceneName:string,className:string):any {
+        let Root: any = window;
+        return new Root[sceneName][className]();
+    }
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);

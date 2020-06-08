@@ -144,8 +144,6 @@ namespace annie {
          * @default false
          */
         public mouseEnable: boolean = true;
-        //显示对象上对显示列表上的最终的所有滤镜组
-        protected cFilters: any = [];
         /**
          * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -719,7 +717,31 @@ namespace annie {
         protected _render(renderObj: IRender | any): void {
             let s = this;
             if (s._visible && s._cAlpha > 0) {
-                renderObj.draw(s);
+                let s = this;
+                let cf = s._filters;
+                let cfLen = cf.length;
+                let fId = -1;
+                if (cfLen) {
+                    for (let i = 0; i < cfLen; i++) {
+                        if (s._filters[i].type == "Shadow"){
+                            fId = i;
+                            break;
+                        }
+                    }
+                }
+                if (fId >= 0) {
+                    let ctx: any = renderObj["_ctx"];
+                    ctx.shadowBlur = cf[fId].blur;
+                    ctx.shadowColor = cf[fId].color;
+                    ctx.shadowOffsetX = cf[fId].offsetX;
+                    ctx.shadowOffsetY = cf[fId].offsetY;
+                    renderObj.draw(s);
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                } else {
+                    renderObj.draw(s);
+                }
             }
         }
 
@@ -973,7 +995,6 @@ namespace annie {
             s.stage = null;
             s._bounds = null;
             s._splitBoundsList = null;
-            s.cFilters = null;
             s._matrix = null;
             s._cMatrix = null;
             s._texture = null;

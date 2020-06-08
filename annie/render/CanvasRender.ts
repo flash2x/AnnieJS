@@ -147,7 +147,6 @@ namespace annie {
                     ctx.drawImage(texture, rect.x+startX, rect.y+startY, rect.width, rect.height, rect.x+startX, rect.y+startY, rect.width, rect.height);
                 }
             }
-
             //getBounds
             /*let rect1=target.getBounds();
             rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);

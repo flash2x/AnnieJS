@@ -1140,7 +1140,6 @@ declare namespace annie {
          * @default false
          */
         mouseEnable: boolean;
-        protected cFilters: any;
         /**
          * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
          * @property name
@@ -4006,6 +4005,17 @@ declare namespace annie {
      * @return {any}
      */
     function getResource(sceneName: string, resName: string): any;
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    function getDisplay(sceneName: string, className: string): any;
     function d(target: any, info: any, isMc?: boolean): void;
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>

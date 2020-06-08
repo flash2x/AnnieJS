@@ -1720,8 +1720,6 @@ var annie;
              * @default false
              */
             _this.mouseEnable = true;
-            //显示对象上对显示列表上的最终的所有滤镜组
-            _this.cFilters = [];
             /**
              * 每一个显示对象都可以给他命一个名字,这样我们在查找子级的时候就可以直接用this.getChildrndByName("name")获取到这个对象的引用
              * @property name
@@ -2364,7 +2362,32 @@ var annie;
         DisplayObject.prototype._render = function (renderObj) {
             var s = this;
             if (s._visible && s._cAlpha > 0) {
-                renderObj.draw(s);
+                var s_1 = this;
+                var cf = s_1._filters;
+                var cfLen = cf.length;
+                var fId = -1;
+                if (cfLen) {
+                    for (var i = 0; i < cfLen; i++) {
+                        if (s_1._filters[i].type == "Shadow") {
+                            fId = i;
+                            break;
+                        }
+                    }
+                }
+                if (fId >= 0) {
+                    var ctx = renderObj["_ctx"];
+                    ctx.shadowBlur = cf[fId].blur;
+                    ctx.shadowColor = cf[fId].color;
+                    ctx.shadowOffsetX = cf[fId].offsetX;
+                    ctx.shadowOffsetY = cf[fId].offsetY;
+                    renderObj.draw(s_1);
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+                else {
+                    renderObj.draw(s_1);
+                }
             }
         };
         Object.defineProperty(DisplayObject.prototype, "width", {
@@ -2594,7 +2617,6 @@ var annie;
             s.stage = null;
             s._bounds = null;
             s._splitBoundsList = null;
-            s.cFilters = null;
             s._matrix = null;
             s._cMatrix = null;
             s._texture = null;
@@ -9250,6 +9272,21 @@ var annie;
         return annie.res[sceneName][resName];
     }
     annie.getResource = getResource;
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    function getDisplay(sceneName, className) {
+        var Root = window;
+        return new Root[sceneName][className]();
+    }
+    annie.getDisplay = getDisplay;
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName, resName) {
         return new annie.Bitmap(annie.res[sceneName][resName]);
