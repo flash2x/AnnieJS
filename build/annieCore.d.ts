@@ -2944,6 +2944,89 @@ declare namespace annie {
     }
 }
 /**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.OffCanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class OffCanvasRender extends AObject {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        static rootContainer: any;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
+        static _ctx: any;
+        /**
+         * @method OffCanvasRender
+         * @public
+         * @since 1.0.0
+         */
+        constructor();
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(color: string): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        private drawMask;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        end(): void;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        init(): void;
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        reSize(width: number, height: number): void;
+        destroy(): void;
+    }
+}
+/**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
@@ -3003,11 +3086,11 @@ declare namespace annie {
      * @public
      * @static
      * @since 3.2.1
-     * @param {string} packageName
+     * @param {string} sceneName
      * @param {string} className
      * @return {any}
      */
-    function getDisplay(packageName: string, className: string): any;
+    function getDisplay(sceneName: string, className: string): any;
     function d(target: any, info: any, isMc?: boolean): void;
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
@@ -3667,6 +3750,7 @@ declare namespace annie {
         FIXED_WIDTH: string;
         FIXED_HEIGHT: string;
     };
+    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组

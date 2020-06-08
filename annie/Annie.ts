@@ -82,6 +82,31 @@ namespace annie {
         FIXED_WIDTH: "fixedWidth",
         FIXED_HEIGHT: "fixedHeight"
     };
+    var _dRender:any;
+    export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
+        if (!_dRender) {
+            _dRender = new OffCanvasRender();
+            _dRender.init();
+        }
+        if(rect==null){
+            rect=obj.getBounds();
+        }
+        let w: number = Math.ceil(rect.width);
+        let h: number = Math.ceil(rect.height);
+        _dRender.reSize(w, h);
+        _dRender.begin(bgColor);
+        OffCanvasRender._ctx.translate(-rect.x,-rect.y);
+        _dRender.draw(obj);
+        if (!typeInfo) {
+            typeInfo = {type: "png"};
+        } else {
+            if (typeInfo.quality) {
+                typeInfo.quality /= 100;
+            }
+        }
+        return OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+    };
+
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组

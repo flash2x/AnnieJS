@@ -345,12 +345,12 @@ namespace annie {
      * @public
      * @static
      * @since 3.2.1
-     * @param {string} packageName
+     * @param {string} sceneName
      * @param {string} className
      * @return {any}
      */
-    export function getDisplay(packageName:string,className:string):any {
-        return new annie.classPool[packageName][className]();
+    export function getDisplay(sceneName:string,className:string):any {
+        return new annie.classPool[sceneName][className]();
     }
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {

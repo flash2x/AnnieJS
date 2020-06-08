@@ -71,7 +71,7 @@ namespace annie {
         public beginMask(target: any): void {
             let s: CanvasRender = this, ctx = CanvasRender._ctx;
             ctx.save();
-            ctx.globalAlpha = 0;
+            // ctx.globalAlpha = 0;
             ctx.beginPath();
             s.drawMask(target);
             ctx.closePath();
@@ -126,7 +126,7 @@ namespace annie {
         public reSize(width: number, height: number): void {
             let s = this;
             s.viewPort.width = width;
-            s.viewPort.height = width;
+            s.viewPort.height = height;
         }
 
         public destroy(): void {
