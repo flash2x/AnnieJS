@@ -2140,9 +2140,6 @@ var annie;
                     ctx.globalAlpha = s._cAlpha;
                 }
                 ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                if (s._offsetX != 0 || s._offsetY != 0) {
-                    ctx.translate(s._offsetX, s._offsetY);
-                }
                 if (s.isNeedDraw === true) {
                     s._draw(ctx);
                 }
@@ -3241,8 +3238,7 @@ var annie;
             var com = s._command;
             var cLen = com.length;
             var data;
-            // let leftX: number = s._offsetX;
-            // let leftY: number = s._offsetY;
+            ctx.translate(s._offsetX, s._offsetY);
             var isStroke = false;
             for (var i = 0; i < cLen; i++) {
                 data = com[i];
@@ -5505,15 +5501,13 @@ var annie;
                 }
                 var maxH = lineH * realLines.length + 4 >> 0;
                 var maxW = s._textWidth >> 0;
-                s._offsetX = 0;
+                s._offsetX = 2;
                 if (s._textAlign == "center") {
-                    s._offsetX = maxW * 0.5;
+                    s._offsetX += maxW * 0.5;
                 }
                 else if (s._textAlign == "right") {
-                    s._offsetX = maxW;
+                    s._offsetX += maxW;
                 }
-                s._offsetX += 2;
-                s._offsetY = 2;
                 s._bounds.width = maxW;
                 s._bounds.height = maxH;
                 s.a2x_um = true;
@@ -5530,15 +5524,8 @@ var annie;
             var realLines = s.realLines;
             var lineHeight = s._lineHeight;
             var w = s._bounds.width;
-            var h = s._bounds.height;
-            if (s.border) {
-                ctx.beginPath();
-                ctx.strokeStyle = "#000";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(0, 0, w, h);
-                ctx.closePath();
-            }
             s._prepContext(ctx);
+            ctx.translate(s._offsetX, s._offsetY);
             for (var i = 0; i < realLines.length; i++) {
                 if (s._stroke > 0) {
                     ctx.strokeText(realLines[i], 0, i * lineHeight, w);
@@ -6961,7 +6948,6 @@ var annie;
         CanvasRender.prototype.beginMask = function (target) {
             var s = this, ctx = CanvasRender._ctx;
             ctx.save();
-            // ctx.globalAlpha = 0;
             ctx.beginPath();
             s.drawMask(target);
             ctx.closePath();
