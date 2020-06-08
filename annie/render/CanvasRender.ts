@@ -77,7 +77,6 @@ namespace annie {
         public beginMask(target: any): void {
             let s: CanvasRender = this, ctx = CanvasRender._ctx;
             ctx.save();
-            ctx.globalAlpha = 0;
             ctx.beginPath();
             s.drawMask(target);
             ctx.closePath();
@@ -141,7 +140,6 @@ namespace annie {
             c.style.width = Math.ceil(width / devicePixelRatio) + "px";
             c.style.height = Math.ceil(height / devicePixelRatio) + "px";
         }
-
         destroy(): void {
             let s = this;
             s.rootContainer = null;

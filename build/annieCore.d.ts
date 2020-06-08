@@ -3206,6 +3206,89 @@ declare namespace annie {
  */
 declare namespace annie {
     /**
+     * Canvas 渲染器
+     * @class annie.OffCanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class OffCanvasRender extends AObject {
+        /**
+         * 渲染器所在最上层的对象
+         * @property rootContainer
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        static rootContainer: any;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
+        static _ctx: any;
+        /**
+         * @method OffCanvasRender
+         * @public
+         * @since 1.0.0
+         */
+        constructor();
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(color: string): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        private drawMask;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        end(): void;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        init(): void;
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        reSize(width: number, height: number): void;
+        destroy(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
      * @class annie.URLLoader
@@ -3454,6 +3537,17 @@ declare namespace annie {
      * @static
      */
     function initRes(target: any, sceneName: string, resName: string): void;
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    function getDisplay(sceneName: string, className: string): any;
 }
 /**
  * @module annie
@@ -4147,6 +4241,7 @@ declare namespace annie {
      *      })
      */
     function sendToURL(url: string): void;
+    let _dRender: any;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -4170,6 +4265,7 @@ declare namespace annie {
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
+    let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组

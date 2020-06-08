@@ -5514,8 +5514,6 @@ var annie;
                 }
                 s._offsetX += 2;
                 s._offsetY = 2;
-                s._bounds.x = s._offsetX;
-                s._bounds.y = s._offsetY;
                 s._bounds.width = maxW;
                 s._bounds.height = maxH;
                 s.a2x_um = true;
@@ -6963,7 +6961,7 @@ var annie;
         CanvasRender.prototype.beginMask = function (target) {
             var s = this, ctx = CanvasRender._ctx;
             ctx.save();
-            ctx.globalAlpha = 0;
+            // ctx.globalAlpha = 0;
             ctx.beginPath();
             s.drawMask(target);
             ctx.closePath();
@@ -7034,6 +7032,172 @@ var annie;
         return CanvasRender;
     }(annie.AObject));
     annie.CanvasRender = CanvasRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * Canvas 渲染器
+     * @class annie.OffCanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    var OffCanvasRender = /** @class */ (function (_super) {
+        __extends(OffCanvasRender, _super);
+        /**
+         * @method OffCanvasRender
+         * @public
+         * @since 1.0.0
+         */
+        function OffCanvasRender() {
+            var _this = _super.call(this) || this;
+            _this._instanceType = "annie.OffCanvasRender";
+            return _this;
+        }
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        OffCanvasRender.prototype.begin = function (color) {
+            var c = OffCanvasRender.rootContainer, ctx = OffCanvasRender._ctx;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            if (color == "") {
+                ctx.clearRect(0, 0, c.width, c.height);
+            }
+        };
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        OffCanvasRender.prototype.beginMask = function (target) {
+            var s = this, ctx = OffCanvasRender._ctx;
+            ctx.save();
+            s.drawMask(target);
+            ctx.clip();
+        };
+        OffCanvasRender.prototype.drawMask = function (target) {
+            var s = this, tm = target._matrix, ctx = OffCanvasRender._ctx;
+            ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if (target._instanceType == "annie.Shape") {
+                target._draw(ctx, true);
+            }
+            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+                for (var i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i]);
+                }
+            }
+            else {
+                var bounds = target._bounds;
+                ctx.beginPath();
+                ctx.rect(0, 0, bounds.width, bounds.height);
+                ctx.closePath();
+            }
+        };
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        OffCanvasRender.prototype.endMask = function () {
+            OffCanvasRender._ctx.restore();
+        };
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        OffCanvasRender.prototype.draw = function (target) {
+            if (target._visible && target._cAlpha > 0) {
+                var children = target.children;
+                var ctx = OffCanvasRender._ctx;
+                var tm = target._matrix;
+                ctx.save();
+                ctx.globalAlpha *= target._alpha;
+                ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                if (target.children == null) {
+                    if (target._offsetX != 0 || target._offsetY != 0) {
+                        ctx.translate(target._offsetX, target._offsetY);
+                    }
+                    target._draw(ctx);
+                }
+                else {
+                    var len = target.children.length;
+                    var s = this;
+                    var maskObj = void 0;
+                    var child = void 0;
+                    for (var i = 0; i < len; i++) {
+                        child = children[i];
+                        if (child._isUseToMask > 0) {
+                            continue;
+                        }
+                        if (maskObj instanceof annie.DisplayObject) {
+                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
+                                    s.endMask();
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            else {
+                                s.endMask();
+                                maskObj = null;
+                            }
+                        }
+                        else {
+                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
+                                maskObj = child.mask;
+                                s.beginMask(maskObj);
+                            }
+                        }
+                        s.draw(child);
+                    }
+                }
+                ctx.restore();
+            }
+        };
+        OffCanvasRender.prototype.end = function () { };
+        ;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        OffCanvasRender.prototype.init = function () {
+            OffCanvasRender._ctx = OffCanvasRender.rootContainer.getContext('2d');
+        };
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        OffCanvasRender.prototype.reSize = function (width, height) {
+            var c = OffCanvasRender.rootContainer;
+            c.width = width;
+            c.height = height;
+            c.style.width = Math.ceil(width / annie.devicePixelRatio) + "px";
+            c.style.height = Math.ceil(height / annie.devicePixelRatio) + "px";
+        };
+        OffCanvasRender.prototype.destroy = function () {
+            OffCanvasRender.rootContainer = null;
+            OffCanvasRender._ctx = null;
+        };
+        return OffCanvasRender;
+    }(annie.AObject));
+    annie.OffCanvasRender = OffCanvasRender;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -8302,6 +8466,21 @@ var annie;
         }
     }
     annie.initRes = initRes;
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    function getDisplay(sceneName, className) {
+        var Root = window;
+        return new Root[sceneName][className]();
+    }
+    annie.getDisplay = getDisplay;
     console.log("https://github.com/flash2x/AnnieJS");
 })(annie || (annie = {}));
 /**
@@ -9470,9 +9649,7 @@ var annie;
     }
     annie.sendToURL = sendToURL;
     // 作为将显示对象导出成图片的render渲染器
-    /*
-        export let _dRender: any = null;
-    */
+    annie._dRender = null;
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -9496,39 +9673,34 @@ var annie;
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
-    /*export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
-        if (!_dRender) {
-            _dRender = new OffCanvasRender();
+    annie.toDisplayDataURL = function (obj, rect, typeInfo, bgColor) {
+        if (rect === void 0) { rect = null; }
+        if (typeInfo === void 0) { typeInfo = null; }
+        if (bgColor === void 0) { bgColor = ""; }
+        if (!annie._dRender) {
+            annie.OffCanvasRender.rootContainer = document.createElement("canvas");
+            annie._dRender = new annie.OffCanvasRender();
+            annie._dRender.init();
         }
-        //一定要更新一次
-        obj._updateMatrix();
-        if (!rect) {
+        if (rect == null) {
             rect = obj.getBounds();
         }
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
-        //先更新
-        let parent = obj.parent;
-        obj.parent = null;
-        //这里一定要执行这个_onUpdateFrame,因为你不知道toDisplayDataURL方法会在哪里执行，为了保证截图的时效性，所以最好执行一次
-        obj._onUpdateFrame(1, true);
-        obj._updateMatrix(true);
-        let w: number = Math.ceil(rect.width);
-        let h: number = Math.ceil(rect.height);
-        _dRender.init(DisplayObject["_canvas"]);
-        _dRender.reSize(w, h);
-        _dRender.begin(bgColor);
-        obj._render(_dRender);
-        obj.parent = parent;
+        var w = Math.ceil(rect.width);
+        var h = Math.ceil(rect.height);
+        annie._dRender.reSize(w, h);
+        annie._dRender.begin(bgColor);
+        annie.OffCanvasRender._ctx.translate(-rect.x, -rect.y);
+        annie._dRender.draw(obj);
         if (!typeInfo) {
-            typeInfo = {type: "png"};
-        } else {
+            typeInfo = { type: "png" };
+        }
+        else {
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             }
         }
-        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
-    };*/
+        return annie.OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+    };
     /*export let createCache = function (obj: any): void {
         if (!_dRender) {
             _dRender = new OffCanvasRender();

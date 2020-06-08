@@ -920,6 +920,19 @@ namespace annie {
             }
         }
     }
-
+    /**
+     * 新建一个已经加载到场景中的类生成的对象
+     * @method annie.getDisplay
+     * @public
+     * @static
+     * @since 3.2.1
+     * @param {string} sceneName
+     * @param {string} className
+     * @return {any}
+     */
+    export function getDisplay(sceneName:string,className:string):any {
+        let Root: any = window;
+        return new Root[sceneName][className]();
+    }
     console.log("https://github.com/flash2x/AnnieJS");
 }

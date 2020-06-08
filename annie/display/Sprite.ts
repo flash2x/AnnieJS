@@ -394,7 +394,7 @@ namespace annie {
                     if (child._isUseToMask > 0) {
                         continue;
                     }
-                    if (maskObj instanceof annie.DisplayObject) {
+                    if (maskObj instanceof annie.DisplayObject){
                         if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
                             if (child.mask != maskObj) {
                                 ro.endMask();

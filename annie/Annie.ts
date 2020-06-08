@@ -164,9 +164,7 @@ namespace annie {
         req.send();
     }
     // 作为将显示对象导出成图片的render渲染器
-/*
     export let _dRender: any = null;
-*/
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 将显示对象转成base64的图片数据,如果要截取的显示对象从来没有添加到舞台更新渲染过，则需要在截图之前手动执行更新方法一次。如:this.update(true);
@@ -190,30 +188,21 @@ namespace annie {
      *
      * Tip:在一些需要上传图片，编辑图片，需要提交图片数据，分享作品又或者长按保存作品的项目，运用annie.toDisplayDataURL方法就是最好不过的选择了。
      */
-    /*export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
+    export let toDisplayDataURL = function (obj: any, rect: Rectangle = null, typeInfo: any = null, bgColor: string = ""): string {
         if (!_dRender) {
+            OffCanvasRender.rootContainer=document.createElement("canvas");
             _dRender = new OffCanvasRender();
+            _dRender.init();
         }
-        //一定要更新一次
-        obj._updateMatrix();
-        if (!rect) {
-            rect = obj.getBounds();
+        if(rect==null){
+            rect=obj.getBounds();
         }
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
-        //先更新
-        let parent = obj.parent;
-        obj.parent = null;
-        //这里一定要执行这个_onUpdateFrame,因为你不知道toDisplayDataURL方法会在哪里执行，为了保证截图的时效性，所以最好执行一次
-        obj._onUpdateFrame(1, true);
-        obj._updateMatrix(true);
         let w: number = Math.ceil(rect.width);
         let h: number = Math.ceil(rect.height);
-        _dRender.init(DisplayObject["_canvas"]);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
-        obj._render(_dRender);
-        obj.parent = parent;
+        OffCanvasRender._ctx.translate(-rect.x,-rect.y);
+        _dRender.draw(obj);
         if (!typeInfo) {
             typeInfo = {type: "png"};
         } else {
@@ -221,8 +210,8 @@ namespace annie {
                 typeInfo.quality /= 100;
             }
         }
-        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
-    };*/
+        return OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+    };
 
     /*export let createCache = function (obj: any): void {
         if (!_dRender) {

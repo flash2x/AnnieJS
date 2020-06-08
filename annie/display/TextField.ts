@@ -450,8 +450,6 @@ namespace annie {
                 }
                 s._offsetX+=2;
                 s._offsetY=2;
-                s._bounds.x=s._offsetX;
-                s._bounds.y=s._offsetY;
                 s._bounds.width = maxW;
                 s._bounds.height = maxH;
                 s.a2x_um=true;
