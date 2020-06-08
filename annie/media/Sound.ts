@@ -50,7 +50,7 @@ namespace annie {
                 s.dispatchEvent("onPlayStart");
             });
             s.media.onTimeUpdate(function () {
-                s.dispatchEvent("onPlayUpdate");
+                s.dispatchEvent("onPlayUpdate",{currentTime: s.media.currentTime});
             });
             annie.Sound._soundList.push(s);
         }
