@@ -54,7 +54,7 @@ namespace annie {
          * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
         public load(url: string, contentType: string = "form"): void {
-            let s = this;
+            let s:any = this;
             s.loadCancel();
             if (s.responseType == null || s.responseType == "") {
                 //看看是什么后缀

@@ -23,7 +23,7 @@ declare namespace annie {
          *      //获取 annie引擎类对象唯一码
          *      trace(this.instanceId);
          */
-        instanceId: number;
+        readonly instanceId: number;
         /**
          * 每一个annie类都有一个实例类型字符串，通过这个字符串，你能知道这个实例是从哪个类实例而来
          * @property instanceType
@@ -32,7 +32,7 @@ declare namespace annie {
          * @return {string}
          * @readonly
          */
-        instanceType: string;
+        readonly instanceType: string;
     }
     /**
      * 事件触发基类
@@ -81,7 +81,7 @@ declare namespace annie {
          * @param {string} type
          * @param {boolean} isAdd
          */
-        private _changeMouseCount(type, isAdd);
+        private _changeMouseCount;
         /**
          * 广播侦听
          * @method dispatchEvent
@@ -1186,7 +1186,7 @@ declare namespace annie {
          * @type {annie.Matrix}
          * @default null
          */
-        matrix: Matrix;
+        readonly matrix: Matrix;
         private _matrix;
         /**
          * 显示对象的遮罩, 是一个Shape显示对象或是一个只包含shape显示对象的MovieClip
@@ -1746,7 +1746,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginBitmapFill(image: any, matrix: Matrix): void;
-        private _fill(fillStyle);
+        private _fill;
         /**
          * 给线条着色
          * @method beginStroke
@@ -1797,7 +1797,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         beginBitmapStroke(image: any, matrix: Matrix, lineWidth?: number, cap?: string, join?: string, miter?: number): void;
-        private _stroke(strokeStyle, width, cap, join, miter);
+        private _stroke;
         /**
          * 结束填充
          * @method endFill
@@ -1829,7 +1829,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         update(isDrawUpdate?: boolean): void;
-        private _drawShape(ctx);
+        private _drawShape;
         /**
          * 重写hitTestPoint
          * @method  hitTestPoint
@@ -1915,7 +1915,7 @@ declare namespace annie {
          * @param {annie.DisplayObject} child
          */
         removeChild(child: DisplayObject): void;
-        private static _getElementsByName(rex, root, isOnlyOne, isRecursive, resultList);
+        private static _getElementsByName;
         /**
          * 通过给displayObject设置的名字来获取一个child,可以使用正则匹配查找
          * @method getChildByName
@@ -2065,7 +2065,7 @@ declare namespace annie {
          */
         play(start?: number, loop?: number): void;
         private _SBWeixin;
-        private _weixinSB();
+        private _weixinSB;
         /**
          * 停止播放
          * @method stop
@@ -2518,7 +2518,7 @@ declare namespace annie {
          * @public
          */
         delElement(): void;
-        private getStyle(elem, cssName);
+        private getStyle;
         /**
          * @method updateStyle
          * @public
@@ -2657,7 +2657,7 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          */
-        private _prepContext(ctx);
+        private _prepContext;
         /**
          * 获取文本宽
          * @method _getMeasuredWidth
@@ -2666,10 +2666,10 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          */
-        private _getMeasuredWidth(text);
+        private _getMeasuredWidth;
         /**
          * 获取当前文本中单行文字的宽，注意是文字的不是文本框的宽
-         * @method getTextWH
+         * @method getTextWidth
          * @param {number} lineIndex 获取的哪一行的高度 默认是第1行
          * @since 2.0.0
          * @public
@@ -2683,7 +2683,7 @@ declare namespace annie {
          * @readonly
          * @since 2.0.0
          */
-        lines: number;
+        readonly lines: number;
         /**
          * 重写 update
          * @method update
@@ -3084,12 +3084,12 @@ declare namespace annie {
          * 刷新mouse或者touch事件
          * @private
          */
-        private _initMouseEvent(event, cp, sp, identifier);
+        private _initMouseEvent;
         private _mouseDownPoint;
         /**
          * 循环刷新页面的函数
          */
-        private flush();
+        private flush;
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method setFrameRate
@@ -3168,7 +3168,7 @@ declare namespace annie {
          * @since 1.0.0
          * @method flushAll
          */
-        private static flushAll();
+        private static flushAll;
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -3456,8 +3456,8 @@ declare namespace annie {
          */
         drawFilter(imageData?: ImageData): void;
         static DELTA_INDEX: number[];
-        private _multiplyMatrix(colorMat);
-        private _cleanValue(value, limit);
+        private _multiplyMatrix;
+        private _cleanValue;
         /**
          *获取滤镜的字符串表现形式以方便比较两个滤镜是否效果一样
          * @method toString
@@ -4043,7 +4043,7 @@ declare namespace annie {
          * @since 1.0.0
          */
         static from(target: any, totalFrame: number, data: Object): number;
-        private static createTween(target, totalFrame, data, isTo);
+        private static createTween;
         /**
          * 销毁所有正在运行的Tween对象
          * @method killAll
@@ -4369,7 +4369,7 @@ declare namespace annie {
          * @private
          * @since 1.0.0
          */
-        private static flush();
+        private static flush;
     }
 }
 /**
@@ -4429,7 +4429,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {number}
          */
-        currentCount: number;
+        readonly currentCount: number;
         private _currentCount;
         /**
          * 设置或者获取当前定时器之间的执行间隔
@@ -4456,7 +4456,7 @@ declare namespace annie {
          * @since 1.0.9
          * @returns {boolean}
          */
-        running: boolean;
+        readonly running: boolean;
         private _running;
         /**
          * 定时器不用了，一定要记得杀死它，不然他会变成厉鬼，时时残绕着你
@@ -4465,9 +4465,9 @@ declare namespace annie {
          * @since 1.0.9
          */
         kill(): void;
-        private update();
+        private update;
         private static _timerList;
-        private static flush();
+        private static flush;
     }
 }
 /**

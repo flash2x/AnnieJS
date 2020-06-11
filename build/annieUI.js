@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -25,7 +28,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var ScrollPage = (function (_super) {
+    var ScrollPage = /** @class */ (function (_super) {
         __extends(ScrollPage, _super);
         /**
          * 构造函数
@@ -401,7 +404,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var FacePhoto = (function (_super) {
+    var FacePhoto = /** @class */ (function (_super) {
         __extends(FacePhoto, _super);
         /**
          * 构造函数
@@ -488,7 +491,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.0
      */
-    var SlidePage = (function (_super) {
+    var SlidePage = /** @class */ (function (_super) {
         __extends(SlidePage, _super);
         /**
          * 构造函数
@@ -924,7 +927,7 @@ var annieUI;
      * @extends annie.Sprite
      * @since 1.0.3
      */
-    var FlipBook = (function (_super) {
+    var FlipBook = /** @class */ (function (_super) {
         __extends(FlipBook, _super);
         /**
          * 初始化电子杂志
@@ -1468,7 +1471,7 @@ var annieUI;
      * @extends annieUI.ScrollPage
      * @since 1.0.9
      */
-    var ScrollList = (function (_super) {
+    var ScrollList = /** @class */ (function (_super) {
         __extends(ScrollList, _super);
         /**
          * 构造函数
@@ -1664,7 +1667,7 @@ var annieUI;
      * @extends annie.Bitmap
      * @since 1.1.1
      */
-    var DrawingBoard = (function (_super) {
+    var DrawingBoard = /** @class */ (function (_super) {
         __extends(DrawingBoard, _super);
         /**
          * 构造函数
@@ -1884,7 +1887,7 @@ var annieUI;
      * @extends annieUI.DrawingBoard
      * @since 1.1.1
      */
-    var ScratchCard = (function (_super) {
+    var ScratchCard = /** @class */ (function (_super) {
         __extends(ScratchCard, _super);
         /**
          * 构造函数

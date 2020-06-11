@@ -296,15 +296,12 @@ namespace annie {
             // let rc = s.renderObj.rootContainer;
             let rc = s.rootDiv;
             let mouseEvent = s.onMouseEvent.bind(s);
-            if (osType != "pc") {
                 rc.addEventListener("touchstart", mouseEvent, false);
                 rc.addEventListener('touchmove', mouseEvent, false);
                 rc.addEventListener('touchend', mouseEvent, false);
-            } else {
                 rc.addEventListener("mousedown", mouseEvent, false);
                 rc.addEventListener('mousemove', mouseEvent, false);
                 rc.addEventListener('mouseup', mouseEvent, false);
-            }
         }
 
         /**
@@ -530,11 +527,11 @@ namespace annie {
                 //事件个数
                 let eLen: number;
                 let identifier: any;
-                if (osType == "pc") {
+                if (e.changedTouches) {
+                    points = e.changedTouches;
+                }else{
                     e.identifier = 0;
                     points = [e];
-                } else {
-                    points = e.changedTouches;
                 }
                 for (let o = 0; o < points.length; o++) {
                     eLen = 0;
