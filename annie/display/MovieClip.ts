@@ -315,7 +315,7 @@ namespace annie {
                 } else if (frameIndex < 1) {
                     frameIndex = 1;
                 }else{
-                    frameIndex=s._wantFrame;
+                    frameIndex=s._curFrame;
                 }
             }
             s._wantFrame = <number>frameIndex;
@@ -363,7 +363,7 @@ namespace annie {
                 } else if (frameIndex < 1) {
                     frameIndex = 1;
                 }else{
-                    frameIndex=s._wantFrame;
+                    frameIndex=s._curFrame;
                 }
             }
             s._wantFrame = <number>frameIndex;

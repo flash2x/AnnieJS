@@ -4581,7 +4581,7 @@ var annie;
                     frameIndex = 1;
                 }
                 else {
-                    frameIndex = s._wantFrame;
+                    frameIndex = s._curFrame;
                 }
             }
             s._wantFrame = frameIndex;
@@ -4633,7 +4633,7 @@ var annie;
                     frameIndex = 1;
                 }
                 else {
-                    frameIndex = s._wantFrame;
+                    frameIndex = s._curFrame;
                 }
             }
             s._wantFrame = frameIndex;
