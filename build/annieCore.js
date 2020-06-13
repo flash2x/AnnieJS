@@ -4563,6 +4563,7 @@ var annie;
         MovieClip.prototype.gotoAndStop = function (frameIndex) {
             var s = this;
             s._isPlaying = false;
+            s._floatFrame = 0;
             var timeLineObj = s._a2x_res_class;
             if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
@@ -4571,7 +4572,6 @@ var annie;
                 else {
                     frameIndex = s._curFrame;
                 }
-                s._floatFrame = 0;
             }
             else if (typeof (frameIndex) == "number") {
                 if (frameIndex > timeLineObj.tf) {
@@ -4579,6 +4579,9 @@ var annie;
                 }
                 else if (frameIndex < 1) {
                     frameIndex = 1;
+                }
+                else {
+                    frameIndex = s._wantFrame;
                 }
             }
             s._wantFrame = frameIndex;
@@ -4613,6 +4616,7 @@ var annie;
             s._isFront = isFront;
             s._isPlaying = true;
             var timeLineObj = s._a2x_res_class;
+            s._floatFrame = 0;
             if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
@@ -4620,7 +4624,6 @@ var annie;
                 else {
                     frameIndex = s._curFrame;
                 }
-                s._floatFrame = 0;
             }
             else if (typeof (frameIndex) == "number") {
                 if (frameIndex > timeLineObj.tf) {
@@ -4628,6 +4631,9 @@ var annie;
                 }
                 else if (frameIndex < 1) {
                     frameIndex = 1;
+                }
+                else {
+                    frameIndex = s._wantFrame;
                 }
             }
             s._wantFrame = frameIndex;

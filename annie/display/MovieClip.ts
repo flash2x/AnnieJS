@@ -301,6 +301,7 @@ namespace annie {
         public gotoAndStop(frameIndex: number | string): void {
             let s: any = this;
             s._isPlaying = false;
+            s._floatFrame = 0;
             let timeLineObj = s._a2x_res_class;
             if (typeof(frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
@@ -308,12 +309,13 @@ namespace annie {
                 } else {
                     frameIndex = s._curFrame;
                 }
-                s._floatFrame = 0;
             } else if (typeof(frameIndex) == "number") {
                 if (frameIndex > timeLineObj.tf) {
                     frameIndex = timeLineObj.tf;
                 } else if (frameIndex < 1) {
                     frameIndex = 1;
+                }else{
+                    frameIndex=s._wantFrame;
                 }
             }
             s._wantFrame = <number>frameIndex;
@@ -348,18 +350,20 @@ namespace annie {
             s._isFront = isFront;
             s._isPlaying = true;
             let timeLineObj = s._a2x_res_class;
+            s._floatFrame = 0;
             if (typeof(frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
                 } else {
                     frameIndex = s._curFrame;
                 }
-                s._floatFrame = 0;
             } else if (typeof(frameIndex) == "number") {
                 if (frameIndex > timeLineObj.tf) {
                     frameIndex = timeLineObj.tf;
                 } else if (frameIndex < 1) {
                     frameIndex = 1;
+                }else{
+                    frameIndex=s._wantFrame;
                 }
             }
             s._wantFrame = <number>frameIndex;
