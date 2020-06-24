@@ -314,8 +314,12 @@ namespace annie {
         }
 
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
-            let s = this;
+            let s:any = this;
             if (!s._visible || !s.mouseEnable) return null;
+            if(s._hitArea){
+                super.hitTestPoint(hitPoint,isGlobalPoint);
+                return
+            }
             let p: Point = hitPoint;
             if (!isGlobalPoint) {
                 p = s.localToGlobal(hitPoint, new Point());

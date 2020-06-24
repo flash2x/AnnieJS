@@ -477,9 +477,6 @@ namespace annie {
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
-            if (s._bounds.width == 0 || s._bounds.height == 0) {
-                return null;
-            }
             let p: any;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._p1);
@@ -491,6 +488,9 @@ namespace annie {
                 if (s._hitArea.isPointIn(p)) {
                     return s;
                 }
+            }
+            if (s._bounds.width == 0 || s._bounds.height == 0) {
+                return null;
             }
             if (s._bounds.isPointIn(p)) {
                 return s;
