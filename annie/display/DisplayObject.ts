@@ -583,10 +583,6 @@ namespace annie {
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
             let s = this;
             if (!s.visible || !s.mouseEnable) return null;
-            let texture = s._texture;
-            if (!texture || texture.width == 0 || texture.height == 0) {
-                return null;
-            }
             let p: any;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._p1);
@@ -599,9 +595,12 @@ namespace annie {
                     return s;
                 }
             }
-
             if (s._bounds.isPointIn(p)) {
                 if (s.hitTestWithPixel) {
+                    let texture = s._texture;
+                    if (!texture || texture.width == 0 || texture.height == 0) {
+                        return null;
+                    }
                     let _canvas = DisplayObject._canvas;
                     let ctx = _canvas.getContext('2d');
                     _canvas.width = 1;
