@@ -2040,9 +2040,6 @@ var annie;
             var s = this;
             if (!s.visible || !s.mouseEnable)
                 return null;
-            if (s._bounds.width == 0 || s._bounds.height == 0) {
-                return null;
-            }
             var p;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._p1);
@@ -2055,6 +2052,9 @@ var annie;
                 if (s._hitArea.isPointIn(p)) {
                     return s;
                 }
+            }
+            if (s._bounds.width == 0 || s._bounds.height == 0) {
+                return null;
             }
             if (s._bounds.isPointIn(p)) {
                 return s;
@@ -3656,6 +3656,10 @@ var annie;
             var s = this;
             if (!s._visible || !s.mouseEnable)
                 return null;
+            if (s._hitArea) {
+                _super.prototype.hitTestPoint.call(this, hitPoint, isGlobalPoint);
+                return;
+            }
             var p = hitPoint;
             if (!isGlobalPoint) {
                 p = s.localToGlobal(hitPoint, new annie.Point());
