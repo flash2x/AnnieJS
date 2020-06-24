@@ -327,9 +327,9 @@ namespace annie {
             }
         }
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
-            let s = this;
+            let s:any = this;
             if (!s._visible || !s.mouseEnable) return null;
-            if(s._isCache){
+            if(s._isCache||s._hitArea){
                 return super.hitTestPoint(hitPoint,isGlobalPoint);
             }
             let p: Point = hitPoint;

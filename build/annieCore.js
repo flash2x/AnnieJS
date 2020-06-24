@@ -2227,10 +2227,6 @@ var annie;
             var s = this;
             if (!s.visible || !s.mouseEnable)
                 return null;
-            var texture = s._texture;
-            if (!texture || texture.width == 0 || texture.height == 0) {
-                return null;
-            }
             var p;
             if (isGlobalPoint) {
                 p = s.globalToLocal(hitPoint, DisplayObject._p1);
@@ -2246,6 +2242,10 @@ var annie;
             }
             if (s._bounds.isPointIn(p)) {
                 if (s.hitTestWithPixel) {
+                    var texture = s._texture;
+                    if (!texture || texture.width == 0 || texture.height == 0) {
+                        return null;
+                    }
                     var _canvas = DisplayObject._canvas;
                     var ctx = _canvas.getContext('2d');
                     _canvas.width = 1;
@@ -4072,7 +4072,7 @@ var annie;
             var s = this;
             if (!s._visible || !s.mouseEnable)
                 return null;
-            if (s._isCache) {
+            if (s._isCache || s._hitArea) {
                 return _super.prototype.hitTestPoint.call(this, hitPoint, isGlobalPoint);
             }
             var p = hitPoint;
