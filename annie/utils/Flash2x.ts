@@ -334,7 +334,6 @@ namespace annie {
     export function getResource(sceneName: string, resName: string): any {
         return res[sceneName][resName];
     }
-
     /**
      * 新建一个已经加载到场景中的类生成的对象
      * @method annie.getDisplay

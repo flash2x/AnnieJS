@@ -8462,6 +8462,3 @@ var annie;
  */
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
-
-annie.A2xExtend=__extends;
-module.exports=annie;
