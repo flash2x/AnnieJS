@@ -6884,11 +6884,7 @@ var annie;
             }
         }
         else {
-            if (annie.classPool[_loadSceneNames[_loadIndex]] == null) {
-                annie.classPool[_loadSceneNames[_loadIndex]] = {};
-            }
-            var className = _currentConfig[_loadIndex][0].src.split("/")[2].split(".")[0];
-            annie.classPool[_loadSceneNames[_loadIndex]][className] = require("../" + _currentConfig[_loadIndex][0].src)[className];
+            require("../" + _currentConfig[_loadIndex][0].src);
             _checkComplete();
         }
     }
