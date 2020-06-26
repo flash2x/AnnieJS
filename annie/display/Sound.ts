@@ -32,8 +32,12 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Sound";
-            s.media = wx.createInnerAudioContext();
-            s.media.src = src;
+            if(typeof src =="string") {
+                s.media = wx.createInnerAudioContext();
+                s.media.src = src;
+            }else{
+                s.media=src;
+            }
             s.media.onEnded(function (e: any) {
                 s.dispatchEvent("onPlayEnd", e);
                 if (s._loop > 1) {

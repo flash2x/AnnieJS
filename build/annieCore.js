@@ -5738,8 +5738,13 @@ var annie;
             _this.name = "";
             var s = _this;
             s._instanceType = "annie.Sound";
-            s.media = wx.createInnerAudioContext();
-            s.media.src = src;
+            if (typeof src == "string") {
+                s.media = wx.createInnerAudioContext();
+                s.media.src = src;
+            }
+            else {
+                s.media = src;
+            }
             s.media.onEnded(function (e) {
                 s.dispatchEvent("onPlayEnd", e);
                 if (s._loop > 1) {
