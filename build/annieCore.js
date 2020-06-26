@@ -6709,14 +6709,18 @@ var annie;
             _onCFGComplete(result);
         }
         else {
-            //网上
-            annie.app.request({
+            var downloadTask = annie.app.downloadFile({
                 url: _domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json",
-                header: {
-                    "content-type": "application/json"
-                },
                 success: function (result) {
-                    _onCFGComplete(result.data);
+                    if (result.statusCode == 200) {
+                        var resultData = annie.app.getFileSystemManager().readFileSync(result.tempFilePath, "utf8");
+                        _onCFGComplete(JSON.parse(resultData));
+                    }
+                }
+            });
+            downloadTask.onProgressUpdate(function (res) {
+                if (_progressCallback) {
+                    _progressCallback((res.progress + 100 * _loadIndex) / _loadSceneNames.length >> 0);
                 }
             });
         }
@@ -6810,10 +6814,12 @@ var annie;
     //检查所有资源是否全加载完成
     function _checkComplete() {
         _currentConfig[_loadIndex].shift();
-        _loadedLoadRes++;
-        _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (_progressCallback) {
-            _progressCallback(_loadPer * 100 >> 0);
+        if (_domain == "") {
+            _loadedLoadRes++;
+            _loadPer = _loadedLoadRes / _totalLoadRes;
+            if (_progressCallback) {
+                _progressCallback(_loadPer * 100 >> 0);
+            }
         }
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
@@ -6841,52 +6847,37 @@ var annie;
         var scene = _loadSceneNames[_loadIndex];
         var type = _currentConfig[_loadIndex][0].type;
         if (type != "javascript") {
-            var loadContent_1;
+            var loadContent = void 0;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                 if (_domain == "") {
                     //本地
-                    loadContent_1 = require("../" + _currentConfig[_loadIndex][0].src);
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent_1;
-                    _parseContent(loadContent_1);
-                    _checkComplete();
+                    loadContent = require("../" + _currentConfig[_loadIndex][0].src);
                 }
                 else {
-                    //服务端
-                    annie.app.request({
-                        url: _domain + _currentConfig[_loadIndex][0].src,
-                        header: {
-                            "content-type": "application/json"
-                        },
-                        success: function (result) {
-                            loadContent_1 = result.data;
-                            annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent_1;
-                            _parseContent(loadContent_1);
-                            _checkComplete();
-                        }
-                    });
+                    loadContent = _currentConfig[_loadIndex][0].src;
                 }
+                annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                _parseContent(loadContent);
             }
             else {
                 if (type == "image") {
                     //图片
-                    loadContent_1 = annie.CanvasRender.rootContainer.createImage();
-                    loadContent_1.onload = _checkComplete;
-                    loadContent_1.src = _domain + _currentConfig[_loadIndex][0].src;
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent_1;
+                    loadContent = annie.CanvasRender.rootContainer.createImage();
+                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
                 else if (type == "sound") {
                     //声音
-                    loadContent_1 = annie.app.createInnerAudioContext();
-                    loadContent_1.src = _domain + _currentConfig[_loadIndex][0].src;
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent_1;
-                    _checkComplete();
+                    loadContent = annie.app.createInnerAudioContext();
+                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
             }
         }
         else {
             require("../" + _currentConfig[_loadIndex][0].src);
-            _checkComplete();
         }
+        _checkComplete();
     }
     /**
      * 判断一个场景是否已经被加载

@@ -108,20 +108,24 @@ namespace annie {
             let result: any = require("../resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
             _onCFGComplete(result)
         } else {
-            //网上
-            app.request({
+            let downloadTask:any =app.downloadFile({
                 url: _domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json",
-                header: {
-                    "content-type": "application/json"
-                },
-                success(result: any) {
-                    _onCFGComplete(result.data)
+                success (result:any) {
+                    if (result.statusCode == 200) {
+                        let resultData:string =app.getFileSystemManager().readFileSync(result.tempFilePath,"utf8");
+                        _onCFGComplete(JSON.parse(resultData));
+                    }
+                }
+            });
+            downloadTask.onProgressUpdate(function(res:any){
+                //远程资源的进度条根据每个加载文件K数才计算
+                if (_progressCallback) {
+                    _progressCallback((res.progress+100*_loadIndex)/_loadSceneNames.length >> 0);
                 }
             })
         }
     }
-
-    function _onCFGComplete(data: any) {
+    function _onCFGComplete(data: any){
         _currentConfig.push(data);
         _totalLoadRes += data.length;
         _loadIndex++;
@@ -209,10 +213,13 @@ namespace annie {
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _currentConfig[_loadIndex].shift();
-        _loadedLoadRes++;
-        _loadPer = _loadedLoadRes / _totalLoadRes;
-        if (_progressCallback) {
-            _progressCallback(_loadPer * 100 >> 0);
+        if(_domain=="") {
+            //本地的进度条根据加个的总文件数才计算
+            _loadedLoadRes++;
+            _loadPer = _loadedLoadRes / _totalLoadRes;
+            if (_progressCallback) {
+                _progressCallback(_loadPer * 100 >> 0);
+            }
         }
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
@@ -245,44 +252,29 @@ namespace annie {
                 if (_domain == "") {
                     //本地
                     loadContent = require("../"+_currentConfig[_loadIndex][0].src);
-                    res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                    _parseContent(loadContent);
-                    _checkComplete();
-                } else {
-                    //服务端
-                    app.request({
-                        url: _domain + _currentConfig[_loadIndex][0].src,
-                        header: {
-                            "content-type": "application/json"
-                        },
-                        success(result: any) {
-                            loadContent = result.data;
-                            res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                            _parseContent(loadContent);
-                            _checkComplete();
-                        }
-                    })
+                }else{
+                    loadContent=_currentConfig[_loadIndex][0].src;
                 }
+                res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                _parseContent(loadContent);
             } else {
                 if (type == "image") {
                     //图片
                     loadContent = CanvasRender.rootContainer.createImage();
-                    loadContent.onload =  _checkComplete;
-                    loadContent.src = _domain+_currentConfig[_loadIndex][0].src;
+                    loadContent.src = _currentConfig[_loadIndex][0].src;
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
                 else if (type == "sound") {
                     //声音
                     loadContent = app.createInnerAudioContext();
-                    loadContent.src =  _domain+_currentConfig[_loadIndex][0].src;
+                    loadContent.src = _currentConfig[_loadIndex][0].src;
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                    _checkComplete();
                 }
             }
         } else {
            require("../"+_currentConfig[_loadIndex][0].src);
-            _checkComplete();
         }
+        _checkComplete();
     }
 
     /**
