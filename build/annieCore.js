@@ -4490,27 +4490,25 @@ var annie;
          */
         MovieClip.prototype.gotoAndStop = function (frameIndex) {
             var s = this;
-            s._isPlaying = false;
             var timeLineObj = s._a2x_res_class;
+            var isOkFrameIndex = false;
             if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
+                    isOkFrameIndex = true;
                 }
-                else {
-                    frameIndex = s._curFrame;
-                }
-                s._floatFrame = 0;
             }
             else if (typeof (frameIndex) == "number") {
-                if (frameIndex > timeLineObj.tf) {
-                    frameIndex = timeLineObj.tf;
-                }
-                else if (frameIndex < 1) {
-                    frameIndex = 1;
+                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
+                    isOkFrameIndex = true;
                 }
             }
-            s._wantFrame = frameIndex;
-            s._onCheckUpdateFrame();
+            if (isOkFrameIndex) {
+                s._isPlaying = false;
+                s._floatFrame = 0;
+                s._wantFrame = frameIndex;
+                s._onCheckUpdateFrame();
+            }
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -4538,28 +4536,26 @@ var annie;
         MovieClip.prototype.gotoAndPlay = function (frameIndex, isFront) {
             if (isFront === void 0) { isFront = true; }
             var s = this;
-            s._isFront = isFront;
-            s._isPlaying = true;
             var timeLineObj = s._a2x_res_class;
+            var isOkFrameIndex = false;
             if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
+                    isOkFrameIndex = true;
                 }
-                else {
-                    frameIndex = s._curFrame;
-                }
-                s._floatFrame = 0;
             }
             else if (typeof (frameIndex) == "number") {
-                if (frameIndex > timeLineObj.tf) {
-                    frameIndex = timeLineObj.tf;
-                }
-                else if (frameIndex < 1) {
-                    frameIndex = 1;
+                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
+                    isOkFrameIndex = true;
                 }
             }
-            s._wantFrame = frameIndex;
-            s._onCheckUpdateFrame();
+            if (isOkFrameIndex) {
+                s._isPlaying = true;
+                s._isFront = isFront;
+                s._floatFrame = 0;
+                s._wantFrame = frameIndex;
+                s._onCheckUpdateFrame();
+            }
         };
         MovieClip.prototype._onCheckUpdateFrame = function () {
             var s = this;
