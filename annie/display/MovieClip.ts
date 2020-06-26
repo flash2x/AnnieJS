@@ -300,26 +300,24 @@ namespace annie {
          */
         public gotoAndStop(frameIndex: number | string): void {
             let s: any = this;
-            s._isPlaying = false;
             let timeLineObj = s._a2x_res_class;
-            s._floatFrame = 0;
+            let isOkFrameIndex=false;
             if (typeof(frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
-                } else {
-                    frameIndex = s._curFrame;
+                    isOkFrameIndex=true;
                 }
             } else if (typeof(frameIndex) == "number") {
-                if (frameIndex > timeLineObj.tf) {
-                    frameIndex = timeLineObj.tf;
-                } else if (frameIndex < 1) {
-                    frameIndex = 1;
-                }else{
-                    frameIndex=s._curFrame;
+                if (frameIndex>=1&&frameIndex <=timeLineObj.tf) {
+                    isOkFrameIndex=true;
                 }
             }
-            s._wantFrame = <number>frameIndex;
-            s._onCheckUpdateFrame();
+            if (isOkFrameIndex) {
+                s._isPlaying = false;
+                s._floatFrame = 0;
+                s._wantFrame = <number>frameIndex;
+                s._onCheckUpdateFrame();
+            }
         }
 
         /**
@@ -347,29 +345,26 @@ namespace annie {
          */
         public gotoAndPlay(frameIndex: number | string, isFront: boolean = true): void {
             let s: any = this;
-            s._isFront = isFront;
-            s._isPlaying = true;
-            s._floatFrame = 0;
             let timeLineObj = s._a2x_res_class;
+            let isOkFrameIndex=false;
             if (typeof(frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
-                } else {
-                    frameIndex = s._curFrame;
+                    isOkFrameIndex=true;
                 }
             } else if (typeof(frameIndex) == "number") {
-                if (frameIndex > timeLineObj.tf) {
-                    frameIndex = timeLineObj.tf;
-                } else if (frameIndex < 1) {
-                    frameIndex = 1;
-                }else{
-                    frameIndex=s._curFrame;
+                if (frameIndex>=1&&frameIndex <=timeLineObj.tf){
+                    isOkFrameIndex=true;
                 }
             }
-            s._wantFrame = <number>frameIndex;
-            s._onCheckUpdateFrame();
+            if (isOkFrameIndex) {
+                s._isPlaying = true;
+                s._isFront=isFront;
+                s._floatFrame = 0;
+                s._wantFrame = <number>frameIndex;
+                s._onCheckUpdateFrame();
+            }
         }
-
         private _onCheckUpdateFrame(): void {
             let s = this;
             if (s._wantFrame != s._curFrame) {
