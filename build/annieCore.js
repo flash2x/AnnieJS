@@ -4566,30 +4566,25 @@ var annie;
          */
         MovieClip.prototype.gotoAndStop = function (frameIndex) {
             var s = this;
-            s._isPlaying = false;
-            s._floatFrame = 0;
             var timeLineObj = s._a2x_res_class;
+            var isOkFrameIndex = false;
             if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
-                }
-                else {
-                    frameIndex = s._curFrame;
+                    isOkFrameIndex = true;
                 }
             }
             else if (typeof (frameIndex) == "number") {
-                if (frameIndex > timeLineObj.tf) {
-                    frameIndex = timeLineObj.tf;
-                }
-                else if (frameIndex < 1) {
-                    frameIndex = 1;
-                }
-                else {
-                    frameIndex = s._curFrame;
+                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
+                    isOkFrameIndex = true;
                 }
             }
-            s._wantFrame = frameIndex;
-            s._onCheckUpdateFrame();
+            if (isOkFrameIndex) {
+                s._isPlaying = false;
+                s._floatFrame = 0;
+                s._wantFrame = frameIndex;
+                s._onCheckUpdateFrame();
+            }
         };
         /**
          * 如果当前时间轴停在某一帧,调用此方法将继续播放.
@@ -4617,31 +4612,26 @@ var annie;
         MovieClip.prototype.gotoAndPlay = function (frameIndex, isFront) {
             if (isFront === void 0) { isFront = true; }
             var s = this;
-            s._isFront = isFront;
-            s._isPlaying = true;
             var timeLineObj = s._a2x_res_class;
-            s._floatFrame = 0;
+            var isOkFrameIndex = false;
             if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
-                }
-                else {
-                    frameIndex = s._curFrame;
+                    isOkFrameIndex = true;
                 }
             }
             else if (typeof (frameIndex) == "number") {
-                if (frameIndex > timeLineObj.tf) {
-                    frameIndex = timeLineObj.tf;
-                }
-                else if (frameIndex < 1) {
-                    frameIndex = 1;
-                }
-                else {
-                    frameIndex = s._curFrame;
+                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
+                    isOkFrameIndex = true;
                 }
             }
-            s._wantFrame = frameIndex;
-            s._onCheckUpdateFrame();
+            if (isOkFrameIndex) {
+                s._isPlaying = true;
+                s._isFront = isFront;
+                s._floatFrame = 0;
+                s._wantFrame = frameIndex;
+                s._onCheckUpdateFrame();
+            }
         };
         MovieClip.prototype._onCheckUpdateFrame = function () {
             var s = this;
@@ -6719,6 +6709,7 @@ var annie;
                 }
             });
             downloadTask.onProgressUpdate(function (res) {
+                //远程资源的进度条根据每个加载文件K数才计算
                 if (_progressCallback) {
                     _progressCallback((res.progress + 100 * _loadIndex) / _loadSceneNames.length >> 0);
                 }
@@ -6815,6 +6806,7 @@ var annie;
     function _checkComplete() {
         _currentConfig[_loadIndex].shift();
         if (_domain == "") {
+            //本地的进度条根据加个的总文件数才计算
             _loadedLoadRes++;
             _loadPer = _loadedLoadRes / _totalLoadRes;
             if (_progressCallback) {
