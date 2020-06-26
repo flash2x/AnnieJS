@@ -32,7 +32,7 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Sound";
-            if(src instanceof String){
+            if(typeof src =="string"){
                 s.media = annie.app.createInnerAudioContext();
                 s.media.src = src;
             }else{

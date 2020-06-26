@@ -20,7 +20,7 @@ var coreList =[
     "annie/display/bitmap.ts",
     "annie/display/Shape.ts",
     "annie/display/Sprite.ts",
-    "annie/media/Media.ts",
+    // "annie/media/Media.ts",
     "annie/media/Sound.ts",
     // "annie/media/Video.ts",
     //"annie/media/ImageFrames.ts",
