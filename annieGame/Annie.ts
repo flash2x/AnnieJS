@@ -16,6 +16,7 @@ namespace annie {
      */
     export let version: string = "3.2.1";
     export let app:any=null;
+    export let isSharedCanvas:boolean=false;
     /**
      * 全局事件触发器
      * @static

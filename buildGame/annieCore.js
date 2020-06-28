@@ -5461,6 +5461,7 @@ var annie;
             s._scaleMode = scaleMode;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
+            s.mouseEvent = s._onMouseEvent.bind(s);
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
@@ -5471,10 +5472,31 @@ var annie;
                 //s.renderObj = new WebGLRender(s);
             }
             s.renderObj.init();
-            s.mouseEvent = s._onMouseEvent.bind(s);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.stage = s;
+            if (annie.isSharedCanvas) {
+                annie.globalDispatcher.addEventListener("onMainStageMsg", function (e) {
+                    switch (e.data.type) {
+                        case "canvasResize":
+                            s.resize();
+                            break;
+                        case annie.MouseEvent.CLICK:
+                        case annie.MouseEvent.MOUSE_MOVE:
+                        case annie.MouseEvent.MOUSE_UP:
+                        case annie.MouseEvent.MOUSE_DOWN:
+                        case annie.MouseEvent.MOUSE_OVER:
+                        case annie.MouseEvent.MOUSE_OUT:
+                            var event_1 = new annie.MouseEvent(e.data.type);
+                            event_1.reset(e.data.type, s);
+                            event_1.clientX = event_1.stageX = event_1.localX = e.data.x;
+                            event_1.clientY = event_1.stageY = event_1.localY = e.data.y;
+                            s.dispatchEvent(event_1);
+                            break;
+                        default:
+                    }
+                });
+            }
             return _this;
         }
         Object.defineProperty(Stage, "pause", {
@@ -5676,7 +5698,7 @@ var annie;
                     var points = void 0;
                     var item = s._mouseEventTypes[e.type];
                     var events = [];
-                    var event_1;
+                    var event_2;
                     //clientPoint
                     var cp = void 0;
                     //事件个数
@@ -5744,15 +5766,15 @@ var annie;
                             sd.y = y1;
                         }
                         if (s._ml[eLen] instanceof annie.MouseEvent) {
-                            event_1 = s._ml[eLen];
-                            event_1.type = item;
+                            event_2 = s._ml[eLen];
+                            event_2.type = item;
                         }
                         else {
-                            event_1 = new annie.MouseEvent(item);
-                            s._ml[eLen] = event_1;
+                            event_2 = new annie.MouseEvent(item);
+                            s._ml[eLen] = event_2;
                         }
-                        events[events.length] = event_1;
-                        s._initMouseEvent(event_1, cp, s.sp, identifier, e.timeStamp);
+                        events[events.length] = event_2;
+                        s._initMouseEvent(event_2, cp, s.sp, identifier, e.timeStamp);
                         eLen++;
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
@@ -5765,15 +5787,15 @@ var annie;
                                     //这个地方检查是所有显示对象列表里是否有添加对应的事件
                                     if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
                                         if (s._ml[eLen] instanceof annie.MouseEvent) {
-                                            event_1 = s._ml[eLen];
-                                            event_1.type = "onMouseClick";
+                                            event_2 = s._ml[eLen];
+                                            event_2.type = "onMouseClick";
                                         }
                                         else {
-                                            event_1 = new annie.MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event_1;
+                                            event_2 = new annie.MouseEvent("onMouseClick");
+                                            s._ml[eLen] = event_2;
                                         }
-                                        events[events.length] = event_1;
-                                        s._initMouseEvent(event_1, cp, s.sp, identifier);
+                                        events[events.length] = event_2;
+                                        s._initMouseEvent(event_2, cp, s.sp, identifier);
                                         eLen++;
                                     }
                                 }
@@ -6371,7 +6393,6 @@ var annie;
             var c = OffCanvasRender.rootContainer;
             c.width = width;
             c.height = height;
-            OffCanvasRender.context.setData({ offCanvasWidth: Math.ceil(width / annie.devicePixelRatio), offCanvasHeight: Math.ceil(height / annie.devicePixelRatio) });
         };
         OffCanvasRender.prototype.destroy = function () {
             OffCanvasRender.rootContainer = null;
@@ -6380,6 +6401,102 @@ var annie;
         return OffCanvasRender;
     }(annie.AObject));
     annie.OffCanvasRender = OffCanvasRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * 小游戏中开放子域在主域的显示容器,小程序中无此类
+     * @class annie.SharedCanvas
+     * @public
+     * @extends annie.AObject
+     * @since 1.0.0
+     */
+    var SharedCanvas = /** @class */ (function () {
+        function SharedCanvas() {
+        }
+        SharedCanvas.onMouseEvent = function (e) {
+            var s = SharedCanvas;
+            s.postMessage({
+                type: e.type,
+                data: {
+                    x: e.localX,
+                    y: e.localY
+                }
+            });
+        };
+        SharedCanvas.init = function (w, h) {
+            var s = SharedCanvas;
+            if (s.context)
+                return;
+            s.context = annie.app.getOpenDataContext();
+            s.postMessage({
+                type: "initSharedCanvasStage",
+            });
+            s.view = new annie.Bitmap(s.context.canvas);
+            s.view.addEventListener(annie.MouseEvent.CLICK, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER, s.onMouseEvent);
+            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent);
+            s.resize(w, h);
+        };
+        SharedCanvas.resize = function (w, h) {
+            var s = SharedCanvas;
+            s.postMessage({
+                type: "canvasResize",
+                data: {
+                    w: w,
+                    h: h,
+                }
+            });
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
+        };
+        SharedCanvas.destroy = function () {
+            //清除相应的数据引用
+            var s = SharedCanvas;
+            s.view.destroy();
+            s.context = null;
+        };
+        /**
+         * 向子域传消息
+         * @method postMessage
+         * @param data
+         * @public
+         */
+        SharedCanvas.postMessage = function (data) {
+            //呼叫数据显示端
+            var s = SharedCanvas;
+            s.context.postMessage(data);
+        };
+        /**
+         * 显示开放域
+         * @method show
+         * @since 2.0.1
+         */
+        SharedCanvas.show = function () {
+            var s = SharedCanvas;
+            s.context.postMessage({ event: "onShow" });
+            s.view.visible = true;
+        };
+        /**
+         * 隐藏开放域
+         * @method hide
+         * @since 2.0.1
+         */
+        SharedCanvas.hide = function () {
+            var s = SharedCanvas;
+            s.context.postMessage({ event: "onHide" });
+            s.view.visible = true;
+        };
+        SharedCanvas.view = null;
+        return SharedCanvas;
+    }());
+    annie.SharedCanvas = SharedCanvas;
 })(annie || (annie = {}));
 /**
  * Flash资源加载或者管理类，静态类，不可实例化
@@ -8125,6 +8242,7 @@ var annie;
      */
     annie.version = "3.2.1";
     annie.app = null;
+    annie.isSharedCanvas = false;
     /**
      * 全局事件触发器
      * @static

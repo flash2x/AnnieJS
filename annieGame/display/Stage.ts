@@ -254,6 +254,28 @@ namespace annie {
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.stage = s;
+            if(annie.isSharedCanvas){
+                annie.globalDispatcher.addEventListener("onMainStageMsg", function (e: any) {
+                    switch (e.data.type){
+                        case "canvasResize":
+                            s.resize();
+                            break;
+                        case annie.MouseEvent.CLICK:
+                        case annie.MouseEvent.MOUSE_MOVE:
+                        case annie.MouseEvent.MOUSE_UP:
+                        case annie.MouseEvent.MOUSE_DOWN:
+                        case annie.MouseEvent.MOUSE_OVER:
+                        case annie.MouseEvent.MOUSE_OUT:
+                            let event: MouseEvent = new MouseEvent(e.data.type);
+                            event.reset(e.data.type, s);
+                            event.clientX = event.stageX = event.localX = e.data.x;
+                            event.clientY = event.stageY = event.localY = e.data.y;
+                            s.dispatchEvent(event);
+                            break;
+                        default:
+                    }
+                });
+            }
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -354,11 +376,9 @@ namespace annie {
         private _mP1: Point = new Point();
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
-
         public static onAppTouchEvent(e: any) {
             Stage.stage.mouseEvent(e);
         }
-
         private mouseEvent: any = null;
         public static _dragDisplay: annie.DisplayObject = null;
         public static _dragBounds: annie.Rectangle = new annie.Rectangle();

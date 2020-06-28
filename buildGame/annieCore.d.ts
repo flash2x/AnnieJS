@@ -2927,6 +2927,45 @@ declare namespace annie {
     }
 }
 /**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * 小游戏中开放子域在主域的显示容器,小程序中无此类
+     * @class annie.SharedCanvas
+     * @public
+     * @extends annie.AObject
+     * @since 1.0.0
+     */
+    class SharedCanvas {
+        static context: any;
+        static view: annie.Bitmap;
+        private static onMouseEvent;
+        static init(w: number, h: number): void;
+        static resize(w: number, h: number): void;
+        static destroy(): void;
+        /**
+         * 向子域传消息
+         * @method postMessage
+         * @param data
+         * @public
+         */
+        static postMessage(data: any): void;
+        /**
+         * 显示开放域
+         * @method show
+         * @since 2.0.1
+         */
+        static show(): void;
+        /**
+         * 隐藏开放域
+         * @method hide
+         * @since 2.0.1
+         */
+        static hide(): void;
+    }
+}
+/**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
@@ -3584,6 +3623,7 @@ declare namespace annie {
      */
     let version: string;
     let app: any;
+    let isSharedCanvas: boolean;
     /**
      * 全局事件触发器
      * @static
