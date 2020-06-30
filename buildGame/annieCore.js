@@ -6018,9 +6018,11 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        //刷新所有定时器
         Stage.flushAll = function () {
-            setInterval(function () {
+            if (Stage._intervalID != -1) {
+                clearInterval(Stage._intervalID);
+            }
+            Stage._intervalID = setInterval(function () {
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
                     for (var i = len - 1; i >= 0; i--) {
@@ -6094,6 +6096,7 @@ var annie;
          * @type {Array}
          */
         Stage.allUpdateObjList = [];
+        Stage._intervalID = -1;
         return Stage;
     }(annie.Sprite));
     annie.Stage = Stage;

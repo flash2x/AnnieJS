@@ -751,10 +751,12 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
-
-        //刷新所有定时器
+        private static _intervalID:number=-1;
         private static flushAll(): void {
-            setInterval(function(){
+            if(Stage._intervalID!=-1){
+                clearInterval(Stage._intervalID);
+            }
+            Stage._intervalID=setInterval(function(){
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
                     for (let i = len - 1; i >= 0; i--) {
