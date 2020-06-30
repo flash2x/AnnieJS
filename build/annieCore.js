@@ -7293,13 +7293,14 @@ var annie;
         });
         //刷新所有定时器
         Stage.flushAll = function () {
-            if (!Stage._pause) {
-                var len = Stage.allUpdateObjList.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            setInterval(function () {
+                if (!Stage._pause) {
+                    var len = Stage.allUpdateObjList.length;
+                    for (var i = len - 1; i >= 0; i--) {
+                        Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                    }
                 }
-            }
-            requestAnimationFrame(Stage.flushAll);
+            }, 17);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
