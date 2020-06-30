@@ -1,1 +1,1 @@
-const annie =getApp().annie;
+module.exports=annieUI;

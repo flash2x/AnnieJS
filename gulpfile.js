@@ -155,8 +155,8 @@ var onBuildGameUI = function(){
     return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 var onBuildGameLast = function(){
-    gulp.src(["buildGame/add2.js","buildGame/annieUI.js","buildGame/add3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildGame"));
-    gulp.src(["buildGame/add2.js","buildGame/annieUI.min.js","buildGame/add3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildGame"));
+    gulp.src(["buildGame/annieUI.js","buildGame/add2.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildGame"));
+    gulp.src(["buildGame/annieUI.min.js","buildGame/add2.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildGame"));
     gulp.src(["buildGame/annieCore.js","buildGame/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildGame"));
     return gulp.src(["buildGame/annieCore.min.js","buildGame/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildGame"));
 };

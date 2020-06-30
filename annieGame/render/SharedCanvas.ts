@@ -9,7 +9,7 @@ namespace annie {
      * @extends annie.AObject
      * @since 1.0.0
      */
-    export class SharedCanvas {
+    export class SharedCanvas{
         public static context: any;
         public static view: annie.Bitmap = null;
         private static onMouseEvent(e:MouseEvent):void{
