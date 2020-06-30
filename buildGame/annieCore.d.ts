@@ -2610,9 +2610,7 @@ declare namespace annie {
          */
         scaleMode: string;
         private _scaleMode;
-        private _flush;
-        private _currentFlush;
-        private static _isLoadedVConsole;
+        private static _FPS;
         private _lastDpList;
         /**
          * 显示对象入口函数
@@ -2657,8 +2655,6 @@ declare namespace annie {
         private muliPoints;
         private _mP1;
         private _mP2;
-        static onAppTouchEvent(e: any): void;
-        private mouseEvent;
         static _dragDisplay: annie.DisplayObject;
         static _dragBounds: annie.Rectangle;
         static _lastDragPoint: annie.Point;
@@ -2989,6 +2985,14 @@ declare namespace annie {
      * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
      */
     let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
+    /**
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    function loadSubScene(subName: string, progressFun: Function, completeFun: Function): void;
     /**
      * 判断一个场景是否已经被加载
      * @method annie.isLoadedScene

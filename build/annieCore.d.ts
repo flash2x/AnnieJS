@@ -2610,9 +2610,7 @@ declare namespace annie {
          */
         scaleMode: string;
         private _scaleMode;
-        private _flush;
-        private _currentFlush;
-        private static _isLoadedVConsole;
+        private static _FPS;
         private _lastDpList;
         /**
          * 显示对象入口函数

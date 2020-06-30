@@ -5383,10 +5383,6 @@ var annie;
              */
             _this.bgColor = "";
             _this._scaleMode = "onScale";
-            //原始为60的刷新速度时的计数器
-            _this._flush = 0;
-            // 当前的刷新次数计数器
-            _this._currentFlush = 0;
             _this._lastDpList = {};
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
             _this._ml = [];
@@ -5402,7 +5398,11 @@ var annie;
                 touchstart: "onMouseDown",
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp",
-                touchcancel: "onMouseUp"
+                touchcancel: "onMouseUp",
+                ontouchstart: "onMouseDown",
+                ontouchmove: "onMouseMove",
+                ontouchend: "onMouseUp",
+                ontouchcancel: "onMouseUp"
             };
             //stageMousePoint
             _this.sp = new annie.Point();
@@ -5413,7 +5413,6 @@ var annie;
             _this._mP1 = new annie.Point();
             //当document有鼠标或触摸事件时调用
             _this._mP2 = new annie.Point();
-            _this.mouseEvent = null;
             /**
              * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
              * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
@@ -5462,25 +5461,11 @@ var annie;
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             s.mouseEvent = s._onMouseEvent.bind(s);
-            //webgl 直到对2d的支持非常成熟了再考虑开启
-            if (renderType == 0) {
-                //canvas
-                s.renderObj = new annie.CanvasRender(s);
-            }
-            else {
-                //webgl
-                //s.renderObj = new WebGLRender(s);
-            }
-            s.renderObj.init();
-            //同时添加到主更新循环中
-            Stage.addUpdateObj(s);
-            Stage.stage = s;
             if (annie.isSharedCanvas) {
+                annie.CanvasRender.rootContainer = annie.app.getSharedCanvas();
+                annie.OffCanvasRender.rootContainer = annie.app.createCanvas();
                 annie.globalDispatcher.addEventListener("onMainStageMsg", function (e) {
                     switch (e.data.type) {
-                        case "canvasResize":
-                            s.resize();
-                            break;
                         case annie.MouseEvent.CLICK:
                         case annie.MouseEvent.MOUSE_MOVE:
                         case annie.MouseEvent.MOUSE_UP:
@@ -5497,6 +5482,33 @@ var annie;
                     }
                 });
             }
+            else {
+                annie.app.onTouchStart(function (e) {
+                    s.mouseEvent(e);
+                });
+                annie.app.onTouchMove(function (e) {
+                    s.mouseEvent(e);
+                });
+                annie.app.onTouchEnd(function (e) {
+                    s.mouseEvent(e);
+                });
+                annie.app.onTouchCancel(function (e) {
+                    s.mouseEvent(e);
+                });
+            }
+            //webgl 直到对2d的支持非常成熟了再考虑开启
+            if (renderType == 0) {
+                //canvas
+                s.renderObj = new annie.CanvasRender(s);
+            }
+            else {
+                //webgl
+                //s.renderObj = new WebGLRender(s);
+            }
+            s.renderObj.init();
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
+            Stage.stage = s;
             return _this;
         }
         Object.defineProperty(Stage, "pause", {
@@ -5591,27 +5603,10 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             //看看是否有resize
-            if (s._flush == 0) {
-                s.resize();
-                s._onUpdateFrame(1);
-                s._updateMatrix();
-                s._render(s.renderObj);
-            }
-            else {
-                //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
-                if (s._currentFlush == 0) {
-                    s._currentFlush = s._flush;
-                    s.resize();
-                }
-                else {
-                    if (s._currentFlush == s._flush) {
-                        s._onUpdateFrame();
-                        s._updateMatrix();
-                        s._render(s.renderObj);
-                    }
-                    s._currentFlush--;
-                }
-            }
+            s.resize();
+            s._onUpdateFrame(1);
+            s._updateMatrix();
+            s._render(s.renderObj);
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -5622,11 +5617,7 @@ var annie;
          * @return {void}
          */
         Stage.prototype.setFrameRate = function (fps) {
-            var s = this;
-            s._flush = 60 / fps - 1 >> 0;
-            if (s._flush < 0) {
-                s._flush = 0;
-            }
+            Stage._FPS = fps;
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -5636,10 +5627,7 @@ var annie;
          * @return {number}
          */
         Stage.prototype.getFrameRate = function () {
-            return 60 / (this._flush + 1);
-        };
-        Stage.onAppTouchEvent = function (e) {
-            Stage.stage.mouseEvent(e);
+            return Stage._FPS;
         };
         Stage.prototype._onMouseEvent = function (e) {
             //检查是否有
@@ -6032,13 +6020,14 @@ var annie;
         });
         //刷新所有定时器
         Stage.flushAll = function () {
-            if (!Stage._pause) {
-                var len = Stage.allUpdateObjList.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            setInterval(function () {
+                if (!Stage._pause) {
+                    var len = Stage.allUpdateObjList.length;
+                    for (var i = len - 1; i >= 0; i--) {
+                        Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                    }
                 }
-            }
-            requestAnimationFrame(Stage.flushAll);
+            }, 1000 / Stage._FPS >> 0);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -6091,7 +6080,8 @@ var annie;
         };
         Stage._pause = false;
         Stage.stage = null;
-        Stage._isLoadedVConsole = false;
+        //原始为60的刷新速度时的计数器
+        Stage._FPS = 30;
         Stage._dragDisplay = null;
         Stage._dragBounds = new annie.Rectangle();
         Stage._lastDragPoint = new annie.Point();
@@ -6432,6 +6422,8 @@ var annie;
             if (s.context)
                 return;
             s.context = annie.app.getOpenDataContext();
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
             s.postMessage({
                 type: "initSharedCanvasStage",
             });
@@ -6442,19 +6434,18 @@ var annie;
             s.view.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent);
             s.view.addEventListener(annie.MouseEvent.MOUSE_OVER, s.onMouseEvent);
             s.view.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent);
-            s.resize(w, h);
         };
         SharedCanvas.resize = function (w, h) {
             var s = SharedCanvas;
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
             s.postMessage({
                 type: "canvasResize",
                 data: {
                     w: w,
-                    h: h,
+                    h: h
                 }
             });
-            s.context.canvas.width = w;
-            s.context.canvas.height = h;
         };
         SharedCanvas.destroy = function () {
             //清除相应的数据引用
@@ -6601,12 +6592,44 @@ var annie;
         _currentConfig = [];
         _loadConfig();
     };
+    /**
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    function loadSubScene(subName, progressFun, completeFun) {
+        if (isLoadedScene(subName)) {
+            completeFun({ status: 1, name: subName });
+        }
+        else {
+            //分包加载
+            var loadTask = annie.app.loadSubpackage({
+                name: subName,
+                success: function (res) {
+                    //分包加载成功后通过 success 回调
+                    completeFun({ status: 1, name: subName });
+                },
+                fail: function (res) {
+                    //分包加载失败通过 fail 回调
+                    completeFun({ status: 0, name: subName });
+                }
+            });
+            loadTask.onProgressUpdate(progressFun);
+        }
+    }
+    annie.loadSubScene = loadSubScene;
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig() {
-        if (_domain == "") {
+        if (_domain.indexOf("http") != 0) {
             //本地
-            var result = require("../resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
+            var sourceUrl = "../resource/";
+            if (_domain != "") {
+                sourceUrl = "../" + _domain + "/resource/";
+            }
+            var result = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
             _onCFGComplete(result);
         }
         else {
@@ -6716,7 +6739,7 @@ var annie;
     //检查所有资源是否全加载完成
     function _checkComplete() {
         _currentConfig[_loadIndex].shift();
-        if (_domain == "") {
+        if (_domain.indexOf("http") != 0) {
             //本地的进度条根据加个的总文件数才计算
             _loadedLoadRes++;
             _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -6737,10 +6760,14 @@ var annie;
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                _completeCallback(info);
+                if (_completeCallback) {
+                    _completeCallback(info);
+                }
             }
             else {
-                _completeCallback(info);
+                if (_completeCallback) {
+                    _completeCallback || _completeCallback(info);
+                }
                 _loadRes();
             }
         }
@@ -6752,9 +6779,13 @@ var annie;
         if (type != "javascript") {
             var loadContent = void 0;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                if (_domain == "") {
+                if (_domain.indexOf("http") != 0) {
                     //本地
-                    loadContent = require("../" + _currentConfig[_loadIndex][0].src);
+                    var sourceUrl = "../";
+                    if (_domain != "") {
+                        sourceUrl = "../" + _domain + "/";
+                    }
+                    loadContent = require(sourceUrl + _currentConfig[_loadIndex][0].src);
                 }
                 else {
                     loadContent = _currentConfig[_loadIndex][0].src;
@@ -6766,19 +6797,42 @@ var annie;
                 if (type == "image") {
                     //图片
                     loadContent = annie.app.createImage();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http") != 0) {
+                        var sourceUrl = "";
+                        if (_domain != "") {
+                            sourceUrl = _domain + "/";
+                        }
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                    }
+                    else {
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
                 else if (type == "sound") {
                     //声音
                     loadContent = annie.app.createInnerAudioContext();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http") != 0) {
+                        var sourceUrl = "";
+                        if (_domain != "") {
+                            sourceUrl = _domain + "/";
+                        }
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                    }
+                    else {
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
             }
         }
         else {
-            require("../" + _currentConfig[_loadIndex][0].src);
+            //本地
+            var sourceUrl = "../";
+            if (_domain != "") {
+                sourceUrl = "../" + _domain + "/";
+            }
+            require(sourceUrl + _currentConfig[_loadIndex][0].src);
         }
         _checkComplete();
     }
@@ -8360,3 +8414,4 @@ annie.Stage["addUpdateObj"](annie.Timer);
 
 annie.A2xExtend=__extends;
 module.exports=annie;
+GameGlobal.trace = console.log;

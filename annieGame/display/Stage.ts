@@ -207,10 +207,7 @@ namespace annie {
 
         private _scaleMode: string = "onScale";
         //原始为60的刷新速度时的计数器
-        private _flush: number = 0;
-        // 当前的刷新次数计数器
-        private _currentFlush: number = 0;
-        private static _isLoadedVConsole: boolean = false;
+        private static _FPS: number = 30;
         private _lastDpList: any = {};
 
         /**
@@ -242,24 +239,11 @@ namespace annie {
             s.anchorX = desW >> 1;
             s.anchorY = desH >> 1;
             s.mouseEvent = s._onMouseEvent.bind(s);
-            //webgl 直到对2d的支持非常成熟了再考虑开启
-            if (renderType == 0) {
-                //canvas
-                s.renderObj = new CanvasRender(s);
-            } else {
-                //webgl
-                //s.renderObj = new WebGLRender(s);
-            }
-            s.renderObj.init();
-            //同时添加到主更新循环中
-            Stage.addUpdateObj(s);
-            Stage.stage = s;
-            if(annie.isSharedCanvas){
+            if (annie.isSharedCanvas) {
+                annie.CanvasRender.rootContainer = annie.app.getSharedCanvas();
+                annie.OffCanvasRender.rootContainer = annie.app.createCanvas()
                 annie.globalDispatcher.addEventListener("onMainStageMsg", function (e: any) {
-                    switch (e.data.type){
-                        case "canvasResize":
-                            s.resize();
-                            break;
+                    switch (e.data.type) {
                         case annie.MouseEvent.CLICK:
                         case annie.MouseEvent.MOUSE_MOVE:
                         case annie.MouseEvent.MOUSE_UP:
@@ -275,7 +259,32 @@ namespace annie {
                         default:
                     }
                 });
+            } else {
+                annie.app.onTouchStart(function (e: any) {
+                    s.mouseEvent(e);
+                });
+                annie.app.onTouchMove(function (e: any) {
+                    s.mouseEvent(e);
+                });
+                annie.app.onTouchEnd(function (e: any) {
+                    s.mouseEvent(e);
+                });
+                annie.app.onTouchCancel(function (e: any) {
+                    s.mouseEvent(e);
+                });
             }
+            //webgl 直到对2d的支持非常成熟了再考虑开启
+            if (renderType == 0) {
+                //canvas
+                s.renderObj = new CanvasRender(s);
+            } else {
+                //webgl
+                //s.renderObj = new WebGLRender(s);
+            }
+            s.renderObj.init();
+            //同时添加到主更新循环中
+            Stage.addUpdateObj(s);
+            Stage.stage = s;
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -309,25 +318,10 @@ namespace annie {
         private flush(): void {
             let s = this;
             //看看是否有resize
-            if (s._flush == 0) {
-                s.resize();
-                s._onUpdateFrame(1);
-                s._updateMatrix();
-                s._render(s.renderObj);
-            } else {
-                //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
-                if (s._currentFlush == 0) {
-                    s._currentFlush = s._flush;
-                    s.resize();
-                } else {
-                    if (s._currentFlush == s._flush) {
-                        s._onUpdateFrame();
-                        s._updateMatrix();
-                        s._render(s.renderObj);
-                    }
-                    s._currentFlush--;
-                }
-            }
+            s.resize();
+            s._onUpdateFrame(1);
+            s._updateMatrix();
+            s._render(s.renderObj);
         }
 
         /**
@@ -339,11 +333,7 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
-            let s = this;
-            s._flush = 60 / fps - 1 >> 0;
-            if (s._flush < 0) {
-                s._flush = 0;
-            }
+            Stage._FPS = fps;
         }
 
         /**
@@ -354,7 +344,7 @@ namespace annie {
          * @return {number}
          */
         public getFrameRate(): number {
-            return 60 / (this._flush + 1);
+            return Stage._FPS;
         }
 
         //html的鼠标或单点触摸对应的引擎事件类型名
@@ -365,7 +355,11 @@ namespace annie {
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
-            touchcancel: "onMouseUp"
+            touchcancel: "onMouseUp",
+            ontouchstart: "onMouseDown",
+            ontouchmove: "onMouseMove",
+            ontouchend: "onMouseUp",
+            ontouchcancel: "onMouseUp"
         };
         //stageMousePoint
         private sp: Point = new annie.Point();
@@ -376,10 +370,6 @@ namespace annie {
         private _mP1: Point = new Point();
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
-        public static onAppTouchEvent(e: any) {
-            Stage.stage.mouseEvent(e);
-        }
-        private mouseEvent: any = null;
         public static _dragDisplay: annie.DisplayObject = null;
         public static _dragBounds: annie.Rectangle = new annie.Rectangle();
         public static _lastDragPoint: annie.Point = new annie.Point();
@@ -795,13 +785,14 @@ namespace annie {
 
         //刷新所有定时器
         private static flushAll(): void {
-            if (!Stage._pause) {
-                let len = Stage.allUpdateObjList.length;
-                for (let i = len - 1; i >= 0; i--) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            setInterval(function () {
+                if (!Stage._pause) {
+                    let len = Stage.allUpdateObjList.length;
+                    for (let i = len - 1; i >= 0; i--) {
+                        Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                    }
                 }
-            }
-            requestAnimationFrame(Stage.flushAll);
+            }, 1000 / Stage._FPS >> 0);
         }
 
         /**

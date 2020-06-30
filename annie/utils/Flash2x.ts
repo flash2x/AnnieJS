@@ -103,9 +103,13 @@ namespace annie {
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
-        if (_domain == "") {
+        if (_domain.indexOf("http")!=0) {
             //本地
-            let result: any = require("../resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
+            let sourceUrl = "../resource/";
+            if(_domain !=""){
+                sourceUrl = "../"+_domain+"/resource/";
+            }
+            let result: any = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
             _onCFGComplete(result)
         } else {
             let downloadTask:any =app.downloadFile({
@@ -249,9 +253,13 @@ namespace annie {
         if (type != "javascript") {
             let loadContent: any;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                if (_domain == "") {
+                if (_domain.indexOf("http")!=0) {
                     //本地
-                    loadContent = require("../"+_currentConfig[_loadIndex][0].src);
+                    let sourceUrl = "../";
+                    if(_domain !=""){
+                        sourceUrl = "../"+_domain+"/";
+                    }
+                    loadContent = require(sourceUrl+_currentConfig[_loadIndex][0].src);
                 }else{
                     loadContent=_currentConfig[_loadIndex][0].src;
                 }
@@ -261,13 +269,29 @@ namespace annie {
                 if (type == "image") {
                     //图片
                     loadContent = CanvasRender.rootContainer.createImage();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http")!=0){
+                        let sourceUrl = "";
+                        if(_domain !=""){
+                            sourceUrl = _domain+"/";
+                        }
+                        loadContent.src = sourceUrl+_currentConfig[_loadIndex][0].src;
+                    }else {
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
                 else if (type == "sound") {
                     //声音
                     loadContent = app.createInnerAudioContext();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http")!=0){
+                        let sourceUrl = "";
+                        if(_domain !=""){
+                            sourceUrl = _domain+"/";
+                        }
+                        loadContent.src = sourceUrl+_currentConfig[_loadIndex][0].src;
+                    }else{
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
             }

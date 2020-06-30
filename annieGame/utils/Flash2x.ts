@@ -100,12 +100,42 @@ namespace annie {
         _currentConfig = [];
         _loadConfig();
     };
+    /**
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     * @param {string} domain
+     */
+    export function loadSubScene(subName: string, progressFun: Function, completeFun: Function){
+        if(isLoadedScene(subName)){
+            completeFun({status: 1, name: subName});
+        }else {
+            //分包加载
+            let loadTask = annie.app.loadSubpackage({
+                name: subName,
+                success: function (res: any) {
+                    //分包加载成功后通过 success 回调
+                    completeFun({status: 1, name: subName});
+                },
+                fail: function (res: any) {
+                    //分包加载失败通过 fail 回调
+                    completeFun({status: 0, name: subName});
+                }
+            });
+            loadTask.onProgressUpdate(progressFun);
+        }
+    }
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
-        if (_domain == "") {
+        if (_domain.indexOf("http")!=0) {
             //本地
-            let result: any = require("../resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
+            let sourceUrl = "../resource/";
+            if(_domain !=""){
+                sourceUrl = "../"+_domain+"/resource/";
+            }
+            let result: any = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
             _onCFGComplete(result)
         } else {
             let downloadTask:any =app.downloadFile({
@@ -213,7 +243,7 @@ namespace annie {
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _currentConfig[_loadIndex].shift();
-        if(_domain=="") {
+        if(_domain.indexOf("http")!=0) {
             //本地的进度条根据加个的总文件数才计算
             _loadedLoadRes++;
             _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -233,10 +263,10 @@ namespace annie {
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                _completeCallback(info);
+                if(_completeCallback){_completeCallback(info);}
             }
             else {
-                _completeCallback(info);
+                if(_completeCallback){_completeCallback||_completeCallback(info);}
                 _loadRes();
             }
         }
@@ -249,9 +279,13 @@ namespace annie {
         if (type != "javascript") {
             let loadContent: any;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                if (_domain == "") {
+                if (_domain.indexOf("http")!=0) {
                     //本地
-                    loadContent = require("../"+_currentConfig[_loadIndex][0].src);
+                    let sourceUrl = "../";
+                    if(_domain !=""){
+                        sourceUrl = "../"+_domain+"/";
+                    }
+                    loadContent = require(sourceUrl+_currentConfig[_loadIndex][0].src);
                 }else{
                     loadContent=_currentConfig[_loadIndex][0].src;
                 }
@@ -261,18 +295,39 @@ namespace annie {
                 if (type == "image") {
                     //图片
                     loadContent = app.createImage();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http")!=0){
+                        let sourceUrl = "";
+                        if(_domain !=""){
+                            sourceUrl = _domain+"/";
+                        }
+                        loadContent.src = sourceUrl+_currentConfig[_loadIndex][0].src;
+                    }else {
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
                 else if (type == "sound") {
                     //声音
                     loadContent = app.createInnerAudioContext();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http")!=0){
+                        let sourceUrl = "";
+                        if(_domain !=""){
+                            sourceUrl = _domain+"/";
+                        }
+                        loadContent.src = sourceUrl+_currentConfig[_loadIndex][0].src;
+                    }else{
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
             }
         } else {
-           require("../"+_currentConfig[_loadIndex][0].src);
+            //本地
+            let sourceUrl = "../";
+            if(_domain !=""){
+                sourceUrl = "../"+_domain+"/";
+            }
+           require(sourceUrl+_currentConfig[_loadIndex][0].src);
         }
         _checkComplete();
     }

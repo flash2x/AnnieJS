@@ -26,6 +26,8 @@ namespace annie {
             let s:any = SharedCanvas;
             if (s.context) return;
             s.context = annie.app.getOpenDataContext();
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
             s.postMessage({
                 type: "initSharedCanvasStage",
             });
@@ -36,19 +38,18 @@ namespace annie {
             s.view.addEventListener(annie.MouseEvent.MOUSE_UP,s.onMouseEvent);
             s.view.addEventListener(annie.MouseEvent.MOUSE_OVER,s.onMouseEvent);
             s.view.addEventListener(annie.MouseEvent.MOUSE_OUT,s.onMouseEvent);
-            s.resize(w, h);
         }
         public static resize(w: number, h: number) {
             let s = SharedCanvas;
+            s.context.canvas.width = w;
+            s.context.canvas.height = h;
             s.postMessage({
                 type: "canvasResize",
                 data: {
                     w: w,
-                    h: h,
+                    h: h
                 }
             });
-            s.context.canvas.width = w;
-            s.context.canvas.height = h;
         }
         public static destroy(): void {
             //清除相应的数据引用

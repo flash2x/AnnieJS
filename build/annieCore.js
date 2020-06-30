@@ -5383,10 +5383,7 @@ var annie;
              */
             _this.bgColor = "";
             _this._scaleMode = "onScale";
-            //原始为60的刷新速度时的计数器
-            _this._flush = 0;
             // 当前的刷新次数计数器
-            _this._currentFlush = 0;
             _this._lastDpList = {};
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
             _this._ml = [];
@@ -5569,27 +5566,10 @@ var annie;
         Stage.prototype.flush = function () {
             var s = this;
             //看看是否有resize
-            if (s._flush == 0) {
-                s.resize();
-                s._onUpdateFrame(1);
-                s._updateMatrix();
-                s._render(s.renderObj);
-            }
-            else {
-                //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
-                if (s._currentFlush == 0) {
-                    s._currentFlush = s._flush;
-                    s.resize();
-                }
-                else {
-                    if (s._currentFlush == s._flush) {
-                        s._onUpdateFrame();
-                        s._updateMatrix();
-                        s._render(s.renderObj);
-                    }
-                    s._currentFlush--;
-                }
-            }
+            s.resize();
+            s._onUpdateFrame(1);
+            s._updateMatrix();
+            s._render(s.renderObj);
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -5600,11 +5580,7 @@ var annie;
          * @return {void}
          */
         Stage.prototype.setFrameRate = function (fps) {
-            var s = this;
-            s._flush = 60 / fps - 1 >> 0;
-            if (s._flush < 0) {
-                s._flush = 0;
-            }
+            Stage._FPS = fps;
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -5614,7 +5590,7 @@ var annie;
          * @return {number}
          */
         Stage.prototype.getFrameRate = function () {
-            return 60 / (this._flush + 1);
+            return Stage._FPS;
         };
         Stage.onAppTouchEvent = function (e) {
             Stage.stage.mouseEvent(e);
@@ -6010,13 +5986,14 @@ var annie;
         });
         //刷新所有定时器
         Stage.flushAll = function () {
-            if (!Stage._pause) {
-                var len = Stage.allUpdateObjList.length;
-                for (var i = len - 1; i >= 0; i--) {
-                    Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+            setInterval(function () {
+                if (!Stage._pause) {
+                    var len = Stage.allUpdateObjList.length;
+                    for (var i = len - 1; i >= 0; i--) {
+                        Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                    }
                 }
-            }
-            annie.CanvasRender.rootContainer.requestAnimationFrame(Stage.flushAll);
+            }, 1000 / Stage._FPS >> 0);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -6069,7 +6046,8 @@ var annie;
         };
         Stage._pause = false;
         Stage.stage = null;
-        Stage._isLoadedVConsole = false;
+        //原始为60的刷新速度时的计数器
+        Stage._FPS = 30;
         Stage._dragDisplay = null;
         Stage._dragBounds = new annie.Rectangle();
         Stage._lastDragPoint = new annie.Point();
@@ -6487,9 +6465,13 @@ var annie;
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig() {
-        if (_domain == "") {
+        if (_domain.indexOf("http") != 0) {
             //本地
-            var result = require("../resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
+            var sourceUrl = "../resource/";
+            if (_domain != "") {
+                sourceUrl = "../" + _domain + "/resource/";
+            }
+            var result = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
             _onCFGComplete(result);
         }
         else {
@@ -6635,9 +6617,13 @@ var annie;
         if (type != "javascript") {
             var loadContent = void 0;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                if (_domain == "") {
+                if (_domain.indexOf("http") != 0) {
                     //本地
-                    loadContent = require("../" + _currentConfig[_loadIndex][0].src);
+                    var sourceUrl = "../";
+                    if (_domain != "") {
+                        sourceUrl = "../" + _domain + "/";
+                    }
+                    loadContent = require(sourceUrl + _currentConfig[_loadIndex][0].src);
                 }
                 else {
                     loadContent = _currentConfig[_loadIndex][0].src;
@@ -6649,13 +6635,31 @@ var annie;
                 if (type == "image") {
                     //图片
                     loadContent = annie.CanvasRender.rootContainer.createImage();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http") != 0) {
+                        var sourceUrl = "";
+                        if (_domain != "") {
+                            sourceUrl = _domain + "/";
+                        }
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                    }
+                    else {
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
                 else if (type == "sound") {
                     //声音
                     loadContent = annie.app.createInnerAudioContext();
-                    loadContent.src = _currentConfig[_loadIndex][0].src;
+                    if (_domain.indexOf("http") != 0) {
+                        var sourceUrl = "";
+                        if (_domain != "") {
+                            sourceUrl = _domain + "/";
+                        }
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                    }
+                    else {
+                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                    }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
             }
