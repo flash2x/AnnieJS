@@ -8302,7 +8302,7 @@ var annie;
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    annie.version = "3.2.1";
+    annie.version = "3.2.2";
     annie.app = null;
     annie.isSharedCanvas = false;
     /**
