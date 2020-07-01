@@ -296,7 +296,11 @@ namespace annie {
                 }
             }
         } else {
-           require("../"+_currentConfig[_loadIndex][0].src);
+            let sourceUrl = "../";
+            if (_domain != "" && _domain.indexOf("http") != 0) {
+                sourceUrl = "../" + _domain + "/";
+            }
+            require(sourceUrl + _currentConfig[_loadIndex][0].src);
         }
         _checkComplete();
     }

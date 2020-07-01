@@ -6530,8 +6530,6 @@ var annie;
     var _progressCallback;
     // 当前加载的资源配置文件内容
     var _currentConfig;
-    //获取当前加载的时间当作随机数用
-    var _time = new Date().getTime();
     // 加载资源数和总资源数的比
     var _loadPer;
     //单个资源占总资源数的比
@@ -6837,7 +6835,7 @@ var annie;
         else {
             //本地
             var sourceUrl = "../";
-            if (_domain != "") {
+            if (_domain != "" && _domain.indexOf("http") != 0) {
                 sourceUrl = "../" + _domain + "/";
             }
             require(sourceUrl + _currentConfig[_loadIndex][0].src);

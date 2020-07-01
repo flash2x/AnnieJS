@@ -5,8 +5,8 @@
  */
 namespace annie {
     declare let require: any;
-    import Shape=annie.Shape;
-    import Bitmap=annie.Bitmap;
+    import Shape = annie.Shape;
+    import Bitmap = annie.Bitmap;
     //打包swf用
     export let _isReleased = false;
     export let suffixName = ".swf";
@@ -33,8 +33,6 @@ namespace annie {
     let _progressCallback: Function;
     // 当前加载的资源配置文件内容
     let _currentConfig: any;
-    //获取当前加载的时间当作随机数用
-    let _time: number = new Date().getTime();
     // 加载资源数和总资源数的比
     let _loadPer: number;
     //单个资源占总资源数的比
@@ -59,7 +57,7 @@ namespace annie {
         }
         _loadSceneNames = [];
         _domain = domain;
-        if (typeof(sceneName) == "string") {
+        if (typeof (sceneName) == "string") {
             if (!isLoadedScene(sceneName)) {
                 res[sceneName] = {};
                 _loadSceneNames.push(sceneName);
@@ -70,8 +68,7 @@ namespace annie {
                 info.sceneTotal = 1;
                 completeFun(info);
             }
-        }
-        else {
+        } else {
             let len = sceneName.length;
             let index = 0;
             for (let i = 0; i < len; i++) {
@@ -100,6 +97,7 @@ namespace annie {
         _currentConfig = [];
         _loadConfig();
     };
+
     /**
      * 加载分包场景的方法
      * @param sceneName 分包名字
@@ -107,10 +105,10 @@ namespace annie {
      * @param {Function} completeFun
      * @param {string} domain
      */
-    export function loadSubScene(subName: string, progressFun: Function, completeFun: Function){
-        if(isLoadedScene(subName)){
+    export function loadSubScene(subName: string, progressFun: Function, completeFun: Function) {
+        if (isLoadedScene(subName)) {
             completeFun({status: 1, name: subName});
-        }else {
+        } else {
             //分包加载
             let loadTask = annie.app.loadSubpackage({
                 name: subName,
@@ -126,43 +124,44 @@ namespace annie {
             loadTask.onProgressUpdate(progressFun);
         }
     }
+
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig(): void {
-        if (_domain.indexOf("http")!=0) {
+        if (_domain.indexOf("http") != 0) {
             //本地
             let sourceUrl = "../resource/";
-            if(_domain !=""){
-                sourceUrl = "../"+_domain+"/resource/";
+            if (_domain != "") {
+                sourceUrl = "../" + _domain + "/resource/";
             }
             let result: any = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
             _onCFGComplete(result)
         } else {
-            let downloadTask:any =app.downloadFile({
+            let downloadTask: any = app.downloadFile({
                 url: _domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json",
-                success (result:any) {
+                success(result: any) {
                     if (result.statusCode == 200) {
-                        let resultData:string =app.getFileSystemManager().readFileSync(result.tempFilePath,"utf8");
+                        let resultData: string = app.getFileSystemManager().readFileSync(result.tempFilePath, "utf8");
                         _onCFGComplete(JSON.parse(resultData));
                     }
                 }
             });
-            downloadTask.onProgressUpdate(function(res:any){
+            downloadTask.onProgressUpdate(function (res: any) {
                 //远程资源的进度条根据每个加载文件K数才计算
                 if (_progressCallback) {
-                    _progressCallback((res.progress+100*_loadIndex)/_loadSceneNames.length >> 0);
+                    _progressCallback((res.progress + 100 * _loadIndex) / _loadSceneNames.length >> 0);
                 }
             })
         }
     }
-    function _onCFGComplete(data: any){
+
+    function _onCFGComplete(data: any) {
         _currentConfig.push(data);
         _totalLoadRes += data.length;
         _loadIndex++;
         if (_loadSceneNames[_loadIndex]) {
             _loadConfig();
-        }
-        else {
+        } else {
             //所有配置文件加载完成,那就开始加载资源
             _loadIndex = 0;
             _loadSinglePer = 1 / _totalLoadRes;
@@ -243,7 +242,7 @@ namespace annie {
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _currentConfig[_loadIndex].shift();
-        if(_domain.indexOf("http")!=0) {
+        if (_domain.indexOf("http") != 0) {
             //本地的进度条根据加个的总文件数才计算
             _loadedLoadRes++;
             _loadPer = _loadedLoadRes / _totalLoadRes;
@@ -263,10 +262,13 @@ namespace annie {
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                if(_completeCallback){_completeCallback(info);}
-            }
-            else {
-                if(_completeCallback){_completeCallback||_completeCallback(info);}
+                if (_completeCallback) {
+                    _completeCallback(info);
+                }
+            } else {
+                if (_completeCallback) {
+                    _completeCallback || _completeCallback(info);
+                }
                 _loadRes();
             }
         }
@@ -279,15 +281,15 @@ namespace annie {
         if (type != "javascript") {
             let loadContent: any;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                if (_domain.indexOf("http")!=0) {
+                if (_domain.indexOf("http") != 0) {
                     //本地
                     let sourceUrl = "../";
-                    if(_domain !=""){
-                        sourceUrl = "../"+_domain+"/";
+                    if (_domain != "") {
+                        sourceUrl = "../" + _domain + "/";
                     }
-                    loadContent = require(sourceUrl+_currentConfig[_loadIndex][0].src);
-                }else{
-                    loadContent=_currentConfig[_loadIndex][0].src;
+                    loadContent = require(sourceUrl + _currentConfig[_loadIndex][0].src);
+                } else {
+                    loadContent = _currentConfig[_loadIndex][0].src;
                 }
                 res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 _parseContent(loadContent);
@@ -295,27 +297,26 @@ namespace annie {
                 if (type == "image") {
                     //图片
                     loadContent = app.createImage();
-                    if (_domain.indexOf("http")!=0){
+                    if (_domain.indexOf("http") != 0) {
                         let sourceUrl = "";
-                        if(_domain !=""){
-                            sourceUrl = _domain+"/";
+                        if (_domain != "") {
+                            sourceUrl = _domain + "/";
                         }
-                        loadContent.src = sourceUrl+_currentConfig[_loadIndex][0].src;
-                    }else {
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                    } else {
                         loadContent.src = _currentConfig[_loadIndex][0].src;
                     }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                }
-                else if (type == "sound") {
+                } else if (type == "sound") {
                     //声音
                     loadContent = app.createInnerAudioContext();
-                    if (_domain.indexOf("http")!=0){
+                    if (_domain.indexOf("http") != 0) {
                         let sourceUrl = "";
-                        if(_domain !=""){
-                            sourceUrl = _domain+"/";
+                        if (_domain != "") {
+                            sourceUrl = _domain + "/";
                         }
-                        loadContent.src = sourceUrl+_currentConfig[_loadIndex][0].src;
-                    }else{
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                    } else {
                         loadContent.src = _currentConfig[_loadIndex][0].src;
                     }
                     annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
@@ -324,10 +325,10 @@ namespace annie {
         } else {
             //本地
             let sourceUrl = "../";
-            if(_domain !=""){
-                sourceUrl = "../"+_domain+"/";
+            if (_domain != "" && _domain.indexOf("http") != 0) {
+                sourceUrl = "../" + _domain + "/";
             }
-           require(sourceUrl+_currentConfig[_loadIndex][0].src);
+            require(sourceUrl + _currentConfig[_loadIndex][0].src);
         }
         _checkComplete();
     }
@@ -381,6 +382,7 @@ namespace annie {
     export function getResource(sceneName: string, resName: string): any {
         return res[sceneName][resName];
     }
+
     /**
      * 新建一个已经加载到场景中的类生成的对象
      * @method annie.getDisplay
@@ -391,9 +393,10 @@ namespace annie {
      * @param {string} className
      * @return {any}
      */
-    export function getDisplay(sceneName:string,className:string):any {
+    export function getDisplay(sceneName: string, className: string): any {
         return new annie.classPool[sceneName][className]();
     }
+
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
@@ -672,8 +675,7 @@ namespace annie {
                         } else {
                             if (objType == 4) {
                                 obj = t(sceneName, children[i]);
-                            }
-                            else {
+                            } else {
                                 //displayObject
                                 if (children[i].indexOf("_$") == 0) {
                                     if (classRoot[children[i]].tf > 1) {
