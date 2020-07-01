@@ -5463,7 +5463,6 @@ var annie;
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.isSharedCanvas) {
                 annie.CanvasRender.rootContainer = annie.app.getSharedCanvas();
-                annie.OffCanvasRender.rootContainer = annie.app.createCanvas();
                 annie.globalDispatcher.addEventListener("onMainStageMsg", function (e) {
                     switch (e.data.type) {
                         case annie.MouseEvent.CLICK:
@@ -5483,6 +5482,11 @@ var annie;
                 });
             }
             else {
+                var sysInfo = annie.app.getSystemInfoSync();
+                var canvas_1 = annie.app.createCanvas();
+                canvas_1.width = sysInfo.windowWidth * sysInfo.pixelRatio;
+                canvas_1.height = sysInfo.windowHeight * sysInfo.pixelRatio;
+                annie.CanvasRender.rootContainer = canvas_1;
                 annie.app.onTouchStart(function (e) {
                     s.mouseEvent(e);
                 });
@@ -5496,6 +5500,7 @@ var annie;
                     s.mouseEvent(e);
                 });
             }
+            annie.OffCanvasRender.rootContainer = annie.app.createCanvas();
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
@@ -8416,5 +8421,8 @@ annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 
 annie.A2xExtend=__extends;
-module.exports=annie;
+annie.app=wx;
+GameGlobal.AnnieRoot=annie.classPool;
 GameGlobal.trace = console.log;
+GameGlobal.annie = annie;
+module.exports=annie;

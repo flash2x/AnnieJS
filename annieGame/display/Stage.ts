@@ -241,7 +241,6 @@ namespace annie {
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.isSharedCanvas) {
                 annie.CanvasRender.rootContainer = annie.app.getSharedCanvas();
-                annie.OffCanvasRender.rootContainer = annie.app.createCanvas()
                 annie.globalDispatcher.addEventListener("onMainStageMsg", function (e: any) {
                     switch (e.data.type) {
                         case annie.MouseEvent.CLICK:
@@ -260,6 +259,11 @@ namespace annie {
                     }
                 });
             } else {
+                let sysInfo = annie.app.getSystemInfoSync();
+                let canvas=annie.app.createCanvas();
+                canvas.width=sysInfo.windowWidth*sysInfo.pixelRatio;
+                canvas.height=sysInfo.windowHeight*sysInfo.pixelRatio;
+                annie.CanvasRender.rootContainer= canvas;
                 annie.app.onTouchStart(function (e: any) {
                     s.mouseEvent(e);
                 });
@@ -273,6 +277,7 @@ namespace annie {
                     s.mouseEvent(e);
                 });
             }
+            annie.OffCanvasRender.rootContainer= annie.app.createCanvas();
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas

@@ -2258,4 +2258,5 @@ var annieUI;
     annieUI.FlipBook = FlipBook;
 })(annieUI || (annieUI = {}));
 
+GameGlobal.annieUI = annieUI;
 module.exports=annieUI;
