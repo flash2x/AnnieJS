@@ -7126,6 +7126,9 @@ var annie;
                         }
                         s.draw(child);
                     }
+                    if (maskObj instanceof annie.DisplayObject) {
+                        s.endMask();
+                    }
                 }
                 ctx.restore();
             }
