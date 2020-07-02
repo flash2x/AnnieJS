@@ -2947,8 +2947,6 @@ declare namespace annie {
          */
         scaleMode: string;
         private _scaleMode;
-        private _flush;
-        private _currentFlush;
         private static _isLoadedVConsole;
         private _lastDpList;
         /**
@@ -3047,6 +3045,8 @@ declare namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList;
+        private static _FPS;
+        private static _intervalID;
         private static flushAll;
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。

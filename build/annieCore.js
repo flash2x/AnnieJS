@@ -6097,10 +6097,6 @@ var annie;
             _this.bgColor = "";
             _this._isFullScreen = true;
             _this._scaleMode = "onScale";
-            //原始为60的刷新速度时的计数器
-            _this._flush = 0;
-            // 当前的刷新次数计数器
-            _this._currentFlush = 0;
             _this._lastDpList = {};
             //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
             _this._ml = [];
@@ -6210,6 +6206,7 @@ var annie;
             rc.addEventListener('touchcancel', s.mouseEvent, false);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
+            Stage.flushAll();
             return _this;
         }
         Object.defineProperty(Stage, "pause", {
@@ -6303,28 +6300,10 @@ var annie;
         //循环刷新页面的函数
         Stage.prototype.flush = function () {
             var s = this;
-            //看看是否有resize
-            if (s._flush == 0) {
-                s.resize();
-                s._onUpdateFrame(1);
-                s._updateMatrix();
-                s._render(s.renderObj);
-            }
-            else {
-                //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
-                if (s._currentFlush == 0) {
-                    s._currentFlush = s._flush;
-                    s.resize();
-                }
-                else {
-                    if (s._currentFlush == s._flush) {
-                        s._onUpdateFrame();
-                        s._updateMatrix();
-                        s._render(s.renderObj);
-                    }
-                    s._currentFlush--;
-                }
-            }
+            s.resize();
+            s._onUpdateFrame(1);
+            s._updateMatrix();
+            s._render(s.renderObj);
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -6335,11 +6314,7 @@ var annie;
          * @return {void}
          */
         Stage.prototype.setFrameRate = function (fps) {
-            var s = this;
-            s._flush = 60 / fps - 1 >> 0;
-            if (s._flush < 0) {
-                s._flush = 0;
-            }
+            Stage._FPS = fps;
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -6349,7 +6324,7 @@ var annie;
          * @return {number}
          */
         Stage.prototype.getFrameRate = function () {
-            return 60 / (this._flush + 1);
+            return Stage._FPS;
         };
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -6788,16 +6763,18 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        //刷新所有定时器
         Stage.flushAll = function () {
-            setInterval(function () {
+            if (Stage._intervalID != -1) {
+                clearInterval(Stage._intervalID);
+            }
+            Stage._intervalID = setInterval(function () {
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
                     for (var i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            }, 17);
+            }, 1000 / Stage._FPS >> 0);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -6846,17 +6823,13 @@ var annie;
             var s = this;
             Stage.removeUpdateObj(s);
             var rc = s.rootDiv;
-            if (annie.osType != "pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            }
-            else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
-            }
+            rc.removeEventListener("touchstart", s.mouseEvent, false);
+            rc.removeEventListener('touchmove', s.mouseEvent, false);
+            rc.removeEventListener('touchend', s.mouseEvent, false);
+            rc.removeEventListener('touchcancel', s.mouseEvent, false);
+            rc.removeEventListener("mousedown", s.mouseEvent, false);
+            rc.removeEventListener('mousemove', s.mouseEvent, false);
+            rc.removeEventListener('mouseup', s.mouseEvent, false);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
@@ -6877,6 +6850,9 @@ var annie;
          * @type {Array}
          */
         Stage.allUpdateObjList = [];
+        //刷新所有定时器
+        Stage._FPS = 30;
+        Stage._intervalID = -1;
         return Stage;
     }(annie.Sprite));
     annie.Stage = Stage;

@@ -246,10 +246,6 @@ namespace annie {
         }
 
         private _scaleMode: string = "onScale";
-        //原始为60的刷新速度时的计数器
-        private _flush: number = 0;
-        // 当前的刷新次数计数器
-        private _currentFlush: number = 0;
         private static _isLoadedVConsole: boolean = false;
         private _lastDpList: any = {};
 
@@ -313,6 +309,7 @@ namespace annie {
             rc.addEventListener('touchcancel', s.mouseEvent, false);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
+            Stage.flushAll();
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -345,26 +342,12 @@ namespace annie {
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
-            //看看是否有resize
-            if (s._flush == 0) {
-                s.resize();
-                s._onUpdateFrame(1);
-                s._updateMatrix();
-                s._render(s.renderObj);
-            } else {
-                //将更新和渲染分放到两个不同的时间更新值来执行,这样可以减轻cpu同时执行的压力。
-                if (s._currentFlush == 0) {
-                    s._currentFlush = s._flush;
-                    s.resize();
-                } else {
-                    if (s._currentFlush == s._flush) {
-                        s._onUpdateFrame();
-                        s._updateMatrix();
-                        s._render(s.renderObj);
-                    }
-                    s._currentFlush--;
-                }
-            }
+
+            s.resize();
+            s._onUpdateFrame(1);
+            s._updateMatrix();
+            s._render(s.renderObj);
+
         }
 
         /**
@@ -376,11 +359,7 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
-            let s = this;
-            s._flush = 60 / fps - 1 >> 0;
-            if (s._flush < 0) {
-                s._flush = 0;
-            }
+            Stage._FPS=fps;
         }
 
         /**
@@ -391,7 +370,7 @@ namespace annie {
          * @return {number}
          */
         public getFrameRate(): number {
-            return 60 / (this._flush + 1);
+            return  Stage._FPS;
         }
 
         /**
@@ -874,16 +853,22 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
         //刷新所有定时器
+        private static _FPS:number=30;
+        private static _intervalID:number=-1;
         private static flushAll(): void {
-           setInterval(function () {
-               if (!Stage._pause) {
-                   let len = Stage.allUpdateObjList.length;
-                   for (let i = len - 1; i >= 0; i--) {
-                       Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
-                   }
-               }
-           },17)
+            if(Stage._intervalID!=-1){
+                clearInterval(Stage._intervalID);
+            }
+            Stage._intervalID=setInterval(function(){
+                if (!Stage._pause) {
+                    let len = Stage.allUpdateObjList.length;
+                    for (let i = len - 1; i >= 0; i--) {
+                        Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
+                    }
+                }
+            },1000/Stage._FPS>>0);
         }
+
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
          * 因为一但添加，这个对象的 flush 函数会以stage的fps间隔调用
@@ -933,16 +918,13 @@ namespace annie {
             let s = this;
             Stage.removeUpdateObj(s);
             let rc = s.rootDiv;
-            if (osType != "pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            } else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
-            }
+            rc.removeEventListener("touchstart", s.mouseEvent, false);
+            rc.removeEventListener('touchmove', s.mouseEvent, false);
+            rc.removeEventListener('touchend', s.mouseEvent, false);
+            rc.removeEventListener('touchcancel', s.mouseEvent, false);
+            rc.removeEventListener("mousedown", s.mouseEvent, false);
+            rc.removeEventListener('mousemove', s.mouseEvent, false);
+            rc.removeEventListener('mouseup', s.mouseEvent, false);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
