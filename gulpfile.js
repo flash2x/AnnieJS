@@ -91,8 +91,8 @@ var onBuildDoc = function(){
         return tsResult.js.pipe(gulp.dest(outDir));
 };
 var onBuildLast = function(){
-    gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));
-    return gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("build"));
+    gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCoreLite.js")).pipe(gulp.dest("build"));
+    return gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCoreLite.min.js")).pipe(gulp.dest("build"));
 };
 gulp.task('onBuildCore', onBuildCore);
 gulp.task('onBuildUI', onBuildUI);
