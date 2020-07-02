@@ -7326,17 +7326,13 @@ var annie;
             var s = this;
             Stage.removeUpdateObj(s);
             var rc = s.rootDiv;
-            if (annie.osType != "pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            }
-            else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
-            }
+            rc.removeEventListener("touchstart", s.mouseEvent, false);
+            rc.removeEventListener('touchmove', s.mouseEvent, false);
+            rc.removeEventListener('touchend', s.mouseEvent, false);
+            rc.removeEventListener('touchcancel', s.mouseEvent, false);
+            rc.removeEventListener("mousedown", s.mouseEvent, false);
+            rc.removeEventListener('mousemove', s.mouseEvent, false);
+            rc.removeEventListener('mouseup', s.mouseEvent, false);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
@@ -8359,7 +8355,9 @@ var annie;
             var s = this, ctx = s._ctx;
             ctx.save();
             ctx.globalAlpha = 0;
+            ctx.beginPath();
             s.drawMask(target);
+            ctx.closePath();
             ctx.clip();
         };
         OffCanvasRender.prototype.drawMask = function (target) {
@@ -8375,9 +8373,7 @@ var annie;
             }
             else {
                 var bounds = target._bounds;
-                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
-                ctx.closePath();
             }
         };
         /**

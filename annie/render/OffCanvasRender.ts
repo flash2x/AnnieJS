@@ -68,7 +68,9 @@ namespace annie {
             let s: any = this, ctx = s._ctx;
             ctx.save();
             ctx.globalAlpha = 0;
+            ctx.beginPath();
             s.drawMask(target);
+            ctx.closePath();
             ctx.clip();
         }
 
@@ -84,9 +86,7 @@ namespace annie {
             }
             else {
                 let bounds = target._bounds;
-                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
-                ctx.closePath();
             }
         }
 
