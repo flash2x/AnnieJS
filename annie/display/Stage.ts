@@ -918,16 +918,13 @@ namespace annie {
             let s = this;
             Stage.removeUpdateObj(s);
             let rc = s.rootDiv;
-            if (osType != "pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            } else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
-            }
+            rc.removeEventListener("touchstart", s.mouseEvent, false);
+            rc.removeEventListener('touchmove', s.mouseEvent, false);
+            rc.removeEventListener('touchend', s.mouseEvent, false);
+            rc.removeEventListener('touchcancel', s.mouseEvent, false);
+            rc.removeEventListener("mousedown", s.mouseEvent, false);
+            rc.removeEventListener('mousemove', s.mouseEvent, false);
+            rc.removeEventListener('mouseup', s.mouseEvent, false);
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
