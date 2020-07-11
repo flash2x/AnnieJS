@@ -7044,7 +7044,9 @@ var annie;
         OffCanvasRender.prototype.beginMask = function (target) {
             var s = this, ctx = OffCanvasRender._ctx;
             ctx.save();
+            ctx.beginPath();
             s.drawMask(target);
+            ctx.closePath();
             ctx.clip();
         };
         OffCanvasRender.prototype.drawMask = function (target) {
@@ -7060,9 +7062,7 @@ var annie;
             }
             else {
                 var bounds = target._bounds;
-                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
-                ctx.closePath();
             }
         };
         /**
@@ -7125,9 +7125,6 @@ var annie;
                             }
                         }
                         s.draw(child);
-                    }
-                    if (maskObj instanceof annie.DisplayObject) {
-                        s.endMask();
                     }
                 }
                 ctx.restore();
@@ -9648,6 +9645,7 @@ var annie;
             annie._dRender = new annie.OffCanvasRender();
             annie._dRender.init();
         }
+        obj._updateMatrix();
         if (rect == null) {
             rect = obj.getBounds();
         }
