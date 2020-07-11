@@ -8211,6 +8211,7 @@ var annie;
             _dRender = new annie.OffCanvasRender();
             _dRender.init();
         }
+        obj._updateMatrix();
         if (rect == null) {
             rect = obj.getBounds();
         }
