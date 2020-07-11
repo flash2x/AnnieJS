@@ -26,7 +26,6 @@ namespace annie {
          * @default null
          */
         public static _ctx: any;
-        public static context:any;
 
         /**
          * @method OffCanvasRender
@@ -62,7 +61,9 @@ namespace annie {
         public beginMask(target: any): void {
             let s: any = this, ctx = OffCanvasRender._ctx;
             ctx.save();
+            ctx.beginPath();
             s.drawMask(target);
+            ctx.closePath();
             ctx.clip();
         }
 
@@ -78,9 +79,7 @@ namespace annie {
             }
             else {
                 let bounds = target._bounds;
-                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
-                ctx.closePath();
             }
         }
 

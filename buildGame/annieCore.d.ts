@@ -2867,7 +2867,6 @@ declare namespace annie {
          * @default null
          */
         static _ctx: any;
-        static context: any;
         /**
          * @method OffCanvasRender
          * @public

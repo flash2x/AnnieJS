@@ -6245,7 +6245,9 @@ var annie;
         OffCanvasRender.prototype.beginMask = function (target) {
             var s = this, ctx = OffCanvasRender._ctx;
             ctx.save();
+            ctx.beginPath();
             s.drawMask(target);
+            ctx.closePath();
             ctx.clip();
         };
         OffCanvasRender.prototype.drawMask = function (target) {
@@ -6261,9 +6263,7 @@ var annie;
             }
             else {
                 var bounds = target._bounds;
-                ctx.beginPath();
                 ctx.rect(0, 0, bounds.width, bounds.height);
-                ctx.closePath();
             }
         };
         /**
