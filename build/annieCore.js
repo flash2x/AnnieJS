@@ -2813,7 +2813,6 @@ var annie;
             var s = this;
             var texture = s._bitmapData;
             if (!texture || texture.width == 0 || texture.height == 0) {
-                s._texture = null;
                 return;
             }
             var bw = texture.width;
@@ -5507,8 +5506,7 @@ var annie;
                 s.a2x_ua = false;
             }
         };
-        FloatDisplay.prototype._render = function (renderObj) {
-        };
+        FloatDisplay.prototype._render = function (renderObj) { };
         FloatDisplay.prototype.removeHtmlElement = function () {
             var s = this;
             var elem = s.htmlElement;
@@ -8395,7 +8393,7 @@ var annie;
         OffCanvasRender.prototype.draw = function (target) {
             var s = this;
             var texture = target._texture;
-            if (texture.width == 0 || texture.height == 0)
+            if (!texture || texture.width == 0 || texture.height == 0)
                 return;
             var ctx = s._ctx;
             var tm = target._ocMatrix;

@@ -160,9 +160,7 @@ namespace annie {
                 s.a2x_ua = false;
             }
         }
-        public _render(renderObj: IRender) {
-
-        }
+        public _render(renderObj: IRender) {}
         private removeHtmlElement():void{
             let s = this;
             let elem = s.htmlElement;

@@ -77,8 +77,7 @@ namespace annie {
             super._updateMatrix(isOffCanvas);
             let s: any = this;
             let texture: any = s._bitmapData;
-            if (!texture || texture.width == 0 || texture.height == 0) {
-                s._texture = null;
+            if (!texture || texture.width == 0 || texture.height == 0){
                 return;
             }
             let bw = texture.width;

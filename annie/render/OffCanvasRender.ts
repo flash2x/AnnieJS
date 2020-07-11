@@ -112,7 +112,7 @@ namespace annie {
         public draw(target: any): void {
             let s = this;
             let texture = target._texture;
-            if (texture.width == 0 || texture.height == 0) return;
+            if (!texture||texture.width == 0 || texture.height == 0) return;
             let ctx = s._ctx;
             let tm = target._ocMatrix;
             if (ctx.globalAlpha != target._ocAlpha) {
