@@ -2798,10 +2798,19 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s._bitmapData) {
+                if (typeof (value) == "string") {
+                    var img = new Image();
+                    img.src = value;
                     s.clearBounds();
-                    s._bitmapData = value;
-                    s._texture = value;
+                    s._bitmapData = img;
+                    s._texture = img;
+                }
+                else {
+                    if (value != s._bitmapData) {
+                        s.clearBounds();
+                        s._bitmapData = value;
+                        s._texture = value;
+                    }
                 }
             },
             enumerable: true,
