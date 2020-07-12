@@ -46,13 +46,7 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Bitmap";
-            if (typeof (bitmapData) == "string") {
-                let img = annie.CanvasRender.rootContainer.createImage();
-                img.src = bitmapData;
-                s.bitmapData = img;
-            } else {
-                s.bitmapData = bitmapData;
-            }
+            s.bitmapData = bitmapData;
         }
 
         // 缓存起来的纹理对象。最后真正送到渲染器去渲染的对象
@@ -73,12 +67,18 @@ namespace annie {
 
         public set bitmapData(value: any) {
             let s = this;
-            if (value != s._texture) {
+            if (typeof (value) == "string") {
+                let img = annie.CanvasRender.rootContainer.createImage();
+                img.src = value;
+                s._texture = img;
                 s.clearBounds();
-                s._texture = value;
+            } else {
+                if (value != s._texture) {
+                    s.clearBounds();
+                    s._texture = value;
+                }
             }
         }
-
         protected _updateMatrix(): void {
             super._updateMatrix();
             let s = this;

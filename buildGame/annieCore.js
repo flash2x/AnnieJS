@@ -2479,14 +2479,7 @@ var annie;
             _this._texture = null;
             var s = _this;
             s._instanceType = "annie.Bitmap";
-            if (typeof (bitmapData) == "string") {
-                var img = annie.CanvasRender.rootContainer.createImage();
-                img.src = bitmapData;
-                s.bitmapData = img;
-            }
-            else {
-                s.bitmapData = bitmapData;
-            }
+            s.bitmapData = bitmapData;
             return _this;
         }
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
@@ -2504,9 +2497,17 @@ var annie;
             },
             set: function (value) {
                 var s = this;
-                if (value != s._texture) {
+                if (typeof (value) == "string") {
+                    var img = annie.CanvasRender.rootContainer.createImage();
+                    img.src = value;
+                    s._texture = img;
                     s.clearBounds();
-                    s._texture = value;
+                }
+                else {
+                    if (value != s._texture) {
+                        s.clearBounds();
+                        s._texture = value;
+                    }
                 }
             },
             enumerable: true,
