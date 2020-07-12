@@ -2479,7 +2479,14 @@ var annie;
             _this._texture = null;
             var s = _this;
             s._instanceType = "annie.Bitmap";
-            s.bitmapData = bitmapData;
+            if (typeof (bitmapData) == "string") {
+                var img = annie.CanvasRender.rootContainer.createImage();
+                img.src = bitmapData;
+                s.bitmapData = img;
+            }
+            else {
+                s.bitmapData = bitmapData;
+            }
             return _this;
         }
         Object.defineProperty(Bitmap.prototype, "bitmapData", {
