@@ -2610,7 +2610,7 @@ declare namespace annie {
          */
         scaleMode: string;
         private _scaleMode;
-        private static _FPS;
+        static _FPS: number;
         private _lastDpList;
         /**
          * 显示对象入口函数

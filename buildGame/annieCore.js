@@ -7353,7 +7353,7 @@ var annie;
             }
             var s = this;
             s.currentFrame = 1;
-            var tTime = times * 60 >> 0;
+            var tTime = times * annie.Stage._FPS >> 0;
             s.totalFrames = tTime > 0 ? tTime : 1;
             s.target = target;
             s._isTo = isTo;
@@ -7390,7 +7390,7 @@ var annie;
                             s._delay = data[item];
                         }
                         else {
-                            s._delay = data[item] * 60 >> 0;
+                            s._delay = data[item] * annie.Stage._FPS >> 0;
                         }
                         break;
                     case "ease":
@@ -8130,7 +8130,7 @@ var annie;
             }
             var s = _this;
             s._delay = delay;
-            s._frameDelay = Math.ceil(delay * 0.06);
+            s._frameDelay = Math.ceil(delay * 0.001 * annie.Stage._FPS);
             s._repeatCount = repeatCount;
             Timer._timerList.push(s);
             return _this;
@@ -8197,7 +8197,7 @@ var annie;
             },
             set: function (value) {
                 this._delay = value;
-                this._frameDelay = Math.ceil(value * 0.001 * 60);
+                this._frameDelay = Math.ceil(value * 0.001 * annie.Stage._FPS);
             },
             enumerable: true,
             configurable: true

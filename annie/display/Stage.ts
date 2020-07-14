@@ -207,7 +207,7 @@ namespace annie {
 
         private _scaleMode: string = "onScale";
         //原始为60的刷新速度时的计数器
-        private  static _FPS: number = 30;
+        public  static _FPS: number = 30;
         // 当前的刷新次数计数器
         private _lastDpList: any = {};
 

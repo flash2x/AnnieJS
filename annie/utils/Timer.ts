@@ -44,7 +44,7 @@ namespace annie {
             }
             let s=this;
             s._delay=delay;
-            s._frameDelay=Math.ceil(delay*0.06);
+            s._frameDelay=Math.ceil(delay*0.001*Stage._FPS);
             s._repeatCount=repeatCount;
             Timer._timerList.push(s);
         }
@@ -107,7 +107,7 @@ namespace annie {
         }
         public set delay(value:number){
             this._delay=value;
-            this._frameDelay=Math.ceil(value*0.001*60);
+            this._frameDelay=Math.ceil(value*0.001*Stage._FPS);
         }
         private _delay:number=0;
         private _frameDelay:number=0;

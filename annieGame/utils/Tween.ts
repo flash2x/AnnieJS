@@ -64,7 +64,7 @@ namespace annie {
             }
             let s = this;
             s.currentFrame = 1;
-            let tTime: number = times * 60 >> 0;
+            let tTime: number = times * Stage._FPS >> 0;
             s.totalFrames = tTime > 0 ? tTime : 1;
             s.target = target;
             s._isTo = isTo;
@@ -98,7 +98,7 @@ namespace annie {
                         if (data.useFrame) {
                             s._delay = data[item];
                         } else {
-                            s._delay = data[item] * 60 >> 0;
+                            s._delay = data[item] * Stage._FPS >> 0;
                         }
                         break;
                     case "ease":
