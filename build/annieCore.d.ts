@@ -3209,7 +3209,7 @@ declare namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList;
-        private static _FPS;
+        static _FPS: number;
         private static _intervalID;
         private static flushAll;
         /**

@@ -853,7 +853,7 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
         //刷新所有定时器
-        private static _FPS:number=30;
+        public static _FPS:number=30;
         private static _intervalID:number=-1;
         private static flushAll(): void {
             if(Stage._intervalID!=-1){
