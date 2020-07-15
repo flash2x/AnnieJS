@@ -256,7 +256,7 @@ var annie;
             if (listeners instanceof Array) {
                 var len = listeners.length;
                 for (var i = len - 1; i >= 0; i--) {
-                    if (listeners[i] == listener) {
+                    if (listener == void 0 || listeners[i] == listener) {
                         listeners.splice(i, 1);
                         if (type.indexOf("onMouse") == 0) {
                             s._changeMouseCount(type, false);
@@ -6707,13 +6707,17 @@ var annie;
             s.renderObj.init(document.createElement('canvas'));
             var rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
-            rc.addEventListener("mousedown", s.mouseEvent, false);
-            rc.addEventListener('mousemove', s.mouseEvent, false);
-            rc.addEventListener('mouseup', s.mouseEvent, false);
-            rc.addEventListener("touchstart", s.mouseEvent, false);
-            rc.addEventListener('touchmove', s.mouseEvent, false);
-            rc.addEventListener('touchend', s.mouseEvent, false);
-            rc.addEventListener('touchcancel', s.mouseEvent, false);
+            if (annie.osType != "pc") {
+                rc.addEventListener("touchstart", s.mouseEvent, false);
+                rc.addEventListener('touchmove', s.mouseEvent, false);
+                rc.addEventListener('touchend', s.mouseEvent, false);
+                rc.addEventListener('touchcancel', s.mouseEvent, false);
+            }
+            else {
+                rc.addEventListener("mousedown", s.mouseEvent, false);
+                rc.addEventListener('mousemove', s.mouseEvent, false);
+                rc.addEventListener('mouseup', s.mouseEvent, false);
+            }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.flushAll();
@@ -7333,13 +7337,17 @@ var annie;
             var s = this;
             Stage.removeUpdateObj(s);
             var rc = s.rootDiv;
-            rc.removeEventListener("touchstart", s.mouseEvent, false);
-            rc.removeEventListener('touchmove', s.mouseEvent, false);
-            rc.removeEventListener('touchend', s.mouseEvent, false);
-            rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            rc.removeEventListener("mousedown", s.mouseEvent, false);
-            rc.removeEventListener('mousemove', s.mouseEvent, false);
-            rc.removeEventListener('mouseup', s.mouseEvent, false);
+            if (annie.osType != "pc") {
+                rc.removeEventListener("touchstart", s.mouseEvent, false);
+                rc.removeEventListener('touchmove', s.mouseEvent, false);
+                rc.removeEventListener('touchend', s.mouseEvent, false);
+                rc.removeEventListener('touchcancel', s.mouseEvent, false);
+            }
+            else {
+                rc.removeEventListener("mousedown", s.mouseEvent, false);
+                rc.removeEventListener('mousemove', s.mouseEvent, false);
+                rc.removeEventListener('mouseup', s.mouseEvent, false);
+            }
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
