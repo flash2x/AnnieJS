@@ -300,13 +300,16 @@ namespace annie {
             s.renderObj.init(document.createElement('canvas'));
             let rc = div;
             s.mouseEvent = s._onMouseEvent.bind(s);
-            rc.addEventListener("mousedown", s.mouseEvent, false);
-            rc.addEventListener('mousemove', s.mouseEvent, false);
-            rc.addEventListener('mouseup', s.mouseEvent, false);
-            rc.addEventListener("touchstart", s.mouseEvent, false);
-            rc.addEventListener('touchmove', s.mouseEvent, false);
-            rc.addEventListener('touchend', s.mouseEvent, false);
-            rc.addEventListener('touchcancel', s.mouseEvent, false);
+            if (osType != "pc") {
+                rc.addEventListener("touchstart", s.mouseEvent, false);
+                rc.addEventListener('touchmove', s.mouseEvent, false);
+                rc.addEventListener('touchend', s.mouseEvent, false);
+                rc.addEventListener('touchcancel', s.mouseEvent, false);
+            } else {
+                rc.addEventListener("mousedown", s.mouseEvent, false);
+                rc.addEventListener('mousemove', s.mouseEvent, false);
+                rc.addEventListener('mouseup', s.mouseEvent, false);
+            }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.flushAll();
@@ -359,7 +362,7 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
-            Stage._FPS=fps;
+            Stage._FPS = fps;
         }
 
         /**
@@ -370,7 +373,7 @@ namespace annie {
          * @return {number}
          */
         public getFrameRate(): number {
-            return  Stage._FPS;
+            return Stage._FPS;
         }
 
         /**
@@ -853,20 +856,21 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
         //刷新所有定时器
-        private static _FPS:number=30;
-        private static _intervalID:number=-1;
+        private static _FPS: number = 30;
+        private static _intervalID: number = -1;
+
         private static flushAll(): void {
-            if(Stage._intervalID!=-1){
+            if (Stage._intervalID != -1) {
                 clearInterval(Stage._intervalID);
             }
-            Stage._intervalID=setInterval(function(){
+            Stage._intervalID = setInterval(function () {
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
                     for (let i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            },1000/Stage._FPS>>0);
+            }, 1000 / Stage._FPS >> 0);
         }
 
         /**
@@ -918,13 +922,16 @@ namespace annie {
             let s = this;
             Stage.removeUpdateObj(s);
             let rc = s.rootDiv;
-            rc.removeEventListener("touchstart", s.mouseEvent, false);
-            rc.removeEventListener('touchmove', s.mouseEvent, false);
-            rc.removeEventListener('touchend', s.mouseEvent, false);
-            rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            rc.removeEventListener("mousedown", s.mouseEvent, false);
-            rc.removeEventListener('mousemove', s.mouseEvent, false);
-            rc.removeEventListener('mouseup', s.mouseEvent, false);
+            if (osType != "pc") {
+                rc.removeEventListener("touchstart", s.mouseEvent, false);
+                rc.removeEventListener('touchmove', s.mouseEvent, false);
+                rc.removeEventListener('touchend', s.mouseEvent, false);
+                rc.removeEventListener('touchcancel', s.mouseEvent, false);
+            }else {
+                rc.removeEventListener("mousedown", s.mouseEvent, false);
+                rc.removeEventListener('mousemove', s.mouseEvent, false);
+                rc.removeEventListener('mouseup', s.mouseEvent, false);
+            }
             rc.style.display = "none";
             if (rc.parentNode) {
                 rc.parentNode.removeChild(rc);
