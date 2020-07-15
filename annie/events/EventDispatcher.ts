@@ -234,7 +234,7 @@ namespace annie {
             if (listeners instanceof Array) {
                 let len = listeners.length;
                 for (let i = len - 1; i >= 0; i--) {
-                    if (listeners[i] == listener) {
+                    if (listener==void 0||listeners[i] == listener) {
                         listeners.splice(i, 1);
                         if (type.indexOf("onMouse") == 0) {
                             s._changeMouseCount(type, false);
