@@ -86,12 +86,14 @@ namespace annie {
                         }
                         break;
                     case "yoyo":
-                        if (data[item] == false) {
-                            s._isLoop = 0;
-                        } else if (data[item] == true) {
-                            s._isLoop = Number.MAX_VALUE;
-                        } else {
+                        if (typeof (data[item]) == "number") {
                             s._isLoop = data[item];
+                        } else {
+                            if (data[item] == false) {
+                                s._isLoop = 0;
+                            } else if (data[item] == true) {
+                                s._isLoop = Number.MAX_VALUE;
+                            }
                         }
                         break;
                     case "delay":
