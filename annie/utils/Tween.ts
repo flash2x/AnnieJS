@@ -12,12 +12,13 @@ namespace annie {
         public constructor() {
             super();
         }
+
         /**
          * 是否暂停，默认false
          * @property pause
          * @type {boolean}
          */
-        public pause:boolean=false;
+        public pause: boolean = false;
         /**
          * 当前帧
          * @property currentFrame
@@ -47,6 +48,7 @@ namespace annie {
         private _isFront: boolean = true;
         private _cParams: any = null;
         private _loop: boolean = false;
+
         /**
          * 初始化数据
          * @method init
@@ -58,8 +60,8 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public init(target: any, times: number, data: any, isTo: boolean = true,isPlay:boolean=true): void {
-            if (times <= 0 || typeof(times) != "number") {
+        public init(target: any, times: number, data: any, isTo: boolean = true, isPlay: boolean = true): void {
+            if (times <= 0 || typeof (times) != "number") {
                 throw new Error("annie.Tween.to()或者annie.Tween.from()方法的第二个参数一定要是大于0的数字");
             }
             let s = this;
@@ -86,12 +88,14 @@ namespace annie {
                         }
                         break;
                     case "yoyo":
-                        if (data[item] == false) {
-                            s._isLoop = 0;
-                        } else if (data[item] == true) {
-                            s._isLoop = Number.MAX_VALUE;
-                        } else {
+                        if (typeof (data[item]) == "number") {
                             s._isLoop = data[item];
+                        } else {
+                            if (data[item] == false) {
+                                s._isLoop = 0;
+                            } else if (data[item] == true) {
+                                s._isLoop = Number.MAX_VALUE;
+                            }
                         }
                         break;
                     case "delay":
@@ -117,7 +121,7 @@ namespace annie {
                         s._loop = data[item];
                         break;
                     default :
-                        if (typeof(data[item]) == "number") {
+                        if (typeof (data[item]) == "number") {
                             if (isTo) {
                                 s._startData[item] = target[item];
                                 s._disData[item] = data[item] - target[item];
@@ -130,6 +134,7 @@ namespace annie {
                 }
             }
         }
+
         /**
          * 更新数据
          * @method update
@@ -138,7 +143,7 @@ namespace annie {
          */
         public update(): void {
             let s = this;
-            if(s.pause)return;
+            if (s.pause) return;
             if (s._isFront && s._delay > 0) {
                 s._delay--;
                 return;
@@ -171,7 +176,7 @@ namespace annie {
                         s.currentFrame = 1;
                     } else {
                         if (cf) {
-                            cf(pm,s._isLoop==0);
+                            cf(pm, s._isLoop == 0);
                         }
                         if (s._isLoop > 0) {
                             s._isFront = false;
@@ -186,7 +191,7 @@ namespace annie {
                 s.currentFrame--;
                 if (s.currentFrame < 0) {
                     if (cf) {
-                        cf(pm,s._isLoop==0);
+                        cf(pm, s._isLoop == 0);
                     }
                     if (s._isLoop > 0) {
                         s._isFront = true;
@@ -254,10 +259,11 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public static from(target: any, totalFrame: number, data: Object): number{
+        public static from(target: any, totalFrame: number, data: Object): number {
             return Tween.createTween(target, totalFrame, data, false);
         }
-        public static createTween(target: any, totalFrame: number, data: any, isTo: boolean,isPlay:boolean=true): number {
+
+        public static createTween(target: any, totalFrame: number, data: any, isTo: boolean, isPlay: boolean = true): number {
             let tweenObj: Tween | any;
             let len = Tween._tweenList.length;
             for (let i = 0; i < len; i++) {
@@ -280,7 +286,7 @@ namespace annie {
                 tweenObj = new TweenObj();
             }
             Tween._tweenList.push(tweenObj);
-            tweenObj.init(target, totalFrame, data, isTo,isPlay);
+            tweenObj.init(target, totalFrame, data, isTo, isPlay);
             return tweenObj.instanceId;
         }
 
@@ -829,6 +835,7 @@ namespace annie {
             }
             return Tween.bounceOut(k * 2 - 1) * 0.5 + 0.5;
         }
+
         //这里之所有要独立运行,是因为可能存在多个stage，不能把这个跟其中任何一个stage放在一起update
         private static flush(): void {
             let len: number = Tween._tweenList.length;
