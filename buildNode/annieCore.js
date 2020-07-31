@@ -91,21 +91,6 @@ var annie;
             _this._instanceType = "annie.EventDispatcher";
             return _this;
         }
-        //看看有多少mouse或者touch侦听数
-        EventDispatcher.getMouseEventCount = function (type) {
-            if (type === void 0) { type = ""; }
-            var count = 0;
-            if (type == "") {
-                //返回所有鼠标事件数
-                count = EventDispatcher._totalMEC;
-            }
-            else {
-                if (EventDispatcher._MECO[type]) {
-                    count = EventDispatcher._MECO[type];
-                }
-            }
-            return count;
-        };
         /**
          * 给对象添加一个侦听
          * @method addEventListener
@@ -136,22 +121,7 @@ var annie;
             }
             if (eventTypes[type].indexOf(listener) < 0) {
                 eventTypes[type].unshift(listener);
-                if (type.indexOf("onMouse") == 0) {
-                    s._changeMouseCount(type, true);
-                }
             }
-        };
-        //增加或删除相应mouse或touch侦听记数
-        EventDispatcher.prototype._changeMouseCount = function (type, isAdd) {
-            var count = isAdd ? 1 : -1;
-            if (!EventDispatcher._MECO[type]) {
-                EventDispatcher._MECO[type] = 0;
-            }
-            EventDispatcher._MECO[type] += count;
-            if (EventDispatcher._MECO[type] < 0) {
-                EventDispatcher._MECO[type] = 0;
-            }
-            EventDispatcher._totalMEC += count;
         };
         /**
          * 广播侦听
@@ -258,9 +228,6 @@ var annie;
                 for (var i = len - 1; i >= 0; i--) {
                     if (listener == void 0 || listeners[i] == listener) {
                         listeners.splice(i, 1);
-                        if (type.indexOf("onMouse") == 0) {
-                            s._changeMouseCount(type, false);
-                        }
                     }
                 }
             }
@@ -274,20 +241,6 @@ var annie;
          */
         EventDispatcher.prototype.removeAllEventListener = function () {
             var s = this;
-            for (var type in s.eventTypes) {
-                if (type.indexOf("onMouse") == 0) {
-                    for (var j = 0; j < s.eventTypes[type].length; j++) {
-                        s._changeMouseCount(type, false);
-                    }
-                }
-            }
-            for (var type in s.eventTypes1) {
-                if (type.indexOf("onMouse") == 0) {
-                    for (var j = 0; j < s.eventTypes1[type].length; j++) {
-                        s._changeMouseCount(type, false);
-                    }
-                }
-            }
             s.eventTypes1 = {};
             s.eventTypes = {};
         };
@@ -637,261 +590,6 @@ var annie;
         return Event;
     }(annie.AObject));
     annie.Event = Event;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 鼠标事件类,电脑端鼠标,移动设备端的触摸都使用此事件来监听
-     * @class annie.MouseEvent
-     * @extends annie.Event
-     * @public
-     * @since 1.0.0
-     */
-    var MouseEvent = /** @class */ (function (_super) {
-        __extends(MouseEvent, _super);
-        /**
-         * @method MouseEvent
-         * @public
-         * @since 1.0.0
-         * @param {string} type
-         */
-        function MouseEvent(type) {
-            var _this = _super.call(this, type) || this;
-            /**
-             * mouse或touch事件时rootDiv坐标x点
-             * @property clientX
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.clientX = 0;
-            /**
-             * mouse或touch事件时rootDiv坐标y点
-             * @property clientY
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.clientY = 0;
-            /**
-             * mouse或touch事件时全局坐标x点
-             * @property stageX
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.stageX = 0;
-            /**
-             * mouse或touch事件时全局坐标y点
-             * @property stageY
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.stageY = 0;
-            /**
-             * mouse或touch事件时本地坐标x点
-             * @property localX
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.localX = 0;
-            /**
-             * mouse或touch事件时本地坐标y点
-             * @property localY
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             */
-            _this.localY = 0;
-            /**
-             * 绑定此事件的侦听对象
-             * @property currentTarget
-             * @public
-             * @since 1.0.0
-             * @type{annie.DisplayObject}
-             * @default null
-             */
-            _this.currentTarget = null;
-            /**
-             * 触摸或者鼠标事件的手指唯一标识
-             * @property identifier
-             * @type {number}
-             * @since 1.1.2
-             * @public
-             */
-            _this.identifier = 0;
-            /**
-             * 当前时间戳
-             * @property timeStamp
-             * @type {number}
-             */
-            _this.timeStamp = 0;
-            _this._instanceType = "annie.MouseEvent";
-            return _this;
-        }
-        /**
-         * 事件后立即更新显示列表状态
-         * @method updateAfterEvent
-         * @since 1.0.9
-         * @public
-         * @return {void}
-         */
-        MouseEvent.prototype.updateAfterEvent = function () {
-            this.target.stage._updateMatrix();
-        };
-        MouseEvent.prototype.destroy = function () {
-            //清除相应的数据引用
-            var s = this;
-            s.currentTarget = null;
-            _super.prototype.destroy.call(this);
-        };
-        /**
-         * annie.DisplayObject鼠标或者手指按下事件
-         * @property MOUSE_DOWN
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_DOWN = "onMouseDown";
-        /**
-         * annie.DisplayObject鼠标或者手指抬起事件
-         * @property MOUSE_UP
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_UP = "onMouseUp";
-        /**
-         * annie.DisplayObject鼠标或者手指单击
-         * @property CLICK
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.CLICK = "onMouseClick";
-        /**
-         * annie.DisplayObject鼠标或者手指移动事件
-         * @property MOUSE_MOVE
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_MOVE = "onMouseMove";
-        /**
-         * annie.DisplayObject鼠标或者手指移入到显示对象上里触发的事件
-         * @property MOUSE_OVER
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_OVER = "onMouseOver";
-        /**
-         * annie.DisplayObject鼠标或者手指移出显示对象边界触发的事件
-         * @property MOUSE_OUT
-         * @static
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        MouseEvent.MOUSE_OUT = "onMouseOut";
-        return MouseEvent;
-    }(annie.Event));
-    annie.MouseEvent = MouseEvent;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 多点触碰事件。单点事件请使用mouseEvent,pc和mobile通用
-     * @class annie.TouchEvent
-     * @extends annie.Event
-     */
-    var TouchEvent = /** @class */ (function (_super) {
-        __extends(TouchEvent, _super);
-        /**
-         * @method TouchEvent
-         * @public
-         * @since 1.0.3
-         * @param {string} type
-         */
-        function TouchEvent(type) {
-            var _this = _super.call(this, type) || this;
-            /**
-             * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第1个点。
-             * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
-             * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
-             * @property clientPoint1
-             * @public
-             * @since 1.0.3
-             * @type {annie.Point}
-             */
-            _this.clientPoint1 = new annie.Point();
-            /**
-             * 多点事件中点的信息,两个手指的点的在Canvas中的信息，第2个点。
-             * 此点坐标不是显示对象中的点坐标，是原始的canvas中的点坐标。
-             * 如果需要获取显示对象中此点对应的位置，包括stage在内，请用对象的getGlobalToLocal方法转换。
-             * @property clientPoint2
-             * @public
-             * @since 1.0.3
-             * @type {annie.Point}
-             */
-            _this.clientPoint2 = new annie.Point();
-            /**
-             * 相对于上一次的缩放值
-             * @property scale
-             * @since 1.0.3
-             */
-            _this.scale = 0;
-            /**
-             * 相对于上一次的旋转值
-             * @property rotate
-             * @since 1.0.3
-             */
-            _this.rotate = 0;
-            _this._instanceType = "annie.TouchEvent";
-            return _this;
-        }
-        /**
-         * 事件后立即更新显示列表状态
-         * @method updateAfterEvent
-         * @since 1.0.9
-         * @public
-         * @return {void}
-         */
-        TouchEvent.prototype.updateAfterEvent = function () {
-            this.target._updateMatrix();
-        };
-        TouchEvent.prototype.destroy = function () {
-            //清除相应的数据引用
-            var s = this;
-            s.clientPoint1 = null;
-            s.clientPoint2 = null;
-            _super.prototype.destroy.call(this);
-        };
-        /**
-         * annie.Stage 的多点触碰事件。这个事件只能在annie.Stage对象上侦听
-         * @property ON_MULTI_TOUCH
-         * @static
-         * @public
-         * @since 1.0.3
-         * @type {string}
-         */
-        TouchEvent.ON_MULTI_TOUCH = "onMultiTouch";
-        return TouchEvent;
-    }(annie.Event));
-    annie.TouchEvent = TouchEvent;
 })(annie || (annie = {}));
 /**
  * @module annie
@@ -1669,15 +1367,6 @@ var annie;
             _this._hitArea = null;
             _this._bounds = new annie.Rectangle();
             _this.isNeedDraw = false;
-            /**
-             * 当前对象包含的声音列表
-             * @property soundList
-             * @public
-             * @since 2.0.0
-             * @type {Array}
-             * @default []
-             */
-            _this.soundList = [];
             //每个Flash文件生成的对象都有一个自带的初始化信息
             _this._a2x_res_obj = {};
             //这里为什么要用undefined呢，这样可以知道一个对象是否从未添加到舞台过
@@ -2216,21 +1905,6 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        /**
-         * 停止这个显示对象上的所有声音
-         * @method stopAllSounds
-         * @public
-         * @since 2.0.0
-         * @return {void}
-         */
-        DisplayObject.prototype.stopAllSounds = function () {
-            var sounds = this.soundList;
-            if (sounds instanceof Array) {
-                for (var i = sounds.length - 1; i >= 0; i--) {
-                    sounds[i].stop();
-                }
-            }
-        };
         DisplayObject.prototype._checkDrawBounds = function () {
             var s = this;
             //检查所有bounds矩阵是否在可视范围里
@@ -2240,81 +1914,8 @@ var annie;
                 s.isNeedDraw = annie.Rectangle.testRectCross(dtr, s.stage.renderObj.viewPort);
             }
         };
-        /**
-         * @method getSound
-         * @param {number|string} id
-         * @return {Array} 这个对象里所有叫这个名字的声音引用数组
-         * @since 2.0.0
-         */
-        DisplayObject.prototype.getSound = function (id) {
-            var sounds = this.soundList, newSounds = [];
-            if (sounds instanceof Array) {
-                if (typeof (id) == "string") {
-                    for (var i = sounds.length - 1; i >= 0; i--) {
-                        if (sounds[i].name == id) {
-                            //这里是全部找出来
-                            newSounds.push(sounds[i]);
-                        }
-                    }
-                }
-                else {
-                    if (id >= 0 && id < sounds.length) {
-                        newSounds.push(sounds[id]);
-                    }
-                }
-            }
-            return newSounds;
-        };
-        /**
-         * 返回一个id，这个id你要留着作为删除他时使用。
-         * 这个声音会根据这个显示对象添加到舞台时播放，移出舞台而关闭
-         * @method addSound
-         * @param {annie.Sound} sound
-         * @return {void}
-         * @since 2.0.0
-         * @public
-         */
-        DisplayObject.prototype.addSound = function (sound) {
-            var s = this;
-            if (!(s.soundList instanceof Array)) {
-                s.soundList = [];
-            }
-            s.soundList.push(sound);
-        };
-        /**
-         * 删除一个已经添加进来的声音
-         * @method removeSound
-         * @public
-         * @since 2.0.0
-         * @param {number|string} id
-         * @return {void}
-         */
-        DisplayObject.prototype.removeSound = function (id) {
-            var sounds = this.soundList;
-            if (sounds instanceof Array) {
-                if (typeof (id) == "string") {
-                    for (var i = sounds.length - 1; i >= 0; i--) {
-                        //这里是全部找出来
-                        if (sounds[i].name == id) {
-                            sounds.splice(i, 1);
-                        }
-                    }
-                }
-                else {
-                    if (id >= 0 && id < sounds.length) {
-                        sounds.splice(id, 1);
-                    }
-                }
-            }
-        };
         DisplayObject.prototype.destroy = function () {
             var s = this;
-            //清除相应的数据引用
-            s.stopAllSounds();
-            for (var i = 0; i < s.soundList.length; i++) {
-                s.soundList[i].destroy();
-            }
-            s.soundList = null;
             s._a2x_res_obj = null;
             s.mask = null;
             s.parent = null;
@@ -2328,24 +1929,11 @@ var annie;
             //如果有音乐,则关闭音乐
             var s = this;
             s._isOnStage = false;
-            var sounds = s.soundList;
-            if (sounds.length > 0) {
-                for (var i = 0; i < sounds.length; i++) {
-                    sounds[i].stop2();
-                }
-            }
             s.dispatchEvent(annie.Event.REMOVE_TO_STAGE);
         };
         DisplayObject.prototype._onAddEvent = function () {
             var s = this;
             s._isOnStage = true;
-            //如果有音乐，则播放音乐
-            var sounds = s.soundList;
-            if (sounds.length > 0) {
-                for (var i = 0; i < sounds.length; i++) {
-                    sounds[i].play2();
-                }
-            }
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         };
         DisplayObject.prototype._onUpdateFrame = function (mcSpeed, isOffCanvas) {
@@ -2354,43 +1942,6 @@ var annie;
             if (this._visible && !isOffCanvas) {
                 this.dispatchEvent(annie.Event.ENTER_FRAME);
             }
-        };
-        /**
-         * 启动鼠标或者触摸拖动
-         * @method startDrag
-         * @param {boolean} isCenter 指定将可拖动的对象锁定到指针位置中心 (true)，还是锁定到用户第一次单击该对象的位置 (false) 默认false
-         * @param {annie.Rectangle} bounds 相对于显示对象父级的坐标的值，用于指定 Sprite 约束矩形
-         * @since 1.1.2
-         * @public
-         * @return {void}
-         */
-        DisplayObject.prototype.startDrag = function (isCenter, bounds) {
-            if (isCenter === void 0) { isCenter = false; }
-            if (bounds === void 0) { bounds = null; }
-            var s = this;
-            annie.Stage._dragDisplay = s;
-            annie.Stage._isDragCenter = isCenter;
-            annie.Stage._lastDragPoint.x = Number.MAX_VALUE;
-            annie.Stage._lastDragPoint.y = Number.MAX_VALUE;
-            if (bounds) {
-                annie.Stage._dragBounds.x = bounds.x;
-                annie.Stage._dragBounds.y = bounds.y;
-                annie.Stage._dragBounds.width = bounds.width;
-                annie.Stage._dragBounds.height = bounds.height;
-            }
-            else {
-                annie.Stage._dragBounds.x = 0;
-                annie.Stage._dragBounds.y = 0;
-                annie.Stage._dragBounds.width = Number.MIN_VALUE;
-                annie.Stage._dragBounds.height = Number.MIN_VALUE;
-            }
-        };
-        /**
-         * 停止鼠标跟随
-         * @method stopDrag
-         */
-        DisplayObject.prototype.stopDrag = function () {
-            annie.Stage._dragDisplay = null;
         };
         /**
          * 如果你在mc更改了对象的x y scale rotation alpha，最后想还原，不再需要自我控制，可以调用这方法
@@ -2498,10 +2049,9 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (typeof (value) == "string") {
-                    var img = annie.app.createImage();
-                    img.src = value;
-                    s._texture = img;
                     s.clearBounds();
+                    s._texture = annie.app.Image();
+                    s._texture.src = value;
                 }
                 else {
                     if (value != s._texture) {
@@ -3827,240 +3377,6 @@ var annie;
  */
 var annie;
 (function (annie) {
-    //declare let WeixinJSBridge:any;
-    /**
-     * 声音类
-     * @class annie.Sound
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     */
-    var Sound = /** @class */ (function (_super) {
-        __extends(Sound, _super);
-        /**
-         * 构造函数
-         * @method Sound
-         * @param {string} src
-         * @param {string}type
-         * @since 1.0.0
-         */
-        function Sound(src) {
-            var _this = _super.call(this) || this;
-            /**
-             * html 标签 有可能是audio 或者 video
-             * @property media
-             * @type {Audio}
-             * @public
-             * @since 1.0.0
-             */
-            _this.media = null;
-            _this._loop = 0;
-            _this._repeate = 1;
-            /**
-             * 是否正在播放中
-             * @property  isPlaying
-             * @public
-             * @since 2.0.0
-             * @type {boolean}
-             */
-            _this.isPlaying = true;
-            /**
-             * 每个声音可以有个名字，并且不同的声音名字可以相同
-             * @property name
-             * @type {string}
-             * @since 2.0.0
-             */
-            _this.name = "";
-            var s = _this;
-            s._instanceType = "annie.Sound";
-            if (typeof src == "string") {
-                s.media = annie.app.createInnerAudioContext();
-                s.media.src = src;
-            }
-            else {
-                s.media = src;
-            }
-            s.media.onEnded(function () {
-                s.dispatchEvent("onPlayEnd");
-                if (s._loop > 1) {
-                    s._loop--;
-                    s.media.startTime = 0;
-                    s.media.play();
-                }
-            });
-            s.media.onPlay(function () {
-                s.dispatchEvent("onPlayStart");
-            });
-            s.media.onTimeUpdate(function () {
-                s.dispatchEvent("onPlayUpdate", { currentTime: s.media.currentTime });
-            });
-            annie.Sound._soundList.push(s);
-            return _this;
-        }
-        /**
-         * 开始播放媒体
-         * @method play
-         * @param {number} start 开始点 默认为0
-         * @param {number} loop 循环次数 默认为1
-         * @public
-         * @since 1.0.0
-         */
-        Sound.prototype.play = function (start, loop) {
-            if (start === void 0) { start = 0; }
-            if (loop === void 0) { loop = 0; }
-            var s = this;
-            s.media.startTime = start;
-            if (loop == 0) {
-                s._loop = s._repeate;
-            }
-            else {
-                s._loop = loop;
-                s._repeate = loop;
-            }
-            s.media.play();
-            s.isPlaying = true;
-        };
-        /**
-         * 停止播放
-         * @method stop
-         * @public
-         * @since 1.0.0
-         */
-        Sound.prototype.stop = function () {
-            var s = this;
-            s.media.stop();
-            s.isPlaying = false;
-        };
-        /**
-         * 暂停播放,或者恢复播放
-         * @method pause
-         * @public
-         * @param isPause  默认为true;是否要暂停，如果要暂停，则暂停；否则则播放
-         * @since 1.0.4
-         */
-        Sound.prototype.pause = function (isPause) {
-            if (isPause === void 0) { isPause = true; }
-            var s = this;
-            if (isPause) {
-                s.media.pause();
-                s.isPlaying = false;
-            }
-            else {
-                s.media.play();
-                s.isPlaying = true;
-            }
-        };
-        Object.defineProperty(Sound.prototype, "volume", {
-            /**
-             * 设置或者获取音量 从0-1
-             * @since 1.1.0
-             * @property volume
-             * @return {number}
-             */
-            get: function () {
-                return this.media.volume;
-            },
-            set: function (value) {
-                this.media.volume = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Sound.prototype.stop2 = function () {
-            var s = this;
-            if (s.isPlaying) {
-                s.media.pause();
-            }
-        };
-        Sound.prototype.play2 = function () {
-            var s = this;
-            if (s.isPlaying) {
-                s.media.play();
-            }
-        };
-        /**
-         * 停止当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method stopAllSounds
-         * @since 1.1.1
-         * @static
-         * @public
-         */
-        Sound.stopAllSounds = function () {
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].stop2();
-                }
-                else {
-                    annie.Sound._soundList.splice(i, 1);
-                }
-            }
-        };
-        /**
-         * 恢复当前所有正在停止的声音，当然一定要是annie.Sound类的声音
-         * @method resumePlaySounds
-         * @since 2.0.0
-         * @static
-         * @public
-         */
-        Sound.resumePlaySounds = function () {
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].play2();
-                }
-                else {
-                    annie.Sound._soundList.splice(i, 1);
-                }
-            }
-        };
-        /**
-         * 设置当前所有正在播放的声音，当然一定要是annie.Sound类的声音
-         * @method setAllSoundsVolume
-         * @since 1.1.1
-         * @static
-         * @public
-         * @param {number} volume 音量大小，从0-1
-         */
-        Sound.setAllSoundsVolume = function (volume) {
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i]) {
-                    annie.Sound._soundList[i].volume = volume;
-                }
-                else {
-                    annie.Sound._soundList.splice(i, 1);
-                }
-            }
-            Sound._volume = volume;
-        };
-        Sound.prototype.destroy = function () {
-            var s = this;
-            var len = annie.Sound._soundList.length;
-            for (var i = len - 1; i >= 0; i--) {
-                if (annie.Sound._soundList[i] == s) {
-                    annie.Sound._soundList[i].stop();
-                    annie.Sound._soundList.splice(i, 1);
-                    break;
-                }
-            }
-            s.media.offTimeUpdate();
-            s.media.offPlay();
-            s.media.offEnded();
-            s.media = null;
-        };
-        //声音对象池
-        Sound._soundList = [];
-        Sound._volume = 1;
-        return Sound;
-    }(annie.EventDispatcher));
-    annie.Sound = Sound;
-})(annie || (annie = {}));
-/**
- * @module annie
- */
-var annie;
-(function (annie) {
     /**
      * annie引擎核心类
      * @class annie.MovieClip
@@ -4594,13 +3910,6 @@ var annie;
                                     frameIndex: s._curFrame,
                                     frameName: "endFrame"
                                 });
-                            }
-                        }
-                        //有没有声音
-                        var curFrameSound = timeLineObj.s[frameIndex];
-                        if (curFrameSound instanceof Object) {
-                            for (var sound in curFrameSound) {
-                                s._a2x_sounds[sound - 1].play(0, curFrameSound[sound]);
                             }
                         }
                     }
@@ -5251,21 +4560,16 @@ var annie;
         /**
          * 显示对象入口函数
          * @method Stage
-         * @param {Object} canvas
          * @param {number} desW 舞台宽
          * @param {number} desH 舞台高
          * @param {number} fps 刷新率
-         * @param {string} scaleMode 缩放模式 StageScaleMode
-         * @param {number} renderType 渲染模式0:canvas 1:webGl 2:dom
          * @public
          * @since 1.0.0
          */
-        function Stage(canvas, desW, desH, frameRate, scaleMode, renderType) {
+        function Stage(desW, desH, frameRate) {
             if (desW === void 0) { desW = 640; }
             if (desH === void 0) { desH = 1040; }
             if (frameRate === void 0) { frameRate = 30; }
-            if (scaleMode === void 0) { scaleMode = "fixedHeight"; }
-            if (renderType === void 0) { renderType = 0; }
             var _this = _super.call(this) || this;
             /**
              * annie.Stage舞台初始化完成后会触发的事件
@@ -5293,54 +4597,6 @@ var annie;
              */
             _this.renderObj = null;
             /**
-             * 渲染模式值 只读 CANVAS:0, webGl: 1
-             * @property renderType
-             * @readonly
-             * @public
-             * @since 1.0.0
-             * @type {number}
-             * @default 0
-             * @readonly
-             */
-            _this.renderType = 0;
-            _this._viewRect = new annie.Rectangle();
-            /**
-             * 开启或关闭多点手势事件 目前仅支持两点 旋转 缩放
-             * @property isMultiTouch
-             * @since 1.0.3
-             * @type {boolean}
-             */
-            _this.isMultiTouch = false;
-            /**
-             * 开启或关闭多个手指的鼠标事件
-             * @property isMultiMouse
-             * @since 1.1.3
-             * @type {boolean}
-             */
-            _this.isMultiMouse = false;
-            /**
-             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 当设备尺寸更新，或者旋转后是否自动更新舞台方向
-             * 默认不开启
-             * @property autoSteering
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             * @default false
-             */
-            _this.autoSteering = false;
-            /**
-             * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-             * 当设备尺寸更新，或者旋转后是否自动更新舞台尺寸
-             * 默认不开启
-             * @property autoResize
-             * @public
-             * @since 1.0.0
-             * @type {boolean}
-             * @default false
-             */
-            _this.autoResize = false;
-            /**
              * 舞台的尺寸宽,也就是我们常说的设计尺寸
              * @property desWidth
              * @public
@@ -5361,26 +4617,6 @@ var annie;
              */
             _this.desHeight = 0;
             /**
-             * 舞台在当前设备中的真实高
-             * @property divHeight
-             * @public
-             * @since 1.0.0
-             * @default 320
-             * @type {number}
-             * @readonly
-             */
-            _this.divHeight = 0;
-            /**
-             * 舞台在当前设备中的真实宽
-             * @property divWidth
-             * @public
-             * @since 1.0.0
-             * @default 240
-             * @readonly
-             * @type {number}
-             */
-            _this.divWidth = 0;
-            /**
              * 舞台的背景色
              * 默认为""就是透明背景
              * 可能设置一个颜色值改变舞台背景
@@ -5390,70 +4626,6 @@ var annie;
              * @type {string} #FFFFFF" 或 RGB(255,255,255) 或 RGBA(255,255,255,255)
              */
             _this.bgColor = "";
-            _this._scaleMode = "onScale";
-            _this._lastDpList = {};
-            //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
-            _this._ml = [];
-            //这个是事件中用到的Point对象池,以提高性能
-            _this._mp = [];
-            // 鼠标按下事件的对象池
-            _this._mouseDownPoint = {};
-            //html的鼠标或单点触摸对应的引擎事件类型名
-            _this._mouseEventTypes = {
-                mousedown: "onMouseDown",
-                mouseup: "onMouseUp",
-                mousemove: "onMouseMove",
-                touchstart: "onMouseDown",
-                touchmove: "onMouseMove",
-                touchend: "onMouseUp",
-                touchcancel: "onMouseUp",
-                ontouchstart: "onMouseDown",
-                ontouchmove: "onMouseMove",
-                ontouchend: "onMouseUp",
-                ontouchcancel: "onMouseUp"
-            };
-            //stageMousePoint
-            _this.sp = new annie.Point();
-            //localPoint;
-            _this.lp = new annie.Point();
-            _this.muliPoints = [];
-            //当document有鼠标或触摸事件时调用
-            _this._mP1 = new annie.Point();
-            //当document有鼠标或触摸事件时调用
-            _this._mP2 = new annie.Point();
-            /**
-             * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
-             * 如果设置stage autoResize 为 false 你需要手动调用此方法以更新界面.
-             * 不管autoResize 的状态是什么，你只要侦听 了stage 的 annie.Event.RESIZE 事件
-             * 都可以接收到舞台变化的通知。
-             * @method resize
-             * @public
-             * @since 1.0.0
-             * @return {void}
-             */
-            _this.resize = function () {
-                var s = this;
-                var w = annie.CanvasRender.rootContainer.width;
-                var h = annie.CanvasRender.rootContainer.height;
-                if (s.divWidth == 0 || s.divHeight == 0) {
-                    s.a2x_um = true;
-                    s.divWidth = w;
-                    s.divHeight = h;
-                    s.renderObj.reSize(w, h);
-                    s.setAlign();
-                    s.dispatchEvent("onInitStage");
-                }
-                else if (s.autoResize) {
-                    if (s.divWidth != w || s.divHeight != h) {
-                        s.a2x_um = true;
-                        s.divHeight = h;
-                        s.divWidth = w;
-                        s.renderObj.reSize(w, h);
-                        s.setAlign();
-                        s.dispatchEvent("onResize");
-                    }
-                }
-            };
             var s = _this;
             s.a2x_ua = true;
             s.a2x_um = true;
@@ -5461,67 +4633,21 @@ var annie;
             s.stage = s;
             s._isOnStage = true;
             s.name = "rootStage";
-            s.renderType = renderType;
             s.desWidth = desW;
             s.desHeight = desH;
             s.setFrameRate(frameRate);
-            s._scaleMode = scaleMode;
-            s.anchorX = desW >> 1;
-            s.anchorY = desH >> 1;
-            s.mouseEvent = s._onMouseEvent.bind(s);
-            if (annie.isSharedCanvas) {
-                annie.CanvasRender.rootContainer = annie.app.getSharedCanvas();
-                annie.globalDispatcher.addEventListener("onMainStageMsg", function (e) {
-                    switch (e.data.type) {
-                        case annie.MouseEvent.CLICK:
-                        case annie.MouseEvent.MOUSE_MOVE:
-                        case annie.MouseEvent.MOUSE_UP:
-                        case annie.MouseEvent.MOUSE_DOWN:
-                        case annie.MouseEvent.MOUSE_OVER:
-                        case annie.MouseEvent.MOUSE_OUT:
-                            var event_1 = new annie.MouseEvent(e.data.type);
-                            event_1.reset(e.data.type, s);
-                            event_1.clientX = event_1.stageX = event_1.localX = e.data.x;
-                            event_1.clientY = event_1.stageY = event_1.localY = e.data.y;
-                            s.dispatchEvent(event_1);
-                            break;
-                        default:
-                    }
-                });
-            }
-            else {
-                var sysInfo = annie.app.getSystemInfoSync();
-                var canvas_1 = annie.app.createCanvas();
-                canvas_1.width = sysInfo.windowWidth * sysInfo.pixelRatio;
-                canvas_1.height = sysInfo.windowHeight * sysInfo.pixelRatio;
-                annie.CanvasRender.rootContainer = canvas_1;
-                annie.app.onTouchStart(function (e) {
-                    s.mouseEvent(e);
-                });
-                annie.app.onTouchMove(function (e) {
-                    s.mouseEvent(e);
-                });
-                annie.app.onTouchEnd(function (e) {
-                    s.mouseEvent(e);
-                });
-                annie.app.onTouchCancel(function (e) {
-                    s.mouseEvent(e);
-                });
-            }
+            var canvas = annie.app.createCanvas();
+            canvas.width = desW;
+            canvas.height = desH;
+            annie.CanvasRender.rootContainer = canvas;
             annie.OffCanvasRender.rootContainer = annie.app.createCanvas();
-            //webgl 直到对2d的支持非常成熟了再考虑开启
-            if (renderType == 0) {
-                //canvas
-                s.renderObj = new annie.CanvasRender(s);
-            }
-            else {
-                //webgl
-                //s.renderObj = new WebGLRender(s);
-            }
+            s.renderObj = new annie.CanvasRender(s);
             s.renderObj.init();
+            s.renderObj.reSize(desW, desH);
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.stage = s;
+            s.a2x_um = true;
             return _this;
         }
         Object.defineProperty(Stage, "pause", {
@@ -5541,57 +4667,8 @@ var annie;
                 var s = Stage;
                 if (value != s._pause) {
                     s._pause = value;
-                    if (value) {
-                        //停止声音
-                        annie.Sound.stopAllSounds();
-                    }
-                    else {
-                        //恢复声音
-                        annie.Sound.resumePlaySounds();
-                    }
                     //触发事件
                     annie.globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Stage.prototype, "scaleMode", {
-            /**
-             * 舞台的缩放模式
-             * 默认为空就是无缩放的真实大小
-             * "noBorder" 无边框模式
-             * ”showAll" 显示所有内容
-             * “fixedWidth" 固定宽
-             * ”fixedHeight" 固定高
-             * @property scaleMode
-             * @public
-             * @since 1.0.0
-             * @default "onScale"
-             * @type {string}
-             * @example
-             *      //动态更改stage的对齐方式示例
-             *      //以下代码放到一个舞台的显示对象的构造函数中
-             *      let s=this;
-             *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-             *          let i=0;
-             *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-             *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-             *              let state=e.currentTarget;
-             *              state.scaleMode=aList[i];
-             *              if(i>5){i=0;}
-             *          }
-             *      }
-             *
-             */
-            get: function () {
-                return this._scaleMode;
-            },
-            set: function (value) {
-                var s = this;
-                if (value != s._scaleMode) {
-                    s._scaleMode = value;
-                    s.setAlign();
                 }
             },
             enumerable: true,
@@ -5602,21 +4679,9 @@ var annie;
             _super.prototype._render.call(this, renderObj);
             renderObj.end();
         };
-        //刷新mouse或者touch事件
-        Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, timeStamp) {
-            event._pd = false;
-            event.clientX = cp.x;
-            event.clientY = cp.y;
-            event.stageX = sp.x;
-            event.stageY = sp.y;
-            event.timeStamp = timeStamp;
-            event.identifier = identifier;
-        };
         //循环刷新页面的函数
         Stage.prototype.flush = function () {
             var s = this;
-            //看看是否有resize
-            s.resize();
             s._onUpdateFrame(1);
             s._updateMatrix();
             s._render(s.renderObj);
@@ -5642,395 +4707,6 @@ var annie;
         Stage.prototype.getFrameRate = function () {
             return Stage._FPS;
         };
-        Stage.prototype._onMouseEvent = function (e) {
-            //检查是否有
-            var s = this, offSetX = 0, offSetY = 0;
-            var sd = Stage._dragDisplay;
-            if (s.isMultiTouch && e.changedTouches.length > 1) {
-                if (e.changedTouches.length == 2) {
-                    //求角度和距离
-                    s._mP1.x = e.changedTouches[0].clientX - offSetX;
-                    s._mP1.y = e.changedTouches[0].clientY - offSetY;
-                    s._mP2.x = e.changedTouches[1].clientX - offSetX;
-                    s._mP2.y = e.changedTouches[1].clientY - offSetY;
-                    var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
-                    var dis = annie.Point.distance(s._mP1, s._mP2);
-                    s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
-                    if (s.muliPoints.length >= 2) {
-                        //如果有事件，抛事件
-                        if (!(s._touchEvent instanceof annie.TouchEvent)) {
-                            s._touchEvent = new annie.TouchEvent(annie.TouchEvent.ON_MULTI_TOUCH);
-                            s._touchEvent.target = s;
-                        }
-                        var len = s.muliPoints.length;
-                        s._touchEvent.rotate = (s.muliPoints[len - 1].angle - s.muliPoints[len - 2].angle) * 2;
-                        s._touchEvent.scale = (s.muliPoints[len - 1].dis - s.muliPoints[len - 2].dis) / (s.divHeight > s.divWidth ? s.desWidth : s.desHeight) * 4;
-                        s._touchEvent.clientPoint1.x = s.muliPoints[len - 1].p1.x * annie.devicePixelRatio;
-                        s._touchEvent.clientPoint2.x = s.muliPoints[len - 1].p2.x * annie.devicePixelRatio;
-                        s._touchEvent.clientPoint1.y = s.muliPoints[len - 1].p1.y * annie.devicePixelRatio;
-                        s._touchEvent.clientPoint2.y = s.muliPoints[len - 1].p2.y * annie.devicePixelRatio;
-                        s.dispatchEvent(s._touchEvent);
-                        s.muliPoints.shift();
-                    }
-                }
-                else {
-                    s.muliPoints.length = 0;
-                }
-                s._mouseDownPoint = {};
-                s._lastDpList = {};
-                if (sd) {
-                    Stage._lastDragPoint.x = Number.MAX_VALUE;
-                    Stage._lastDragPoint.y = Number.MAX_VALUE;
-                }
-            }
-            else {
-                if (s.muliPoints.length > 0) {
-                    s._touchEvent.rotate = 0;
-                    s._touchEvent.scale = 0;
-                    s._touchEvent.clientPoint1.x = 0;
-                    s._touchEvent.clientPoint2.x = 0;
-                    s._touchEvent.clientPoint1.y = 0;
-                    s._touchEvent.clientPoint2.y = 0;
-                    s.dispatchEvent(s._touchEvent);
-                    s.muliPoints.length = 0;
-                }
-                //检查mouse或touch事件是否有，如果有的话，就触发事件函数
-                if (annie.EventDispatcher._totalMEC > 0) {
-                    var points = void 0;
-                    var item = s._mouseEventTypes[e.type];
-                    var events = [];
-                    var event_2;
-                    //clientPoint
-                    var cp = void 0;
-                    //事件个数
-                    var eLen = void 0;
-                    var identifier = void 0;
-                    if (s.isMultiMouse) {
-                        points = e.changedTouches;
-                    }
-                    else {
-                        var fp = e.changedTouches[0];
-                        if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
-                            s._lastDpList.isStart = true;
-                            points = [fp];
-                        }
-                        else {
-                            return;
-                        }
-                    }
-                    var pLen = points.length;
-                    for (var o = 0; o < pLen; o++) {
-                        eLen = 0;
-                        events.length = 0;
-                        identifier = points[o].identifier;
-                        if (s._mp.length > 0) {
-                            cp = s._mp.shift();
-                        }
-                        else {
-                            cp = new annie.Point();
-                        }
-                        cp.x = (points[o].clientX - offSetX) * annie.devicePixelRatio;
-                        cp.y = (points[o].clientY - offSetY) * annie.devicePixelRatio;
-                        s.globalToLocal(cp, s.sp);
-                        if (sd && sd.stage && sd.parent) {
-                            var x1 = sd.x, y1 = sd.y;
-                            sd.parent.globalToLocal(cp, s.lp);
-                            if (!Stage._isDragCenter) {
-                                if (Stage._lastDragPoint.x != Number.MAX_VALUE) {
-                                    x1 += s.lp.x - Stage._lastDragPoint.x;
-                                    y1 += s.lp.y - Stage._lastDragPoint.y;
-                                }
-                                Stage._lastDragPoint.x = s.lp.x;
-                                Stage._lastDragPoint.y = s.lp.y;
-                            }
-                            else {
-                                x1 = s.lp.x;
-                                y1 = s.lp.y;
-                            }
-                            s.lp.x = x1;
-                            s.lp.y = y1;
-                            if (Stage._dragBounds.width != Number.MIN_VALUE) {
-                                if (x1 < Stage._dragBounds.x) {
-                                    x1 = Stage._dragBounds.x;
-                                }
-                                else if (x1 > Stage._dragBounds.x + Stage._dragBounds.width) {
-                                    x1 = Stage._dragBounds.x + Stage._dragBounds.width;
-                                }
-                                if (y1 < Stage._dragBounds.y) {
-                                    y1 = Stage._dragBounds.y;
-                                }
-                                else if (y1 > Stage._dragBounds.y + Stage._dragBounds.height) {
-                                    y1 = Stage._dragBounds.y + Stage._dragBounds.height;
-                                }
-                            }
-                            sd.x = x1;
-                            sd.y = y1;
-                        }
-                        if (s._ml[eLen] instanceof annie.MouseEvent) {
-                            event_2 = s._ml[eLen];
-                            event_2.type = item;
-                        }
-                        else {
-                            event_2 = new annie.MouseEvent(item);
-                            s._ml[eLen] = event_2;
-                        }
-                        events[events.length] = event_2;
-                        s._initMouseEvent(event_2, cp, s.sp, identifier, e.timeStamp);
-                        eLen++;
-                        if (item == "onMouseDown") {
-                            s._mouseDownPoint[identifier] = cp;
-                            //清空上次存在的显示列表
-                        }
-                        else if (item == "onMouseUp") {
-                            if (s._mouseDownPoint[identifier] instanceof annie.Point) {
-                                if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
-                                    //click事件
-                                    //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                                    if (annie.EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                        if (s._ml[eLen] instanceof annie.MouseEvent) {
-                                            event_2 = s._ml[eLen];
-                                            event_2.type = "onMouseClick";
-                                        }
-                                        else {
-                                            event_2 = new annie.MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event_2;
-                                        }
-                                        events[events.length] = event_2;
-                                        s._initMouseEvent(event_2, cp, s.sp, identifier);
-                                        eLen++;
-                                    }
-                                }
-                            }
-                        }
-                        if (eLen > 0) {
-                            //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
-                            var d_1 = s.hitTestPoint(cp, true);
-                            var displayList = [];
-                            if (d_1 instanceof annie.DisplayObject) {
-                                //证明有点击到事件,然后从最底层追上来,看看一路是否有人添加过mouse或touch事件,还要考虑mousechildren和阻止事件方法
-                                //找出真正的target,因为有些父级可能会mouseChildren=false;
-                                do {
-                                    if (d_1 instanceof annie.Sprite && d_1.mouseChildren == false) {
-                                        //丢掉之前的层级,因为根本没用了
-                                        displayList.length = 0;
-                                    }
-                                    displayList[displayList.length] = d_1;
-                                    d_1 = d_1.parent;
-                                } while (d_1 instanceof annie.DisplayObject);
-                            }
-                            else {
-                                displayList[0] = s;
-                            }
-                            var len = displayList.length;
-                            for (var i = len - 1; i >= 0; i--) {
-                                d_1 = displayList[i];
-                                for (var j = 0; j < eLen; j++) {
-                                    if (!events[j]._pd && d_1.hasEventListener(events[j].type)) {
-                                        events[j].currentTarget = d_1;
-                                        events[j].target = displayList[0];
-                                        d_1.globalToLocal(cp, s.lp);
-                                        events[j].localX = s.lp.x;
-                                        events[j].localY = s.lp.y;
-                                        d_1.dispatchEvent(events[j]);
-                                    }
-                                }
-                            }
-                            //这里一定要反转一下，因为会影响mouseOut mouseOver
-                            displayList.reverse();
-                            for (var i = len - 1; i >= 0; i--) {
-                                d_1 = displayList[i];
-                                for (var j = 0; j < eLen; j++) {
-                                    if (!events[j]._pd && d_1.hasEventListener(events[j].type, false)) {
-                                        events[j].currentTarget = d_1;
-                                        events[j].target = displayList[eLen - 1];
-                                        d_1.globalToLocal(cp, s.lp);
-                                        events[j].localX = s.lp.x;
-                                        events[j].localY = s.lp.y;
-                                        d_1.dispatchEvent(events[j], null, false);
-                                    }
-                                }
-                            }
-                            //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                            if (item != "onMouseDown") {
-                                if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
-                                    if (s._lastDpList[identifier] instanceof Array) {
-                                        //从第二个开始，因为第一个对象始终是stage顶级对象
-                                        var len1 = s._lastDpList[identifier].length;
-                                        var len2 = displayList.length;
-                                        len = len1 > len2 ? len1 : len2;
-                                        var isDiff = false;
-                                        var overEvent = void 0;
-                                        var outEvent = void 0;
-                                        for (var i = 1; i < len; i++) {
-                                            if (!isDiff) {
-                                                if (s._lastDpList[identifier][i] != displayList[i]) {
-                                                    //好就是这里，需要确定哪些有onMouseOver,哪些有onMouseOut
-                                                    isDiff = true;
-                                                    if (s._ml[eLen] instanceof annie.MouseEvent) {
-                                                        overEvent = s._ml[eLen];
-                                                        overEvent.type = "onMouseOver";
-                                                    }
-                                                    else {
-                                                        overEvent = new annie.MouseEvent("onMouseOver");
-                                                        s._ml[eLen] = overEvent;
-                                                    }
-                                                    s._initMouseEvent(overEvent, cp, s.sp, identifier);
-                                                    eLen++;
-                                                    if (s._ml[eLen] instanceof annie.MouseEvent) {
-                                                        outEvent = s._ml[eLen];
-                                                        outEvent.type = "onMouseOut";
-                                                    }
-                                                    else {
-                                                        outEvent = new annie.MouseEvent("onMouseOut");
-                                                        s._ml[eLen] = outEvent;
-                                                    }
-                                                    s._initMouseEvent(outEvent, cp, s.sp, identifier);
-                                                }
-                                            }
-                                            if (isDiff) {
-                                                if (s._lastDpList[identifier][i]) {
-                                                    //触发onMouseOut事件
-                                                    d_1 = s._lastDpList[identifier][i];
-                                                    if (!outEvent._pd && d_1.hasEventListener("onMouseOut")) {
-                                                        outEvent.currentTarget = d_1;
-                                                        outEvent.target = s._lastDpList[identifier][len1 - 1];
-                                                        d_1.globalToLocal(cp, s.lp);
-                                                        outEvent.localX = s.lp.x;
-                                                        outEvent.localY = s.lp.y;
-                                                        d_1.dispatchEvent(outEvent);
-                                                    }
-                                                }
-                                                d_1 = displayList[i];
-                                                if (d_1 instanceof annie.DisplayObject) {
-                                                    //触发onMouseOver事件
-                                                    if (!overEvent._pd && d_1.hasEventListener("onMouseOver")) {
-                                                        overEvent.currentTarget = d_1;
-                                                        overEvent.target = displayList[len2 - 1];
-                                                        d_1.globalToLocal(cp, s.lp);
-                                                        overEvent.localX = s.lp.x;
-                                                        overEvent.localY = s.lp.y;
-                                                        d_1.dispatchEvent(overEvent);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                s._mp[s._mp.length] = cp;
-                            }
-                            if (item == "onMouseUp") {
-                                delete s._mouseDownPoint[identifier];
-                                delete s._lastDpList[identifier];
-                                s._lastDpList.isStart = false;
-                                if (sd) {
-                                    Stage._lastDragPoint.x = Number.MAX_VALUE;
-                                    Stage._lastDragPoint.y = Number.MAX_VALUE;
-                                }
-                            }
-                            else {
-                                s._lastDpList[identifier] = displayList;
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        ;
-        //设置舞台的对齐模式
-        Stage.prototype.setAlign = function () {
-            var s = this;
-            var divH = s.divHeight;
-            var divW = s.divWidth;
-            var desH = s.desHeight;
-            var desW = s.desWidth;
-            s.anchorX = desW >> 1;
-            s.anchorY = desH >> 1;
-            //设备是否为竖屏
-            var isDivH = divH >= divW;
-            //内容是否为竖屏内容
-            var isDesH = desH >= desW;
-            var scaleY = 1;
-            var scaleX = 1;
-            s.x = (divW - desW) >> 1;
-            s.y = (divH - desH) >> 1;
-            if (s.autoSteering) {
-                if (isDesH != isDivH) {
-                    var d_2 = divH;
-                    divH = divW;
-                    divW = d_2;
-                }
-            }
-            if (s._scaleMode != "noScale") {
-                scaleY = divH / desH;
-                scaleX = divW / desW;
-                switch (s._scaleMode) {
-                    case "noBorder":
-                        if (scaleX > scaleY) {
-                            scaleY = scaleX;
-                        }
-                        else {
-                            scaleX = scaleY;
-                        }
-                        break;
-                    case "showAll":
-                        if (scaleX < scaleY) {
-                            scaleY = scaleX;
-                        }
-                        else {
-                            scaleX = scaleY;
-                        }
-                        break;
-                    case "fixedWidth":
-                        scaleY = scaleX;
-                        break;
-                    case "fixedHeight":
-                        scaleX = scaleY;
-                        break;
-                }
-            }
-            s.scaleX = scaleX;
-            s.scaleY = scaleY;
-            if (s.autoSteering) {
-                if (isDesH == isDivH) {
-                    s.rotation = 0;
-                }
-                else {
-                    if (desH > desW) {
-                        s.rotation = -90;
-                    }
-                    else {
-                        s.rotation = 90;
-                    }
-                }
-            }
-            else {
-                s.rotation = 0;
-            }
-            s._viewRect.x = (desW - divW / scaleX) >> 1;
-            s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x * 2;
-            s._viewRect.height = desH - s._viewRect.y * 2;
-        };
-        ;
-        Object.defineProperty(Stage.prototype, "viewRect", {
-            /**
-             * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
-             * @property viewRect
-             * @public
-             * @readonly
-             * @since 1.0.0
-             * @type {annie.Rectangle}
-             * @default {x:0,y:0,width:0,height:0}
-             * @readonly
-             * @example
-             *      //始终让一个对象顶对齐，或者
-             */
-            get: function () {
-                return this._viewRect;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Stage.flushAll = function () {
             if (Stage._intervalID != -1) {
                 clearInterval(Stage._intervalID);
@@ -6097,10 +4773,6 @@ var annie;
         Stage.stage = null;
         //原始为60的刷新速度时的计数器
         Stage._FPS = 30;
-        Stage._dragDisplay = null;
-        Stage._dragBounds = new annie.Rectangle();
-        Stage._lastDragPoint = new annie.Point();
-        Stage._isDragCenter = false;
         /**
          * 要循环调用 flush 函数对象列表
          * @method allUpdateObjList
@@ -6409,103 +5081,6 @@ var annie;
     annie.OffCanvasRender = OffCanvasRender;
 })(annie || (annie = {}));
 /**
- * @module annie
- */
-var annie;
-(function (annie) {
-    /**
-     * 小游戏中开放子域在主域的显示容器,小程序中无此类
-     * @class annie.SharedCanvas
-     * @public
-     * @extends annie.AObject
-     * @since 1.0.0
-     */
-    var SharedCanvas = /** @class */ (function () {
-        function SharedCanvas() {
-        }
-        SharedCanvas.onMouseEvent = function (e) {
-            var s = SharedCanvas;
-            s.postMessage({
-                type: e.type,
-                data: {
-                    x: e.localX,
-                    y: e.localY
-                }
-            });
-        };
-        SharedCanvas.init = function (w, h) {
-            var s = SharedCanvas;
-            if (s.context)
-                return;
-            s.context = annie.app.getOpenDataContext();
-            s.context.canvas.width = w;
-            s.context.canvas.height = h;
-            s.postMessage({
-                type: "initSharedCanvasStage",
-            });
-            s.view = new annie.Bitmap(s.context.canvas);
-            s.view.addEventListener(annie.MouseEvent.CLICK, s.onMouseEvent);
-            s.view.addEventListener(annie.MouseEvent.MOUSE_MOVE, s.onMouseEvent);
-            s.view.addEventListener(annie.MouseEvent.MOUSE_DOWN, s.onMouseEvent);
-            s.view.addEventListener(annie.MouseEvent.MOUSE_UP, s.onMouseEvent);
-            s.view.addEventListener(annie.MouseEvent.MOUSE_OVER, s.onMouseEvent);
-            s.view.addEventListener(annie.MouseEvent.MOUSE_OUT, s.onMouseEvent);
-        };
-        SharedCanvas.resize = function (w, h) {
-            var s = SharedCanvas;
-            s.context.canvas.width = w;
-            s.context.canvas.height = h;
-            s.postMessage({
-                type: "canvasResize",
-                data: {
-                    w: w,
-                    h: h
-                }
-            });
-        };
-        SharedCanvas.destroy = function () {
-            //清除相应的数据引用
-            var s = SharedCanvas;
-            s.view.destroy();
-            s.context = null;
-        };
-        /**
-         * 向子域传消息
-         * @method postMessage
-         * @param data
-         * @public
-         */
-        SharedCanvas.postMessage = function (data) {
-            //呼叫数据显示端
-            var s = SharedCanvas;
-            s.context.postMessage(data);
-        };
-        /**
-         * 显示开放域
-         * @method show
-         * @since 2.0.1
-         */
-        SharedCanvas.show = function () {
-            var s = SharedCanvas;
-            s.context.postMessage({ event: "onShow" });
-            s.view.visible = true;
-        };
-        /**
-         * 隐藏开放域
-         * @method hide
-         * @since 2.0.1
-         */
-        SharedCanvas.hide = function () {
-            var s = SharedCanvas;
-            s.context.postMessage({ event: "onHide" });
-            s.view.visible = true;
-        };
-        SharedCanvas.view = null;
-        return SharedCanvas;
-    }());
-    annie.SharedCanvas = SharedCanvas;
-})(annie || (annie = {}));
-/**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
@@ -6791,7 +5366,7 @@ var annie;
         var scene = _loadSceneNames[_loadIndex];
         var type = _currentConfig[_loadIndex][0].type;
         if (type != "javascript") {
-            var loadContent = void 0;
+            var loadContent_1;
             if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
                 if (_domain.indexOf("http") != 0) {
                     //本地
@@ -6799,44 +5374,33 @@ var annie;
                     if (_domain != "") {
                         sourceUrl = "../" + _domain + "/";
                     }
-                    loadContent = require(sourceUrl + _currentConfig[_loadIndex][0].src);
+                    loadContent_1 = require(sourceUrl + _currentConfig[_loadIndex][0].src);
                 }
                 else {
-                    loadContent = _currentConfig[_loadIndex][0].src;
+                    loadContent_1 = _currentConfig[_loadIndex][0].src;
                 }
-                annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                _parseContent(loadContent);
+                annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent_1;
+                _parseContent(loadContent_1);
+                _checkComplete();
             }
             else {
                 if (type == "image") {
                     //图片
-                    loadContent = annie.app.createImage();
+                    loadContent_1 = new annie.app.Image();
+                    loadContent_1.onload = function () {
+                        _checkComplete();
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent_1;
+                    };
                     if (_domain.indexOf("http") != 0) {
                         var sourceUrl = "";
                         if (_domain != "") {
                             sourceUrl = _domain + "/";
                         }
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        loadContent_1.src = sourceUrl + _currentConfig[_loadIndex][0].src;
                     }
                     else {
-                        loadContent.src = _currentConfig[_loadIndex][0].src;
+                        loadContent_1.src = _currentConfig[_loadIndex][0].src;
                     }
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                }
-                else if (type == "sound") {
-                    //声音
-                    loadContent = annie.app.createInnerAudioContext();
-                    if (_domain.indexOf("http") != 0) {
-                        var sourceUrl = "";
-                        if (_domain != "") {
-                            sourceUrl = _domain + "/";
-                        }
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
-                    }
-                    else {
-                        loadContent.src = _currentConfig[_loadIndex][0].src;
-                    }
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                 }
             }
         }
@@ -6847,8 +5411,8 @@ var annie;
                 sourceUrl = "../" + _domain + "/";
             }
             require(sourceUrl + _currentConfig[_loadIndex][0].src);
+            _checkComplete();
         }
-        _checkComplete();
     }
     /**
      * 判断一个场景是否已经被加载
@@ -7079,10 +5643,6 @@ var annie;
         }
         return shape;
     }
-    // 获取声音实例
-    function s(sceneName, resName) {
-        return new annie.Sound(annie.res[sceneName][resName]);
-    }
     /**
      * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 获取url地址中的get参数
@@ -7239,10 +5799,7 @@ var annie;
                         obj = g(sceneName, children[i]);
                         break;
                     case 5:
-                        //sound
-                        obj = s(sceneName, children[i]);
-                        obj.name = children[i];
-                        target.addSound(obj);
+                    //sound
                 }
                 if (!isMc) {
                     var index = i + 1;
@@ -8312,7 +6869,6 @@ var annie;
      */
     annie.version = "3.2.2";
     annie.app = null;
-    annie.isSharedCanvas = false;
     /**
      * 全局事件触发器
      * @static
@@ -8332,53 +6888,6 @@ var annie;
      *
      */
     annie.globalDispatcher = new annie.EventDispatcher();
-    /**
-     * 设备的retina值,简单点说就是几个像素表示设备上的一个点
-     * @property annie.devicePixelRatio
-     * @type {number}
-     * @since 1.0.0
-     * @public
-     * @static
-     * @example
-     *      //打印当前设备的retina值
-     *      console.log(annie.devicePixelRatio);
-     */
-    annie.devicePixelRatio = 1;
-    /**
-     * 一个 StageScaleMode 中指定要使用哪种缩放模式的值。以下是有效值：
-     * StageScaleMode.EXACT_FIT -- 整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示。
-     * StageScaleMode.SHOW_ALL -- 整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框。
-     * StageScaleMode.NO_BORDER -- 整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比。
-     * StageScaleMode.NO_SCALE -- 整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_WIDTH -- 整个应用程序的宽固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * StageScaleMode.FIXED_HEIGHT -- 整个应用程序的高固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切。
-     * @property annie.StageScaleMode
-     * @type {Object}
-     * @public
-     * @since 1.0.0
-     * @static
-     * @example
-     *      //动态更改stage的对齐方式示例
-     *      //以下代码放到一个舞台的显示对象的构造函数中
-     *      let s=this;
-     *      s.addEventListener(annie.Event.ADD_TO_STAGE,function(e){
-     *          let i=0;
-     *          s.stage.addEventListener(annie.MouseEvent.CLICK,function(e){
-     *              let aList=[annie.StageScaleMode.EXACT_FIT,annie.StageScaleMode.NO_BORDER,annie.StageScaleMode.NO_SCALE,annie.StageScaleMode.SHOW_ALL,annie.StageScaleMode.FIXED_WIDTH,annie.StageScaleMode.FIXED_HEIGHT]
-     *              s.stage.scaleMode=aList[i];
-     *              if(i>5){i=0;}
-     *          }
-     *      }
-     *
-     */
-    annie.StageScaleMode = {
-        EXACT_FIT: "exactFit",
-        NO_BORDER: "noBorder",
-        NO_SCALE: "noScale",
-        SHOW_ALL: "showAll",
-        FIXED_WIDTH: "fixedWidth",
-        FIXED_HEIGHT: "fixedHeight"
-    };
     var _dRender;
     annie.toDisplayDataURL = function (obj, rect, typeInfo, bgColor) {
         if (rect === void 0) { rect = null; }
@@ -8428,3 +6937,6 @@ var annie;
  */
 annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
+
+annie.A2xExtend=__extends;
+module.exports=annie;
