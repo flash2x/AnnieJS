@@ -109,7 +109,7 @@ namespace annie {
             s.rootContainer = canvas;
             s.rootContainer.id = "_a2x_webgl";
             let options = {
-                depth: false,
+                depth: true,
                 alpha: true,
                 stencil: true,
                 antialias: false,
