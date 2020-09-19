@@ -4612,7 +4612,7 @@ var annie;
         function MovieClip() {
             var _this = _super.call(this) || this;
             _this._curFrame = 0;
-            _this._wantFrame = 1;
+            _this._wantFrame = 0;
             _this._lastFrameObj = null;
             _this._isPlaying = true;
             _this._isFront = true;
@@ -4724,6 +4724,9 @@ var annie;
          */
         MovieClip.prototype.stop = function () {
             var s = this;
+            if (s._wantFrame == 0 && s._curFrame == 0) {
+                s._wantFrame = 1;
+            }
             s._isPlaying = false;
         };
         /**
@@ -5147,8 +5150,8 @@ var annie;
         MovieClip.prototype._onUpdateFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
             var s = this;
-            s._updateTimeline();
             _super.prototype._onUpdateFrame.call(this, mcSpeed);
+            s._updateTimeline();
         };
         MovieClip.prototype._onRemoveEvent = function (isReSetMc) {
             _super.prototype._onRemoveEvent.call(this, isReSetMc);
@@ -6624,15 +6627,15 @@ var annie;
             div.appendChild(s.renderObj.canvas);
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.osType != "pc") {
-                document.body.addEventListener("touchstart", s.mouseEvent, false);
-                document.body.addEventListener('touchmove', s.mouseEvent, false);
-                document.body.addEventListener('touchend', s.mouseEvent, false);
-                document.body.addEventListener('touchcancel', s.mouseEvent, false);
+                div.addEventListener("touchstart", s.mouseEvent, false);
+                div.addEventListener('touchmove', s.mouseEvent, false);
+                div.addEventListener('touchend', s.mouseEvent, false);
+                div.addEventListener('touchcancel', s.mouseEvent, false);
             }
             else {
-                document.body.addEventListener("mousedown", s.mouseEvent, false);
-                document.body.addEventListener('mousemove', s.mouseEvent, false);
-                document.body.addEventListener('mouseup', s.mouseEvent, false);
+                div.addEventListener("mousedown", s.mouseEvent, false);
+                div.addEventListener('mousemove', s.mouseEvent, false);
+                div.addEventListener('mouseup', s.mouseEvent, false);
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
@@ -7251,17 +7254,16 @@ var annie;
             var s = this;
             Stage.removeUpdateObj(s);
             var rc = s.rootDiv;
-            var body = document.body;
             if (annie.osType != "pc") {
-                body.removeEventListener("touchstart", s.mouseEvent, false);
-                body.removeEventListener('touchmove', s.mouseEvent, false);
-                body.removeEventListener('touchend', s.mouseEvent, false);
-                body.removeEventListener('touchcancel', s.mouseEvent, false);
+                rc.removeEventListener("touchstart", s.mouseEvent, false);
+                rc.removeEventListener('touchmove', s.mouseEvent, false);
+                rc.removeEventListener('touchend', s.mouseEvent, false);
+                rc.removeEventListener('touchcancel', s.mouseEvent, false);
             }
             else {
-                body.removeEventListener("mousedown", s.mouseEvent, false);
-                body.removeEventListener('mousemove', s.mouseEvent, false);
-                body.removeEventListener('mouseup', s.mouseEvent, false);
+                rc.removeEventListener("mousedown", s.mouseEvent, false);
+                rc.removeEventListener('mousemove', s.mouseEvent, false);
+                rc.removeEventListener('mouseup', s.mouseEvent, false);
             }
             rc.style.display = "none";
             if (rc.parentNode) {
@@ -11057,23 +11059,29 @@ var annie;
             annie._dRender = new annie.OffCanvasRender();
         }
         //一定要更新一次
+        obj._onUpdateFrame(0);
+        obj._onUpdateMatrixAndAlpha();
+        obj._onUpdateTexture();
+        var lastOffsetX = obj._offsetX;
+        var lastOffsetY = obj._offsetY;
         if (!rect) {
             rect = obj.getBounds();
+            obj._offsetX = rect.x;
+            obj._offsetY = rect.y;
         }
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
-        //先更新
-        var parent = obj.parent;
-        obj.parent = null;
-        //这里一定要执行这个_onUpdateFrame,因为你不知道toDisplayDataURL方法会在哪里执行，为了保证截图的时效性，所以最好执行一次
-        obj._onUpdateFrame(0);
+        else {
+            obj._offsetX += rect.x;
+            obj._offsetY += rect.y;
+        }
+        var texture = document.createElement("canvas");
+        annie._dRender.init(texture);
         var w = Math.ceil(rect.width);
         var h = Math.ceil(rect.height);
-        annie._dRender.init(annie.DisplayObject["_canvas"]);
         annie._dRender.reSize(w, h);
         annie._dRender.begin(bgColor);
-        obj._render(annie._dRender);
-        obj.parent = parent;
+        annie._dRender.render(obj);
+        obj._offsetX = lastOffsetX;
+        obj._offsetY = lastOffsetY;
         if (!typeInfo) {
             typeInfo = { type: "png" };
         }
@@ -11082,7 +11090,7 @@ var annie;
                 typeInfo.quality /= 100;
             }
         }
-        return annie._dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+        return texture.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
     annie.createCache = function (obj) {
         if (!annie._dRender) {
@@ -11091,7 +11099,6 @@ var annie;
         var rect = obj.getBounds();
         obj._offsetX = rect.x;
         obj._offsetY = rect.y;
-        //先更新
         if (!obj._texture) {
             obj._texture = document.createElement("canvas");
         }

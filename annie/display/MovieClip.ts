@@ -44,7 +44,7 @@ namespace annie {
         }
 
         private _curFrame: number = 0;
-        private _wantFrame: number = 1;
+        private _wantFrame: number = 0;
         private _lastFrameObj: any = null;
 
         /**
@@ -119,9 +119,11 @@ namespace annie {
          */
         public stop(): void {
             let s = this;
+            if(s._wantFrame==0&&s._curFrame==0){
+                s._wantFrame=1;
+            }
             s._isPlaying = false;
         }
-
         private _a2x_script: any = null;
 
         /**
@@ -541,8 +543,8 @@ namespace annie {
         }
         public _onUpdateFrame(mcSpeed: number = 1): void {
             let s = this;
-            s._updateTimeline();
             super._onUpdateFrame(mcSpeed);
+            s._updateTimeline();
         }
 
         public _onRemoveEvent(isReSetMc: boolean) {

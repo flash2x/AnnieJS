@@ -203,31 +203,33 @@ namespace annie {
             _dRender = new OffCanvasRender();
         }
         //一定要更新一次
+        obj._onUpdateFrame(0);
+        obj._onUpdateMatrixAndAlpha();
+        obj._onUpdateTexture();
+        let lastOffsetX = obj._offsetX;
+        let lastOffsetY = obj._offsetY;
         if (!rect) {
             rect = obj.getBounds();
         }
-        obj._offsetX = rect.x;
-        obj._offsetY = rect.y;
-        //先更新
-        let parent = obj.parent;
-        obj.parent = null;
-        //这里一定要执行这个_onUpdateFrame,因为你不知道toDisplayDataURL方法会在哪里执行，为了保证截图的时效性，所以最好执行一次
-        obj._onUpdateFrame(0);
+        obj._offsetX += rect.x;
+        obj._offsetY += rect.y;
+        let texture = document.createElement("canvas");
+        _dRender.init(texture);
         let w: number = Math.ceil(rect.width);
         let h: number = Math.ceil(rect.height);
-        _dRender.init(DisplayObject["_canvas"]);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
-        obj._render(_dRender);
-        obj.parent = parent;
+        _dRender.render(obj);
+        obj._offsetX = lastOffsetX;
+        obj._offsetY = lastOffsetY;
         if (!typeInfo) {
-            typeInfo = {type: "png"};
+            typeInfo = { type: "png" };
         } else {
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             }
         }
-        return _dRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+        return texture.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
     export let createCache = function (obj: any): void {
         if (!_dRender) {
@@ -236,8 +238,7 @@ namespace annie {
         let rect = obj.getBounds();
         obj._offsetX = rect.x;
         obj._offsetY = rect.y;
-        //先更新
-        if (!obj._texture){
+        if (!obj._texture) {
             obj._texture = document.createElement("canvas");
         }
         _dRender.init(obj._texture);

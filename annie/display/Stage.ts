@@ -306,14 +306,14 @@ namespace annie {
             div.appendChild(s.renderObj.canvas);
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType!="pc"){
-                document.body.addEventListener("touchstart", s.mouseEvent, false);
-                document.body.addEventListener('touchmove', s.mouseEvent, false);
-                document.body.addEventListener('touchend', s.mouseEvent, false);
-                document.body.addEventListener('touchcancel', s.mouseEvent, false);
+                div.addEventListener("touchstart", s.mouseEvent, false);
+                div.addEventListener('touchmove', s.mouseEvent, false);
+                div.addEventListener('touchend', s.mouseEvent, false);
+                div.addEventListener('touchcancel', s.mouseEvent, false);
             }else{
-                document.body.addEventListener("mousedown", s.mouseEvent, false);
-                document.body.addEventListener('mousemove', s.mouseEvent, false);
-                document.body.addEventListener('mouseup', s.mouseEvent, false);
+                div.addEventListener("mousedown", s.mouseEvent, false);
+                div.addEventListener('mousemove', s.mouseEvent, false);
+                div.addEventListener('mouseup', s.mouseEvent, false);
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
@@ -922,16 +922,15 @@ namespace annie {
             let s = this;
             Stage.removeUpdateObj(s);
             let rc = s.rootDiv;
-            let body=document.body;
             if (osType!="pc") {
-                body.removeEventListener("touchstart", s.mouseEvent, false);
-                body.removeEventListener('touchmove', s.mouseEvent, false);
-                body.removeEventListener('touchend', s.mouseEvent, false);
-                body.removeEventListener('touchcancel', s.mouseEvent, false);
+                rc.removeEventListener("touchstart", s.mouseEvent, false);
+                rc.removeEventListener('touchmove', s.mouseEvent, false);
+                rc.removeEventListener('touchend', s.mouseEvent, false);
+                rc.removeEventListener('touchcancel', s.mouseEvent, false);
             }else {
-                body.removeEventListener("mousedown", s.mouseEvent, false);
-                body.removeEventListener('mousemove', s.mouseEvent, false);
-                body.removeEventListener('mouseup', s.mouseEvent, false);
+                rc.removeEventListener("mousedown", s.mouseEvent, false);
+                rc.removeEventListener('mousemove', s.mouseEvent, false);
+                rc.removeEventListener('mouseup', s.mouseEvent, false);
             }
             rc.style.display = "none";
             if (rc.parentNode) {
