@@ -1128,9 +1128,7 @@ declare namespace annie {
          */
         parent: Sprite;
         _cAlpha: number;
-        _ocAlpha: number;
         _cMatrix: Matrix;
-        _ocMatrix: Matrix;
         /**
          * 是否可以接受点击事件,如果设置为false,此显示对象将无法接收到点击事件
          * @property mouseEnable
@@ -1364,9 +1362,12 @@ declare namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
-        protected _render(renderObj: IRender | any): void;
+        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): annie.Rectangle;
+        /**
+         * 更新贴图
+         */
+        abstract _onUpdateTexture(): void;
+        protected _onUpdateMatrixAndAlpha(): void;
         /**
          * 获取或者设置显示对象在父级里的x方向的宽，不到必要不要用此属性获取高
          * 如果你要同时获取宽高，建议使用 getWH()方法获取宽和高
@@ -1417,6 +1418,7 @@ declare namespace annie {
          * @private
          */
         protected _updateSplitBounds(): void;
+        protected _needCheckDrawBounds: boolean;
         protected _checkDrawBounds(): void;
         /**
          * @method getSound
@@ -1458,7 +1460,7 @@ declare namespace annie {
         _isOnStage: boolean;
         _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
-        _onUpdateFrame(mcSpeed?: number, isOffCanvas?: boolean): void;
+        _onUpdateFrame(mcSpeed?: number): void;
         /**
          * 启动鼠标或者触摸拖动
          * @method startDrag
@@ -1543,7 +1545,8 @@ declare namespace annie {
         bitmapData: any;
         private _cacheCanvas;
         protected _bitmapData: any;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        _onUpdateTexture(): void;
+        protected _onUpdateMatrixAndAlpha(): void;
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 从Bitmap中剥离出单独的小图以供特殊用途
@@ -1912,7 +1915,7 @@ declare namespace annie {
          */
         decodePath(data: Array<number>): void;
         private a2x_ut;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        _onUpdateTexture(): void;
         private _draw;
         /**
          * 如果有的话,改变矢量对象的边框或者填充的颜色.
@@ -2077,11 +2080,11 @@ declare namespace annie {
         removeAllChildren(): void;
         hitTestPoint(hitPoint: Point, isGlobalPoint?: boolean): DisplayObject;
         getBounds(): Rectangle;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
-        _render(renderObj: IRender): void;
+        protected _onUpdateMatrixAndAlpha(): void;
+        _onUpdateTexture(): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         _onAddEvent(): void;
-        _onUpdateFrame(mcSpeed?: number, isOffCanvas?: boolean): void;
+        _onUpdateFrame(mcSpeed?: number): void;
     }
 }
 /**
@@ -2510,7 +2513,7 @@ declare namespace annie {
         private _a2x_sounds;
         _onAddEvent(): void;
         _updateTimeline(): void;
-        _onUpdateFrame(mcSpeed?: number, isOffCanvas?: boolean): void;
+        _onUpdateFrame(mcSpeed?: number): void;
         _onRemoveEvent(isReSetMc: boolean): void;
         private _updateFrameGap;
         private static _resetMC;
@@ -2565,9 +2568,9 @@ declare namespace annie {
          */
         init(htmlElement: any): void;
         private getStyle;
+        _onUpdateTexture(): void;
         _onUpdateFrame(): void;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
-        _render(renderObj: IRender): void;
+        protected _onUpdateMatrixAndAlpha(): void;
         private removeHtmlElement;
         destroy(): void;
     }
@@ -2738,7 +2741,7 @@ declare namespace annie {
         private _getMeasuredWidth;
         private realLines;
         a2x_ut: boolean;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        _onUpdateTexture(): void;
     }
 }
 /**
@@ -3042,6 +3045,11 @@ declare namespace annie {
          */
         desWidth: number;
         /**
+         * @property viewPort
+         *
+         */
+        viewPort: annie.Rectangle;
+        /**
          * 舞台的尺寸高,也就是我们常说的设计尺寸
          * @property desHeight
          * @public
@@ -3127,7 +3135,6 @@ declare namespace annie {
          */
         constructor(rootDivId?: string, desW?: number, desH?: number, frameRate?: number, scaleMode?: string, renderType?: number);
         private _touchEvent;
-        _render(renderObj: IRender): void;
         private _ml;
         private _mp;
         private _initMouseEvent;
@@ -3609,7 +3616,7 @@ declare namespace annie {
          * 渲染循环
          * @param target
          */
-        draw(target: any): void;
+        render(target: any): void;
         /**
          * 初始化事件
          * @param canvas
@@ -3631,7 +3638,7 @@ declare namespace annie {
         /**
          * 最上层容器对象
          */
-        rootContainer: any;
+        canvas: any;
         /**
          * 开始渲染
          */
@@ -3640,10 +3647,6 @@ declare namespace annie {
          * 结束渲染
          */
         end(): void;
-        /**
-         * viewPort
-         */
-        viewPort: annie.Rectangle;
     }
 }
 /**
@@ -3661,18 +3664,13 @@ declare namespace annie {
     class CanvasRender extends AObject implements IRender {
         /**
          * 渲染器所在最上层的对象
-         * @property rootContainer
+         * @property canvas
          * @public
          * @since 1.0.0
          * @type {any}
          * @default null
          */
-        rootContainer: any;
-        /**
-         * @property viewPort
-         *
-         */
-        viewPort: annie.Rectangle;
+        canvas: any;
         /**
          * @property _ctx
          * @protected
@@ -3680,18 +3678,12 @@ declare namespace annie {
          */
         _ctx: any;
         /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage;
-        /**
          * @method CanvasRender
          * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
-        constructor(stage: Stage);
+        constructor();
         /**
          * 开始渲染时执行
          * @method begin
@@ -3716,6 +3708,7 @@ declare namespace annie {
          */
         endMask(): void;
         private _blendMode;
+        render(target: any): void;
         /**
          * 调用渲染
          * @public
@@ -3757,18 +3750,13 @@ declare namespace annie {
     class OffCanvasRender extends AObject implements IRender {
         /**
          * 渲染器所在最上层的对象
-         * @property rootContainer
+         * @property canvas
          * @public
          * @since 1.0.0
          * @type {any}
          * @default null
          */
-        rootContainer: any;
-        /**
-         * @property viewPort
-         *
-         */
-        viewPort: annie.Rectangle;
+        canvas: any;
         /**
          * @property _ctx
          * @protected
@@ -3777,10 +3765,12 @@ declare namespace annie {
         _ctx: any;
         /**
          * @method OffCanvasRender
+         * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
         constructor();
+        private isFirstObj;
         /**
          * 开始渲染时执行
          * @method begin
@@ -3805,14 +3795,7 @@ declare namespace annie {
          */
         endMask(): void;
         private _blendMode;
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        draw(target: any): void;
+        render(target: any): void;
         end(): void;
         /**
          * 初始化渲染器

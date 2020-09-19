@@ -165,6 +165,11 @@ namespace annie {
          */
         public desWidth: number = 0;
         /**
+         * @property viewPort
+         *
+         */
+        public viewPort: annie.Rectangle = new annie.Rectangle();
+        /**
          * 舞台的尺寸高,也就是我们常说的设计尺寸
          * @property desHeight
          * @public
@@ -292,42 +297,33 @@ namespace annie {
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                s.renderObj = new CanvasRender(s);
+                s.renderObj = new CanvasRender();
             } else {
                 //webgl
-                //s.renderObj = new WebGLRender(s);
+                //s.renderObj = new WebGLRender();
             }
             s.renderObj.init(document.createElement('canvas'));
-            let rc = div;
+            div.appendChild(s.renderObj.canvas);
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (osType!="pc"){
-                rc.addEventListener("touchstart", s.mouseEvent, false);
-                rc.addEventListener('touchmove', s.mouseEvent, false);
-                rc.addEventListener('touchend', s.mouseEvent, false);
-                rc.addEventListener('touchcancel', s.mouseEvent, false);
+                document.body.addEventListener("touchstart", s.mouseEvent, false);
+                document.body.addEventListener('touchmove', s.mouseEvent, false);
+                document.body.addEventListener('touchend', s.mouseEvent, false);
+                document.body.addEventListener('touchcancel', s.mouseEvent, false);
             }else{
-                rc.addEventListener("mousedown", s.mouseEvent, false);
-                rc.addEventListener('mousemove', s.mouseEvent, false);
-                rc.addEventListener('mouseup', s.mouseEvent, false);
+                document.body.addEventListener("mousedown", s.mouseEvent, false);
+                document.body.addEventListener('mousemove', s.mouseEvent, false);
+                document.body.addEventListener('mouseup', s.mouseEvent, false);
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.flushAll();
         }
-
         private _touchEvent: annie.TouchEvent;
-
-        public _render(renderObj: IRender): void {
-            renderObj.begin(this.bgColor);
-            super._render(renderObj);
-            renderObj.end();
-        }
-
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
         private _ml: any = [];
         //这个是事件中用到的Point对象池,以提高性能
         private _mp: any = [];
-
         //刷新mouse或者touch事件
         private _initMouseEvent(event: any, cp: Point, sp: Point, identifier: number, timeStamp: number): void {
             event._pd = false;
@@ -345,12 +341,13 @@ namespace annie {
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
-
                 s.resize();
                 s._onUpdateFrame(1);
-                s._updateMatrix();
-                s._render(s.renderObj);
-
+                s._onUpdateMatrixAndAlpha();
+                s._onUpdateTexture();
+                s.renderObj.begin(this.bgColor);
+                s.renderObj.render(s);
+                s.renderObj.end();
         }
 
         /**
@@ -428,7 +425,7 @@ namespace annie {
 
         private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
+            let s: any = this, c = s.renderObj.canvas, offSetX = 0, offSetY = 0;
             if (e.target.id == "_a2x_canvas") {
                 s._isMouseClickCanvas = true;
                 if (s.isPreventDefaultEvent) {
@@ -816,7 +813,9 @@ namespace annie {
                 s.a2x_um = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
-                s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
+                s.viewPort.width=whObj.w * annie.devicePixelRatio;
+                s.viewPort.height=whObj.h * annie.devicePixelRatio;
+                s.renderObj.reSize(s.viewPort.width,s.viewPort.height);
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
             } else if (s.autoResize) {
@@ -824,7 +823,9 @@ namespace annie {
                     s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
-                    s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
+                    s.viewPort.width=whObj.w * annie.devicePixelRatio;
+                    s.viewPort.height=whObj.h * annie.devicePixelRatio;
+                    s.renderObj.reSize(s.viewPort.width,s.viewPort.height);
                     s.setAlign();
                     s.dispatchEvent("onResize");
                 }
@@ -921,15 +922,16 @@ namespace annie {
             let s = this;
             Stage.removeUpdateObj(s);
             let rc = s.rootDiv;
+            let body=document.body;
             if (osType!="pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
+                body.removeEventListener("touchstart", s.mouseEvent, false);
+                body.removeEventListener('touchmove', s.mouseEvent, false);
+                body.removeEventListener('touchend', s.mouseEvent, false);
+                body.removeEventListener('touchcancel', s.mouseEvent, false);
             }else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
+                body.removeEventListener("mousedown", s.mouseEvent, false);
+                body.removeEventListener('mousemove', s.mouseEvent, false);
+                body.removeEventListener('mouseup', s.mouseEvent, false);
             }
             rc.style.display = "none";
             if (rc.parentNode) {

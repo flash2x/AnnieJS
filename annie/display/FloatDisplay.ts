@@ -72,27 +72,22 @@ namespace annie {
         public init(htmlElement: any): void {
             let s = this;
             let she: any;
-            if (typeof(htmlElement) == "string") {
+            if (typeof (htmlElement) == "string") {
                 she = document.getElementById(htmlElement);
             } else if (htmlElement._instanceType == "annie.Video") {
                 she = htmlElement.media;
             } else {
                 she = htmlElement;
             }
-            if(s.htmlElement){
+            if (s.htmlElement) {
                 s.removeHtmlElement();
             }
             let style = she.style;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            let w = she.width||s.getStyle(she, "width");
-            let h = she.height||s.getStyle(she, "height");
-            s._bounds.width = parseInt(w);
-            s._bounds.height = parseInt(h);
-            s._updateSplitBounds();
-            s._checkDrawBounds();
             s.htmlElement = she;
+            s._onUpdateTexture();
         }
 
         private getStyle(elem: HTMLElement, cssName: any): any {
@@ -110,7 +105,22 @@ namespace annie {
             }
             return null;
         }
-
+        public _onUpdateTexture(): void {
+            let s: any = this;
+            let texture: any = s.htmlElement;
+            if (!texture) {
+                s._bounds.width = 0;
+                s._bounds.height = 0;
+            } else {
+                let bw = texture.offsetWidth;
+                let bh = texture.offsetHeight;
+                if (s._bounds.width != bw || s._bounds.height != bh) {
+                    s._bounds.width = bw;
+                    s._bounds.height = bh;
+                    s._updateSplitBounds();
+                }
+            }
+        }
         public _onUpdateFrame(): void {
             super._onUpdateFrame();
             let s: any = this;
@@ -138,12 +148,12 @@ namespace annie {
                 }
             }
         }
-        protected _updateMatrix(isOffCanvas:boolean=false):void {
+        protected _onUpdateMatrixAndAlpha(): void {
             let s = this;
             let o = s.htmlElement;
             if (!s._visible || !o) return;
-            super._updateMatrix(isOffCanvas);
-            if (s.a2x_um || s.a2x_ua || s.a2x_uf) {
+            super._onUpdateMatrixAndAlpha();
+            if (s.a2x_um || s.a2x_ua) {
                 let style = o.style;
                 if (s.a2x_um) {
                     let mtx = s._cMatrix;
@@ -154,14 +164,10 @@ namespace annie {
                     style.opacity = s._cAlpha;
                 }
             }
-            if(!isOffCanvas) {
-                s.a2x_uf = false;
-                s.a2x_um = false;
-                s.a2x_ua = false;
-            }
+            s.a2x_um = false;
+            s.a2x_ua = false;
         }
-        public _render(renderObj: IRender) {}
-        private removeHtmlElement():void{
+        private removeHtmlElement(): void {
             let s = this;
             let elem = s.htmlElement;
             if (elem) {

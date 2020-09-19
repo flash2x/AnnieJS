@@ -13,18 +13,13 @@ namespace annie {
     export class CanvasRender extends AObject implements IRender {
         /**
          * 渲染器所在最上层的对象
-         * @property rootContainer
+         * @property canvas
          * @public
          * @since 1.0.0
          * @type {any}
          * @default null
          */
-        public rootContainer: any = null;
-        /**
-         * @property viewPort
-         *
-         */
-        public viewPort: annie.Rectangle = new annie.Rectangle();
+        public canvas: any = null;
         /**
          * @property _ctx
          * @protected
@@ -32,24 +27,15 @@ namespace annie {
          */
         public _ctx: any;
         /**
-         * @protected _stage
-         * @protected
-         * @default null
-         */
-        private _stage: Stage;
-
-        /**
          * @method CanvasRender
          * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
-        public constructor(stage: Stage) {
+        public constructor() {
             super();
             this._instanceType = "annie.CanvasRender";
-            this._stage = stage;
         }
-
         /**
          * 开始渲染时执行
          * @method begin
@@ -57,7 +43,7 @@ namespace annie {
          * @public
          */
         public begin(color: string): void {
-            let s = this, c = s.rootContainer, ctx = s._ctx;
+            let s = this, c = s.canvas, ctx = s._ctx;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (color == "") {
                 ctx.clearRect(0, 0, c.width, c.height);
@@ -99,7 +85,6 @@ namespace annie {
                 ctx.rect(0, 0, bounds.width, bounds.height);
             }
         }
-
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -109,9 +94,70 @@ namespace annie {
         public endMask(): void {
             this._ctx.restore();
         }
-
         private _blendMode: number = 0;
-
+        public render(target: any){
+            if (target._visible && target._cAlpha > 0) {
+                let s=this;
+                let children = target.children;
+                if (target._texture!=null){
+                    let cf = target._filters;
+                    let cfLen = cf.length;
+                    let fId = -1;
+                    if (cfLen) {
+                        for (let i = 0; i < cfLen; i++) {
+                            if (target._filters[i].type == "Shadow") {
+                                fId = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (fId >= 0) {
+                        let ctx: any = this._ctx;
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        s.draw(target);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    } else {
+                        s.draw(target);
+                    }
+                }else if(children!=void 0){
+                    let maskObj: any;
+                    let child: any;
+                    let len=children.length;
+                    for (let i = 0; i < len; i++) {
+                        child = children[i];
+                        if (child._isUseToMask > 0) {
+                            continue;
+                        }
+                        if (maskObj !=null) {
+                            if (child.mask !=null && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
+                                    s.endMask();
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            } else {
+                                s.endMask();
+                                maskObj = null;
+                            }
+                        } else {
+                            if (child.mask !=null && child.mask.parent == child.parent) {
+                                maskObj = child.mask;
+                                s.beginMask(maskObj);
+                            }
+                        }
+                        s.render(child);
+                    }
+                    if (maskObj !=null) {
+                        s.endMask();
+                    }
+                }
+            }
+        }
         /**
          * 调用渲染
          * @public
@@ -122,12 +168,9 @@ namespace annie {
         public draw(target: any): void {
             let s = this;
             let texture = target._texture;
-            if (!texture||texture.width == 0 || texture.height == 0) return;
-            let ctx = s._ctx, tm;
-            tm = target._cMatrix;
-            if (ctx.globalAlpha != target._cAlpha) {
-                ctx.globalAlpha = target._cAlpha
-            }
+            if (texture.width == 0 || texture.height == 0) return;
+            let ctx = s._ctx, tm= target._cMatrix;
+            ctx.globalAlpha = target._cAlpha
             if (s._blendMode != target.blendMode) {
                 ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
                 s._blendMode = target.blendMode;
@@ -138,13 +181,13 @@ namespace annie {
             }
             let sbl = target._splitBoundsList;
             let rect = null;
-            let bounds=target._bounds;
-            let startX=0-bounds.x;
-            let startY=0-bounds.y;
+            let bounds = target._bounds;
+            let startX = 0 - bounds.x;
+            let startY = 0 - bounds.y;
             for (let i = 0; i < sbl.length; i++) {
                 if (sbl[i].isDraw === true) {
                     rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x+startX, rect.y+startY, rect.width, rect.height, rect.x+startX, rect.y+startY, rect.width, rect.height);
+                    ctx.drawImage(texture, rect.x + startX, rect.y + startY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
                 }
             }
             //getBounds
@@ -175,12 +218,8 @@ namespace annie {
             s._ctx.closePath();
             s._ctx.stroke();
             //*/
-
         }
-
-        public end() {
-        };
-
+        public end() {};
         /**
          * 初始化渲染器
          * @public
@@ -189,9 +228,8 @@ namespace annie {
          */
         public init(canvas: any): void {
             let s = this;
-            s.rootContainer = canvas;
-            s._stage.rootDiv.appendChild(s.rootContainer);
-            s.rootContainer.id = "_a2x_canvas";
+            s.canvas = canvas;
+            s.canvas.id = "_a2x_canvas";
             s._ctx = canvas.getContext('2d');
         }
 
@@ -202,19 +240,15 @@ namespace annie {
          * @method reSize
          */
         public reSize(width: number, height: number): void {
-            let s = this, c = s.rootContainer;
+            let s = this, c = s.canvas;
             c.width = width;
             c.height = height;
-            s.viewPort.width = c.width;
-            s.viewPort.height = c.height;
             c.style.width = Math.ceil(width / devicePixelRatio) + "px";
             c.style.height = Math.ceil(height / devicePixelRatio) + "px";
         }
-
         destroy(): void {
             let s = this;
-            s.rootContainer = null;
-            s._stage = null;
+            s.canvas = null;
             s._ctx = null;
         }
     }

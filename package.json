@@ -15,7 +15,8 @@
     "merge2": "^1.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "buildSDK": "gulp onBuildCore && gulp onBuildUI && gulp onBuildLast",
+    "buildDOC": "gulp onBuildDoc && yuidoc -c docConfig.json"
   },
   "author": "anlun214",
   "license": "MIT"

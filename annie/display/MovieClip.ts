@@ -107,7 +107,7 @@ namespace annie {
         }
 
         //sprite 和 moveClip的类资源信息
-        private _a2x_res_class: any = {tf: 1};
+        private _a2x_res_class: any = { tf: 1 };
         private _a2x_res_children: any = [];
 
         /**
@@ -177,7 +177,7 @@ namespace annie {
          */
         public initButton(): void {
             let s: any = this;
-            if (s._a2x_mode != -1&&s._a2x_res_class.tf > 1) {
+            if (s._a2x_mode != -1 && s._a2x_res_class.tf > 1) {
                 s.mouseChildren = false;
                 //将mc设置成按钮形式
                 s.addEventListener("onMouseDown", s._mouseEvent.bind(s));
@@ -185,13 +185,13 @@ namespace annie {
                 s.addEventListener("onMouseUp", s._mouseEvent.bind(s));
                 s.addEventListener("onMouseOut", s._mouseEvent.bind(s));
                 s._a2x_mode = -1;
-                if(s._clicked) {
+                if (s._clicked) {
                     if (s.totalFrames > 2) {
                         s.gotoAndStop(3);
-                    }else{
+                    } else {
                         s.gotoAndStop(2);
                     }
-                }else{
+                } else {
                     s.gotoAndStop(1);
                 }
             }
@@ -201,7 +201,7 @@ namespace annie {
             let s = this;
             if (value != s._clicked) {
                 if (value) {
-                    s._mouseEvent({type: "onMouseDown"});
+                    s._mouseEvent({ type: "onMouseDown" });
                 } else {
                     s.gotoAndStop(1);
                 }
@@ -301,15 +301,15 @@ namespace annie {
         public gotoAndStop(frameIndex: number | string): void {
             let s: any = this;
             let timeLineObj = s._a2x_res_class;
-            let isOkFrameIndex=false;
-            if (typeof(frameIndex) == "string") {
+            let isOkFrameIndex = false;
+            if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
-                    isOkFrameIndex=true;
+                    isOkFrameIndex = true;
                 }
-            } else if (typeof(frameIndex) == "number") {
-                if (frameIndex>=1&&frameIndex <=timeLineObj.tf) {
-                    isOkFrameIndex=true;
+            } else if (typeof (frameIndex) == "number") {
+                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
+                    isOkFrameIndex = true;
                 }
             }
             if (isOkFrameIndex) {
@@ -346,20 +346,20 @@ namespace annie {
         public gotoAndPlay(frameIndex: number | string, isFront: boolean = true): void {
             let s: any = this;
             let timeLineObj = s._a2x_res_class;
-            let isOkFrameIndex=false;
-            if (typeof(frameIndex) == "string") {
+            let isOkFrameIndex = false;
+            if (typeof (frameIndex) == "string") {
                 if (timeLineObj.label[frameIndex] != undefined) {
                     frameIndex = timeLineObj.label[frameIndex];
-                    isOkFrameIndex=true;
+                    isOkFrameIndex = true;
                 }
-            } else if (typeof(frameIndex) == "number") {
-                if (frameIndex>=1&&frameIndex <=timeLineObj.tf){
-                    isOkFrameIndex=true;
+            } else if (typeof (frameIndex) == "number") {
+                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
+                    isOkFrameIndex = true;
                 }
             }
             if (isOkFrameIndex) {
                 s._isPlaying = true;
-                s._isFront=isFront;
+                s._isFront = isFront;
                 s._floatFrame = 0;
                 s._wantFrame = <number>frameIndex;
                 s._onCheckUpdateFrame();
@@ -413,7 +413,7 @@ namespace annie {
                     s._floatFrame = s._wantFrame - wantFrame;
                     s._curFrame = s._wantFrame;
                     if (curFrame != wantFrame) {
-                        s.a2x_uf=true;
+                        s.a2x_uf = true;
                         let timeLineObj = s._a2x_res_class;
                         //先确定是哪一帧
                         let allChildren = s._a2x_res_children;
@@ -539,29 +539,22 @@ namespace annie {
                 }
             }
         }
-        public _onUpdateFrame(mcSpeed: number = 1, isOffCanvas: boolean = false): void {
+        public _onUpdateFrame(mcSpeed: number = 1): void {
             let s = this;
-            let playStatus: boolean;
-            if (isOffCanvas) {
-                playStatus = s._isPlaying;
-                s._isPlaying = false;
-            }
             s._updateTimeline();
-            if (isOffCanvas) {
-                s._isPlaying = playStatus;
-            }
-            super._onUpdateFrame(mcSpeed, isOffCanvas);
+            super._onUpdateFrame(mcSpeed);
         }
 
         public _onRemoveEvent(isReSetMc: boolean) {
             super._onRemoveEvent(isReSetMc);
-            if (isReSetMc)
+            if (isReSetMc) {
                 MovieClip._resetMC(this);
+            }
         }
 
         private _updateFrameGap() {
             let s = this;
-            s.a2x_uf=true;
+            s.a2x_uf = true;
             let timeLineObj = s._a2x_res_class;
             //先确定是哪一帧
             let allChildren = s._a2x_res_children;

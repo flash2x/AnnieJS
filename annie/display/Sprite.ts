@@ -23,7 +23,7 @@ namespace annie {
             super();
             let s = this;
             s._instanceType = "annie.Sprite";
-            s.hitTestWithPixel=true;
+            s.hitTestWithPixel = true;
         }
 
         public destroy(): void {
@@ -141,7 +141,7 @@ namespace annie {
             if (!name) return null;
             let s = this;
             let rex: any;
-            if (typeof(name) == "string") {
+            if (typeof (name) == "string") {
                 rex = new RegExp("^" + name + "$");
             } else {
                 rex = name;
@@ -174,7 +174,7 @@ namespace annie {
             let cp = child.parent;
             if (cp instanceof annie.Sprite) {
                 Sprite._removeFormParent(cp, child);
-                cp.a2x_uf=true;
+                cp.a2x_uf = true;
             }
             len = s.children.length;
             if (index >= len) {
@@ -192,7 +192,7 @@ namespace annie {
                     child._onAddEvent();
                 }
             }
-            s.a2x_uf=true;
+            s.a2x_uf = true;
         }
 
         private static _removeFormParent(cp: Sprite, child: DisplayObject): void {
@@ -254,12 +254,12 @@ namespace annie {
             let id1 = -1;
             let id2 = -1;
             let childCount = s.children.length;
-            if (typeof(child1) == "number") {
+            if (typeof (child1) == "number") {
                 id1 = child1;
             } else {
                 id1 = s.getChildIndex(child1);
             }
-            if (typeof(child2) == "number") {
+            if (typeof (child2) == "number") {
                 id2 = child2;
             } else {
                 id2 = s.getChildIndex(child2);
@@ -299,7 +299,7 @@ namespace annie {
                 child.stage = null;
             }
             child.parent = null;
-            s.a2x_uf=true;
+            s.a2x_uf = true;
         }
 
         /**
@@ -327,10 +327,10 @@ namespace annie {
             }
         }
         public hitTestPoint(hitPoint: Point, isGlobalPoint: boolean = false): DisplayObject {
-            let s:any = this;
+            let s: any = this;
             if (!s._visible || !s.mouseEnable) return null;
-            if(s._isCache||s._hitArea){
-                return super.hitTestPoint(hitPoint,isGlobalPoint);
+            if (s._isCache || s._hitArea) {
+                return super.hitTestPoint(hitPoint, isGlobalPoint);
             }
             let p: Point = hitPoint;
             if (!isGlobalPoint) {
@@ -384,74 +384,48 @@ namespace annie {
             return rect;
         }
 
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
+        protected _onUpdateMatrixAndAlpha(): void {
             let s = this;
             if (s._visible) {
-                super._updateMatrix(isOffCanvas);
+                super._onUpdateMatrixAndAlpha();
                 let children: any = s.children;
                 let len: number = children.length;
                 for (let i = 0; i < len; i++) {
-                    children[i]._updateMatrix(isOffCanvas);
+                    children[i]._onUpdateMatrixAndAlpha();
                 }
-                //所有未缓存的信息还是一如既往的更新,保持信息同步
-                if (s.a2x_uf) {
-                    s.a2x_uf = false;
-                    if (s._isCache) {
-                        //更新缓存
-                        annie.createCache(s);
-                        s._updateSplitBounds();
-                        s._checkDrawBounds();
-                    }
+                if (s.a2x_um) {
+                    s._needCheckDrawBounds = true;
                 }
-                if (!isOffCanvas){
-                    s.a2x_ua = false;
-                    s.a2x_um = false;
-                }
+                s.a2x_ua = false;
+                s.a2x_um = false;
             }
         }
-        public _render(renderObj: IRender): void {
+        public _onUpdateTexture(): void {
             let s: any = this;
-            if (s._isCache && s.parent) {
-                //这里为什么要加上s.parent判断呢，因为离屏渲染也是走的这个方法，显然离屏渲染就是为了生成缓存的，当然就不能直接走缓存这个逻辑
-                super._render(renderObj);
-            } else {
-                let len: number = s.children.length;
-                if (s._visible && s._cAlpha > 0 && len > 0) {
-                    let children: any = s.children;
-                    let ro: any = renderObj;
-                    let maskObj: any;
-                    let child: any;
-                    for (let i = 0; i < len; i++) {
-                        child = children[i];
-                        if (child._isUseToMask > 0) {
-                            continue;
-                        }
-                        if (maskObj instanceof annie.DisplayObject) {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
-                                    ro.endMask();
-                                    maskObj = child.mask;
-                                    ro.beginMask(maskObj);
-                                }
-                            } else {
-                                ro.endMask();
-                                maskObj = null;
-                            }
-                        } else {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                ro.beginMask(maskObj);
-                            }
-                        }
-                        child._render(ro);
-                    }
-                    if (maskObj instanceof annie.DisplayObject) {
-                        ro.endMask();
-                    }
+            if(s._isCache&&!s.a2x_uf){
+               //空着
+            }else{
+                let children: any = s.children;
+                let len: number = children.length;
+                for (let i = 0; i < len; i++) {
+                    children[i]._onUpdateTexture();
                 }
             }
+            if (s.a2x_uf) {
+                s.a2x_uf = false;
+                s._texture=null;
+                if (s._isCache) {
+                    annie.createCache(s);
+                    s._updateSplitBounds();
+                }else{
+                    s._offsetX = 0;
+                    s._offsetY = 0;
+                }
+            }
+            if (s._needCheckDrawBounds) {
+                s._checkDrawBounds();
+            }
         }
-
         public _onRemoveEvent(isReSetMc: boolean): void {
             let s = this;
             let child: any = null;
@@ -483,17 +457,17 @@ namespace annie {
             super._onAddEvent();
         }
 
-        public _onUpdateFrame(mcSpeed: number = 1, isOffCanvas: boolean = false): void {
+        public _onUpdateFrame(mcSpeed: number = 1): void {
             let s = this;
             s._cMcSpeed = s.mcSpeed * mcSpeed;
-            super._onUpdateFrame(s._cMcSpeed, isOffCanvas);
+            super._onUpdateFrame(s._cMcSpeed);
             let child: any = null;
             let children = s.children.concat();
             let len = children.length;
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child) {
-                    child._onUpdateFrame(s._cMcSpeed, isOffCanvas);
+                    child._onUpdateFrame(s._cMcSpeed);
                 }
             }
         }

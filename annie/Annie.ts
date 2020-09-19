@@ -44,7 +44,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    export let version: string = "3.2.2";
+    export let version: string = "3.2.1";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -203,7 +203,6 @@ namespace annie {
             _dRender = new OffCanvasRender();
         }
         //一定要更新一次
-        obj._updateMatrix();
         if (!rect) {
             rect = obj.getBounds();
         }
@@ -213,8 +212,7 @@ namespace annie {
         let parent = obj.parent;
         obj.parent = null;
         //这里一定要执行这个_onUpdateFrame,因为你不知道toDisplayDataURL方法会在哪里执行，为了保证截图的时效性，所以最好执行一次
-        obj._onUpdateFrame(1, true);
-        obj._updateMatrix(true);
+        obj._onUpdateFrame(0);
         let w: number = Math.ceil(rect.width);
         let h: number = Math.ceil(rect.height);
         _dRender.init(DisplayObject["_canvas"]);
@@ -235,15 +233,11 @@ namespace annie {
         if (!_dRender) {
             _dRender = new OffCanvasRender();
         }
-        let parent = obj.parent;
-        //这里不需要执行_onUpdateFrame
         let rect = obj.getBounds();
         obj._offsetX = rect.x;
         obj._offsetY = rect.y;
         //先更新
-        obj.parent = null;
-        obj._updateMatrix(true);
-        if (!obj._texture) {
+        if (!obj._texture){
             obj._texture = document.createElement("canvas");
         }
         _dRender.init(obj._texture);
@@ -251,19 +245,7 @@ namespace annie {
         let h: number = Math.ceil(rect.height);
         _dRender.reSize(w, h);
         _dRender.begin("");
-        obj._render(_dRender);
-        //看看是否有滤镜
-        let cf: any = obj._filters;
-        let cfLen = cf.length;
-        if (cfLen > 0) {
-            let ctx = _dRender._ctx;
-            let imageData = ctx.getImageData(0, 0, w, h);
-            for (let i = 0; i < cfLen; i++) {
-                cf[i].drawFilter(imageData);
-            }
-            ctx.putImageData(imageData, 0, 0);
-        }
-        obj.parent = parent;
+        _dRender.render(obj);
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -277,6 +259,6 @@ namespace annie {
      */
     export let getStagePixels = function (stage: annie.Stage, rect: annie.Rectangle): Array<number> {
         let newPoint: Point = stage.localToGlobal(new Point(rect.x, rect.y));
-        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
+        return stage.renderObj.canvas.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
     }
 }

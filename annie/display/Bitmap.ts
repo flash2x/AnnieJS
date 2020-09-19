@@ -63,14 +63,14 @@ namespace annie {
         }
 
         public set bitmapData(value: any) {
-            let s:any = this;
-            if(typeof(value)=="string"){
-                let img=new Image();
-                img.src=value;
+            let s: any = this;
+            if (typeof (value) == "string") {
+                let img = new Image();
+                img.src = value;
                 s.clearBounds();
                 s._bitmapData = img;
                 s._texture = img;
-            }else {
+            } else {
                 if (value != s._bitmapData) {
                     s.clearBounds();
                     s._bitmapData = value;
@@ -78,14 +78,12 @@ namespace annie {
                 }
             }
         }
-
         private _cacheCanvas: any = null;
         protected _bitmapData: any = null;
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
-            super._updateMatrix(isOffCanvas);
+        public _onUpdateTexture(): void {
             let s: any = this;
             let texture: any = s._bitmapData;
-            if (!texture || texture.width == 0 || texture.height == 0){
+            if (!texture || texture.width == 0 || texture.height == 0) {
                 return;
             }
             let bw = texture.width;
@@ -94,26 +92,20 @@ namespace annie {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 s._updateSplitBounds();
-                s._checkDrawBounds();
                 if (s._filters.length > 0) {
                     s.a2x_uf = true;
                 }
                 s._texture = texture;
-            } else if (s.a2x_um) {
-                s._checkDrawBounds();
-            }
-            if (!isOffCanvas) {
-                s.a2x_um = false;
-                s.a2x_ua = false;
             }
             if (s.a2x_uf) {
                 s.a2x_uf = false;
-                if(!s._cacheCanvas){
-                    s._cacheCanvas=document.createElement("canvas");
+                s._needCheckDrawBounds=true;
+                if (!s._cacheCanvas) {
+                    s._cacheCanvas = document.createElement("canvas");
                 }
                 let canvas = s._cacheCanvas;
-                canvas.width=bw;
-                canvas.heigth=bh;
+                canvas.width = bw;
+                canvas.heigth = bh;
                 canvas.style.width = Math.ceil(bw / devicePixelRatio) + "px";
                 canvas.style.height = Math.ceil(bh / devicePixelRatio) + "px";
                 let ctx = canvas.getContext("2d");
@@ -130,12 +122,22 @@ namespace annie {
                     }
                     ctx.putImageData(imageData, 0, 0);
                     s._texture = canvas;
-                }else{
+                } else {
                     s._texture = texture;
                 }
             }
+            if(s._needCheckDrawBounds){
+                s._checkDrawBounds();
+            }
         }
-
+        protected _onUpdateMatrixAndAlpha(): void {
+            super._onUpdateMatrixAndAlpha();
+            if(this.a2x_um){
+                this._needCheckDrawBounds=true;
+            }
+            this.a2x_um=false;
+            this.a2x_ua=false;
+        }
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
          * 从Bitmap中剥离出单独的小图以供特殊用途

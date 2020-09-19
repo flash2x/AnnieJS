@@ -576,7 +576,7 @@ namespace annie {
         };
         //是否矢量元素有更新
         private a2x_ut: boolean = true;
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
+        public _onUpdateTexture(): void {
             let s: any = this;
             if (s.a2x_ut){
                 let texture: any = s._bitmapData;
@@ -708,17 +708,16 @@ namespace annie {
                         texture.style.height = (height / devicePixelRatio) + "px";
                         ctx.clearRect(0, 0, width, height);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        ///////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////
                         s._draw(ctx);
-                        ///////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////
                     }
                 }
-                s._texture=texture;
                 if(s._filters.length>0){
                     s.a2x_uf=true;
                 }
             }
-            super._updateMatrix(isOffCanvas);
+            super._onUpdateTexture();
         }
         private _draw(ctx: any, isMask: boolean = false): void {
             let s = this;

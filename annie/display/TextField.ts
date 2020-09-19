@@ -392,7 +392,7 @@ namespace annie {
 
         private realLines: any = [];
         public a2x_ut: boolean = true;
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
+        public _onUpdateTexture(): void {
             let s: any = this;
             if (s.a2x_ut) {
                 let texture = s._bitmapData;
@@ -475,11 +475,9 @@ namespace annie {
                 }
                 if (s._filters.length > 0) {
                     s.a2x_uf = true;
-                } else {
-                    s._texture = texture;
                 }
             }
-            super._updateMatrix(isOffCanvas);
+            super._onUpdateTexture();
         }
     }
 }

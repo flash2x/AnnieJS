@@ -65,6 +65,7 @@
 ## AnnieJS 3.2.2 版本
     修复截图时多遮罩显示异常的bug
     修复annie.Tween和annie.Timer与stage帧率不同步的bug
+    修复鼠标事件重复的bug
 ## AnnieJS 3.2.1 版本
     修复MCScroller有时白屏的bug
     修复MovieClip有滤镜或者色彩或blender变化时，播放动画不更新的bug

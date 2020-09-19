@@ -742,7 +742,7 @@ var annie;
          * @return {void}
          */
         MouseEvent.prototype.updateAfterEvent = function () {
-            this.target.stage._updateMatrix();
+            this.target.stage._onUpdateMatrixAndAlpha();
         };
         MouseEvent.prototype.destroy = function () {
             //清除相应的数据引用
@@ -871,7 +871,7 @@ var annie;
          * @return {void}
          */
         TouchEvent.prototype.updateAfterEvent = function () {
-            this.target._updateMatrix();
+            this.target._onUpdateMatrixAndAlpha();
         };
         TouchEvent.prototype.destroy = function () {
             //清除相应的数据引用
@@ -1708,7 +1708,6 @@ var annie;
             _this.parent = null;
             //显示对象在显示列表上的最终表现出来的透明度,此透明度会继承父级的透明度依次相乘得到最终的值
             _this._cAlpha = 1;
-            _this._ocAlpha = 1;
             //显示对象上对显示列表上的最终合成的矩阵,此矩阵会继承父级的显示属性依次相乘得到最终的值
             _this._cMatrix = new annie.Matrix();
             /**
@@ -1763,6 +1762,7 @@ var annie;
             _this._texture = null;
             _this._bounds = new annie.Rectangle();
             _this._splitBoundsList = [];
+            _this._needCheckDrawBounds = false;
             /**
              * 当前对象包含的声音列表
              * @property soundList
@@ -2288,106 +2288,47 @@ var annie;
             matrix.transformPoint(x + w, y, DisplayObject._p2);
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
             matrix.transformPoint(x, y + h, DisplayObject._p4);
-            annie.Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
+            return annie.Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
         };
-        DisplayObject.prototype._updateMatrix = function (isOffCanvas) {
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
+        DisplayObject.prototype._onUpdateMatrixAndAlpha = function () {
             var s = this, cm, pcm, ca, pca;
             var isHadParent = s.parent instanceof annie.Sprite;
-            if (isOffCanvas) {
-                if (!s._ocMatrix) {
-                    s._ocMatrix = new annie.Matrix();
-                }
-                if (isHadParent) {
-                    pcm = s.parent._ocMatrix;
-                    pca = s.parent._ocAlpha;
-                }
-                else {
-                    s._ocMatrix.identity();
-                    s._ocMatrix.tx = -s._offsetX;
-                    s._ocMatrix.ty = -s._offsetY;
-                    s._ocAlpha = 1;
-                    return;
-                }
-                cm = s._ocMatrix;
+            cm = s._cMatrix;
+            ca = s._cAlpha;
+            if (isHadParent) {
+                pcm = s.parent._cMatrix;
+                pca = s.parent._cAlpha;
+            }
+            if (s.a2x_um) {
                 s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-                cm.setFrom(s._matrix);
-                ca = s._alpha;
-                if (isHadParent) {
-                    cm.prepend(pcm);
-                    ca *= pca;
-                }
-                s._ocAlpha = ca;
+            }
+            if (s._cp) {
+                s.a2x_um = s.a2x_ua = s.a2x_uf = true;
+                s._cp = false;
             }
             else {
-                cm = s._cMatrix;
-                ca = s._cAlpha;
                 if (isHadParent) {
-                    pcm = s.parent._cMatrix;
-                    pca = s.parent._cAlpha;
-                }
-                if (s.a2x_um) {
-                    s._matrix.createBox(s._x, s._y, s._scaleX, s._scaleY, s._rotation, s._skewX, s._skewY, s._anchorX, s._anchorY);
-                }
-                if (s._cp) {
-                    s.a2x_um = s.a2x_ua = true;
-                }
-                else {
-                    if (isHadParent) {
-                        var PUI = s.parent;
-                        if (PUI.a2x_um) {
-                            s.a2x_um = true;
-                        }
-                        if (PUI.a2x_ua) {
-                            s.a2x_ua = true;
-                        }
+                    var PUI = s.parent;
+                    if (PUI.a2x_um) {
+                        s.a2x_um = true;
+                    }
+                    if (PUI.a2x_ua) {
+                        s.a2x_ua = true;
                     }
                 }
-                if (s.a2x_um) {
-                    cm.setFrom(s._matrix);
-                    if (isHadParent) {
-                        cm.prepend(pcm);
-                    }
-                }
-                if (s.a2x_ua) {
-                    ca = s._alpha;
-                    if (isHadParent) {
-                        ca *= pca;
-                    }
-                }
-                s._cp = false;
-                s._cAlpha = ca;
             }
-        };
-        DisplayObject.prototype._render = function (renderObj) {
-            var s = this;
-            if (s._visible && s._cAlpha > 0) {
-                var s_1 = this;
-                var cf = s_1._filters;
-                var cfLen = cf.length;
-                var fId = -1;
-                if (cfLen) {
-                    for (var i = 0; i < cfLen; i++) {
-                        if (s_1._filters[i].type == "Shadow") {
-                            fId = i;
-                            break;
-                        }
-                    }
+            if (s.a2x_um) {
+                cm.setFrom(s._matrix);
+                if (isHadParent) {
+                    cm.prepend(pcm);
                 }
-                if (fId >= 0) {
-                    var ctx = renderObj["_ctx"];
-                    ctx.shadowBlur = cf[fId].blur;
-                    ctx.shadowColor = cf[fId].color;
-                    ctx.shadowOffsetX = cf[fId].offsetX;
-                    ctx.shadowOffsetY = cf[fId].offsetY;
-                    renderObj.draw(s_1);
-                    ctx.shadowBlur = 0;
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 0;
+            }
+            if (s.a2x_ua) {
+                ca = s._alpha;
+                if (isHadParent) {
+                    ca *= pca;
                 }
-                else {
-                    renderObj.draw(s_1);
-                }
+                s._cAlpha = ca;
             }
         };
         Object.defineProperty(DisplayObject.prototype, "width", {
@@ -2400,13 +2341,13 @@ var annie;
              * @return {number}
              */
             get: function () {
-                this._updateMatrix();
+                this._onUpdateMatrixAndAlpha();
                 this.getDrawRect();
                 return DisplayObject._transformRect.width;
             },
             set: function (value) {
                 var s = this;
-                s._updateMatrix();
+                s._onUpdateMatrixAndAlpha();
                 s.getDrawRect();
                 var w = DisplayObject._transformRect.width;
                 if (w > 0) {
@@ -2427,7 +2368,7 @@ var annie;
          * @return {{w: number; h: number}}
          */
         DisplayObject.prototype.getWH = function () {
-            this._updateMatrix();
+            this._onUpdateMatrixAndAlpha();
             this.getDrawRect();
             return { w: DisplayObject._transformRect.width, h: DisplayObject._transformRect.height };
         };
@@ -2441,13 +2382,13 @@ var annie;
              * @return {number}
              */
             get: function () {
-                this._updateMatrix();
+                this._onUpdateMatrixAndAlpha();
                 this.getDrawRect();
                 return DisplayObject._transformRect.height;
             },
             set: function (value) {
                 var s = this;
-                s._updateMatrix();
+                s._onUpdateMatrixAndAlpha();
                 s.getDrawRect();
                 var h = DisplayObject._transformRect.height;
                 if (h > 0) {
@@ -2522,18 +2463,18 @@ var annie;
                 }
             }
             s._splitBoundsList = sbl;
+            s._needCheckDrawBounds = true;
         };
         DisplayObject.prototype._checkDrawBounds = function () {
             var s = this;
             //检查所有bounds矩阵是否在可视范围里
             var sbl = s._splitBoundsList;
-            var dtr = DisplayObject._transformRect;
             if (s.stage) {
                 for (var i = 0; i < sbl.length; i++) {
-                    s.getDrawRect(s._cMatrix, sbl[i].rect);
-                    sbl[i].isDraw = annie.Rectangle.testRectCross(dtr, s.stage.renderObj.viewPort);
+                    sbl[i].isDraw = annie.Rectangle.testRectCross(s.getDrawRect(s._cMatrix, sbl[i].rect), s.stage.viewPort);
                 }
             }
+            s._needCheckDrawBounds = false;
         };
         /**
          * @method getSound
@@ -2646,10 +2587,9 @@ var annie;
             }
             s.dispatchEvent(annie.Event.ADD_TO_STAGE);
         };
-        DisplayObject.prototype._onUpdateFrame = function (mcSpeed, isOffCanvas) {
+        DisplayObject.prototype._onUpdateFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
-            if (this._visible && !isOffCanvas) {
+            if (this._visible) {
                 this.dispatchEvent(annie.Event.ENTER_FRAME);
             }
         };
@@ -2816,9 +2756,7 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Bitmap.prototype._updateMatrix = function (isOffCanvas) {
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
-            _super.prototype._updateMatrix.call(this, isOffCanvas);
+        Bitmap.prototype._onUpdateTexture = function () {
             var s = this;
             var texture = s._bitmapData;
             if (!texture || texture.width == 0 || texture.height == 0) {
@@ -2830,21 +2768,14 @@ var annie;
                 s._bounds.width = bw;
                 s._bounds.height = bh;
                 s._updateSplitBounds();
-                s._checkDrawBounds();
                 if (s._filters.length > 0) {
                     s.a2x_uf = true;
                 }
                 s._texture = texture;
             }
-            else if (s.a2x_um) {
-                s._checkDrawBounds();
-            }
-            if (!isOffCanvas) {
-                s.a2x_um = false;
-                s.a2x_ua = false;
-            }
             if (s.a2x_uf) {
                 s.a2x_uf = false;
+                s._needCheckDrawBounds = true;
                 if (!s._cacheCanvas) {
                     s._cacheCanvas = document.createElement("canvas");
                 }
@@ -2872,6 +2803,17 @@ var annie;
                     s._texture = texture;
                 }
             }
+            if (s._needCheckDrawBounds) {
+                s._checkDrawBounds();
+            }
+        };
+        Bitmap.prototype._onUpdateMatrixAndAlpha = function () {
+            _super.prototype._onUpdateMatrixAndAlpha.call(this);
+            if (this.a2x_um) {
+                this._needCheckDrawBounds = true;
+            }
+            this.a2x_um = false;
+            this.a2x_ua = false;
         };
         /**
          * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -3494,8 +3436,7 @@ var annie;
             s.a2x_ut = true;
         };
         ;
-        Shape.prototype._updateMatrix = function (isOffCanvas) {
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
+        Shape.prototype._onUpdateTexture = function () {
             var s = this;
             if (s.a2x_ut) {
                 var texture = s._bitmapData;
@@ -3630,17 +3571,16 @@ var annie;
                         texture.style.height = (height / annie.devicePixelRatio) + "px";
                         ctx.clearRect(0, 0, width, height);
                         ctx.setTransform(1, 0, 0, 1, -leftX, -leftY);
-                        ///////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////
                         s._draw(ctx);
-                        ///////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////
                     }
                 }
-                s._texture = texture;
                 if (s._filters.length > 0) {
                     s.a2x_uf = true;
                 }
             }
-            _super.prototype._updateMatrix.call(this, isOffCanvas);
+            _super.prototype._onUpdateTexture.call(this);
         };
         Shape.prototype._draw = function (ctx, isMask) {
             if (isMask === void 0) { isMask = false; }
@@ -4135,75 +4075,48 @@ var annie;
             }
             return rect;
         };
-        Sprite.prototype._updateMatrix = function (isOffCanvas) {
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
+        Sprite.prototype._onUpdateMatrixAndAlpha = function () {
             var s = this;
             if (s._visible) {
-                _super.prototype._updateMatrix.call(this, isOffCanvas);
+                _super.prototype._onUpdateMatrixAndAlpha.call(this);
                 var children = s.children;
                 var len = children.length;
                 for (var i = 0; i < len; i++) {
-                    children[i]._updateMatrix(isOffCanvas);
+                    children[i]._onUpdateMatrixAndAlpha();
                 }
-                //所有未缓存的信息还是一如既往的更新,保持信息同步
-                if (s.a2x_uf) {
-                    s.a2x_uf = false;
-                    if (s._isCache) {
-                        //更新缓存
-                        annie.createCache(s);
-                        s._updateSplitBounds();
-                        s._checkDrawBounds();
-                    }
+                if (s.a2x_um) {
+                    s._needCheckDrawBounds = true;
                 }
-                if (!isOffCanvas) {
-                    s.a2x_ua = false;
-                    s.a2x_um = false;
-                }
+                s.a2x_ua = false;
+                s.a2x_um = false;
             }
         };
-        Sprite.prototype._render = function (renderObj) {
+        Sprite.prototype._onUpdateTexture = function () {
             var s = this;
-            if (s._isCache && s.parent) {
-                //这里为什么要加上s.parent判断呢，因为离屏渲染也是走的这个方法，显然离屏渲染就是为了生成缓存的，当然就不能直接走缓存这个逻辑
-                _super.prototype._render.call(this, renderObj);
+            if (s._isCache && !s.a2x_uf) {
+                //空着
             }
             else {
-                var len = s.children.length;
-                if (s._visible && s._cAlpha > 0 && len > 0) {
-                    var children = s.children;
-                    var ro = renderObj;
-                    var maskObj = void 0;
-                    var child = void 0;
-                    for (var i = 0; i < len; i++) {
-                        child = children[i];
-                        if (child._isUseToMask > 0) {
-                            continue;
-                        }
-                        if (maskObj instanceof annie.DisplayObject) {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                if (child.mask != maskObj) {
-                                    ro.endMask();
-                                    maskObj = child.mask;
-                                    ro.beginMask(maskObj);
-                                }
-                            }
-                            else {
-                                ro.endMask();
-                                maskObj = null;
-                            }
-                        }
-                        else {
-                            if (child.mask instanceof annie.DisplayObject && child.mask.parent == child.parent) {
-                                maskObj = child.mask;
-                                ro.beginMask(maskObj);
-                            }
-                        }
-                        child._render(ro);
-                    }
-                    if (maskObj instanceof annie.DisplayObject) {
-                        ro.endMask();
-                    }
+                var children = s.children;
+                var len = children.length;
+                for (var i = 0; i < len; i++) {
+                    children[i]._onUpdateTexture();
                 }
+            }
+            if (s.a2x_uf) {
+                s.a2x_uf = false;
+                s._texture = null;
+                if (s._isCache) {
+                    annie.createCache(s);
+                    s._updateSplitBounds();
+                }
+                else {
+                    s._offsetX = 0;
+                    s._offsetY = 0;
+                }
+            }
+            if (s._needCheckDrawBounds) {
+                s._checkDrawBounds();
             }
         };
         Sprite.prototype._onRemoveEvent = function (isReSetMc) {
@@ -4236,19 +4149,18 @@ var annie;
             }
             _super.prototype._onAddEvent.call(this);
         };
-        Sprite.prototype._onUpdateFrame = function (mcSpeed, isOffCanvas) {
+        Sprite.prototype._onUpdateFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
             var s = this;
             s._cMcSpeed = s.mcSpeed * mcSpeed;
-            _super.prototype._onUpdateFrame.call(this, s._cMcSpeed, isOffCanvas);
+            _super.prototype._onUpdateFrame.call(this, s._cMcSpeed);
             var child = null;
             var children = s.children.concat();
             var len = children.length;
             for (var i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child) {
-                    child._onUpdateFrame(s._cMcSpeed, isOffCanvas);
+                    child._onUpdateFrame(s._cMcSpeed);
                 }
             }
         };
@@ -5232,25 +5144,17 @@ var annie;
                 }
             }
         };
-        MovieClip.prototype._onUpdateFrame = function (mcSpeed, isOffCanvas) {
+        MovieClip.prototype._onUpdateFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
             var s = this;
-            var playStatus;
-            if (isOffCanvas) {
-                playStatus = s._isPlaying;
-                s._isPlaying = false;
-            }
             s._updateTimeline();
-            if (isOffCanvas) {
-                s._isPlaying = playStatus;
-            }
-            _super.prototype._onUpdateFrame.call(this, mcSpeed, isOffCanvas);
+            _super.prototype._onUpdateFrame.call(this, mcSpeed);
         };
         MovieClip.prototype._onRemoveEvent = function (isReSetMc) {
             _super.prototype._onRemoveEvent.call(this, isReSetMc);
-            if (isReSetMc)
+            if (isReSetMc) {
                 MovieClip._resetMC(this);
+            }
         };
         MovieClip.prototype._updateFrameGap = function () {
             var s = this;
@@ -5440,13 +5344,8 @@ var annie;
             style.position = "absolute";
             style.display = "none";
             style.transformOrigin = style.WebkitTransformOrigin = "0 0 0";
-            var w = she.width || s.getStyle(she, "width");
-            var h = she.height || s.getStyle(she, "height");
-            s._bounds.width = parseInt(w);
-            s._bounds.height = parseInt(h);
-            s._updateSplitBounds();
-            s._checkDrawBounds();
             s.htmlElement = she;
+            s._onUpdateTexture();
         };
         FloatDisplay.prototype.getStyle = function (elem, cssName) {
             //如果该属性存在于style[]中，则它最近被设置过(且就是当前的)
@@ -5462,6 +5361,23 @@ var annie;
                 return s && s.getPropertyValue(cssName);
             }
             return null;
+        };
+        FloatDisplay.prototype._onUpdateTexture = function () {
+            var s = this;
+            var texture = s.htmlElement;
+            if (!texture) {
+                s._bounds.width = 0;
+                s._bounds.height = 0;
+            }
+            else {
+                var bw = texture.offsetWidth;
+                var bh = texture.offsetHeight;
+                if (s._bounds.width != bw || s._bounds.height != bh) {
+                    s._bounds.width = bw;
+                    s._bounds.height = bh;
+                    s._updateSplitBounds();
+                }
+            }
         };
         FloatDisplay.prototype._onUpdateFrame = function () {
             _super.prototype._onUpdateFrame.call(this);
@@ -5491,14 +5407,13 @@ var annie;
                 }
             }
         };
-        FloatDisplay.prototype._updateMatrix = function (isOffCanvas) {
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
+        FloatDisplay.prototype._onUpdateMatrixAndAlpha = function () {
             var s = this;
             var o = s.htmlElement;
             if (!s._visible || !o)
                 return;
-            _super.prototype._updateMatrix.call(this, isOffCanvas);
-            if (s.a2x_um || s.a2x_ua || s.a2x_uf) {
+            _super.prototype._onUpdateMatrixAndAlpha.call(this);
+            if (s.a2x_um || s.a2x_ua) {
                 var style = o.style;
                 if (s.a2x_um) {
                     var mtx = s._cMatrix;
@@ -5509,13 +5424,9 @@ var annie;
                     style.opacity = s._cAlpha;
                 }
             }
-            if (!isOffCanvas) {
-                s.a2x_uf = false;
-                s.a2x_um = false;
-                s.a2x_ua = false;
-            }
+            s.a2x_um = false;
+            s.a2x_ua = false;
         };
-        FloatDisplay.prototype._render = function (renderObj) { };
         FloatDisplay.prototype.removeHtmlElement = function () {
             var s = this;
             var elem = s.htmlElement;
@@ -5950,8 +5861,7 @@ var annie;
             //ctx.restore();
             return w;
         };
-        TextField.prototype._updateMatrix = function (isOffCanvas) {
-            if (isOffCanvas === void 0) { isOffCanvas = false; }
+        TextField.prototype._onUpdateTexture = function () {
             var s = this;
             if (s.a2x_ut) {
                 var texture = s._bitmapData;
@@ -6040,11 +5950,8 @@ var annie;
                 if (s._filters.length > 0) {
                     s.a2x_uf = true;
                 }
-                else {
-                    s._texture = texture;
-                }
             }
-            _super.prototype._updateMatrix.call(this, isOffCanvas);
+            _super.prototype._onUpdateTexture.call(this);
         };
         return TextField;
     }(annie.Bitmap));
@@ -6566,6 +6473,11 @@ var annie;
              */
             _this.desWidth = 0;
             /**
+             * @property viewPort
+             *
+             */
+            _this.viewPort = new annie.Rectangle();
+            /**
              * 舞台的尺寸高,也就是我们常说的设计尺寸
              * @property desHeight
              * @public
@@ -6654,7 +6566,9 @@ var annie;
                     s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
-                    s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
+                    s.viewPort.width = whObj.w * annie.devicePixelRatio;
+                    s.viewPort.height = whObj.h * annie.devicePixelRatio;
+                    s.renderObj.reSize(s.viewPort.width, s.viewPort.height);
                     s.setAlign();
                     s.dispatchEvent("onInitStage");
                 }
@@ -6663,7 +6577,9 @@ var annie;
                         s.a2x_um = true;
                         s.divHeight = whObj.h;
                         s.divWidth = whObj.w;
-                        s.renderObj.reSize(whObj.w * annie.devicePixelRatio, whObj.h * annie.devicePixelRatio);
+                        s.viewPort.width = whObj.w * annie.devicePixelRatio;
+                        s.viewPort.height = whObj.h * annie.devicePixelRatio;
+                        s.renderObj.reSize(s.viewPort.width, s.viewPort.height);
                         s.setAlign();
                         s.dispatchEvent("onResize");
                     }
@@ -6698,25 +6614,25 @@ var annie;
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                s.renderObj = new annie.CanvasRender(s);
+                s.renderObj = new annie.CanvasRender();
             }
             else {
                 //webgl
-                //s.renderObj = new WebGLRender(s);
+                //s.renderObj = new WebGLRender();
             }
             s.renderObj.init(document.createElement('canvas'));
-            var rc = div;
+            div.appendChild(s.renderObj.canvas);
             s.mouseEvent = s._onMouseEvent.bind(s);
             if (annie.osType != "pc") {
-                rc.addEventListener("touchstart", s.mouseEvent, false);
-                rc.addEventListener('touchmove', s.mouseEvent, false);
-                rc.addEventListener('touchend', s.mouseEvent, false);
-                rc.addEventListener('touchcancel', s.mouseEvent, false);
+                document.body.addEventListener("touchstart", s.mouseEvent, false);
+                document.body.addEventListener('touchmove', s.mouseEvent, false);
+                document.body.addEventListener('touchend', s.mouseEvent, false);
+                document.body.addEventListener('touchcancel', s.mouseEvent, false);
             }
             else {
-                rc.addEventListener("mousedown", s.mouseEvent, false);
-                rc.addEventListener('mousemove', s.mouseEvent, false);
-                rc.addEventListener('mouseup', s.mouseEvent, false);
+                document.body.addEventListener("mousedown", s.mouseEvent, false);
+                document.body.addEventListener('mousemove', s.mouseEvent, false);
+                document.body.addEventListener('mouseup', s.mouseEvent, false);
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
@@ -6796,11 +6712,6 @@ var annie;
             enumerable: true,
             configurable: true
         });
-        Stage.prototype._render = function (renderObj) {
-            renderObj.begin(this.bgColor);
-            _super.prototype._render.call(this, renderObj);
-            renderObj.end();
-        };
         //刷新mouse或者touch事件
         Stage.prototype._initMouseEvent = function (event, cp, sp, identifier, timeStamp) {
             event._pd = false;
@@ -6816,8 +6727,11 @@ var annie;
             var s = this;
             s.resize();
             s._onUpdateFrame(1);
-            s._updateMatrix();
-            s._render(s.renderObj);
+            s._onUpdateMatrixAndAlpha();
+            s._onUpdateTexture();
+            s.renderObj.begin(this.bgColor);
+            s.renderObj.render(s);
+            s.renderObj.end();
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -6866,7 +6780,7 @@ var annie;
         };
         Stage.prototype._onMouseEvent = function (e) {
             //检查是否有
-            var s = this, c = s.renderObj.rootContainer, offSetX = 0, offSetY = 0;
+            var s = this, c = s.renderObj.canvas, offSetX = 0, offSetY = 0;
             if (e.target.id == "_a2x_canvas") {
                 s._isMouseClickCanvas = true;
                 if (s.isPreventDefaultEvent) {
@@ -7337,16 +7251,17 @@ var annie;
             var s = this;
             Stage.removeUpdateObj(s);
             var rc = s.rootDiv;
+            var body = document.body;
             if (annie.osType != "pc") {
-                rc.removeEventListener("touchstart", s.mouseEvent, false);
-                rc.removeEventListener('touchmove', s.mouseEvent, false);
-                rc.removeEventListener('touchend', s.mouseEvent, false);
-                rc.removeEventListener('touchcancel', s.mouseEvent, false);
+                body.removeEventListener("touchstart", s.mouseEvent, false);
+                body.removeEventListener('touchmove', s.mouseEvent, false);
+                body.removeEventListener('touchend', s.mouseEvent, false);
+                body.removeEventListener('touchcancel', s.mouseEvent, false);
             }
             else {
-                rc.removeEventListener("mousedown", s.mouseEvent, false);
-                rc.removeEventListener('mousemove', s.mouseEvent, false);
-                rc.removeEventListener('mouseup', s.mouseEvent, false);
+                body.removeEventListener("mousedown", s.mouseEvent, false);
+                body.removeEventListener('mousemove', s.mouseEvent, false);
+                body.removeEventListener('mouseup', s.mouseEvent, false);
             }
             rc.style.display = "none";
             if (rc.parentNode) {
@@ -8135,25 +8050,19 @@ var annie;
          * @public
          * @since 1.0.0
          */
-        function CanvasRender(stage) {
+        function CanvasRender() {
             var _this = _super.call(this) || this;
             /**
              * 渲染器所在最上层的对象
-             * @property rootContainer
+             * @property canvas
              * @public
              * @since 1.0.0
              * @type {any}
              * @default null
              */
-            _this.rootContainer = null;
-            /**
-             * @property viewPort
-             *
-             */
-            _this.viewPort = new annie.Rectangle();
+            _this.canvas = null;
             _this._blendMode = 0;
             _this._instanceType = "annie.CanvasRender";
-            _this._stage = stage;
             return _this;
         }
         /**
@@ -8163,7 +8072,7 @@ var annie;
          * @public
          */
         CanvasRender.prototype.begin = function (color) {
-            var s = this, c = s.rootContainer, ctx = s._ctx;
+            var s = this, c = s.canvas, ctx = s._ctx;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (color == "") {
                 ctx.clearRect(0, 0, c.width, c.height);
@@ -8214,6 +8123,73 @@ var annie;
         CanvasRender.prototype.endMask = function () {
             this._ctx.restore();
         };
+        CanvasRender.prototype.render = function (target) {
+            if (target._visible && target._cAlpha > 0) {
+                var s = this;
+                var children = target.children;
+                if (target._texture != null) {
+                    var cf = target._filters;
+                    var cfLen = cf.length;
+                    var fId = -1;
+                    if (cfLen) {
+                        for (var i = 0; i < cfLen; i++) {
+                            if (target._filters[i].type == "Shadow") {
+                                fId = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (fId >= 0) {
+                        var ctx = this._ctx;
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        s.draw(target);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    }
+                    else {
+                        s.draw(target);
+                    }
+                }
+                else if (children != void 0) {
+                    var maskObj = void 0;
+                    var child = void 0;
+                    var len = children.length;
+                    for (var i = 0; i < len; i++) {
+                        child = children[i];
+                        if (child._isUseToMask > 0) {
+                            continue;
+                        }
+                        if (maskObj != null) {
+                            if (child.mask != null && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
+                                    s.endMask();
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            else {
+                                s.endMask();
+                                maskObj = null;
+                            }
+                        }
+                        else {
+                            if (child.mask != null && child.mask.parent == child.parent) {
+                                maskObj = child.mask;
+                                s.beginMask(maskObj);
+                            }
+                        }
+                        s.render(child);
+                    }
+                    if (maskObj != null) {
+                        s.endMask();
+                    }
+                }
+            }
+        };
         /**
          * 调用渲染
          * @public
@@ -8224,13 +8200,10 @@ var annie;
         CanvasRender.prototype.draw = function (target) {
             var s = this;
             var texture = target._texture;
-            if (!texture || texture.width == 0 || texture.height == 0)
+            if (texture.width == 0 || texture.height == 0)
                 return;
-            var ctx = s._ctx, tm;
-            tm = target._cMatrix;
-            if (ctx.globalAlpha != target._cAlpha) {
-                ctx.globalAlpha = target._cAlpha;
-            }
+            var ctx = s._ctx, tm = target._cMatrix;
+            ctx.globalAlpha = target._cAlpha;
             if (s._blendMode != target.blendMode) {
                 ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
                 s._blendMode = target.blendMode;
@@ -8279,8 +8252,7 @@ var annie;
             s._ctx.stroke();
             //*/
         };
-        CanvasRender.prototype.end = function () {
-        };
+        CanvasRender.prototype.end = function () { };
         ;
         /**
          * 初始化渲染器
@@ -8290,9 +8262,8 @@ var annie;
          */
         CanvasRender.prototype.init = function (canvas) {
             var s = this;
-            s.rootContainer = canvas;
-            s._stage.rootDiv.appendChild(s.rootContainer);
-            s.rootContainer.id = "_a2x_canvas";
+            s.canvas = canvas;
+            s.canvas.id = "_a2x_canvas";
             s._ctx = canvas.getContext('2d');
         };
         /**
@@ -8302,18 +8273,15 @@ var annie;
          * @method reSize
          */
         CanvasRender.prototype.reSize = function (width, height) {
-            var s = this, c = s.rootContainer;
+            var s = this, c = s.canvas;
             c.width = width;
             c.height = height;
-            s.viewPort.width = c.width;
-            s.viewPort.height = c.height;
             c.style.width = Math.ceil(width / annie.devicePixelRatio) + "px";
             c.style.height = Math.ceil(height / annie.devicePixelRatio) + "px";
         };
         CanvasRender.prototype.destroy = function () {
             var s = this;
-            s.rootContainer = null;
-            s._stage = null;
+            s.canvas = null;
             s._ctx = null;
         };
         return CanvasRender;
@@ -8337,11 +8305,21 @@ var annie;
         __extends(OffCanvasRender, _super);
         /**
          * @method OffCanvasRender
+         * @param {annie.Stage} stage
          * @public
          * @since 1.0.0
          */
         function OffCanvasRender() {
             var _this = _super.call(this) || this;
+            /**
+             * 渲染器所在最上层的对象
+             * @property canvas
+             * @public
+             * @since 1.0.0
+             * @type {any}
+             * @default null
+             */
+            _this.canvas = null;
             _this._blendMode = 0;
             _this._instanceType = "annie.OffCanvasRender";
             return _this;
@@ -8353,11 +8331,17 @@ var annie;
          * @public
          */
         OffCanvasRender.prototype.begin = function (color) {
-            var s = this, c = s.rootContainer, ctx = s._ctx;
+            var s = this, c = s.canvas, ctx = s._ctx;
+            ctx.globalAlpha = 1;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             if (color == "") {
                 ctx.clearRect(0, 0, c.width, c.height);
             }
+            else {
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, c.width, c.height);
+            }
+            s.isFirstObj = true;
         };
         /**
          * 开始有遮罩时调用
@@ -8376,7 +8360,7 @@ var annie;
             ctx.clip();
         };
         OffCanvasRender.prototype.drawMask = function (target) {
-            var s = this, tm = target._ocMatrix, ctx = s._ctx;
+            var s = this, tm = target._cMatrix, ctx = s._ctx;
             ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
                 target._draw(ctx, true);
@@ -8400,35 +8384,101 @@ var annie;
         OffCanvasRender.prototype.endMask = function () {
             this._ctx.restore();
         };
-        /**
-         * 调用渲染
-         * @public
-         * @since 1.0.0
-         * @method draw
-         * @param {annie.DisplayObject} target 显示对象
-         */
-        OffCanvasRender.prototype.draw = function (target) {
+        OffCanvasRender.prototype.render = function (target) {
             var s = this;
-            var texture = target._texture;
-            if (!texture || texture.width == 0 || texture.height == 0)
-                return;
-            var ctx = s._ctx;
-            var tm = target._ocMatrix;
-            if (ctx.globalAlpha != target._ocAlpha) {
-                ctx.globalAlpha = target._ocAlpha;
+            var isFistObj = s.isFirstObj;
+            if (s.isFirstObj) {
+                s.isFirstObj = false;
             }
-            if (s._blendMode != target.blendMode) {
-                ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
-                s._blendMode = target.blendMode;
+            if (target._visible) {
+                var children = target.children;
+                var texture = target._texture;
+                var ctx = s._ctx, tm = target._matrix;
+                ctx.save();
+                if (!isFistObj) {
+                    ctx.globalAlpha *= target._alpha;
+                    ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                    ctx.translate(target._offsetX, target._offsetY);
+                }
+                else {
+                    ctx.translate(-target._offsetX, -target._offsetY);
+                }
+                if (texture != null && !isFistObj) {
+                    if (texture.width == 0 || texture.height == 0) {
+                        return;
+                    }
+                    var cf_1 = target._filters;
+                    var cfLen_1 = cf_1.length;
+                    var fId = -1;
+                    if (cfLen_1) {
+                        for (var i = 0; i < cfLen_1; i++) {
+                            if (target._filters[i].type == "Shadow") {
+                                fId = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (fId >= 0) {
+                        var ctx_1 = this._ctx;
+                        ctx_1.shadowBlur = cf_1[fId].blur;
+                        ctx_1.shadowColor = cf_1[fId].color;
+                        ctx_1.shadowOffsetX = cf_1[fId].offsetX;
+                        ctx_1.shadowOffsetY = cf_1[fId].offsetY;
+                    }
+                    if (s._blendMode != target.blendMode) {
+                        ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
+                        s._blendMode = target.blendMode;
+                    }
+                    ctx.drawImage(texture, 0, 0);
+                }
+                else if (children != void 0) {
+                    var maskObj = void 0;
+                    var child = void 0;
+                    var len = children.length;
+                    for (var i = 0; i < len; i++) {
+                        child = children[i];
+                        if (child._isUseToMask > 0) {
+                            continue;
+                        }
+                        if (maskObj != null) {
+                            if (child.mask != null && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
+                                    s.endMask();
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            else {
+                                s.endMask();
+                                maskObj = null;
+                            }
+                        }
+                        else {
+                            if (child.mask != null && child.mask.parent == child.parent) {
+                                maskObj = child.mask;
+                                s.beginMask(maskObj);
+                            }
+                        }
+                        s.render(child);
+                    }
+                    if (maskObj != null) {
+                        s.endMask();
+                    }
+                }
+                ctx.restore();
+                //看看是否有滤镜
+                var cf = target._filters;
+                var cfLen = cf.length;
+                if (cfLen > 0) {
+                    var imageData = ctx.getImageData(0, 0, target._bounds.width, target._bounds.height);
+                    for (var i = 0; i < cfLen; i++) {
+                        cf[i].drawFilter(imageData);
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                }
             }
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-            if (target._offsetX != 0 || target._offsetY != 0) {
-                ctx.translate(target._offsetX, target._offsetY);
-            }
-            ctx.drawImage(texture, 0, 0);
         };
-        OffCanvasRender.prototype.end = function () {
-        };
+        OffCanvasRender.prototype.end = function () { };
         ;
         /**
          * 初始化渲染器
@@ -8438,7 +8488,7 @@ var annie;
          */
         OffCanvasRender.prototype.init = function (canvas) {
             var s = this;
-            s.rootContainer = canvas;
+            s.canvas = canvas;
             s._ctx = canvas.getContext('2d');
         };
         /**
@@ -8448,7 +8498,7 @@ var annie;
          * @method reSize
          */
         OffCanvasRender.prototype.reSize = function (width, height) {
-            var s = this, c = s.rootContainer;
+            var s = this, c = s.canvas;
             c.width = width;
             c.height = height;
             c.style.width = Math.ceil(width / annie.devicePixelRatio) + "px";
@@ -8456,7 +8506,7 @@ var annie;
         };
         OffCanvasRender.prototype.destroy = function () {
             var s = this;
-            s.rootContainer = null;
+            s.canvas = null;
             s._ctx = null;
         };
         return OffCanvasRender;
@@ -10844,7 +10894,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.2";
+    annie.version = "3.2.1";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -11007,7 +11057,6 @@ var annie;
             annie._dRender = new annie.OffCanvasRender();
         }
         //一定要更新一次
-        obj._updateMatrix();
         if (!rect) {
             rect = obj.getBounds();
         }
@@ -11017,8 +11066,7 @@ var annie;
         var parent = obj.parent;
         obj.parent = null;
         //这里一定要执行这个_onUpdateFrame,因为你不知道toDisplayDataURL方法会在哪里执行，为了保证截图的时效性，所以最好执行一次
-        obj._onUpdateFrame(1, true);
-        obj._updateMatrix(true);
+        obj._onUpdateFrame(0);
         var w = Math.ceil(rect.width);
         var h = Math.ceil(rect.height);
         annie._dRender.init(annie.DisplayObject["_canvas"]);
@@ -11040,14 +11088,10 @@ var annie;
         if (!annie._dRender) {
             annie._dRender = new annie.OffCanvasRender();
         }
-        var parent = obj.parent;
-        //这里不需要执行_onUpdateFrame
         var rect = obj.getBounds();
         obj._offsetX = rect.x;
         obj._offsetY = rect.y;
         //先更新
-        obj.parent = null;
-        obj._updateMatrix(true);
         if (!obj._texture) {
             obj._texture = document.createElement("canvas");
         }
@@ -11056,19 +11100,7 @@ var annie;
         var h = Math.ceil(rect.height);
         annie._dRender.reSize(w, h);
         annie._dRender.begin("");
-        obj._render(annie._dRender);
-        //看看是否有滤镜
-        var cf = obj._filters;
-        var cfLen = cf.length;
-        if (cfLen > 0) {
-            var ctx = annie._dRender._ctx;
-            var imageData = ctx.getImageData(0, 0, w, h);
-            for (var i = 0; i < cfLen; i++) {
-                cf[i].drawFilter(imageData);
-            }
-            ctx.putImageData(imageData, 0, 0);
-        }
-        obj.parent = parent;
+        annie._dRender.render(obj);
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
@@ -11082,7 +11114,7 @@ var annie;
      */
     annie.getStagePixels = function (stage, rect) {
         var newPoint = stage.localToGlobal(new annie.Point(rect.x, rect.y));
-        return stage.renderObj.rootContainer.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
+        return stage.renderObj.canvas.getContext("2d").getImageData(newPoint.x, newPoint.y, rect.width, rect.height);
     };
 })(annie || (annie = {}));
 /**

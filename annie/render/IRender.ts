@@ -7,7 +7,7 @@ namespace annie {
          * 渲染循环
          * @param target
          */
-        draw(target:any):void;
+        render(target:any):void;
         /**
          * 初始化事件
          * @param canvas
@@ -29,7 +29,7 @@ namespace annie {
         /**
          * 最上层容器对象
          */
-        rootContainer:any;
+        canvas:any;
         /**
          * 开始渲染
          */
@@ -39,10 +39,5 @@ namespace annie {
          * 结束渲染
          */
         end():void;
-
-        /**
-         * viewPort
-         */
-        viewPort:annie.Rectangle;
     }
 }
