@@ -543,8 +543,9 @@ namespace annie {
         }
         public _onUpdateFrame(mcSpeed: number = 1): void {
             let s = this;
-            super._onUpdateFrame(mcSpeed);
+            s._cMcSpeed=s.mcSpeed * mcSpeed;
             s._updateTimeline();
+            super._onUpdateFrame(mcSpeed);
         }
 
         public _onRemoveEvent(isReSetMc: boolean) {

@@ -4152,15 +4152,15 @@ var annie;
         Sprite.prototype._onUpdateFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
             var s = this;
-            s._cMcSpeed = s.mcSpeed * mcSpeed;
-            _super.prototype._onUpdateFrame.call(this, s._cMcSpeed);
+            var cMcSpeed = s.mcSpeed * mcSpeed;
+            _super.prototype._onUpdateFrame.call(this, cMcSpeed);
             var child = null;
             var children = s.children.concat();
             var len = children.length;
             for (var i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child) {
-                    child._onUpdateFrame(s._cMcSpeed);
+                    child._onUpdateFrame(cMcSpeed);
                 }
             }
         };
@@ -5150,8 +5150,9 @@ var annie;
         MovieClip.prototype._onUpdateFrame = function (mcSpeed) {
             if (mcSpeed === void 0) { mcSpeed = 1; }
             var s = this;
-            _super.prototype._onUpdateFrame.call(this, mcSpeed);
+            s._cMcSpeed = s.mcSpeed * mcSpeed;
             s._updateTimeline();
+            _super.prototype._onUpdateFrame.call(this, mcSpeed);
         };
         MovieClip.prototype._onRemoveEvent = function (isReSetMc) {
             _super.prototype._onRemoveEvent.call(this, isReSetMc);
@@ -11066,13 +11067,9 @@ var annie;
         var lastOffsetY = obj._offsetY;
         if (!rect) {
             rect = obj.getBounds();
-            obj._offsetX = rect.x;
-            obj._offsetY = rect.y;
         }
-        else {
-            obj._offsetX += rect.x;
-            obj._offsetY += rect.y;
-        }
+        obj._offsetX += rect.x;
+        obj._offsetY += rect.y;
         var texture = document.createElement("canvas");
         annie._dRender.init(texture);
         var w = Math.ceil(rect.width);

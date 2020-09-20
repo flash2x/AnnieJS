@@ -459,15 +459,15 @@ namespace annie {
 
         public _onUpdateFrame(mcSpeed: number = 1): void {
             let s = this;
-            s._cMcSpeed = s.mcSpeed * mcSpeed;
-            super._onUpdateFrame(s._cMcSpeed);
+            let cMcSpeed = s.mcSpeed * mcSpeed;
+            super._onUpdateFrame(cMcSpeed);
             let child: any = null;
             let children = s.children.concat();
             let len = children.length;
             for (let i = len - 1; i >= 0; i--) {
                 child = children[i];
                 if (child) {
-                    child._onUpdateFrame(s._cMcSpeed);
+                    child._onUpdateFrame(cMcSpeed);
                 }
             }
         }
