@@ -26,15 +26,6 @@ namespace annie {
      */
     export let debug: boolean = false;
     /**
-     * @property annie.isCutDraw
-     * 是否对超大图像资源分割渲染
-     * @type {boolean}
-     * @since 3.2.1
-     * @public
-     * @default false
-     */
-    export let isCutDraw: boolean = false;
-    /**
      * annie引擎的版本号
      * @public
      * @since 1.0.1
@@ -44,7 +35,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    export let version: string = "3.2.1";
+    export let version: string = "3.2.2";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

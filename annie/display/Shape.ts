@@ -573,7 +573,7 @@ namespace annie {
                 }
             }
             s.a2x_ut = true;
-        };
+        }
         //是否矢量元素有更新
         private a2x_ut: boolean = true;
         public _onUpdateTexture(): void {

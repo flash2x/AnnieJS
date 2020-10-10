@@ -117,7 +117,6 @@ namespace annie {
                 if (s._bounds.width != bw || s._bounds.height != bh) {
                     s._bounds.width = bw;
                     s._bounds.height = bh;
-                    s._updateSplitBounds();
                 }
             }
         }

@@ -151,7 +151,9 @@ namespace annie {
          * @default ""
          */
         public name: string = "";
-
+        private _drawRect:{t:number,l:number,b:number,r:number}={t:0,l:0,b:0,r:0};
+        private _UVRect:{t:number,l:number,b:number,r:number}={t:0,l:0,b:0,r:0};
+        private _vertices:Float32Array=new Float32Array(8);
         /**
          * 显示对象位置x
          * @property x
@@ -759,8 +761,6 @@ namespace annie {
         public _texture: any = null;
         public static _transformRect: Rectangle = new annie.Rectangle();
         protected _bounds: Rectangle = new Rectangle();
-        public _splitBoundsList: Array<{ isDraw: boolean, rect: Rectangle }> = [];
-
         /**
          * 停止这个显示对象上的所有声音
          * @method stopAllSounds
@@ -776,66 +776,34 @@ namespace annie {
                 }
             }
         }
-
-        /**
-         * 更新boundsList矩阵
-         * @method _updateSplitBounds
-         * @private
-         */
-        protected _updateSplitBounds(): void {
+        protected _needCheckWebGlUVAndUI:boolean=false;
+        //重新计算顶点和贴图信息
+        protected _checkWebGlUVAndUI() {
             let s = this;
-            let sbl: any = [];
-            let bounds = s.getBounds();
-            if (bounds.width * bounds.height > 0) {
-                let row = 1;
-                let col = 1;
-                let br = 0;
-                let bc = 0;
-                let newWidth = bounds.width;
-                let newHeight = bounds.height;
-                if (annie.isCutDraw) {
-                    br = 1024;
-                    bc = 1024;
-                    newWidth = br + 2;
-                    newHeight = bc + 2;
-                    if (bounds.width > br) {
-                        row = Math.ceil(bounds.width / br);
-                    }
-                    if (bounds.height > bc) {
-                        col = Math.ceil(bounds.height / bc);
-                    }
-                }
-                for (let i = 0; i < row; i++) {
-                    for (let j = 0; j < col; j++) {
-                        let newX = i * br;
-                        let newY = j * bc;
-                        if (i == row - 1) {
-                            newWidth = bounds.width - newX;
-                        }
-                        if (j == col - 1) {
-                            newHeight = bounds.height - newY;
-                        }
-                        sbl.push({
-                            isDraw: true,
-                            rect: new Rectangle(newX + bounds.x, newY + bounds.y, newWidth, newHeight)
-                        });
-                    }
-                }
-            }
-            s._splitBoundsList = sbl;
-            s._needCheckDrawBounds=true;
-        }
-        protected _needCheckDrawBounds:boolean=false;
-        protected _checkDrawBounds() {
-            let s = this;
-            //检查所有bounds矩阵是否在可视范围里
-            let sbl = s._splitBoundsList;
-            if (s.stage) {
-                for (let i = 0; i < sbl.length; i++) {
-                    sbl[i].isDraw = Rectangle.testRectCross(s.getDrawRect(s._cMatrix, sbl[i].rect), s.stage.viewPort);
-                }
-            }
-            s._needCheckDrawBounds=false;
+            let texture=s._texture;
+            let uvRect = s._UVRect;
+            let drawRect=s._drawRect;
+            let vertices=s._vertices;
+            let iMtx = s._cMatrix;
+            let subL=uvRect.l;
+            let subT=uvRect.t;
+            let subR=uvRect.r;
+            let subB=uvRect.b;
+            //更新贴图信息
+            uvRect.t = drawRect.t / texture.height;
+            uvRect.l = drawRect.l / texture.width;
+            uvRect.b = drawRect.b / texture.height;
+            uvRect.r = drawRect.r / texture.width;
+             //计算转换后的顶点信息
+            vertices[0] = subL * iMtx.a + subT * iMtx.c + iMtx.tx;
+            vertices[1] = subL * iMtx.b + subT * iMtx.d + iMtx.ty;
+            vertices[2] = subL * iMtx.a + subB * iMtx.c + iMtx.tx;
+            vertices[3] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
+            vertices[4] = subR * iMtx.a + subT * iMtx.c + iMtx.tx;
+            vertices[5] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
+            vertices[6] = subR * iMtx.a + subB * iMtx.c + iMtx.tx;
+            vertices[7] = subR * iMtx.b + subB * iMtx.d + iMtx.ty;
+            s._needCheckWebGlUVAndUI=false;
         }
         /**
          * @method getSound

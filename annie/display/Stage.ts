@@ -297,10 +297,10 @@ namespace annie {
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                s.renderObj = new CanvasRender();
+                // s.renderObj = new CanvasRender();
             } else {
                 //webgl
-                //s.renderObj = new WebGLRender();
+                s.renderObj = new WebGLRender();
             }
             s.renderObj.init(document.createElement('canvas'));
             div.appendChild(s.renderObj.canvas);
@@ -722,7 +722,7 @@ namespace annie {
                     }
                 }
             }
-        };
+        }
 
         //设置舞台的对齐模式
         private setAlign(): void {
@@ -793,7 +793,7 @@ namespace annie {
             s._viewRect.y = (desH - divH / scaleY) >> 1;
             s._viewRect.width = desW - s._viewRect.x * 2;
             s._viewRect.height = desH - s._viewRect.y * 2;
-        };
+        }
 
         /**
          * 当舞台尺寸发生改变时,如果stage autoResize 为 true，则此方法会自己调用；
@@ -830,7 +830,7 @@ namespace annie {
                     s.dispatchEvent("onResize");
                 }
             }
-        };
+        }
 
         /**
          * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。

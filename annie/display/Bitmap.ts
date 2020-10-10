@@ -91,15 +91,19 @@ namespace annie {
             if (s._bounds.width != bw || s._bounds.height != bh) {
                 s._bounds.width = bw;
                 s._bounds.height = bh;
-                s._updateSplitBounds();
+                s._drawRect.l=0;
+                s._drawRect.t=0;
+                s._drawRect.r=bw;
+                s._drawRect.b=bh;
                 if (s._filters.length > 0) {
                     s.a2x_uf = true;
                 }
                 s._texture = texture;
+                s._needCheckWebGlUVAndUI=true;
             }
             if (s.a2x_uf) {
                 s.a2x_uf = false;
-                s._needCheckDrawBounds=true;
+                s._needCheckWebGlUVAndUI=true;
                 if (!s._cacheCanvas) {
                     s._cacheCanvas = document.createElement("canvas");
                 }
@@ -126,14 +130,14 @@ namespace annie {
                     s._texture = texture;
                 }
             }
-            if(s._needCheckDrawBounds){
-                s._checkDrawBounds();
+            if(s._needCheckWebGlUVAndUI){
+                s._checkWebGlUVAndUI();
             }
         }
         protected _onUpdateMatrixAndAlpha(): void {
             super._onUpdateMatrixAndAlpha();
             if(this.a2x_um){
-                this._needCheckDrawBounds=true;
+                this._needCheckWebGlUVAndUI=true;
             }
             this.a2x_um=false;
             this.a2x_ua=false;

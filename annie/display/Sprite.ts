@@ -394,7 +394,7 @@ namespace annie {
                     children[i]._onUpdateMatrixAndAlpha();
                 }
                 if (s.a2x_um) {
-                    s._needCheckDrawBounds = true;
+                    s._needCheckWebGlUVAndUI = true;
                 }
                 s.a2x_ua = false;
                 s.a2x_um = false;
@@ -416,15 +416,12 @@ namespace annie {
                 s._texture=null;
                 if (s._isCache) {
                     annie.createCache(s);
-                    s._updateSplitBounds();
                 }else{
                     s._offsetX = 0;
                     s._offsetY = 0;
                 }
             }
-            if (s._needCheckDrawBounds) {
-                s._checkDrawBounds();
-            }
+            s._needCheckWebGlUVAndUI = false;
         }
         public _onRemoveEvent(isReSetMc: boolean): void {
             let s = this;

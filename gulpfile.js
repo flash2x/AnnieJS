@@ -30,7 +30,7 @@ var coreList =[
     "annie/display/Stage.ts",
     "annie/filters/Filters.ts",
     "annie/render/IRender.ts",
-    "annie/render/CanvasRender.ts",
+    "annie/render/WebGLRender.ts",
     "annie/render/OffCanvasRender.ts",
     "annie/net/URLLoader.ts",
     "annie/utils/Flash2x.ts",
