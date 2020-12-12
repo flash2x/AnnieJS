@@ -95,11 +95,11 @@ namespace annie {
             this._ctx.restore();
         }
         private _blendMode: number = 0;
-        public render(target: any){
+        public render(target: any) {
             if (target._visible && target._cAlpha > 0) {
-                let s=this;
+                let s = this;
                 let children = target.children;
-                if (target._texture!=null){
+                if (target._texture != null) {
                     let cf = target._filters;
                     let cfLen = cf.length;
                     let fId = -1;
@@ -124,17 +124,17 @@ namespace annie {
                     } else {
                         s.draw(target);
                     }
-                }else if(children!=void 0){
+                } else if (children != void 0) {
                     let maskObj: any;
                     let child: any;
-                    let len=children.length;
+                    let len = children.length;
                     for (let i = 0; i < len; i++) {
                         child = children[i];
                         if (child._isUseToMask > 0) {
                             continue;
                         }
-                        if (maskObj !=null) {
-                            if (child.mask !=null && child.mask.parent == child.parent) {
+                        if (maskObj != null) {
+                            if (child.mask != null && child.mask.parent == child.parent) {
                                 if (child.mask != maskObj) {
                                     s.endMask();
                                     maskObj = child.mask;
@@ -145,14 +145,14 @@ namespace annie {
                                 maskObj = null;
                             }
                         } else {
-                            if (child.mask !=null && child.mask.parent == child.parent) {
+                            if (child.mask != null && child.mask.parent == child.parent) {
                                 maskObj = child.mask;
                                 s.beginMask(maskObj);
                             }
                         }
                         s.render(child);
                     }
-                    if (maskObj !=null) {
+                    if (maskObj != null) {
                         s.endMask();
                     }
                 }
@@ -169,7 +169,7 @@ namespace annie {
             let s = this;
             let texture = target._texture;
             if (texture.width == 0 || texture.height == 0) return;
-            let ctx = s._ctx, tm= target._cMatrix;
+            let ctx = s._ctx, tm = target._cMatrix;
             ctx.globalAlpha = target._cAlpha
             if (s._blendMode != target.blendMode) {
                 ctx.globalCompositeOperation = BlendMode.getBlendMode(target.blendMode);
@@ -179,17 +179,8 @@ namespace annie {
             if (target._offsetX != 0 || target._offsetY != 0) {
                 ctx.translate(target._offsetX, target._offsetY);
             }
-            let sbl = target._splitBoundsList;
-            let rect = null;
-            let bounds = target._bounds;
-            let startX = 0 - bounds.x;
-            let startY = 0 - bounds.y;
-            for (let i = 0; i < sbl.length; i++) {
-                if (sbl[i].isDraw === true) {
-                    rect = sbl[i].rect;
-                    ctx.drawImage(texture, rect.x + startX, rect.y + startY, rect.width, rect.height, rect.x + startX, rect.y + startY, rect.width, rect.height);
-                }
-            }
+            ctx.drawImage(texture, 0, 0);
+
             //getBounds
             /*let rect1=target.getBounds();
             rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);
@@ -219,7 +210,7 @@ namespace annie {
             s._ctx.stroke();
             //*/
         }
-        public end() {};
+        public end() { };
         /**
          * 初始化渲染器
          * @public

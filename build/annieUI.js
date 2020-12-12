@@ -774,8 +774,8 @@ var annieUI;
             s.view.mask = s.maskObj;
             s.maskObj.x = -1;
             s.maskObj.y = -1;
-            s.maskObj["_isUseToMask"] = 0;
-            s.maskObj.alpha = 0;
+            // s.maskObj["_isUseToMask"] = 0;
+            // s.maskObj.alpha = 0;
             s._scroller = new annieUI.Scroller(s, viewWidth, viewHeight, scrollWidth, scrollHeight);
             s._scroller.addEventListener(annie.Event.ON_SCROLL_ING, function (e) {
                 s._view.y = e.data.posY;

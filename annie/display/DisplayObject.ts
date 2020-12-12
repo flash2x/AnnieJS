@@ -785,24 +785,30 @@ namespace annie {
             let drawRect=s._drawRect;
             let vertices=s._vertices;
             let iMtx = s._cMatrix;
-            let subL=uvRect.l;
-            let subT=uvRect.t;
-            let subR=uvRect.r;
-            let subB=uvRect.b;
+            let subL=drawRect.l;
+            let subT=drawRect.t;
+            let subR=drawRect.r;
+            let subB=drawRect.b;
             //更新贴图信息
-            uvRect.t = drawRect.t / texture.height;
-            uvRect.l = drawRect.l / texture.width;
-            uvRect.b = drawRect.b / texture.height;
-            uvRect.r = drawRect.r / texture.width;
+            uvRect.t = subT/ texture.height;
+            uvRect.l = subL / texture.width;
+            uvRect.b = subB / texture.height;
+            uvRect.r = subR / texture.width;
              //计算转换后的顶点信息
-            vertices[0] = subL * iMtx.a + subT * iMtx.c + iMtx.tx;
-            vertices[1] = subL * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vertices[2] = subL * iMtx.a + subB * iMtx.c + iMtx.tx;
-            vertices[3] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
-            vertices[4] = subR * iMtx.a + subT * iMtx.c + iMtx.tx;
-            vertices[5] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vertices[6] = subR * iMtx.a + subB * iMtx.c + iMtx.tx;
-            vertices[7] = subR * iMtx.b + subB * iMtx.d + iMtx.ty;
+             if(s._offsetX!=0&&s._offsetY!=0){
+                iMtx.transformPoint(s.x+s._offsetX,s.y+s._offsetY,DisplayObject._p1);
+             }else{
+                DisplayObject._p1.x=iMtx.tx;
+                DisplayObject._p1.y=iMtx.ty;
+             }
+            vertices[0] = subL * iMtx.a + subT * iMtx.c + DisplayObject._p1.x;
+            vertices[1] = subL * iMtx.b + subT * iMtx.d + DisplayObject._p1.y;
+            vertices[2] = subL * iMtx.a + subB * iMtx.c + DisplayObject._p1.x;
+            vertices[3] = subL * iMtx.b + subB * iMtx.d + DisplayObject._p1.y;
+            vertices[4] = subR * iMtx.a + subT * iMtx.c + DisplayObject._p1.x;
+            vertices[5] = subR * iMtx.b + subT * iMtx.d + DisplayObject._p1.y;
+            vertices[6] = subR * iMtx.a + subB * iMtx.c + DisplayObject._p1.x;
+            vertices[7] = subR * iMtx.b + subB * iMtx.d + DisplayObject._p1.y;
             s._needCheckWebGlUVAndUI=false;
         }
         /**

@@ -297,7 +297,7 @@ namespace annie {
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                // s.renderObj = new CanvasRender();
+                s.renderObj = new CanvasRender();
             } else {
                 //webgl
                 s.renderObj = new WebGLRender();

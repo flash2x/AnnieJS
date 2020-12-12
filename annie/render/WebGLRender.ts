@@ -51,6 +51,7 @@ namespace annie {
         public begin(color: string): void {
             let s = this;
             let gl = s._ctx;
+            gl.clear(gl.COLOR_BUFFER_BIT);
             gl.clearColor(s._clearColor.r, s._clearColor.g, s._clearColor.b, s._clearColor.a);
         }
 
@@ -62,13 +63,27 @@ namespace annie {
          * @since 4.0.0
          */
         public beginMask(target: any): void {
-
+            let s = this;
+            s._drawBuffers();
+            let gl = s._ctx;
+            // ----- 模板方法 begin -----
+            gl.enable(gl.STENCIL_TEST);
+            gl.clear(gl.STENCIL_BUFFER_BIT);
+            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+            gl.stencilMask(0xff);
+            // No need to display the triangle
+            gl.colorMask(0, 0, 0, 0);   
+            //画遮罩
+            this._drawBatchMaskGroup(target);
+            s._drawBuffers();
+            // ----- 模板方法 begin -----
+            // Pass test if stencil value is 1
+            gl.stencilFunc(gl.EQUAL, 1, 0xFF);
+            gl.stencilMask(0x00);
+            gl.colorMask(1, 1, 1, 1);
+            // ----- 模板方法 end -----  
         }
-
-        private drawMask(target: any): void {
-
-        }
-
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -76,7 +91,13 @@ namespace annie {
          * @since 4.0.0
          */
         public endMask(): void {
-
+            let s = this;
+            s._drawBuffers();
+            let gl = s._ctx;
+            // ----- 模板方法 begin -----
+            // 关闭模板测试
+            gl.disable(gl.STENCIL_TEST);
+            // ----- 模板方法 end -----
         }
 
         private _blendMode: number = 0;
@@ -93,6 +114,7 @@ namespace annie {
             s.batchCardCount = 0;
             s._drawBatchGroup(target);
             s._drawBuffers();
+            s._maskObj = null;
         }
 
         public end() {
@@ -109,7 +131,7 @@ namespace annie {
             s.canvas = canvas;
             s.canvas.id = "_a2x_webgl";
             let options = {
-                depth: true,
+                depth: false,
                 alpha: true,
                 stencil: true,
                 antialias: false,
@@ -123,7 +145,6 @@ namespace annie {
                 console.log("No Supported WebGL");
                 return;
             }
-            gl.disable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
             gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, s._premultiply);
@@ -132,8 +153,8 @@ namespace annie {
             s._batchTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
             s._createShaderProgram();
             s._createBuffers();
-            for(let i=0;i<s._batchTextureCount;i++) {
-                s._batchTextures[i]=s.getBaseTexture();
+            for (let i = 0; i < s._batchTextureCount; i++) {
+                s._batchTextures[i] = s.getBaseTexture();
             }
         }
 
@@ -197,7 +218,6 @@ namespace annie {
          * @default null
          */
         public _projectionMatrix: Float32Array = null;
-        public _projectionMatrixFlip: Float32Array = null;
         /**
          * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
          * @property _clearColor
@@ -205,7 +225,7 @@ namespace annie {
          * @type {Object}
          * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
          */
-        public _clearColor: any = {r: 1.0, g: 1.0, b: 1.0, a: 1.00};
+        public _clearColor: any = { r: 1.0, g: 1.0, b: 1.0, a: 1.00 };
 
         /**
          * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
@@ -314,7 +334,6 @@ namespace annie {
          * @type {Array}
          */
         public _batchTextures: Array<any> = [];
-
         /**
          * The number of concurrent textures the GPU can handle. This value is dynamically set from WebGL during initialization
          * via `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`. The WebGL spec states that the lowest guaranteed value is 8,
@@ -382,7 +401,7 @@ namespace annie {
          * @default {t:0, l:0, b:1, r:1}
          * @readonly
          */
-        public static UV_RECT: any = {t: 0, l: 0, b: 1, r: 1};
+        public static UV_RECT: any = { t: 0, l: 0, b: 1, r: 1 };
 
         /**
          * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
@@ -481,7 +500,7 @@ namespace annie {
             let s = this;
             let isHadTexture = true;
             if (displayObject.children) {
-                for (let i = 0;i<displayObject.children.length; i++) {
+                for (let i = 0; i < displayObject.children.length; i++) {
                     s.releaseTexture(displayObject.children[i]);
                 }
                 if (!displayObject._isCache) {
@@ -523,13 +542,8 @@ namespace annie {
                     0, 0, 1, 0,
                     -1, 1, 0.1, 0
                 ]);
-                s._projectionMatrixFlip = new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-                s._projectionMatrixFlip.set(s._projectionMatrix);
-                s._projectionMatrixFlip[5] *= -1;
-                s._projectionMatrixFlip[13] *= -1;
             }
         }
-
         public getBaseTexture() {
             let s = this;
             let gl = s._ctx;
@@ -559,7 +573,6 @@ namespace annie {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
-
         public _getShaderProgram() {
             let s = this;
             let gl = s._ctx;
@@ -638,7 +651,6 @@ namespace annie {
             gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.DYNAMIC_DRAW);
             uvPositionBuffer.itemSize = groupSize;
             uvPositionBuffer.numItems = groupCount;
-
             // what texture it should use
             let textureIndexBuffer = s._textureIndexBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, textureIndexBuffer);
@@ -669,14 +681,14 @@ namespace annie {
         public _createTexture(texData: any) {
             let s = this;
             let storeID = s._storeID++;
-            let texture:any;
+            let texture: any;
             if (storeID < s._batchTextureCount) {
-                texture=s._batchTextures[storeID];
+                texture = s._batchTextures[storeID];
             } else {
-                texture=s.getBaseTexture();
+                texture = s.getBaseTexture();
             }
             texture._activeIndex = -1;
-            s._textureDictionary[storeID]=texture;
+            s._textureDictionary[storeID] = texture;
             texData._storeID = storeID;
             texture._storeID = storeID;
             texture._imageData = texData;
@@ -698,7 +710,6 @@ namespace annie {
                 } while (look !== start);
                 if (found == -1) {
                     s._drawBuffers();
-                    s.batchCardCount = 0;
                     found = start;
                 }
                 texture._activeIndex = found;
@@ -707,7 +718,7 @@ namespace annie {
                 s._updateTextureData(texture);
             } else {
                 //看看是否需要更新贴图
-                // s._updateTextureData(texture);
+                //s._updateTextureData(texture);
             }
             texture._batchID = s._batchID;
         }
@@ -748,15 +759,29 @@ namespace annie {
                 }
             }
         }
-
         public batchCardCount: number = 0;
+        private _maskObj: any = null;
         public _drawBatchGroup(sprite: annie.Sprite) {
             let s = this;
             let l = sprite.children.length;
             for (let i = 0; i < l; i++) {
                 let displayObj: any = sprite.children[i];
-                if (!displayObj._visible || displayObj._cAlpha <= 0){
+                if (!displayObj._visible || displayObj._cAlpha <= 0 || displayObj._isUseToMask > 0) {
                     continue;
+                }
+                if (displayObj.mask != null) {
+                    if (displayObj.mask != s._maskObj) {
+                        if (s._maskObj != null) {
+                            s.endMask();
+                        }
+                        s.beginMask(displayObj.mask);
+                        s._maskObj = displayObj.mask;
+                    }
+                } else {
+                    if (s._maskObj != null) {
+                        s.endMask();
+                        s._maskObj = null;
+                    }
                 }
                 if (displayObj.children && !displayObj._isCache) {
                     s._drawBatchGroup(displayObj);
@@ -768,62 +793,86 @@ namespace annie {
                 }
                 if (s.batchCardCount + 1 > s._maxCardsPerBatch) {
                     s._drawBuffers();
-                    s.batchCardCount = 0;
                 }
-                let uvRect: any, texIndex, texture;
-                let uvs = s._uvs;
-                let vertices = s._vertices;
-                let texI = s._indices;
-                let alphas = s._alphas;
-                if (textureSource._storeID == void 0) {
-                    texture = s._createTexture(textureSource);
-                } else {
-                    texture = s._textureDictionary[textureSource._storeID];
-                    if (!texture) {
-                        continue;
-                    }
-                }
-                
-                s._pushTextureToBatch(texture);
-                texIndex = texture._activeIndex;
-                uvRect = displayObj._UVRect;
-                let displayVertices=displayObj._vertices;
-                //更新顶点数据
-                let offV1 = s.batchCardCount * WebGLRender.INDICIES_PER_CARD;
-                let offV2 = offV1<<1;
-                vertices[offV2] = displayVertices[0];
-                vertices[offV2 + 1] = displayVertices[1];
-                vertices[offV2 + 2] = displayVertices[2];
-                vertices[offV2 + 3] = displayVertices[3];
-                vertices[offV2 + 4] = displayVertices[4];
-                vertices[offV2 + 5] = displayVertices[5];
-                vertices[offV2 + 6] = vertices[offV2 + 2];
-                vertices[offV2 + 7] = vertices[offV2 + 3];
-                vertices[offV2 + 8] = vertices[offV2 + 4];
-                vertices[offV2 + 9] = vertices[offV2 + 5];
-                vertices[offV2 + 10] = displayVertices[6];
-                vertices[offV2 + 11] = displayVertices[7];
-                //更新贴图数据
-                uvs[offV2] = uvRect.l;
-                uvs[offV2 + 1] = uvRect.t;
-                uvs[offV2 + 2] = uvRect.l;
-                uvs[offV2 + 3] = uvRect.b;
-                uvs[offV2 + 4] = uvRect.r;
-                uvs[offV2 + 5] = uvRect.t;
-                uvs[offV2 + 6] = uvRect.l;
-                uvs[offV2 + 7] = uvRect.b;
-                uvs[offV2 + 8] = uvRect.r;
-                uvs[offV2 + 9] = uvRect.t;
-                uvs[offV2 + 10] = uvRect.r;
-                uvs[offV2 + 11] = uvRect.b;
-                // apply texture
-                texI[offV1] = texI[offV1 + 1] = texI[offV1 + 2] = texI[offV1 + 3] = texI[offV1 + 4] = texI[offV1 + 5] = texIndex;
-                // apply alpha
-                alphas[offV1] = alphas[offV1 + 1] = alphas[offV1 + 2] = alphas[offV1 + 3] = alphas[offV1 + 4] = alphas[offV1 + 5] = displayObj._cAlpha;
-                s.batchCardCount++;
+                s.updateDrawData(textureSource, displayObj);
             }
         }
-
+        public _drawBatchMaskGroup(sprite: any) {
+            let s = this;
+            if (!sprite._visible) {
+                return;
+            }
+            let children=sprite.children;
+            if(children!=void 0&&!sprite._isCache){
+                let l = children.length;
+                for (let i = 0; i < l; i++) {
+                    let displayObj: any = children[i];
+                    s._drawBatchMaskGroup(displayObj);
+                }
+            }else{
+                let textureSource = sprite._texture;
+                if (!textureSource || sprite._bounds.width <= 0) {
+                    return;
+                }
+                if (s.batchCardCount + 1 > s._maxCardsPerBatch) {
+                    s._drawBuffers();
+                }
+                s.updateDrawData(textureSource, sprite);
+            }
+        }
+        public updateDrawData(textureSource: any, displayObj: any) {
+            let s = this;
+            let uvRect: any, texIndex, texture;
+            let uvs = s._uvs;
+            let vertices = s._vertices;
+            let texI = s._indices;
+            let alphas = s._alphas;
+            if (textureSource._storeID == void 0) {
+                texture = s._createTexture(textureSource);
+            } else {
+                texture = s._textureDictionary[textureSource._storeID];
+                if (!texture) {
+                    return;
+                }
+            }
+            s._pushTextureToBatch(texture);
+            texIndex = texture._activeIndex;
+            uvRect = displayObj._UVRect;
+            let displayVertices = displayObj._vertices;
+            //更新顶点数据
+            let offV1 = s.batchCardCount * WebGLRender.INDICIES_PER_CARD;
+            let offV2 = offV1 << 1;
+            vertices[offV2] = displayVertices[0];
+            vertices[offV2 + 1] = displayVertices[1];
+            vertices[offV2 + 2] = displayVertices[2];
+            vertices[offV2 + 3] = displayVertices[3];
+            vertices[offV2 + 4] = displayVertices[4];
+            vertices[offV2 + 5] = displayVertices[5];
+            vertices[offV2 + 6] = vertices[offV2 + 2];
+            vertices[offV2 + 7] = vertices[offV2 + 3];
+            vertices[offV2 + 8] = vertices[offV2 + 4];
+            vertices[offV2 + 9] = vertices[offV2 + 5];
+            vertices[offV2 + 10] = displayVertices[6];
+            vertices[offV2 + 11] = displayVertices[7];
+            //更新贴图数据
+            uvs[offV2] = uvRect.l;
+            uvs[offV2 + 1] = uvRect.t;
+            uvs[offV2 + 2] = uvRect.l;
+            uvs[offV2 + 3] = uvRect.b;
+            uvs[offV2 + 4] = uvRect.r;
+            uvs[offV2 + 5] = uvRect.t;
+            uvs[offV2 + 6] = uvRect.l;
+            uvs[offV2 + 7] = uvRect.b;
+            uvs[offV2 + 8] = uvRect.r;
+            uvs[offV2 + 9] = uvRect.t;
+            uvs[offV2 + 10] = uvRect.r;
+            uvs[offV2 + 11] = uvRect.b;
+            // apply texture
+            texI[offV1] = texI[offV1 + 1] = texI[offV1 + 2] = texI[offV1 + 3] = texI[offV1 + 4] = texI[offV1 + 5] = texIndex;
+            // apply alpha
+            alphas[offV1] = alphas[offV1 + 1] = alphas[offV1 + 2] = alphas[offV1 + 3] = alphas[offV1 + 4] = alphas[offV1 + 5] = displayObj._cAlpha;
+            s.batchCardCount++;
+        }
         public _drawBuffers() {
             let s = this;
             let gl = s._ctx;
@@ -835,7 +884,7 @@ namespace annie {
             let textureIndexBuffer = s._textureIndexBuffer;
             let uvPositionBuffer = s._uvPositionBuffer;
             let alphaBuffer = s._alphaBuffer;
-            let projectionMatrix=s._projectionMatrix;
+            let projectionMatrix = s._projectionMatrix;
             //gl.useProgram(shaderProgram);
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -856,11 +905,13 @@ namespace annie {
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 s.setTextureParams();
             }
+            
             gl.drawArrays(gl.TRIANGLES, 0, s.batchCardCount * WebGLRender.INDICIES_PER_CARD);
             s._batchID++;
             if (s._batchID == Number.MAX_VALUE) {
                 s._batchID = 0;
             }
+            s.batchCardCount = 0;
         }
     }
 }

@@ -3696,7 +3696,6 @@ declare namespace annie {
          * @since 4.0.0
          */
         beginMask(target: any): void;
-        private drawMask;
         /**
          * 结束遮罩时调用
          * @method endMask
@@ -3762,7 +3761,6 @@ declare namespace annie {
          * @default null
          */
         _projectionMatrix: Float32Array;
-        _projectionMatrixFlip: Float32Array;
         /**
          * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
          * @property _clearColor
@@ -3993,8 +3991,97 @@ declare namespace annie {
         _updateTextureData(texture: any): void;
         _killTextureObject(texture: any): void;
         batchCardCount: number;
+        private _maskObj;
         _drawBatchGroup(sprite: annie.Sprite): void;
+        _drawBatchMaskGroup(sprite: any): void;
+        updateDrawData(textureSource: any, displayObj: any): void;
         _drawBuffers(): void;
+    }
+}
+/**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * Canvas 渲染器
+     * @class annie.CanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    class CanvasRender extends AObject implements IRender {
+        /**
+         * 渲染器所在最上层的对象
+         * @property canvas
+         * @public
+         * @since 1.0.0
+         * @type {any}
+         * @default null
+         */
+        canvas: any;
+        /**
+         * @property _ctx
+         * @protected
+         * @default null
+         */
+        _ctx: any;
+        /**
+         * @method CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        constructor();
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        begin(color: string): void;
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        beginMask(target: any): void;
+        private drawMask;
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        endMask(): void;
+        private _blendMode;
+        render(target: any): void;
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        draw(target: any): void;
+        end(): void;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        init(canvas: any): void;
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        reSize(width: number, height: number): void;
+        destroy(): void;
     }
 }
 /**

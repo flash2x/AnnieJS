@@ -2427,24 +2427,31 @@ var annie;
             var drawRect = s._drawRect;
             var vertices = s._vertices;
             var iMtx = s._cMatrix;
-            var subL = uvRect.l;
-            var subT = uvRect.t;
-            var subR = uvRect.r;
-            var subB = uvRect.b;
+            var subL = drawRect.l;
+            var subT = drawRect.t;
+            var subR = drawRect.r;
+            var subB = drawRect.b;
             //更新贴图信息
-            uvRect.t = drawRect.t / texture.height;
-            uvRect.l = drawRect.l / texture.width;
-            uvRect.b = drawRect.b / texture.height;
-            uvRect.r = drawRect.r / texture.width;
+            uvRect.t = subT / texture.height;
+            uvRect.l = subL / texture.width;
+            uvRect.b = subB / texture.height;
+            uvRect.r = subR / texture.width;
             //计算转换后的顶点信息
-            vertices[0] = subL * iMtx.a + subT * iMtx.c + iMtx.tx;
-            vertices[1] = subL * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vertices[2] = subL * iMtx.a + subB * iMtx.c + iMtx.tx;
-            vertices[3] = subL * iMtx.b + subB * iMtx.d + iMtx.ty;
-            vertices[4] = subR * iMtx.a + subT * iMtx.c + iMtx.tx;
-            vertices[5] = subR * iMtx.b + subT * iMtx.d + iMtx.ty;
-            vertices[6] = subR * iMtx.a + subB * iMtx.c + iMtx.tx;
-            vertices[7] = subR * iMtx.b + subB * iMtx.d + iMtx.ty;
+            if (s._offsetX != 0 && s._offsetY != 0) {
+                iMtx.transformPoint(s.x + s._offsetX, s.y + s._offsetY, DisplayObject._p1);
+            }
+            else {
+                DisplayObject._p1.x = iMtx.tx;
+                DisplayObject._p1.y = iMtx.ty;
+            }
+            vertices[0] = subL * iMtx.a + subT * iMtx.c + DisplayObject._p1.x;
+            vertices[1] = subL * iMtx.b + subT * iMtx.d + DisplayObject._p1.y;
+            vertices[2] = subL * iMtx.a + subB * iMtx.c + DisplayObject._p1.x;
+            vertices[3] = subL * iMtx.b + subB * iMtx.d + DisplayObject._p1.y;
+            vertices[4] = subR * iMtx.a + subT * iMtx.c + DisplayObject._p1.x;
+            vertices[5] = subR * iMtx.b + subT * iMtx.d + DisplayObject._p1.y;
+            vertices[6] = subR * iMtx.a + subB * iMtx.c + DisplayObject._p1.x;
+            vertices[7] = subR * iMtx.b + subB * iMtx.d + DisplayObject._p1.y;
             s._needCheckWebGlUVAndUI = false;
         };
         /**
@@ -3410,7 +3417,6 @@ var annie;
             }
             s.a2x_ut = true;
         };
-        ;
         Shape.prototype._onUpdateTexture = function () {
             var s = this;
             if (s.a2x_ut) {
@@ -6589,7 +6595,7 @@ var annie;
             //webgl 直到对2d的支持非常成熟了再考虑开启
             if (renderType == 0) {
                 //canvas
-                // s.renderObj = new CanvasRender();
+                s.renderObj = new annie.CanvasRender();
             }
             else {
                 //webgl
@@ -7070,7 +7076,6 @@ var annie;
                 }
             }
         };
-        ;
         //设置舞台的对齐模式
         Stage.prototype.setAlign = function () {
             var s = this;
@@ -7146,7 +7151,6 @@ var annie;
             s._viewRect.width = desW - s._viewRect.x * 2;
             s._viewRect.height = desH - s._viewRect.y * 2;
         };
-        ;
         Object.defineProperty(Stage.prototype, "viewRect", {
             /**
              * 舞台在设备里截取后的可见区域,有些时候知道可见区域是非常重要的,因为这样你就可以根据舞台的可见区域做自适应了。
@@ -8073,7 +8077,6 @@ var annie;
              * @default null
              */
             _this._projectionMatrix = null;
-            _this._projectionMatrixFlip = null;
             /**
              * The color to use when the WebGL canvas has been cleared. May appear as a background color. Defaults to grey.
              * @property _clearColor
@@ -8081,7 +8084,7 @@ var annie;
              * @type {Object}
              * @default {r: 0.50, g: 0.50, b: 0.50, a: 0.00}
              */
-            _this._clearColor = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
+            _this._clearColor = { r: 1.0, g: 1.0, b: 1.0, a: 1.00 };
             /**
              * The maximum number of cards (aka a single sprite) that can be drawn in one draw call. Use getter/setters to
              * modify otherwise internal buffers may be incorrect sizes.
@@ -8219,6 +8222,7 @@ var annie;
             _this._lastTrackedCanvas = 0;
             _this._storeID = 0;
             _this.batchCardCount = 0;
+            _this._maskObj = null;
             _this._instanceType = "annie.WebGLRender";
             return _this;
         }
@@ -8231,8 +8235,8 @@ var annie;
         WebGLRender.prototype.begin = function (color) {
             var s = this;
             var gl = s._ctx;
-            gl.clearColor(s._clearColor.r, s._clearColor.g, s._clearColor.b, s._clearColor.a);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.clearColor(s._clearColor.r, s._clearColor.g, s._clearColor.b, s._clearColor.a);
         };
         /**
          * 开始有遮罩时调用
@@ -8242,8 +8246,26 @@ var annie;
          * @since 4.0.0
          */
         WebGLRender.prototype.beginMask = function (target) {
-        };
-        WebGLRender.prototype.drawMask = function (target) {
+            var s = this;
+            s._drawBuffers();
+            var gl = s._ctx;
+            // ----- 模板方法 begin -----
+            gl.enable(gl.STENCIL_TEST);
+            gl.clear(gl.STENCIL_BUFFER_BIT);
+            gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+            gl.stencilMask(0xff);
+            // No need to display the triangle
+            gl.colorMask(0, 0, 0, 0);
+            //画遮罩
+            this._drawBatchMaskGroup(target);
+            s._drawBuffers();
+            // ----- 模板方法 begin -----
+            // Pass test if stencil value is 1
+            gl.stencilFunc(gl.EQUAL, 1, 0xFF);
+            gl.stencilMask(0x00);
+            gl.colorMask(1, 1, 1, 1);
+            // ----- 模板方法 end -----  
         };
         /**
          * 结束遮罩时调用
@@ -8252,6 +8274,13 @@ var annie;
          * @since 4.0.0
          */
         WebGLRender.prototype.endMask = function () {
+            var s = this;
+            s._drawBuffers();
+            var gl = s._ctx;
+            // ----- 模板方法 begin -----
+            // 关闭模板测试
+            gl.disable(gl.STENCIL_TEST);
+            // ----- 模板方法 end -----
         };
         /**
          * 调用渲染
@@ -8264,9 +8293,10 @@ var annie;
             var s = this;
             s.batchCardCount = 0;
             s._drawBatchGroup(target);
+            s._drawBuffers();
+            s._maskObj = null;
         };
         WebGLRender.prototype.end = function () {
-            s._drawBuffers();
         };
         /**
          * 初始化渲染器
@@ -8279,7 +8309,7 @@ var annie;
             s.canvas = canvas;
             s.canvas.id = "_a2x_webgl";
             var options = {
-                depth: true,
+                depth: false,
                 alpha: true,
                 stencil: true,
                 antialias: false,
@@ -8294,7 +8324,6 @@ var annie;
                 console.log("No Supported WebGL");
                 return;
             }
-            gl.disable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
             gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, s._premultiply);
@@ -8350,7 +8379,6 @@ var annie;
                 }
             }
         };
-        ;
         WebGLRender.prototype._createShaderProgram = function () {
             var s = this;
             var success = false;
@@ -8367,7 +8395,6 @@ var annie;
                 }
             }
         };
-        ;
         WebGLRender.prototype.updateViewport = function () {
             var s = this;
             var width = s.viewPort.width, height = s.viewPort.height;
@@ -8380,13 +8407,8 @@ var annie;
                     0, 0, 1, 0,
                     -1, 1, 0.1, 0
                 ]);
-                s._projectionMatrixFlip = new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-                s._projectionMatrixFlip.set(s._projectionMatrix);
-                s._projectionMatrixFlip[5] *= -1;
-                s._projectionMatrixFlip[13] *= -1;
             }
         };
-        ;
         WebGLRender.prototype.getBaseTexture = function () {
             var s = this;
             var gl = s._ctx;
@@ -8407,7 +8429,6 @@ var annie;
             s.setTextureParams();
             return texture;
         };
-        ;
         WebGLRender.prototype.setTextureParams = function () {
             var gl = this._ctx;
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -8415,7 +8436,6 @@ var annie;
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         };
-        ;
         WebGLRender.prototype._getShaderProgram = function () {
             var s = this;
             var gl = s._ctx;
@@ -8447,7 +8467,6 @@ var annie;
             shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "pMatrix");
             return shaderProgram;
         };
-        ;
         WebGLRender.prototype._createShader = function (type, str) {
             var s = this;
             var gl = s._ctx;
@@ -8466,7 +8485,6 @@ var annie;
             gl.compileShader(shader);
             return shader;
         };
-        ;
         WebGLRender.prototype._createBuffers = function () {
             var s = this;
             var gl = s._ctx;
@@ -8516,7 +8534,6 @@ var annie;
             alphaBuffer.itemSize = groupSize;
             alphaBuffer.numItems = groupCount;
         };
-        ;
         WebGLRender.prototype._createTexture = function (texData) {
             var s = this;
             var storeID = s._storeID++;
@@ -8534,7 +8551,6 @@ var annie;
             texture._imageData = texData;
             return texture;
         };
-        ;
         WebGLRender.prototype._pushTextureToBatch = function (texture) {
             var s = this;
             if (texture._activeIndex == -1 || s._batchTextures[texture._activeIndex] != texture) {
@@ -8550,7 +8566,6 @@ var annie;
                 } while (look !== start);
                 if (found == -1) {
                     s._drawBuffers();
-                    s.batchCardCount = 0;
                     found = start;
                 }
                 texture._activeIndex = found;
@@ -8560,11 +8575,10 @@ var annie;
             }
             else {
                 //看看是否需要更新贴图
-                // s._updateTextureData(texture);
+                //s._updateTextureData(texture);
             }
             texture._batchID = s._batchID;
         };
-        ;
         WebGLRender.prototype._updateTextureData = function (texture) {
             var s = this;
             var gl = s._ctx;
@@ -8577,7 +8591,6 @@ var annie;
             catch (e) {
             }
         };
-        ;
         WebGLRender.prototype._killTextureObject = function (texture) {
             if (!texture) {
                 return;
@@ -8603,14 +8616,28 @@ var annie;
                 }
             }
         };
-        ;
         WebGLRender.prototype._drawBatchGroup = function (sprite) {
             var s = this;
             var l = sprite.children.length;
             for (var i = 0; i < l; i++) {
                 var displayObj = sprite.children[i];
-                if (!displayObj._visible || displayObj._cAlpha <= 0) {
+                if (!displayObj._visible || displayObj._cAlpha <= 0 || displayObj._isUseToMask > 0) {
                     continue;
+                }
+                if (displayObj.mask != null) {
+                    if (displayObj.mask != s._maskObj) {
+                        if (s._maskObj != null) {
+                            s.endMask();
+                        }
+                        s.beginMask(displayObj.mask);
+                        s._maskObj = displayObj.mask;
+                    }
+                }
+                else {
+                    if (s._maskObj != null) {
+                        s.endMask();
+                        s._maskObj = null;
+                    }
                 }
                 if (displayObj.children && !displayObj._isCache) {
                     s._drawBatchGroup(displayObj);
@@ -8622,62 +8649,88 @@ var annie;
                 }
                 if (s.batchCardCount + 1 > s._maxCardsPerBatch) {
                     s._drawBuffers();
-                    s.batchCardCount = 0;
                 }
-                var uvRect = void 0, texIndex = void 0, texture = void 0;
-                var uvs = s._uvs;
-                var vertices = s._vertices;
-                var texI = s._indices;
-                var alphas = s._alphas;
-                if (textureSource._storeID == void 0) {
-                    texture = s._createTexture(textureSource);
-                }
-                else {
-                    texture = s._textureDictionary[textureSource._storeID];
-                    if (!texture) {
-                        continue;
-                    }
-                }
-                s._pushTextureToBatch(texture);
-                texIndex = texture._activeIndex;
-                uvRect = displayObj._UVRect;
-                var displayVertices = displayObj._vertices;
-                //更新顶点数据
-                var offV1 = s.batchCardCount * WebGLRender.INDICIES_PER_CARD;
-                var offV2 = offV1 << 1;
-                vertices[offV2] = displayVertices[0];
-                vertices[offV2 + 1] = displayVertices[1];
-                vertices[offV2 + 2] = displayVertices[2];
-                vertices[offV2 + 3] = displayVertices[3];
-                vertices[offV2 + 4] = displayVertices[4];
-                vertices[offV2 + 5] = displayVertices[5];
-                vertices[offV2 + 6] = vertices[offV2 + 2];
-                vertices[offV2 + 7] = vertices[offV2 + 3];
-                vertices[offV2 + 8] = vertices[offV2 + 4];
-                vertices[offV2 + 9] = vertices[offV2 + 5];
-                vertices[offV2 + 10] = displayVertices[6];
-                vertices[offV2 + 11] = displayVertices[7];
-                //更新贴图数据
-                uvs[offV2] = uvRect.l;
-                uvs[offV2 + 1] = uvRect.t;
-                uvs[offV2 + 2] = uvRect.l;
-                uvs[offV2 + 3] = uvRect.b;
-                uvs[offV2 + 4] = uvRect.r;
-                uvs[offV2 + 5] = uvRect.t;
-                uvs[offV2 + 6] = uvRect.l;
-                uvs[offV2 + 7] = uvRect.b;
-                uvs[offV2 + 8] = uvRect.r;
-                uvs[offV2 + 9] = uvRect.t;
-                uvs[offV2 + 10] = uvRect.r;
-                uvs[offV2 + 11] = uvRect.b;
-                // apply texture
-                texI[offV1] = texI[offV1 + 1] = texI[offV1 + 2] = texI[offV1 + 3] = texI[offV1 + 4] = texI[offV1 + 5] = texIndex;
-                // apply alpha
-                alphas[offV1] = alphas[offV1 + 1] = alphas[offV1 + 2] = alphas[offV1 + 3] = alphas[offV1 + 4] = alphas[offV1 + 5] = displayObj._cAlpha;
-                s.batchCardCount++;
+                s.updateDrawData(textureSource, displayObj);
             }
         };
-        ;
+        WebGLRender.prototype._drawBatchMaskGroup = function (sprite) {
+            var s = this;
+            if (!sprite._visible) {
+                return;
+            }
+            var children = sprite.children;
+            if (children != void 0 && !sprite._isCache) {
+                var l = children.length;
+                for (var i = 0; i < l; i++) {
+                    var displayObj = children[i];
+                    s._drawBatchMaskGroup(displayObj);
+                }
+            }
+            else {
+                var textureSource = sprite._texture;
+                if (!textureSource || sprite._bounds.width <= 0) {
+                    return;
+                }
+                if (s.batchCardCount + 1 > s._maxCardsPerBatch) {
+                    s._drawBuffers();
+                }
+                s.updateDrawData(textureSource, sprite);
+            }
+        };
+        WebGLRender.prototype.updateDrawData = function (textureSource, displayObj) {
+            var s = this;
+            var uvRect, texIndex, texture;
+            var uvs = s._uvs;
+            var vertices = s._vertices;
+            var texI = s._indices;
+            var alphas = s._alphas;
+            if (textureSource._storeID == void 0) {
+                texture = s._createTexture(textureSource);
+            }
+            else {
+                texture = s._textureDictionary[textureSource._storeID];
+                if (!texture) {
+                    return;
+                }
+            }
+            s._pushTextureToBatch(texture);
+            texIndex = texture._activeIndex;
+            uvRect = displayObj._UVRect;
+            var displayVertices = displayObj._vertices;
+            //更新顶点数据
+            var offV1 = s.batchCardCount * WebGLRender.INDICIES_PER_CARD;
+            var offV2 = offV1 << 1;
+            vertices[offV2] = displayVertices[0];
+            vertices[offV2 + 1] = displayVertices[1];
+            vertices[offV2 + 2] = displayVertices[2];
+            vertices[offV2 + 3] = displayVertices[3];
+            vertices[offV2 + 4] = displayVertices[4];
+            vertices[offV2 + 5] = displayVertices[5];
+            vertices[offV2 + 6] = vertices[offV2 + 2];
+            vertices[offV2 + 7] = vertices[offV2 + 3];
+            vertices[offV2 + 8] = vertices[offV2 + 4];
+            vertices[offV2 + 9] = vertices[offV2 + 5];
+            vertices[offV2 + 10] = displayVertices[6];
+            vertices[offV2 + 11] = displayVertices[7];
+            //更新贴图数据
+            uvs[offV2] = uvRect.l;
+            uvs[offV2 + 1] = uvRect.t;
+            uvs[offV2 + 2] = uvRect.l;
+            uvs[offV2 + 3] = uvRect.b;
+            uvs[offV2 + 4] = uvRect.r;
+            uvs[offV2 + 5] = uvRect.t;
+            uvs[offV2 + 6] = uvRect.l;
+            uvs[offV2 + 7] = uvRect.b;
+            uvs[offV2 + 8] = uvRect.r;
+            uvs[offV2 + 9] = uvRect.t;
+            uvs[offV2 + 10] = uvRect.r;
+            uvs[offV2 + 11] = uvRect.b;
+            // apply texture
+            texI[offV1] = texI[offV1 + 1] = texI[offV1 + 2] = texI[offV1 + 3] = texI[offV1 + 4] = texI[offV1 + 5] = texIndex;
+            // apply alpha
+            alphas[offV1] = alphas[offV1 + 1] = alphas[offV1 + 2] = alphas[offV1 + 3] = alphas[offV1 + 4] = alphas[offV1 + 5] = displayObj._cAlpha;
+            s.batchCardCount++;
+        };
         WebGLRender.prototype._drawBuffers = function () {
             var s = this;
             var gl = s._ctx;
@@ -8689,6 +8742,7 @@ var annie;
             var textureIndexBuffer = s._textureIndexBuffer;
             var uvPositionBuffer = s._uvPositionBuffer;
             var alphaBuffer = s._alphaBuffer;
+            var projectionMatrix = s._projectionMatrix;
             //gl.useProgram(shaderProgram);
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -8702,7 +8756,7 @@ var annie;
             gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
             gl.vertexAttribPointer(shaderProgram.alphaAttribute, alphaBuffer.itemSize, gl.FLOAT, false, 0, 0);
             gl.bufferSubData(gl.ARRAY_BUFFER, 0, s._alphas);
-            gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, s._projectionMatrix);
+            gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, gl.FALSE, projectionMatrix);
             for (var i = 0; i < s._batchTextureCount; i++) {
                 var texture = s._batchTextures[i];
                 gl.activeTexture(gl.TEXTURE0 + i);
@@ -8714,6 +8768,7 @@ var annie;
             if (s._batchID == Number.MAX_VALUE) {
                 s._batchID = 0;
             }
+            s.batchCardCount = 0;
         };
         /**
          * The number of triangle indices it takes to form a Card. 3 per triangle, 2 triangles.
@@ -8821,6 +8876,255 @@ var annie;
         return WebGLRender;
     }(annie.AObject));
     annie.WebGLRender = WebGLRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * Canvas 渲染器
+     * @class annie.CanvasRender
+     * @extends annie.AObject
+     * @implements IRender
+     * @public
+     * @since 1.0.0
+     */
+    var CanvasRender = /** @class */ (function (_super) {
+        __extends(CanvasRender, _super);
+        /**
+         * @method CanvasRender
+         * @param {annie.Stage} stage
+         * @public
+         * @since 1.0.0
+         */
+        function CanvasRender() {
+            var _this = _super.call(this) || this;
+            /**
+             * 渲染器所在最上层的对象
+             * @property canvas
+             * @public
+             * @since 1.0.0
+             * @type {any}
+             * @default null
+             */
+            _this.canvas = null;
+            _this._blendMode = 0;
+            _this._instanceType = "annie.CanvasRender";
+            return _this;
+        }
+        /**
+         * 开始渲染时执行
+         * @method begin
+         * @since 1.0.0
+         * @public
+         */
+        CanvasRender.prototype.begin = function (color) {
+            var s = this, c = s.canvas, ctx = s._ctx;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            if (color == "") {
+                ctx.clearRect(0, 0, c.width, c.height);
+            }
+            else {
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, c.width, c.height);
+            }
+        };
+        /**
+         * 开始有遮罩时调用
+         * @method beginMask
+         * @param {annie.DisplayObject} target
+         * @public
+         * @since 1.0.0
+         */
+        CanvasRender.prototype.beginMask = function (target) {
+            var s = this, ctx = s._ctx;
+            ctx.save();
+            ctx.globalAlpha = 0;
+            ctx.beginPath();
+            s.drawMask(target);
+            ctx.closePath();
+            ctx.clip();
+        };
+        CanvasRender.prototype.drawMask = function (target) {
+            var s = this, tm = target._cMatrix, ctx = s._ctx;
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if (target._instanceType == "annie.Shape") {
+                target._draw(ctx, true);
+            }
+            else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {
+                for (var i = 0; i < target.children.length; i++) {
+                    s.drawMask(target.children[i]);
+                }
+            }
+            else {
+                var bounds = target._bounds;
+                ctx.rect(0, 0, bounds.width, bounds.height);
+            }
+        };
+        /**
+         * 结束遮罩时调用
+         * @method endMask
+         * @public
+         * @since 1.0.0
+         */
+        CanvasRender.prototype.endMask = function () {
+            this._ctx.restore();
+        };
+        CanvasRender.prototype.render = function (target) {
+            if (target._visible && target._cAlpha > 0) {
+                var s = this;
+                var children = target.children;
+                if (target._texture != null) {
+                    var cf = target._filters;
+                    var cfLen = cf.length;
+                    var fId = -1;
+                    if (cfLen) {
+                        for (var i = 0; i < cfLen; i++) {
+                            if (target._filters[i].type == "Shadow") {
+                                fId = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (fId >= 0) {
+                        var ctx = this._ctx;
+                        ctx.shadowBlur = cf[fId].blur;
+                        ctx.shadowColor = cf[fId].color;
+                        ctx.shadowOffsetX = cf[fId].offsetX;
+                        ctx.shadowOffsetY = cf[fId].offsetY;
+                        s.draw(target);
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    }
+                    else {
+                        s.draw(target);
+                    }
+                }
+                else if (children != void 0) {
+                    var maskObj = void 0;
+                    var child = void 0;
+                    var len = children.length;
+                    for (var i = 0; i < len; i++) {
+                        child = children[i];
+                        if (child._isUseToMask > 0) {
+                            continue;
+                        }
+                        if (maskObj != null) {
+                            if (child.mask != null && child.mask.parent == child.parent) {
+                                if (child.mask != maskObj) {
+                                    s.endMask();
+                                    maskObj = child.mask;
+                                    s.beginMask(maskObj);
+                                }
+                            }
+                            else {
+                                s.endMask();
+                                maskObj = null;
+                            }
+                        }
+                        else {
+                            if (child.mask != null && child.mask.parent == child.parent) {
+                                maskObj = child.mask;
+                                s.beginMask(maskObj);
+                            }
+                        }
+                        s.render(child);
+                    }
+                    if (maskObj != null) {
+                        s.endMask();
+                    }
+                }
+            }
+        };
+        /**
+         * 调用渲染
+         * @public
+         * @since 1.0.0
+         * @method draw
+         * @param {annie.DisplayObject} target 显示对象
+         */
+        CanvasRender.prototype.draw = function (target) {
+            var s = this;
+            var texture = target._texture;
+            if (texture.width == 0 || texture.height == 0)
+                return;
+            var ctx = s._ctx, tm = target._cMatrix;
+            ctx.globalAlpha = target._cAlpha;
+            if (s._blendMode != target.blendMode) {
+                ctx.globalCompositeOperation = annie.BlendMode.getBlendMode(target.blendMode);
+                s._blendMode = target.blendMode;
+            }
+            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            if (target._offsetX != 0 || target._offsetY != 0) {
+                ctx.translate(target._offsetX, target._offsetY);
+            }
+            ctx.drawImage(texture, 0, 0);
+            //getBounds
+            /*let rect1=target.getBounds();
+            rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);
+            s._ctx.beginPath();
+            s._ctx.lineWidth=4;
+            s._ctx.strokeStyle="#ff0000";
+            s._ctx.moveTo(rect.x,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+            s._ctx.lineTo(rect.x,rect.y+rect.height);
+            s._ctx.closePath();
+            s._ctx.stroke();
+
+            //getDrawRect
+            s._ctx.setTransform(1, 0, 0, 1, 0, 0);
+            target.getDrawRect(target._cMatrix);
+            rect1=DisplayObject._transformRect;
+            rect=new annie.Rectangle(rect1.x-target._offsetX,rect1.y-target._offsetY,rect1.width,rect1.height);
+            s._ctx.beginPath();
+            s._ctx.lineWidth=2;
+            s._ctx.strokeStyle="#00ff00";
+            s._ctx.moveTo(rect.x,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y);
+            s._ctx.lineTo(rect.x+rect.width,rect.y+rect.height);
+            s._ctx.lineTo(rect.x,rect.y+rect.height);
+            s._ctx.closePath();
+            s._ctx.stroke();
+            //*/
+        };
+        CanvasRender.prototype.end = function () { };
+        ;
+        /**
+         * 初始化渲染器
+         * @public
+         * @since 1.0.0
+         * @method init
+         */
+        CanvasRender.prototype.init = function (canvas) {
+            var s = this;
+            s.canvas = canvas;
+            s.canvas.id = "_a2x_canvas";
+            s._ctx = canvas.getContext('2d');
+        };
+        /**
+         * 当尺寸改变时调用
+         * @public
+         * @since 1.0.0
+         * @method reSize
+         */
+        CanvasRender.prototype.reSize = function (width, height) {
+            var s = this, c = s.canvas;
+            c.width = width;
+            c.height = height;
+            c.style.width = Math.ceil(width / annie.devicePixelRatio) + "px";
+            c.style.height = Math.ceil(height / annie.devicePixelRatio) + "px";
+        };
+        CanvasRender.prototype.destroy = function () {
+            var s = this;
+            s.canvas = null;
+            s._ctx = null;
+        };
+        return CanvasRender;
+    }(annie.AObject));
+    annie.CanvasRender = CanvasRender;
 })(annie || (annie = {}));
 /**
  * @module annie
