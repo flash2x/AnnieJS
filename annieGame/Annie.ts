@@ -14,7 +14,7 @@ namespace annie {
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    export let version: string = "3.2.2";
+    export let version: string = "3.2.3";
     export let app:any=null;
     export let isSharedCanvas:boolean=false;
     /**
@@ -102,8 +102,11 @@ namespace annie {
         if (!typeInfo) {
             typeInfo = {type: "png"};
         } else {
+            typeInfo.type="jpg";
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
+            }else{
+                typeInfo.quality=0.8;
             }
         }
         return OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);

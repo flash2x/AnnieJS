@@ -1,7 +1,7 @@
 /**
  * @module annieUI
  */
-namespace annieUI {
+ namespace annieUI {
     /**
      * 滚动视图，有些时候你的内容超过了一屏，需要上下或者左右滑动来查看内容，这个时候，你就应该用它了
      * @class annieUI.Scroller
@@ -222,7 +222,7 @@ namespace annieUI {
         /**
          * 初始化
          * @method Scroller
-         * @param {annie.DisplayObject} container
+         * @param {annie.MovieClip} container
          * @param {number} viewWidth
          * @param {number} viewHeight
          * @param {number} scrollWidth
@@ -240,7 +240,7 @@ namespace annieUI {
         /**
          * 初始化，也可以反复调用此方法重用scroller
          * @method init
-         * @param {annie.DisplayObject} container
+         * @param {annie.MovieClip} container
          * @param {number} viewWidth
          * @param {number} viewHeight
          * @param {number} scrollWidth
@@ -346,7 +346,7 @@ namespace annieUI {
         private _mouseEvent: Function = null;
         private _enterFrame: Function = null;
 
-        private onEnterFrame(e: annie.Event) {
+        protected onEnterFrame(e: annie.Event){
             let s = this;
             if (s.isRunning) {
                 let now = Date.now(),
@@ -559,10 +559,10 @@ namespace annieUI {
 
         public _translate(x: number, y: number) {
             let s = this;
-            if(x!=Number.NaN) {
+            if(x!=Number.NaN&&this.isScrollX) {
                 s._curX = x;
             }
-            if(y!=Number.NaN){
+            if(y!=Number.NaN&&this.isScrollY){
                 s._curY = y;
             }
             s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: s._curX, posY: s._curY});

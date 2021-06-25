@@ -1,7 +1,7 @@
 /**
  * @module annieUI
  */
-namespace annieUI {
+ namespace annieUI {
     /**
      * 用滚动的方式播放MC,回弹默认关闭，可开启
      * @class annieUI.MCScroller
@@ -102,6 +102,18 @@ namespace annieUI {
             s.isBounce = false;
             s.rate = rate;
             s.isVertical = isVertical;
+        }
+        protected onEnterFrame(e: annie.Event){
+            let s=this;
+            let mc:any=s._container;
+            if(mc.isPlaying){
+                if (s._isVertical) {
+                    s._curY=-mc.currentFrame*s._rate;
+                } else {
+                    s._curX=-mc.currentFrame*s._rate;
+                }
+            }
+            super.onEnterFrame(e);
         }
         public _translate(x: number, y: number) {
             super._translate(x,y);
