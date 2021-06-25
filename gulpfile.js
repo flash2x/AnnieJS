@@ -89,7 +89,7 @@ var coreGameList =[
     "annieGame/GlobalFunction.ts"
 ];
 var uiGameList=[
-    "build/annieCore.d.ts",
+    "buildGame/annieCore.d.ts",
     "annieGame/ui/Scroller.ts",
     "annieGame/ui/MCScroller.ts",
     "annieGame/ui/ScrollPage.ts",
@@ -135,8 +135,8 @@ var coreNodeList =[
     "annieNode/Annie.ts",
     "annieNode/GlobalFunction.ts"
 ];
-var uiGameList=[
-    "build/annieCore.d.ts",
+var uiNodeList=[
+    "buildNode/annieCore.d.ts",
     "annieNode/ui/Scroller.ts",
     "annieNode/ui/MCScroller.ts",
     "annieNode/ui/ScrollPage.ts",

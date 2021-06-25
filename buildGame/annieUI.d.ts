@@ -196,7 +196,7 @@ declare namespace annieUI {
         /**
          * 初始化
          * @method Scroller
-         * @param {annie.DisplayObject} container
+         * @param {annie.MovieClip} container
          * @param {number} viewWidth
          * @param {number} viewHeight
          * @param {number} scrollWidth
@@ -206,7 +206,7 @@ declare namespace annieUI {
         /**
          * 初始化，也可以反复调用此方法重用scroller
          * @method init
-         * @param {annie.DisplayObject} container
+         * @param {annie.MovieClip} container
          * @param {number} viewWidth
          * @param {number} viewHeight
          * @param {number} scrollWidth
@@ -249,7 +249,7 @@ declare namespace annieUI {
         _updateViewAndScroll(): void;
         private _mouseEvent;
         private _enterFrame;
-        private onEnterFrame;
+        protected onEnterFrame(e: annie.Event): void;
         private onMouseEvent;
         destroy(): void;
         resetPosition(time?: number): boolean;
@@ -324,6 +324,7 @@ declare namespace annieUI {
          * @param {boolean} isVertical 是横向还是竖向滑动，默认是竖向
          */
         constructor(mc: annie.MovieClip, rate?: number, isVertical?: boolean);
+        protected onEnterFrame(e: annie.Event): void;
         _translate(x: number, y: number): void;
     }
 }

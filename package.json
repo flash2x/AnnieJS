@@ -15,7 +15,9 @@
     "merge2": "^1.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "buildAppSDK": "gulp onBuildCore && gulp onBuildUI && gulp onBuildLast",
+    "buildGameSDK": "gulp onBuildGameCore && gulp onBuildGameUI && gulp onBuildGameLast",
+    "buildNodeSDK": "gulp onBuildNodeCore  && gulp onBuildNodeLast"
   },
   "author": "anlun214",
   "license": "MIT"
