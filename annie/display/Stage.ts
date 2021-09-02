@@ -317,7 +317,10 @@ namespace annie {
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
-            Stage.flushAll();
+            //这里需要做个延时，方便init事件捕捉
+            setTimeout(() => {
+                Stage.flushAll();
+            }, 0);
         }
         private _touchEvent: annie.TouchEvent;
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
@@ -359,9 +362,12 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
+            if(fps<=0){
+                fps=30;
+            }
             Stage._FPS=fps;
+            Stage._flushTime=1000/fps;
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method getFrameRate
@@ -711,7 +717,7 @@ namespace annie {
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
                                 s._lastDpList.isStart = false;
-                                if (sd) {
+                                if (sd){
                                     Stage._lastDragPoint.x = Number.MAX_VALUE;
                                     Stage._lastDragPoint.y = Number.MAX_VALUE;
                                 }
@@ -791,8 +797,8 @@ namespace annie {
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x * 2;
-            s._viewRect.height = desH - s._viewRect.y * 2;
+            s._viewRect.width = desW - s._viewRect.x <<2;
+            s._viewRect.height = desH - s._viewRect.y << 2;
         };
 
         /**
@@ -858,19 +864,20 @@ namespace annie {
         private static allUpdateObjList: Array<any> = [];
         //刷新所有定时器
         public static _FPS:number=30;
-        private static _intervalID:number=-1;
+        private static _flushTime:number=0;
+        private static _lastFluashTime:number=0;
         private static flushAll(): void {
-            if(Stage._intervalID!=-1){
-                clearInterval(Stage._intervalID);
-            }
-            Stage._intervalID=setInterval(function(){
+            let nowTime:number=new Date().getTime();
+            if(nowTime-Stage._lastFluashTime>=Stage._flushTime){
+                Stage._lastFluashTime=nowTime;
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
                     for (let i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            },1000/Stage._FPS>>0);
+            }
+            requestAnimationFrame(Stage.flushAll);
         }
 
         /**
@@ -916,7 +923,6 @@ namespace annie {
                 }
             }
         }
-
         public destroy(): void {
             super.destroy();
             let s = this;

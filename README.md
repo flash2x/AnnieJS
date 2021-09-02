@@ -62,6 +62,9 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.2.3 版本
+    修复annieUI.DrawingBoard设置为透明背景时,无法擦除撤销
+    修复jpeg格式下截图全黑的bug
 ## AnnieJS 3.2.2 版本
     修复截图时多遮罩显示异常的bug
     修复annie.Tween和annie.Timer与stage帧率不同步的bug

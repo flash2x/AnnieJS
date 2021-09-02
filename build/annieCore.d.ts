@@ -3217,7 +3217,8 @@ declare namespace annie {
          */
         private static allUpdateObjList;
         static _FPS: number;
-        private static _intervalID;
+        private static _flushTime;
+        private static _lastFluashTime;
         private static flushAll;
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。

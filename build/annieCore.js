@@ -6640,7 +6640,10 @@ var annie;
             }
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
-            Stage.flushAll();
+            //这里需要做个延时，方便init事件捕捉
+            setTimeout(function () {
+                Stage.flushAll();
+            }, 0);
             return _this;
         }
         Object.defineProperty(Stage, "pause", {
@@ -6746,7 +6749,11 @@ var annie;
          * @return {void}
          */
         Stage.prototype.setFrameRate = function (fps) {
+            if (fps <= 0) {
+                fps = 30;
+            }
             Stage._FPS = fps;
+            Stage._flushTime = 1000 / fps;
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -7172,8 +7179,8 @@ var annie;
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x * 2;
-            s._viewRect.height = desH - s._viewRect.y * 2;
+            s._viewRect.width = desW - s._viewRect.x << 2;
+            s._viewRect.height = desH - s._viewRect.y << 2;
         };
         ;
         Object.defineProperty(Stage.prototype, "viewRect", {
@@ -7196,17 +7203,18 @@ var annie;
             configurable: true
         });
         Stage.flushAll = function () {
-            if (Stage._intervalID != -1) {
-                clearInterval(Stage._intervalID);
-            }
-            Stage._intervalID = setInterval(function () {
+            var nowTime = new Date().getTime();
+            if (nowTime - Stage._lastFluashTime >= Stage._flushTime) {
+                console.log(nowTime-Stage._lastFluashTime);
+                Stage._lastFluashTime = nowTime;
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
                     for (var i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            }, 1000 / Stage._FPS >> 0);
+            }
+            requestAnimationFrame(Stage.flushAll);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -7288,7 +7296,8 @@ var annie;
         Stage.allUpdateObjList = [];
         //刷新所有定时器
         Stage._FPS = 30;
-        Stage._intervalID = -1;
+        Stage._flushTime = 0;
+        Stage._lastFluashTime = 0;
         return Stage;
     }(annie.Sprite));
     annie.Stage = Stage;
@@ -10897,7 +10906,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.2";
+    annie.version = "3.2.3";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -11083,7 +11092,7 @@ var annie;
             typeInfo = { type: "png" };
         }
         else {
-            typeInfo.type = "jpg";
+            typeInfo.type = "jpeg";
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             }

@@ -159,7 +159,10 @@ namespace annieUI {
             }
             if (s.bgColor != "") {
                 s.context.fillStyle = s.bgColor;
+            }else{
+                s.context.fillStyle="#00000000";
             }
+            s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
             s.context.fillRect(0, 0, s._bitmapData.width, s._bitmapData.height);
             s.currentStepId = 0;
             s.totalStepList = [];
@@ -184,10 +187,11 @@ namespace annieUI {
                     s.totalStepList.splice(s.currentStepId, step);
                     if (s.bgColor != "") {
                         s.context.fillStyle = s.bgColor;
-                        s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
-                    } else {
-                        s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                    }else{
+                        s.context.fillStyle = "#00000000";
                     }
+                    s.context.clearRect(0, 0, s.bitmapData.width, s.bitmapData.height);
+                    s.context.fillRect(0, 0, s.bitmapData.width, s.bitmapData.height);
                     let len: number = s.totalStepList.length;
                     for (let i = 0; i < len; i++) {
                         let ctx = s.context;
