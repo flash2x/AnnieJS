@@ -791,8 +791,8 @@ namespace annie {
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x * 2;
-            s._viewRect.height = desH - s._viewRect.y * 2;
+            s._viewRect.width = desW - s._viewRect.x <<2;
+            s._viewRect.height = desH - s._viewRect.y << 2;
         };
 
         /**
@@ -916,7 +916,6 @@ namespace annie {
                 }
             }
         }
-
         public destroy(): void {
             super.destroy();
             let s = this;

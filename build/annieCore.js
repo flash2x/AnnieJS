@@ -7172,8 +7172,8 @@ var annie;
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x * 2;
-            s._viewRect.height = desH - s._viewRect.y * 2;
+            s._viewRect.width = desW - s._viewRect.x << 2;
+            s._viewRect.height = desH - s._viewRect.y << 2;
         };
         ;
         Object.defineProperty(Stage.prototype, "viewRect", {
@@ -10897,7 +10897,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.2";
+    annie.version = "3.2.3";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -11083,7 +11083,7 @@ var annie;
             typeInfo = { type: "png" };
         }
         else {
-            typeInfo.type = "jpg";
+            typeInfo.type = "jpeg";
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             }
