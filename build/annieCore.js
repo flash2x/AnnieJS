@@ -7205,7 +7205,6 @@ var annie;
         Stage.flushAll = function () {
             var nowTime = new Date().getTime();
             if (nowTime - Stage._lastFluashTime >= Stage._flushTime) {
-                console.log(nowTime-Stage._lastFluashTime);
                 Stage._lastFluashTime = nowTime;
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
