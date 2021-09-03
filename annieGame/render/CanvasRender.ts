@@ -114,7 +114,6 @@ namespace annie {
          */
         public init(): void {
             annie.CanvasRender._ctx= CanvasRender.rootContainer.getContext("2d");
-            annie.Stage["flushAll"]();
         }
 
         /**

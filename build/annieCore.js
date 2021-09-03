@@ -5480,6 +5480,10 @@ var annie;
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.stage = s;
+            //这里需要做个延时，方便init事件捕捉
+            setTimeout(function () {
+                Stage.flushAll();
+            }, 0);
             return _this;
         }
         Object.defineProperty(Stage, "pause", {
@@ -5589,6 +5593,7 @@ var annie;
          */
         Stage.prototype.setFrameRate = function (fps) {
             Stage._FPS = fps;
+            Stage._flushTime = 1000 / fps;
         };
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -5993,17 +5998,17 @@ var annie;
             configurable: true
         });
         Stage.flushAll = function () {
-            if (Stage._intervalID != -1) {
-                clearInterval(Stage._intervalID);
-            }
-            Stage._intervalID = setInterval(function () {
+            var nowTime = new Date().getTime();
+            if (nowTime - Stage._lastFluashTime >= Stage._flushTime) {
+                Stage._lastFluashTime = nowTime;
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
                     for (var i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            }, 1000 / Stage._FPS >> 0);
+            }
+            annie.CanvasRender.rootContainer && annie.CanvasRender.rootContainer.requestAnimationFrame(Stage.flushAll);
         };
         /**
          * 添加一个刷新对象，这个对象里一定要有一个 flush 函数。
@@ -6070,7 +6075,9 @@ var annie;
          * @type {Array}
          */
         Stage.allUpdateObjList = [];
-        Stage._intervalID = -1;
+        //刷新所有定时器
+        Stage._flushTime = 0;
+        Stage._lastFluashTime = 0;
         return Stage;
     }(annie.Sprite));
     annie.Stage = Stage;
@@ -6174,8 +6181,7 @@ var annie;
          * @method init
          */
         CanvasRender.prototype.init = function () {
-            annie.CanvasRender._ctx = CanvasRender.rootContainer.getContext("2d");
-            annie.Stage["flushAll"]();
+            CanvasRender._ctx = CanvasRender.rootContainer.getContext("2d");
         };
         /**
          * 当尺寸改变时调用

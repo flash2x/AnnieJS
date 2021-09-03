@@ -290,6 +290,10 @@ namespace annie {
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.stage = s;
+             //这里需要做个延时，方便init事件捕捉
+             setTimeout(() => {
+                Stage.flushAll();
+            }, 0);
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -338,7 +342,8 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
-            Stage._FPS = fps;
+            Stage._FPS=fps;
+            Stage._flushTime=1000/fps;
         }
 
         /**
@@ -787,19 +792,21 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
-        private static _intervalID:number=-1;
+        //刷新所有定时器
+        private static _flushTime:number=0;
+        private static _lastFluashTime:number=0;
         private static flushAll(): void {
-            if(Stage._intervalID!=-1){
-                clearInterval(Stage._intervalID);
-            }
-            Stage._intervalID=setInterval(function(){
+            let nowTime:number=new Date().getTime();
+            if(nowTime-Stage._lastFluashTime>=Stage._flushTime){
+                Stage._lastFluashTime=nowTime;
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
                     for (let i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            },1000/Stage._FPS>>0);
+            }
+            requestAnimationFrame(Stage.flushAll);
         }
 
         /**

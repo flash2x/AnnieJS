@@ -252,6 +252,10 @@ namespace annie {
             //同时添加到主更新循环中
             Stage.addUpdateObj(s);
             Stage.stage = s;
+             //这里需要做个延时，方便init事件捕捉
+             setTimeout(() => {
+                Stage.flushAll();
+            }, 0);
         }
 
         private _touchEvent: annie.TouchEvent;
@@ -300,9 +304,9 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
-           Stage._FPS=fps;
+            Stage._FPS=fps;
+            Stage._flushTime=1000/fps;
         }
-
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
          * @method getFrameRate
@@ -313,7 +317,6 @@ namespace annie {
         public getFrameRate(): number {
             return Stage._FPS;
         }
-
         //html的鼠标或单点触摸对应的引擎事件类型名
         private _mouseEventTypes: any = {
             mousedown: "onMouseDown",
@@ -333,17 +336,14 @@ namespace annie {
         private _mP1: Point = new Point();
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
-
         public static onAppTouchEvent(e: any) {
             Stage.stage.mouseEvent(e);
         }
-
         private mouseEvent: any = null;
         public static _dragDisplay: annie.DisplayObject = null;
         public static _dragBounds: annie.Rectangle = new annie.Rectangle();
         public static _lastDragPoint: annie.Point = new annie.Point();
         public static _isDragCenter: boolean = false;
-
         private _onMouseEvent(e: any): void {
             //检查是否有
             let s: any = this, offSetX = 0, offSetY = 0;
@@ -751,19 +751,21 @@ namespace annie {
          * @type {Array}
          */
         private static allUpdateObjList: Array<any> = [];
-        private static _intervalID:number=-1;
+        //刷新所有定时器
+        private static _flushTime:number=0;
+        private static _lastFluashTime:number=0;
         private static flushAll(): void {
-            if(Stage._intervalID!=-1){
-                clearInterval(Stage._intervalID);
-            }
-            Stage._intervalID=setInterval(function(){
+            let nowTime:number=new Date().getTime();
+            if(nowTime-Stage._lastFluashTime>=Stage._flushTime){
+                Stage._lastFluashTime=nowTime;
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
                     for (let i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
-            },1000/Stage._FPS>>0);
+            }
+            CanvasRender.rootContainer&&CanvasRender.rootContainer.requestAnimationFrame(Stage.flushAll);
         }
 
         /**

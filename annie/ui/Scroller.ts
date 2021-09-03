@@ -556,7 +556,6 @@
                 s.isRunning = true;
             }
         }
-
         public _translate(x: number, y: number) {
             let s = this;
             if(x!=Number.NaN&&this.isScrollX) {

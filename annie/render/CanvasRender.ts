@@ -113,8 +113,7 @@ namespace annie {
          * @method init
          */
         public init(): void {
-            annie.CanvasRender._ctx= CanvasRender.rootContainer.getContext("2d");
-            annie.Stage["flushAll"]();
+            CanvasRender._ctx= CanvasRender.rootContainer.getContext("2d");
         }
 
         /**
