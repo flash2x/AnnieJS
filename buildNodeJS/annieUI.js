@@ -1,3 +1,4 @@
+const annie =getApp().annie;
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -28,7 +29,7 @@ var annieUI;
         /**
          * 初始化
          * @method Scroller
-         * @param {annie.DisplayObject} container
+         * @param {annie.MovieClip} container
          * @param {number} viewWidth
          * @param {number} viewHeight
          * @param {number} scrollWidth
@@ -232,7 +233,7 @@ var annieUI;
         /**
          * 初始化，也可以反复调用此方法重用scroller
          * @method init
-         * @param {annie.DisplayObject} container
+         * @param {annie.MovieClip} container
          * @param {number} viewWidth
          * @param {number} viewHeight
          * @param {number} scrollWidth
@@ -537,10 +538,10 @@ var annieUI;
         };
         Scroller.prototype._translate = function (x, y) {
             var s = this;
-            if (x != Number.NaN) {
+            if (x != Number.NaN && this.isScrollX) {
                 s._curX = x;
             }
-            if (y != Number.NaN) {
+            if (y != Number.NaN && this.isScrollY) {
                 s._curY = y;
             }
             s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: s._curX, posY: s._curY });
@@ -689,6 +690,19 @@ var annieUI;
             enumerable: true,
             configurable: true
         });
+        MCScroller.prototype.onEnterFrame = function (e) {
+            var s = this;
+            var mc = s._container;
+            if (mc.isPlaying) {
+                if (s._isVertical) {
+                    s._curY = -mc.currentFrame * s._rate;
+                }
+                else {
+                    s._curX = -mc.currentFrame * s._rate;
+                }
+            }
+            _super.prototype.onEnterFrame.call(this, e);
+        };
         MCScroller.prototype._translate = function (x, y) {
             _super.prototype._translate.call(this, x, y);
             var s = this;
@@ -2258,5 +2272,6 @@ var annieUI;
     annieUI.FlipBook = FlipBook;
 })(annieUI || (annieUI = {}));
 
-GameGlobal.annieUI = annieUI;
+module.exports=annieUI;
+
 module.exports=annieUI;

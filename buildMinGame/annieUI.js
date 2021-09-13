@@ -1,3 +1,4 @@
+const annie =getApp().annie;
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -2270,6 +2271,8 @@ var annieUI;
     }(Sprite));
     annieUI.FlipBook = FlipBook;
 })(annieUI || (annieUI = {}));
+
+module.exports=annieUI;
 
 GameGlobal.annieUI = annieUI;
 module.exports=annieUI;

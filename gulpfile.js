@@ -7,158 +7,122 @@ var del = require('del');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var concat=require('gulp-concat');
-var coreList =[
-    "annie/events/EventDispatcher.ts",
-    "annie/events/Event.ts",
-    "annie/events/MouseEvent.ts",
-    "annie/events/TouchEvent.ts",
-    "annie/geom/Point.ts",
-    "annie/geom/Matrix.ts",
-    "annie/geom/Rectangle.ts",
-    // "annie/utils/BlendMode.ts",
-    "annie/display/DisplayObject.ts",
-    "annie/display/bitmap.ts",
-    "annie/display/Shape.ts",
-    "annie/display/Sprite.ts",
-    // "annie/media/Media.ts",
-    "annie/media/Sound.ts",
-    // "annie/media/Video.ts",
-    //"annie/media/ImageFrames.ts",
-    "annie/display/MovieClip.ts",
-    // "annie/display/FloatDisplay.ts",
-    //"annie/display/VideoPlayer.ts",
-    "annie/display/TextField.ts",
-    // "annie/display/InputText.ts",
-    "annie/display/Stage.ts",
-    // "annie/filters/Filters.ts",
-    "annie/render/IRender.ts",
-    "annie/render/CanvasRender.ts",
-    "annie/render/OffCanvasRender.ts",
-    // "annie/net/URLLoader.ts",
-    "annie/utils/Flash2x.ts",
-    "annie/utils/Tween.ts",
-    "annie/utils/Timer.ts",
-    "annie/Annie.ts",
-    "annie/GlobalFunction.ts"
+var annieMinAppCoreList =[
+    "annieMinApp/events/EventDispatcher.ts",
+    "annieMinApp/events/Event.ts",
+    "annieMinApp/events/MouseEvent.ts",
+    "annieMinApp/events/TouchEvent.ts",
+    "annieMinApp/geom/Point.ts",
+    "annieMinApp/geom/Matrix.ts",
+    "annieMinApp/geom/Rectangle.ts",
+    // "annieMinApp/utils/BlendMode.ts",
+    "annieMinApp/display/DisplayObject.ts",
+    "annieMinApp/display/bitmap.ts",
+    "annieMinApp/display/Shape.ts",
+    "annieMinApp/display/Sprite.ts",
+    // "annieMinApp/media/Media.ts",
+    "annieMinApp/media/Sound.ts",
+    // "annieMinApp/media/Video.ts",
+    //"annieMinApp/media/ImageFrames.ts",
+    "annieMinApp/display/MovieClip.ts",
+    // "annieMinApp/display/FloatDisplay.ts",
+    //"annieMinApp/display/VideoPlayer.ts",
+    "annieMinApp/display/TextField.ts",
+    // "annieMinApp/display/InputText.ts",
+    "annieMinApp/display/Stage.ts",
+    // "annieMinApp/filters/Filters.ts",
+    "annieMinApp/render/IRender.ts",
+    "annieMinApp/render/CanvasRender.ts",
+    "annieMinApp/render/OffCanvasRender.ts",
+    // "annieMinApp/net/URLLoader.ts",
+    "annieMinApp/utils/Flash2x.ts",
+    "annieMinApp/utils/Tween.ts",
+    "annieMinApp/utils/Timer.ts",
+    "annieMinApp/Annie.ts",
+    "annieMinApp/GlobalFunction.ts"
 ];
-var uiList=[
-    "build/annieCore.d.ts",
-    "annie/ui/Scroller.ts",
-    "annie/ui/MCScroller.ts",
-    "annie/ui/ScrollPage.ts",
-    "annie/ui/ScrollList.ts",
-    "annie/ui/FacePhoto.ts",
-    "annie/ui/SlidePage.ts",
-    "annie/ui/FlipBook.ts"
-    // "annie/ui/DrawingBoard.ts",
-    // "annie/ui/ScratchCard.ts"
+var annieMinGameCoreList =[
+    "annieMinGame/events/EventDispatcher.ts",
+    "annieMinGame/events/Event.ts",
+    "annieMinGame/events/MouseEvent.ts",
+    "annieMinGame/events/TouchEvent.ts",
+    "annieMinGame/geom/Point.ts",
+    "annieMinGame/geom/Matrix.ts",
+    "annieMinGame/geom/Rectangle.ts",
+    // "annieMinGame/utils/BlendMode.ts",
+    "annieMinGame/display/DisplayObject.ts",
+    "annieMinGame/display/bitmap.ts",
+    "annieMinGame/display/Shape.ts",
+    "annieMinGame/display/Sprite.ts",
+    // "annieMinGame/media/Media.ts",
+    "annieMinGame/media/Sound.ts",
+    // "annieMinGame/media/Video.ts",
+    //"annieMinGame/media/ImageFrames.ts",
+    "annieMinGame/display/MovieClip.ts",
+    // "annieMinGame/display/FloatDisplay.ts",
+    //"annieMinGame/display/VideoPlayer.ts",
+    "annieMinGame/display/TextField.ts",
+    // "annieMinGame/display/InputText.ts",
+    "annieMinGame/display/Stage.ts",
+    // "annieMinGame/filters/Filters.ts",
+    "annieMinGame/render/IRender.ts",
+    "annieMinGame/render/CanvasRender.ts",
+    "annieMinGame/render/OffCanvasRender.ts",
+    "annieMinGame/render/SharedCanvas.ts",
+    // "annieMinGame/net/URLLoader.ts",
+    "annieMinGame/utils/Flash2x.ts",
+    "annieMinGame/utils/Tween.ts",
+    "annieMinGame/utils/Timer.ts",
+    "annieMinGame/Annie.ts",
+    "annieMinGame/GlobalFunction.ts"
 ];
-var coreGameList =[
-    "annieGame/events/EventDispatcher.ts",
-    "annieGame/events/Event.ts",
-    "annieGame/events/MouseEvent.ts",
-    "annieGame/events/TouchEvent.ts",
-    "annieGame/geom/Point.ts",
-    "annieGame/geom/Matrix.ts",
-    "annieGame/geom/Rectangle.ts",
-    // "annieGame/utils/BlendMode.ts",
-    "annieGame/display/DisplayObject.ts",
-    "annieGame/display/bitmap.ts",
-    "annieGame/display/Shape.ts",
-    "annieGame/display/Sprite.ts",
-    // "annieGame/media/Media.ts",
-    "annieGame/media/Sound.ts",
-    // "annieGame/media/Video.ts",
-    //"annieGame/media/ImageFrames.ts",
-    "annieGame/display/MovieClip.ts",
-    // "annieGame/display/FloatDisplay.ts",
-    //"annieGame/display/VideoPlayer.ts",
-    "annieGame/display/TextField.ts",
-    // "annieGame/display/InputText.ts",
-    "annieGame/display/Stage.ts",
-    // "annieGame/filters/Filters.ts",
-    "annieGame/render/IRender.ts",
-    "annieGame/render/CanvasRender.ts",
-    "annieGame/render/OffCanvasRender.ts",
-    "annieGame/render/SharedCanvas.ts",
-    // "annieGame/net/URLLoader.ts",
-    "annieGame/utils/Flash2x.ts",
-    "annieGame/utils/Tween.ts",
-    "annieGame/utils/Timer.ts",
-    "annieGame/Annie.ts",
-    "annieGame/GlobalFunction.ts"
+var annieNodeJSCoreList =[
+    "annieNodeJS/events/EventDispatcher.ts",
+    "annieNodeJS/events/Event.ts",
+    // "annieNodeJS/events/MouseEvent.ts",
+    // "annieNodeJS/events/TouchEvent.ts",
+    "annieNodeJS/geom/Point.ts",
+    "annieNodeJS/geom/Matrix.ts",
+    "annieNodeJS/geom/Rectangle.ts",
+    // "annieNodeJS/utils/BlendMode.ts",
+    "annieNodeJS/display/DisplayObject.ts",
+    "annieNodeJS/display/bitmap.ts",
+    "annieNodeJS/display/Shape.ts",
+    "annieNodeJS/display/Sprite.ts",
+    // "annieNodeJS/media/Media.ts",
+    // "annieNodeJS/media/Sound.ts",
+    // "annieNodeJS/media/Video.ts",
+    //"annieNodeJS/media/ImageFrames.ts",
+    "annieNodeJS/display/MovieClip.ts",
+    // "annieNodeJS/display/FloatDisplay.ts",
+    //"annieNodeJS/display/VideoPlayer.ts",
+    "annieNodeJS/display/TextField.ts",
+    // "annieNodeJS/display/InputText.ts",
+    "annieNodeJS/display/Stage.ts",
+    // "annieNodeJS/filters/Filters.ts",
+    "annieNodeJS/render/IRender.ts",
+    "annieNodeJS/render/CanvasRender.ts",
+    "annieNodeJS/render/OffCanvasRender.ts",
+    // "annieNodeJS/render/SharedCanvas.ts",
+    // "annieNodeJS/net/URLLoader.ts",
+    "annieNodeJS/utils/Flash2x.ts",
+    "annieNodeJS/utils/Tween.ts",
+    "annieNodeJS/utils/Timer.ts",
+    "annieNodeJS/Annie.ts",
+    "annieNodeJS/GlobalFunction.ts"
 ];
-var uiGameList=[
-    "buildGame/annieCore.d.ts",
-    "annieGame/ui/Scroller.ts",
-    "annieGame/ui/MCScroller.ts",
-    "annieGame/ui/ScrollPage.ts",
-    "annieGame/ui/ScrollList.ts",
-    "annieGame/ui/FacePhoto.ts",
-    "annieGame/ui/SlidePage.ts",
-    "annieGame/ui/FlipBook.ts"
-    // "annieGame/ui/DrawingBoard.ts",
-    // "annieGame/ui/ScratchCard.ts"
+var annieUIList=[
+    "buildMinApp/annieCore.d.ts",
+    "annieUI/Scroller.ts",
+    "annieUI/MCScroller.ts",
+    "annieUI/ScrollPage.ts",
+    "annieUI/ScrollList.ts",
+    "annieUI/FacePhoto.ts",
+    "annieUI/SlidePage.ts",
+    "annieUI/FlipBook.ts",
+    "annieUI/DrawingBoard.ts",
+    "annieUI/ScratchCard.ts"
 ];
-var coreNodeList =[
-    "annieNode/events/EventDispatcher.ts",
-    "annieNode/events/Event.ts",
-    // "annieNode/events/MouseEvent.ts",
-    // "annieNode/events/TouchEvent.ts",
-    "annieNode/geom/Point.ts",
-    "annieNode/geom/Matrix.ts",
-    "annieNode/geom/Rectangle.ts",
-    // "annieNode/utils/BlendMode.ts",
-    "annieNode/display/DisplayObject.ts",
-    "annieNode/display/bitmap.ts",
-    "annieNode/display/Shape.ts",
-    "annieNode/display/Sprite.ts",
-    // "annieNode/media/Media.ts",
-    // "annieNode/media/Sound.ts",
-    // "annieNode/media/Video.ts",
-    //"annieNode/media/ImageFrames.ts",
-    "annieNode/display/MovieClip.ts",
-    // "annieNode/display/FloatDisplay.ts",
-    //"annieNode/display/VideoPlayer.ts",
-    "annieNode/display/TextField.ts",
-    // "annieNode/display/InputText.ts",
-    "annieNode/display/Stage.ts",
-    // "annieNode/filters/Filters.ts",
-    "annieNode/render/IRender.ts",
-    "annieNode/render/CanvasRender.ts",
-    "annieNode/render/OffCanvasRender.ts",
-    // "annieNode/render/SharedCanvas.ts",
-    // "annieNode/net/URLLoader.ts",
-    "annieNode/utils/Flash2x.ts",
-    "annieNode/utils/Tween.ts",
-    "annieNode/utils/Timer.ts",
-    "annieNode/Annie.ts",
-    "annieNode/GlobalFunction.ts"
-];
-var uiNodeList=[
-    "buildNode/annieCore.d.ts",
-    "annieNode/ui/Scroller.ts",
-    "annieNode/ui/MCScroller.ts",
-    "annieNode/ui/ScrollPage.ts",
-    "annieNode/ui/ScrollList.ts",
-    "annieNode/ui/FacePhoto.ts",
-    "annieNode/ui/SlidePage.ts",
-    "annieNode/ui/FlipBook.ts"
-    // "annieNode/ui/DrawingBoard.ts",
-    // "annieNode/ui/ScratchCard.ts"
-];
-var onBuildCore = function(){
-    var op = {
-        noImplicitAny: true,
-        declaration: true,
-        out: "annieCore.js",
-        target: "ES5"
-    };
-    var outDir = "build";
-    var tsResult = gulp.src(coreList).pipe(ts(op));
-        tsResult.dts.pipe(gulp.dest(outDir));
-        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
-};
 var onBuildUI = function(){
     var op = {
         noImplicitAny: true,
@@ -166,46 +130,47 @@ var onBuildUI = function(){
         target: "ES5",
         out: "annieUI.js"
     };
-    var outDir = "build";
-    var tsResult = gulp.src(uiList).pipe(ts(op));
+    var outDir = "buildUI";
+    var tsResult = gulp.src(annieUIList).pipe(ts(op));
         tsResult.dts.pipe(gulp.dest(outDir));
         return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
-var onBuildLast = function(){
-    gulp.src(["build/add2.js","build/annieUI.js","build/add3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("build"));
-    gulp.src(["build/add2.js","build/annieUI.min.js","build/add3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("build"));
-    gulp.src(["build/annieCore.js","build/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("build"));
-    return gulp.src(["build/annieCore.min.js","build/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("build"));
-};
-var onBuildGameCore = function(){
+var onBuildMinAppCore = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
         target: "ES5"
     };
-    var outDir = "buildGame";
-    var tsResult = gulp.src(coreGameList).pipe(ts(op));
-    tsResult.dts.pipe(gulp.dest(outDir));
-    return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+    var outDir = "buildMinApp";
+    var tsResult = gulp.src(annieMinAppCoreList).pipe(ts(op));
+        tsResult.dts.pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
-var onBuildGameUI = function(){
+
+var onBuildMinAppLast = function(){
+    gulp.src(["buildMinApp/add2.js","buildUI/annieUI.js","buildMinApp/add3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildMinApp"));
+    gulp.src(["buildMinApp/add2.js","buildUI/annieUI.min.js","buildMinApp/add3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildMinApp"));
+    gulp.src(["buildMinApp/annieCore.js","buildMinApp/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildMinApp"));
+    return gulp.src(["buildMinApp/annieCore.min.js","buildMinApp/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildMinApp"));
+};
+var onBuildMinGameCore = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
-        target: "ES5",
-        out: "annieUI.js"
+        out: "annieCore.js",
+        target: "ES5"
     };
-    var outDir = "buildGame";
-    var tsResult = gulp.src(uiGameList).pipe(ts(op));
+    var outDir = "buildMinGame";
+    var tsResult = gulp.src(annieMinGameCoreList).pipe(ts(op));
     tsResult.dts.pipe(gulp.dest(outDir));
     return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
-var onBuildGameLast = function(){
-    gulp.src(["buildGame/annieUI.js","buildGame/add2.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildGame"));
-    gulp.src(["buildGame/annieUI.min.js","buildGame/add2.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildGame"));
-    gulp.src(["buildGame/annieCore.js","buildGame/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildGame"));
-    return gulp.src(["buildGame/annieCore.min.js","buildGame/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildGame"));
+var onBuildMinGameLast = function(){
+    gulp.src(["buildUI/annieUI.js","buildMinGame/add2.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildMinGame"));
+    gulp.src(["buildUI/annieUI.min.js","buildMinGame/add2.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildMinGame"));
+    gulp.src(["buildMinGame/annieCore.js","buildMinGame/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildMinGame"));
+    return gulp.src(["buildMinGame/annieCore.min.js","buildMinGame/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildMinGame"));
 };
 var onBuildNodeCore = function(){
     var op = {
@@ -214,35 +179,22 @@ var onBuildNodeCore = function(){
         out: "annieCore.js",
         target: "ES5"
     };
-    var outDir = "buildNode";
-    var tsResult = gulp.src(coreNodeList).pipe(ts(op));
+    var outDir = "buildNodeJS";
+    var tsResult = gulp.src(annieNodeJSCoreList).pipe(ts(op));
     tsResult.dts.pipe(gulp.dest(outDir));
     return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
 };
 
 var onBuildNodeLast = function(){
-    gulp.src(["buildNode/annieCore.js","buildNode/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildNode"));
-    return gulp.src(["buildNode/annieCore.min.js","buildNode/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildNode"));
+    gulp.src(["buildUI/annieUI.js","buildNodeJS/add2.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildNodeJS"));
+    gulp.src(["buildUI/annieUI.min.js","buildNodeJS/add2.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildNodeJS"));
+    gulp.src(["buildNodeJS/annieCore.js","buildNodeJS/add.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildNodeJS"));
+    return gulp.src(["buildNodeJS/annieCore.min.js","buildNodeJS/add.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildNodeJS"));
 };
-var onBuildDoc = function(){
-    del([
-        'libs'
-    ]);
-    var op = {
-        noImplicitAny: true,
-        declaration: true,
-        target: "ES5"
-    };
-    var outDir = "libs";
-    var tsResult = gulp.src(coreList.concat(uiList.slice(1))).pipe(ts(op));
-    return tsResult.js.pipe(gulp.dest(outDir));
-};
-gulp.task('onBuildCore', onBuildCore);
 gulp.task('onBuildUI', onBuildUI);
-gulp.task("onBuildLast", onBuildLast);
-gulp.task('onBuildGameCore', onBuildGameCore);
-gulp.task('onBuildGameUI', onBuildGameUI);
-gulp.task("onBuildGameLast", onBuildGameLast);
+gulp.task('onBuildMinAppCore', onBuildMinAppCore);
+gulp.task("onBuildMinAppLast", onBuildMinAppLast);
+gulp.task('onBuildMinGameCore', onBuildMinGameCore);
+gulp.task("onBuildMinGameLast", onBuildMinGameLast);
 gulp.task('onBuildNodeCore', onBuildNodeCore);
 gulp.task("onBuildNodeLast", onBuildNodeLast);
-gulp.task("onBuildDoc", onBuildDoc);

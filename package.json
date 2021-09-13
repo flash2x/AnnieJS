@@ -15,9 +15,9 @@
     "merge2": "^1.1.0"
   },
   "scripts": {
-    "buildAppSDK": "gulp onBuildCore && gulp onBuildUI && gulp onBuildLast",
-    "buildGameSDK": "gulp onBuildGameCore && gulp onBuildGameUI && gulp onBuildGameLast",
-    "buildNodeSDK": "gulp onBuildNodeCore  && gulp onBuildNodeLast"
+    "buildMinAppSDK": "gulp onBuildMinAppCore && gulp onBuildMinAppLast",
+    "buildMinGameSDK": "gulp onBuildMinGameCore && gulp onBuildMinGameLast",
+    "buildNodeJSSDK": "gulp onBuildNodeCore && gulp onBuildNodeLast"
   },
   "author": "anlun214",
   "license": "MIT"
