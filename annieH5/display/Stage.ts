@@ -797,8 +797,8 @@ namespace annie {
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x <<2;
-            s._viewRect.height = desH - s._viewRect.y << 2;
+            s._viewRect.width = desW - s._viewRect.x*2;
+            s._viewRect.height = desH - s._viewRect.y*2;
         };
 
         /**
@@ -868,11 +868,11 @@ namespace annie {
         private static _lastFluashTime:number=0;
         private static flushAll(): void {
             let nowTime:number=new Date().getTime();
-            if(nowTime-Stage._lastFluashTime>=Stage._flushTime){
+            if(Stage._flushTime-nowTime+Stage._lastFluashTime<Stage._flushTime*0.1){
                 Stage._lastFluashTime=nowTime;
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
-                    for (let i = len - 1; i >= 0; i--) {
+                    for (let i = len - 1; i >= 0; i--){
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }

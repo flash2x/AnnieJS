@@ -47,9 +47,8 @@ namespace annie {
             let s = this, c = s.canvas, ctx = s._ctx;
             ctx.globalAlpha = 1;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (color == "") {
-                ctx.clearRect(0, 0, c.width, c.height);
-            } else {
+            ctx.clearRect(0, 0, c.width, c.height);
+            if (color != "") {
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
             }
@@ -66,7 +65,6 @@ namespace annie {
         public beginMask(target: any): void {
             let s: OffCanvasRender = this, ctx = s._ctx;
             ctx.save();
-            ctx.globalAlpha = 0;
             ctx.beginPath();
             s.drawMask(target);
             ctx.closePath();
@@ -74,8 +72,8 @@ namespace annie {
         }
 
         private drawMask(target: any): void {
-            let s = this, tm = target._cMatrix, ctx = s._ctx;
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            let s = this, tm = target.matrix, ctx = s._ctx;
+            ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
                 target._draw(ctx, true);
             } else if (target._instanceType == "annie.Sprite" || target._instanceType == "annie.MovieClip") {

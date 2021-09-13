@@ -7179,8 +7179,8 @@ var annie;
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x << 2;
-            s._viewRect.height = desH - s._viewRect.y << 2;
+            s._viewRect.width = desW - s._viewRect.x * 2;
+            s._viewRect.height = desH - s._viewRect.y * 2;
         };
         ;
         Object.defineProperty(Stage.prototype, "viewRect", {
@@ -7204,7 +7204,7 @@ var annie;
         });
         Stage.flushAll = function () {
             var nowTime = new Date().getTime();
-            if (nowTime - Stage._lastFluashTime >= Stage._flushTime) {
+            if (Stage._flushTime - nowTime + Stage._lastFluashTime < Stage._flushTime * 0.1) {
                 Stage._lastFluashTime = nowTime;
                 if (!Stage._pause) {
                     var len = Stage.allUpdateObjList.length;
@@ -8085,10 +8085,8 @@ var annie;
         CanvasRender.prototype.begin = function (color) {
             var s = this, c = s.canvas, ctx = s._ctx;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (color == "") {
-                ctx.clearRect(0, 0, c.width, c.height);
-            }
-            else {
+            ctx.clearRect(0, 0, c.width, c.height);
+            if (color != "") {
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
             }
@@ -8345,10 +8343,8 @@ var annie;
             var s = this, c = s.canvas, ctx = s._ctx;
             ctx.globalAlpha = 1;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (color == "") {
-                ctx.clearRect(0, 0, c.width, c.height);
-            }
-            else {
+            ctx.clearRect(0, 0, c.width, c.height);
+            if (color != "") {
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
             }
@@ -8364,15 +8360,14 @@ var annie;
         OffCanvasRender.prototype.beginMask = function (target) {
             var s = this, ctx = s._ctx;
             ctx.save();
-            ctx.globalAlpha = 0;
             ctx.beginPath();
             s.drawMask(target);
             ctx.closePath();
             ctx.clip();
         };
         OffCanvasRender.prototype.drawMask = function (target) {
-            var s = this, tm = target._cMatrix, ctx = s._ctx;
-            ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+            var s = this, tm = target.matrix, ctx = s._ctx;
+            ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
             if (target._instanceType == "annie.Shape") {
                 target._draw(ctx, true);
             }
@@ -10905,7 +10900,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.3";
+    annie.version = "3.2.4";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -11068,6 +11063,7 @@ var annie;
             annie._dRender = new annie.OffCanvasRender();
         }
         //一定要更新一次
+        obj.getBounds();
         obj._onUpdateFrame(0);
         obj._onUpdateMatrixAndAlpha();
         obj._onUpdateTexture();
@@ -11076,8 +11072,8 @@ var annie;
         if (!rect) {
             rect = obj.getBounds();
         }
-        obj._offsetX += rect.x;
-        obj._offsetY += rect.y;
+        obj._offsetX = rect.x;
+        obj._offsetY = rect.y;
         var texture = document.createElement("canvas");
         annie._dRender.init(texture);
         var w = Math.ceil(rect.width);

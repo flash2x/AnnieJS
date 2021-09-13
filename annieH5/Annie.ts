@@ -44,7 +44,7 @@ namespace annie {
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    export let version: string = "3.2.3";
+    export let version: string = "3.2.4";
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -203,6 +203,7 @@ namespace annie {
             _dRender = new OffCanvasRender();
         }
         //一定要更新一次
+        obj.getBounds();
         obj._onUpdateFrame(0);
         obj._onUpdateMatrixAndAlpha();
         obj._onUpdateTexture();
@@ -211,8 +212,8 @@ namespace annie {
         if (!rect) {
             rect = obj.getBounds();
         }
-        obj._offsetX += rect.x;
-        obj._offsetY += rect.y;
+        obj._offsetX = rect.x;
+        obj._offsetY = rect.y;
         let texture = document.createElement("canvas");
         _dRender.init(texture);
         let w: number = Math.ceil(rect.width);

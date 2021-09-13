@@ -62,6 +62,11 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.2.4 版本
+    将AnnieJS引擎的NodeJS分支,小程序分支,小游戏分支全部合并成一个主分支进行管理和编译
+    修复annie.toDisplayDataURL 截图设置背景透明而无法透明的bug
+    修复annie.toDisplayDataURL 截图有遮罩时截图错乱的bug
+    优化刷新机制,死刷新率更合理,更精准
 ## AnnieJS 3.2.3 版本
     修复annieUI.DrawingBoard设置为透明背景时,无法擦除撤销
     修复jpeg格式下截图全黑的bug

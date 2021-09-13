@@ -45,9 +45,8 @@ namespace annie {
         public begin(color: string): void {
             let s = this, c = s.canvas, ctx = s._ctx;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            if (color == "") {
-                ctx.clearRect(0, 0, c.width, c.height);
-            } else {
+            ctx.clearRect(0, 0, c.width, c.height);
+            if(color != ""){
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
             }

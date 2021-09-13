@@ -3,9 +3,6 @@
   "version": "2.0.0",
   "description": "annie is powerful js Engine!",
   "main": "gulpfile.js",
-  "directories": {
-    "test": "test"
-  },
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",
@@ -15,7 +12,7 @@
     "merge2": "^1.1.0"
   },
   "scripts": {
-    "buildSDK": "gulp onBuildCore && gulp onBuildUI && gulp onBuildLast",
+    "buildH5SDK": "gulp onBuildH5Core && gulp onBuildH5UI && gulp onBuildH5Last",
     "buildDOC": "gulp onBuildDoc && yuidoc -c docConfig.json"
   },
   "author": "anlun214",
