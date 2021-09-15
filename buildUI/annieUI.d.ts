@@ -175,8 +175,6 @@ declare namespace annieUI {
         private distX;
         private distY;
         private startTime;
-        private absStartX;
-        private absStartY;
         private pointX;
         private pointY;
         /**

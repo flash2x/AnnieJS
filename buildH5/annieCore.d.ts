@@ -4674,17 +4674,17 @@ declare namespace annie {
      */
     let version: string;
     /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
-     * @property annie.osType
-     * @since 1.0.0
-     * @public
-     * @type {string|string}
-     * @static
-     * @example
-     *      //获取当前设备类型
-     *      console.log(annie.osType);
-     */
+    * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+    * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
+    * @property annie.osType
+    * @since 1.0.0
+    * @public
+    * @type {string|string}
+    * @static
+    * @example
+    *      //获取当前设备类型
+    *      console.log(annie.osType);
+    */
     let osType: string;
     /**
      * 全局事件触发器

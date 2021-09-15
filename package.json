@@ -12,7 +12,11 @@
     "merge2": "^1.1.0"
   },
   "scripts": {
-    "buildH5SDK": "gulp onBuildH5Core && gulp onBuildH5UI && gulp onBuildH5Last",
+    "buildUI":"gulp onBuildUI",
+    "buildH5SDK": "gulp onBuildH5Core && gulp onBuildH5Last",
+    "buildMinAppSDK": "gulp onBuildMinAppCore && gulp onBuildMinAppLast",
+    "buildMinGameSDK": "gulp onBuildMinGameCore && gulp onBuildMinGameLast",
+    "buildNodeJSSDK": "gulp onBuildNodeCore && gulp onBuildNodeLast",
     "buildDOC": "gulp onBuildDoc && yuidoc -c docConfig.json"
   },
   "author": "anlun214",

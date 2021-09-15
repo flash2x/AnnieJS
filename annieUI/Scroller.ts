@@ -200,8 +200,6 @@ namespace annieUI {
         private distX: number = 0;
         private distY: number = 0;
         private startTime: number = 0;
-        private absStartX: number = 0;
-        private absStartY: number = 0;
         private pointX: number = 0;
         private pointY: number = 0;
         /**
@@ -255,7 +253,7 @@ namespace annieUI {
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent,false);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             if (s._container != container) {
@@ -263,7 +261,7 @@ namespace annieUI {
                 container.addEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
+                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent,false);
                 container.addEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             s.isRunning = false;
@@ -357,9 +355,11 @@ namespace annieUI {
                     s._translate(s.destX, s.destY);
                     if (!s.resetPosition(s.bounceTime)) {
                         s.dispatchEvent(annie.Event.ON_SCROLL_STOP);
+                        //有可能内容区域没有滑动区域宽,这两个事件会同时触发，既滑到了头也滑到了尾,所以两个if不用else连接起来
                         if (s._curX == 0 && s._curY == 0) {
                             s.dispatchEvent(annie.Event.ON_SCROLL_TO_HEAD);
-                        } else if (s._curX == s.maxScrollX && s._curY == s.maxScrollY) {
+                        } 
+                        if (s._curX == s.maxScrollX && s._curY == s.maxScrollY) {
                             s.dispatchEvent(annie.Event.ON_SCROLL_TO_END);
                         }
                     }
@@ -383,8 +383,6 @@ namespace annieUI {
                 s.startTime = Date.now();
                 s.startX = s._curX;
                 s.startY = s._curY;
-                s.absStartX = s._curX;
-                s.absStartY = s._curY;
                 s.pointX = e.localX;
                 s.pointY = e.localY;
             } else if (e.type == annie.MouseEvent.MOUSE_MOVE) {
@@ -481,7 +479,7 @@ namespace annieUI {
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent,false);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             s._container = null;

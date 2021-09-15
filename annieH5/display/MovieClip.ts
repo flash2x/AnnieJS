@@ -44,7 +44,7 @@ namespace annie {
         }
 
         private _curFrame: number = 0;
-        private _wantFrame: number = 0;
+        private _wantFrame: number = 1;
         private _lastFrameObj: any = null;
 
         /**
@@ -107,7 +107,7 @@ namespace annie {
         }
 
         //sprite 和 moveClip的类资源信息
-        private _a2x_res_class: any = { tf: 1 };
+        private _a2x_res_class: any = {tf: 1};
         private _a2x_res_children: any = [];
 
         /**

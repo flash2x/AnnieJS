@@ -4612,7 +4612,7 @@ var annie;
         function MovieClip() {
             var _this = _super.call(this) || this;
             _this._curFrame = 0;
-            _this._wantFrame = 0;
+            _this._wantFrame = 1;
             _this._lastFrameObj = null;
             _this._isPlaying = true;
             _this._isFront = true;
@@ -10900,19 +10900,19 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "3.2.4";
+    annie.version = "annie_js_3.2.4";
     /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
-     * @property annie.osType
-     * @since 1.0.0
-     * @public
-     * @type {string|string}
-     * @static
-     * @example
-     *      //获取当前设备类型
-     *      console.log(annie.osType);
-     */
+    * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+    * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
+    * @property annie.osType
+    * @since 1.0.0
+    * @public
+    * @type {string|string}
+    * @static
+    * @example
+    *      //获取当前设备类型
+    *      console.log(annie.osType);
+    */
     annie.osType = (function () {
         var n = navigator.userAgent.toLocaleLowerCase();
         var reg1 = /android|mobile/;
