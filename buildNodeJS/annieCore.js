@@ -3517,11 +3517,17 @@ var annie;
          * @method addFrameScript
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex {number} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
+         * @param {number|string} frameIndex {number|string} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
          * @param {Function}frameScript {Function} 时间轴播放到当前帧时要执行回调方法
          */
         MovieClip.prototype.addFrameScript = function (frameIndex, frameScript) {
             var s = this;
+            var timeLineObj = s._a2x_res_class;
+            if (typeof (frameIndex) == "string") {
+                if (timeLineObj.label[frameIndex] != undefined) {
+                    frameIndex = timeLineObj.label[frameIndex];
+                }
+            }
             if (!(s._a2x_script instanceof Object))
                 s._a2x_script = {};
             s._a2x_script[frameIndex] = frameScript;
@@ -3531,10 +3537,16 @@ var annie;
          * @method removeFrameScript
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex
+         * @param {number|string} frameIndex
          */
         MovieClip.prototype.removeFrameScript = function (frameIndex) {
             var s = this;
+            var timeLineObj = s._a2x_res_class;
+            if (typeof (frameIndex) == "string") {
+                if (timeLineObj.label[frameIndex] != undefined) {
+                    frameIndex = timeLineObj.label[frameIndex];
+                }
+            }
             if (s._a2x_script instanceof Object)
                 s._a2x_script[frameIndex] = null;
         };

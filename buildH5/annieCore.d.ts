@@ -2416,18 +2416,18 @@ declare namespace annie {
          * @method addFrameScript
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex {number} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
+         * @param {number|string} frameIndex {number|string} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
          * @param {Function}frameScript {Function} 时间轴播放到当前帧时要执行回调方法
          */
-        addFrameScript(frameIndex: number, frameScript: Function): void;
+        addFrameScript(frameIndex: number | string, frameScript: Function): void;
         /**
          * 移除帧上的回调方法
          * @method removeFrameScript
          * @public
          * @since 1.0.0
-         * @param {number} frameIndex
+         * @param {number|string} frameIndex
          */
-        removeFrameScript(frameIndex: number): void;
+        removeFrameScript(frameIndex: number | string): void;
         /**
          * 确认是不是按钮形态
          * @property isButton

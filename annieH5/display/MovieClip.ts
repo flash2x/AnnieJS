@@ -125,7 +125,14 @@ namespace annie {
             s._isPlaying = false;
         }
         private _a2x_script: any = null;
-
+        /**
+         * 给时间轴添加回调函数,当时间轴播放到当前帧时,此函数将被调用.注意,之前在此帧上添加的所有代码将被覆盖,包括Fla文件中当前帧的代码.
+         * @method addFrameScript
+         * @public
+         * @since 1.0.0
+         * @param {number|string} frameIndex {number|string} 要将代码添加到哪一帧,从0开始.0就是第一帧,1是第二帧...
+         * @param {Function}frameScript {Function} 时间轴播放到当前帧时要执行回调方法
+         */
         public addFrameScript(frameIndex: number|string, frameScript: Function): void {
             let s = this;
             var timeLineObj = s._a2x_res_class;
