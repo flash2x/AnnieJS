@@ -339,6 +339,12 @@ namespace annie {
         //当document有鼠标或触摸事件时调用
         private _mP2: Point = new Point();
         public static onAppTouchEvent(e: any) {
+            if (e.changedTouches[0].hasOwnProperty("x")) {
+                for (var i = 0; i < e.changedTouches.length; i++) {
+                    e.changedTouches[i].clientX = e.changedTouches[0].x;
+                    e.changedTouches[i].clientY = e.changedTouches[0].y;
+                }
+            }
             Stage.stage.mouseEvent(e);
         }
         private mouseEvent: any = null;

@@ -572,13 +572,13 @@ namespace annie {
         protected _render(renderObj: IRender | any): void {
             let s = this;
             if (s._visible && s._cAlpha > 0) {
-                let ctx = CanvasRender._ctx, tm;
-                tm = s._cMatrix;
-                if (ctx.globalAlpha != s._cAlpha) {
-                    ctx.globalAlpha = s._cAlpha
-                }
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                 if (s.isNeedDraw) {
+                    let ctx = CanvasRender._ctx, tm;
+                    tm = s._cMatrix;
+                    if (ctx.globalAlpha != s._cAlpha) {
+                        ctx.globalAlpha = s._cAlpha
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                     s._draw(ctx);
                 }
             }

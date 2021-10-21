@@ -57,6 +57,8 @@ namespace annie {
             if(color != ""){
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
+            }else{
+                ctx.fillRect(0, 0, 1, 1);
             }
         }
 

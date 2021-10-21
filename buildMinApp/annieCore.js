@@ -2134,13 +2134,13 @@ var annie;
         DisplayObject.prototype._render = function (renderObj) {
             var s = this;
             if (s._visible && s._cAlpha > 0) {
-                var ctx = annie.CanvasRender._ctx, tm = void 0;
-                tm = s._cMatrix;
-                if (ctx.globalAlpha != s._cAlpha) {
-                    ctx.globalAlpha = s._cAlpha;
-                }
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                 if (s.isNeedDraw) {
+                    var ctx = annie.CanvasRender._ctx, tm = void 0;
+                    tm = s._cMatrix;
+                    if (ctx.globalAlpha != s._cAlpha) {
+                        ctx.globalAlpha = s._cAlpha;
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                     s._draw(ctx);
                 }
             }
@@ -5622,6 +5622,12 @@ var annie;
             return Stage._FPS;
         };
         Stage.onAppTouchEvent = function (e) {
+            if (e.changedTouches[0].hasOwnProperty("x")) {
+                for (var i = 0; i < e.changedTouches.length; i++) {
+                    e.changedTouches[i].clientX = e.changedTouches[0].x;
+                    e.changedTouches[i].clientY = e.changedTouches[0].y;
+                }
+            }
             Stage.stage.mouseEvent(e);
         };
         Stage.prototype._onMouseEvent = function (e) {
@@ -6143,6 +6149,9 @@ var annie;
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
             }
+            else {
+                ctx.fillRect(0, 0, 1, 1);
+            }
         };
         /**
          * 开始有遮罩时调用
@@ -6263,6 +6272,9 @@ var annie;
             if (color != "") {
                 ctx.fillStyle = color;
                 ctx.fillRect(0, 0, c.width, c.height);
+            }
+            else {
+                ctx.fillRect(0, 0, 1, 1);
             }
         };
         /**
@@ -8257,7 +8269,7 @@ var annie;
             typeInfo = { type: "png" };
         }
         else {
-            typeInfo.type = "jpg";
+            typeInfo.type = "jpeg";
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             }
