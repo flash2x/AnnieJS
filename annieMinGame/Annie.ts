@@ -102,7 +102,7 @@ namespace annie {
         if (!typeInfo) {
             typeInfo = { type: "png" };
         } else {
-            typeInfo.type = "jpg";
+            typeInfo.type = "jpeg";
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             } else {

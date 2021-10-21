@@ -325,7 +325,9 @@ namespace annie {
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
-            touchcancel: "onMouseUp"
+            ontouchstart: "onMouseDown",
+            ontouchmove: "onMouseMove",
+            ontouchend: "onMouseUp"
         };
         //stageMousePoint
         private sp: Point = new annie.Point();
@@ -345,6 +347,7 @@ namespace annie {
         public static _lastDragPoint: annie.Point = new annie.Point();
         public static _isDragCenter: boolean = false;
         private _onMouseEvent(e: any): void {
+            
             //检查是否有
             let s: any = this, offSetX = 0, offSetY = 0;
             let sd: any = Stage._dragDisplay;

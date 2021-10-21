@@ -5420,11 +5420,9 @@ var annie;
                 touchstart: "onMouseDown",
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp",
-                touchcancel: "onMouseUp",
                 ontouchstart: "onMouseDown",
                 ontouchmove: "onMouseMove",
-                ontouchend: "onMouseUp",
-                ontouchcancel: "onMouseUp"
+                ontouchend: "onMouseUp"
             };
             //stageMousePoint
             _this.sp = new annie.Point();
@@ -5510,17 +5508,29 @@ var annie;
                 canvas_1.height = sysInfo.windowHeight * sysInfo.pixelRatio;
                 annie.CanvasRender.rootContainer = canvas_1;
                 annie.app.onTouchStart(function (e) {
+                    if (e.type == undefined) {
+                        e.type = "touchstart";
+                    }
                     s.mouseEvent(e);
                 });
                 annie.app.onTouchMove(function (e) {
+                    if (e.type == undefined) {
+                        e.type = "touchmove";
+                    }
                     s.mouseEvent(e);
                 });
                 annie.app.onTouchEnd(function (e) {
+                    if (e.type == undefined) {
+                        e.type = "touchend";
+                    }
                     s.mouseEvent(e);
                 });
-                annie.app.onTouchCancel(function (e) {
-                    s.mouseEvent(e);
-                });
+                // annie.app.onTouchCancel(function (e: any) {
+                //     if(e.type==undefined){
+                //         e.type="touchcancel";
+                //     }
+                //     s.mouseEvent(e);
+                // });
             }
             annie.OffCanvasRender.rootContainer = annie.app.createCanvas();
             //webgl 直到对2d的支持非常成熟了再考虑开启

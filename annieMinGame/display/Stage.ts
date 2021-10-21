@@ -265,17 +265,29 @@ namespace annie {
                 canvas.height=sysInfo.windowHeight*sysInfo.pixelRatio;
                 annie.CanvasRender.rootContainer= canvas;
                 annie.app.onTouchStart(function (e: any) {
+                    if(e.type==undefined){
+                        e.type="touchstart";
+                    }
                     s.mouseEvent(e);
                 });
                 annie.app.onTouchMove(function (e: any) {
+                    if(e.type==undefined){
+                        e.type="touchmove";
+                    }
                     s.mouseEvent(e);
                 });
                 annie.app.onTouchEnd(function (e: any) {
+                    if(e.type==undefined){
+                        e.type="touchend";
+                    }
                     s.mouseEvent(e);
                 });
-                annie.app.onTouchCancel(function (e: any) {
-                    s.mouseEvent(e);
-                });
+                // annie.app.onTouchCancel(function (e: any) {
+                //     if(e.type==undefined){
+                //         e.type="touchcancel";
+                //     }
+                //     s.mouseEvent(e);
+                // });
             }
             annie.OffCanvasRender.rootContainer= annie.app.createCanvas();
             //webgl 直到对2d的支持非常成熟了再考虑开启
@@ -365,11 +377,9 @@ namespace annie {
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
-            touchcancel: "onMouseUp",
             ontouchstart: "onMouseDown",
             ontouchmove: "onMouseMove",
-            ontouchend: "onMouseUp",
-            ontouchcancel: "onMouseUp"
+            ontouchend: "onMouseUp"
         };
         //stageMousePoint
         private sp: Point = new annie.Point();

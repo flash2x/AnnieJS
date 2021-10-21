@@ -5421,7 +5421,9 @@ var annie;
                 touchstart: "onMouseDown",
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp",
-                touchcancel: "onMouseUp"
+                ontouchstart: "onMouseDown",
+                ontouchmove: "onMouseMove",
+                ontouchend: "onMouseUp"
             };
             //stageMousePoint
             _this.sp = new annie.Point();

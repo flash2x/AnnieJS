@@ -4925,9 +4925,13 @@ var annie;
                 }
             }
             else if (typeof (frameIndex) == "number") {
-                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
-                    isOkFrameIndex = true;
+                if (frameIndex < 1) {
+                    frameIndex = 1;
                 }
+                else if (frameIndex > timeLineObj.tf) {
+                    frameIndex = timeLineObj.tf;
+                }
+                isOkFrameIndex = true;
             }
             if (isOkFrameIndex) {
                 s._isPlaying = false;
@@ -4971,9 +4975,13 @@ var annie;
                 }
             }
             else if (typeof (frameIndex) == "number") {
-                if (frameIndex >= 1 && frameIndex <= timeLineObj.tf) {
-                    isOkFrameIndex = true;
+                if (frameIndex < 1) {
+                    frameIndex = 1;
                 }
+                else if (frameIndex > timeLineObj.tf) {
+                    frameIndex = timeLineObj.tf;
+                }
+                isOkFrameIndex = true;
             }
             if (isOkFrameIndex) {
                 s._isPlaying = true;
