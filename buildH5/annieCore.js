@@ -6902,11 +6902,8 @@ var annie;
                             var fp = e.changedTouches[0];
                             if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
                                 s._lastDpList.isStart = true;
-                                points = [fp];
                             }
-                            else {
-                                return;
-                            }
+                            points = [fp];
                         }
                     }
                     var pLen = points.length;

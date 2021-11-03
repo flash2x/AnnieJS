@@ -2932,10 +2932,7 @@ declare namespace annie {
  * @class annie
  */
 declare namespace annie {
-    let _isReleased: boolean;
-    let suffixName: string;
     let classPool: any;
-    let _shareSceneList: any;
     let res: any;
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>

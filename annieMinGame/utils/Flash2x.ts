@@ -7,12 +7,7 @@ namespace annie {
     declare let require: any;
     import Shape = annie.Shape;
     import Bitmap = annie.Bitmap;
-    //打包swf用
-    export let _isReleased = false;
-    export let suffixName = ".swf";
     export let classPool: any = {};
-    //打包swf用
-    export let _shareSceneList: any = [];
     //存储加载资源的总对象
     export let res: any = {};
     // 加载器是否正在加载中
@@ -360,12 +355,11 @@ namespace annie {
      */
     export function unLoadScene(sceneName: string): void {
         delete res[sceneName];
-        let w: any = window;
-        let scene: any = w[sceneName];
+        let scene: any = classPool[sceneName];
         for (let i in scene) {
             delete scene[i];
         }
-        delete w[sceneName];
+        delete classPool[sceneName];
         scene = null;
     }
 
@@ -558,30 +552,6 @@ namespace annie {
     function s(sceneName: string, resName: string): annie.Sound {
         return new annie.Sound(res[sceneName][resName]);
     }
-
-    /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
-     * 获取url地址中的get参数
-     * @method annie.getQueryString
-     * @static
-     * @param name
-     * @return {any}
-     * @since 1.0.9
-     * @public
-     * @example
-     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
-     *      //通过此方法获取id和username的值
-     *      var id=annie.getQueryString("id");
-     *      var userName=annie.getQueryString("username");
-     *      console.log(id,userName);
-     */
-    export function getQueryString(name: string) {
-        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-        let r = window.location.search.substr(1).match(reg);
-        if (r != null) return decodeURIComponent(r[2]);
-        return null;
-    }
-
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes

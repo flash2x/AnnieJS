@@ -5685,7 +5685,7 @@ var annie;
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
                 if (annie.EventDispatcher._totalMEC > 0) {
                     var points = void 0;
-                    var item = s._mouseEventTypes[e.type];
+                    var item = s._mouseEventTypes[e.type.toLowerCase()];
                     var events = [];
                     var event_1;
                     //clientPoint
@@ -5700,11 +5700,8 @@ var annie;
                         var fp = e.changedTouches[0];
                         if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
                             s._lastDpList.isStart = true;
-                            points = [fp];
                         }
-                        else {
-                            return;
-                        }
+                        points = [fp];
                     }
                     var pLen = points.length;
                     for (var o = 0; o < pLen; o++) {
@@ -6411,12 +6408,7 @@ var annie;
  */
 var annie;
 (function (annie) {
-    //打包swf用
-    annie._isReleased = false;
-    annie.suffixName = ".swf";
     annie.classPool = {};
-    //打包swf用
-    annie._shareSceneList = [];
     //存储加载资源的总对象
     annie.res = {};
     // 加载器是否正在加载中
@@ -6746,12 +6738,11 @@ var annie;
      */
     function unLoadScene(sceneName) {
         delete annie.res[sceneName];
-        var w = window;
-        var scene = w[sceneName];
+        var scene = annie.classPool[sceneName];
         for (var i in scene) {
             delete scene[i];
         }
-        delete w[sceneName];
+        delete annie.classPool[sceneName];
         scene = null;
     }
     annie.unLoadScene = unLoadScene;

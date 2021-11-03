@@ -406,7 +406,7 @@ namespace annie {
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
                 if (EventDispatcher._totalMEC > 0) {
                     let points: any;
-                    let item = s._mouseEventTypes[e.type];
+                    let item = s._mouseEventTypes[e.type.toLowerCase()];
                     let events: any = [];
                     let event: any;
                     //clientPoint
@@ -420,10 +420,8 @@ namespace annie {
                         let fp = e.changedTouches[0];
                         if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
                             s._lastDpList.isStart = true;
-                            points = [fp];
-                        } else {
-                            return;
-                        }
+                        } 
+                        points = [fp];
                     }
                     let pLen = points.length;
                     for (let o = 0; o < pLen; o++) {

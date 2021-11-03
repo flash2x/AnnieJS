@@ -2968,10 +2968,7 @@ declare namespace annie {
  * @class annie
  */
 declare namespace annie {
-    let _isReleased: boolean;
-    let suffixName: string;
     let classPool: any;
-    let _shareSceneList: any;
     let res: any;
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
@@ -3036,23 +3033,6 @@ declare namespace annie {
      */
     function getDisplay(sceneName: string, className: string): any;
     function d(target: any, info: any, isMc?: boolean): void;
-    /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
-     * 获取url地址中的get参数
-     * @method annie.getQueryString
-     * @static
-     * @param name
-     * @return {any}
-     * @since 1.0.9
-     * @public
-     * @example
-     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
-     *      //通过此方法获取id和username的值
-     *      var id=annie.getQueryString("id");
-     *      var userName=annie.getQueryString("username");
-     *      console.log(id,userName);
-     */
-    function getQueryString(name: string): string;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes

@@ -7,12 +7,7 @@ namespace annie {
     declare let require: any;
     import Shape=annie.Shape;
     import Bitmap=annie.Bitmap;
-    //打包swf用
-    export let _isReleased = false;
-    export let suffixName = ".swf";
     export let classPool: any = {};
-    //打包swf用
-    export let _shareSceneList: any = [];
     //存储加载资源的总对象
     export let res: any = {};
     // 加载器是否正在加载中
@@ -332,12 +327,11 @@ namespace annie {
      */
     export function unLoadScene(sceneName: string): void {
         delete res[sceneName];
-        let w: any = window;
-        let scene: any = w[sceneName];
+        let scene: any = classPool[sceneName];
         for (let i in scene) {
             delete scene[i];
         }
-        delete w[sceneName];
+        delete classPool[sceneName];
         scene = null;
     }
 

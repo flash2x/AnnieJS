@@ -2134,13 +2134,13 @@ var annie;
         DisplayObject.prototype._render = function (renderObj) {
             var s = this;
             if (s._visible && s._cAlpha > 0) {
-                var ctx = annie.CanvasRender._ctx, tm = void 0;
-                tm = s._cMatrix;
-                if (ctx.globalAlpha != s._cAlpha) {
-                    ctx.globalAlpha = s._cAlpha;
-                }
-                ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                 if (s.isNeedDraw) {
+                    var ctx = annie.CanvasRender._ctx, tm = void 0;
+                    tm = s._cMatrix;
+                    if (ctx.globalAlpha != s._cAlpha) {
+                        ctx.globalAlpha = s._cAlpha;
+                    }
+                    ctx.setTransform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                     s._draw(ctx);
                 }
             }
@@ -5726,7 +5726,7 @@ var annie;
                 //检查mouse或touch事件是否有，如果有的话，就触发事件函数
                 if (annie.EventDispatcher._totalMEC > 0) {
                     var points = void 0;
-                    var item = s._mouseEventTypes[e.type];
+                    var item = s._mouseEventTypes[e.type.toLowerCase()];
                     var events = [];
                     var event_2;
                     //clientPoint
@@ -5741,11 +5741,8 @@ var annie;
                         var fp = e.changedTouches[0];
                         if ((s._lastDpList[fp.identifier] != void 0) || (item == "onMouseDown" && !s._lastDpList.isStart)) {
                             s._lastDpList.isStart = true;
-                            points = [fp];
                         }
-                        else {
-                            return;
-                        }
+                        points = [fp];
                     }
                     var pLen = points.length;
                     for (var o = 0; o < pLen; o++) {
@@ -6542,12 +6539,7 @@ var annie;
  */
 var annie;
 (function (annie) {
-    //打包swf用
-    annie._isReleased = false;
-    annie.suffixName = ".swf";
     annie.classPool = {};
-    //打包swf用
-    annie._shareSceneList = [];
     //存储加载资源的总对象
     annie.res = {};
     // 加载器是否正在加载中
@@ -6908,12 +6900,11 @@ var annie;
      */
     function unLoadScene(sceneName) {
         delete annie.res[sceneName];
-        var w = window;
-        var scene = w[sceneName];
+        var scene = annie.classPool[sceneName];
         for (var i in scene) {
             delete scene[i];
         }
-        delete w[sceneName];
+        delete annie.classPool[sceneName];
         scene = null;
     }
     annie.unLoadScene = unLoadScene;
@@ -7113,30 +7104,6 @@ var annie;
     function s(sceneName, resName) {
         return new annie.Sound(annie.res[sceneName][resName]);
     }
-    /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
-     * 获取url地址中的get参数
-     * @method annie.getQueryString
-     * @static
-     * @param name
-     * @return {any}
-     * @since 1.0.9
-     * @public
-     * @example
-     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
-     *      //通过此方法获取id和username的值
-     *      var id=annie.getQueryString("id");
-     *      var userName=annie.getQueryString("username");
-     *      console.log(id,userName);
-     */
-    function getQueryString(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-        var r = window.location.search.substr(1).match(reg);
-        if (r != null)
-            return decodeURIComponent(r[2]);
-        return null;
-    }
-    annie.getQueryString = getQueryString;
     /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes
@@ -8432,7 +8399,7 @@ var annie;
             typeInfo = { type: "png" };
         }
         else {
-            typeInfo.type = "jpg";
+            typeInfo.type = "jpeg";
             if (typeInfo.quality) {
                 typeInfo.quality /= 100;
             }
