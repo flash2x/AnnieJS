@@ -385,7 +385,7 @@ namespace annie {
      * @return {any}
      */
     export function getDisplay(sceneName: string, className: string): any {
-        return new annie.classPool[sceneName][className]();
+        return new annie.Global[sceneName][className]();
     }
 
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
@@ -578,7 +578,7 @@ namespace annie {
      * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
-        let Root: any = annie.classPool;
+        let Root: any = annie.Global;
         //资源树最顶层
         let resRoot: any = res[sceneName];
         //资源树里类对象json数据

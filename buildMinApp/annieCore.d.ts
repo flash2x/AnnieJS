@@ -2927,13 +2927,142 @@ declare namespace annie {
     }
 }
 /**
+ * @module annie
+ */
+declare namespace annie {
+    /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+     * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
+     * @class annie.URLLoader
+     * @extends annie.EventDispatcher
+     * @public
+     * @since 1.0.0
+     * @example
+     *      var urlLoader = new annie.URLLoader();
+     *      urlLoader.addEventListener('onComplete', function (e) {
+     *      //console.log(e.data.response);
+     *      var bitmapData = e.data.response,//bitmap图片数据
+     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
+     *      //居中对齐
+     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+     *      s.addChild(bitmap);
+     *      });
+     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
+     */
+    class URLLoader extends EventDispatcher {
+        /**
+         * 完成事件
+         * @event annie.Event.COMPLETE
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader加载过程事件
+         * @event annie.Event.PROGRESS
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader出错事件
+         * @event annie.Event.ERROR
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader中断事件
+         * @event annie.Event.ABORT
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader开始事件
+         * @event annie.Event.START
+         * @since 1.0.0
+         */
+        /**
+         * 构造函数
+         * @method URLLoader
+         * @param type text json js xml image sound css svg video unKnow
+         */
+        constructor();
+        /**
+         * 取消加载
+         * @method loadCancel
+         * @public
+         * @since 1.0.0
+         */
+        loadCancel(): void;
+        private _req;
+        /**
+         * 加载或请求数据
+         * @method load
+         * @public
+         * @since 1.0.0
+         * @param {string} url
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
+         */
+        load(url: string): void;
+        /**
+         * 后台返回来的数据类型
+         * @property responseType
+         * @type {string}
+         * @default null
+         * @public
+         * @since 1.0.0
+         */
+        responseType: string;
+        /**
+         * 传给后台的数据类型
+         * @property dataType
+         * @type {string}
+         * @default null
+         * @public
+         * @since 1.0.0
+         */
+        dataType: string;
+        /**
+         * 请求的url地址
+         * @property url
+         * @public
+         * @since 1.0.0
+         * @type {string}
+         */
+        url: string;
+        /**
+         * 请求后台的类型 get post
+         * @property method
+         * @type {string}
+         * @default get
+         * @public
+         * @since 1.0.0
+         */
+        method: string;
+        /**
+         * 需要向后台传送的数据对象
+         * @property data
+         * @public
+         * @since 1.0.0
+         * @default ""
+         * @type {Object}
+         */
+        data: any;
+        private headers;
+        /**
+         * 添加自定义头
+         * @method addHeader
+         * @param name
+         * @param value
+         */
+        addHeader(name: string, value: string): void;
+        destroy(): void;
+    }
+}
+/**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
  */
 declare namespace annie {
-    let classPool: any;
+    let Global: any;
     let res: any;
+    let suffixName: string;
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
@@ -2990,23 +3119,6 @@ declare namespace annie {
     function getDisplay(sceneName: string, className: string): any;
     function d(target: any, info: any, isMc?: boolean): void;
     /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
-     * 获取url地址中的get参数
-     * @method annie.getQueryString
-     * @static
-     * @param name
-     * @return {any}
-     * @since 1.0.9
-     * @public
-     * @example
-     *      //如果当前网页的地址为http://xxx.xxx.com?id=1&username=anlun
-     *      //通过此方法获取id和username的值
-     *      var id=annie.getQueryString("id");
-     *      var userName=annie.getQueryString("username");
-     *      console.log(id,userName);
-     */
-    function getQueryString(name: string): string;
-    /**
      * 引擎自调用.初始化 sprite和movieClip用
      * @method annie.initRes
      * @param target
@@ -3016,6 +3128,39 @@ declare namespace annie {
      * @static
      */
     function initRes(target: any, sceneName: string, resName: string): void;
+    /**
+     * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
+     * @method annie.ajax
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param info 向后台传送数据所需要设置的信息
+     * @param {url} info.url 向后台请求的地址
+     * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
+     * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
+     * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
+     * @param {Object} info.data 向后台发送的信息对象,默认为null
+     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
+     * @example
+     *      //get
+     *      annie.ajax({
+     *             type: "GET",
+     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
+     *             responseType: 'json',
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
+     *      })
+     *      //post
+     *      annie.ajax({
+     *             type: "POST",
+     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
+     *             data: {phone:'135******58'},
+     *             responseType: 'json',
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
+     *      })
+     */
+    function ajax(info: any): void;
 }
 /**
  * @module annie
@@ -3581,6 +3726,7 @@ declare namespace annie {
      */
     let version: string;
     let app: any;
+    let Eval: any;
     /**
      * 全局事件触发器
      * @static

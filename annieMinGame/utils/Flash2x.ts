@@ -233,7 +233,6 @@ namespace annie {
             }
         }
     }
-
     //检查所有资源是否全加载完成
     function _checkComplete(): void {
         _currentConfig[_loadIndex].shift();
@@ -257,13 +256,10 @@ namespace annie {
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                if (_completeCallback) {
-                    _completeCallback(info);
-                }
-            } else {
-                if (_completeCallback) {
-                    _completeCallback || _completeCallback(info);
-                }
+                _completeCallback(info);
+            } 
+            else {
+                 _completeCallback(info);
                 _loadRes();
             }
         }
@@ -355,11 +351,11 @@ namespace annie {
      */
     export function unLoadScene(sceneName: string): void {
         delete res[sceneName];
-        let scene: any = classPool[sceneName];
+        let scene: any = Global[sceneName];
         for (let i in scene) {
             delete scene[i];
         }
-        delete classPool[sceneName];
+        delete Global[sceneName];
         scene = null;
     }
 
@@ -376,7 +372,6 @@ namespace annie {
     export function getResource(sceneName: string, resName: string): any {
         return res[sceneName][resName];
     }
-
     /**
      * 新建一个已经加载到场景中的类生成的对象
      * @method annie.getDisplay
@@ -387,10 +382,9 @@ namespace annie {
      * @param {string} className
      * @return {any}
      */
-    export function getDisplay(sceneName: string, className: string): any {
-        return new annie.classPool[sceneName][className]();
+    export function getDisplay(sceneName:string,className:string):any {
+        return new annie.Global[sceneName][className]();
     }
-
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
     function b(sceneName: string, resName: string): Bitmap {
         return new annie.Bitmap(res[sceneName][resName]);
@@ -562,7 +556,7 @@ namespace annie {
      * @static
      */
     export function initRes(target: any, sceneName: string, resName: string) {
-        let Root: any = annie.classPool;
+        let Root: any = annie.Global;
         //资源树最顶层
         let resRoot: any = res[sceneName];
         //资源树里类对象json数据

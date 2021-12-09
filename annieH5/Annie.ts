@@ -226,11 +226,12 @@ namespace annie {
         if (!typeInfo) {
             typeInfo = { type: "png" };
         } else {
-            typeInfo.type="jpeg";
-            if (typeInfo.quality) {
-                typeInfo.quality /= 100;
-            }else{
-                typeInfo.quality=0.8;
+            if(typeInfo.type=="jpeg"){
+                if (typeInfo.quality) {
+                    typeInfo.quality /= 100;
+                }else{
+                    typeInfo.quality=0.8;
+                }
             }
         }
         return texture.toDataURL("image/" + typeInfo.type, typeInfo.quality);

@@ -121,16 +121,6 @@ namespace annie {
             _loadConfig();
         } else {
             //加载正式的单个文件
-            //看看是否需要加载共享资源
-            if (_shareSceneList.length > 0 && (!isLoadedScene("f2xShare"))) {
-                for (let i = 0; i < _loadSceneNames.length; i++) {
-                    if (_shareSceneList.indexOf(_loadSceneNames[i]) >= 0) {
-                        _loadSceneNames.unshift("f2xShare");
-                        break;
-                    }
-                }
-            }
-            _loadIndex = 0;
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
             for (let i = 0; i < _totalLoadRes; i++) {
@@ -178,7 +168,6 @@ namespace annie {
 
     //解析加载后的json资源数据
     function _parseContent(loadContent: any) {
-
         //在加载完成之后解析并调整json数据文件，_a2x_con应该是con.json文件里最后一个被加载的，这个一定在fla生成json文件时注意
         //主要工作就是遍历时间轴并调整成方便js读取的方式
         let mc: any;
@@ -698,7 +687,6 @@ namespace annie {
     }
 
     /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public
@@ -733,12 +721,9 @@ namespace annie {
      */
     export function ajax(info: any): void {
         let urlLoader = new URLLoader();
-        if (info.isNeedOption) {
-            urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
-        }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "text" : info.dataType) : info.responseType;
+        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "json" : info.dataType) : info.responseType;
         if (info.success instanceof Object) {
             urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
@@ -983,6 +968,5 @@ namespace annie {
             }
         }
     }
-
     console.log("https://github.com/flash2x/AnnieJS");
 }

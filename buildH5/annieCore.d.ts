@@ -3880,15 +3880,15 @@ declare namespace annie {
         loadCancel(): void;
         private _req;
         private headers;
+        contentType: string;
         /**
          * 加载或请求数据
          * @method load
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
-        load(url: string, contentType?: string): void;
+        load(url: string): void;
         /**
          * 后台返回来的数据类型
          * @property responseType
@@ -4002,7 +4002,6 @@ declare namespace annie {
     function getDisplay(sceneName: string, className: string): any;
     function d(target: any, info: any, isMc?: boolean): void;
     /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public

@@ -16,6 +16,7 @@ namespace annie {
      */
     export let version: string = "annie_MinApp_3.2.3";
     export let app:any=null;
+    export let Eval:any=null;
     /**
      * 全局事件触发器
      * @static
@@ -101,11 +102,12 @@ namespace annie {
         if (!typeInfo) {
             typeInfo = {type: "png"};
         } else {
-            typeInfo.type="jpeg";
-            if (typeInfo.quality) {
-                typeInfo.quality /= 100;
-            }else{
-                typeInfo.quality=0.8;
+            if(typeInfo.type=="jpeg"){
+                if (typeInfo.quality) {
+                    typeInfo.quality /= 100;
+                }else{
+                    typeInfo.quality=0.8;
+                }
             }
         }
         return OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);

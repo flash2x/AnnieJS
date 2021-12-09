@@ -58,6 +58,7 @@ var annieMinAppCoreList =[
     "annieMinApp/render/IRender.ts",
     "annieMinApp/render/CanvasRender.ts",
     "annieMinApp/render/OffCanvasRender.ts",
+    "annieMinApp/net/URLLoader.ts",
     "annieMinApp/utils/Flash2x.ts",
     "annieMinApp/utils/Tween.ts",
     "annieMinApp/utils/Timer.ts",

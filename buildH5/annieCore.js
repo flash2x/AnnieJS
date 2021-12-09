@@ -8598,6 +8598,7 @@ var annie;
             var _this = _super.call(this) || this;
             _this._req = null;
             _this.headers = [];
+            _this.contentType = "form";
             /**
              * 后台返回来的数据类型
              * @property responseType
@@ -8685,10 +8686,8 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
-        URLLoader.prototype.load = function (url, contentType) {
-            if (contentType === void 0) { contentType = "form"; }
+        URLLoader.prototype.load = function (url) {
             var s = this;
             s.loadCancel();
             if (s.responseType == "") {
@@ -8810,13 +8809,13 @@ var annie;
                 }
                 s.headers.length = 0;
             }
-            if (contentType == "form") {
+            if (s.contentType == "form") {
                 s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
                 s._req.send(s._fqs(s.data, null));
             }
             else {
                 var type = "application/json";
-                if (contentType != "json") {
+                if (s.contentType != "json") {
                     type = "multipart/form-data";
                 }
                 s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
@@ -8970,16 +8969,6 @@ var annie;
         }
         else {
             //加载正式的单个文件
-            //看看是否需要加载共享资源
-            if (annie._shareSceneList.length > 0 && (!isLoadedScene("f2xShare"))) {
-                for (var i = 0; i < _loadSceneNames.length; i++) {
-                    if (annie._shareSceneList.indexOf(_loadSceneNames[i]) >= 0) {
-                        _loadSceneNames.unshift("f2xShare");
-                        break;
-                    }
-                }
-            }
-            _loadIndex = 0;
             _totalLoadRes = _loadSceneNames.length;
             _loadSinglePer = 1 / _totalLoadRes;
             for (var i = 0; i < _totalLoadRes; i++) {
@@ -9568,7 +9557,6 @@ var annie;
         return new annie.Sound(annie.res[sceneName][resName]);
     }
     /**
-     * <h4><font color="red">注意:小程序 小游戏不支持</font></h4>
      * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
      * @method annie.ajax
      * @public

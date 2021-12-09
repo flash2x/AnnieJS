@@ -72,19 +72,16 @@ namespace annie {
                 s._req.abort();
             }
         }
-
         private _req: XMLHttpRequest = null;
         private headers: Array<string> = [];
-
         /**
          * 加载或请求数据
          * @method load
          * @public
          * @since 1.0.0
          * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
-        public load(url: string, contentType: string = "form"): void {
+        public load(url: string): void {
             let s = this;
             s.loadCancel();
             if (s.responseType == "") {
@@ -130,7 +127,7 @@ namespace annie {
                 s._req.onerror = function (event: any): void {
                     reSendTimes++;
                     if (reSendTimes > 2) {
-                        s.dispatchEvent("onError", {id: 2, msg: event["message"]});
+                        s.dispatchEvent("onError", {msg: event["message"]});
                     } else {
                         //断线重连
                         s._req.abort();
@@ -145,7 +142,7 @@ namespace annie {
                     //是否异步
                     let e: Event = new Event("onComplete");
                     let result = s._req.response;
-                    e.data = {type: s.responseType, response: null};
+                    e.data = {type: s.responseType};
                     let item: any;
                     switch (s.responseType) {
                         case "css":
@@ -191,19 +188,14 @@ namespace annie {
                 }
                 s.headers.length = 0;
             }
-            if (contentType == "form") {
-                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+            if (s.dataType == "form") {
+                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;");
                 s._req.send(s._fqs(s.data, null));
             } else {
-                var type = "application/json";
-                if (contentType != "json") {
-                    type = "multipart/form-data";
-                }
-                s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
+                s._req.setRequestHeader("Content-type", "application/json");
                 s._req.send(s.data);
             }
         }
-
         /**
          * 后台返回来的数据类型
          * @property responseType
@@ -212,7 +204,8 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public responseType: string = "";
+        public responseType: string = "json";
+        public dataType:string="json";
         /**
          * 请求的url地址
          * @property url
@@ -285,6 +278,7 @@ namespace annie {
             s.loadCancel();
             s.headers = null;
             s.data = null;
+            s._req=null;
             super.destroy();
         }
     }
