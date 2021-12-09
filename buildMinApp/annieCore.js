@@ -5610,7 +5610,7 @@ var annie;
         };
         Stage.prototype._onMouseEvent = function (e) {
             //检查是否有
-            var s = this, offSetX = 0, offSetY = 0;
+            var s = this, offSetX = annie.CanvasRender.rootContainer._left, offSetY = annie.CanvasRender.rootContainer._top;
             var sd = Stage._dragDisplay;
             if (s.isMultiTouch && e.changedTouches.length > 1) {
                 if (e.changedTouches.length == 2) {

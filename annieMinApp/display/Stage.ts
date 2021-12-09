@@ -346,7 +346,7 @@ namespace annie {
         public static _isDragCenter: boolean = false;
         private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this, offSetX = 0, offSetY = 0;
+            let s: any = this, offSetX = CanvasRender.rootContainer._left, offSetY = CanvasRender.rootContainer._top;
             let sd: any = Stage._dragDisplay;
             if (s.isMultiTouch && e.changedTouches.length > 1) {
                 if (e.changedTouches.length == 2) {
