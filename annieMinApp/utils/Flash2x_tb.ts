@@ -3,7 +3,7 @@
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
  */
- namespace annie {
+namespace annie {
     declare let require: any;
     import Shape = annie.Shape;
     import Bitmap = annie.Bitmap;
@@ -270,13 +270,17 @@
                 } else {
                     if (type == "image") {
                         //图片
-                        loadContent = app.createImage();
+                        loadContent = CanvasRender.rootContainer.createImage();
+                        //TODO 抖音
+                        //loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
                         loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
                         res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                     else if (type == "sound") {
                         //声音
                         loadContent = app.createInnerAudioContext();
+                        //TODO 抖音
+                        //loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
                         loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
                         res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
@@ -301,7 +305,7 @@
                           for(let i=0;i<jsonDataArray.length;i++){
                                 count=jsonDataArray[i].src;
                                 if(jsonDataArray[i].type=="javascript"){
-                                    //eval
+                                    // //eval
                                     // if(Eval!=null){
                                     //     loadContent=fs.readFileSync(filePath,"utf-8",index,count);
                                     //     if(app.annieUI){
@@ -315,7 +319,7 @@
                                 }else if(jsonDataArray[i].type=="image"){
                                     //base64 图片
                                     //console.log(fs.readFileSync(filePath,"base64",index,count));
-                                    loadContent = app.createImage();
+                                    loadContent = CanvasRender.rootContainer.createImage();
                                     let base64:String=fs.readFileSync(filePath,"base64",index,count);
                                     if(base64.substr(0,4)=="iVBO"){
                                         loadContent.src = "data:image/png;base64,"+base64;
@@ -785,7 +789,7 @@
      *             error: function (result) {console.log(result)}
      *      })
      */
-    export function ajax(info: any): void {
+     export function ajax(info: any): void {
         let s = info;
         let headers: any = {};
         if (s.dataType == "json") {
@@ -793,12 +797,12 @@
         } else {
             headers["content-type"] = "application/x-www-form-urlencoded";
         }
-        annie.app.request({
+        annie.app.tb.request({
             url: s.url,
             data: s.data,
             dataType: s.dataType,
             responseType: s.responseType,
-            method: s.method,
+            method: s.type,
             header: headers,
             success: s.success,
             fail: s.error?s.error:s.fail,

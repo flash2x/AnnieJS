@@ -3,7 +3,7 @@
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
  */
- namespace annie {
+namespace annie {
     declare let require: any;
     import Shape = annie.Shape;
     import Bitmap = annie.Bitmap;
@@ -270,14 +270,16 @@
                 } else {
                     if (type == "image") {
                         //图片
-                        loadContent = app.createImage();
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        loadContent = CanvasRender.rootContainer.createImage();
+                        //TODO 抖音
+                        loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
                         res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                     else if (type == "sound") {
                         //声音
                         loadContent = app.createInnerAudioContext();
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        //TODO 抖音
+                        loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
                         res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                 }
@@ -292,16 +294,18 @@
                     let fs=app.getFileSystemManager();
                     let filePath=result.tempFilePath;
                     fs.getFileInfo({filePath:filePath,success:function(fileInfoRes:any){
-                            let data=fs.readFileSync(filePath,"utf-8",fileInfoRes.size-1,1);
-                            let jsonDataCount=parseInt(data);
-                            let jsonDataSize=parseInt(fs.readFileSync(filePath,"utf-8",fileInfoRes.size-jsonDataCount-1,jsonDataCount));
-                            let jsonDataArray=JSON.parse(fs.readFileSync(filePath,"utf-8",fileInfoRes.size-jsonDataSize-jsonDataCount-1,jsonDataSize));
-                            let index=0;
-                            let count=0;
+                        let totalSize=fileInfoRes.size;
+                        let allDataBuffer=fs.readFileSync(filePath);
+                        let data = String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,totalSize-1));
+                        let jsonDataCount = parseInt(data.toString());
+                        let jsonDataSize = parseInt(String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,fileInfoRes.size - jsonDataCount - 1,jsonDataCount)));
+                        let jsonDataArray = JSON.parse(String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,fileInfoRes.size - jsonDataSize - jsonDataCount - 1,jsonDataSize)));
+                        let index = 0;
+                        let count = 0;
                           for(let i=0;i<jsonDataArray.length;i++){
                                 count=jsonDataArray[i].src;
                                 if(jsonDataArray[i].type=="javascript"){
-                                    //eval
+                                    // //eval
                                     // if(Eval!=null){
                                     //     loadContent=fs.readFileSync(filePath,"utf-8",index,count);
                                     //     if(app.annieUI){
@@ -314,13 +318,23 @@
                                     // }
                                 }else if(jsonDataArray[i].type=="image"){
                                     //base64 图片
-                                    //console.log(fs.readFileSync(filePath,"base64",index,count));
-                                    loadContent = app.createImage();
-                                    let base64:String=fs.readFileSync(filePath,"base64",index,count);
-                                    if(base64.substr(0,4)=="iVBO"){
-                                        loadContent.src = "data:image/png;base64,"+base64;
+                                    loadContent = CanvasRender.rootContainer.createImage();
+                                    let base64="";
+                                    if(count>9999){
+                                        let times=Math.floor(count/9999);
+                                        let lastCount=count%9999;
+                                        for(let c=0;c<times;c++){
+                                            base64+= app.arrayBufferToBase64(allDataBuffer.slice(index+9999*c,index+9999*(c+1)));
+                                        }
+                                        base64+= app.arrayBufferToBase64(allDataBuffer.slice(index+9999*times,index+9999*times+lastCount));
                                     }else{
-                                        loadContent.src = "data:image/jpeg;base64,"+base64;
+                                        base64= app.arrayBufferToBase64(allDataBuffer.slice(index,index+count));
+                                    }
+                                    if (base64.substr(0, 4) == "iVBO") {
+                                        loadContent.src = "data:image/png;base64," + base64;
+                                    }
+                                    else {
+                                        loadContent.src = "data:image/jpeg;base64," + base64;
                                     }
                                     res[scene][jsonDataArray[i].id] = loadContent;
                                 }else if(jsonDataArray[i].type=="sound"){
@@ -328,21 +342,17 @@
                                     //console.log(fs.readFileSync(filePath,"base64",index,count));
                                     var mp3Path=app.env.USER_DATA_PATH+"/"+scene+"_"+jsonDataArray[i].id+".mp3";
                                     try {
-                                        fs.writeFileSync(
-                                          mp3Path,
-                                          fs.readFileSync(filePath,"binary",index,count),
-                                          "binary"
-                                        );
+                                        fs.writeFileSync(mp3Path, allDataBuffer.slice(index,index+count), "binary");
                                         loadContent = app.createInnerAudioContext();
-                                        loadContent.src=mp3Path;
+                                        loadContent.src = mp3Path;
                                         res[scene][jsonDataArray[i].id] = loadContent;
-                                      } catch(e) {
+                                    }
+                                    catch (e) {
                                         console.log(e);
-                                      }
+                                    }
                                 }else if(jsonDataArray[i].type=="json"){
                                     //解析动画
-                                    //console.log(fs.readFileSync(res.tempFilePath,"utf-8",index,count));
-                                    loadContent = JSON.parse(fs.readFileSync(result.tempFilePath,"utf-8",index,count));
+                                    loadContent = JSON.parse(String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,index,count)));
                                     res[scene][jsonDataArray[i].id] = loadContent;
                                     _parseContent(loadContent);
                                 }
@@ -785,7 +795,7 @@
      *             error: function (result) {console.log(result)}
      *      })
      */
-    export function ajax(info: any): void {
+     export function ajax(info: any): void {
         let s = info;
         let headers: any = {};
         if (s.dataType == "json") {
@@ -798,7 +808,7 @@
             data: s.data,
             dataType: s.dataType,
             responseType: s.responseType,
-            method: s.method,
+            method: s.type,
             header: headers,
             success: s.success,
             fail: s.error?s.error:s.fail,

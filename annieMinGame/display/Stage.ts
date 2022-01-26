@@ -377,9 +377,13 @@ namespace annie {
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
+            tap:"onMouseClick",
+            touchcancel: "onMouseUp",
             ontouchstart: "onMouseDown",
             ontouchmove: "onMouseMove",
-            ontouchend: "onMouseUp"
+            ontouchend: "onMouseUp",
+            ontap:"onMouseClick",
+            ontouchcancel: "onMouseUp"
         };
         //stageMousePoint
         private sp: Point = new annie.Point();

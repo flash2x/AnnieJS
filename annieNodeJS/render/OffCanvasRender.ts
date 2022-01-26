@@ -110,9 +110,6 @@ namespace annie {
                 ctx.globalAlpha *= target._alpha;
                 ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                 if(target.children==null) {
-                    if (target._offsetX != 0 || target._offsetY != 0) {
-                        ctx.translate(target._offsetX, target._offsetY);
-                    }
                     target._draw(ctx);
                 }else {
                     let len: number = target.children.length;

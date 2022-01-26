@@ -1,7 +1,7 @@
 /**
  * @module annie
  */
-namespace annie {
+ namespace annie {
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
@@ -72,16 +72,19 @@ namespace annie {
                 s._req.abort();
             }
         }
+
         private _req: XMLHttpRequest = null;
         private headers: Array<string> = [];
+
         /**
          * 加载或请求数据
          * @method load
          * @public
          * @since 1.0.0
          * @param {string} url
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
-        public load(url: string): void {
+        public load(url: string, contentType: string = "form"): void {
             let s = this;
             s.loadCancel();
             if (s.responseType == "") {
@@ -127,7 +130,7 @@ namespace annie {
                 s._req.onerror = function (event: any): void {
                     reSendTimes++;
                     if (reSendTimes > 2) {
-                        s.dispatchEvent("onError", {msg: event["message"]});
+                        s.dispatchEvent("onError", {id: 2, msg: event["message"]});
                     } else {
                         //断线重连
                         s._req.abort();
@@ -142,7 +145,7 @@ namespace annie {
                     //是否异步
                     let e: Event = new Event("onComplete");
                     let result = s._req.response;
-                    e.data = {type: s.responseType};
+                    e.data = {type: s.responseType, response: null};
                     let item: any;
                     switch (s.responseType) {
                         case "css":
@@ -188,14 +191,20 @@ namespace annie {
                 }
                 s.headers.length = 0;
             }
-            if (s.dataType == "form") {
-                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;");
+            if (contentType == "form") {
+                s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
                 s._req.send(s._fqs(s.data, null));
             } else {
-                s._req.setRequestHeader("Content-type", "application/json");
+                var type = "application/json";
+                if (contentType != "json") {
+                    type = "multipart/form-data";
+                }
+                s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
                 s._req.send(s.data);
+                s.data=null;
             }
         }
+
         /**
          * 后台返回来的数据类型
          * @property responseType
@@ -204,8 +213,7 @@ namespace annie {
          * @public
          * @since 1.0.0
          */
-        public responseType: string = "json";
-        public dataType:string="json";
+        public responseType: string = "";
         /**
          * 请求的url地址
          * @property url
@@ -278,7 +286,6 @@ namespace annie {
             s.loadCancel();
             s.headers = null;
             s.data = null;
-            s._req=null;
             super.destroy();
         }
     }

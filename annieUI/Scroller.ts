@@ -253,7 +253,8 @@ namespace annieUI {
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent,false);
+                //这里不要加false
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             if (s._container != container) {
@@ -261,7 +262,8 @@ namespace annieUI {
                 container.addEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent,false);
+                //这里不要加false
+                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 container.addEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             s.isRunning = false;
@@ -479,7 +481,7 @@ namespace annieUI {
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent,false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             s._container = null;
@@ -539,6 +541,9 @@ namespace annieUI {
          */
         public scrollTo(x: number, y: number, time: number = 0, easing: Function = null) {
             let s = this;
+            if(isNaN(x)||isNaN(y)) {
+                return;
+            }
             if (!time) {
                 s._translate(x, y);
             } else {
@@ -557,10 +562,10 @@ namespace annieUI {
 
         public _translate(x: number, y: number) {
             let s = this;
-            if(x!=Number.NaN&&this.isScrollX) {
+            if(this.isScrollX) {
                 s._curX = x;
             }
-            if(y!=Number.NaN&&this.isScrollY){
+            if(this.isScrollY){
                 s._curY = y;
             }
             s.dispatchEvent(annie.Event.ON_SCROLL_ING, {posX: s._curX, posY: s._curY});

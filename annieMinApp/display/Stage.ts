@@ -325,9 +325,13 @@ namespace annie {
             touchstart: "onMouseDown",
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
+            tap:"onMouseClick",
+            touchcancel: "onMouseUp",
             ontouchstart: "onMouseDown",
             ontouchmove: "onMouseMove",
-            ontouchend: "onMouseUp"
+            ontouchend: "onMouseUp",
+            ontap:"onMouseClick",
+            ontouchcancel: "onMouseUp"
         };
         //stageMousePoint
         private sp: Point = new annie.Point();
@@ -354,7 +358,7 @@ namespace annie {
         public static _isDragCenter: boolean = false;
         private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this, offSetX = 0, offSetY = 0;
+            let s: any = this, offSetX = CanvasRender.rootContainer._left, offSetY = CanvasRender.rootContainer._top;
             let sd: any = Stage._dragDisplay;
             if (s.isMultiTouch && e.changedTouches.length > 1) {
                 if (e.changedTouches.length == 2) {
@@ -479,26 +483,27 @@ namespace annie {
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                             //清空上次存在的显示列表
-                        } else if (item == "onMouseUp") {
-                            if (s._mouseDownPoint[identifier] instanceof annie.Point) {
-                                if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
-                                    //click事件
-                                    //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                                    if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                        if (s._ml[eLen] instanceof annie.MouseEvent) {
-                                            event = s._ml[eLen];
-                                            event.type = "onMouseClick";
-                                        } else {
-                                            event = new MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event;
-                                        }
-                                        events[events.length] = event;
-                                        s._initMouseEvent(event, cp, s.sp, identifier);
-                                        eLen++;
-                                    }
-                                }
-                            }
                         }
+                        // else if (item == "onMouseUp") {
+                        //     if (s._mouseDownPoint[identifier] instanceof annie.Point) {
+                        //         if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
+                        //             //click事件
+                        //             //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                        //             if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
+                        //                 if (s._ml[eLen] instanceof annie.MouseEvent) {
+                        //                     event = s._ml[eLen];
+                        //                     event.type = "onMouseClick";
+                        //                 } else {
+                        //                     event = new MouseEvent("onMouseClick");
+                        //                     s._ml[eLen] = event;
+                        //                 }
+                        //                 events[events.length] = event;
+                        //                 s._initMouseEvent(event, cp, s.sp, identifier);
+                        //                 eLen++;
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
                             let d: any = s.hitTestPoint(cp, true);
@@ -547,7 +552,7 @@ namespace annie {
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                            if (item != "onMouseDown") {
+                            if (item == "onMouseMove") {
                                 if (EventDispatcher.getMouseEventCount("onMouseOver") > 0 || EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                     if (s._lastDpList[identifier] instanceof Array) {
                                         //从第二个开始，因为第一个对象始终是stage顶级对象

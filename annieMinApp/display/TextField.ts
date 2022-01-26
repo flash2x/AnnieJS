@@ -388,9 +388,9 @@ namespace annie {
 
         private realLines: any = [];
         public a2x_ut: boolean = true;
-        protected _updateMatrix(isOffCanvas: boolean = false): void {
-            let s: any = this;
+        protected _updateMatrix(): void {
             super._updateMatrix();
+            let s: any = this;
             if (s.a2x_ut) {
                 let ctx = CanvasRender._ctx;
                 s.a2x_ut = false;
@@ -462,16 +462,15 @@ namespace annie {
             let s=this;
             let realLines=s.realLines;
             let lineHeight=s._lineHeight;
-            let w=s._bounds.width;
             s._prepContext(ctx);
             ctx.translate(s._offsetX, s._offsetY);
             for (let i = 0; i < realLines.length; i++) {
                 if (s._stroke > 0) {
-                    ctx.strokeText(realLines[i], 0, i * lineHeight, w);
+                    ctx.strokeText(realLines[i], 0, i * lineHeight);
                 }
-                ctx.fillText(realLines[i], 0, i * lineHeight, w);
+                ctx.fillText(realLines[i], 0, i * lineHeight);
                 if (s._stroke < 0) {
-                    ctx.strokeText(realLines[i], 0, i * lineHeight, w);
+                    ctx.strokeText(realLines[i], 0, i * lineHeight);
                 }
             }
         }

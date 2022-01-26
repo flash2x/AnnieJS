@@ -2430,7 +2430,7 @@ declare namespace annie {
         private _getMeasuredWidth;
         private realLines;
         a2x_ut: boolean;
-        protected _updateMatrix(isOffCanvas?: boolean): void;
+        protected _updateMatrix(): void;
         _draw(ctx: any, isMask?: boolean): void;
     }
 }
@@ -2884,6 +2884,7 @@ declare namespace annie {
          * @public
          */
         begin(color: string): void;
+        private isFirstObj;
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -2927,142 +2928,15 @@ declare namespace annie {
     }
 }
 /**
- * @module annie
- */
-declare namespace annie {
-    /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
-     * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
-     * @class annie.URLLoader
-     * @extends annie.EventDispatcher
-     * @public
-     * @since 1.0.0
-     * @example
-     *      var urlLoader = new annie.URLLoader();
-     *      urlLoader.addEventListener('onComplete', function (e) {
-     *      //console.log(e.data.response);
-     *      var bitmapData = e.data.response,//bitmap图片数据
-     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
-     *      //居中对齐
-     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
-     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
-     *      s.addChild(bitmap);
-     *      });
-     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
-     */
-    class URLLoader extends EventDispatcher {
-        /**
-         * 完成事件
-         * @event annie.Event.COMPLETE
-         * @since 1.0.0
-         */
-        /**
-         * annie.URLLoader加载过程事件
-         * @event annie.Event.PROGRESS
-         * @since 1.0.0
-         */
-        /**
-         * annie.URLLoader出错事件
-         * @event annie.Event.ERROR
-         * @since 1.0.0
-         */
-        /**
-         * annie.URLLoader中断事件
-         * @event annie.Event.ABORT
-         * @since 1.0.0
-         */
-        /**
-         * annie.URLLoader开始事件
-         * @event annie.Event.START
-         * @since 1.0.0
-         */
-        /**
-         * 构造函数
-         * @method URLLoader
-         * @param type text json js xml image sound css svg video unKnow
-         */
-        constructor();
-        /**
-         * 取消加载
-         * @method loadCancel
-         * @public
-         * @since 1.0.0
-         */
-        loadCancel(): void;
-        private _req;
-        /**
-         * 加载或请求数据
-         * @method load
-         * @public
-         * @since 1.0.0
-         * @param {string} url
-         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
-         */
-        load(url: string): void;
-        /**
-         * 后台返回来的数据类型
-         * @property responseType
-         * @type {string}
-         * @default null
-         * @public
-         * @since 1.0.0
-         */
-        responseType: string;
-        /**
-         * 传给后台的数据类型
-         * @property dataType
-         * @type {string}
-         * @default null
-         * @public
-         * @since 1.0.0
-         */
-        dataType: string;
-        /**
-         * 请求的url地址
-         * @property url
-         * @public
-         * @since 1.0.0
-         * @type {string}
-         */
-        url: string;
-        /**
-         * 请求后台的类型 get post
-         * @property method
-         * @type {string}
-         * @default get
-         * @public
-         * @since 1.0.0
-         */
-        method: string;
-        /**
-         * 需要向后台传送的数据对象
-         * @property data
-         * @public
-         * @since 1.0.0
-         * @default ""
-         * @type {Object}
-         */
-        data: any;
-        private headers;
-        /**
-         * 添加自定义头
-         * @method addHeader
-         * @param name
-         * @param value
-         */
-        addHeader(name: string, value: string): void;
-        destroy(): void;
-    }
-}
-/**
  * Flash资源加载或者管理类，静态类，不可实例化
  * 一般都是初始化或者设置从Flash里导出的资源
  * @class annie
  */
 declare namespace annie {
-    let Global: any;
-    let res: any;
     let suffixName: string;
+    let global: any;
+    let classPool: any;
+    let res: any;
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
@@ -3076,6 +2950,13 @@ declare namespace annie {
      * @param {string} domain 加载时要设置的url前缀,默认则不更改加载路径
      */
     let loadScene: (sceneName: any, progressFun: Function, completeFun: Function, domain?: string) => void;
+    /**
+     * 加载分包场景的方法
+     * @param sceneName 分包名字
+     * @param {Function} progressFun
+     * @param {Function} completeFun
+     */
+    function loadSubScene(subName: string, progressFun: Function, completeFun: Function): void;
     /**
      * 判断一个场景是否已经被加载
      * @method annie.isLoadedScene
@@ -3726,7 +3607,6 @@ declare namespace annie {
      */
     let version: string;
     let app: any;
-    let Eval: any;
     /**
      * 全局事件触发器
      * @static

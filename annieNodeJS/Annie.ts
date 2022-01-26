@@ -41,6 +41,7 @@ namespace annie {
             _dRender = new OffCanvasRender();
             _dRender.init();
         }
+        obj._onUpdateFrame(0,true);
         obj._updateMatrix();
         if(rect==null){
             rect=obj.getBounds();

@@ -15,6 +15,8 @@
     "buildUI":"gulp onBuildUI",
     "buildH5SDK": "gulp onBuildH5Core && gulp onBuildH5Last",
     "buildMinAppSDK": "gulp onBuildMinAppCore && gulp onBuildMinAppLast",
+    "buildDyMinAppSDK": "gulp onBuildDyMinAppCore && gulp onBuildDyMinAppLast",
+    "buildTbMinAppSDK": "gulp onBuildTbMinAppCore && gulp onBuildTbMinAppLast",
     "buildMinGameSDK": "gulp onBuildMinGameCore && gulp onBuildMinGameLast",
     "buildNodeJSSDK": "gulp onBuildNodeCore && gulp onBuildNodeLast",
     "buildDOC": "gulp onBuildDoc && yuidoc -c docConfig.json"

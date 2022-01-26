@@ -246,7 +246,8 @@ var annieUI;
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent, false);
+                //这里不要加false
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             if (s._container != container) {
@@ -254,7 +255,8 @@ var annieUI;
                 container.addEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 container.addEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent, false);
+                //这里不要加false
+                container.addEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 container.addEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             s.isRunning = false;
@@ -454,7 +456,7 @@ var annieUI;
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_MOVE, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_DOWN, s._mouseEvent, false);
                 s._container.removeEventListener(annie.MouseEvent.MOUSE_UP, s._mouseEvent, false);
-                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent, false);
+                s._container.removeEventListener(annie.MouseEvent.MOUSE_OUT, s._mouseEvent);
                 s._container.removeEventListener(annie.Event.ENTER_FRAME, s._enterFrame);
             }
             s._container = null;
@@ -517,6 +519,9 @@ var annieUI;
             if (time === void 0) { time = 0; }
             if (easing === void 0) { easing = null; }
             var s = this;
+            if (isNaN(x) || isNaN(y)) {
+                return;
+            }
             if (!time) {
                 s._translate(x, y);
             }
@@ -535,10 +540,10 @@ var annieUI;
         };
         Scroller.prototype._translate = function (x, y) {
             var s = this;
-            if (x != Number.NaN && this.isScrollX) {
+            if (this.isScrollX) {
                 s._curX = x;
             }
-            if (y != Number.NaN && this.isScrollY) {
+            if (this.isScrollY) {
                 s._curY = y;
             }
             s.dispatchEvent(annie.Event.ON_SCROLL_ING, { posX: s._curX, posY: s._curY });
@@ -982,7 +987,10 @@ var annieUI;
             var s = this;
             if (s._isInit > 0) {
                 var id = (Math.abs(Math.floor(s._view[s._paramXY] / s._itemRow)) - 1) * s._cols;
-                id = id < 0 ? 0 : id;
+                if (id < 0 || isNaN(id)) {
+                    id = 0;
+                    s._view[s._paramXY] = 0;
+                }
                 if (id != s._lastFirstId) {
                     s._lastFirstId = id;
                     if (id != s._items[0].id) {
@@ -1001,9 +1009,10 @@ var annieUI;
                     if (s._isInit == 1) {
                         item._a2x_sl_id = -1;
                     }
+                    var newXY = Math.floor(id / s._cols) * s._itemRow;
                     if (item._a2x_sl_id != id) {
                         item.initData(s.data[id] ? id : -1, s.data[id]);
-                        item[s._paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                        item[s._paramXY] = newXY;
                         item[s._disParam] = (id % s._cols) * s._itemCol;
                         //如果没有数据则隐藏
                         if (s.data[id]) {

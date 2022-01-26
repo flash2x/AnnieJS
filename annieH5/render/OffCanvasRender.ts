@@ -98,23 +98,22 @@ namespace annie {
         private _blendMode: number = 0;
         public render(target: any) {
             let s = this;
-            let isFistObj=s.isFirstObj;
             if(s.isFirstObj){
                 s.isFirstObj=false;
             }
-            if (target._visible){
+            if(target._visible){
                 let children = target.children;
                 let texture = target._texture;
                 let ctx = s._ctx, tm = target._matrix;
                 ctx.save();
-                if(!isFistObj){
+                if(!s.isFirstObj){
                     ctx.globalAlpha *= target._alpha;
                     ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                     ctx.translate(target._offsetX, target._offsetY);
                 }else{
                     ctx.translate(-target._offsetX, -target._offsetY);
                 }
-                if (texture != null&&!isFistObj) {
+                if (texture != null&&!s.isFirstObj) {
                     if (texture.width == 0 || texture.height == 0) { return; }
                     let cf = target._filters;
                     let cfLen = cf.length;

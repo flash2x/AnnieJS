@@ -92,7 +92,7 @@ namespace annieUI {
          * @param {boolean} isReset 是否重置数据列表。
          * @since 1.0.9
          */
-        public updateData(data: Array<any>, isReset: boolean = false): void {
+        public updateData(data: Array<any>, isReset: boolean = false): void{
             let s: any = this;
             if(data) {
                 if (!s._isInit || isReset) {
@@ -111,7 +111,6 @@ namespace annieUI {
             }
             s.resetMaxDistance();
         }
-
         private resetMaxDistance() {
             let s = this;
             if (s._isVertical) {
@@ -126,7 +125,10 @@ namespace annieUI {
             let s: any = this;
             if (s._isInit > 0) {
                 let id: number = (Math.abs(Math.floor(s._view[s._paramXY] / s._itemRow)) - 1) * s._cols;
-                id = id < 0 ? 0 : id;
+                if(id<0||isNaN(id)){
+                    id=0;
+                    s._view[s._paramXY]=0;
+                }
                 if (id != s._lastFirstId) {
                     s._lastFirstId = id;
                     if (id != s._items[0].id) {
@@ -144,9 +146,10 @@ namespace annieUI {
                     if (s._isInit == 1) {
                         item._a2x_sl_id = -1;
                     }
+                    let newXY=Math.floor(id / s._cols) * s._itemRow;
                     if (item._a2x_sl_id != id) {
                         item.initData(s.data[id] ? id : -1, s.data[id]);
-                        item[s._paramXY] = Math.floor(id / s._cols) * s._itemRow;
+                        item[s._paramXY] = newXY;
                         item[s._disParam] = (id % s._cols) * s._itemCol;
                         //如果没有数据则隐藏
                         if (s.data[id]) {
@@ -197,7 +200,6 @@ namespace annieUI {
                 s._lastFirstId = -1;
             }
         }
-
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9

@@ -5420,9 +5420,13 @@ var annie;
                 touchstart: "onMouseDown",
                 touchmove: "onMouseMove",
                 touchend: "onMouseUp",
+                tap: "onMouseClick",
+                touchcancel: "onMouseUp",
                 ontouchstart: "onMouseDown",
                 ontouchmove: "onMouseMove",
-                ontouchend: "onMouseUp"
+                ontouchend: "onMouseUp",
+                ontap: "onMouseClick",
+                ontouchcancel: "onMouseUp"
             };
             //stageMousePoint
             _this.sp = new annie.Point();
@@ -6441,6 +6445,179 @@ var annie;
 var annie;
 (function (annie) {
     /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+     * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
+     * @class annie.URLLoader
+     * @extends annie.EventDispatcher
+     * @public
+     * @since 1.0.0
+     * @example
+     *      var urlLoader = new annie.URLLoader();
+     *      urlLoader.addEventListener('onComplete', function (e) {
+     *      //console.log(e.data.response);
+     *      var bitmapData = e.data.response,//bitmap图片数据
+     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
+     *      //居中对齐
+     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+     *      s.addChild(bitmap);
+     *      });
+     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
+     */
+    var URLLoader = /** @class */ (function (_super) {
+        __extends(URLLoader, _super);
+        //Event
+        /**
+         * 完成事件
+         * @event annie.Event.COMPLETE
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader加载过程事件
+         * @event annie.Event.PROGRESS
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader出错事件
+         * @event annie.Event.ERROR
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader中断事件
+         * @event annie.Event.ABORT
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader开始事件
+         * @event annie.Event.START
+         * @since 1.0.0
+         */
+        /**
+         * 构造函数
+         * @method URLLoader
+         * @param type text json js xml image sound css svg video unKnow
+         */
+        function URLLoader() {
+            var _this = _super.call(this) || this;
+            _this._req = null;
+            /**
+             * 后台返回来的数据类型
+             * @property responseType
+             * @type {string}
+             * @default null
+             * @public
+             * @since 1.0.0
+             */
+            _this.responseType = "json";
+            /**
+             * 传给后台的数据类型
+             * @property dataType
+             * @type {string}
+             * @default null
+             * @public
+             * @since 1.0.0
+             */
+            _this.dataType = "json";
+            /**
+             * 请求的url地址
+             * @property url
+             * @public
+             * @since 1.0.0
+             * @type {string}
+             */
+            _this.url = "";
+            /**
+             * 请求后台的类型 get post
+             * @property method
+             * @type {string}
+             * @default get
+             * @public
+             * @since 1.0.0
+             */
+            _this.method = "get";
+            /**
+             * 需要向后台传送的数据对象
+             * @property data
+             * @public
+             * @since 1.0.0
+             * @default ""
+             * @type {Object}
+             */
+            _this.data = "";
+            _this.headers = {};
+            _this._instanceType = "annie.URLLoader";
+            return _this;
+        }
+        /**
+         * 取消加载
+         * @method loadCancel
+         * @public
+         * @since 1.0.0
+         */
+        URLLoader.prototype.loadCancel = function () {
+            var s = this;
+            if (s._req) {
+                s._req.abort();
+            }
+        };
+        /**
+         * 加载或请求数据
+         * @method load
+         * @public
+         * @since 1.0.0
+         * @param {string} url
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
+         */
+        URLLoader.prototype.load = function (url) {
+            var s = this;
+            if (s.dataType == "json") {
+                s.headers["content-type"] = "application/json";
+            }
+            else {
+                s.headers["content-type"] = "application/x-www-form-urlencoded";
+            }
+            s._req = annie.app.request({
+                url: url,
+                data: s.data,
+                dataType: s.dataType,
+                responseType: s.responseType,
+                method: s.method,
+                header: s.headers,
+                success: function (result) {
+                    s.dispatchEvent(annie.Event.COMPLETE, { type: s.responseType, response: result.data });
+                },
+                faile: function (result) {
+                    s.dispatchEvent("onError", { msg: result });
+                }
+            });
+        };
+        /**
+         * 添加自定义头
+         * @method addHeader
+         * @param name
+         * @param value
+         */
+        URLLoader.prototype.addHeader = function (name, value) {
+            this.headers[name] = value;
+        };
+        URLLoader.prototype.destroy = function () {
+            var s = this;
+            s.loadCancel();
+            s.data = null;
+            s.headers = null;
+            s._req = null;
+            _super.prototype.destroy.call(this);
+        };
+        return URLLoader;
+    }(annie.EventDispatcher));
+    annie.URLLoader = URLLoader;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
      * 小游戏中开放子域在主域的显示容器,小程序中无此类
      * @class annie.SharedCanvas
      * @public
@@ -6539,7 +6716,10 @@ var annie;
  */
 var annie;
 (function (annie) {
-    annie.classPool = {};
+    annie.suffixName = ".swf";
+    annie.global = {};
+    annie.classPool = annie.global;
+    var _isReleased = false;
     //存储加载资源的总对象
     annie.res = {};
     // 加载器是否正在加载中
@@ -6562,8 +6742,7 @@ var annie;
     var _currentConfig;
     // 加载资源数和总资源数的比
     var _loadPer;
-    //单个资源占总资源数的比
-    var _loadSinglePer;
+    var download;
     /**
      * <h4><font color="red">注意:小程序 小游戏里这个方法是同步方法</font></h4>
      * 加载一个flash2x转换的文件内容,如果未加载完成继续调用此方法将会刷新加载器,中断未被加载完成的资源
@@ -6626,14 +6805,25 @@ var annie;
         _completeCallback = completeFun;
         _progressCallback = progressFun;
         _currentConfig = [];
-        _loadConfig();
+        if (_domain.indexOf("http") != 0) {
+            _isReleased = false;
+            _loadConfig();
+        }
+        else {
+            _isReleased = true;
+            //加载正式的单个文件
+            _totalLoadRes = _loadSceneNames.length;
+            for (var i = 0; i < _totalLoadRes; i++) {
+                _currentConfig.push([{ src: _loadSceneNames[i] + "/" + _loadSceneNames[i] + annie.suffixName }]);
+            }
+            _loadRes();
+        }
     };
     /**
      * 加载分包场景的方法
      * @param sceneName 分包名字
      * @param {Function} progressFun
      * @param {Function} completeFun
-     * @param {string} domain
      */
     function loadSubScene(subName, progressFun, completeFun) {
         if (isLoadedScene(subName)) {
@@ -6659,32 +6849,12 @@ var annie;
     //加载配置文件,打包成released线上版时才会用到这个方法。
     //打包released后，所有资源都被base64了，所以线上版不会调用这个方法。
     function _loadConfig() {
-        if (_domain.indexOf("http") != 0) {
-            //本地
-            var sourceUrl = "../resource/";
-            if (_domain != "") {
-                sourceUrl = "../" + _domain + "/resource/";
-            }
-            var result = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
-            _onCFGComplete(result);
+        var sourceUrl = "../resource/";
+        if (_domain != "") {
+            sourceUrl = "../" + _domain + "/resource/";
         }
-        else {
-            var downloadTask = annie.app.downloadFile({
-                url: _domain + "resource/" + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.json",
-                success: function (result) {
-                    if (result.statusCode == 200) {
-                        var resultData = annie.app.getFileSystemManager().readFileSync(result.tempFilePath, "utf8");
-                        _onCFGComplete(JSON.parse(resultData));
-                    }
-                }
-            });
-            downloadTask.onProgressUpdate(function (res) {
-                //远程资源的进度条根据每个加载文件K数才计算
-                if (_progressCallback) {
-                    _progressCallback((res.progress + 100 * _loadIndex) / _loadSceneNames.length >> 0);
-                }
-            });
-        }
+        var result = require(sourceUrl + _loadSceneNames[_loadIndex] + "/" + _loadSceneNames[_loadIndex] + ".res.js");
+        _onCFGComplete(result);
     }
     function _onCFGComplete(data) {
         _currentConfig.push(data);
@@ -6696,7 +6866,6 @@ var annie;
         else {
             //所有配置文件加载完成,那就开始加载资源
             _loadIndex = 0;
-            _loadSinglePer = 1 / _totalLoadRes;
             _loadRes();
         }
     }
@@ -6775,13 +6944,10 @@ var annie;
     //检查所有资源是否全加载完成
     function _checkComplete() {
         _currentConfig[_loadIndex].shift();
-        if (_domain.indexOf("http") != 0) {
-            //本地的进度条根据加个的总文件数才计算
-            _loadedLoadRes++;
-            _loadPer = _loadedLoadRes / _totalLoadRes;
-            if (_progressCallback) {
-                _progressCallback(_loadPer * 100 >> 0);
-            }
+        _loadedLoadRes++;
+        _loadPer = _loadedLoadRes / _totalLoadRes;
+        if (_progressCallback) {
+            _progressCallback(_loadPer * 100 >> 0);
         }
         if (_currentConfig[_loadIndex].length > 0) {
             _loadRes();
@@ -6796,81 +6962,125 @@ var annie;
             if (_loadIndex == _loadSceneNames.length) {
                 //全部资源加载完成
                 _isLoading = false;
-                if (_completeCallback) {
-                    _completeCallback(info);
-                }
+                _completeCallback(info);
             }
             else {
-                if (_completeCallback) {
-                    _completeCallback || _completeCallback(info);
-                }
+                _completeCallback(info);
                 _loadRes();
             }
         }
     }
     //加载场景资源
     function _loadRes() {
+        var loadContent;
         var scene = _loadSceneNames[_loadIndex];
-        var type = _currentConfig[_loadIndex][0].type;
-        if (type != "javascript") {
-            var loadContent = void 0;
-            if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
-                if (_domain.indexOf("http") != 0) {
-                    //本地
-                    var sourceUrl = "../";
-                    if (_domain != "") {
-                        sourceUrl = "../" + _domain + "/";
-                    }
-                    loadContent = require(sourceUrl + _currentConfig[_loadIndex][0].src);
-                }
-                else {
-                    loadContent = _currentConfig[_loadIndex][0].src;
-                }
-                annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                _parseContent(loadContent);
-            }
-            else {
-                if (type == "image") {
-                    //图片
-                    loadContent = annie.app.createImage();
-                    if (_domain.indexOf("http") != 0) {
-                        var sourceUrl = "";
-                        if (_domain != "") {
-                            sourceUrl = _domain + "/";
-                        }
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
-                    }
-                    else {
-                        loadContent.src = _currentConfig[_loadIndex][0].src;
-                    }
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                }
-                else if (type == "sound") {
-                    //声音
-                    loadContent = annie.app.createInnerAudioContext();
-                    if (_domain.indexOf("http") != 0) {
-                        var sourceUrl = "";
-                        if (_domain != "") {
-                            sourceUrl = _domain + "/";
-                        }
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
-                    }
-                    else {
-                        loadContent.src = _currentConfig[_loadIndex][0].src;
-                    }
-                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
-                }
-            }
-        }
-        else {
-            //本地
+        if (!_isReleased) {
+            var type = _currentConfig[_loadIndex][0].type;
             var sourceUrl = "../";
-            if (_domain != "" && _domain.indexOf("http") != 0) {
+            if (_domain != "") {
                 sourceUrl = "../" + _domain + "/";
             }
-            require(sourceUrl + _currentConfig[_loadIndex][0].src);
+            if (type != "javascript") {
+                if (_currentConfig[_loadIndex][0].id == "_a2x_con") {
+                    loadContent = require(sourceUrl + _currentConfig[_loadIndex][0].src);
+                    annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                    _parseContent(loadContent);
+                }
+                else {
+                    if (type == "image") {
+                        //图片
+                        loadContent = annie.app.createImage();
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                    }
+                    else if (type == "sound") {
+                        //声音
+                        loadContent = annie.app.createInnerAudioContext();
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
+                    }
+                }
+            }
+            else {
+                require(sourceUrl + _currentConfig[_loadIndex][0].src);
+            }
+            _checkComplete();
         }
-        _checkComplete();
+        else {
+            download = annie.app.downloadFile({
+                url: _domain + "/" + _currentConfig[_loadIndex][0].src,
+                success: function (result) {
+                    var fs = annie.app.getFileSystemManager();
+                    var filePath = result.tempFilePath;
+                    fs.getFileInfo({ filePath: filePath, success: function (fileInfoRes) {
+                            var data = fs.readFileSync(filePath, "utf-8", fileInfoRes.size - 1, 1);
+                            var jsonDataCount = parseInt(data);
+                            var jsonDataSize = parseInt(fs.readFileSync(filePath, "utf-8", fileInfoRes.size - jsonDataCount - 1, jsonDataCount));
+                            var jsonDataArray = JSON.parse(fs.readFileSync(filePath, "utf-8", fileInfoRes.size - jsonDataSize - jsonDataCount - 1, jsonDataSize));
+                            var index = 0;
+                            var count = 0;
+                            for (var i = 0; i < jsonDataArray.length; i++) {
+                                count = jsonDataArray[i].src;
+                                if (jsonDataArray[i].type == "javascript") {
+                                    //eval
+                                    // if(Eval!=null){
+                                    //     loadContent=fs.readFileSync(filePath,"utf-8",index,count);
+                                    //     if(app.annieUI){
+                                    //         Eval(loadContent,{window:global,AnnieRoot:global,annie:annie,annieUI:app.annieUI});
+                                    //     }else{
+                                    //         Eval(loadContent,{window:global,AnnieRoot:global,annie:annie});
+                                    //     }
+                                    // }else{
+                                    require("../src/" + scene + "/" + scene + ".js");
+                                    // }
+                                }
+                                else if (jsonDataArray[i].type == "image") {
+                                    //base64 图片
+                                    //console.log(fs.readFileSync(filePath,"base64",index,count));
+                                    loadContent = annie.app.createImage();
+                                    var base64 = fs.readFileSync(filePath, "base64", index, count);
+                                    if (base64.substr(0, 4) == "iVBO") {
+                                        loadContent.src = "data:image/png;base64," + base64;
+                                    }
+                                    else {
+                                        loadContent.src = "data:image/jpeg;base64," + base64;
+                                    }
+                                    annie.res[scene][jsonDataArray[i].id] = loadContent;
+                                }
+                                else if (jsonDataArray[i].type == "sound") {
+                                    //存到临时文件
+                                    //console.log(fs.readFileSync(filePath,"base64",index,count));
+                                    var mp3Path = annie.app.env.USER_DATA_PATH + "/" + scene + "_" + jsonDataArray[i].id + ".mp3";
+                                    try {
+                                        fs.writeFileSync(mp3Path, fs.readFileSync(filePath, "binary", index, count), "binary");
+                                        loadContent = annie.app.createInnerAudioContext();
+                                        loadContent.src = mp3Path;
+                                        annie.res[scene][jsonDataArray[i].id] = loadContent;
+                                    }
+                                    catch (e) {
+                                        console.log(e);
+                                    }
+                                }
+                                else if (jsonDataArray[i].type == "json") {
+                                    //解析动画
+                                    //console.log(fs.readFileSync(res.tempFilePath,"utf-8",index,count));
+                                    loadContent = JSON.parse(fs.readFileSync(result.tempFilePath, "utf-8", index, count));
+                                    annie.res[scene][jsonDataArray[i].id] = loadContent;
+                                    _parseContent(loadContent);
+                                }
+                                index += count;
+                            }
+                            _checkComplete();
+                        } });
+                }
+            });
+            download.onProgressUpdate(function (res) {
+                //远程资源的进度条根据每个加载文件K数才计算
+                if (_progressCallback) {
+                    _progressCallback((res.progress + 100 * _loadIndex) / _loadSceneNames.length >> 0);
+                }
+            });
+        }
     }
     /**
      * 判断一个场景是否已经被加载
@@ -6900,11 +7110,11 @@ var annie;
      */
     function unLoadScene(sceneName) {
         delete annie.res[sceneName];
-        var scene = annie.classPool[sceneName];
+        var scene = annie.global[sceneName];
         for (var i in scene) {
             delete scene[i];
         }
-        delete annie.classPool[sceneName];
+        delete annie.global[sceneName];
         scene = null;
     }
     annie.unLoadScene = unLoadScene;
@@ -6933,7 +7143,7 @@ var annie;
      * @return {any}
      */
     function getDisplay(sceneName, className) {
-        return new annie.classPool[sceneName][className]();
+        return new annie.global[sceneName][className]();
     }
     annie.getDisplay = getDisplay;
     // 通过已经加载场景中的图片资源创建Bitmap对象实例,此方法一般给Annie2x工具自动调用
@@ -7114,7 +7324,7 @@ var annie;
      * @static
      */
     function initRes(target, sceneName, resName) {
-        var Root = annie.classPool;
+        var Root = annie.global;
         //资源树最顶层
         var resRoot = annie.res[sceneName];
         //资源树里类对象json数据
@@ -7289,6 +7499,52 @@ var annie;
         }
     }
     annie.initRes = initRes;
+    /**
+     * 向后台请求或者传输数据的快速简便方法,比直接用URLLoader要方便,小巧
+     * @method annie.ajax
+     * @public
+     * @static
+     * @since 1.0.0
+     * @param info 向后台传送数据所需要设置的信息
+     * @param {url} info.url 向后台请求的地址
+     * @param {string} info.type 向后台请求的类型 get 和 post,默认为get
+     * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
+     * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
+     * @param {Object} info.data 向后台发送的信息对象,默认为null
+     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
+     * @example
+     *      //get
+     *      annie.ajax({
+     *             type: "GET",
+     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
+     *             responseType: 'json',
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
+     *      })
+     *      //post
+     *      annie.ajax({
+     *             type: "POST",
+     *             url: serverUrl + "Home/Getinfo/getPersonInfo",
+     *             data: {phone:'135******58'},
+     *             responseType: 'json',
+     *             success: function (result) {console.log(result)},
+     *             error: function (result) {console.log(result)}
+     *      })
+     */
+    function ajax(info) {
+        var urlLoader = new annie.URLLoader();
+        urlLoader.method = info.type == undefined ? "get" : info.type;
+        urlLoader.data = info.data == undefined ? null : info.data;
+        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "json" : info.dataType) : info.responseType;
+        if (info.success instanceof Object) {
+            urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
+        }
+        if (info.error instanceof Object) {
+            urlLoader.addEventListener(annie.Event.ERROR, info.error);
+        }
+        urlLoader.load(info.url);
+    }
+    annie.ajax = ajax;
     console.log("https://github.com/flash2x/AnnieJS");
 })(annie || (annie = {}));
 /**
@@ -8307,7 +8563,7 @@ var annie;
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    annie.version = "annie_MinGame_3.2.3";
+    annie.version = "annie_MinGame_3.2.5";
     annie.app = null;
     annie.isSharedCanvas = false;
     /**
@@ -8399,12 +8655,13 @@ var annie;
             typeInfo = { type: "png" };
         }
         else {
-            typeInfo.type = "jpeg";
-            if (typeInfo.quality) {
-                typeInfo.quality /= 100;
-            }
-            else {
-                typeInfo.quality = 0.8;
+            if (typeInfo.type == "jpeg") {
+                if (typeInfo.quality) {
+                    typeInfo.quality /= 100;
+                }
+                else {
+                    typeInfo.quality = 0.8;
+                }
             }
         }
         return annie.OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
@@ -8431,8 +8688,7 @@ annie.Stage["addUpdateObj"](annie.Tween);
 annie.Stage["addUpdateObj"](annie.Timer);
 
 annie.A2xExtend=__extends;
-annie.app=wx;
-GameGlobal.AnnieRoot=annie.classPool;
+GameGlobal.AnnieRoot=annie.global;
 GameGlobal.trace = console.log;
 GameGlobal.annie = annie;
 module.exports=annie;

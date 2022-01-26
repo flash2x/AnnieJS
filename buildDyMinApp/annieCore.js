@@ -2498,11 +2498,9 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (typeof (value) == "string") {
-                    if (!s._texture) {
-                        s._texture = annie.CanvasRender.rootContainer.createImage();
-                        ;
-                    }
-                    s._texture.src = value;
+                    var img = annie.CanvasRender.rootContainer.createImage();
+                    img.src = value;
+                    s._texture = img;
                     s.clearBounds();
                 }
                 else {
@@ -5152,9 +5150,10 @@ var annie;
             //ctx.restore();
             return w;
         };
-        TextField.prototype._updateMatrix = function () {
-            _super.prototype._updateMatrix.call(this);
+        TextField.prototype._updateMatrix = function (isOffCanvas) {
+            if (isOffCanvas === void 0) { isOffCanvas = false; }
             var s = this;
+            _super.prototype._updateMatrix.call(this);
             if (s.a2x_ut) {
                 var ctx = annie.CanvasRender._ctx;
                 s.a2x_ut = false;
@@ -5839,7 +5838,7 @@ var annie;
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                            if (item == "onMouseMove") {
+                            if (item != "onMouseDown") {
                                 if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                     if (s._lastDpList[identifier] instanceof Array) {
                                         //从第二个开始，因为第一个对象始终是stage顶级对象
@@ -6256,7 +6255,6 @@ var annie;
          */
         function OffCanvasRender() {
             var _this = _super.call(this) || this;
-            _this.isFirstObj = false;
             _this._instanceType = "annie.OffCanvasRender";
             return _this;
         }
@@ -6268,8 +6266,6 @@ var annie;
          */
         OffCanvasRender.prototype.begin = function (color) {
             var c = OffCanvasRender.rootContainer, ctx = OffCanvasRender._ctx;
-            ctx.globalAlpha = 1;
-            this.isFirstObj = true;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, c.width, c.height);
             if (color != "") {
@@ -6333,18 +6329,16 @@ var annie;
                 var ctx = OffCanvasRender._ctx;
                 var tm = target._matrix;
                 ctx.save();
-                if (this.isFirstObj) {
-                    this.isFirstObj = false;
-                }
-                else {
-                    ctx.globalAlpha *= target._alpha;
-                    ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
-                }
-                if (children == null) {
+                ctx.globalAlpha *= target._alpha;
+                ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                if (target.children == null) {
+                    if (target._offsetX != 0 || target._offsetY != 0) {
+                        ctx.translate(target._offsetX, target._offsetY);
+                    }
                     target._draw(ctx);
                 }
                 else {
-                    var len = children.length;
+                    var len = target.children.length;
                     var s = this;
                     var maskObj = void 0;
                     var child = void 0;
@@ -6408,6 +6402,179 @@ var annie;
         return OffCanvasRender;
     }(annie.AObject));
     annie.OffCanvasRender = OffCanvasRender;
+})(annie || (annie = {}));
+/**
+ * @module annie
+ */
+var annie;
+(function (annie) {
+    /**
+     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
+     * 资源加载类,后台请求,加载资源和后台交互都可以使用此类
+     * @class annie.URLLoader
+     * @extends annie.EventDispatcher
+     * @public
+     * @since 1.0.0
+     * @example
+     *      var urlLoader = new annie.URLLoader();
+     *      urlLoader.addEventListener('onComplete', function (e) {
+     *      //console.log(e.data.response);
+     *      var bitmapData = e.data.response,//bitmap图片数据
+     *      bitmap = new annie.Bitmap(bitmapData);//实例化bitmap对象
+     *      //居中对齐
+     *      bitmap.x = (s.stage.desWidth - bitmap.width) / 2;
+     *      bitmap.y = (s.stage.desHeight - bitmap.height) / 2;
+     *      s.addChild(bitmap);
+     *      });
+     *      urlLoader.load('http://test.annie2x.com/biglong/logo.jpg');//载入外部图片
+     */
+    var URLLoader = /** @class */ (function (_super) {
+        __extends(URLLoader, _super);
+        //Event
+        /**
+         * 完成事件
+         * @event annie.Event.COMPLETE
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader加载过程事件
+         * @event annie.Event.PROGRESS
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader出错事件
+         * @event annie.Event.ERROR
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader中断事件
+         * @event annie.Event.ABORT
+         * @since 1.0.0
+         */
+        /**
+         * annie.URLLoader开始事件
+         * @event annie.Event.START
+         * @since 1.0.0
+         */
+        /**
+         * 构造函数
+         * @method URLLoader
+         * @param type text json js xml image sound css svg video unKnow
+         */
+        function URLLoader() {
+            var _this = _super.call(this) || this;
+            _this._req = null;
+            /**
+             * 后台返回来的数据类型
+             * @property responseType
+             * @type {string}
+             * @default null
+             * @public
+             * @since 1.0.0
+             */
+            _this.responseType = "json";
+            /**
+             * 传给后台的数据类型
+             * @property dataType
+             * @type {string}
+             * @default null
+             * @public
+             * @since 1.0.0
+             */
+            _this.dataType = "json";
+            /**
+             * 请求的url地址
+             * @property url
+             * @public
+             * @since 1.0.0
+             * @type {string}
+             */
+            _this.url = "";
+            /**
+             * 请求后台的类型 get post
+             * @property method
+             * @type {string}
+             * @default get
+             * @public
+             * @since 1.0.0
+             */
+            _this.method = "get";
+            /**
+             * 需要向后台传送的数据对象
+             * @property data
+             * @public
+             * @since 1.0.0
+             * @default ""
+             * @type {Object}
+             */
+            _this.data = "";
+            _this.headers = {};
+            _this._instanceType = "annie.URLLoader";
+            return _this;
+        }
+        /**
+         * 取消加载
+         * @method loadCancel
+         * @public
+         * @since 1.0.0
+         */
+        URLLoader.prototype.loadCancel = function () {
+            var s = this;
+            if (s._req) {
+                s._req.abort();
+            }
+        };
+        /**
+         * 加载或请求数据
+         * @method load
+         * @public
+         * @since 1.0.0
+         * @param {string} url
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
+         */
+        URLLoader.prototype.load = function (url) {
+            var s = this;
+            if (s.dataType == "json") {
+                s.headers["content-type"] = "application/json";
+            }
+            else {
+                s.headers["content-type"] = "application/x-www-form-urlencoded";
+            }
+            s._req = annie.app.request({
+                url: url,
+                data: s.data,
+                dataType: s.dataType,
+                responseType: s.responseType,
+                method: s.method,
+                header: s.headers,
+                success: function (result) {
+                    s.dispatchEvent(annie.Event.COMPLETE, { type: s.responseType, response: result.data });
+                },
+                faile: function (result) {
+                    s.dispatchEvent("onError", { msg: result });
+                }
+            });
+        };
+        /**
+         * 添加自定义头
+         * @method addHeader
+         * @param name
+         * @param value
+         */
+        URLLoader.prototype.addHeader = function (name, value) {
+            this.headers[name] = value;
+        };
+        URLLoader.prototype.destroy = function () {
+            var s = this;
+            s.loadCancel();
+            s.data = null;
+            s.headers = null;
+            s._req = null;
+            _super.prototype.destroy.call(this);
+        };
+        return URLLoader;
+    }(annie.EventDispatcher));
+    annie.URLLoader = URLLoader;
 })(annie || (annie = {}));
 /**
  * Flash资源加载或者管理类，静态类，不可实例化
@@ -6690,13 +6857,15 @@ var annie;
                     if (type == "image") {
                         //图片
                         loadContent = annie.CanvasRender.rootContainer.createImage();
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        //TODO 抖音
+                        loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                     else if (type == "sound") {
                         //声音
                         loadContent = annie.app.createInnerAudioContext();
-                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
+                        //TODO 抖音
+                        loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                 }
@@ -6712,12 +6881,13 @@ var annie;
                 success: function (result) {
                     var fs = annie.app.getFileSystemManager();
                     var filePath = result.tempFilePath;
-                    fs.getFileInfo({
-                        filePath: filePath, success: function (fileInfoRes) {
-                            var data = fs.readFileSync(filePath, "utf-8", fileInfoRes.size - 1, 1);
-                            var jsonDataCount = parseInt(data);
-                            var jsonDataSize = parseInt(fs.readFileSync(filePath, "utf-8", fileInfoRes.size - jsonDataCount - 1, jsonDataCount));
-                            var jsonDataArray = JSON.parse(fs.readFileSync(filePath, "utf-8", fileInfoRes.size - jsonDataSize - jsonDataCount - 1, jsonDataSize));
+                    fs.getFileInfo({ filePath: filePath, success: function (fileInfoRes) {
+                            var totalSize = fileInfoRes.size;
+                            var allDataBuffer = fs.readFileSync(filePath);
+                            var data = String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, totalSize - 1));
+                            var jsonDataCount = parseInt(data.toString());
+                            var jsonDataSize = parseInt(String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, fileInfoRes.size - jsonDataCount - 1, jsonDataCount)));
+                            var jsonDataArray = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, fileInfoRes.size - jsonDataSize - jsonDataCount - 1, jsonDataSize)));
                             var index = 0;
                             var count = 0;
                             for (var i = 0; i < jsonDataArray.length; i++) {
@@ -6737,9 +6907,19 @@ var annie;
                                 }
                                 else if (jsonDataArray[i].type == "image") {
                                     //base64 图片
-                                    //console.log(fs.readFileSync(filePath,"base64",index,count));
                                     loadContent = annie.CanvasRender.rootContainer.createImage();
-                                    var base64 = fs.readFileSync(filePath, "base64", index, count);
+                                    var base64 = "";
+                                    if (count > 9999) {
+                                        var times = Math.floor(count / 9999);
+                                        var lastCount = count % 9999;
+                                        for (var c = 0; c < times; c++) {
+                                            base64 += annie.app.arrayBufferToBase64(allDataBuffer.slice(index + 9999 * c, index + 9999 * (c + 1)));
+                                        }
+                                        base64 += annie.app.arrayBufferToBase64(allDataBuffer.slice(index + 9999 * times, index + 9999 * times + lastCount));
+                                    }
+                                    else {
+                                        base64 = annie.app.arrayBufferToBase64(allDataBuffer.slice(index, index + count));
+                                    }
                                     if (base64.substr(0, 4) == "iVBO") {
                                         loadContent.src = "data:image/png;base64," + base64;
                                     }
@@ -6753,7 +6933,7 @@ var annie;
                                     //console.log(fs.readFileSync(filePath,"base64",index,count));
                                     var mp3Path = annie.app.env.USER_DATA_PATH + "/" + scene + "_" + jsonDataArray[i].id + ".mp3";
                                     try {
-                                        fs.writeFileSync(mp3Path, fs.readFileSync(filePath, "binary", index, count), "binary");
+                                        fs.writeFileSync(mp3Path, allDataBuffer.slice(index, index + count), "binary");
                                         loadContent = annie.app.createInnerAudioContext();
                                         loadContent.src = mp3Path;
                                         annie.res[scene][jsonDataArray[i].id] = loadContent;
@@ -6764,16 +6944,14 @@ var annie;
                                 }
                                 else if (jsonDataArray[i].type == "json") {
                                     //解析动画
-                                    //console.log(fs.readFileSync(res.tempFilePath,"utf-8",index,count));
-                                    loadContent = JSON.parse(fs.readFileSync(result.tempFilePath, "utf-8", index, count));
+                                    loadContent = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, index, count)));
                                     annie.res[scene][jsonDataArray[i].id] = loadContent;
                                     _parseContent(loadContent);
                                 }
                                 index += count;
                             }
                             _checkComplete();
-                        }
-                    });
+                        } });
                 }
             });
             download.onProgressUpdate(function (res) {
@@ -7234,25 +7412,17 @@ var annie;
      *      })
      */
     function ajax(info) {
-        var s = info;
-        var headers = {};
-        if (s.dataType == "json") {
-            headers["content-type"] = "application/json";
+        var urlLoader = new annie.URLLoader();
+        urlLoader.method = info.type == undefined ? "get" : info.type;
+        urlLoader.data = info.data == undefined ? null : info.data;
+        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "json" : info.dataType) : info.responseType;
+        if (info.success instanceof Object) {
+            urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
-        else {
-            headers["content-type"] = "application/x-www-form-urlencoded";
+        if (info.error instanceof Object) {
+            urlLoader.addEventListener(annie.Event.ERROR, info.error);
         }
-        annie.app.request({
-            url: s.url,
-            data: s.data,
-            dataType: s.dataType,
-            responseType: s.responseType,
-            method: s.type,
-            header: headers,
-            success: s.success,
-            fail: s.error ? s.error : s.fail,
-            complete: s.complete
-        });
+        urlLoader.load(info.url);
     }
     annie.ajax = ajax;
     console.log("https://github.com/flash2x/AnnieJS");
@@ -8350,7 +8520,6 @@ var annie;
             _dRender = new annie.OffCanvasRender();
             _dRender.init();
         }
-        obj._onUpdateFrame(0, true);
         obj._updateMatrix();
         if (rect == null) {
             rect = obj.getBounds();

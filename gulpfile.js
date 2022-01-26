@@ -58,8 +58,57 @@ var annieMinAppCoreList =[
     "annieMinApp/render/IRender.ts",
     "annieMinApp/render/CanvasRender.ts",
     "annieMinApp/render/OffCanvasRender.ts",
-    "annieMinApp/net/URLLoader.ts",
     "annieMinApp/utils/Flash2x.ts",
+    "annieMinApp/utils/Tween.ts",
+    "annieMinApp/utils/Timer.ts",
+    "annieMinApp/Annie.ts",
+    "annieMinApp/GlobalFunction.ts"
+];
+var annieDyMinAppCoreList =[
+    "annieMinApp/events/EventDispatcher.ts",
+    "annieMinApp/events/Event.ts",
+    "annieMinApp/events/MouseEvent.ts",
+    "annieMinApp/events/TouchEvent.ts",
+    "annieMinApp/geom/Point.ts",
+    "annieMinApp/geom/Matrix.ts",
+    "annieMinApp/geom/Rectangle.ts",
+    "annieMinApp/display/DisplayObject.ts",
+    "annieMinApp/display/bitmap.ts",
+    "annieMinApp/display/Shape.ts",
+    "annieMinApp/display/Sprite.ts",
+    "annieMinApp/media/Sound.ts",
+    "annieMinApp/display/MovieClip.ts",
+    "annieMinApp/display/TextField.ts",
+    "annieMinApp/display/Stage.ts",
+    "annieMinApp/render/IRender.ts",
+    "annieMinApp/render/CanvasRender.ts",
+    "annieMinApp/render/OffCanvasRender.ts",
+    "annieMinApp/utils/Flash2x_dy.ts",
+    "annieMinApp/utils/Tween.ts",
+    "annieMinApp/utils/Timer.ts",
+    "annieMinApp/Annie.ts",
+    "annieMinApp/GlobalFunction.ts"
+];
+var annieTbMinAppCoreList =[
+    "annieMinApp/events/EventDispatcher.ts",
+    "annieMinApp/events/Event.ts",
+    "annieMinApp/events/MouseEvent.ts",
+    "annieMinApp/events/TouchEvent.ts",
+    "annieMinApp/geom/Point.ts",
+    "annieMinApp/geom/Matrix.ts",
+    "annieMinApp/geom/Rectangle.ts",
+    "annieMinApp/display/DisplayObject.ts",
+    "annieMinApp/display/bitmap.ts",
+    "annieMinApp/display/Shape.ts",
+    "annieMinApp/display/Sprite.ts",
+    "annieMinApp/media/Sound.ts",
+    "annieMinApp/display/MovieClip.ts",
+    "annieMinApp/display/TextField.ts",
+    "annieMinApp/display/Stage.ts",
+    "annieMinApp/render/IRender.ts",
+    "annieMinApp/render/CanvasRender.ts",
+    "annieMinApp/render/OffCanvasRender.ts",
+    "annieMinApp/utils/Flash2x_tb.ts",
     "annieMinApp/utils/Tween.ts",
     "annieMinApp/utils/Timer.ts",
     "annieMinApp/Annie.ts",
@@ -155,10 +204,51 @@ var onBuildMinAppCore = function(){
 };
 
 var onBuildMinAppLast = function(){
-    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest("buildMinApp"));
-    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.min.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest("buildMinApp"));
-    gulp.src(["buildMinApp/annieCore.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest("buildMinApp"));
-    return gulp.src(["buildMinApp/annieCore.min.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest("buildMinApp"));
+    var outDir = "buildMinApp";
+    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest(outDir));
+    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.min.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest(outDir));
+    gulp.src([outDir+"/annieCore.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest(outDir));
+    return gulp.src([outDir+"/annieCore.min.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest(outDir));
+};
+var onBuildDyMinAppCore = function(){
+    var op = {
+        noImplicitAny: true,
+        declaration: true,
+        out: "annieCore.js",
+        target: "ES5"
+    };
+    var outDir = "buildDyMinApp";
+    var tsResult = gulp.src(annieDyMinAppCoreList).pipe(ts(op));
+        tsResult.dts.pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+};
+
+var onBuildDyMinAppLast = function(){
+    var outDir = "buildDyMinApp";
+    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest(outDir));
+    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.min.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest(outDir));
+    gulp.src([outDir+"/annieCore.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest(outDir));
+    return gulp.src([outDir+"/annieCore.min.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest(outDir));
+};
+var onBuildTbMinAppCore = function(){
+    var op = {
+        noImplicitAny: true,
+        declaration: true,
+        out: "annieCore.js",
+        target: "ES5"
+    };
+    var outDir = "buildDyMinApp";
+    var tsResult = gulp.src(annieTbMinAppCoreList).pipe(ts(op));
+        tsResult.dts.pipe(gulp.dest(outDir));
+        return tsResult.js.pipe(gulp.dest(outDir)).pipe(uglify()).pipe(rename({ extname: '.min.js' })).pipe(gulp.dest(outDir));
+};
+
+var onBuildTbMinAppLast = function(){
+    var outDir = "buildDyMinApp";
+    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.js")).pipe(gulp.dest(outDir));
+    gulp.src(["extendFiles/minAppExtend2.js","buildUI/annieUI.min.js","extendFiles/minAppExtend3.js"]).pipe(concat("annieUI.min.js")).pipe(gulp.dest(outDir));
+    gulp.src([outDir+"/annieCore.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.js")).pipe(gulp.dest(outDir));
+    return gulp.src([outDir+"/annieCore.min.js","extendFiles/minAppExtend1.js"]).pipe(concat("annieCore.min.js")).pipe(gulp.dest(outDir));
 };
 var onBuildMinGameCore = function(){
     var op = {
@@ -227,6 +317,10 @@ gulp.task('onBuildH5Core', onBuildH5Core);
 gulp.task("onBuildH5Last", onBuildH5Last);
 gulp.task('onBuildMinAppCore', onBuildMinAppCore);
 gulp.task("onBuildMinAppLast", onBuildMinAppLast);
+gulp.task('onBuildDyMinAppCore', onBuildDyMinAppCore);
+gulp.task("onBuildDyMinAppLast", onBuildDyMinAppLast);
+gulp.task('onBuildTbMinAppCore', onBuildTbMinAppCore);
+gulp.task("onBuildTbMinAppLast", onBuildTbMinAppLast);
 gulp.task('onBuildMinGameCore', onBuildMinGameCore);
 gulp.task("onBuildMinGameLast", onBuildMinGameLast);
 gulp.task('onBuildNodeCore', onBuildNodeCore);

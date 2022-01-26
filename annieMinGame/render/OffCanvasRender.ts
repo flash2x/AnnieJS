@@ -45,6 +45,8 @@ namespace annie {
          */
         public begin(color: string): void {
             let  c = OffCanvasRender.rootContainer, ctx = OffCanvasRender._ctx;
+            ctx.globalAlpha = 1;
+            this.isFirstObj=true;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, c.width, c.height);
             if(color != ""){
@@ -52,7 +54,7 @@ namespace annie {
                 ctx.fillRect(0, 0, c.width, c.height);
             }
         }
-
+        private isFirstObj:boolean=false;
         /**
          * 开始有遮罩时调用
          * @method beginMask
@@ -107,12 +109,13 @@ namespace annie {
                 let ctx = OffCanvasRender._ctx;
                 let tm = target._matrix;
                 ctx.save();
-                ctx.globalAlpha *= target._alpha;
-                ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                if(this.isFirstObj){
+                    this.isFirstObj=false;
+                }else{
+                    ctx.globalAlpha *= target._alpha;
+                    ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
+                }
                 if(target.children==null) {
-                    if (target._offsetX != 0 || target._offsetY != 0) {
-                        ctx.translate(target._offsetX, target._offsetY);
-                    }
                     target._draw(ctx);
                 }else {
                     let len: number = target.children.length;

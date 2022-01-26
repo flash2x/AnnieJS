@@ -13,7 +13,6 @@ namespace annieUI {
     export class DrawingBoard extends annie.Bitmap {
         protected context: CanvasRenderingContext2D = null;
         protected _isMouseDown: boolean = false;
-
         /**
          * 绘画半径
          * @property drawRadius
@@ -24,11 +23,9 @@ namespace annieUI {
         public get drawRadius(): number {
             return this._drawRadius;
         };
-
         public set drawRadius(value: number) {
             this._drawRadius = value;
         }
-
         protected _drawRadius: number = 50;
         /**
          * 绘画颜色, 可以是任何的颜色类型
@@ -68,7 +65,6 @@ namespace annieUI {
          * @type {number}
          */
         protected currentStepId: number = 0;
-
         protected static _getDrawCanvas(width: number, height: number): HTMLCanvasElement {
             let canvas: HTMLCanvasElement = document.createElement("canvas");
             canvas.width = width;

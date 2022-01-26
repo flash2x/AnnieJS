@@ -14,9 +14,8 @@ namespace annie {
      *      //在初始化stage之前输入以下代码，将会在界面调出调度面板
      *      annie.debug=true;
      */
-    export let version: string = "annie_MinApp_3.2.3";
+    export let version: string = "annie_MinApp_3.2.5";
     export let app:any=null;
-    export let Eval:any=null;
     /**
      * 全局事件触发器
      * @static
@@ -89,6 +88,7 @@ namespace annie {
             _dRender = new OffCanvasRender();
             _dRender.init();
         }
+        obj._onUpdateFrame(0,true);
         obj._updateMatrix();
         if(rect==null){
             rect=obj.getBounds();

@@ -68,9 +68,10 @@ namespace annie {
         public set bitmapData(value: any) {
             let s = this;
             if(typeof(value)=="string"){
-                let img=annie.CanvasRender.rootContainer.createImage();
-                img.src=value;
-                s._texture=img;
+                if(!s._texture){
+                    s._texture=annie.CanvasRender.rootContainer.createImage();;
+                }
+                s._texture.src=value;
                 s.clearBounds();
             }else {
                 if (value != s._texture) {

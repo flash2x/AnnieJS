@@ -698,7 +698,8 @@ namespace annie {
      * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
+     * @param {string} info.responseType 后台返回数据的类型,默认为"json"
+     * @param {string} info.dataType 传给后台数据的类型,默认为"json"
      * @param {boolean} info.isNeedOption 是否需要添加X-Requested-With 头
      * @example
      *      //get
@@ -706,6 +707,7 @@ namespace annie {
      *             type: "GET",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             responseType: 'json',
+     *             dataType:"json",
      *             success: function (result) {console.log(result)},
      *             error: function (result) {console.log(result)}
      *      })
@@ -715,6 +717,7 @@ namespace annie {
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             data: {phone:'135******58'},
      *             responseType: 'json',
+     *             dataType:"json",
      *             success: function (result) {console.log(result)},
      *             error: function (result) {console.log(result)}
      *      })
@@ -723,14 +726,22 @@ namespace annie {
         let urlLoader = new URLLoader();
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "json" : info.dataType) : info.responseType;
-        if (info.success instanceof Object) {
+        urlLoader.responseType = info.responseType == undefined ? "json":info.responseType;
+        if (info.success) {
             urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
-        if (info.error instanceof Object) {
-            urlLoader.addEventListener(annie.Event.ERROR, info.error);
+        if (info.error||info.fail) {
+            if(info.error){
+                urlLoader.addEventListener(annie.Event.ERROR, info.error);
+            }else{
+                urlLoader.addEventListener(annie.Event.ERROR, info.fail);
+            }
         }
-        urlLoader.load(info.url);
+        if(info.dataType){
+            urlLoader.load(info.url,info.dataType);
+        }else{
+            urlLoader.load(info.url);
+        }
     }
 
     /**

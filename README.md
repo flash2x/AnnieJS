@@ -62,6 +62,10 @@
 # 如何更新引擎及工具
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
+## AnnieJS 3.2.5 版本
+    更新annie.ajax方法使此方法支持小程序和小游戏
+    修复annieUI.Scroller滑动时偶尔白屏bug
+    部分代码优化
 ## AnnieJS 3.2.4 版本
     将AnnieJS引擎的NodeJS分支,小程序分支,小游戏分支全部合并成一个主分支进行管理和编译
     修复annie.toDisplayDataURL 截图设置背景透明而无法透明的bug

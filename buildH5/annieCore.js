@@ -2739,11 +2739,13 @@ var annie;
             set: function (value) {
                 var s = this;
                 if (typeof (value) == "string") {
-                    var img = new Image();
-                    img.src = value;
+                    if (s._bitmapData == null) {
+                        var img = new Image();
+                        s._bitmapData = img;
+                    }
+                    s._texture = s._bitmapData;
+                    s._bitmapData.src = value;
                     s.clearBounds();
-                    s._bitmapData = img;
-                    s._texture = img;
                 }
                 else {
                     if (value != s._bitmapData) {
@@ -7039,7 +7041,7 @@ var annie;
                                 }
                             }
                             //最后要和上一次的遍历者对比下，如果不相同则要触发onMouseOver和onMouseOut
-                            if (item != "onMouseDown") {
+                            if (item == "onMouseMove") {
                                 if (annie.EventDispatcher.getMouseEventCount("onMouseOver") > 0 || annie.EventDispatcher.getMouseEventCount("onMouseOut") > 0) {
                                     if (s._lastDpList[identifier] instanceof Array) {
                                         //从第二个开始，因为第一个对象始终是stage顶级对象
@@ -8409,7 +8411,6 @@ var annie;
         };
         OffCanvasRender.prototype.render = function (target) {
             var s = this;
-            var isFistObj = s.isFirstObj;
             if (s.isFirstObj) {
                 s.isFirstObj = false;
             }
@@ -8418,7 +8419,7 @@ var annie;
                 var texture = target._texture;
                 var ctx = s._ctx, tm = target._matrix;
                 ctx.save();
-                if (!isFistObj) {
+                if (!s.isFirstObj) {
                     ctx.globalAlpha *= target._alpha;
                     ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
                     ctx.translate(target._offsetX, target._offsetY);
@@ -8426,7 +8427,7 @@ var annie;
                 else {
                     ctx.translate(-target._offsetX, -target._offsetY);
                 }
-                if (texture != null && !isFistObj) {
+                if (texture != null && !s.isFirstObj) {
                     if (texture.width == 0 || texture.height == 0) {
                         return;
                     }
@@ -8598,7 +8599,6 @@ var annie;
             var _this = _super.call(this) || this;
             _this._req = null;
             _this.headers = [];
-            _this.contentType = "form";
             /**
              * 后台返回来的数据类型
              * @property responseType
@@ -8686,8 +8686,10 @@ var annie;
          * @public
          * @since 1.0.0
          * @param {string} url
+         * @param {string} contentType 如果请求类型需要设置主体类型，有form json binary jsonp等，请设置 默认为form
          */
-        URLLoader.prototype.load = function (url) {
+        URLLoader.prototype.load = function (url, contentType) {
+            if (contentType === void 0) { contentType = "form"; }
             var s = this;
             s.loadCancel();
             if (s.responseType == "") {
@@ -8809,17 +8811,18 @@ var annie;
                 }
                 s.headers.length = 0;
             }
-            if (s.contentType == "form") {
+            if (contentType == "form") {
                 s._req.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
                 s._req.send(s._fqs(s.data, null));
             }
             else {
                 var type = "application/json";
-                if (s.contentType != "json") {
+                if (contentType != "json") {
                     type = "multipart/form-data";
                 }
                 s._req.setRequestHeader("Content-type", type + ";charset=UTF-8");
                 s._req.send(s.data);
+                s.data = null;
             }
         };
         /**
@@ -9568,7 +9571,8 @@ var annie;
      * @param {Function} info.success 发送成功后的回调方法,后台数据将通过参数传回
      * @param {Function} info.error 发送出错后的回调方法,出错信息通过参数传回
      * @param {Object} info.data 向后台发送的信息对象,默认为null
-     * @param {string} info.responseType 后台返回数据的类型,默认为"text"
+     * @param {string} info.responseType 后台返回数据的类型,默认为"json"
+     * @param {string} info.dataType 传给后台数据的类型,默认为"json"
      * @param {boolean} info.isNeedOption 是否需要添加X-Requested-With 头
      * @example
      *      //get
@@ -9576,6 +9580,7 @@ var annie;
      *             type: "GET",
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             responseType: 'json',
+     *             dataType:"json",
      *             success: function (result) {console.log(result)},
      *             error: function (result) {console.log(result)}
      *      })
@@ -9585,25 +9590,33 @@ var annie;
      *             url: serverUrl + "Home/Getinfo/getPersonInfo",
      *             data: {phone:'135******58'},
      *             responseType: 'json',
+     *             dataType:"json",
      *             success: function (result) {console.log(result)},
      *             error: function (result) {console.log(result)}
      *      })
      */
     function ajax(info) {
         var urlLoader = new URLLoader();
-        if (info.isNeedOption) {
-            urlLoader.addHeader("X-Requested-With", "XMLHttpRequest");
-        }
         urlLoader.method = info.type == undefined ? "get" : info.type;
         urlLoader.data = info.data == undefined ? null : info.data;
-        urlLoader.responseType = info.responseType == undefined ? (info.dataType == undefined ? "text" : info.dataType) : info.responseType;
-        if (info.success instanceof Object) {
+        urlLoader.responseType = info.responseType == undefined ? "json" : info.responseType;
+        if (info.success) {
             urlLoader.addEventListener(annie.Event.COMPLETE, info.success);
         }
-        if (info.error instanceof Object) {
-            urlLoader.addEventListener(annie.Event.ERROR, info.error);
+        if (info.error || info.fail) {
+            if (info.error) {
+                urlLoader.addEventListener(annie.Event.ERROR, info.error);
+            }
+            else {
+                urlLoader.addEventListener(annie.Event.ERROR, info.fail);
+            }
         }
-        urlLoader.load(info.url);
+        if (info.dataType) {
+            urlLoader.load(info.url, info.dataType);
+        }
+        else {
+            urlLoader.load(info.url);
+        }
     }
     annie.ajax = ajax;
     /**
@@ -10905,7 +10918,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "annie_js_3.2.4";
+    annie.version = "annie_js_3.2.5";
     /**
     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android
@@ -11092,12 +11105,13 @@ var annie;
             typeInfo = { type: "png" };
         }
         else {
-            typeInfo.type = "jpeg";
-            if (typeInfo.quality) {
-                typeInfo.quality /= 100;
-            }
-            else {
-                typeInfo.quality = 0.8;
+            if (typeInfo.type == "jpeg") {
+                if (typeInfo.quality) {
+                    typeInfo.quality /= 100;
+                }
+                else {
+                    typeInfo.quality = 0.8;
+                }
             }
         }
         return texture.toDataURL("image/" + typeInfo.type, typeInfo.quality);
