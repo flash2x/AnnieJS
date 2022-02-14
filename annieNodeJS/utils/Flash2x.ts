@@ -8,6 +8,7 @@ namespace annie {
     import Shape = annie.Shape;
     import Bitmap = annie.Bitmap;
     //打包swf用
+    export let global:any = null;
     export let _isReleased = false;
     export let suffixName = ".swf";
     export let classPool: any = {};

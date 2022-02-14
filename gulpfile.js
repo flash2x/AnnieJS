@@ -4,7 +4,6 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
 var del = require('del');
-var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var concat=require('gulp-concat');
 var annieH5CoreList =[
@@ -174,12 +173,20 @@ var annieUIList=[
     "annieUI/DrawingBoard.ts",
     "annieUI/ScratchCard.ts"
 ];
+var targetJS="ES5";
+var uglify;
+if(targetJS=="ES6"){
+    uglify = require('gulp-uglifyes');
+}else{
+    uglify = require('gulp-uglify');
+}
+
 var onBuildH5Core = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "buildH5";
     var tsResult = gulp.src(annieH5CoreList).pipe(ts(op));
@@ -195,7 +202,7 @@ var onBuildMinAppCore = function(){
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "buildMinApp";
     var tsResult = gulp.src(annieMinAppCoreList).pipe(ts(op));
@@ -215,7 +222,7 @@ var onBuildDyMinAppCore = function(){
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "buildDyMinApp";
     var tsResult = gulp.src(annieDyMinAppCoreList).pipe(ts(op));
@@ -235,7 +242,7 @@ var onBuildTbMinAppCore = function(){
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "buildDyMinApp";
     var tsResult = gulp.src(annieTbMinAppCoreList).pipe(ts(op));
@@ -255,7 +262,7 @@ var onBuildMinGameCore = function(){
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "buildMinGame";
     var tsResult = gulp.src(annieMinGameCoreList).pipe(ts(op));
@@ -273,7 +280,7 @@ var onBuildNodeCore = function(){
         noImplicitAny: true,
         declaration: true,
         out: "annieCore.js",
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "buildNodeJS";
     var tsResult = gulp.src(annieNodeJSCoreList).pipe(ts(op));
@@ -291,7 +298,7 @@ var onBuildUI = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
-        target: "ES5",
+        target: targetJS,
         out: "annieUI.js"
     };
     var outDir = "buildUI";
@@ -306,7 +313,7 @@ var onBuildDoc = function(){
     var op = {
         noImplicitAny: true,
         declaration: true,
-        target: "ES5"
+        target: targetJS
     };
     var outDir = "libs";
     var tsResult = gulp.src(annieH5CoreList.concat(uiList.slice(1))).pipe(ts(op));

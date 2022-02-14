@@ -326,11 +326,13 @@ namespace annie {
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
             tap:"onMouseClick",
+            longtap:"onMouseLongTap",
             touchcancel: "onMouseUp",
             ontouchstart: "onMouseDown",
             ontouchmove: "onMouseMove",
             ontouchend: "onMouseUp",
             ontap:"onMouseClick",
+            onlongtap:"onMouseLongTap",
             ontouchcancel: "onMouseUp"
         };
         //stageMousePoint

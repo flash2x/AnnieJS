@@ -378,11 +378,13 @@ namespace annie {
             touchmove: "onMouseMove",
             touchend: "onMouseUp",
             tap:"onMouseClick",
+            longtap:"onMouseLongTap",
             touchcancel: "onMouseUp",
             ontouchstart: "onMouseDown",
             ontouchmove: "onMouseMove",
             ontouchend: "onMouseUp",
             ontap:"onMouseClick",
+            onlongtap:"onMouseLongTap",
             ontouchcancel: "onMouseUp"
         };
         //stageMousePoint
@@ -526,26 +528,27 @@ namespace annie {
                         if (item == "onMouseDown") {
                             s._mouseDownPoint[identifier] = cp;
                             //清空上次存在的显示列表
-                        } else if (item == "onMouseUp") {
-                            if (s._mouseDownPoint[identifier] instanceof annie.Point) {
-                                if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
-                                    //click事件
-                                    //这个地方检查是所有显示对象列表里是否有添加对应的事件
-                                    if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
-                                        if (s._ml[eLen] instanceof annie.MouseEvent) {
-                                            event = s._ml[eLen];
-                                            event.type = "onMouseClick";
-                                        } else {
-                                            event = new MouseEvent("onMouseClick");
-                                            s._ml[eLen] = event;
-                                        }
-                                        events[events.length] = event;
-                                        s._initMouseEvent(event, cp, s.sp, identifier);
-                                        eLen++;
-                                    }
-                                }
-                            }
                         }
+                        //  else if (item == "onMouseUp") {
+                        //     if (s._mouseDownPoint[identifier] instanceof annie.Point) {
+                        //         if (annie.Point.distance(s._mouseDownPoint[identifier], cp) < 20) {
+                        //             //click事件
+                        //             //这个地方检查是所有显示对象列表里是否有添加对应的事件
+                        //             if (EventDispatcher.getMouseEventCount("onMouseClick") > 0) {
+                        //                 if (s._ml[eLen] instanceof annie.MouseEvent) {
+                        //                     event = s._ml[eLen];
+                        //                     event.type = "onMouseClick";
+                        //                 } else {
+                        //                     event = new MouseEvent("onMouseClick");
+                        //                     s._ml[eLen] = event;
+                        //                 }
+                        //                 events[events.length] = event;
+                        //                 s._initMouseEvent(event, cp, s.sp, identifier);
+                        //                 eLen++;
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         if (eLen > 0) {
                             //证明有事件那么就开始遍历显示列表。就算有多个事件也不怕，因为坐标点相同，所以只需要遍历一次
                             let d: any = s.hitTestPoint(cp, true);

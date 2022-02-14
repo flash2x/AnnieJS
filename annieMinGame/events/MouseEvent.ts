@@ -38,6 +38,15 @@ namespace annie {
          */
         public static CLICK:string = "onMouseClick";
         /**
+         * annie.DisplayObject鼠标或者手指长按到显示对象上里触发的事件
+         * @property LONG_TAP
+         * @static
+         * @public
+         * @since 3.2.5
+         * @type {string}
+         */
+         public static LONG_TAP:string = "onMouseLongTap";
+        /**
          * annie.DisplayObject鼠标或者手指移动事件
          * @property MOUSE_MOVE
          * @static

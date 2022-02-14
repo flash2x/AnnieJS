@@ -573,7 +573,7 @@ namespace annie {
             let s = this;
             if (s._visible && s._cAlpha > 0) {
                 if (s.isNeedDraw) {
-                    let ctx = CanvasRender._ctx, tm;
+                    let ctx = CanvasRender._ctx, tm:annie.Matrix;
                     tm = s._cMatrix;
                     if (ctx.globalAlpha != s._cAlpha) {
                         ctx.globalAlpha = s._cAlpha

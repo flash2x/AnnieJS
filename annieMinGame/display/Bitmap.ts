@@ -67,12 +67,13 @@ namespace annie {
 
         public set bitmapData(value: any) {
             let s = this;
-            if (typeof (value) == "string") {
-                let img = app.createImage();
-                img.src = value;
-                s._texture = img;
+            if(typeof(value)=="string"){
+                if(!s._texture){
+                    s._texture=app.createImage();
+                }
+                s._texture.src=value;
                 s.clearBounds();
-            } else {
+            }else {
                 if (value != s._texture) {
                     s.clearBounds();
                     s._texture = value;

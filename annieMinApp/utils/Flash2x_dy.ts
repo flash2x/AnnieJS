@@ -320,13 +320,16 @@ namespace annie {
                                     //base64 图片
                                     loadContent = CanvasRender.rootContainer.createImage();
                                     let base64="";
-                                    if(count>9999){
-                                        let times=Math.floor(count/9999);
-                                        let lastCount=count%9999;
+                                    let maxStepCode=9999;
+                                    if(count>maxStepCode){
+                                        let times=Math.floor(count/maxStepCode);
+                                        let lastCount=count%maxStepCode;
                                         for(let c=0;c<times;c++){
-                                            base64+= app.arrayBufferToBase64(allDataBuffer.slice(index+9999*c,index+9999*(c+1)));
+                                            base64+= app.arrayBufferToBase64(allDataBuffer.slice(index+maxStepCode*c,index+maxStepCode*(c+1)));
                                         }
-                                        base64+= app.arrayBufferToBase64(allDataBuffer.slice(index+9999*times,index+9999*times+lastCount));
+                                        if(lastCount>0){
+                                            base64+= app.arrayBufferToBase64(allDataBuffer.slice(index+maxStepCode*times,index+maxStepCode*times+lastCount));
+                                        }
                                     }else{
                                         base64= app.arrayBufferToBase64(allDataBuffer.slice(index,index+count));
                                     }
@@ -352,7 +355,21 @@ namespace annie {
                                     }
                                 }else if(jsonDataArray[i].type=="json"){
                                     //解析动画
-                                    loadContent = JSON.parse(String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,index,count)));
+                                    let jsonStr:string="";
+                                    let maxStepCode=6666;
+                                    if(count>maxStepCode){
+                                        let times=Math.floor(count/maxStepCode);
+                                        let lastCount=count%maxStepCode;
+                                        for(let c=0;c<times;c++){
+                                            jsonStr+=String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,index+maxStepCode*c,maxStepCode));
+                                        }
+                                        if(lastCount>0){
+                                            jsonStr+=String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,index+maxStepCode*times,lastCount));
+                                        }
+                                    }else{
+                                        jsonStr=String.fromCharCode.apply(null,new Uint8Array(allDataBuffer,index,count));
+                                    }
+                                    loadContent = JSON.parse(jsonStr);
                                     res[scene][jsonDataArray[i].id] = loadContent;
                                     _parseContent(loadContent);
                                 }

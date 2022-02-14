@@ -6,18 +6,22 @@
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^1.1.3",
+    "gulp-tsc": "^1.3.2",
     "gulp-typescript": "^2.14.1",
     "gulp-uglify": "^2.0.0",
+    "gulp-uglifyes": "^0.2.1",
     "merge2": "^1.1.0"
   },
   "scripts": {
-    "buildUI":"gulp onBuildUI",
+    "buildUI": "gulp onBuildUI",
     "buildH5SDK": "gulp onBuildH5Core && gulp onBuildH5Last",
-    "buildMinAppSDK": "gulp onBuildMinAppCore && gulp onBuildMinAppLast",
-    "buildDyMinAppSDK": "gulp onBuildDyMinAppCore && gulp onBuildDyMinAppLast",
-    "buildTbMinAppSDK": "gulp onBuildTbMinAppCore && gulp onBuildTbMinAppLast",
-    "buildMinGameSDK": "gulp onBuildMinGameCore && gulp onBuildMinGameLast",
+    "buildWxAppSDK": "gulp onBuildMinAppCore && gulp onBuildMinAppLast",
+    "buildDyAppSDK": "gulp onBuildDyMinAppCore && gulp onBuildDyMinAppLast",
+    "buildTbAppSDK": "gulp onBuildTbMinAppCore && gulp onBuildTbMinAppLast",
+    "buildWxGameSDK": "gulp onBuildMinGameCore && gulp onBuildMinGameLast",
     "buildNodeJSSDK": "gulp onBuildNodeCore && gulp onBuildNodeLast",
     "buildDOC": "gulp onBuildDoc && yuidoc -c docConfig.json"
   },

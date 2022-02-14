@@ -179,7 +179,7 @@ namespace annie {
                 ctx.translate(target._offsetX, target._offsetY);
             }
             let sbl = target._splitBoundsList;
-            let rect = null;
+            let rect:annie.Rectangle = null;
             let bounds = target._bounds;
             let startX = 0 - bounds.x;
             let startY = 0 - bounds.y;

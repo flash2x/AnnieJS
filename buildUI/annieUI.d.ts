@@ -107,7 +107,7 @@ declare namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        readonly curX: number;
+        curX: number;
         protected _curX: number;
         /**
          * 当前滑动的y坐标 更改此参数则需要调用resetPosition()方法生效
@@ -116,7 +116,7 @@ declare namespace annieUI {
          * @since 3.1.5
          * @default 0
          */
-        readonly curY: number;
+        curY: number;
         protected _curY: number;
         /**
          * 当前显示范围的宽
@@ -126,7 +126,7 @@ declare namespace annieUI {
          * @default 0
          * @readonly
          */
-        readonly viewWidth: number;
+        viewWidth: number;
         _viewWidth: number;
         /**
          * 当前显示范围的高
@@ -136,7 +136,7 @@ declare namespace annieUI {
          * @default 0
          * @readonly
          */
-        readonly viewHeight: number;
+        viewHeight: number;
         _viewHeight: number;
         /**
          * 当前横向的滑动范围
@@ -146,7 +146,7 @@ declare namespace annieUI {
          * @default 0
          * @readonly
          */
-        readonly scrollWidth: number;
+        scrollWidth: number;
         _scrollWidth: number;
         /**
          * 当前纵向的滑动范围
@@ -156,7 +156,7 @@ declare namespace annieUI {
          * @default 0
          * @readonly
          */
-        readonly scrollHeight: number;
+        scrollHeight: number;
         _scrollHeight: number;
         /**
          * 是否正在滑动中
@@ -248,7 +248,7 @@ declare namespace annieUI {
         private _mouseEvent;
         private _enterFrame;
         protected onEnterFrame(e: annie.Event): void;
-        private onMouseEvent;
+        private onMouseEvent(e);
         destroy(): void;
         resetPosition(time?: number): boolean;
         /**
@@ -274,7 +274,7 @@ declare namespace annieUI {
          */
         scrollTo(x: number, y: number, time?: number, easing?: Function): void;
         _translate(x: number, y: number): void;
-        private static toMomentum;
+        private static toMomentum(current, start, time, lowerMargin, wrapperSize, deceleration);
     }
 }
 /**
@@ -312,7 +312,7 @@ declare namespace annieUI {
          * @readonly
          * @return {number}
          */
-        readonly curFramePos: number;
+        curFramePos: number;
         private _isVertical;
         /**
          * 构造函数
@@ -373,7 +373,7 @@ declare namespace annieUI {
          * @since 1.0.0
          * @type {annie.Sprite}
          */
-        readonly view: DisplayObject;
+        view: DisplayObject;
         protected _view: DisplayObject;
         /**
          * scroller滑动控制器
@@ -382,7 +382,7 @@ declare namespace annieUI {
          * @public
          * @since 3.1.5
          */
-        readonly scroller: annieUI.Scroller;
+        scroller: annieUI.Scroller;
         _scroller: annieUI.Scroller;
         /**
          * 构造函数
@@ -461,7 +461,7 @@ declare namespace annieUI {
          * @since 1.0.9
          * @return {DisplayObject}
          */
-        readonly loadingView: DisplayObject;
+        loadingView: DisplayObject;
         /**
          * 构造函数
          * @method ScrollList
@@ -483,9 +483,9 @@ declare namespace annieUI {
          * @since 1.0.9
          */
         updateData(data: Array<any>, isReset?: boolean): void;
-        private resetMaxDistance;
-        private flushData;
-        private _updateItems;
+        private resetMaxDistance();
+        private flushData();
+        private _updateItems();
         /**
          * 设置加载数据时显示的loading对象
          * @since 1.0.9
@@ -750,8 +750,8 @@ declare namespace annieUI {
          * @public
          * @since 1.0.0
          */
-        private setMask;
-        private onMouseEvent;
+        private setMask(w, h);
+        private onMouseEvent(e);
         /**
          * 滑动到指定页
          * @method slideTo
@@ -875,19 +875,19 @@ declare namespace annieUI {
         private md;
         private mu;
         private mm;
-        private drawPage;
-        private checkLimit;
-        private getPage;
-        private getBookArr;
-        private getLayerArr;
-        private getShape;
-        private setShadowMask;
-        private getShadow;
-        private setPage;
-        private onMouseDown;
-        private onMouseUp;
-        private onMouseMove;
-        private checkArea;
+        private drawPage(num, movePoint);
+        private checkLimit(point, limitPoint, limitGap);
+        private getPage(index);
+        private getBookArr(point, actionPoint1, actionPoint2);
+        private getLayerArr(point1, point2, actionPoint1, actionPoint2, limitPoint1, limitPoint2);
+        private getShape(shape, pointArr);
+        private setShadowMask(shape, g_width, g_height);
+        private getShadow(shape, point1, point2, arg);
+        private setPage(pageNum);
+        private onMouseDown(e);
+        private onMouseUp(e);
+        private onMouseMove(e);
+        private checkArea(point);
         /**
          * 跳到指定的页数
          * @method flipTo
@@ -919,11 +919,11 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         endPage(): void;
-        private flushPage;
-        private onEnterFrame;
-        private arc;
-        private angle;
-        private pos;
+        private flushPage();
+        private onEnterFrame(e);
+        private arc(argR, argN1, argN2);
+        private angle(target1, target2);
+        private pos(target1, target2);
         destroy(): void;
     }
 }
@@ -999,9 +999,9 @@ declare namespace annieUI {
          * @since 1.1.1
          */
         constructor(width: number, height: number, bgColor?: any);
-        private onMouseDown;
-        private onMouseUp;
-        private onMouseMove;
+        private onMouseDown(e);
+        private onMouseUp(e);
+        private onMouseMove(e);
         /**
          * 重置画板
          * @method reset

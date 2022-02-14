@@ -56,6 +56,15 @@ namespace annie {
          */
         public static MOUSE_OVER:string = "onMouseOver";
         /**
+         * annie.DisplayObject鼠标或者手指长按到显示对象上里触发的事件
+         * @property LONG_TAP
+         * @static
+         * @public
+         * @since 3.2.5
+         * @type {string}
+         */
+        public static LONG_TAP:string = "onMouseLongTap";
+        /**
          * annie.DisplayObject鼠标或者手指移出显示对象边界触发的事件
          * @property MOUSE_OUT
          * @static

@@ -97,20 +97,26 @@ namespace annie {
         let h: number = Math.ceil(rect.height);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
-        OffCanvasRender._ctx.translate(-rect.x,-rect.y);
+        let ctx=OffCanvasRender._ctx;
+        ctx.translate(-rect.x,-rect.y);
         _dRender.draw(obj);
         if (!typeInfo) {
-            typeInfo = {type: "png"};
+            typeInfo = {type: "png",quality:1.0};
         } else {
             if(typeInfo.type=="jpeg"){
                 if (typeInfo.quality) {
-                    typeInfo.quality /= 100;
+                    if(typeInfo.quality>1){
+                        typeInfo.quality /= 100;
+                    }
                 }else{
                     typeInfo.quality=0.8;
                 }
+            }else{
+                typeInfo.quality=1.0;
             }
         }
-        return OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+        //抖音里一定要这么拿canvas才能成功,为了统一就都这样吧
+        return ctx.canvas.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
 
     /**

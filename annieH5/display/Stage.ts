@@ -320,7 +320,7 @@ namespace annie {
             //这里需要做个延时，方便init事件捕捉
             setTimeout(() => {
                 Stage.flushAll();
-            }, 0);
+            }, 100);
         }
         private _touchEvent: annie.TouchEvent;
         //这个是鼠标事件的MouseEvent对象池,因为如果用户有监听鼠标事件,如果不建立对象池,那每一秒将会new Fps个数的事件对象,影响性能
