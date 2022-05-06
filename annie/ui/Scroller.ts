@@ -350,8 +350,8 @@ namespace annieUI {
             let s = this;
             if (s.isRunning) {
                 let now = Date.now(),
-                    newX, newY,
-                    easing;
+                    newX:number, newY:number,
+                    easing:number;
                 if (now >= s.destTime) {
                     s.isRunning = false;
                     s._translate(s.destX, s.destY);
@@ -394,8 +394,8 @@ namespace annieUI {
                 let deltaX = e.localX - s.pointX,
                     deltaY = e.localY - s.pointY,
                     timestamp = Date.now(),
-                    newX, newY,
-                    absDistX, absDistY;
+                    newX:number, newY:number,
+                    absDistX:number, absDistY:number;
                 s.pointX = e.localX;
                 s.pointY = e.localY;
                 s.distX += deltaX;
@@ -571,8 +571,8 @@ namespace annieUI {
         private static toMomentum(current: number, start: number, time: number, lowerMargin: number, wrapperSize: number, deceleration: number) {
             let distance = current - start,
                 speed = Math.abs(distance) / time,
-                destination,
-                duration;
+                destination:number,
+                duration:number;
             deceleration = deceleration === undefined ? 0.0006 : deceleration;
             destination = current + (speed * speed) / (2 * deceleration) * (distance < 0 ? -1 : 1);
             duration = speed / deceleration;

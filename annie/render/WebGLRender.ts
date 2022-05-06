@@ -134,11 +134,10 @@ namespace annie {
                 depth: false,
                 alpha: true,
                 stencil: true,
-                antialias: false,
-                premultipliedAlpha: false,
-                preserveDrawingBuffer: false
+                antialias: true,
+                premultipliedAlpha: true
             };
-            let gl;
+            let gl:any;
             try {
                 gl = canvas.getContext('webgl', options) || canvas.getContext("experimental-webgl", options);
             } catch (e) {
@@ -390,8 +389,6 @@ namespace annie {
          * @readonly
          */
         public static INDICIES_PER_CARD: number = 6;
-
-
         /**
          * Default U/V rect for dealing with full coverage from an image source.
          * @property UV_RECT
@@ -413,11 +410,7 @@ namespace annie {
          * @type {String}
          * @readonly
          */
-        public static REGULAR_VARYING_HEADER: string =
-            "precision mediump float;" +
-            "varying vec2 vTextureCoord;" +
-            "varying lowp float indexPicker;" +
-            "varying lowp float alphaValue;";
+        public static REGULAR_VARYING_HEADER: string ="precision mediump float;varying vec2 vTextureCoord;varying lowp float indexPicker;varying lowp float alphaValue;";
 
         /**
          * Actual full header for the vertex shader. Includes the varying header. The regular shader is designed to render
@@ -428,13 +421,7 @@ namespace annie {
          * @type {String}
          * @readonly
          */
-        public static REGULAR_VERTEX_HEADER: string =
-            WebGLRender.REGULAR_VARYING_HEADER +
-            "attribute vec2 vertexPosition;" +
-            "attribute vec2 uvPosition;" +
-            "attribute lowp float textureIndex;" +
-            "attribute lowp float objectAlpha;" +
-            "uniform mat4 pMatrix;";
+        public static REGULAR_VERTEX_HEADER: string = WebGLRender.REGULAR_VARYING_HEADER +"attribute vec2 vertexPosition;attribute vec2 uvPosition;attribute lowp float textureIndex;attribute lowp float objectAlpha;uniform mat4 pMatrix;";
 
         /**
          * Actual full header for the fragment shader. Includes the varying header. The regular shader is designed to render
@@ -445,9 +432,7 @@ namespace annie {
          * @type {String}
          * @readonly
          */
-        public static REGULAR_FRAGMENT_HEADER: string =
-            WebGLRender.REGULAR_VARYING_HEADER +
-            "uniform sampler2D uSampler[{{count}}];";
+        public static REGULAR_FRAGMENT_HEADER: string =WebGLRender.REGULAR_VARYING_HEADER +"uniform sampler2D uSampler[{{count}}];";
 
         /**
          * Body of the vertex shader. The regular shader is designed to render all expected objects. Shader code may contain
@@ -458,18 +443,7 @@ namespace annie {
          * @type {String}
          * @readonly
          */
-        public static REGULAR_VERTEX_BODY: string =
-            "void main(void) {" +
-            "gl_Position = vec4(" +
-            "(vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0]," +
-            "(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1]," +
-            "pMatrix[3][2]," +
-            "1.0" +
-            ");" +
-            "alphaValue = objectAlpha;" +
-            "indexPicker = textureIndex;" +
-            "vTextureCoord = uvPosition;" +
-            "}";
+        public static REGULAR_VERTEX_BODY: string = "void main(void) {gl_Position = vec4((vertexPosition.x * pMatrix[0][0]) + pMatrix[3][0],(vertexPosition.y * pMatrix[1][1]) + pMatrix[3][1],pMatrix[3][2],1.0);alphaValue = objectAlpha;indexPicker = textureIndex;vTextureCoord = uvPosition;}";
 
         /**
          * Body of the fragment shader. The regular shader is designed to render all expected objects. Shader code may
@@ -480,22 +454,9 @@ namespace annie {
          * @type {String}
          * @readonly
          */
-        public static REGULAR_FRAGMENT_BODY: string =
-            "void main(void) {" +
-            "vec4 color = vec4(1.0, 0.0, 0.0, 1.0);" +
-            "if (indexPicker <= 0.5) {" +
-            "color = texture2D(uSampler[0], vTextureCoord);" +
-            "{{alternates}}" +
-            "}" +
-            "{{fragColor}}" +
-            "}";
+        public static REGULAR_FRAGMENT_BODY: string ="void main(void) {vec4 color = vec4(1.0, 0.0, 0.0, 1.0);if (indexPicker <= 0.5) {color = texture2D(uSampler[0], vTextureCoord);{{alternates}}}{{fragColor}}}";
         public static REGULAR_FRAG_COLOR_NORMAL: string = "gl_FragColor = vec4(color.rgb, color.a * alphaValue);";
-        public static REGULAR_FRAG_COLOR_PREMULTIPLY: string =
-            "if(color.a > 0.001) {" +
-            "gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);" +
-            "} else {" +
-            "gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
-            "}";
+        public static REGULAR_FRAG_COLOR_PREMULTIPLY: string = "if(color.a > 0.001) {gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);} else {gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);}";
         public releaseTexture(displayObject: any) {
             let s = this;
             let isHadTexture = true;
@@ -568,8 +529,8 @@ namespace annie {
 
         public setTextureParams() {
             let gl = this._ctx;
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
@@ -594,7 +555,7 @@ namespace annie {
             gl.enableVertexAttribArray(shaderProgram.textureIndexAttribute);
             shaderProgram.alphaAttribute = gl.getAttribLocation(shaderProgram, "objectAlpha");
             gl.enableVertexAttribArray(shaderProgram.alphaAttribute);
-            let samplers = [];
+            let samplers:any[] = [];
             for (let i = 0; i < s._batchTextureCount; i++) {
                 samplers[i] = i;
             }
@@ -628,7 +589,7 @@ namespace annie {
             let s = this;
             let gl = s._ctx;
             let groupCount = s._maxCardsPerBatch * WebGLRender.INDICIES_PER_CARD;
-            let groupSize, i, l;
+            let groupSize:any, i:any, l:any;
             let vertexPositionBuffer = s._vertexPositionBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
             groupSize = 2;
@@ -643,7 +604,6 @@ namespace annie {
             // where on the texture it gets its information
             let uvPositionBuffer = s._uvPositionBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, uvPositionBuffer);
-            groupSize = 2;
             let uvs = s._uvs = new Float32Array(groupCount * groupSize);
             for (i = 0, l = uvs.length; i < l; i += groupSize) {
                 uvs[i] = uvs[i + 1] = 0;
@@ -666,7 +626,6 @@ namespace annie {
             // what alpha it should have
             let alphaBuffer = s._alphaBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-            groupSize = 1;
             let alphas = s._alphas = new Float32Array(groupCount * groupSize);
             for (i = 0, l = alphas.length; i < l; i++) {
                 alphas[i] = 1;
@@ -822,7 +781,7 @@ namespace annie {
         }
         public updateDrawData(textureSource: any, displayObj: any) {
             let s = this;
-            let uvRect: any, texIndex, texture;
+            let uvRect: any, texIndex:any, texture:any;
             let uvs = s._uvs;
             let vertices = s._vertices;
             let texI = s._indices;
