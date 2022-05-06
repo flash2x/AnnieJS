@@ -1283,7 +1283,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
+        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): annie.Rectangle;
         protected _updateMatrix(): void;
         _draw(ctx: any): void;
         protected _render(renderObj: IRender | any): void;
@@ -3721,7 +3721,6 @@ declare namespace annie {
     };
     let toDisplayDataURL: (obj: any, rect?: Rectangle, typeInfo?: any, bgColor?: string) => string;
     /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组
      * @method annie.getStagePixels
      * @param {annie.Stage} stage

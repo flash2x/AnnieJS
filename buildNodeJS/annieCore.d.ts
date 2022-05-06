@@ -1048,7 +1048,7 @@ declare namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): void;
+        getDrawRect(matrix?: annie.Matrix, bounds?: annie.Rectangle): annie.Rectangle;
         protected _updateMatrix(): void;
         _draw(ctx: any): void;
         protected _render(renderObj: IRender | any): void;

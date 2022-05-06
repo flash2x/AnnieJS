@@ -2081,6 +2081,7 @@ var annie;
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             annie.Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
+            return DisplayObject._transformRect;
         };
         DisplayObject.prototype._updateMatrix = function () {
             var s = this, cm, pcm, ca, pca;

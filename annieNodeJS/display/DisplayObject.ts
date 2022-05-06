@@ -510,7 +510,7 @@ namespace annie {
          * @since 1.0.0
          * @return {annie.Rectangle}
          */
-        public getDrawRect(matrix: annie.Matrix = null, bounds: annie.Rectangle = null): void {
+        public getDrawRect(matrix: annie.Matrix = null, bounds: annie.Rectangle = null): annie.Rectangle {
             let s = this;
             if (matrix == void 0) {
                 matrix = s.matrix;
@@ -525,6 +525,7 @@ namespace annie {
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
+            return DisplayObject._transformRect;
         }
 
         protected _updateMatrix(): void {

@@ -2081,6 +2081,7 @@ var annie;
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             annie.Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
+            return DisplayObject._transformRect;
         };
         DisplayObject.prototype._updateMatrix = function () {
             var s = this, cm, pcm, ca, pca;
@@ -8464,25 +8465,31 @@ var annie;
         var h = Math.ceil(rect.height);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
-        annie.OffCanvasRender._ctx.translate(-rect.x, -rect.y);
+        var ctx = annie.OffCanvasRender._ctx;
+        ctx.translate(-rect.x, -rect.y);
         _dRender.draw(obj);
         if (!typeInfo) {
-            typeInfo = { type: "png" };
+            typeInfo = { type: "png", quality: 1.0 };
         }
         else {
             if (typeInfo.type == "jpeg") {
                 if (typeInfo.quality) {
-                    typeInfo.quality /= 100;
+                    if (typeInfo.quality > 1) {
+                        typeInfo.quality /= 100;
+                    }
                 }
                 else {
                     typeInfo.quality = 0.8;
                 }
             }
+            else {
+                typeInfo.quality = 1.0;
+            }
         }
-        return annie.OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+        //抖音里一定要这么拿canvas才能成功,为了统一就都这样吧
+        return ctx.canvas.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
     /**
-     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
      * 获取显示区域的颜色值，会返回颜色值的数组
      * @method annie.getStagePixels
      * @param {annie.Stage} stage

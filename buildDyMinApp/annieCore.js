@@ -2081,6 +2081,7 @@ var annie;
             matrix.transformPoint(x + w, y + h, DisplayObject._p3);
             matrix.transformPoint(x, y + h, DisplayObject._p4);
             annie.Rectangle.createFromPoints(DisplayObject._transformRect, DisplayObject._p1, DisplayObject._p2, DisplayObject._p3, DisplayObject._p4);
+            return DisplayObject._transformRect;
         };
         DisplayObject.prototype._updateMatrix = function () {
             var s = this, cm, pcm, ca, pca;
@@ -8368,7 +8369,8 @@ var annie;
         var h = Math.ceil(rect.height);
         _dRender.reSize(w, h);
         _dRender.begin(bgColor);
-        annie.OffCanvasRender._ctx.translate(-rect.x, -rect.y);
+        var ctx = annie.OffCanvasRender._ctx;
+        ctx.translate(-rect.x, -rect.y);
         _dRender.draw(obj);
         if (!typeInfo) {
             typeInfo = { type: "png", quality: 1.0 };
@@ -8388,7 +8390,8 @@ var annie;
                 typeInfo.quality = 1.0;
             }
         }
-        return annie.OffCanvasRender.rootContainer.toDataURL("image/" + typeInfo.type, typeInfo.quality);
+        //抖音里一定要这么拿canvas才能成功,为了统一就都这样吧
+        return ctx.canvas.toDataURL("image/" + typeInfo.type, typeInfo.quality);
     };
     /**
      * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
