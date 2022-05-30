@@ -360,15 +360,15 @@ namespace annie {
         public static _isDragCenter: boolean = false;
         private _onMouseEvent(e: any): void {
             //检查是否有
-            let s: any = this, offSetX = CanvasRender.rootContainer._left, offSetY = CanvasRender.rootContainer._top;
+            let s: any = this;
             let sd: any = Stage._dragDisplay;
             if (s.isMultiTouch && e.changedTouches.length > 1) {
                 if (e.changedTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.changedTouches[0].clientX - offSetX;
-                    s._mP1.y = e.changedTouches[0].clientY - offSetY;
-                    s._mP2.x = e.changedTouches[1].clientX - offSetX;
-                    s._mP2.y = e.changedTouches[1].clientY - offSetY;
+                    s._mP1.x = e.changedTouches[0].clientX;
+                    s._mP1.y = e.changedTouches[0].clientY;
+                    s._mP2.x = e.changedTouches[1].clientX;
+                    s._mP2.y = e.changedTouches[1].clientY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
@@ -438,8 +438,8 @@ namespace annie {
                         } else {
                             cp = new Point();
                         }
-                        cp.x = (points[o].clientX - offSetX) * devicePixelRatio;
-                        cp.y = (points[o].clientY - offSetY) * devicePixelRatio;
+                        cp.x = (points[o].clientX) * devicePixelRatio;
+                        cp.y = (points[o].clientY) * devicePixelRatio;
                         s.globalToLocal(cp, s.sp);
                         if (sd && sd.stage && sd.parent) {
                             let x1 = sd.x, y1 = sd.y;

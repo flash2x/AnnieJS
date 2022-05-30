@@ -5623,15 +5623,15 @@ var annie;
         };
         Stage.prototype._onMouseEvent = function (e) {
             //检查是否有
-            var s = this, offSetX = annie.CanvasRender.rootContainer._left, offSetY = annie.CanvasRender.rootContainer._top;
+            var s = this;
             var sd = Stage._dragDisplay;
             if (s.isMultiTouch && e.changedTouches.length > 1) {
                 if (e.changedTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.changedTouches[0].clientX - offSetX;
-                    s._mP1.y = e.changedTouches[0].clientY - offSetY;
-                    s._mP2.x = e.changedTouches[1].clientX - offSetX;
-                    s._mP2.y = e.changedTouches[1].clientY - offSetY;
+                    s._mP1.x = e.changedTouches[0].clientX;
+                    s._mP1.y = e.changedTouches[0].clientY;
+                    s._mP2.x = e.changedTouches[1].clientX;
+                    s._mP2.y = e.changedTouches[1].clientY;
                     var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     var dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -5705,8 +5705,8 @@ var annie;
                         else {
                             cp = new annie.Point();
                         }
-                        cp.x = (points[o].clientX - offSetX) * annie.devicePixelRatio;
-                        cp.y = (points[o].clientY - offSetY) * annie.devicePixelRatio;
+                        cp.x = (points[o].clientX) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY) * annie.devicePixelRatio;
                         s.globalToLocal(cp, s.sp);
                         if (sd && sd.stage && sd.parent) {
                             var x1 = sd.x, y1 = sd.y;
@@ -6675,14 +6675,16 @@ var annie;
                         //图片
                         loadContent = annie.CanvasRender.rootContainer.createImage();
                         //TODO 抖音
-                        loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
+                        //loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                     else if (type == "sound") {
                         //声音
                         loadContent = annie.app.createInnerAudioContext();
                         //TODO 抖音
-                        loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
+                        //loadContent.src = "./" + _currentConfig[_loadIndex][0].src;
+                        loadContent.src = sourceUrl + _currentConfig[_loadIndex][0].src;
                         annie.res[scene][_currentConfig[_loadIndex][0].id] = loadContent;
                     }
                 }
@@ -6699,12 +6701,10 @@ var annie;
                     var fs = annie.app.getFileSystemManager();
                     var filePath = result.tempFilePath;
                     fs.getFileInfo({ filePath: filePath, success: function (fileInfoRes) {
-                            var totalSize = fileInfoRes.size;
-                            var allDataBuffer = fs.readFileSync(filePath);
-                            var data = String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, totalSize - 1));
-                            var jsonDataCount = parseInt(data.toString());
-                            var jsonDataSize = parseInt(String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, fileInfoRes.size - jsonDataCount - 1, jsonDataCount)));
-                            var jsonDataArray = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, fileInfoRes.size - jsonDataSize - jsonDataCount - 1, jsonDataSize)));
+                            var data = fs.readFileSync(filePath, "utf-8", fileInfoRes.size - 1, 1);
+                            var jsonDataCount = parseInt(data);
+                            var jsonDataSize = parseInt(fs.readFileSync(filePath, "utf-8", fileInfoRes.size - jsonDataCount - 1, jsonDataCount));
+                            var jsonDataArray = JSON.parse(fs.readFileSync(filePath, "utf-8", fileInfoRes.size - jsonDataSize - jsonDataCount - 1, jsonDataSize));
                             var index = 0;
                             var count = 0;
                             for (var i = 0; i < jsonDataArray.length; i++) {
@@ -6723,22 +6723,9 @@ var annie;
                                 }
                                 else if (jsonDataArray[i].type == "image") {
                                     //base64 图片
+                                    //console.log(fs.readFileSync(filePath,"base64",index,count));
                                     loadContent = annie.CanvasRender.rootContainer.createImage();
-                                    var base64 = "";
-                                    var maxStepCode = 9999;
-                                    if (count > maxStepCode) {
-                                        var times = Math.floor(count / maxStepCode);
-                                        var lastCount = count % maxStepCode;
-                                        for (var c = 0; c < times; c++) {
-                                            base64 += annie.app.arrayBufferToBase64(allDataBuffer.slice(index + maxStepCode * c, index + maxStepCode * (c + 1)));
-                                        }
-                                        if (lastCount > 0) {
-                                            base64 += annie.app.arrayBufferToBase64(allDataBuffer.slice(index + maxStepCode * times, index + maxStepCode * times + lastCount));
-                                        }
-                                    }
-                                    else {
-                                        base64 = annie.app.arrayBufferToBase64(allDataBuffer.slice(index, index + count));
-                                    }
+                                    var base64 = fs.readFileSync(filePath, "base64", index, count);
                                     if (base64.substr(0, 4) == "iVBO") {
                                         loadContent.src = "data:image/png;base64," + base64;
                                     }
@@ -6752,7 +6739,7 @@ var annie;
                                     //console.log(fs.readFileSync(filePath,"base64",index,count));
                                     var mp3Path = annie.app.env.USER_DATA_PATH + "/" + scene + "_" + jsonDataArray[i].id + ".mp3";
                                     try {
-                                        fs.writeFileSync(mp3Path, allDataBuffer.slice(index, index + count), "binary");
+                                        fs.writeFileSync(mp3Path, fs.readFileSync(filePath, "binary", index, count), "binary");
                                         loadContent = annie.app.createInnerAudioContext();
                                         loadContent.src = mp3Path;
                                         annie.res[scene][jsonDataArray[i].id] = loadContent;
@@ -6763,22 +6750,8 @@ var annie;
                                 }
                                 else if (jsonDataArray[i].type == "json") {
                                     //解析动画
-                                    var jsonStr = "";
-                                    var maxStepCode = 6666;
-                                    if (count > maxStepCode) {
-                                        var times = Math.floor(count / maxStepCode);
-                                        var lastCount = count % maxStepCode;
-                                        for (var c = 0; c < times; c++) {
-                                            jsonStr += String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, index + maxStepCode * c, maxStepCode));
-                                        }
-                                        if (lastCount > 0) {
-                                            jsonStr += String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, index + maxStepCode * times, lastCount));
-                                        }
-                                    }
-                                    else {
-                                        jsonStr = String.fromCharCode.apply(null, new Uint8Array(allDataBuffer, index, count));
-                                    }
-                                    loadContent = JSON.parse(jsonStr);
+                                    //console.log(fs.readFileSync(res.tempFilePath,"utf-8",index,count));
+                                    loadContent = JSON.parse(fs.readFileSync(result.tempFilePath, "utf-8", index, count));
                                     annie.res[scene][jsonDataArray[i].id] = loadContent;
                                     _parseContent(loadContent);
                                 }
@@ -7254,7 +7227,7 @@ var annie;
         else {
             headers["content-type"] = "application/x-www-form-urlencoded";
         }
-        annie.app.request({
+        annie.app.tb.request({
             url: s.url,
             data: s.data,
             dataType: s.dataType,

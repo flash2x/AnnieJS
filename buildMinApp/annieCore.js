@@ -5623,15 +5623,15 @@ var annie;
         };
         Stage.prototype._onMouseEvent = function (e) {
             //检查是否有
-            var s = this, offSetX = annie.CanvasRender.rootContainer._left, offSetY = annie.CanvasRender.rootContainer._top;
+            var s = this;
             var sd = Stage._dragDisplay;
             if (s.isMultiTouch && e.changedTouches.length > 1) {
                 if (e.changedTouches.length == 2) {
                     //求角度和距离
-                    s._mP1.x = e.changedTouches[0].clientX - offSetX;
-                    s._mP1.y = e.changedTouches[0].clientY - offSetY;
-                    s._mP2.x = e.changedTouches[1].clientX - offSetX;
-                    s._mP2.y = e.changedTouches[1].clientY - offSetY;
+                    s._mP1.x = e.changedTouches[0].clientX;
+                    s._mP1.y = e.changedTouches[0].clientY;
+                    s._mP2.x = e.changedTouches[1].clientX;
+                    s._mP2.y = e.changedTouches[1].clientY;
                     var angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     var dis = annie.Point.distance(s._mP1, s._mP2);
                     s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
@@ -5705,8 +5705,8 @@ var annie;
                         else {
                             cp = new annie.Point();
                         }
-                        cp.x = (points[o].clientX - offSetX) * annie.devicePixelRatio;
-                        cp.y = (points[o].clientY - offSetY) * annie.devicePixelRatio;
+                        cp.x = (points[o].clientX) * annie.devicePixelRatio;
+                        cp.y = (points[o].clientY) * annie.devicePixelRatio;
                         s.globalToLocal(cp, s.sp);
                         if (sd && sd.stage && sd.parent) {
                             var x1 = sd.x, y1 = sd.y;
