@@ -104,7 +104,8 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: any): void {
-            if (target._visible && target._cAlpha > 0) {
+            let s=this;
+            if (s.isFirstObj||(target._visible && target._cAlpha > 0)) {
                 let children: any = target.children;
                 let ctx = OffCanvasRender._ctx;
                 let tm = target._matrix;
@@ -119,7 +120,6 @@ namespace annie {
                     target._draw(ctx);
                 }else {
                     let len: number = target.children.length;
-                    let s: any = this;
                     let maskObj: any;
                     let child: any;
                     for (let i = 0; i < len; i++) {

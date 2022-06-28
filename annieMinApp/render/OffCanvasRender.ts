@@ -107,13 +107,14 @@ namespace annie {
          * @param {annie.DisplayObject} target 显示对象
          */
         public draw(target: any): void {
-            if (target._visible && target._cAlpha > 0) {
+            let s=this;
+            if (s.isFirstObj||(target._visible && target._cAlpha > 0)) {
                 let children: any = target.children;
                 let ctx = OffCanvasRender._ctx;
                 let tm = target._matrix;
                 ctx.save();
-                if(this.isFirstObj){
-                    this.isFirstObj=false
+                if(s.isFirstObj){
+                    s.isFirstObj=false
                 }else{
                     ctx.globalAlpha *= target._alpha;
                     ctx.transform(tm.a, tm.b, tm.c, tm.d, tm.tx, tm.ty);
@@ -122,7 +123,6 @@ namespace annie {
                     target._draw(ctx);
                 }else {
                     let len: number = children.length;
-                    let s: any = this;
                     let maskObj: any;
                     let child: any;
                     for (let i = 0; i < len; i++) {

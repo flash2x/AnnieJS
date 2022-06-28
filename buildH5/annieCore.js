@@ -8373,10 +8373,7 @@ var annie;
         };
         OffCanvasRender.prototype.render = function (target) {
             var s = this;
-            if (s.isFirstObj) {
-                s.isFirstObj = false;
-            }
-            if (target._visible) {
+            if (target._visible || s.isFirstObj) {
                 var children = target.children;
                 var texture = target._texture;
                 var ctx = s._ctx, tm = target._matrix;
@@ -8388,6 +8385,7 @@ var annie;
                 }
                 else {
                     ctx.translate(-target._offsetX, -target._offsetY);
+                    s.isFirstObj = false;
                 }
                 if (texture != null && !s.isFirstObj) {
                     if (texture.width == 0 || texture.height == 0) {
