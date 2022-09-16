@@ -6566,7 +6566,15 @@ var annie;
                     s.divWidth = whObj.w;
                     s.viewPort.width = whObj.w * annie.devicePixelRatio;
                     s.viewPort.height = whObj.h * annie.devicePixelRatio;
-                    s.renderObj.reSize(s.viewPort.width, s.viewPort.height);
+                    if (annie.osType == "ios") {
+                        //ios16版本 尺寸设置不够,动态调整尺寸canvas
+                        s.divHeight = 3333;
+                        s.divWidth = 3333;
+                        s.renderObj.reSize(9999, 9999);
+                    }
+                    else {
+                        s.renderObj.reSize(s.viewPort.width, s.viewPort.height);
+                    }
                     s.setAlign();
                     s.dispatchEvent("onInitStage");
                 }
@@ -10874,7 +10882,7 @@ var annie;
      *      //打印当前引擎的版本号
      *      console.log(annie.version);
      */
-    annie.version = "annie_js_3.2.5";
+    annie.version = "annie_js_3.2.6";
     /**
     * <h4><font color="red">小游戏不支持 小程序不支持</font></h4>
     * 当前设备是否是移动端或或是pc端,移动端是ios 或者 android

@@ -63,6 +63,8 @@
     如果官网有新版本，直接下载通过安装器覆盖安装就行
 # AnnieJS 版本更新列表
 ## AnnieJS 3.2.5 版本
+    增加对ios16 web端的兼容
+## AnnieJS 3.2.5 版本
     更新annie.ajax方法使此方法支持小程序和小游戏
     修复annieUI.Scroller滑动时偶尔白屏bug
     部分代码优化

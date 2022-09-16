@@ -112,7 +112,7 @@ namespace annie {
                     Sound.resumePlaySounds();
                 }
                 //触发事件
-                globalDispatcher.dispatchEvent("onRunChanged", {pause: value});
+                globalDispatcher.dispatchEvent("onRunChanged", { pause: value });
             }
         }
 
@@ -305,12 +305,12 @@ namespace annie {
             s.renderObj.init(document.createElement('canvas'));
             div.appendChild(s.renderObj.canvas);
             s.mouseEvent = s._onMouseEvent.bind(s);
-            if (osType!="pc"){
+            if (osType != "pc") {
                 div.addEventListener("touchstart", s.mouseEvent, false);
                 div.addEventListener('touchmove', s.mouseEvent, false);
                 div.addEventListener('touchend', s.mouseEvent, false);
                 div.addEventListener('touchcancel', s.mouseEvent, false);
-            }else{
+            } else {
                 div.addEventListener("mousedown", s.mouseEvent, false);
                 div.addEventListener('mousemove', s.mouseEvent, false);
                 div.addEventListener('mouseup', s.mouseEvent, false);
@@ -344,13 +344,13 @@ namespace annie {
         //循环刷新页面的函数
         private flush(): void {
             let s = this;
-                s.resize();
-                s._onUpdateFrame(1);
-                s._onUpdateMatrixAndAlpha();
-                s._onUpdateTexture();
-                s.renderObj.begin(this.bgColor);
-                s.renderObj.render(s);
-                s.renderObj.end();
+            s.resize();
+            s._onUpdateFrame(1);
+            s._onUpdateMatrixAndAlpha();
+            s._onUpdateTexture();
+            s.renderObj.begin(this.bgColor);
+            s.renderObj.render(s);
+            s.renderObj.end();
         }
 
         /**
@@ -362,11 +362,11 @@ namespace annie {
          * @return {void}
          */
         public setFrameRate(fps: number): void {
-            if(fps<=0){
-                fps=30;
+            if (fps <= 0) {
+                fps = 30;
             }
-            Stage._FPS=fps;
-            Stage._flushTime=1000/fps;
+            Stage._FPS = fps;
+            Stage._flushTime = 1000 / fps;
         }
         /**
          * 引擎的刷新率,就是一秒中执行多少次刷新
@@ -376,7 +376,7 @@ namespace annie {
          * @return {number}
          */
         public getFrameRate(): number {
-            return  Stage._FPS;
+            return Stage._FPS;
         }
 
         /**
@@ -400,7 +400,7 @@ namespace annie {
                 vW = document.documentElement.clientWidth;
                 vH = document.documentElement.clientHeight;
             }
-            return {w: vW, h: vH};
+            return { w: vW, h: vH };
         }
 
         //html的鼠标或单点触摸对应的引擎事件类型名
@@ -459,7 +459,7 @@ namespace annie {
                     s._mP2.y = e.targetTouches[1].clientY - offSetY;
                     let angle = Math.atan2(s._mP1.y - s._mP2.y, s._mP1.x - s._mP2.x) / Math.PI * 180;
                     let dis = annie.Point.distance(s._mP1, s._mP2);
-                    s.muliPoints.push({p1: s._mP1, p2: s._mP2, angle: angle, dis: dis});
+                    s.muliPoints.push({ p1: s._mP1, p2: s._mP2, angle: angle, dis: dis });
                     if (s.muliPoints.length >= 2) {
                         //如果有事件，抛事件
                         if (!(s._touchEvent instanceof annie.TouchEvent)) {
@@ -715,7 +715,7 @@ namespace annie {
                                 delete s._mouseDownPoint[identifier];
                                 delete s._lastDpList[identifier];
                                 s._lastDpList.isStart = false;
-                                if (sd){
+                                if (sd) {
                                     Stage._lastDragPoint.x = Number.MAX_VALUE;
                                     Stage._lastDragPoint.y = Number.MAX_VALUE;
                                 }
@@ -795,8 +795,8 @@ namespace annie {
             }
             s._viewRect.x = (desW - divW / scaleX) >> 1;
             s._viewRect.y = (desH - divH / scaleY) >> 1;
-            s._viewRect.width = desW - s._viewRect.x*2;
-            s._viewRect.height = desH - s._viewRect.y*2;
+            s._viewRect.width = desW - s._viewRect.x * 2;
+            s._viewRect.height = desH - s._viewRect.y * 2;
         };
 
         /**
@@ -817,9 +817,16 @@ namespace annie {
                 s.a2x_um = true;
                 s.divHeight = whObj.h;
                 s.divWidth = whObj.w;
-                s.viewPort.width=whObj.w * annie.devicePixelRatio;
-                s.viewPort.height=whObj.h * annie.devicePixelRatio;
-                s.renderObj.reSize(s.viewPort.width,s.viewPort.height);
+                s.viewPort.width = whObj.w * annie.devicePixelRatio;
+                s.viewPort.height = whObj.h * annie.devicePixelRatio;
+                if (annie.osType == "ios") {
+                    //ios16版本 尺寸设置不够,动态调整尺寸canvas
+                    s.divHeight = 3333;
+                    s.divWidth = 3333;
+                    s.renderObj.reSize(9999, 9999);
+                } else {
+                    s.renderObj.reSize(s.viewPort.width, s.viewPort.height);
+                }
                 s.setAlign();
                 s.dispatchEvent("onInitStage");
             } else if (s.autoResize) {
@@ -827,9 +834,9 @@ namespace annie {
                     s.a2x_um = true;
                     s.divHeight = whObj.h;
                     s.divWidth = whObj.w;
-                    s.viewPort.width=whObj.w * annie.devicePixelRatio;
-                    s.viewPort.height=whObj.h * annie.devicePixelRatio;
-                    s.renderObj.reSize(s.viewPort.width,s.viewPort.height);
+                    s.viewPort.width = whObj.w * annie.devicePixelRatio;
+                    s.viewPort.height = whObj.h * annie.devicePixelRatio;
+                    s.renderObj.reSize(s.viewPort.width, s.viewPort.height);
                     s.setAlign();
                     s.dispatchEvent("onResize");
                 }
@@ -861,16 +868,16 @@ namespace annie {
          */
         private static allUpdateObjList: Array<any> = [];
         //刷新所有定时器
-        public static _FPS:number=30;
-        private static _flushTime:number=0;
-        private static _lastFluashTime:number=0;
+        public static _FPS: number = 30;
+        private static _flushTime: number = 0;
+        private static _lastFluashTime: number = 0;
         private static flushAll(): void {
-            let nowTime:number=new Date().getTime();
-            if(Stage._flushTime-nowTime+Stage._lastFluashTime<Stage._flushTime*0.1){
-                Stage._lastFluashTime=nowTime;
+            let nowTime: number = new Date().getTime();
+            if (Stage._flushTime - nowTime + Stage._lastFluashTime < Stage._flushTime * 0.1) {
+                Stage._lastFluashTime = nowTime;
                 if (!Stage._pause) {
                     let len = Stage.allUpdateObjList.length;
-                    for (let i = len - 1; i >= 0; i--){
+                    for (let i = len - 1; i >= 0; i--) {
                         Stage.allUpdateObjList[i] && Stage.allUpdateObjList[i].flush();
                     }
                 }
@@ -926,12 +933,12 @@ namespace annie {
             let s = this;
             Stage.removeUpdateObj(s);
             let rc = s.rootDiv;
-            if (osType!="pc") {
+            if (osType != "pc") {
                 rc.removeEventListener("touchstart", s.mouseEvent, false);
                 rc.removeEventListener('touchmove', s.mouseEvent, false);
                 rc.removeEventListener('touchend', s.mouseEvent, false);
                 rc.removeEventListener('touchcancel', s.mouseEvent, false);
-            }else {
+            } else {
                 rc.removeEventListener("mousedown", s.mouseEvent, false);
                 rc.removeEventListener('mousemove', s.mouseEvent, false);
                 rc.removeEventListener('mouseup', s.mouseEvent, false);
